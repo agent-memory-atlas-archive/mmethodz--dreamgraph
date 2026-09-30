@@ -13,6 +13,7 @@ import sys
 from importlib import import_module
 
 from . import instance as inst_mod
+from . import __version__
 
 ANALYZERS = [
     "tension_flow",
@@ -54,6 +55,9 @@ def _list_cmd(argv: list[str]) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "--version":
+        print(f"DreamGraph Analytics v{__version__}")
+        return 0
     if not argv or argv[0] in ("-h", "--help"):
         _print_help()
         return 0 if argv else 1
@@ -70,6 +74,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _print_help() -> None:
+    print(f"DreamGraph Analytics v{__version__}")
     print(__doc__)
     print("Subcommands:")
     print(f"  {'list':24s} List known instances from instances.json")
@@ -85,6 +90,7 @@ def _print_help() -> None:
     print("  --data-dir PATH        Skip the registry and point at a data dir directly")
     print("  --master-dir PATH      Override registry root ($DREAMGRAPH_MASTER_DIR)")
     print("  --json                 Emit structured JSON")
+    print("  --version              Show the DreamGraph distribution version")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,9 @@
 # DreamGraph Release Notes
 
+## v13.3.0 - Current Model Support
+
+Current OpenAI and Claude models are available across the engine, standalone Architect, and VS Code architect. Codex CLI routes also offer the GPT-6 family. GPT-5.5/5.6/6 use Responses with JSON/schema support and reasoning replay; Claude tool loops preserve signed thinking and omit unsupported sampling parameters. The engine's retired Sonnet 4 fallback moves to Sonnet 5.5, and model availability remains account-dependent. See [v13.3.0 notes](../RELEASE_NOTES_v13.3.0.md) and [LLM setup](setup-llm.md).
+
 ## v13.2.0 - Continuation Boundaries
 
 DreamGraph v13.2.0 removes Architect continuation-envelope mechanics from Codex CLI, Copilot CLI, and the standalone CLI bridge contract. Native API/controller continuation remains intact; controllers project only concrete execution tool requirements into CLI requests and evaluate requested-target completion above normalized CLI results.

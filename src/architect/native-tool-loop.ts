@@ -201,7 +201,7 @@ export async function runArchitectNativeToolLoop(input: {
       const missingRequiredTools = missingRequiredArchitectToolCalls(toolSelection, trace);
       if (missingRequiredTools.length > 0 && iteration < MAX_ARCHITECT_TOOL_ITERATIONS) {
         if (response.text?.trim()) {
-          rawMessages.push({ role: "assistant", content: response.text.trim() });
+          rawMessages.push({ role: "assistant", content: response.text.trim(), providerRawAssistant: response.providerRawAssistant });
         }
         rawMessages.push({ role: "user", content: buildRequiredToolCorrectionPrompt(missingRequiredTools, toolSelection, trace) });
         finalText = "";
@@ -220,7 +220,7 @@ export async function runArchitectNativeToolLoop(input: {
     for (const call of response.toolCalls) {
       assistantBlocks.push({ type: "tool_use", id: call.id, name: call.name, input: call.input });
     }
-    rawMessages.push({ role: "assistant", content: assistantBlocks });
+    rawMessages.push({ role: "assistant", content: assistantBlocks, providerRawAssistant: response.providerRawAssistant });
 
     const toolResultBlocks: NeutralContentBlock[] = [];
     for (const call of response.toolCalls) {

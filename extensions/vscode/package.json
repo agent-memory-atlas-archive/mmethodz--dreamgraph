@@ -2,7 +2,7 @@
   "name": "dreamgraph-vscode",
   "displayName": "DreamGraph",
   "description": "DreamGraph-native development agent — intentional context, architectural discipline, knowledge-grounded AI.",
-  "version": "13.2.0",
+  "version": "13.3.0",
   "icon": "media/dreamgraph-icon.png",
   "publisher": "siteledger-solutions",
   "homepage": "https://dreamgraph.nofs.ai/",
@@ -293,7 +293,7 @@
         "dreamgraph.architect.model": {
           "type": "string",
           "default": "claude-opus-4-7",
-          "description": "Model name for the Architect (e.g., 'claude-opus-4-7', 'claude-fable-5', 'claude-mythos-5', 'gpt-5.5', or a Codex CLI model such as 'gpt-5.6-sol')."
+          "description": "Model name for the Architect (e.g., 'claude-opus-5-5', 'claude-sonnet-5-5', 'claude-fable-5-1', 'claude-mythos-5-1' (restricted access), 'gpt-6-astra', or 'gpt-6.1-sol' (OpenAI API / Codex CLI))."
         },
         "dreamgraph.architect.baseUrl": {
           "type": "string",
@@ -359,7 +359,7 @@
             "xhigh"
           ],
           "default": "medium",
-          "description": "OpenAI GPT-5.5 Responses API reasoning effort for Architect calls. Use low for efficient reasoning, medium for balanced latency/performance, high for complex agentic tasks, and xhigh for hardest asynchronous/evaluation workloads."
+          "description": "OpenAI GPT-5.5/5.6/6 Responses API reasoning effort for Architect calls. Use low for efficient reasoning, medium for balanced latency/performance, high for complex agentic tasks, and xhigh for hardest asynchronous/evaluation workloads."
         },
         "dreamgraph.architect.openai.verbosity": {
           "type": "string",
@@ -369,7 +369,7 @@
             "high"
           ],
           "default": "low",
-          "description": "OpenAI GPT-5.5 Responses API text verbosity for Architect calls. Low produces concise responses; medium and high allow progressively more detail."
+          "description": "OpenAI GPT-5.5/5.6/6 Responses API text verbosity for Architect calls. Low produces concise responses; medium and high allow progressively more detail."
         },
         "dreamgraph.architect.autonomyMode": {
           "type": "string",
@@ -397,12 +397,12 @@
             "max"
           ],
           "default": "xhigh",
-          "description": "Anthropic effort level. Opus 4.7, Opus 4.8, Fable 5, and Mythos 5 default to xhigh when unset; Opus 4.6 uses high and clamps xhigh to high for compatibility."
+          "description": "Anthropic effort level for supported Claude models, including Opus/Sonnet 5.5 and Fable/Mythos 5.1. The configured default is xhigh; Opus 4.6 clamps xhigh to high for compatibility."
         },
         "dreamgraph.architect.anthropic.adaptiveThinking": {
           "type": "boolean",
           "default": true,
-          "description": "Enable Anthropic adaptive thinking for Claude Opus 4.7, Opus 4.8, Fable 5, and Mythos 5."
+          "description": "Request Anthropic adaptive thinking for supported Claude models. Opus 5.5, Sonnet 5.5, and Fable 5.1 keep adaptive thinking active to apply the compatible history-binding policy; control depth with effort."
         },
         "dreamgraph.architect.anthropic.showThinkingSummary": {
           "type": "boolean",

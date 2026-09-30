@@ -14,6 +14,7 @@ import {
   toOpenAIResponsesContent,
   translateRawToOpenAIResponses,
   usesOpenAIResponsesApi,
+  RESPONSES_RAW_ITEMS_KEY,
   type OpenAIResponsesData,
 } from "./openai-responses-adapter";
 import {
@@ -75,9 +76,8 @@ export interface ArchitectToolResponse extends ArchitectResponse {
   toolCalls: ToolUseRequest[];
   stopReason: "end_turn" | "tool_use" | "max_tokens" | "stop" | string;
   /** Provider-specific verbatim assistant turn items.
-   * For OpenAI Responses API (gpt-5.5/o-series) this is the full `output[]`
-   * array including `reasoning` items. The chat panel persists these so the
-   * next turn can replay them and preserve stateless reasoning context. */
+   * OpenAI returns `output[]` including encrypted reasoning; Anthropic returns
+   * signed `content[]` blocks. Persist these unchanged for the next tool turn. */
   providerRawAssistant?: unknown[];
 }
 
@@ -100,6 +100,12 @@ export interface ToolResultMessage {
 export type StreamCallback = (chunk: string) => void;
 
 export const ANTHROPIC_MODELS = [
+  "claude-opus-5-5",
+  "claude-sonnet-5-5",
+  "claude-fable-5-1",
+  "claude-mythos-5-1",
+  "claude-opus-5",
+  "claude-sonnet-5",
   "claude-opus-4-8",
   "claude-opus-4-7",
   "claude-fable-5",
@@ -110,6 +116,14 @@ export const ANTHROPIC_MODELS = [
 ];
 
 export const OPENAI_MODELS = [
+  "gpt-6.1-sol",
+  "gpt-6-astra",
+  "gpt-6-sol",
+  "gpt-6-luna",
+  "gpt-5.6",
+  "gpt-5.6-sol",
+  "gpt-5.6-terra",
+  "gpt-5.6-luna",
   "gpt-5.5",
   "gpt-5",
   "gpt-5.4",
@@ -135,6 +149,10 @@ export const COPILOT_CLI_MODELS = [
 ];
 
 export const CODEX_CLI_MODELS = [
+  "gpt-6.1-sol",
+  "gpt-6-astra",
+  "gpt-6-sol",
+  "gpt-6-luna",
   "gpt-5.6",
   "gpt-5.6-sol",
   "gpt-5.6-terra",
@@ -149,6 +167,8 @@ export const CODEX_CLI_MODELS = [
 ];
 
 const ANTHROPIC_EFFORT_MODELS = [
+  "claude-opus-5",
+  "claude-sonnet-5",
   "claude-opus-4-8",
   "claude-opus-4-7",
   "claude-fable-5",
@@ -164,7 +184,24 @@ export function supportsAnthropicAdaptiveThinking(model: string): boolean {
   return supportsAnthropicEffortConfig(model);
 }
 
+export function usesBoundAnthropicThinking(model: string): boolean {
+  return /^claude-(?:opus-5-5|sonnet-5-5|fable-5-1)(?:$|[-_])/i.test(model.trim());
+}
+
+function anthropicThinkingHeaders(model: string): Record<string, string> {
+  return usesBoundAnthropicThinking(model)
+    ? { "anthropic-beta": "thinking-binding-controls-2026-08-01" } : {};
+}
+
+function logAnthropicThinkingDrops(model: string, transformations: unknown): void {
+  if (!Array.isArray(transformations)) return;
+  const dropped = transformations.filter((item) => item?.type === "thinking_dropped").length;
+  if (dropped > 0) console.warn("[DreamGraph][anthropic_thinking_dropped]", { model, dropped });
+}
+
 export function getAnthropicDefaultEffortForModel(model: string): AnthropicEffort {
+  if (model.trim().toLowerCase().startsWith("claude-opus-5-5")) return "medium";
+  if (/^claude-(sonnet-5|fable-5-1|mythos-5-1)/i.test(model.trim())) return "high";
   return supportsAnthropicEffortConfig(model) ? "xhigh" : "high";
 }
 
@@ -173,6 +210,7 @@ export function getAnthropicMaxTokensForModel(model: string): number {
   if (normalized.startsWith("claude-fable-5")) {
     return 128_000;
   }
+  if (/^claude-(opus-5|sonnet-5|mythos-5-1)/.test(normalized)) return 128_000;
   if (supportsAnthropicEffortConfig(normalized)) {
     return 65_536;
   }
@@ -295,6 +333,7 @@ export class ArchitectLlm implements vscode.Disposable {
       case "openai": {
         const imageCapable =
           effectiveModel.startsWith("gpt-5") ||
+          effectiveModel.startsWith("gpt-6") ||
           effectiveModel.startsWith("gpt-4.1") ||
           effectiveModel.startsWith("gpt-4o") ||
           effectiveModel.startsWith("o4") ||
@@ -336,19 +375,26 @@ export class ArchitectLlm implements vscode.Disposable {
     return getAnthropicMaxTokensForModel(model);
   }
 
-  private _getAnthropicThinking(model: string): { type: "adaptive"; display?: "summarized" } | undefined {
+  private _getAnthropicThinking(model: string): Record<string, unknown> | undefined {
     if (!supportsAnthropicAdaptiveThinking(model)) {
       return undefined;
     }
 
     const cfg = vscode.workspace.getConfiguration("dreamgraph.architect");
     const enabled = cfg.get<boolean>("anthropic.adaptiveThinking") ?? true;
-    if (!enabled) {
+    if (!enabled && !usesBoundAnthropicThinking(model)) {
       return undefined;
     }
 
     const summarized = cfg.get<boolean>("anthropic.showThinkingSummary") ?? true;
-    return summarized ? { type: "adaptive", display: "summarized" } : { type: "adaptive" };
+    return {
+      type: "adaptive",
+      ...(summarized ? { display: "summarized" } : {}),
+      // Architect can rebuild context/tools between passes. Let the API discard
+      // only invalidated reasoning instead of rejecting a compacted history.
+      ...(usesBoundAnthropicThinking(model)
+        ? { block_binding: { prefix_mismatch_behavior: "drop_block" } } : {}),
+    };
   }
 
   private _buildAnthropicMessagesRequest(
@@ -640,6 +686,7 @@ export class ArchitectLlm implements vscode.Disposable {
         "Content-Type": "application/json",
         "x-api-key": config.apiKey,
         "anthropic-version": "2023-06-01",
+        ...anthropicThinkingHeaders(config.model),
       },
       body: _serializeAndLogRequest('callAnthropic', config.model, requestBody),
       signal,
@@ -650,7 +697,10 @@ export class ArchitectLlm implements vscode.Disposable {
     const data = (await res.json()) as {
       content: Array<{ type: string; text?: string }>;
       usage: { input_tokens: number; output_tokens: number };
+      input_transformations?: unknown[];
     };
+
+    logAnthropicThinkingDrops(config.model, data.input_transformations);
 
     return {
       content: data.content.filter((c) => c.type === "text").map((c) => c.text ?? "").join(""),
@@ -670,7 +720,13 @@ export class ArchitectLlm implements vscode.Disposable {
   ): Promise<ArchitectToolResponse> {
     const { system } = this._splitSystem(messages);
     const apiMessages = rawMessages
-      ? rawMessages
+      ? rawMessages.map((message) => {
+          const msg = message as Record<string, unknown>;
+          const stored = msg[RESPONSES_RAW_ITEMS_KEY];
+          return { role: msg.role, content: msg.role === "assistant" && Array.isArray(stored)
+            && stored.every((item) => item && ["text", "thinking", "redacted_thinking", "tool_use"].includes(item.type))
+            ? stored : msg.content };
+        })
       : messages.filter((m) => m.role !== "system").map((m) => ({ role: m.role, content: this._toAnthropicContent(m.content) }));
 
     const requestBody = this._buildAnthropicMessagesRequest(config, apiMessages, system, tools);
@@ -680,6 +736,7 @@ export class ArchitectLlm implements vscode.Disposable {
         "Content-Type": "application/json",
         "x-api-key": config.apiKey,
         "anthropic-version": "2023-06-01",
+        ...anthropicThinkingHeaders(config.model),
       },
       body: _serializeAndLogRequest('callAnthropicWithTools', config.model, requestBody),
       signal,
@@ -691,7 +748,10 @@ export class ArchitectLlm implements vscode.Disposable {
       content: Array<{ type: string; text?: string; id?: string; name?: string; input?: Record<string, unknown> }>;
       usage: { input_tokens: number; output_tokens: number };
       stop_reason: string;
+      input_transformations?: unknown[];
     };
+
+    logAnthropicThinkingDrops(config.model, data.input_transformations);
 
     return {
       content: data.content.filter((c) => c.type === "text").map((c) => c.text ?? "").join(""),
@@ -702,6 +762,7 @@ export class ArchitectLlm implements vscode.Disposable {
         .filter((c) => c.type === "tool_use")
         .map((c) => ({ id: c.id!, name: c.name!, input: c.input ?? {} })),
       stopReason: data.stop_reason ?? "end_turn",
+      providerRawAssistant: data.content,
     };
   }
 
@@ -989,6 +1050,7 @@ export class ArchitectLlm implements vscode.Disposable {
         "Content-Type": "application/json",
         "x-api-key": config.apiKey,
         "anthropic-version": "2023-06-01",
+        ...anthropicThinkingHeaders(config.model),
       },
       body: _serializeAndLogRequest('streamAnthropic', config.model, requestBody),
       signal,
@@ -1241,6 +1303,9 @@ export class ArchitectLlm implements vscode.Disposable {
             }
             if (parsed.type === "message_delta" && parsed.usage) {
               completionTokens = parsed.usage.output_tokens ?? 0;
+            }
+            if (parsed.type === "message_start") {
+              logAnthropicThinkingDrops(this._config?.model ?? "", parsed.input_transformations ?? parsed.message?.input_transformations);
             }
             if (parsed.type === "message_start" && parsed.message?.usage) {
               promptTokens = parsed.message.usage.input_tokens ?? 0;

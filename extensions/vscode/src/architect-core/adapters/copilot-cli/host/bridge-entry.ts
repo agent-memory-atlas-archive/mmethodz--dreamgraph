@@ -53,6 +53,7 @@
 //     CLI reports the server failed.
 
 import { spawn as spawnChild } from "node:child_process";
+import { EXTENSION_VERSION } from "../../../../version.js";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 
@@ -133,7 +134,7 @@ if (AUDIT_PATH.length > 0) {
 // ---------------------------------------------------------------------------
 
 const upstream = new Client(
-  { name: "dreamgraph-copilot-cli-bridge", version: "1.0.0" },
+  { name: "dreamgraph-copilot-cli-bridge", version: EXTENSION_VERSION },
   { capabilities: {} },
 );
 const upstreamTransport = new StreamableHTTPClientTransport(upstreamUrl);
@@ -202,7 +203,7 @@ async function main(): Promise<void> {
   const upstreamInstructions = upstream.getInstructions();
 
   const server = new Server(
-    { name: SERVER_NAME, version: "1.0.0" },
+    { name: SERVER_NAME, version: EXTENSION_VERSION },
     {
       capabilities: upstreamCaps,
       ...(upstreamInstructions !== undefined ? { instructions: upstreamInstructions } : {}),

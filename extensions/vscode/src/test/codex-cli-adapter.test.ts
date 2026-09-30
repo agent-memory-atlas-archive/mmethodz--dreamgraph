@@ -365,16 +365,22 @@ test("argv: emits authoritative codex exec shape with stdin positional dash", ()
   assert.deepEqual([...plan.policy.addedDirs], ["C:\\repo\\.tmp\\run"]);
 });
 
-test("argv: gives GPT-5.6 Codex models xhigh reasoning by default", () => {
+for (const model of ["gpt-6.1-sol", "gpt-6-astra", "gpt-6-sol", "gpt-6-luna", "gpt-5.6-sol"]) {
+test(`argv: gives ${model} xhigh reasoning and respects explicit overrides`, () => {
   const plan = buildCodexArgv({
     workspace: "C:\\repo",
-    model: "gpt-5.6-sol",
+    model,
     helpSurface: FULL_SURFACE,
   });
   assert.ok(plan.args.includes("--model"));
-  assert.ok(plan.args.includes("gpt-5.6-sol"));
+  assert.ok(plan.args.includes(model));
   assert.ok(plan.args.includes('model_reasoning_effort="xhigh"'));
+  const explicit = buildCodexArgv({ workspace: "C:\\repo", model, helpSurface: FULL_SURFACE,
+    configOverrides: [{ key: "model_reasoning_effort", value: '"low"' }] });
+  assert.ok(explicit.args.includes('model_reasoning_effort="low"'));
+  assert.ok(!explicit.args.includes('model_reasoning_effort="xhigh"'));
 });
+}
 
 test("argv: omits ask-for-approval when Codex exec does not advertise it", () => {
   const helpSurface = parseCodexHelpSurface({

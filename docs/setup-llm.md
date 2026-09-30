@@ -138,11 +138,11 @@ DREAMGRAPH_ARCHITECT_TOKEN_ECONOMY_SOFT_TARGET=16384
 
 `DREAMGRAPH_ARCHITECT_TOKEN_ECONOMY=false` requests full-context mode for that instance. Leave `DREAMGRAPH_ARCHITECT_PREAMBLE_COMPILER=true` when you only want to benchmark economy on/off; set it to `false` to disable preamble compilation entirely.
 
-## 3. OpenAI GPT-5.5 / Responses API notes
+## 3. Current OpenAI models / Responses API notes
 
-The VS Code architect supports OpenAI `gpt-5.5` models through the OpenAI Responses API, following OpenAI's [migration guide from Chat Completions to Responses](https://developers.openai.com/api/docs/guides/migrate-to-responses).
+The engine, standalone Architect, and VS Code architect support `gpt-6.1-sol`, `gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna`, the GPT-5.6 family, and GPT-5.5 through Responses. See [OpenAI model guidance](https://developers.openai.com/api/docs/guides/latest-model).
 
-For GPT-5.5 Architect calls, DreamGraph uses:
+For current OpenAI Architect calls, DreamGraph uses:
 
 - Responses-style `input` instead of Chat Completions `messages`
 - Responses function-tool definitions
@@ -150,7 +150,9 @@ For GPT-5.5 Architect calls, DreamGraph uses:
 - `reasoning.effort` via `dreamgraph.architect.openai.reasoningEffort`
 - `text.verbosity` via `dreamgraph.architect.openai.verbosity`
 
-DreamGraph uses the Responses API statelessly initially. DreamGraph's knowledge graph remains the source of memory and context; `previous_response_id` / stored Responses state is deferred as a possible future optimization after GPT-5.5 tool-call correctness remains stable.
+Native tool loops replay encrypted reasoning with `store: false`; the knowledge graph remains the source of persistent project memory. Engine JSON/schema options are sent as Responses `text.format`. Sampling temperature is omitted for these models. Existing API keys, URLs, and explicit role-specific model settings continue to apply.
+
+Codex CLI selectors include the GPT-6 models and default GPT-5.6/GPT-6 to `xhigh` unless a CLI config override is supplied. Access depends on your installed CLI and account; see [Codex models](https://learn.chatgpt.com/docs/models).
 
 ## 4. Installer behavior
 
@@ -162,7 +164,9 @@ VS Code is optional:
 - if VS Code is not present, the installer skips extension build/install
 - CLI, MCP server, and dashboard installation still succeed without VS Code
 
-## 5. Anthropic / Opus 4.7 notes
+## 5. Current Claude models and the Architect default
+
+Engine and Architect selectors include Opus 5.5, Sonnet 5.5, Fable 5.1, and restricted-access Mythos 5.1. The engine defaults to `claude-sonnet-5-5` when no model is set; the VS Code Architect default remains `claude-opus-4-7`. Current Claude requests omit sampling temperature and retain signed thinking blocks in tool history. See the [Claude model catalog](https://platform.claude.com/docs/en/models/overview).
 
 If using Anthropic in the Architect, also see:
 

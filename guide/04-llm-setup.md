@@ -37,7 +37,7 @@ After editing: **`dg restart <name>`**. Config is read at startup.
 | Provider | URL example | Notes |
 |----------|-------------|-------|
 | `openai` | `https://api.openai.com/v1` | Most common. Needs `DREAMGRAPH_LLM_API_KEY`. |
-| `anthropic` | `https://api.anthropic.com` | Needs `DREAMGRAPH_LLM_API_KEY`. |
+| `anthropic` | `https://api.anthropic.com/v1` | Needs `DREAMGRAPH_LLM_API_KEY`. Default model `claude-sonnet-5-5`. |
 | `ollama` | `http://localhost:11434` | Local. No API key. Default model `qwen3:8b`. |
 | `lmstudio` | `http://localhost:1234/v1` | Local. OpenAI-compatible server inside LM Studio. Load a model in the UI, start its server, set the model id. API key is ignored — the literal `lm-studio` is sent automatically. |
 | `sampling` | — | Uses the MCP client's own sampling capability. No URL/key needed. |
@@ -72,6 +72,9 @@ Rules:
 - `DREAMGRAPH_LLM_DREAMER_*` overrides only apply to the Dreamer.
 - `DREAMGRAPH_LLM_NORMALIZER_*` overrides only apply to the Normalizer.
 - If no Normalizer temperature is set, it defaults to `0.1`.
+- GPT-5.5/5.6/6 and current Claude models reject sampling controls; DreamGraph omits temperature for those models. Their output-token budgets include reasoning.
+
+Current hosted model IDs include `gpt-6.1-sol`, `gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna`, `claude-opus-5-5`, `claude-sonnet-5-5`, and `claude-fable-5-1`. `claude-mythos-5-1` requires restricted account access. Set the model explicitly for each engine role or use the Dashboard configuration selector. GPT-6.1 Sol is suitable for complex work; Luna is the smaller tier for focused tasks. Existing explicit model settings are retained.
 
 ### Standalone Architect token economy
 
@@ -112,10 +115,10 @@ Open VS Code settings (`Ctrl+,`) and search for `dreamgraph.architect`:
 | Setting | Purpose |
 |---------|---------|
 | `dreamgraph.architect.provider` | `openai`, `anthropic`, `ollama`, `lmstudio`, `copilot-cli`, or `codex-cli`. |
-| `dreamgraph.architect.model` | Model id (e.g. `gpt-5.5`, `gpt-5.6-sol` for Codex CLI, or `claude-opus-4-7`). |
+| `dreamgraph.architect.model` | Model id (e.g. `gpt-6.1-sol` for OpenAI API or Codex CLI, or `claude-opus-5-5`). The governed Anthropic default remains `claude-opus-4-7`. |
 | `dreamgraph.architect.baseUrl` | Override only when needed (custom proxy, Azure, etc.). |
-| `dreamgraph.architect.openai.reasoningEffort` | GPT-5.5 only: `low`, `medium`, `high`. |
-| `dreamgraph.architect.openai.verbosity` | GPT-5.5 only: text verbosity. |
+| `dreamgraph.architect.openai.reasoningEffort` | GPT-5.5/5.6/6 Responses: `low`, `medium`, `high`, or `xhigh`. |
+| `dreamgraph.architect.openai.verbosity` | GPT-5.5/5.6/6 Responses text verbosity. |
 
 ### Setting the API key
 
@@ -125,9 +128,9 @@ Don't paste the key into settings.json. Use the command palette:
 
 Keys are stored in VS Code's secret storage.
 
-### GPT-5.5 / OpenAI Responses API
+### Current OpenAI models / Responses API
 
-For `gpt-5.5*` models, the Architect uses the OpenAI Responses API (not Chat Completions). This is automatic — DreamGraph detects the model id and switches transports. You get:
+For GPT-5.5, GPT-5.6, and GPT-6 models (including `gpt-6.1-sol`), engine and Architect API requests use Responses automatically. You get:
 
 - Responses-style `input` instead of `messages`
 - Function-tool calling with `function_call` / `function_call_output` replay
@@ -156,7 +159,7 @@ Knobs:
 
 Set `dreamgraph.architect.provider` to `codex-cli` to route Architect chat turns through your locally-installed Codex CLI (`codex` binary on `PATH`, or set an absolute path in `dreamgraph.architect.codexCli.command`). This uses your existing Codex login and the same DreamGraph MCP inheritance proxy model as Copilot CLI: the extension validates the live tool registry, injects the audited `dreamgraph` MCP server, and fails closed if graph grounding is unavailable.
 
-The model selector includes `gpt-5.6`, `gpt-5.6-sol`, `gpt-5.6-terra`, and `gpt-5.6-luna`. The adapter defaults GPT-5.6-family runs to `xhigh` reasoning effort unless you explicitly override the CLI configuration.
+The model selector includes `gpt-6.1-sol`, `gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna`, and the GPT-5.6 family. The adapter defaults GPT-5.6/GPT-6 runs to `xhigh` reasoning unless explicitly overridden. Update your installed Codex CLI to expose the models your account can use; adding a picker entry does not grant access. See the [official Codex model documentation](https://learn.chatgpt.com/docs/models).
 
 Knobs:
 

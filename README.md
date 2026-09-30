@@ -1,8 +1,8 @@
 ![DreamGraph](assets/dreamgraph.jpeg)
 
-# DreamGraph v13.2.0 - Continuation Boundaries
+# DreamGraph v13.3.0 - Current Model Support
 
-![Version](https://img.shields.io/badge/version-13.2.0-blue)
+![Version](https://img.shields.io/badge/version-13.3.0-blue)
 ![VS%20Code](https://img.shields.io/badge/VS%20Code-extension-0098FF?logo=visualstudiocode&logoColor=white)
 ![MCP](https://img.shields.io/badge/MCP-enabled-7C3AED)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=nodedotjs&logoColor=white)
@@ -14,7 +14,7 @@
 
 **New here?** Use the [DreamGraph Easy Start guide](guide/00-easy-start.md) for a short path from install to Dashboard, Explorer, and Architect.
 
-**v13.2.0 - Continuation Boundaries** makes CLI adapters continuation-envelope agnostic and keeps autonomous Architect execution working until the user-requested target is complete or genuinely blocked. Native API continuation remains controller-owned, while the v13.1 additive-scan, timeout/cancellation, audit, provenance, and MCP transport guarantees remain intact.
+**v13.3.0 - Current Model Support** updates OpenAI and Anthropic models across the cognitive engine, standalone Architect, VS Code architect, and Codex CLI adapter, including GPT-6.1 Sol and Claude Opus/Sonnet 5.5. It also preserves provider reasoning through tool calls and respects the newest API request formats. See [release notes](RELEASE_NOTES_v13.3.0.md).
 
 DreamGraph is a governed architecture cognition layer for MCP-enabled software projects. It combines an instance-scoped daemon, CLI, architect beta, VS Code extension, dashboard, and a persistent knowledge graph so project understanding is grounded in source, ADRs, workflows, tests, runtime observations, and human review rather than any single file read or isolated chat turn.
 
@@ -111,9 +111,11 @@ Tier ladder: $5/mo (sponsor badge + name in [`SPONSORS.md`](SPONSORS.md)) · $10
 
 *DreamGraph Architect with the DreamGraph Explorer in VS Code*
 
-## GPT-5.6 Codex CLI models and OpenAI Responses API
+## Current OpenAI, Anthropic, and Codex CLI models
 
-The VS Code architect's Codex CLI adapter offers `gpt-5.6`, `gpt-5.6-sol`, `gpt-5.6-terra`, and `gpt-5.6-luna`, with an `xhigh` default reasoning effort for the GPT-5.6 family. Direct OpenAI `gpt-5.5` Architect calls continue through the Responses API with Responses-style input, function-tool definitions, tool-call output replay, reasoning effort, and text verbosity controls. DreamGraph keeps both routes stateless at the model boundary: the knowledge graph remains the source of memory and context.
+The engine and both Architect surfaces offer `gpt-6.1-sol`, `gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna`, and the GPT-5.6 family. GPT-5.5, GPT-5.6, and GPT-6 API calls use Responses, including structured JSON output and reasoning replay. The Codex CLI adapter also offers the GPT-6 models and defaults GPT-5.6/GPT-6 runs to `xhigh` reasoning unless explicitly overridden. Model access depends on your account and installed CLI. See [OpenAI model guidance](https://developers.openai.com/api/docs/guides/latest-model) and [Codex models](https://learn.chatgpt.com/docs/models).
+
+Anthropic selectors include `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-fable-5-1`, and restricted-access `claude-mythos-5-1`. The engine's unconfigured Anthropic model defaults to Sonnet 5.5; VS Code architect retains its governed Opus 4.7 default. Existing model settings remain explicit choices. See [Anthropic setup and migration](docs/anthropic-opus-4-7.md) and the [Claude model catalog](https://platform.claude.com/docs/en/models/overview).
 
 ## Local LLMs (Ollama and LM Studio)
 
@@ -388,6 +390,8 @@ explorer/
 ```
 
 ## Version Semantics
+
+The CLI, standalone Architect, VS Code Architect, daemon, Explorer, Dashboard, analytics suite, and daemon-exposed MCP authority share release **13.3.0**. MCP initialization and `system://capabilities` report the daemon package version. Analytics reports it with `python -m analytics --version` from the `python/` directory.
 
 DreamGraph instance status can show two different version concepts:
 

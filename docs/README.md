@@ -1,5 +1,7 @@
 # DreamGraph Documentation
 
+Version: **13.3.0** — [Current Model Support](../RELEASE_NOTES_v13.3.0.md).
+
 **Project website:** [dreamgraph.nofs.ai](https://dreamgraph.nofs.ai/) · **User guide:** [`guide/`](../guide/README.md)
 
 This directory contains DreamGraph documentation, but the **canonical living docs entry** is:
@@ -23,6 +25,8 @@ Some files in this directory are hand-written narrative or reference documents. 
 - [Easy Start](easy-start.md) — the shortest browser-first setup path, also available as [HTML](easy-start.html) and [PDF](easy-start.pdf).
 - [Adaptive Future Engine](adaptive-future-engine.md) — advisory candidate-future ranking and audit-trail overview.
 - [Release Notes](release-notes.md) — manually curated implementation/release notes for notable features.
+- [LLM Setup](setup-llm.md) — engine and Architect provider configuration, including current OpenAI and Claude models.
+- [Anthropic Configuration](anthropic-opus-4-7.md) — Claude compatibility and the governed Architect default.
 
 For the current graph-grounded documentation, start here:
 

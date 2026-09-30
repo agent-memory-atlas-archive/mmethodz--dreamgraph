@@ -1,5 +1,5 @@
 /**
- * DreamGraph v8.2.5 — Bedrock Web Dashboard.
+ * DreamGraph Web Dashboard.
  *
  * Self-contained HTTP route handlers that render status, config,
  * and live documentation pages as HTML.  Zero external dependencies —
@@ -163,7 +163,7 @@ async function shell(title: string, body: string, activeTab: string): Promise<st
   </nav>
   <main>${body}</main>
   <footer>
-    <span>${BRAND} v${VERSION} "Bedrock"</span>
+    <span>${BRAND} v${VERSION}</span>
     <span>Instance: ${instanceId}</span>
     <span>Generated: ${new Date().toISOString()}</span>
   </footer>
@@ -1366,14 +1366,12 @@ async function renderConfig(savedSection?: string): Promise<string> {
 
       var MODEL_PRESETS = {
         openai: [
-          'gpt-4o', 'gpt-4o-mini', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano',
+          'gpt-6.1-sol', 'gpt-6-astra', 'gpt-6-sol', 'gpt-6-luna', 'gpt-5.6', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-4o', 'gpt-4o-mini', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano',
           'gpt-5.4-nano',
           'o4-mini', 'o3', 'o3-mini', 'o1', 'o1-mini',
         ],
         anthropic: [
-          'claude-sonnet-4-20250514', 'claude-opus-4-20250514',
-          'claude-3-7-sonnet-20250219', 'claude-3-5-sonnet-20241022',
-          'claude-3-5-haiku-20241022', 'claude-3-haiku-20240307',
+          'claude-opus-5-5', 'claude-sonnet-5-5', 'claude-fable-5-1', 'claude-mythos-5-1', 'claude-opus-5', 'claude-sonnet-5', 'claude-sonnet-4-6', 'claude-opus-4-8', 'claude-opus-4-7', 'claude-haiku-4-5',
         ],
         ollama: [
           'qwen3:8b', 'qwen3:4b', 'qwen3:1.7b', 'qwen3:32b',

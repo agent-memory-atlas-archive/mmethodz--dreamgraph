@@ -1,9 +1,11 @@
 # DreamGraph Architecture
 
-Version: **13.2.0**
+Version: **13.3.0**
 License: **DreamGraph Source-Available Community License v2.0**
 
 ## Overview
+
+Hosted model configuration supports GPT-6.1 Sol, GPT-6 Astra/Sol/Luna, GPT-5.6, and Claude Opus/Sonnet 5.5 and Fable/Mythos 5.1. OpenAI GPT-5.5/5.6/6 requests use Responses; Claude requests omit unsupported sampling parameters. Native tool loops retain provider assistant blocks for reasoning replay. Architect compaction can invalidate newer Claude thinking prefixes, so those models use the API's `drop_block` binding policy with count-only diagnostics. Model selections are configured independently for engine roles and Architect; see [LLM setup](setup-llm.md).
 
 DreamGraph is an instance-scoped, graph-first cognitive daemon for development environments. Its primary architectural rule is that the knowledge graph is authoritative: features, workflows, data models, ADRs, UI elements, and tensions represent the system at a higher semantic level than any individual source file.
 
@@ -492,6 +494,8 @@ scripts/
 ```
 
 ## Version Semantics
+
+The CLI, standalone Architect, VS Code Architect, daemon, Explorer, Dashboard, analytics suite, and daemon-exposed MCP authority ship as release **13.3.0**. Daemon HTTP surfaces and MCP identity/resources read the root package version. Explorer reads its package metadata; VS Code MCP clients and CLI bridges use their matching release constants. Analytics reads root package metadata and exposes `--version` on the dispatcher and individual analyzers.
 
 A DreamGraph installation may surface more than one version value:
 

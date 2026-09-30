@@ -1,6 +1,8 @@
-# DreamGraph Analytics
+# DreamGraph Analytics v13.3.0
 
 Read-only Python scripts that analyze the JSON state of a DreamGraph instance. Pure stdlib (no `pip install` needed).
+
+The suite reads its version from the root `package.json`, matching the daemon, MCP authority, CLI, Architect, Explorer, and Dashboard. From the `python/` directory, run `python -m analytics --version` or `python -m analytics model_impact --version` to check it. Keep the root package metadata with the suite when copying an installation.
 
 ## Usage
 

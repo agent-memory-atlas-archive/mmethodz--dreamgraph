@@ -66,6 +66,7 @@ function hasConfigOverride(
 function defaultReasoningEffortForModel(model: string | undefined): DefaultReasoningEffort | undefined {
   const normalized = model?.trim().toLowerCase();
   if (!normalized) return undefined;
+  if (/^gpt-6(?:\.1)?(?:$|[-_])/.test(normalized)) return "xhigh";
   if (normalized.startsWith("gpt-5.6")) return "xhigh";
   if (normalized.startsWith("gpt-5.5")) return "xhigh";
   if (normalized.startsWith("gpt-5.4")) return "high";

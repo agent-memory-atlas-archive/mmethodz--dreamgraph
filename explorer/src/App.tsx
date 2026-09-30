@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { version as explorerVersion } from "../package.json";
 import {
   DEFAULT_EXPLORER_PREFS,
   fetchExplorerPrefs,
@@ -168,7 +169,7 @@ export function App() {
     >
       <div className="topbar" style={{ gridColumn: "1 / 6" }}>
         <a className="brand" href="/" title="DreamGraph landing page">DreamGraph Explorer</a>
-        <span className="meta">Phase 4 · curated mutations</span>
+        <span className="meta">v{explorerVersion} · curated mutations</span>
         <SearchBar onPick={setSelected} />
         <div className="mode-toggle">
           <button

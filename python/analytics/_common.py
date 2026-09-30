@@ -8,9 +8,11 @@ from pathlib import Path
 from typing import Any
 
 from . import instance as inst_mod
+from . import __version__
 
 
 def add_common_args(p: argparse.ArgumentParser) -> None:
+    p.add_argument("--version", action="version", version=f"DreamGraph Analytics v{__version__}")
     g = p.add_argument_group("instance selection")
     g.add_argument("--instance", "-i", help="Instance name or UUID (resolved via instances.json).")
     g.add_argument("--data-dir", help="Path to a data directory (escape hatch; bypasses the registry).")

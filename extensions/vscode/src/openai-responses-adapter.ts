@@ -57,7 +57,7 @@ type ResponsesContentBlock =
   | { type: "input_image"; image_url: string };
 
 export function usesOpenAIResponsesApi(model: string): boolean {
-  return model.trim().toLowerCase().startsWith("gpt-5.5");
+  return /^(?:gpt-5\.[56]|gpt-6(?:\.1)?)(?:$|[-_])/i.test(model.trim());
 }
 
 export function buildOpenAIResponsesRequest(
@@ -167,7 +167,8 @@ export function translateRawToOpenAIResponses(raw: unknown[]): unknown[] {
     // output[] items verbatim so reasoning replay keeps gpt-5.5 stateful
     // across tool round-trips without server-side `previous_response_id`.
     const stored = msg[RESPONSES_RAW_ITEMS_KEY];
-    if (msg.role === "assistant" && Array.isArray(stored)) {
+    if (msg.role === "assistant" && Array.isArray(stored)
+      && stored.every((item) => isRecord(item) && ["reasoning", "message", "function_call"].includes(String(item.type)))) {
       for (const item of stored) {
         if (isRecord(item)) {
           out.push(item);

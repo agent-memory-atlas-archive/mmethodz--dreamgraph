@@ -1,4 +1,5 @@
 import { spawn as spawnChild } from "node:child_process";
+import { CLI_VERSION } from "../cli/version.js";
 import { createHash, randomUUID } from "node:crypto";
 import { appendFile, mkdirSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
@@ -66,7 +67,7 @@ if (AUDIT_PATH.length > 0) {
 }
 
 const upstream = new Client(
-  { name: "dreamgraph-architect-cli-mcp-bridge", version: "1.0.0" },
+  { name: "dreamgraph-architect-cli-mcp-bridge", version: CLI_VERSION },
   { capabilities: {} },
 );
 const upstreamTransport = new StreamableHTTPClientTransport(upstreamUrl);
@@ -103,7 +104,7 @@ async function main(): Promise<void> {
   const upstreamCaps: ServerCapabilities = upstream.getServerCapabilities() ?? {};
   const upstreamInstructions = upstream.getInstructions();
   const server = new Server(
-    { name: SERVER_NAME, version: "1.0.0" },
+    { name: SERVER_NAME, version: CLI_VERSION },
     {
       capabilities: upstreamCaps,
       ...(upstreamInstructions !== undefined ? { instructions: upstreamInstructions } : {}),

@@ -9,7 +9,10 @@ import {
   usesOpenAIResponsesApi,
 } from '../openai-responses-adapter';
 
-test('routes only GPT-5.5 model slugs to the Responses API', () => {
+test('routes current OpenAI reasoning families to the Responses API', () => {
+  for (const model of ['gpt-6.1-sol', 'gpt-6-astra', 'gpt-6-sol', 'gpt-6-luna', 'gpt-5.6', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna']) {
+    assert.equal(usesOpenAIResponsesApi(model), true, model);
+  }
   assert.equal(usesOpenAIResponsesApi('gpt-5.5'), true);
   assert.equal(usesOpenAIResponsesApi(' GPT-5.5-2026-04-27 '), true);
   assert.equal(usesOpenAIResponsesApi('gpt-5.4'), false);

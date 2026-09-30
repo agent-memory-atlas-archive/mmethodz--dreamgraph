@@ -25,6 +25,7 @@
 //      class of bug v10.0.x was created to prevent.
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { EXTENSION_VERSION } from "../../../../version.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
 import type {
@@ -182,7 +183,7 @@ async function probeHostMcpToolNames(opts: {
 
   const transport = new StreamableHTTPClientTransport(url);
   const client = new Client(
-    { name: "dreamgraph-copilot-cli-registry-probe", version: "1.0.0" },
+    { name: "dreamgraph-copilot-cli-registry-probe", version: EXTENSION_VERSION },
     { capabilities: {} },
   );
 

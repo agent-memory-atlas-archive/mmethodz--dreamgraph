@@ -699,7 +699,7 @@ function buildArchitectAttachmentCapabilities(runtime: ActiveArchitectSessionRun
       return {
         textAttachments: true,
         imageAttachments:
-          model.startsWith("gpt-5") ||
+          model.startsWith("gpt-6") || model.startsWith("gpt-5") ||
           model.startsWith("gpt-4.1") ||
           model.startsWith("gpt-4o") ||
           model.startsWith("o4") ||
@@ -5880,7 +5880,7 @@ function renderArchitectShell(): string {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DreamGraph Architect</title>
+  <title>DreamGraph Architect v${config.server.version}</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="stylesheet" href="/api/architect/v1/assets/xterm/xterm.css" />
   <style>
@@ -7895,14 +7895,14 @@ function renderArchitectShell(): string {
     let architectCodeEditorModulePromise = null;
 ${isArchitectDoomEnabled() ? "    let architectDoomRuntimePromise = null;\n" : ""}    const architectTabTypeRegistry = new Map();
     const architectModelOptionsByProvider = {
-      anthropic: ['claude-opus-4-8', 'claude-opus-4-7', 'claude-fable-5', 'claude-mythos-5', 'claude-opus-4-6', 'claude-sonnet-4-6', 'claude-haiku-4-5'],
-      openai: ['gpt-5.5', 'gpt-5', 'gpt-5.4', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano', 'gpt-4o-mini', 'o3', 'o4-mini'],
+      anthropic: ['claude-opus-5-5', 'claude-sonnet-5-5', 'claude-fable-5-1', 'claude-mythos-5-1', 'claude-opus-5', 'claude-sonnet-5', 'claude-opus-4-8', 'claude-opus-4-7', 'claude-fable-5', 'claude-mythos-5', 'claude-opus-4-6', 'claude-sonnet-4-6', 'claude-haiku-4-5'],
+      openai: ['gpt-6.1-sol', 'gpt-6-astra', 'gpt-6-sol', 'gpt-6-luna', 'gpt-5.6', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5', 'gpt-5.4', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano', 'gpt-4o-mini', 'o3', 'o4-mini'],
       ollama: ['qwen3:8b', 'llama3.1', 'mistral', 'codellama'],
       lmstudio: ['local-model'],
       sampling: ['client'],
       none: [''],
       'copilot-cli': ['claude-opus-4.7', 'claude-opus-4.6', 'gpt-5.5', 'gpt-5.4', 'gpt-4o', 'claude-sonnet-4.6', 'auto'],
-      'codex-cli': ['gpt-5.6', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5.4', 'gpt-5.3-codex', 'gpt-5.2-codex', 'gpt-5.2', 'gpt-5-mini', 'auto'],
+      'codex-cli': ['gpt-6.1-sol', 'gpt-6-astra', 'gpt-6-sol', 'gpt-6-luna', 'gpt-5.6', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5.4', 'gpt-5.3-codex', 'gpt-5.2-codex', 'gpt-5.2', 'gpt-5-mini', 'auto'],
     };
 
     function registerArchitectTabType(descriptor) {
@@ -9884,7 +9884,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       if (normalizedProvider === 'openai') {
         return {
           textAttachments: true,
-          imageAttachments: normalizedModel.indexOf('gpt-5') === 0 || normalizedModel.indexOf('gpt-4.1') === 0 || normalizedModel.indexOf('gpt-4o') === 0 || normalizedModel.indexOf('o4') === 0 || normalizedModel.indexOf('o3') === 0,
+          imageAttachments: normalizedModel.indexOf('gpt-6') === 0 || normalizedModel.indexOf('gpt-5') === 0 || normalizedModel.indexOf('gpt-4.1') === 0 || normalizedModel.indexOf('gpt-4o') === 0 || normalizedModel.indexOf('o4') === 0 || normalizedModel.indexOf('o3') === 0,
         };
       }
       if (normalizedProvider === 'ollama' || normalizedProvider === 'lmstudio') {

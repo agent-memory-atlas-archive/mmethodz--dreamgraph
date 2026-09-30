@@ -11,6 +11,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { LoggingMessageNotificationSchema } from "@modelcontextprotocol/sdk/types.js";
 import * as vscode from "vscode";
+import { EXTENSION_VERSION } from "./version.js";
 
 /* ------------------------------------------------------------------ */
 /*  MCP Client Wrapper                                                */
@@ -45,7 +46,7 @@ export class McpClient implements vscode.Disposable {
     );
 
     this._client = new Client(
-      { name: "dreamgraph-vscode", version: "13.2.0" },
+      { name: "dreamgraph-vscode", version: EXTENSION_VERSION },
       { capabilities: {} },
     );
 

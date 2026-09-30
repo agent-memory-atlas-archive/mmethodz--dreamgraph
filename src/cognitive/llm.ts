@@ -157,6 +157,7 @@ export type LlmToolContentBlock =
 export type LlmToolLoopMessage = {
   role: "system" | "user" | "assistant";
   content: string | LlmToolContentBlock[];
+  providerRawAssistant?: Array<Record<string, unknown>>;
 };
 
 export type LlmToolLoopResponse = {
@@ -164,7 +165,29 @@ export type LlmToolLoopResponse = {
   model: string;
   stopReason: string;
   toolCalls: LlmToolCall[];
+  providerRawAssistant?: Array<Record<string, unknown>>;
 };
+
+function usesBoundAnthropicThinking(model: string): boolean {
+  return /^claude-(?:opus-5-5|sonnet-5-5|fable-5-1)(?:$|[-_])/i.test(model.trim());
+}
+
+function anthropicThinkingOptions(model: string): Record<string, unknown> {
+  return usesBoundAnthropicThinking(model) ? {
+    thinking: { type: "adaptive", block_binding: { prefix_mismatch_behavior: "drop_block" } },
+  } : {};
+}
+
+function anthropicThinkingHeaders(model: string): Record<string, string> {
+  return usesBoundAnthropicThinking(model)
+    ? { "anthropic-beta": "thinking-binding-controls-2026-08-01" } : {};
+}
+
+function logAnthropicThinkingDrops(model: string, transformations: unknown): void {
+  if (!Array.isArray(transformations)) return;
+  const dropped = transformations.filter((item) => item?.type === "thinking_dropped").length;
+  if (dropped > 0) logger.warn(`Anthropic ${model}: API dropped ${dropped} bound thinking block(s) after a context or model change`);
+}
 
 export type LlmRouteLayer = "connected" | "daemon" | "deterministic_fallback";
 
@@ -312,7 +335,7 @@ const _jsonSchemaUnsupported = new Set<string>();
 
 const OPENAI_MODEL_CAPABILITIES: Array<{ pattern: RegExp; capabilities: Omit<ModelCapabilities, "model"> }> = [
   {
-    pattern: /^gpt-5\.5(?:\b|[-_])/i,
+    pattern: /^(?:gpt-5\.[56]|gpt-6(?:\.1)?)(?:$|[-_])/i,
     capabilities: {
       api: "responses",
       supportsTemperature: false,
@@ -363,7 +386,7 @@ export function getModelCapabilities(provider: LlmProviderType | string, model: 
     return {
       model: normalizedModel,
       api: "anthropic-messages",
-      supportsTemperature: true,
+      supportsTemperature: !/^claude-(?:opus-(?:4-[78]|5)|sonnet-5|fable-5|mythos-5)(?:$|[-_])/i.test(normalizedModel),
       supportsReasoningEffort: false,
       supportsStructuredOutputs: false,
       supportsJsonSchema: false,
@@ -446,7 +469,7 @@ class OpenAiCompatibleProvider implements LlmProvider {
     const knownUnsupported = _jsonSchemaUnsupported.has(downgradeKey);
 
     if (capabilities.api === "responses") {
-      return this.completeWithResponses(messages, model, temp, maxTokens, capabilities, options?.textVerbosity);
+      return this.completeWithResponses(messages, model, temp, maxTokens, capabilities, options);
     }
 
     const buildBody = (useStrictSchema: boolean): Record<string, unknown> => {
@@ -542,7 +565,7 @@ class OpenAiCompatibleProvider implements LlmProvider {
     temp: number,
     maxTokens: number,
     capabilities: ModelCapabilities,
-    textVerbosity?: "low" | "medium" | "high",
+    options?: LlmCompletionOptions,
   ): Promise<LlmResponse> {
     const instructions = messages
       .filter((message) => message.role === "system")
@@ -555,7 +578,11 @@ class OpenAiCompatibleProvider implements LlmProvider {
       model,
       input,
       max_output_tokens: maxTokens,
-      ...(textVerbosity ? { text: { verbosity: textVerbosity } } : {}),
+      text: {
+        ...(options?.textVerbosity ? { verbosity: options.textVerbosity } : {}),
+        ...(options?.jsonSchema ? { format: { type: "json_schema", name: options.jsonSchema.name, schema: options.jsonSchema.schema, strict: true } }
+          : options?.jsonMode ? { format: { type: "json_object" } } : {}),
+      },
       ...(capabilities.supportsTemperature ? { temperature: temp } : {}),
     };
     if (instructions) {
@@ -686,6 +713,8 @@ async function callOpenAiResponsesWithTools(
   const body: Record<string, unknown> = {
     model: config.model,
     input: toOpenAiResponsesInput(messages.filter((message) => message.role !== "system")),
+    store: false,
+    include: ["reasoning.encrypted_content"],
     tools: tools.map(toOpenAiResponsesTool),
     tool_choice: "auto",
     max_output_tokens: config.maxTokens,
@@ -746,6 +775,7 @@ async function callOpenAiResponsesWithTools(
     model: data.model ?? config.model,
     stopReason: toolCalls.length > 0 ? "tool_use" : (data.status ?? "stop"),
     toolCalls,
+    providerRawAssistant: output,
   };
 }
 
@@ -763,7 +793,8 @@ async function callAnthropicWithTools(
   const body: Record<string, unknown> = {
     model: config.model,
     max_tokens: config.maxTokens,
-    temperature: config.temperature,
+    ...anthropicThinkingOptions(config.model),
+    ...(getModelCapabilities("anthropic", config.model).supportsTemperature ? { temperature: config.temperature } : {}),
     messages: messages
       .filter((message) => message.role !== "system")
       .map(toAnthropicToolMessage),
@@ -779,6 +810,7 @@ async function callAnthropicWithTools(
       "Content-Type": "application/json",
       "x-api-key": config.apiKey,
       "anthropic-version": "2023-06-01",
+      ...anthropicThinkingHeaders(config.model),
     },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(config.timeoutMs),
@@ -793,12 +825,15 @@ async function callAnthropicWithTools(
     content?: Array<{ type: string; text?: string; id?: string; name?: string; input?: Record<string, unknown> }>;
     model?: string;
     stop_reason?: string;
+    input_transformations?: unknown[];
   };
+  logAnthropicThinkingDrops(config.model, data.input_transformations);
   const blocks = data.content ?? [];
   return {
     text: blocks.filter((block) => block.type === "text").map((block) => block.text ?? "").join(""),
     model: data.model ?? config.model,
     stopReason: data.stop_reason ?? "stop",
+    providerRawAssistant: blocks,
     toolCalls: blocks
       .filter((block) => block.type === "tool_use" && block.id && block.name)
       .map((block) => ({
@@ -812,6 +847,10 @@ async function callAnthropicWithTools(
 function toOpenAiResponsesInput(messages: LlmToolLoopMessage[]): Array<Record<string, unknown>> {
   const out: Array<Record<string, unknown>> = [];
   for (const message of messages) {
+    if (message.role === "assistant" && message.providerRawAssistant?.length) {
+      out.push(...message.providerRawAssistant);
+      continue;
+    }
     if (typeof message.content === "string") {
       out.push({ role: message.role === "assistant" ? "assistant" : "user", content: message.content });
       continue;
@@ -869,6 +908,9 @@ function toOpenAiMessages(messages: LlmToolLoopMessage[]): Array<Record<string, 
 }
 
 function toAnthropicToolMessage(message: LlmToolLoopMessage): Record<string, unknown> {
+  if (message.role === "assistant" && message.providerRawAssistant?.length) {
+    return { role: message.role, content: message.providerRawAssistant };
+  }
   if (typeof message.content === "string") {
     return { role: message.role, content: message.content };
   }
@@ -992,7 +1034,8 @@ class AnthropicProvider implements LlmProvider {
     const body: Record<string, unknown> = {
       model,
       max_tokens: maxTokens,
-      temperature: temp,
+      ...anthropicThinkingOptions(model),
+      ...(getModelCapabilities("anthropic", model).supportsTemperature ? { temperature: temp } : {}),
       messages: nonSystemMessages.map(m => ({ role: m.role, content: m.content })),
     };
 
@@ -1019,6 +1062,7 @@ class AnthropicProvider implements LlmProvider {
         "Content-Type": "application/json",
         "x-api-key": this.apiKey,
         "anthropic-version": "2023-06-01",
+        ...anthropicThinkingHeaders(model),
       },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(this.timeoutMs),
@@ -1034,11 +1078,13 @@ class AnthropicProvider implements LlmProvider {
       model?: string;
       usage?: { output_tokens?: number };
       stop_reason?: string;
+      input_transformations?: unknown[];
     };
 
-    const textBlock = data.content?.find(b => b.type === "text");
+    logAnthropicThinkingDrops(model, data.input_transformations);
+
     return {
-      text: textBlock?.text ?? "",
+      text: (data.content ?? []).filter(b => b.type === "text").map(b => b.text ?? "").join(""),
       model: data.model ?? this.model,
       tokensUsed: data.usage?.output_tokens,
       stopReason: data.stop_reason,
@@ -1202,7 +1248,7 @@ export function parseLlmConfig(): LlmConfig {
       apiKey = process.env.DREAMGRAPH_LLM_API_KEY ?? "";
       break;
     case "anthropic":
-      model = "claude-sonnet-4-20250514";
+      model = "claude-sonnet-5-5";
       baseUrl = process.env.DREAMGRAPH_LLM_URL ?? "https://api.anthropic.com/v1";
       apiKey = process.env.DREAMGRAPH_LLM_API_KEY ?? "";
       break;
@@ -1277,7 +1323,7 @@ function providerDefaults(provider: LlmProviderType, base: LlmConfig): Pick<LlmC
     case "openai":
       return { model: "gpt-4o-mini", baseUrl: "https://api.openai.com/v1", apiKey: process.env.DREAMGRAPH_LLM_API_KEY ?? "" };
     case "anthropic":
-      return { model: "claude-sonnet-4-20250514", baseUrl: "https://api.anthropic.com/v1", apiKey: process.env.DREAMGRAPH_LLM_API_KEY ?? "" };
+      return { model: "claude-sonnet-5-5", baseUrl: "https://api.anthropic.com/v1", apiKey: process.env.DREAMGRAPH_LLM_API_KEY ?? "" };
     case "sampling":
       return { model: "client", baseUrl: "", apiKey: "" };
     default:

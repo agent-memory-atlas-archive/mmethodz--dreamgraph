@@ -1,6 +1,16 @@
 # Anthropic Architect Configuration and Claude Migration
 
-This document describes how DreamGraph's VS Code architect integrates with Anthropic models, with guidance for **Claude Opus 4.7**, **Claude Fable 5**, and **Claude Mythos 5**.
+This document describes Anthropic support in the engine, standalone Architect, and VS Code architect, including Claude Opus/Sonnet 5.5 and Fable/Mythos 5.1, while retaining the governed Opus 4.7 Architect default.
+
+## v13.3 current-model support
+
+All three model selectors include `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-fable-5-1`, and `claude-mythos-5-1`, alongside previous compatible models. These latest models have a 1M context window and 128K output limit. Mythos 5.1 remains restricted to approved Project Glasswing accounts. See the [model catalog](https://platform.claude.com/docs/en/models/overview) and [Fable 5.1 overview](https://platform.claude.com/docs/en/models/fable-5-1/overview).
+
+The engine's provider fallback is now Sonnet 5.5 because Sonnet 4 was retired. Explicit engine/Architect model settings are retained. Current Claude request bodies omit temperature. VS Code exposes effort/adaptive-thinking controls for Opus/Sonnet 5 and Fable/Mythos; the existing configured effort remains authoritative. The extension allocates up to 128K output tokens for these latest models; engine budgets remain configurable and include thinking.
+
+Native tool loops keep the complete assistant response, including empty or signed thinking blocks, for the next call. Architect compaction or rebuilt context can change the signed prefix. Opus 5.5, Sonnet 5.5, and Fable 5.1 therefore send `thinking.block_binding.prefix_mismatch_behavior: "drop_block"` with `thinking-binding-controls-2026-08-01`. This allows the API to discard invalidated reasoning and continue; count-only diagnostics expose those drops. This policy does not guarantee reasoning reuse after context changes. See [preserved thinking](https://platform.claude.com/docs/en/build-with-claude/preserved-thinking).
+
+For these prefix-bound models the adaptive-thinking request remains active even when the older adaptive-thinking toggle is off; effort controls depth. No forced `tool_choice` is used. See the [Opus 5.5 migration guide](https://platform.claude.com/docs/en/models/opus-5-5/migration-guide) and [Sonnet 5.5 migration guide](https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide).
 
 ## Current DreamGraph defaults
 

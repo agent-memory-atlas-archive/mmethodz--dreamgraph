@@ -1345,7 +1345,7 @@ class ArchitectCodexEnrichmentProvider implements LlmProvider {
       args.push("--output-schema", schemaFile);
     }
     if (model && model !== "auto") args.push("--model", model);
-    if (model.startsWith("gpt-5.6")) args.push("-c", 'model_reasoning_effort="xhigh"');
+    if (/^gpt-6(?:\.1)?(?:$|[-_])/.test(model) || model.startsWith("gpt-5.6")) args.push("-c", 'model_reasoning_effort="xhigh"');
     args.push("-");
     const prompt = messages.map((message) => `## ${message.role.toUpperCase()}\n${message.content}`).join("\n\n");
 
