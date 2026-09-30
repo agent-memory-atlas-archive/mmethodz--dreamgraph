@@ -10,8 +10,9 @@
  */
 
 import {
-  ACESFilmicToneMapping,
+  NeutralToneMapping,
   AmbientLight,
+  CanvasTexture,
   Color,
   DirectionalLight,
   Fog,
@@ -24,7 +25,7 @@ import {
 } from "three";
 
 /** Background colour — matches the 2D canvas-wrap radial-gradient floor. */
-export const BG_COLOR = new Color("#06080d");
+export const BG_COLOR = new Color("#080e19");
 
 /**
  * Detect WebGL2 support without leaking a context. Used by the toggle to
@@ -71,7 +72,22 @@ export function createScene(opts: CreateSceneOpts): SceneBundle {
   const { container, cameraPosition, cameraTarget, showGrid } = opts;
 
   const scene = new Scene();
-  scene.background = BG_COLOR;
+  // A static studio backdrop adds depth without another animated layer.
+  const backdrop = document.createElement("canvas");
+  backdrop.width = backdrop.height = 128;
+  const backdropContext = backdrop.getContext("2d");
+  let backgroundTexture: CanvasTexture | null = null;
+  if (backdropContext) {
+    const gradient = backdropContext.createRadialGradient(48, 40, 4, 64, 64, 88);
+    gradient.addColorStop(0, "#142333");
+    gradient.addColorStop(0.55, "#0d1726");
+    gradient.addColorStop(1, "#080e19");
+    backdropContext.fillStyle = gradient;
+    backdropContext.fillRect(0, 0, 128, 128);
+    backgroundTexture = new CanvasTexture(backdrop);
+    backgroundTexture.colorSpace = SRGBColorSpace;
+  }
+  scene.background = backgroundTexture ?? BG_COLOR;
   // Fog defaults are tuned for the force layout (~30 unit radius). The
   // radial layout produces a much larger cloud, so callers should drive
   // fog via `tuneSceneForBounds` once the layout settles.
@@ -96,16 +112,10 @@ export function createScene(opts: CreateSceneOpts): SceneBundle {
     preserveDrawingBuffer: true,
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  // ACES filmic tone mapping compresses extreme peaks instead of clipping
-  // them to flat white, so dense hubs of overlapping additive tubes
-  // retain colour and shape rather than blowing out. Phase 8 lifted
-  // exposure 0.95 → 1.10 to restore midtone luminance after the AA /
-  // MSAA chain darkened the resolved buffer. Phase 9 settled at 1.06
-  // alongside the per-shader floor lifts (tube baseI 0.42, node body
-  // 0.40) so global contrast eases off without crushing the dark
-  // background or losing depth.
-  renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.06;
+  // OutputPass applies the neutral tone map and sRGB conversion once,
+  // after bloom. Keep the intermediate compositor target linear HDR.
+  renderer.toneMapping = NeutralToneMapping;
+  renderer.toneMappingExposure = 1.0;
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.setSize(container.clientWidth, container.clientHeight, false);
   renderer.domElement.style.position = "absolute";
@@ -136,6 +146,7 @@ export function createScene(opts: CreateSceneOpts): SceneBundle {
   scene.add(grid);
 
   function dispose(): void {
+    backgroundTexture?.dispose();
     scene.remove(grid);
     grid.geometry.dispose();
     if (Array.isArray(grid.material)) {

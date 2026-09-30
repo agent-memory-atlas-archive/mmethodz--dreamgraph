@@ -638,7 +638,7 @@ Both modes auto-strip template stubs (`_schema`, `_fields`, `_note` entries), in
 
 #### `enrich_parser_nodes`
 
-Graph-wide semantic enrichment for every canonical node: features, workflows, data models, capabilities, UI elements, datastores, and auxiliary entities. It chooses the configured standalone LLM or connected Architect model/adapter, traverses at least two graph hops (three by default), selectively reads source evidence, and writes substantive descriptions, intent, purpose, tags, confidence, semantic relations, and source/coverage metadata. UI elements also require data contracts, interactions, visual semantics, layout semantics, ownership, and composition links. The original mechanical description is preserved in `description_raw` on first enrichment.
+Graph-wide semantic enrichment for every canonical node: features, workflows, data models, capabilities, UI elements, datastores, and auxiliary entities. It chooses the configured standalone LLM or connected Architect model/adapter, traverses up to the configured graph-hop limit (three by default), selectively reads source evidence, and writes substantive descriptions, intent, purpose, tags, confidence, semantic relations, and source/coverage metadata. UI elements also require data contracts, interactions, visual semantics, layout semantics, ownership, and composition links. The original mechanical description is preserved in `description_raw` on first enrichment.
 
 Already-enriched neighborhood nodes are confidence-aware semantic cache entries. When their completeness, freshness, source coverage, and relationship coverage meet the configured gates, their persisted evidence is reused and redundant source reads are omitted. Conflicting or low-confidence areas still trigger source-backed analysis. Writes are atomic per batch, progress notifications keep CLI calls observable, and partial progress survives interruption.
 
@@ -650,7 +650,7 @@ Already-enriched neighborhood nodes are confidence-aware semantic cache entries.
 | `dry_run` | boolean | false | Run the LLM but skip persistence |
 | `force` | boolean | false | Re-enrich nodes that already have `enrichment.enriched === true` |
 | `feature_context_size` | number (0–100) | 20 | Sibling features included per bucket for anchor grounding |
-| `context_hops` | number (2–6) | 3 | Semantic graph hops traversed for every node |
+| `context_hops` | number (0–6) | 3 | Maximum semantic graph hops; 1 includes direct neighbors, 0 omits graph neighbors |
 | `relation_context_size` | number (5–100) | 40 | Maximum related nodes supplied as semantic context |
 | `model_source` | enum | `auto` | `auto`, `standalone`, or `architect` |
 | `semantic_cache` | boolean | true | Reuse sufficiently complete, confident, fresh neighborhood evidence |
@@ -659,13 +659,23 @@ Already-enriched neighborhood nodes are confidence-aware semantic cache entries.
 
 **Returns:** per-store and total eligibility/enrichment counts, semantic coverage, relation counts, batch/call/token totals, route/fallback evidence, semantic-cache hits and source-read savings, stabilization schedules, errors, and notes.
 
+CLI: `dg enrich <instance> --max-hops 1 --skip-scan` sends `context_hops=1`; without `--skip-scan`, the same limit applies inside the preceding scan pass. This is a context-depth limit, not a token, call, or spending cap. The default of three is unchanged.
+
 **Eligibility:** Every non-enriched canonical node is eligible, regardless of origin; `force=true` refreshes every selected node. Source-bound UI entries retain their role tag while their description, intent, contracts, interaction model, visual/layout knowledge, and semantic links are refreshed.
 
 **LLM unavailable or invalid:** Deterministic fallback metadata may preserve structural progress, but `enriched` remains false and semantic coverage remains incomplete. Fallback output is never presented as successful LLM enrichment.
 
+Relation target types come from the canonical graph ID supplied in the prompt. A model's incorrect type label is corrected from that ID, redundant self-links are omitted, and evidenced non-feature IDs misplaced in `feature_anchors` are converted into typed relations before validation; none requires discarding an otherwise valid description. Unknown targets, missing relation evidence, shallow descriptions, and incomplete UI contracts still fail validation. Normalization counts are included in the run notes and daemon log.
+
+Structured-output requests constrain result count to the input batch size and result IDs to the input IDs. Feature-anchor IDs and relation IDs are constrained to supplied Feature context and neighbors when their enums fit the provider's schema limits; larger custom batches retain prompt grounding and server validation. At zero hops, anchor and relation arrays are constrained to be empty. Other providers still receive the same complete-batch instruction and strict per-node validation. These safeguards add no paid retry or output-token budget increase. The daemon logs the enrichment route/model and warns when a provider reports an output-limit stop.
+
+Scan and enrichment operations share a per-instance ownership guard. Independent overlapping requests return `GRAPH_OPERATION_BUSY` before provider calls or graph writes, including automatic re-enrichment after a model change. The owning scan can still run its internal enrichment and bounded incremental retries. This prevents concurrent passes from charging for the same nodes and persisting stale snapshots over one another.
+
+Fallback nodes remain retryable in `enrichment_state.json`, with at most three checkpoint attempts per node. Existing checkpoints that incorrectly marked evidence-only fallbacks as enriched are also resumable. Exhausted retries and terminal failures remain unfinished and cannot cause the run to report semantic completion merely because there are no more automatic retries. `enrichment_checkpoint.remaining` counts all unfinished nodes, including those outside the retry budget.
+
 #### `scan_project`
 
-Automated project scan followed by mandatory graph-wide semantic enrichment. Discovery honors the project-root `.gitignore`, scans requested repositories and UI/native sources, and introspects configured PostgreSQL tables when `DATABASE_URL` is present. It then forces `enrich_parser_nodes(target="all", context_hops=3)` so every canonical node is evaluated with source-backed multi-hop context. The result reports incomplete semantic coverage explicitly when no valid LLM route can satisfy the node contracts.
+Automated project scan followed by mandatory graph-wide semantic enrichment. Discovery honors the project-root `.gitignore`, scans requested repositories and UI/native sources, and introspects configured PostgreSQL tables when `DATABASE_URL` is present. It then forces `enrich_parser_nodes(target="all")` with the requested `context_hops` (0–6, default 3) so every canonical node is evaluated with source-backed context. CLI: `dg scan <instance> --max-hops 1`. This controls enrichment depth independently of filesystem `depth`; it also applies when incremental scans explicitly request enrichment. The result reports incomplete semantic coverage explicitly when no valid LLM route can satisfy the node contracts.
 
 This is a convenience orchestrator. All individual tools (`init_graph`, `enrich_seed_data`, `register_ui_element`) remain available for manual or targeted enrichment.
 
@@ -674,6 +684,7 @@ This is a convenience orchestrator. All individual tools (`init_graph`, `enrich_
 | `depth` | enum | `deep` | `shallow` (3 levels) or `deep` (10 levels). Shallow is faster but may miss nested modules. |
 | `targets` | string[] | all four | Subset of `["features", "workflows", "data_model", "ui"]` to populate. The `ui` target runs the native UI scanner over `.tsx/.jsx/.vue/.svelte/.razor/.xaml` files (v10.3). |
 | `repos` | string[] | all configured | Specific repo names to scan. |
+| `context_hops` | number (0–6) | 3 | Maximum graph-neighbor depth for the enrichment pass; CLI `--max-hops`. Does not change filesystem depth. |
 
 **Returns:** Summary with repository/file discovery, ignored-path behavior, coarse extraction, native data/UI results, PostgreSQL scan/link counts, mandatory semantic coverage, cache/source-read metrics, index entries, targeted stabilization schedules, LLM usage, partial-mode state, and warnings. Phase and batch progress is streamed through MCP notifications.
 

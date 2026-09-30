@@ -35,7 +35,7 @@ dg scan my-project --depth deep         # follows imports further
 dg scan my-project --targets features,data_model,workflows
 ```
 
-You can re-run scan whenever you want. Subsequent runs upsert existing entities and discover new ones. Every structural scan then forces graph-wide semantic enrichment with at least three hops of context so the result is not left as parser-only inventory.
+You can re-run scan whenever you want. Subsequent runs upsert existing entities and discover new ones. Every full structural scan then forces graph-wide semantic enrichment, using three graph hops by default so the result is not left as parser-only inventory.
 
 ### `dg enrich` — fill in the gaps
 
@@ -47,6 +47,15 @@ dg enrich my-project --skip-scan --force
 dg enrich my-project --model-source architect
 ```
 
+To reduce graph-neighbor context, set `--max-hops` on either command:
+
+```bash
+dg scan my-project --max-hops 1
+dg enrich my-project --skip-scan --max-hops 1
+```
+
+The range is 0–6 and the default remains 3. `1` includes direct neighbors only; `0` omits graph neighbors and relies on the node and source evidence. In `dg enrich`, the option also reaches the mandatory enrichment inside its scan pass. This controls context depth, not the number of nodes, LLM calls, output tokens, or total spend. Full scans still run coarse extraction and graph-wide enrichment. For a bounded enrichment-only pass, combine `--skip-scan --max-hops 1 --max-nodes 50`. The active daemon must be updated/restarted after any running scan finishes for these options to take effect.
+
 Enrichment uses either the standalone LLM configuration or, during an Architect session, the connected Architect model/adapter to:
 
 - Give every canonical node a substantive description of intent, behavior, rationale, and relationships
@@ -57,6 +66,10 @@ Enrichment uses either the standalone LLM configuration or, during an Architect 
 Already-enriched neighbors act as a confidence-aware semantic cache. DreamGraph reuses their persisted evidence when coverage is sufficient and reads source only for uncovered, conflicting, or low-confidence areas. This reduces repeated source reads and LLM cost across overlapping neighborhoods. Disable this only for diagnosis with `--no-semantic-cache`; tune the gates with `--semantic-cache-min-confidence` and `--semantic-cache-min-coverage`.
 
 If neither a standalone nor connected Architect LLM route is available, DreamGraph records deterministic fallback metadata but does not claim semantic completion. `graph_health_report` will continue to identify those nodes as needing enrichment.
+
+Fallback counts can also indicate rejected model output. The daemon log records validation reasons; known relation IDs supply their canonical graph types, and evidenced non-feature links misplaced in `feature_anchors` become typed relations. Unknown targets and missing evidence remain invalid. Structured-output batches constrain result counts and supplied IDs to reduce omitted nodes and incorrect anchors. These changes add no automatic paid retries. Fallback nodes stay retryable in the enrichment checkpoint for up to three attempts. After an active scan finishes and the daemon has been updated/restarted, use `dg enrich my-project --skip-scan` to resume remaining enrichment without another filesystem scan. Exhausted attempts remain reported as unfinished.
+
+Only one independent scan or enrichment pass can run for an instance. An overlapping request reports `GRAPH_OPERATION_BUSY`; wait for the current pass to finish. A model change can trigger automatic re-enrichment, so check the daemon log before launching another full scan. Semantic enrichment uses the dreamer model (or the selected Architect route), while the normalizer model serves the separate normalization stage. Each enrichment run logs its actual model, graph-hop limit, and batch size.
 
 ### Graph health before expensive maintenance
 

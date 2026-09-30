@@ -1,5 +1,9 @@
 # DreamGraph Release Notes
 
+## v13.4.0 - Glass Atlas
+
+Explorer gains compact panels, type-specific glass nodes, a coordinated palette, restrained connection flow, and collision-aware labels in 2D and 3D. Link thickness stays bounded at close zoom and dense hubs retain their color. Scan and standalone enrichment accept `--max-hops 0..6`; enrichment recovery and same-instance concurrency protection reduce waste. All distribution components share 13.4.0. See [v13.4.0 notes](../RELEASE_NOTES_v13.4.0.md).
+
 ## v13.3.0 - Current Model Support
 
 Current OpenAI and Claude models are available across the engine, standalone Architect, and VS Code architect. Codex CLI routes also offer the GPT-6 family. GPT-5.5/5.6/6 use Responses with JSON/schema support and reasoning replay; Claude tool loops preserve signed thinking and omit unsupported sampling parameters. The engine's retired Sonnet 4 fallback moves to Sonnet 5.5, and model availability remains account-dependent. See [v13.3.0 notes](../RELEASE_NOTES_v13.3.0.md) and [LLM setup](setup-llm.md).

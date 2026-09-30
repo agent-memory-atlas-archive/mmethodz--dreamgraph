@@ -27,6 +27,7 @@ import { postClientMetrics } from "./api";
 import type { ExplorerMode, FilterState } from "./filters";
 import { PulseOverlay } from "./PulseOverlay";
 import type { PulseToken } from "./sse";
+import { placeLabels, type LabelCandidate } from "./label-layout";
 
 interface Props {
   snapshot: GraphSnapshot;
@@ -202,11 +203,31 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
     });
     const layoutMs = Math.round(performance.now() - t0);
 
+    type LabelData = Parameters<typeof drawGlowingLabel>[1];
+    let labelContext: CanvasRenderingContext2D | null = null;
+    const pendingLabels = new Map<string, { data: LabelData; candidate: LabelCandidate }>();
+    const queueLabel: typeof drawGlowingLabel = (ctx, data, settings) => {
+      if (!data.label) return;
+      labelContext = ctx;
+      ctx.font = `${settings.labelWeight} ${settings.labelSize}px ${settings.labelFont}`;
+      let label = data.label;
+      while (label.length > 1 && ctx.measureText(label).width > 200) label = label.slice(0, -1);
+      if (label !== data.label) label += "…";
+      const width = ctx.measureText(label).width + 12;
+      const anchor = anchorRef.current;
+      const primary = anchor && graph.hasNode(anchor) && data.label === graph.getNodeAttribute(anchor, "label");
+      const id = `${data.x}:${data.y}`;
+      pendingLabels.set(id, { data: { ...data, label }, candidate: {
+        id, x: data.x + data.size + 6 + width / 2, y: data.y + 18,
+        width, height: 20, priority: primary ? 10000 : data.size,
+      } });
+    };
+
     const sigma = new Sigma<NodeAttrs, EdgeAttrs>(graph, containerRef.current, {
       renderEdgeLabels: false,
       defaultEdgeColor: "#4b6584",
       labelColor: { color: "#eef1f6" },
-      labelSize: 12,
+      labelSize: 11,
       labelWeight: "500",
       labelDensity: 0.55,
       labelGridCellSize: 80,
@@ -214,7 +235,7 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
       minCameraRatio: 0.05,
       maxCameraRatio: 8,
       zIndex: true,
-      defaultDrawNodeLabel: drawGlowingLabel,
+      defaultDrawNodeLabel: queueLabel,
       // Sigma uses a SEPARATE drawer when a node is hovered; the stock
       // one renders a white pill with dark text — unreadable on our dark
       // canvas. Reuse our glowing label so hover stays on-theme.
@@ -253,7 +274,7 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
         // Universal baseline: every node sits at ~55% so the canvas reads
         // as a muted backdrop. Hover/selection then lifts the anchor +
         // 1-hop neighbors back up to 100%.
-        const BASE = 0.55;
+        const BASE = 0.85;
         const anchor = anchorRef.current;
         const k = intensityRef.current;
         if (!anchor || k <= 0.01) {
@@ -281,20 +302,20 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
           reduced.ringKind = NODE_KIND_FOCUSED;
           // Anchor more than doubles in size so its opaque disc clearly
           // covers the edge endpoints meeting it.
-          reduced.size = (data.size ?? 5) * (1 + 1.4 * k);
+          reduced.size = (data.size ?? 5) * (1 + 0.3 * k);
           reduced.zIndex = 4;
           reduced.label = data.label;
           reduced.forceLabel = true;
         } else if (isClose) {
           // 1-hop neighbors grow ~90% so even thin nodes have enough
           // opaque disc area to cover incoming highlighted edges.
-          reduced.size = (data.size ?? 5) * (1 + 0.9 * k);
+          reduced.size = (data.size ?? 5) * (1 + 0.15 * k);
           reduced.zIndex = 2;
           // Keep noisy dream-artifact labels suppressed even on hover —
           // restoring data.label here was leaking the long rejection text.
           if (!isNoisyLabel(data.label, data.nodeType)) {
             reduced.label = data.label;
-            reduced.forceLabel = true;
+            reduced.forceLabel = false;
           }
         } else {
           // Outside d1: blank label entirely so it can't bleed through.
@@ -327,8 +348,8 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
         if (!anchor || k <= 0.01) {
           return {
             ...data,
-            colorStart: dimRgb(data.colorStart, 0.30, 0.35),
-            colorEnd: dimRgb(data.colorEnd, 0.30, 0.35),
+            colorStart: dimRgb(data.colorStart, 0.65, 0.35),
+            colorEnd: dimRgb(data.colorEnd, 0.65, 0.35),
           };
         }
 
@@ -350,7 +371,7 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
         let alpha: number;
         if (touchesAnchor) {
           // Active: full RGB, full alpha. Glow done elsewhere.
-          scale = 1.0; alpha = 1.0;
+          scale = 0.9; alpha = 0.85;
         } else if (minHop <= 1 && maxHop <= 2) {
           scale = 0.18; alpha = 0.20;
         } else if (minHop <= 2 && maxHop <= 3) {
@@ -360,7 +381,7 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
         }
 
         // Lerp from idle-dim toward target as intensity rises.
-        const idleScale = 0.30;
+        const idleScale = 0.65;
         const idleAlpha = 0.35;
         const finalScale = idleScale + k * (scale - idleScale);
         const finalAlpha = idleAlpha + k * (alpha - idleAlpha);
@@ -371,11 +392,8 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
           colorEnd: dimRgb(data.colorEnd, finalScale, finalAlpha),
         };
         if (touchesAnchor) {
-          // Active edge: thicker line + push gradient hard toward white
-          // so it visibly glows against the 50%-alpha background graph.
-          out.size = data.size * (1 + 1.2 * k);
-          out.colorStart = brighten(data.colorStart, k);
-          out.colorEnd = brighten(data.colorEnd, k);
+          // A modest weight lift retains each relationship's colour.
+          out.size = data.size * (1 + 0.2 * k);
           out.zIndex = 1;
         }
         return out;
@@ -383,6 +401,15 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
     });
 
     sigmaRef.current = sigma;
+    sigma.on("beforeRender", () => pendingLabels.clear());
+    sigma.on("afterRender", () => {
+      if (!labelContext) return;
+      const { width, height } = sigma.getDimensions();
+      for (const box of placeLabels([...pendingLabels.values()].map((entry) => entry.candidate), width, height)) {
+        const { data } = pendingLabels.get(box.id)!;
+        drawGlowingLabel(labelContext, { ...data, x: box.left - data.size - 1, y: box.top + 11 * 2 / 3 - 1 }, sigma.getSettings());
+      }
+    });
 
     sigma.on("clickNode", ({ node }) => onSelect(node));
     sigma.on("clickStage", () => {
@@ -501,6 +528,11 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
     <div className="canvas-wrap">
       <div ref={containerRef} className="canvas" />
       <PulseOverlay sigmaRef={sigmaRef} pulses={pulses ?? []} />
+      <div className="canvas-heading"><span className="eyebrow">Graph atlas</span><span>Follow an idea.</span></div>
+      <div className="canvas-tools">
+        <button onClick={() => sigmaRef.current?.getCamera().animate({ x: 0.5, y: 0.5, ratio: 1, angle: 0 }, { duration: 500 })}><span aria-hidden="true">⌖</span> Fit graph</button>
+        <details className="canvas-help"><summary aria-label="Navigation help">?</summary><div><strong>Explore the map</strong><p>Drag to pan · Scroll to zoom<br />Hover to trace connections<br />Click a node to inspect it<br />Use Focus to isolate its neighborhood.</p></div></details>
+      </div>
       <div className="status">
         <strong>{snapshot.stats.node_count}</strong> nodes ·{" "}
         <strong>{snapshot.stats.edge_count}</strong> edges ·{" "}
@@ -591,34 +623,6 @@ function dimRgb(color: string, scale: number, alpha: number): string {
     }
   }
   return `rgba(${Math.round(r * s)}, ${Math.round(g * s)}, ${Math.round(b * s)}, ${alpha.toFixed(3)})`;
-}
-
-/**
- * Lighten a #rrggbb / #rgb / rgba(...) color toward white by `amount` (0..1).
- * Used for the anchor-edge glow — small lift so it stands out without
- * blowing out the node colors.
- */
-function brighten(color: string, amount: number): string {
-  const lift = Math.max(0, Math.min(1, amount)) * 180; // 0..180 channels
-  if (color.startsWith("#")) {
-    let v = color.slice(1);
-    if (v.length === 3) v = v.split("").map((c) => c + c).join("");
-    const n = parseInt(v, 16);
-    const r = Math.min(255, ((n >> 16) & 255) + lift);
-    const g = Math.min(255, ((n >> 8) & 255) + lift);
-    const b = Math.min(255, (n & 255) + lift);
-    return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
-  }
-  const m = color.match(/rgba?\(([^)]+)\)/);
-  if (m) {
-    const parts = m[1].split(",").map((s) => parseFloat(s.trim()));
-    const r = Math.min(255, (parts[0] ?? 0) + lift);
-    const g = Math.min(255, (parts[1] ?? 0) + lift);
-    const b = Math.min(255, (parts[2] ?? 0) + lift);
-    const a = parts[3] ?? 1;
-    return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
-  }
-  return color;
 }
 
 // Tiny seeded PRNG for deterministic initial node positions across reloads.

@@ -31,6 +31,8 @@ interface MockLlmState {
   responses: Array<string | { text: string; model?: string; tokensUsed?: number }>;
   throwAfter?: number;
   throwMessage?: string;
+  completeGate?: Promise<void>;
+  onCall?: () => void;
   calls: Array<{ messages: unknown; options: unknown }>;
 }
 
@@ -48,6 +50,8 @@ vi.mock("../../src/cognitive/llm.js", async (importOriginal) => {
     complete: async (messages: unknown, options: unknown) => {
       const idx = mockState.calls.length;
       mockState.calls.push({ messages, options });
+      mockState.onCall?.();
+      await mockState.completeGate;
       if (mockState.throwAfter !== undefined && idx >= mockState.throwAfter) {
         throw new Error(mockState.throwMessage ?? "simulated LLM failure");
       }
@@ -91,6 +95,7 @@ import {
   chunk,
   buildMultiHopContext,
   buildSemanticCachePlan,
+  enrichmentJsonSchema,
   type ParserNodeRecord,
   type PerNodeEnrichment,
 } from "../../src/tools/enrich-parser-nodes.js";
@@ -174,6 +179,8 @@ beforeEach(() => {
   mockState.calls = [];
   mockState.throwAfter = undefined;
   mockState.throwMessage = undefined;
+  mockState.completeGate = undefined;
+  mockState.onCall = undefined;
   tmpDir = mkdtempSync(join(tmpdir(), "dg-enrich-parser-"));
   setDataDirOverride(tmpDir);
   setDataDirResolver(() => tmpDir);
@@ -194,6 +201,37 @@ async function readData<T>(filename: string): Promise<T> {
   const raw = await readFile(join(tmpDir, filename), "utf-8");
   return JSON.parse(raw) as T;
 }
+
+describe("enrichment structured output provider limits", () => {
+  it.each(["enum count", "enum string length"])("retains server grounding without exceeding the %s limit", (limit) => {
+    const ids = Array.from({ length: 600 }, (_, index) =>
+      limit === "enum count" ? `neighbor-${index}` : `${"long-id-".repeat(8)}${index}`);
+    const anchors = new Set(ids.slice(0, 500));
+    const targets = new Map(ids.map((id) => [id, "feature" as const]));
+    const schema = enrichmentJsonSchema([parserNode()], anchors, targets) as {
+      properties: { results: { items: { properties: {
+        feature_anchors: { items: { properties: { target_id: { enum?: string[] } } } };
+        relations: { items: { properties: { target_id: { enum?: string[] } } } };
+      } } } };
+    };
+    const properties = schema.properties.results.items.properties;
+    const anchorEnum = properties.feature_anchors.items.properties.target_id.enum ?? [];
+    const relationEnum = properties.relations.items.properties.target_id.enum ?? [];
+    expect(anchorEnum.length + relationEnum.length).toBeLessThanOrEqual(799);
+    for (const values of [anchorEnum, relationEnum]) {
+      if (values.length > 250) expect(values.join("").length).toBeLessThanOrEqual(15_000);
+    }
+    expect(properties.relations.items.properties.target_id.enum).toBeUndefined();
+  });
+
+  it("requires empty link arrays at zero graph hops", () => {
+    const schema = enrichmentJsonSchema([parserNode()], new Set(), new Map()) as {
+      properties: { results: { items: { properties: { feature_anchors: { maxItems: number }; relations: { maxItems: number } } } } };
+    };
+    expect(schema.properties.results.items.properties.feature_anchors.maxItems).toBe(0);
+    expect(schema.properties.results.items.properties.relations.maxItems).toBe(0);
+  });
+});
 
 // ---------------------------------------------------------------------------
 // Pure helpers
@@ -473,6 +511,222 @@ describe("mergeEnrichment", () => {
 // ---------------------------------------------------------------------------
 
 describe("enrichParserNodesProgrammatic — integration", () => {
+  it("rejects an overlapping enrichment before another provider call or graph write", async () => {
+    const node = parserNode();
+    await writeData("data_model.json", [node]);
+    await writeData("features.json", []);
+    mockState.responses = [llmResponseFor([node])];
+    let release!: () => void;
+    let called!: () => void;
+    mockState.completeGate = new Promise<void>((resolve) => { release = resolve; });
+    const started = new Promise<void>((resolve) => { called = resolve; });
+    mockState.onCall = called;
+    const running = enrichParserNodesProgrammatic({ target: "data_model" });
+    await started;
+    try {
+      const second = await enrichParserNodesProgrammatic({ target: "data_model", force: true });
+      expect(second).toMatchObject({ success: false, error: { code: "GRAPH_OPERATION_BUSY" } });
+      expect(mockState.calls).toHaveLength(1);
+      expect((await readData<ParserNodeRecord[]>("data_model.json"))[0].enrichment).toBeUndefined();
+    } finally {
+      release();
+      await running;
+    }
+    expect((await readData<ParserNodeRecord[]>("data_model.json"))[0].enrichment?.enriched).toBe(true);
+  });
+
+  it("restricts structured output to the complete input batch and the supplied typed target IDs", async () => {
+    const nodes = [parserNode({ id: "contract-a" }), parserNode({ id: "contract-b" })];
+    const anchor = feature({ id: "feature-a" });
+    await writeData("data_model.json", nodes);
+    await writeData("features.json", [anchor]);
+    mockState.responses = [llmResponseFor([nodes[0]])]; // Non-schema provider omits one result.
+    const result = await enrichParserNodesProgrammatic({ target: "data_model", batchSize: 2 });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.semantic_coverage).toMatchObject({ llm_enriched: 1, fallback_nodes: 1 });
+    expect(result.data.errors.join(" ")).toContain("missing enrichment for node contract-b");
+    expect(mockState.calls).toHaveLength(1); // No paid automatic retry.
+    const options = mockState.calls[0].options as { jsonSchema: { schema: {
+      properties: { results: { minItems: number; maxItems: number; items: { properties: {
+        id: { enum: string[] };
+        feature_anchors: { items: { properties: { target_id: { enum: string[] } } } };
+        relations: { items: { properties: { target_id: { enum: string[] } } } };
+      } } } };
+    } } };
+    const schema = options.jsonSchema.schema.properties.results;
+    expect(schema).toMatchObject({ minItems: 2, maxItems: 2 });
+    expect(schema.items.properties.id.enum).toEqual(nodes.map((node) => node.id));
+    expect(schema.items.properties.feature_anchors.items.properties.target_id.enum).toEqual([anchor.id]);
+    expect(schema.items.properties.relations.items.properties.target_id.enum).toEqual(expect.arrayContaining([anchor.id, ...nodes.map((node) => node.id)]));
+  });
+
+  it.each(["data_model", "workflow", "capability", "datastore"])("converts an evidenced %s link misplaced in feature_anchors into its canonical typed relation", async (targetType) => {
+    const root = parserNode({ id: "contract" });
+    const neighbor = parserNode({ id: "neighbor", enrichment: { enriched: true, enriched_at: "2024-01-01", enricher: "fixture" } });
+    await writeData("data_model.json", targetType === "data_model" ? [root, neighbor] : [root]);
+    await writeData("features.json", []);
+    if (targetType !== "data_model") {
+      await writeData(`${targetType === "capability" ? "capabilities" : `${targetType}s`}.json`, [neighbor]);
+    }
+    mockState.responses = [llmResponseFor([root], {
+      feature_anchors: [{ target_id: neighbor.id, relationship: "uses", rationale: "Consumes the supplied neighbor", evidence_excerpt: "Ride" }],
+    })];
+    const result = await enrichParserNodesProgrammatic({ target: "data_model" });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.semantic_coverage).toMatchObject({ llm_enriched: 1, fallback_nodes: 0 });
+    expect(mockState.calls).toHaveLength(1);
+    const persisted = (await readData<ParserNodeRecord[]>("data_model.json"))[0];
+    expect(persisted.links).toEqual(expect.arrayContaining([expect.objectContaining({ target: neighbor.id, type: targetType, relationship: "uses" })]));
+    expect(result.data.notes.join(" ")).toContain("converted 1 non-feature anchor(s)");
+  });
+
+  it.each(["", "   "])("still rejects a misplaced known anchor without evidence (%j)", async (evidence) => {
+    const root = parserNode({ id: "contract" });
+    const neighbor = parserNode({ id: "neighbor", enrichment: { enriched: true, enriched_at: "2024-01-01", enricher: "fixture" } });
+    await writeData("data_model.json", [root, neighbor]);
+    await writeData("features.json", []);
+    mockState.responses = [llmResponseFor([root], {
+      feature_anchors: [{ target_id: neighbor.id, relationship: "uses", rationale: "No evidence", evidence_excerpt: evidence }],
+    })];
+    const result = await enrichParserNodesProgrammatic({ target: "data_model" });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.semantic_coverage).toMatchObject({ llm_enriched: 0, fallback_nodes: 1 });
+    expect((await readData<ParserNodeRecord[]>("data_model.json"))[0].links).toEqual([]);
+  });
+
+  it.each([0, 1])("honors a maximum context depth of %s in traversal, prompts and persisted metadata", async (hops) => {
+    const root = parserNode({ id: "hop-root", source_files: ["root/root.ts"], domain: "root", name: "Root", description: "Alpha", keywords: [] });
+    const direct = parserNode({ id: "hop-direct", source_files: ["direct/direct.ts"], domain: "direct", name: "Direct", description: "Beta", keywords: [] });
+    const distant = parserNode({ id: "hop-distant", source_files: ["distant/distant.ts"], domain: "distant", name: "Distant", description: "Gamma", keywords: [] });
+    root.links = [{ target: direct.id, type: "data_model", relationship: "uses", strength: "weak" }];
+    direct.links = [{ target: distant.id, type: "data_model", relationship: "uses", strength: "weak" }];
+    for (const neighbor of [direct, distant]) {
+      neighbor.enrichment = { enriched: true, enriched_at: "2024-01-01", enricher: "fixture" };
+    }
+    await writeData("data_model.json", [root, direct, distant]);
+    await writeData("features.json", []);
+    mockState.responses = [llmResponseFor([root])];
+
+    expect(buildMultiHopContext(root, [root, direct, distant], hops, 40).map((node) => node.id))
+      .toEqual(hops === 0 ? [] : [direct.id]);
+    const result = await enrichParserNodesProgrammatic({ target: "data_model", contextHops: hops });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.semantic_coverage.context_hops).toBe(hops);
+    const prompt = (mockState.calls[0].messages as Array<{ role: string; content: string }>)[1].content;
+    expect(prompt).toContain(`Semantic context depth: ${hops} hops`);
+    expect(prompt).not.toContain('"id": "hop-distant"');
+    if (hops === 0) expect(prompt).not.toContain('"id": "hop-direct"');
+    const persisted = (await readData<ParserNodeRecord[]>("data_model.json"))[0];
+    expect(persisted.enrichment?.semantic_cache?.context_hops).toBe(hops);
+  });
+
+  it("uses canonical graph types for known relation IDs instead of discarding rich node knowledge", async () => {
+    const root = parserNode({ id: "contract", name: "Contract" });
+    const otherModel = parserNode({ id: "layout", name: "Layout", enrichment: { enriched: true, enriched_at: "2024-01-01", enricher: "x" } });
+    await writeData("data_model.json", [root, otherModel]);
+    await writeData("features.json", [feature({ id: "binding", name: "Binding" })]);
+    await writeData("workflows.json", [parserNode({ id: "data-flow", name: "Data Flow" })]);
+    mockState.responses = [llmResponseFor([root], {
+      relations: ["binding", "data-flow", "layout"].map((id) => ({
+        target_id: id, target_type: "capability", relationship: "uses",
+        rationale: "Uses the supplied neighboring contract", evidence_excerpt: "Ride",
+      })),
+    })];
+
+    const result = await enrichParserNodesProgrammatic({ target: "data_model" });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.semantic_coverage).toMatchObject({ llm_enriched: 1, fallback_nodes: 0 });
+    const after = await readData<ParserNodeRecord[]>("data_model.json");
+    expect(after[0].enrichment?.enriched).toBe(true);
+    expect(after[0].links).toEqual(expect.arrayContaining([
+      expect.objectContaining({ target: "binding", type: "feature" }),
+      expect.objectContaining({ target: "data-flow", type: "workflow" }),
+      expect.objectContaining({ target: "layout", type: "data_model" }),
+    ]));
+    expect(result.data.notes.join(" ")).toMatch(/canonical.*3.*relation|3.*relation.*canonical/);
+  });
+
+  it("omits redundant self links without losing otherwise valid semantic enrichment", async () => {
+    const node = parserNode({ id: "self-contract" });
+    await writeData("data_model.json", [node]);
+    await writeData("features.json", []);
+    mockState.responses = [llmResponseFor([node], {
+      feature_anchors: [{ target_id: node.id, relationship: "supports", rationale: "Own contract", evidence_excerpt: "Ride" }],
+      relations: [{ target_id: node.id, target_type: "data_model", relationship: "uses", rationale: "Own contract", evidence_excerpt: "Ride" }],
+    })];
+    const result = await enrichParserNodesProgrammatic({ target: "data_model" });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.semantic_coverage).toMatchObject({ llm_enriched: 1, fallback_nodes: 0 });
+    expect((await readData<ParserNodeRecord[]>("data_model.json"))[0].links).toEqual([]);
+  });
+
+  it.each([
+    { name: "unknown relation IDs", target: "missing", evidence: "Ride" },
+    { name: "known relations without evidence", target: "neighbor", evidence: "" },
+  ])("still rejects $name after canonical relation normalization", async ({ target, evidence }) => {
+    const node = parserNode({ id: "guarded-contract" });
+    await writeData("data_model.json", [node]);
+    await writeData("features.json", [feature({ id: "neighbor" })]);
+    mockState.responses = [llmResponseFor([node], {
+      relations: [{ target_id: target, target_type: "workflow", relationship: "uses", rationale: "Supplied relation", evidence_excerpt: evidence }],
+    })];
+    const result = await enrichParserNodesProgrammatic({ target: "data_model" });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.semantic_coverage).toMatchObject({ llm_enriched: 0, fallback_nodes: 1, complete: false });
+    const persisted = (await readData<ParserNodeRecord[]>("data_model.json"))[0];
+    expect(persisted.links).toEqual([]);
+    expect(persisted.enrichment?.enriched).toBe(false);
+  });
+
+  it.each([false, true])("resumes fallback nodes without treating them as checkpoint success (legacy=%s)", async (legacy) => {
+    const node = parserNode({ id: "retry-fallback" });
+    await writeData("data_model.json", [node]);
+    await writeData("features.json", []);
+    mockState.responses = [llmResponseFor([node], { description: "too short" }), llmResponseFor([node])];
+    const first = await enrichParserNodesProgrammatic({ target: "data_model" });
+    expect(first.success).toBe(true);
+    if (!first.success) return;
+    expect(first.data.enrichment_checkpoint).toMatchObject({ remaining: 1, complete: false });
+    const checkpoint = await readData<{ nodes: Record<string, { state: string; reason?: string }> }>("enrichment_state.json");
+    expect(checkpoint.nodes[node.id].state).toBe("failed_retryable");
+    if (legacy) {
+      checkpoint.nodes[node.id].state = "enriched";
+      checkpoint.nodes[node.id].reason = "evidence_only_fallback";
+      await writeData("enrichment_state.json", checkpoint);
+    }
+    const retried = await enrichParserNodesProgrammatic({ target: "data_model" });
+    expect(retried.success).toBe(true);
+    if (!retried.success) return;
+    expect(mockState.calls).toHaveLength(2);
+    expect(retried.data.semantic_coverage).toMatchObject({ llm_enriched: 1, fallback_nodes: 0, complete: true });
+    expect(retried.data.enrichment_checkpoint).toMatchObject({ remaining: 0, complete: true });
+    expect((await readData<ParserNodeRecord[]>("data_model.json"))[0].enrichment?.enriched).toBe(true);
+  });
+
+  it("reports unresolved fallback work after the retry budget is exhausted without calling the provider again", async () => {
+    const node = parserNode({ id: "exhausted-fallback" });
+    await writeData("data_model.json", [node]);
+    await writeData("features.json", []);
+    mockState.responses = Array.from({ length: 3 }, () => llmResponseFor([node], { description: "too short" }));
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await enrichParserNodesProgrammatic({ target: "data_model" });
+    }
+    const exhausted = await enrichParserNodesProgrammatic({ target: "data_model" });
+    expect(exhausted.success).toBe(true);
+    if (!exhausted.success) return;
+    expect(mockState.calls).toHaveLength(3);
+    expect(exhausted.data.semantic_coverage.complete).toBe(false);
+    expect(exhausted.data.enrichment_checkpoint).toMatchObject({ remaining: 1, complete: false });
+    expect(exhausted.data.notes.join(" ")).toMatch(/unresolved.*retry limit/);
+  });
+
   it("reuses a fresh enriched neighborhood as semantic cache without rereading covered source", async () => {
     const repoRoot = join(tmpDir, "semantic-cache-repo");
     await mkdir(join(repoRoot, "src"), { recursive: true });

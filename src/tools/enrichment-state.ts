@@ -45,7 +45,21 @@ export function createEnrichmentRun(scanRevision: string, providerFingerprint: s
 
 export function resumableNodeIds(state: EnrichmentRunState, maxAttempts = 3): string[] {
   return Object.entries(state.nodes)
-    .filter(([, node]) => node.state === "pending" || (node.state === "failed_retryable" && node.attempts < maxAttempts))
+    .filter(([, node]) => node.state === "pending" || (
+      (node.state === "failed_retryable" || isLegacyFallback(node)) && node.attempts < maxAttempts
+    ))
+    .map(([id]) => id)
+    .sort();
+}
+
+function isLegacyFallback(node: EnrichmentAttempt): boolean {
+  return node.state === "enriched" && node.reason === "evidence_only_fallback";
+}
+
+/** Unfinished work includes exhausted retries and legacy fallback-as-success records. */
+export function unfinishedEnrichmentNodeIds(state: EnrichmentRunState): string[] {
+  return Object.entries(state.nodes)
+    .filter(([, node]) => (node.state !== "enriched" && node.state !== "skipped") || isLegacyFallback(node))
     .map(([id]) => id)
     .sort();
 }
@@ -68,7 +82,7 @@ export function recordEnrichmentOutcome(
 ): EnrichmentRunState {
   const prior = state.nodes[id];
   if (!prior) throw new Error(`ENRICHMENT_NODE_NOT_ELIGIBLE: ${id}`);
-  if (prior.state === "enriched") return state;
+  if (prior.state === "enriched" && !isLegacyFallback(prior)) return state;
   return {
     ...state,
     updated_at: now,

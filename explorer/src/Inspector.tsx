@@ -47,16 +47,28 @@ export function Inspector({ selected, stats, onNavigate }: Props) {
   if (!selected) {
     return (
       <div className="inspector">
-        <h2 className="inspector-title">Snapshot</h2>
+        <div className="rail-heading">
+          <span className="eyebrow">At a glance</span>
+          <h2>Graph overview</h2>
+          <p>Select a node to explore its story.</p>
+        </div>
         {stats ? (
-          <dl className="kv">
-            <dt>Nodes</dt><dd>{stats.totals.nodes}</dd>
-            <dt>Edges</dt><dd>{stats.totals.edges}</dd>
+          <>
+          <div className="graph-totals">
+            <div><span>Nodes</span><strong>{stats.totals.nodes.toLocaleString()}</strong></div>
+            <div><span>Connections</span><strong>{stats.totals.edges.toLocaleString()}</strong></div>
+          </div>
+          <div className="health-summary">
+            <div><span>Graph health</span><strong>{Math.round(stats.health_mean * 100)}%</strong></div>
+            <progress value={stats.health_mean} max={1} aria-label="Mean graph health" />
+          </div>
+          <dl className="kv overview-details">
             <dt>Tensions (active)</dt><dd>{stats.totals.tensions_active}</dd>
             <dt>Tensions (resolved)</dt><dd>{stats.totals.tensions_resolved}</dd>
             <dt>Mean health</dt><dd>{stats.health_mean.toFixed(2)}</dd>
             <dt>Mean confidence</dt><dd>{stats.confidence_mean.toFixed(2)}</dd>
           </dl>
+          </>
         ) : (
           <p className="inspector-empty">Loading stats…</p>
         )}
@@ -65,19 +77,19 @@ export function Inspector({ selected, stats, onNavigate }: Props) {
             <h3 className="inspector-subtitle">By type</h3>
             <dl className="kv">
               {Object.entries(stats.nodes_by_type).map(([k, v]) => (
-                <>
-                  <dt key={`t-${k}`}>{k}</dt>
-                  <dd key={`v-${k}`}>{v}</dd>
-                </>
+                <Fragment key={k}>
+                  <dt>{k.replaceAll("_", " ")}</dt>
+                  <dd>{v}</dd>
+                </Fragment>
               ))}
             </dl>
             <h3 className="inspector-subtitle">By edge kind</h3>
             <dl className="kv">
               {Object.entries(stats.edges_by_kind).map(([k, v]) => (
-                <>
-                  <dt key={`et-${k}`}>{k}</dt>
-                  <dd key={`ev-${k}`}>{v}</dd>
-                </>
+                <Fragment key={k}>
+                  <dt>{k}</dt>
+                  <dd>{v}</dd>
+                </Fragment>
               ))}
             </dl>
           </>

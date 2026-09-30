@@ -11,17 +11,14 @@
  *   - boosting the per-instance color (multiplier on the kind base color);
  *   - scaling the instance up slightly so it pops under bloom.
  *
- * That avoids a custom shader (kept for a possible Slice E rim pass) while
- * still reading clearly under the bloom we add in this same slice.
+ * A shared glass shader adds tinted studio reflections and a Fresnel rim.
+ * Bounded highlights keep the material's colour even at dense hubs.
  */
 
 import {
-  BoxGeometry,
   Color,
   ConeGeometry,
   CylinderGeometry,
-  DodecahedronGeometry,
-  IcosahedronGeometry,
   InstancedBufferAttribute,
   InstancedMesh,
   type BufferGeometry,
@@ -36,6 +33,8 @@ import {
   UniformsLib,
   UniformsUtils,
 } from "three";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { nodeRenderColor } from "../theme";
 import type { ExplorerNode, ExplorerNodeType } from "../types";
 
@@ -61,7 +60,7 @@ interface Bucket {
 }
 
 /** Multiplier applied to the base color when a node is hovered or selected. */
-const HIGHLIGHT_TINT = 1.7;
+const HIGHLIGHT_TINT = 1.22;
 /** Scale multiplier applied to a hovered/selected instance. */
 const SELECT_SCALE = 1.25;
 const HOVER_SCALE = 1.12;
@@ -74,25 +73,27 @@ const HOVER_SCALE = 1.12;
 function geometryForType(type: ExplorerNodeType): BufferGeometry {
   switch (type) {
     case "feature":
-      // Lightly chamfered cube — three.js BoxGeometry has flat faces, so
-      // subdivide it once with `widthSegments` to pick up better lighting.
-      return new BoxGeometry(1.4, 1.4, 1.4, 1, 1, 1);
+      // Beveled building block: a discrete unit of functionality.
+      return new RoundedBoxGeometry(1.4, 1.4, 1.4, 2, 0.13);
     case "workflow":
-      return new ConeGeometry(1.0, 1.8, 6);
+      return new ConeGeometry(1.0, 1.8, 8);
     case "data_model":
-      return new DodecahedronGeometry(1.0, 0);
+      return new CylinderGeometry(0.9, 0.9, 1.4, 6);
     case "capability":
-      return new TorusGeometry(0.85, 0.32, 8, 18);
-    case "datastore":
-      return new CylinderGeometry(1.0, 1.0, 0.55, 16);
+      return new TorusGeometry(0.85, 0.25, 12, 24);
+    case "datastore": {
+      const discs = [-0.5, 0, 0.5].map((y) => new CylinderGeometry(0.94, 0.94, 0.32, 24).translate(0, y, 0));
+      const stack = mergeGeometries(discs)!;
+      discs.forEach((disc) => disc.dispose());
+      return stack;
+    }
     case "ui_element":
-      // Faceted sphere — visually distinct from dodecahedron/tetrahedron
-      // and reads as a "surface" the user interacts with.
-      return new IcosahedronGeometry(1.0, 0);
+      // A thin pane represents an interface surface.
+      return new RoundedBoxGeometry(1.65, 1.25, 0.24, 2, 0.10);
     case "dream_node":
-      return new TetrahedronGeometry(1.2, 0);
+      return new OctahedronGeometry(1.0, 0).scale(0.85, 1.3, 0.85);
     case "tension":
-      return new OctahedronGeometry(1.0, 0);
+      return new TetrahedronGeometry(1.15, 0);
   }
 }
 
@@ -139,6 +140,7 @@ export class NodeSystem {
       const material = makeGlassMaterial();
       const mesh = new InstancedMesh(geometry, material, group.length);
       mesh.frustumCulled = false;
+      mesh.renderOrder = 2;
       // Userdata lets the raycast loop map a hit back to a node id without
       // reverse-searching every meta list.
       mesh.userData["nodeBucketType"] = type;
@@ -156,18 +158,12 @@ export class NodeSystem {
         const n = group[i];
         const radius = nodeRadius(n);
         const baseColor = new Color(nodeRenderColor(n.type, n.health));
-        // Push per-type colors into vivid-but-elegant territory so node
-        // hues read distinctly against the dark background and the tube
-        // palette. Phase 9 dialled saturation back from a +0.50 boost
-        // with floor 0.62 to a +0.30 boost with floor 0.55 — colours
-        // remain clearly identifiable per type but no longer push toward
-        // neon. Lightness floor lifted slightly (0.42 → 0.46) to keep
-        // midtones readable.
+        // Retain palette lightness, with a small saturation lift for glass.
         {
           const hsl = { h: 0, s: 0, l: 0 };
           baseColor.getHSL(hsl);
-          const s = Math.min(0.92, Math.max(hsl.s, 0.55) + 0.30);
-          const l = Math.min(0.78, Math.max(hsl.l, 0.46));
+          const s = Math.min(0.88, hsl.s * 1.04);
+          const l = hsl.l;
           baseColor.setHSL(hsl.h, s, l);
         }
         const meta: NodeInstanceMeta = {
@@ -363,6 +359,7 @@ export class NodeSystem {
     const scale = visible ? baseScale : 0;
 
     this.proxy.position.set(meta.x, meta.y, meta.z);
+    this.proxy.rotation.set(0.18 + (meta.index % 5) * 0.12, meta.index * 0.618, 0.12);
     this.proxy.scale.setScalar(scale);
     this.proxy.updateMatrix();
     bucket.mesh.setMatrixAt(meta.index, this.proxy.matrix);
@@ -428,10 +425,10 @@ export function nodeRadius(n: ExplorerNode): number {
 // Phase 8 lifted opacity + emissive floor a touch so non-highlighted
 // nodes carry visible presence after the AA chain darkened midtones.
 // Rim/specular untouched (highlights already preserved by ACES).
-const BASE_OPACITY = 0.62;
-const BASE_EMISSIVE = 0.20;
-const BASE_RIM_STRENGTH = 1.05;
-const BASE_RIM_POWER = 2.8;
+const BASE_OPACITY = 0.54;
+const BASE_EMISSIVE = 0.07;
+const BASE_RIM_STRENGTH = 0.72;
+const BASE_RIM_POWER = 2.5;
 
 const NODE_VERTEX_SHADER = /* glsl */ `
 #include <common>
@@ -512,19 +509,13 @@ void main() {
   // large nodes pick up specular, depth gradient, and a sharper rim.
   float largeWeight = smoothstep(0.95, 1.6, vSize);
 
-  // Body — face/edge contrast tuned for readability over drama. Phase 9
-  // lifted the dark face term (0.32 → 0.40) and softened the face
-  // brighten (0.46 → 0.36) so unlit sides stay legible and lit sides
-  // don't push midtones into a high-contrast cinematic look.
+  // Translucent body, with enough face shading to reveal its volume.
   float facing = pow(NoV, 0.70);
-  vec3 body = vColor * (0.40 + 0.36 * facing);
+  vec3 body = vColor * (0.14 + 0.22 * facing);
 
-  // Internal depth gradient (large nodes only) — fakes a refractive
-  // top-to-bottom shift inside the volume. Phase 9 narrowed the
-  // gradient (0.84–1.18 → 0.92–1.10) so large hubs read as gentle
-  // glass volumes rather than high-contrast jewels.
+  // A top-to-bottom absorption gradient gives larger glass nodes depth.
   float vertical = clamp(vObjPos.y * 0.5 + 0.5, 0.0, 1.0);
-  float depthGrad = mix(0.92, 1.10, vertical);
+  float depthGrad = mix(0.72, 1.15, vertical);
   body *= mix(1.0, depthGrad, largeWeight);
 
   // Internal emissive — tinted by instance colour so each node type
@@ -538,7 +529,7 @@ void main() {
   float rimPow = mix(uRimPower, uRimPower + 0.6, largeWeight);
   float fresnel = pow(1.0 - NoV, rimPow);
   float rimMul = mix(uRimStrength, uRimStrength * 1.20, largeWeight);
-  vec3  rimTint = mix(uRimColor, vColor + vec3(0.20), 0.55);
+  vec3  rimTint = mix(vColor, uRimColor, 0.14);
   vec3  rim = rimTint * fresnel * rimMul;
 
   // Specular — Blinn-Phong half-vector against a fixed view-space key
@@ -548,27 +539,24 @@ void main() {
   // sparkle and the dense-hub blowout problem doesn't return.
   vec3 L = normalize(vec3(0.40, 0.70, 0.60));
   vec3 H = normalize(L + V);
-  float specTerm = pow(max(dot(N, H), 0.0), 72.0);
-  vec3  specular = vec3(specTerm) * (0.55 * largeWeight);
+  float specTerm = pow(max(dot(N, H), 0.0), 96.0);
+  // Two studio reflections give the polished surface a readable shape.
+  // Tint highlights toward the material rather than adding a white bulb.
+  vec3 reflected = reflect(-V, N);
+  float softbox = pow(max(dot(reflected, normalize(vec3(-0.6, 0.8, 0.6))), 0.0), 22.0);
+  float strip = pow(max(dot(reflected, normalize(vec3(0.8, 0.15, 0.6))), 0.0), 60.0);
+  vec3 specular = mix(vColor, vec3(0.72, 0.86, 1.0), 0.32) * (specTerm * 0.3 + softbox * 0.38 + strip * 0.22);
+  float innerCaustic = pow(max(0.0, 1.0 - abs(vObjPos.y + 0.35) * 2.4), 3.0);
+  body += vColor * innerCaustic * (0.07 + 0.05 * largeWeight);
 
-  vec3 outCol = body + emissive + rim;
-  // Soft hue-preserving roll-off — divides by (1 + maxChannel) so peaks
-  // taper toward (but never reach) 1.0 while preserving the colour
-  // ratio. Keeps blue nodes blue-hot, gold nodes gold-hot, etc., even
-  // before tone mapping kicks in downstream.
+  vec3 outCol = body + emissive + rim + specular;
+  // Bound the complete lighting result while preserving colour ratios.
   float peak = max(max(outCol.r, outCol.g), outCol.b);
-  outCol = outCol / (1.0 + 0.45 * peak);
-  // Specular sits on top of the roll-off so the highlight stays sharp
-  // and white. ACES tone mapping downstream prevents it from clipping
-  // even though it can briefly push channels above 1.0.
-  outCol += specular;
+  outCol = outCol / max(1.0, peak / 0.86);
 
-  // Glass alpha — translucent body + rim alpha boost so silhouettes
-  // remain crisp even when the body is faint. Slight per-size lift
-  // keeps large hubs reading as solid volumes; clamped so additive
-  // bloom on top doesn't chase past 1.0 and turn glass into milk.
-  float alpha = uOpacity + fresnel * 0.34 + 0.06 * largeWeight;
-  alpha = clamp(alpha, 0.0, 0.95);
+  // Opaque rims and translucent faces make silhouettes readable.
+  float alpha = uOpacity + fresnel * 0.32 + softbox * 0.10;
+  alpha = clamp(alpha, 0.0, 0.91);
 
   gl_FragColor = vec4(outCol, alpha);
   #include <fog_fragment>
@@ -591,7 +579,7 @@ function makeGlassMaterial(): ShaderMaterial {
     vertexShader: NODE_VERTEX_SHADER,
     fragmentShader: NODE_FRAGMENT_SHADER,
     transparent: true,
-    depthWrite: false,
+    depthWrite: true,
     depthTest: true,
     blending: NormalBlending,
     fog: true,

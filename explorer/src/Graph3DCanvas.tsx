@@ -16,16 +16,16 @@
  * picking, label sprites — see the plan §3.2.4–§3.2.6.
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  AdditiveBlending,
+  NormalBlending,
   Box3,
   CanvasTexture,
   Color,
   Raycaster,
   Sprite,
   SpriteMaterial,
-  SRGBColorSpace,
+  HalfFloatType,
   Vector2,
   Vector3,
   WebGLRenderTarget,
@@ -49,7 +49,7 @@ import { TubeSystem } from "./three/TubeSystem";
 import { WavefrontSystem } from "./three/WavefrontSystem";
 import { DensityHaze } from "./three/DensityHaze";
 import { LabelOverlay } from "./three/LabelOverlay";
-import type { FilterState } from "./filters";
+import type { ExplorerMode, FilterState } from "./filters";
 import { defaultFilters } from "./filters";
 
 interface Graph3DCanvasProps {
@@ -67,6 +67,7 @@ interface Graph3DCanvasProps {
   liveEvents?: GraphEvent[];
   /** Sidebar visibility filters — parity with 2D mode. */
   filters?: FilterState;
+  mode?: ExplorerMode;
   /** Surface a fatal init error to the parent so it can fall back to 2D. */
   onFatal?: (message: string) => void;
 }
@@ -78,6 +79,7 @@ export default function Graph3DCanvas({
   onSelect,
   liveEvents,
   filters,
+  mode = "atlas",
   onFatal,
 }: Graph3DCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -89,15 +91,20 @@ export default function Graph3DCanvas({
   snapshotRef.current = snapshot;
   const filtersRef = useRef<FilterState>(filters ?? defaultFilters());
   filtersRef.current = filters ?? defaultFilters();
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
   const selectedRef = useRef<string | null>(selected ?? null);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
   const statusRef = useRef<HTMLDivElement | null>(null);
+  const [motionPaused, setMotionPaused] = useState(false);
   /** Imperative handle filled in by the mount effect; null until then. */
   const apiRef = useRef<{
     setSelected(id: string | null): void;
     triggerWave(color?: number | string): void;
     applyFilters(): void;
+    frame(): void;
+    toggleMotion(): void;
   } | null>(null);
 
   // Push selection updates from React → renderer without re-mounting.
@@ -110,7 +117,7 @@ export default function Graph3DCanvas({
   // applies them via per-instance scale + per-vertex hide attributes.
   useEffect(() => {
     apiRef.current?.applyFilters();
-  }, [filters]);
+  }, [filters, mode]);
 
   // Trigger a wavefront whenever a new dream.cycle.completed event
   // arrives. We key off the seq of the head event so a stable list
@@ -139,7 +146,7 @@ export default function Graph3DCanvas({
     let cleanup: (() => void) | null = null;
 
     (async () => {
-      const [{ OrbitControls }, composerMod, renderPassMod, bloomMod, smaaMod] =
+      const [{ OrbitControls }, composerMod, renderPassMod, bloomMod, smaaMod, outputMod] =
         await Promise.all([
           import("three/examples/jsm/controls/OrbitControls.js") as Promise<
             typeof import("three/examples/jsm/controls/OrbitControls.js")
@@ -156,6 +163,7 @@ export default function Graph3DCanvas({
           import("three/examples/jsm/postprocessing/SMAAPass.js") as Promise<
             typeof import("three/examples/jsm/postprocessing/SMAAPass.js")
           >,
+          import("three/examples/jsm/postprocessing/OutputPass.js"),
         ]);
 
       if (disposed) return;
@@ -204,8 +212,7 @@ export default function Graph3DCanvas({
       // Selected-node backglow halo — a camera-facing sprite with a
       // soft radial gradient so the glow has feathered edges (a solid
       // sphere produces a hard-edged disc when fog/blend can't fade it).
-      // Additive blending lets it brighten anything behind it without
-      // occluding tubes or other nodes.
+      // A transparent center preserves the selected node's material.
       const haloCanvas = document.createElement("canvas");
       haloCanvas.width = 256;
       haloCanvas.height = 256;
@@ -213,16 +220,10 @@ export default function Graph3DCanvas({
         const ctx = haloCanvas.getContext("2d");
         if (ctx) {
           const grd = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
-          // Phase 7 — softer, less-white core. Previous core was a near
-          // pure-white dot that, after bloom, presented as a flashlight
-          // bulb on top of hubs. We pull the core toward blue-cyan and
-          // drop its opacity ~12% so the bloom rays still read as a halo
-          // around an energetic nucleus instead of a hot white blob.
-          // Outer mid + rim stops are unchanged so the blue bloom rays
-          // and feathered falloff stay intact.
-          grd.addColorStop(0.0, "rgba(170, 215, 252, 0.86)");
-          grd.addColorStop(0.18, "rgba(155, 205, 252, 0.62)");
-          grd.addColorStop(0.55, "rgba(110, 180, 245, 0.18)");
+          // Keep the middle clear and use a quiet blue peripheral halo.
+          grd.addColorStop(0.0, "rgba(85, 165, 230, 0.0)");
+          grd.addColorStop(0.28, "rgba(85, 165, 230, 0.0)");
+          grd.addColorStop(0.48, "rgba(110, 185, 245, 0.24)");
           grd.addColorStop(1.0, "rgba(80, 150, 220, 0.0)");
           ctx.fillStyle = grd;
           ctx.fillRect(0, 0, 256, 256);
@@ -234,13 +235,10 @@ export default function Graph3DCanvas({
         map: haloTex,
         color: new Color(0xa8d8ff),
         transparent: true,
-        // Phase 9 — reduced halo opacity ~20% (0.95 → 0.76) so the
-        // selected-node glow is a clear focus indicator instead of
-        // dominating the whole scene.
-        opacity: 0.76,
+        opacity: 0.30,
         depthWrite: false,
         depthTest: true,
-        blending: AdditiveBlending,
+        blending: NormalBlending,
         toneMapped: false,
       });
       const haloMesh = new Sprite(haloMat);
@@ -264,16 +262,9 @@ export default function Graph3DCanvas({
         const degree = node?.degree ?? 0;
         const r = node ? Math.max(1.4, 0.6 + Math.log1p(degree) * 0.45 + 0.25 * node.confidence) : 1.4;
         haloMesh.position.set(pos.x, pos.y, pos.z);
-        // Phase 9 — selected-node glow trimmed ~20%. The halo size and
-        // opacity were dialled back so the glow remains a clear focus
-        // signal without dominating the surrounding graph.
-        //   degree  0 → scale ≈ 5.6,  opacity ≈ 0.78 (tight, calmer)
-        //   degree 10 → scale ≈ 6.6,  opacity ≈ 0.69
-        //   degree 30 → scale ≈ 7.4,  opacity ≈ 0.59
-        //   degree 80 → scale ≈ 8.4,  opacity ≈ 0.45 (wide, soft)
         const auraGrowth = Math.log1p(degree) * 0.65; // ≈ ln(deg+1) bonus
-        haloMesh.scale.setScalar(r * (5.6 + auraGrowth));
-        const coreOpacity = Math.max(0.45, 0.78 - degree * 0.0042);
+        haloMesh.scale.setScalar(r * (4.2 + auraGrowth * 0.3));
+        const coreOpacity = 0.35;
         haloMat.opacity = coreOpacity;
         haloMesh.visible = true;
       };
@@ -315,16 +306,14 @@ export default function Graph3DCanvas({
        */
       const applyFilters = (): void => {
         const f = filtersRef.current;
+        const focus = modeRef.current === "focus" ? currentFocusSet : null;
+        const visibleNode = (id: string): boolean => {
+          const node = snap.nodes[nodeIndexById.get(id) ?? -1];
+          return !!node && f.nodeTypes.has(node.type) && node.confidence >= f.minConfidence
+            && (!focus || focus.has(id));
+        };
         nodeSystem.setVisibilityFilter((meta) => {
-          if (!f.nodeTypes.has(meta.type)) return false;
-          // Mirror 2D behaviour: confidence threshold gates dream nodes;
-          // for non-dream nodes the threshold is informational only —
-          // hiding all features at min-conf > 0 would empty the canvas.
-          if (meta.type === "dream_node") {
-            const n = snap.nodes[nodeIndexById.get(meta.id) ?? -1];
-            if (n && n.confidence < f.minConfidence) return false;
-          }
-          return true;
+          return visibleNode(meta.id);
         });
         tubeSystem.setVisibilityFilter((edge) => {
           if (!f.edgeKinds.has(edge.kind)) return false;
@@ -335,17 +324,14 @@ export default function Graph3DCanvas({
           const conf = edgeConfByKey.get(`${edge.s}\u0000${edge.t}\u0000${edge.kind}`) ?? 1;
           if (conf < f.minConfidence) return false;
           // Hide edges whose endpoint nodes are themselves filtered out.
-          if (!f.nodeTypes.has(typeById.get(edge.s) ?? "feature")) return false;
-          if (!f.nodeTypes.has(typeById.get(edge.t) ?? "feature")) return false;
-          return true;
+          return visibleNode(edge.s) && visibleNode(edge.t);
         });
         // Density haze should track node visibility too, otherwise hidden
         // clusters keep glowing in the background.
         const visibleVec: boolean[] = new Array(snap.nodes.length);
         for (let i = 0; i < snap.nodes.length; i++) {
           const n = snap.nodes[i];
-          visibleVec[i] = f.nodeTypes.has(n.type)
-            && (n.type !== "dream_node" || n.confidence >= f.minConfidence);
+          visibleVec[i] = visibleNode(n.id);
         }
         densityHaze.setVisibility(visibleVec);
         refreshLabels();
@@ -369,6 +355,8 @@ export default function Graph3DCanvas({
         const passesFilter = (id: string): boolean => {
           const t = typeById.get(id);
           if (!t || !f.nodeTypes.has(t)) return false;
+          const n = snap.nodes[nodeIndexById.get(id) ?? -1];
+          if (n && n.confidence < f.minConfidence) return false;
           return true;
         };
         const ids = currentFocusSet
@@ -381,6 +369,7 @@ export default function Graph3DCanvas({
             return {
               id,
               label: labelById.get(id) ?? id,
+              priority: id === selectedRef.current ? 10000 : degreeById.get(id) ?? 0,
               x: pos.x,
               y: pos.y,
               z: pos.z,
@@ -417,17 +406,19 @@ export default function Graph3DCanvas({
           samples: 4,
           // Match the renderer's working colour space so tone mapping +
           // sRGB output stays consistent through the post chain.
-          colorSpace: SRGBColorSpace,
+          type: HalfFloatType,
         }),
       );
       composer.addPass(new renderPassMod.RenderPass(bundle.scene, bundle.camera));
       const bloomPass = new bloomMod.UnrealBloomPass(
         new Vector2(container.clientWidth, container.clientHeight),
-        0.45, // strength  — Phase 9: lowered 0.55 → 0.45 so bloom adds glow without dominating
-        0.32, // radius    — slightly tighter so bloom stays a halo, not a wash
-        0.88, // threshold — only true peaks bloom (rest is tone-mapped)
+        0.18, // A small highlight halo; edges never accumulate additive light.
+        0.30,
+        0.68,
       );
       composer.addPass(bloomPass);
+      const outputPass = new outputMod.OutputPass();
+      composer.addPass(outputPass);
       // Phase 7 — SMAA pass after bloom catches any remaining sub-pixel
       // jaggies that survive MSAA (e.g. inside the bloom blur, on the
       // hot edges of additive tubes). It's a single full-screen pass
@@ -568,8 +559,10 @@ export default function Graph3DCanvas({
       // OS-level motion preference.
       const reducedMotionMql = window.matchMedia("(prefers-reduced-motion: reduce)");
       let userFlowPaused = reducedMotionMql.matches;
+      setMotionPaused(userFlowPaused);
       const onMotionPrefChange = (e: MediaQueryListEvent): void => {
         userFlowPaused = e.matches;
+        setMotionPaused(userFlowPaused);
       };
       reducedMotionMql.addEventListener("change", onMotionPrefChange);
 
@@ -900,13 +893,10 @@ export default function Graph3DCanvas({
         bloomPass.strength = BASE_BLOOM_STRENGTH;
         bloomPass.radius = BASE_BLOOM_RADIUS;
         bloomPass.enabled = true;
-        // Photo mode: lift exposure a touch and add a small rim boost
-        // for cinematic punch. ACES tone mapping protects against
-        // clipping even at the higher exposure, so the saved PNG is
-        // dramatic without going milky. Restored in restoreLiveQuality.
+        // Preserve the live material/exposure; only capture quality changes.
         const prevExposure = bundle.renderer.toneMappingExposure;
-        bundle.renderer.toneMappingExposure = 1.16;
-        nodeSystem.setRimBoost(1.20);
+        bundle.renderer.toneMappingExposure = prevExposure;
+        nodeSystem.setRimBoost(1.0);
         // Force a synchronous render so the readback below sees the
         // current frame even if requestAnimationFrame hasn't ticked
         // since the last paint.
@@ -1148,7 +1138,7 @@ export default function Graph3DCanvas({
             renderStatus(`layout: ${mode}`);
           })
           .catch((err: unknown) => {
-            if ((err as Error).message === "layout-superseded") return;
+            if (disposed || (err as Error).message === "layout-superseded") return;
             // eslint-disable-next-line no-console
             console.warn("[explorer-3d] layout failed:", err);
           });
@@ -1221,11 +1211,15 @@ export default function Graph3DCanvas({
           updateBloomEnabled(!bloomEnabled);
           renderStatus();
         } else if (e.code === "Space") {
+          if (targets.some((t) => t?.tagName === "BUTTON" || t?.tagName === "SUMMARY")) return;
           userFlowPaused = !userFlowPaused;
+          setMotionPaused(userFlowPaused);
           renderStatus();
           e.preventDefault();
         } else if (e.key === "f" || e.key === "F") {
+          activeTween = null;
           if (lastPositions.length > 0) frameAll(lastPositions, bundle.camera, controls);
+          queueCameraSave();
         } else if (e.key === "h" || e.key === "H") {
           setHeatmapEnabled(!heatmapOn);
         } else if (e.shiftKey && (e.key === "S" || e.key === "s")) {
@@ -1357,6 +1351,7 @@ export default function Graph3DCanvas({
         // skipping forward when motion resumes.
         if (framedYet && !userFlowPaused && !adaptiveFlowPaused) flowClock += dt;
         tubeSystem.setTime(flowClock);
+        tubeSystem.setViewportHeight(container.clientHeight);
         nodeSystem.setTime(flowClock);
         wavefrontSystem.tick(now / 1000);
         tickPresetTween(now);
@@ -1388,6 +1383,7 @@ export default function Graph3DCanvas({
         setSelected(id) {
           nodeSystem.setSelected(id);
           applyFocusToScene(id);
+          applyFilters();
           updateHaloFor(id);
           // Travel to the new selection. flyToNode short-circuits if the
           // camera is already nearby (so clicking around a cluster doesn't
@@ -1401,6 +1397,16 @@ export default function Graph3DCanvas({
           wavefrontSystem.trigger(performance.now() / 1000, color);
         },
         applyFilters,
+        frame() {
+          activeTween = null;
+          if (lastPositions.length > 0) frameAll(lastPositions, bundle.camera, controls);
+          queueCameraSave();
+        },
+        toggleMotion() {
+          userFlowPaused = !userFlowPaused;
+          setMotionPaused(userFlowPaused);
+          renderStatus();
+        },
       };
       // Bind the safe wrapper now that renderStatus is in scope.
       renderStatusSafe = () => renderStatus();
@@ -1434,6 +1440,8 @@ export default function Graph3DCanvas({
         haloMat.dispose();
         composer.dispose();
         bloomPass.dispose();
+        outputPass.dispose();
+        smaaPass.dispose();
         bundle.dispose();
         apiRef.current = null;
       };
@@ -1456,8 +1464,14 @@ export default function Graph3DCanvas({
   return (
     <div className="canvas-wrap canvas-3d">
       <div ref={containerRef} className="canvas" />
+      <div className="canvas-heading"><span className="eyebrow">Spatial atlas</span><span>Discover the connections.</span></div>
+      <div className="canvas-tools" role="group" aria-label="3D view controls">
+        <button onClick={() => apiRef.current?.frame()} title="Frame all nodes (F)"><span aria-hidden="true">⌖</span> Fit graph</button>
+        <button onClick={() => apiRef.current?.toggleMotion()} aria-pressed={motionPaused} title="Pause or resume connection flow (Space)"><span aria-hidden="true">{motionPaused ? "▷" : "Ⅱ"}</span> {motionPaused ? "Resume flow" : "Pause flow"}</button>
+        <details className="canvas-help"><summary aria-label="View navigation help">?</summary><div><strong>Explore in space</strong><p>Drag to orbit · Scroll to zoom<br />Right-drag to pan · Click to inspect</p><p><kbd>F</kbd> Fit graph <kbd>H</kbd> Activity heatmap<br /><kbd>L</kbd> Change layout <kbd>Esc</kbd> Clear selection</p></div></details>
+      </div>
       <div className="status" ref={statusRef}>
-        <strong>3D</strong> · slice D · laying out…
+        <strong>3D</strong> · Arranging your graph…
       </div>
     </div>
   );

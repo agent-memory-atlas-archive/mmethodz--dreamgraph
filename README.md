@@ -1,8 +1,8 @@
 ![DreamGraph](assets/dreamgraph.jpeg)
 
-# DreamGraph v13.3.0 - Current Model Support
+# DreamGraph v13.4.0 - Glass Atlas
 
-![Version](https://img.shields.io/badge/version-13.3.0-blue)
+![Version](https://img.shields.io/badge/version-13.4.0-blue)
 ![VS%20Code](https://img.shields.io/badge/VS%20Code-extension-0098FF?logo=visualstudiocode&logoColor=white)
 ![MCP](https://img.shields.io/badge/MCP-enabled-7C3AED)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=nodedotjs&logoColor=white)
@@ -14,7 +14,7 @@
 
 **New here?** Use the [DreamGraph Easy Start guide](guide/00-easy-start.md) for a short path from install to Dashboard, Explorer, and Architect.
 
-**v13.3.0 - Current Model Support** updates OpenAI and Anthropic models across the cognitive engine, standalone Architect, VS Code architect, and Codex CLI adapter, including GPT-6.1 Sol and Claude Opus/Sonnet 5.5. It also preserves provider reasoning through tool calls and respects the newest API request formats. See [release notes](RELEASE_NOTES_v13.3.0.md).
+**v13.4.0 - Glass Atlas** brings a compact Explorer with glass nodes, meaningful shapes, restrained animated connections, and collision-aware labels in both views. Dense hubs retain their colors and links remain thin at close zoom. Enrichment gains configurable context depth and better fallback recovery. Current OpenAI, Anthropic, and Codex CLI model support from v13.3.0 remains available. See [release notes](RELEASE_NOTES_v13.4.0.md).
 
 DreamGraph is a governed architecture cognition layer for MCP-enabled software projects. It combines an instance-scoped daemon, CLI, architect beta, VS Code extension, dashboard, and a persistent knowledge graph so project understanding is grounded in source, ADRs, workflows, tests, runtime observations, and human review rather than any single file read or isolated chat turn.
 
@@ -258,6 +258,8 @@ Once the daemon is running and the project is attached:
 
 ```bash
 dg scan my-project
+dg scan my-project --max-hops 1
+dg enrich my-project --skip-scan --max-hops 1
 ```
 
 You can also use:
@@ -312,6 +314,10 @@ dg scan my-project
 dg plugin list my-project
 dg plugin inspect my-project <plugin-id>
 ```
+
+`--max-hops` sets enrichment graph-neighbor depth for both `dg scan` and `dg enrich` (0–6, default 3). `1` uses direct neighbors; `0` uses node/source evidence without graph neighbors. It reduces context depth rather than imposing a token, call, or spending limit. Use `--skip-scan` for an enrichment-only pass when the source map is current.
+
+The daemon permits one scan or enrichment operation per instance at a time. An overlapping request fails with `GRAPH_OPERATION_BUSY` before paid calls or graph writes; enrichment inside its owning scan remains allowed. This also prevents an automatic model-change refresh from overlapping a running scan. The shared operation guard lives in `src/utils/graph-operation.ts`.
 
 ## Architecture at a Glance
 
@@ -377,6 +383,8 @@ explorer/
   src/
     App.tsx
     GraphCanvas.tsx
+    Graph3DCanvas.tsx
+    label-layout.ts      # viewport label budget, priority, and collision packing
     Inspector.tsx
     TensionsPanel.tsx
     CandidatesPanel.tsx
@@ -391,7 +399,7 @@ explorer/
 
 ## Version Semantics
 
-The CLI, standalone Architect, VS Code Architect, daemon, Explorer, Dashboard, analytics suite, and daemon-exposed MCP authority share release **13.3.0**. MCP initialization and `system://capabilities` report the daemon package version. Analytics reports it with `python -m analytics --version` from the `python/` directory.
+The CLI, standalone Architect, VS Code Architect, daemon, Explorer, Dashboard, analytics suite, and daemon-exposed MCP authority share release **13.4.0**. MCP initialization and `system://capabilities` report the daemon package version. Analytics reports it with `python -m analytics --version` from the `python/` directory.
 
 DreamGraph instance status can show two different version concepts:
 

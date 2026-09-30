@@ -168,14 +168,15 @@ export function App() {
       }}
     >
       <div className="topbar" style={{ gridColumn: "1 / 6" }}>
-        <a className="brand" href="/" title="DreamGraph landing page">DreamGraph Explorer</a>
-        <span className="meta">v{explorerVersion} · curated mutations</span>
+        <a className="brand" href="/" title="DreamGraph landing page"><span className="brand-mark" aria-hidden="true">◈</span><span>DreamGraph<small>EXPLORER</small></span></a>
+        <span className="meta version">v{explorerVersion}</span>
         <SearchBar onPick={setSelected} />
         <div className="mode-toggle">
           <button
             className={`mode-btn${mode === "atlas" ? " active" : ""}`}
             onClick={() => setMode("atlas")}
             title="Show the entire graph"
+            aria-pressed={mode === "atlas"}
           >
             Atlas
           </button>
@@ -184,6 +185,7 @@ export function App() {
             onClick={() => setMode("focus")}
             disabled={!selected}
             title={selected ? "Show only the selected node and its 2-hop neighborhood" : "Select a node first"}
+            aria-pressed={mode === "focus"}
           >
             Focus
           </button>
@@ -192,16 +194,18 @@ export function App() {
           <button
             className={`mode-btn${prefs.renderMode === "2d" ? " active" : ""}`}
             onClick={() => setRenderMode("2d")}
-            title="Classic 2D Sigma renderer"
+            title="Explore on a two-dimensional map"
+            aria-pressed={prefs.renderMode === "2d"}
           >
             2D
           </button>
           <button
             className={`mode-btn${prefs.renderMode === "3d" ? " active" : ""}`}
             onClick={() => setRenderMode("3d")}
-            title="Experimental 3D Three.js renderer (slice A)"
+            title="Explore the spatial glass atlas"
+            aria-pressed={prefs.renderMode === "3d"}
           >
-            3D ✨
+            3D
           </button>
         </div>
         {snapshot ? (
@@ -210,8 +214,8 @@ export function App() {
           </span>
         ) : null}
         {snapshot ? (
-          <span className="meta">
-            etag <strong>{snapshot.etag.slice(7, 15)}</strong>
+          <span className="meta connection-state" title={`Snapshot ${snapshot.etag}`}>
+            <i className={sseConnected ? "connected" : ""} />{sseConnected ? "Live" : "Reconnecting"}
           </span>
         ) : null}
       </div>
@@ -270,6 +274,7 @@ export function App() {
             >
               <Graph3DCanvas
                 prefs={prefs}
+                mode={mode}
                 snapshot={snapshot}
                 selected={selected}
                 onSelect={setSelected}

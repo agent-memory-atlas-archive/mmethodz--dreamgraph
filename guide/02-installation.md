@@ -66,7 +66,7 @@ The installer modifies PATH. Your **current** terminal won't see the change. Ope
 
 ```bash
 dg --version
-# DreamGraph CLI v13.3.0 (Current Model Support)
+# DreamGraph CLI v13.4.0 (Glass Atlas)
 
 dg --help
 # (lists every subcommand)
@@ -89,7 +89,7 @@ If `code` was missing, install the extension manually:
 ```bash
 cd extensions/vscode
 npm run build
-code --install-extension dreamgraph-vscode-13.3.0.vsix
+code --install-extension dreamgraph-vscode-13.4.0.vsix
 ```
 
 ---

@@ -12,6 +12,7 @@
  */
 
 import { Vector3, type PerspectiveCamera } from "three";
+import { placeLabels, type LabelCandidate } from "../label-layout";
 
 /** Shape the overlay needs from each candidate node. */
 export interface LabelTarget {
@@ -20,6 +21,7 @@ export interface LabelTarget {
   x: number;
   y: number;
   z: number;
+  priority?: number;
 }
 
 /** How often to re-project labels. ~15 Hz keeps DOM traffic cheap. */
@@ -34,6 +36,8 @@ export class LabelOverlay {
   private active: LabelTarget[] = [];
   private lastUpdate = 0;
   private readonly tmpVec = new Vector3();
+  private readonly textWidths = new Map<string, number>();
+  private readonly measure = document.createElement("canvas").getContext("2d");
 
   constructor(container: HTMLElement) {
     this.host = document.createElement("div");
@@ -65,7 +69,21 @@ export class LabelOverlay {
     this.lastUpdate = now;
 
     const seen = new Set<string>();
+    const candidates: LabelCandidate[] = [];
     for (const t of this.active) {
+      this.tmpVec.set(t.x, t.y, t.z).project(camera);
+      if (this.tmpVec.z > 1 || this.tmpVec.z < NEAR_CULL) continue;
+      let width = this.textWidths.get(t.label);
+      if (width === undefined) {
+        if (this.measure) this.measure.font = '10px "Segoe UI", sans-serif';
+        width = Math.min(220, Math.ceil(this.measure?.measureText(t.label).width ?? t.label.length * 6) + 22 + Math.ceil(t.label.length * 0.1));
+        this.textWidths.set(t.label, width);
+      }
+      candidates.push({ id: t.id, x: (this.tmpVec.x * 0.5 + 0.5) * viewportW, y: (-this.tmpVec.y * 0.5 + 0.5) * viewportH, width, height: 22, priority: t.priority ?? 0 });
+    }
+    const targets = new Map(this.active.map((target) => [target.id, target]));
+    for (const placement of placeLabels(candidates, viewportW, viewportH)) {
+      const t = targets.get(placement.id)!;
       seen.add(t.id);
       let el = this.pool.get(t.id);
       if (!el) {
@@ -81,31 +99,18 @@ export class LabelOverlay {
           borderRadius: "4px",
           letterSpacing: "0.01em",
           whiteSpace: "nowrap",
-          transform: "translate(-50%, -120%)",
           pointerEvents: "none",
           textShadow: "0 1px 2px rgba(0,0,0,0.6)",
         } satisfies Partial<CSSStyleDeclaration>);
         this.host.appendChild(el);
         this.pool.set(t.id, el);
       }
-      this.tmpVec.set(t.x, t.y, t.z);
-      this.tmpVec.project(camera);
-      // Off-screen / behind camera → hide rather than churning DOM.
-      if (this.tmpVec.z > 1 || this.tmpVec.z < NEAR_CULL || this.tmpVec.z < -1) {
-        el.style.display = "none";
-        continue;
-      }
-      const px = (this.tmpVec.x * 0.5 + 0.5) * viewportW;
-      const py = (-this.tmpVec.y * 0.5 + 0.5) * viewportH;
-      // Clip slack so labels don't pile up at the edges when targets
-      // wander outside the framing.
-      if (px < -40 || px > viewportW + 40 || py < -20 || py > viewportH + 20) {
-        el.style.display = "none";
-        continue;
-      }
-      el.style.display = "";
-      el.style.left = `${px.toFixed(1)}px`;
-      el.style.top = `${py.toFixed(1)}px`;
+      if (el.textContent !== t.label) el.textContent = t.label;
+      el.classList.toggle("selected", (t.priority ?? 0) >= 10000);
+      el.style.width = `${placement.width}px`;
+      el.style.height = `${placement.height}px`;
+      el.style.left = `${placement.left.toFixed(1)}px`;
+      el.style.top = `${placement.top.toFixed(1)}px`;
     }
     // Recycle any pool entries the active set no longer references.
     for (const [id, el] of this.pool) {
@@ -119,6 +124,7 @@ export class LabelOverlay {
   dispose(): void {
     for (const el of this.pool.values()) el.remove();
     this.pool.clear();
+    this.textWidths.clear();
     this.host.remove();
   }
 }

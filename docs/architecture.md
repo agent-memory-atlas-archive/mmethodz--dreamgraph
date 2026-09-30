@@ -1,6 +1,6 @@
 # DreamGraph Architecture
 
-Version: **13.3.0**
+Version: **13.4.0**
 License: **DreamGraph Source-Available Community License v2.0**
 
 ## Overview
@@ -64,6 +64,10 @@ The `dg` CLI is responsible for:
 
 ### VS Code Extension
 The extension integrates DreamGraph into the editor and currently lives under `extensions/vscode/src/`. It surfaces the chat panel, dashboard, the Explorer (interactive graph with curated tension/candidate mutations — selectable 2D Sigma.js view or 3D Three.js view), and changed-files view. The Explorer SPA itself lives under `explorer/src/` and is bundled to `dist/explorer-spa/`, served by the daemon at `/explorer/`.
+
+Explorer's glass rendering uses instanced type-specific geometries and bounded, tinted reflections. `TubeSystem` caps tube radii in screen space and reduces opacity near crowded hubs; normal alpha compositing prevents additive white hotspots. The 3D composer keeps a linear half-float target through bloom, then applies `OutputPass` tone mapping and sRGB conversion before SMAA. Sigma's custom shaders emit premultiplied colors for its blend mode. Both canvases use `label-layout.ts` to prioritize selection, reject overlapping labels, and cap visible labels by viewport area (maximum 18). The 3D label overlay only allocates DOM elements for accepted labels. Filters and two-hop Focus apply to both renderers.
+
+For frontend development against an existing daemon, set `DREAMGRAPH_EXPLORER_PROXY` to its HTTP origin and run `npm --prefix explorer run dev`. Vite proxies Explorer API and event-stream requests to that origin; the default remains `http://localhost:8010`. This allows visual verification without restarting a daemon that is scanning.
 
 ### Copilot CLI Inheritance Proxy
 
@@ -279,7 +283,9 @@ src/
   src/utils/atomic-write.ts
   src/utils/cache.ts
   src/utils/engine-env.ts
+  src/utils/enrichment-context.ts
   src/utils/errors.ts
+  src/utils/graph-operation.ts
   src/utils/graph-reconciliation-barrier.ts
   src/utils/json-store.ts
   src/utils/logger.ts
@@ -495,7 +501,7 @@ scripts/
 
 ## Version Semantics
 
-The CLI, standalone Architect, VS Code Architect, daemon, Explorer, Dashboard, analytics suite, and daemon-exposed MCP authority ship as release **13.3.0**. Daemon HTTP surfaces and MCP identity/resources read the root package version. Explorer reads its package metadata; VS Code MCP clients and CLI bridges use their matching release constants. Analytics reads root package metadata and exposes `--version` on the dispatcher and individual analyzers.
+The CLI, standalone Architect, VS Code Architect, daemon, Explorer, Dashboard, analytics suite, and daemon-exposed MCP authority ship as release **13.4.0**. Daemon HTTP surfaces and MCP identity/resources read the root package version. Explorer reads its package metadata; VS Code MCP clients and CLI bridges use their matching release constants. Analytics reads root package metadata and exposes `--version` on the dispatcher and individual analyzers.
 
 A DreamGraph installation may surface more than one version value:
 

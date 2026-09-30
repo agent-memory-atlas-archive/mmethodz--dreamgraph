@@ -1,5 +1,5 @@
 /**
- * Edge tubes — translucent additive-blended pipes along each edge spline,
+ * Edge filaments — translucent, normally blended tubes along each spline,
  * with a custom shader that draws moving "flow pulses" right on the tube
  * surface. Replaces the old `ParticleSystem`: one draw call instead of
  * 4000+ matrix updates per frame.
@@ -18,6 +18,8 @@
  *   - aConfidence                    (0..1, drives base brightness)
  *   - aPulsePhase                    (per-edge offset, desyncs the flow)
  *   - aFocus                         (1 = highlighted, ~0.15 when dimmed)
+ *   - aCenter                        (centerline for screen-space radius cap)
+ *   - aCrowding                      (opacity budget around dense hubs)
  *
  * The fragment shader walks `vUv.x` (longitudinal) to draw moving pulses
  * and supports bilateral counter-flow for tension edges. Three's standard
@@ -33,7 +35,7 @@
  */
 
 import {
-  AdditiveBlending,
+  NormalBlending,
   BufferAttribute,
   BufferGeometry,
   Color,
@@ -57,21 +59,21 @@ const RADIAL_SEGMENTS = 6;
 /** Warm tint mixed in for hot edges. Roughly amber/orange. */
 const HEAT_COLOR = new Color(1.0, 0.55, 0.15);
 /** How much extra brightness a fully-hot edge gets (1 + this). */
-const HEAT_BRIGHTNESS = 1.2;
+const HEAT_BRIGHTNESS = 0.18;
 
 /** Default focus level for off-focus edges when selection is active. */
-const DEFAULT_DIMMED_FOCUS = 0.30;
+const DEFAULT_DIMMED_FOCUS = 0.16;
 
 /** Per-kind motion table — replaces the old ParticleSystem motion table. */
 const KIND_MOTION: Record<
   ExplorerEdge["kind"],
   { speed: number; density: number; direction: -1 | 0 | 1 }
 > = {
-  validated: { speed: 0.55, density: 4, direction: 1 },
-  candidate: { speed: 0.40, density: 2, direction: 1 },
-  dream:     { speed: 0.18, density: 3, direction: 1 },
-  tension:   { speed: 0.70, density: 5, direction: 0 }, // bilateral
-  fact:      { speed: 0.10, density: 2, direction: 1 },
+  validated: { speed: 0.16, density: 1.4, direction: 1 },
+  candidate: { speed: 0.12, density: 1.2, direction: 1 },
+  dream:     { speed: 0.09, density: 1.3, direction: 1 },
+  tension:   { speed: 0.20, density: 1.8, direction: 0 },
+  fact:      { speed: 0.07, density: 1.0, direction: 1 },
 };
 
 interface EdgeColorRange {
@@ -102,6 +104,9 @@ attribute float aConfidence;
 attribute float aPulsePhase;
 attribute float aFocus;
 attribute float aHidden;
+attribute vec3 aCenter;
+attribute float aCrowding;
+uniform float uViewportHeight;
 
 varying vec2 vUv;
 varying vec3 vColor;
@@ -112,6 +117,7 @@ varying float vConfidence;
 varying float vPulsePhase;
 varying float vFocus;
 varying float vHidden;
+varying float vCrowding;
 varying vec3 vNormalView;
 varying vec3 vViewDir;
 
@@ -125,7 +131,15 @@ void main() {
   vPulsePhase = aPulsePhase;
   vFocus = aFocus;
   vHidden = aHidden;
-  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+  vCrowding = aCrowding;
+  // Cap the radius in CSS pixels. Perspective must never turn a connection
+  // into a thick pipe when the camera approaches a hub.
+  vec4 centerView = modelViewMatrix * vec4(aCenter, 1.0);
+  vec3 offsetView = mat3(modelViewMatrix) * (position - aCenter);
+  float worldPerPixel = 2.0 * max(0.01, -centerView.z) / (projectionMatrix[1][1] * max(1.0, uViewportHeight));
+  float radiusPixels = mix(0.45, 0.70, aConfidence);
+  offsetView *= min(1.0, worldPerPixel * radiusPixels / max(length(offsetView), 0.00001));
+  vec4 mvPosition = centerView + vec4(offsetView, 0.0);
   // TubeGeometry generates outward-facing normals, perfect for fresnel.
   vNormalView = normalize(normalMatrix * normal);
   vViewDir = normalize(-mvPosition.xyz);
@@ -149,6 +163,7 @@ varying float vConfidence;
 varying float vPulsePhase;
 varying float vFocus;
 varying float vHidden;
+varying float vCrowding;
 varying vec3 vNormalView;
 varying vec3 vViewDir;
 
@@ -160,12 +175,8 @@ float pulse(float t) {
 
 void main() {
   if (vHidden > 0.5) discard;
-  // Base tube glow, scaled by confidence so low-trust edges fade back.
-  // Phase 9 lifted the floor (0.30 → 0.42) and softened the confidence
-  // slope so even medium / low-trust edges remain clearly visible
-  // without needing the flow head to draw them in. The hue-preserving
-  // roll-off below still prevents dense-hub blowout.
-  float baseI = 0.42 + 0.48 * vConfidence;
+  // A quiet baseline keeps low-trust edges behind their moving pulses.
+  float baseI = 0.38 + 0.28 * vConfidence;
   vec3 base = vColor * baseI;
 
   float flow;
@@ -182,49 +193,36 @@ void main() {
   // Bright pulse on top of the base — ride the per-edge colour ONLY,
   // no achromatic white-add. The previous "+ vec3(flow * 0.25)" term
   // was bleeding hue out of dense clusters, turning green hubs white.
-  vec3 col = base + vColor * flow * 1.05;
+  vec3 col = base + vColor * flow * 0.42;
 
   // Fresnel rim — lifts the tube silhouette so it reads as a translucent
   // glass conduit. Coloured-only (no white add) for the same reason as
   // the flow term: keep edges green/blue/etc. through tone mapping.
   float NoV = clamp(dot(normalize(vNormalView), normalize(vViewDir)), 0.0, 1.0);
   float fresnel = pow(1.0 - NoV, 2.4);
-  col += vColor * fresnel * 0.40;
+  col += vColor * fresnel * 0.12;
 
   // Focus dimming — pre-fog so dimmed edges also sink into the haze.
   col *= mix(${DEFAULT_DIMMED_FOCUS.toFixed(3)}, 1.0, vFocus);
 
-  // Soft hue-preserving roll-off so additive overlap in dense hubs
-  // tapers toward (but never reaches) saturation. Each pixel is still
-  // bright; we just stop runaway clipping to flat white.
+  // Bound highlights before normal alpha compositing, preserving hue.
   float peak = max(max(col.r, col.g), col.b);
-  col = col / (1.0 + 0.55 * peak);
+  col = col / max(1.0, peak / 0.72);
 
-  // Alpha rises with the flow head + rim so dim trails don't pile up
-  // to opaque but silhouettes still hold against the dark scene.
-  // Phase 9 lifted the alpha floor (0.12 → 0.20) and the dimmed-focus
-  // alpha floor (0.4 → 0.55) so non-pulsing tube segments and dimmed
-  // edges remain legible without piling up in dense hubs.
-  float alpha = 0.20 + 0.40 * flow + 0.18 * fresnel;
-  alpha *= mix(0.55, 1.0, vFocus);
+  // Feather the junctions and reduce crowded-edge opacity, leaving the
+  // node itself legible. Normal compositing bounds accumulated brightness.
+  float junction = smoothstep(0.0, 0.055, vUv.x) * (1.0 - smoothstep(0.945, 1.0, vUv.x));
+  float alpha = (0.12 + 0.30 * flow + 0.03 * fresnel) * vCrowding * junction;
+  alpha *= mix(0.26, 1.0, vFocus);
 
   gl_FragColor = vec4(col, alpha);
 
-  // Phase 6 — atmospheric distance attenuation in place of stock
-    // mix-to-fog-colour. With additive blending, mixing toward the near-
-    // black background literally subtracts the contribution and far tubes
-    // vanish into the void. Instead we apply a gentle intensity falloff
-    // with a hue-preserving floor so distant edges keep their colour and
-    // a faint glow even at the far rim — atmospheric haze, not blackout.
-    // Phase 9 raised the far-distance brightness floor (0.70 → 0.82)
-    // and the alpha floor (0.72 → 0.84) so medium / far edges remain
-    // legible — distance now communicates depth without erasing edges.
+  // Depth attenuation leaves a faint trace of distant connections.
   #ifdef USE_FOG
     float fogFactor = smoothstep(fogNear, fogFar, vFogDepth);
-    float atten = mix(1.0, 0.82, fogFactor);
+    float atten = mix(1.0, 0.55, fogFactor);
     gl_FragColor.rgb *= atten;
-    gl_FragColor.rgb += vColor * fogFactor * 0.07;
-    gl_FragColor.a *= mix(1.0, 0.84, fogFactor);
+    gl_FragColor.a *= mix(1.0, 0.55, fogFactor);
   #endif
 }
 `;
@@ -245,13 +243,13 @@ export class TubeSystem {
     this.material = new ShaderMaterial({
       uniforms: UniformsUtils.merge([
         UniformsLib.fog,
-        { uTime: { value: 0 } },
+        { uTime: { value: 0 }, uViewportHeight: { value: 900 } },
       ]),
       vertexShader: VERTEX_SHADER,
       fragmentShader: FRAGMENT_SHADER,
       transparent: true,
       depthWrite: false,
-      blending: AdditiveBlending,
+      blending: NormalBlending,
       vertexColors: true,
       fog: true,
     });
@@ -271,12 +269,17 @@ export class TubeSystem {
     const ranges: EdgeColorRange[] = [];
     const metas: EdgeMeta[] = [];
     let cursor = 0;
+    const degrees = new Map<string, number>();
+    for (const edge of this.splines.metas) {
+      degrees.set(edge.s, (degrees.get(edge.s) ?? 0) + 1);
+      degrees.set(edge.t, (degrees.get(edge.t) ?? 0) + 1);
+    }
     for (const meta of this.splines.metas) {
       const curve = this.splines.curves[meta.index];
       const style = EDGE_STYLES[meta.kind];
       const motion = KIND_MOTION[meta.kind];
       // Radius scales with the 2D edge size and confidence.
-      const radius = 0.06 + style.size * 0.05 + meta.conf * 0.06;
+      const radius = 0.055 + style.size * 0.018 + meta.conf * 0.025;
       const tube = new TubeGeometry(
         curve,
         TUBULAR_SEGMENTS,
@@ -300,9 +303,19 @@ export class TubeSystem {
       const aPhase = new Float32Array(vCount);
       const aFocus = new Float32Array(vCount);
       const aHidden = new Float32Array(vCount);
+      const centers = new Float32Array(vCount * 3);
+      const crowding = new Float32Array(vCount);
+      const positions = tube.getAttribute("position");
+      const normals = tube.getAttribute("normal");
+      const density = Math.max(degrees.get(meta.s) ?? 1, degrees.get(meta.t) ?? 1);
+      const opacityScale = Math.max(0.32, 1 / Math.sqrt(1 + density / 18));
       // Deterministic per-edge phase offset so flows aren't synchronised.
       const phase = pseudoRandom(meta.s + ":" + meta.t + ":" + meta.kind);
       for (let v = 0; v < vCount; v++) {
+        centers[v * 3] = positions.getX(v) - normals.getX(v) * radius;
+        centers[v * 3 + 1] = positions.getY(v) - normals.getY(v) * radius;
+        centers[v * 3 + 2] = positions.getZ(v) - normals.getZ(v) * radius;
+        crowding[v] = opacityScale;
         colors[v * 3 + 0] = baseR;
         colors[v * 3 + 1] = baseG;
         colors[v * 3 + 2] = baseB;
@@ -322,6 +335,8 @@ export class TubeSystem {
       tube.setAttribute("aPulsePhase", new BufferAttribute(aPhase, 1));
       tube.setAttribute("aFocus", new BufferAttribute(aFocus, 1));
       tube.setAttribute("aHidden", new BufferAttribute(aHidden, 1));
+      tube.setAttribute("aCenter", new BufferAttribute(centers, 3));
+      tube.setAttribute("aCrowding", new BufferAttribute(crowding, 1));
 
       parts.push(tube);
       ranges.push({ start: cursor, count: vCount, baseR, baseG, baseB });
@@ -357,6 +372,10 @@ export class TubeSystem {
   /** Advance the shader clock; call once per frame from the render loop. */
   setTime(seconds: number): void {
     this.material.uniforms["uTime"].value = seconds;
+  }
+
+  setViewportHeight(height: number): void {
+    this.material.uniforms["uViewportHeight"].value = Math.max(1, height);
   }
 
   /** Vertex offsets for each edge, exposed for tests + heatmap callers. */

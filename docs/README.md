@@ -1,6 +1,6 @@
 # DreamGraph Documentation
 
-Version: **13.3.0** — [Current Model Support](../RELEASE_NOTES_v13.3.0.md).
+Version: **13.4.0** — [Glass Atlas](../RELEASE_NOTES_v13.4.0.md).
 
 **Project website:** [dreamgraph.nofs.ai](https://dreamgraph.nofs.ai/) · **User guide:** [`guide/`](../guide/README.md)
 

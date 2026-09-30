@@ -61,7 +61,7 @@ void main() {
   float kind = floor(a_meta.z * 255.0 + 0.5);
 
   // Subtle breathe: ±3% size oscillation. Tension nodes pulse harder.
-  float breatheAmp = (kind > 1.5 && kind < 2.5) ? 0.10 : 0.03;
+  float breatheAmp = (kind > 1.5 && kind < 2.5) ? 0.025 : 0.01;
   float breathe = 1.0 + breatheAmp * sin(u_time * 1.4 + phase);
 
   // Match NodeCircleProgram's expansion math (×4 size).
@@ -130,10 +130,29 @@ void main(void) {
   float health = v_meta.x;
   float confidence = v_meta.y;
   float kind = floor(v_meta.z * 255.0 + 0.5);
+  float shape = floor(v_meta.w * 255.0 + 0.5);
 
-  float innerMask = 1.0 - smoothstep(0.58, 0.66, r);
-  float ringMask  = smoothstep(0.62, 0.70, r) * (1.0 - smoothstep(0.88, 0.96, r));
-  float haloMask  = smoothstep(0.90, 1.0, r);
+  // Silhouettes echo the spatial atlas, so colour is not the only cue.
+  if (shape < 0.5 || (shape > 4.5 && shape < 5.5)) {
+    vec2 p = abs(uv * (shape < 0.5 ? vec2(1.3) : vec2(1.15, 1.7))) - vec2(0.62);
+    r = length(max(p, 0.0)) + min(max(p.x, p.y), 0.0) + 0.62;
+  } else if (shape < 1.5 || shape > 6.5) {
+    r = max(abs(uv.x) * 0.866 + uv.y * 0.5, -uv.y) * 1.7;
+  } else if (shape < 2.5) {
+    r = max(abs(uv.x) * 0.866 + abs(uv.y) * 0.5, abs(uv.y)) * 1.08;
+  } else if (shape > 3.5 && shape < 4.5) {
+    r = length(uv * vec2(1.0, 1.25));
+  } else if (shape > 5.5 && shape < 6.5) {
+    r = (abs(uv.x) + abs(uv.y) * 0.8) * 1.2;
+  }
+
+  float innerMask = 1.0 - smoothstep(0.78, 0.85, r);
+  float ringMask  = smoothstep(0.79, 0.86, r) * (1.0 - smoothstep(0.91, 0.98, r));
+  float haloMask  = smoothstep(0.90, 0.97, r) * (1.0 - smoothstep(0.97, 1.0, r));
+  if (shape > 2.5 && shape < 3.5) {
+    innerMask *= smoothstep(0.38, 0.50, r);
+    ringMask += smoothstep(0.36, 0.42, r) * (1.0 - smoothstep(0.42, 0.49, r));
+  }
 
   float aa = 1.0;
   if (outerEdge > 0.0) {
@@ -142,50 +161,52 @@ void main(void) {
 
   // ── Inner disc with health tint and a fake-3D specular highlight ─
   vec3 healthShift = mix(vec3(1.0, 0.42, 0.42), vec3(1.0), clamp(health + 0.15, 0.0, 1.0));
-  vec3 innerRGB = v_color.rgb * healthShift;
+  vec3 innerRGB = v_color.rgb * healthShift * 0.65;
 
   // Specular highlight at upper-left: gives every node a glassy bead look.
   vec2 lightDir = vec2(-0.35, 0.45);
   float specD = distance(uv, lightDir);
-  float spec = exp(-specD * specD * 18.0) * 0.55;
-  innerRGB = innerRGB + vec3(spec);
+  float spec = exp(-specD * specD * 28.0) * 0.30;
+  innerRGB += mix(v_color.rgb, vec3(0.8, 0.9, 1.0), 0.3) * spec;
 
   // Soft inner shadow toward bottom-right edge for depth.
   float shade = 1.0 - smoothstep(0.0, 0.6, distance(uv, vec2(0.4, -0.45)));
   innerRGB *= 0.85 + 0.25 * shade;
 
   // ── Confidence ring ─────────────────────────────────────────────
-  float ringIntensity = 0.25 + confidence * 0.85;
+  float ringIntensity = 0.50 + confidence * 0.35;
   vec3 ringRGB = v_ring.rgb;
 
   // Dream shimmer: angular sine sweep on the ring.
   if (kind > 0.5 && kind < 1.5) {
     float angle = atan(v_diffVector.y, v_diffVector.x);
     float wave = 0.5 + 0.5 * sin(angle * 3.0 + u_time * 1.6 + v_phase);
-    ringIntensity *= 0.55 + 0.65 * wave;
-    ringRGB = mix(ringRGB, vec3(1.0, 0.95, 1.0), wave * 0.4);
+    ringIntensity *= 0.75 + 0.25 * wave;
   }
   // Tension pulse.
   float pulseAmt = 0.0;
   if (kind > 1.5 && kind < 2.5) {
     pulseAmt = 0.5 + 0.5 * sin(u_time * 2.8 + v_phase);
-    ringIntensity *= 0.7 + 0.7 * pulseAmt;
+    ringIntensity *= 0.85 + 0.15 * pulseAmt;
   }
   // Focused (hovered).
   if (kind > 2.5) {
-    ringIntensity = 1.25 + 0.15 * sin(u_time * 5.0);
+    ringIntensity = 0.95;
   }
 
   // ── Compose layers ──────────────────────────────────────────────
   vec3 rgb = innerRGB * innerMask
            + ringRGB * ringIntensity * ringMask
-           + ringRGB * 0.45 * haloMask * (0.6 + pulseAmt * 0.6);
+           + ringRGB * 0.10 * haloMask;
 
   float alpha = (innerMask * v_color.a)
               + (ringMask  * v_ring.a * (0.6 + ringIntensity * 0.45))
               + (haloMask  * v_ring.a * 0.30 * (0.5 + pulseAmt));
 
-  gl_FragColor = vec4(rgb, alpha * aa);
+  rgb /= max(1.0, max(rgb.r, max(rgb.g, rgb.b)) / 0.9);
+  // Sigma composites with ONE / ONE_MINUS_SRC_ALPHA: RGB must be premultiplied.
+  float coverage = min(0.98, alpha) * aa;
+  gl_FragColor = vec4(rgb * coverage, coverage);
 }
 `;
 
@@ -199,6 +220,7 @@ export interface NodeRingDisplayData extends NodeDisplayData {
   health?: number;
   confidence?: number;
   ringKind?: number;
+  nodeType?: string;
 }
 
 export class NodeRingProgram<
@@ -206,6 +228,7 @@ export class NodeRingProgram<
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
 > extends NodeProgram<Uniform, N, E, G> {
+  private readonly reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   static readonly ANGLE_1 = 0;
   static readonly ANGLE_2 = (2 * Math.PI) / 3;
   static readonly ANGLE_3 = (4 * Math.PI) / 3;
@@ -247,7 +270,8 @@ export class NodeRingProgram<
     const health = clampByte((data.health ?? 1) * 255);
     const confidence = clampByte((data.confidence ?? 1) * 255);
     const kind = clampByte(data.ringKind ?? NODE_KIND_NEUTRAL);
-    const metaFloat = packFourBytesToFloat(health, confidence, kind, 0);
+    const shape = Math.max(0, ["feature", "workflow", "data_model", "capability", "datastore", "ui_element", "dream_node", "tension"].indexOf(data.nodeType ?? "feature"));
+    const metaFloat = packFourBytesToFloat(health, confidence, kind, shape);
 
     array[startIndex++] = data.x;
     array[startIndex++] = data.y;
@@ -264,7 +288,7 @@ export class NodeRingProgram<
     gl.uniform1f(uniformLocations.u_sizeRatio, params.sizeRatio);
     gl.uniformMatrix3fv(uniformLocations.u_matrix, false, params.matrix);
     // u_time is in seconds since first render of this program instance.
-    gl.uniform1f(uniformLocations.u_time, performance.now() / 1000);
+    gl.uniform1f(uniformLocations.u_time, this.reducedMotion.matches ? 0 : performance.now() / 1000);
   }
 }
 

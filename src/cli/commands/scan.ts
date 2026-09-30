@@ -16,6 +16,7 @@ import {
   isProcessAlive,
 } from "../utils/daemon.js";
 import { mcpCallTool } from "../utils/mcp-call.js";
+import { parseEnrichmentContextHops } from "../../utils/enrichment-context.js";
 
 export async function cmdScan(
   positional: string[],
@@ -34,6 +35,7 @@ must be started first with 'dg start <instance>'.
 Options:
   --depth <shallow|deep>    Scan depth (default: deep)
   --targets <list>          Comma-separated: features,workflows,data_model,ui
+  --max-hops <0-6>          Maximum enrichment graph hops (default: 3; 0 omits neighbors)
   --incremental             Reconcile only repository evidence changed since the baseline
   --dry-run                 Preview the incremental delta without parsing or graph writes
   --json                    Output raw JSON result
@@ -44,6 +46,8 @@ Options:
 
   const query = positional[0];
   const jsonOutput = flags.json === true;
+  const maxHops = flags["max-hops"] === undefined ? undefined
+    : parseEnrichmentContextHops(flags["max-hops"], "--max-hops");
 
   // 1. Resolve instance
   const { entry, instanceRoot } = await resolveInstanceForCommand(query, flags);
@@ -59,6 +63,7 @@ Options:
 
   // 3. Build tool arguments
   const args: Record<string, unknown> = {};
+  if (maxHops !== undefined) args.context_hops = maxHops;
 
   if (typeof flags.depth === "string") {
     if (!["shallow", "deep"].includes(flags.depth)) {

@@ -16,7 +16,8 @@ export default defineConfig({
   server: {
     // Standalone vite dev mode: proxy API calls to a running daemon.
     proxy: {
-      "/explorer/api": "http://localhost:8010",
+      "/explorer/api": process.env.DREAMGRAPH_EXPLORER_PROXY ?? "http://localhost:8010",
+      "/explorer/events": process.env.DREAMGRAPH_EXPLORER_PROXY ?? "http://localhost:8010",
     },
   },
 });

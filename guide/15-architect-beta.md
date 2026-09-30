@@ -47,7 +47,7 @@ In v13, Architect also owns cognitive graph health as part of ordinary reasoning
 
 Before opening architect, you need:
 
-- DreamGraph v13.3.0 Current Model Support installed.
+- DreamGraph v13.4.0 Glass Atlas installed.
 - A DreamGraph instance created with `dg init`.
 - A project attached to that instance, either during `dg init` or later with `dg attach`.
 - The daemon running in HTTP mode.

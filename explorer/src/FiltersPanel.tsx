@@ -5,6 +5,7 @@ import {
   type FilterState,
 } from "./filters";
 import type { ExplorerEdgeKind, ExplorerNodeType } from "./types";
+import { NODE_SHAPES } from "./theme";
 
 interface Props {
   filters: FilterState;
@@ -21,23 +22,22 @@ interface Props {
 export function FiltersPanel({ filters, onChange, nodeColors, edgeColors }: Props) {
   return (
     <div className="filters">
+      <div className="rail-heading"><span className="eyebrow">Your knowledge</span><h2>Graph layers</h2><p>Shape what comes into view.</p></div>
       <h3 className="filters-title">Node types</h3>
       <ul className="filters-list">
         {ALL_NODE_TYPES.map((t) => (
           <li key={t} className="filters-row">
-            <label>
+            <label title={NODE_SHAPES[t].description}>
               <input
                 type="checkbox"
+                aria-label={t.replace(/_/g, " ")}
                 checked={filters.nodeTypes.has(t)}
                 onChange={() =>
                   onChange({ ...filters, nodeTypes: toggle(filters.nodeTypes, t) })
                 }
               />
-              <span
-                className="filters-swatch"
-                style={{ background: nodeColors[t] }}
-              />
-              <span className="filters-name">{t}</span>
+              <svg className="node-shape" viewBox="0 0 24 24" fill="none" stroke={nodeColors[t]} strokeWidth="1.35" strokeLinejoin="round" aria-hidden="true"><path d={NODE_SHAPES[t].path} /></svg>
+              <span className="filters-name">{t.replace(/_/g, " ")}</span>
             </label>
           </li>
         ))}
@@ -50,6 +50,7 @@ export function FiltersPanel({ filters, onChange, nodeColors, edgeColors }: Prop
             <label>
               <input
                 type="checkbox"
+                aria-label={`${k} connections`}
                 checked={filters.edgeKinds.has(k)}
                 onChange={() =>
                   onChange({ ...filters, edgeKinds: toggle(filters.edgeKinds, k) })
@@ -69,6 +70,7 @@ export function FiltersPanel({ filters, onChange, nodeColors, edgeColors }: Prop
       <div className="filters-row filters-row--slider">
         <input
           type="range"
+          aria-label="Minimum confidence"
           min={0}
           max={1}
           step={0.05}

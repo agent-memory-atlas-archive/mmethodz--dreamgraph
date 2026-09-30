@@ -76,6 +76,8 @@ import { extractNativeDataModel, hasNativeCodeFiles } from "./native-data-model.
 import { extractNativeUiElements, hasScannableUiFiles } from "./native-ui-scanner.js";
 import { applyScannerUiElements } from "./ui-registry.js";
 import { enrichParserNodesProgrammatic, type EnrichResult } from "./enrich-parser-nodes.js";
+import { DEFAULT_ENRICHMENT_CONTEXT_HOPS, MAX_ENRICHMENT_CONTEXT_HOPS, parseEnrichmentContextHops } from "../utils/enrichment-context.js";
+import { GraphOperationBusyError, withGraphOperation } from "../utils/graph-operation.js";
 import { buildCoverageLedger, validateCoverageLedger } from "./coverage-ledger.js";
 import { runDatastoreScan } from "./db-senses.js";
 import { autoSeedPrimaryDatastore } from "../instance/datastore-bootstrap.js";
@@ -706,6 +708,8 @@ export interface RunScanOptions {
   mode?: "full" | "incremental";
   dry_run?: boolean;
   enrich?: boolean;
+  /** Maximum graph-neighbor depth for any enrichment pass; zero omits neighbors. */
+  context_hops?: number;
   /** Optional progress callback (replaces MCP progress notifications) */
   onProgress?: (message: string, step: number, total: number) => void;
   /** Test-only observation/barrier hooks; omitted by MCP, CLI, and production callers. */
@@ -724,6 +728,11 @@ export interface RunScanOptions {
  * Can also be called programmatically (e.g. during instance bootstrap).
  */
 export async function runScanProject(opts: RunScanOptions = {}): Promise<ScanProjectResult> {
+  return withGraphOperation("scan", () => executeScanProject(opts));
+}
+
+async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResult> {
+  const contextHops = parseEnrichmentContextHops(opts.context_hops);
   const VALID_TARGETS = ["features", "workflows", "data_model", "ui"];
   const depth = opts.depth ?? "deep";
   const targetList = opts.targets ?? [...VALID_TARGETS];
@@ -929,7 +938,7 @@ export async function runScanProject(opts: RunScanOptions = {}): Promise<ScanPro
     if (opts.enrich === true) {
       const enriched = await enrichParserNodesProgrammatic({
         target: "all", maxNodes: Number.MAX_SAFE_INTEGER, batchSize: 12,
-        dryRun: false, force: false, contextHops: 3, relationContextSize: 40,
+        dryRun: false, force: false, contextHops, relationContextSize: 40,
         modelSource: "auto", scheduleStabilization: false,
       });
       if (enriched.success) explicitEnrichment = enriched.data;
@@ -1358,18 +1367,18 @@ export async function runScanProject(opts: RunScanOptions = {}): Promise<ScanPro
   }
 
   // Mandatory graph-wide pass after every structural scanner. It covers all
-  // canonical nodes, always traverses more than one semantic hop, and may use
+  // canonical nodes, uses the requested maximum graph-neighbor depth, and may use
   // either standalone or Architect LLM configuration.
   let semanticEnrichment: EnrichResult | undefined;
   try {
-    progress("Enriching every graph node with multi-hop semantic context…");
+    progress(`Enriching every graph node with semantic context (max hops: ${contextHops})…`);
     const enriched = await enrichParserNodesProgrammatic({
       target: "all",
       maxNodes: Number.MAX_SAFE_INTEGER,
       batchSize: Math.max(1, Math.min(20, Number(process.env.DREAMGRAPH_ENRICHMENT_BATCH_SIZE) || 12)),
       dryRun: false,
       force: true,
-      contextHops: 3,
+      contextHops,
       relationContextSize: 40,
       modelSource: "auto",
       scheduleStabilization: false,
@@ -1656,7 +1665,7 @@ export function registerScanProjectTool(server: McpServer): void {
     "scan_project",
     "Scan the project and populate the knowledge graph with features, workflows, and data model entities. " +
     "Full scans preserve mandatory graph-wide enrichment; incremental scans reconcile evidence with zero LLM calls unless enrich=true. " +
-    "using source evidence and at least two semantic graph hops. UI contracts, appearance, " +
+    "using source evidence and configurable graph-neighbor depth (default three hops). UI contracts, appearance, " +
     "layout, datastore tables, and cross-node relations are included. " +
     "Use this for quick initial enrichment — you can always refine with " +
     "enrich_seed_data and register_ui_element afterward. " +
@@ -1689,8 +1698,10 @@ export function registerScanProjectTool(server: McpServer): void {
       mode: z.enum(["full", "incremental"]).default("full").describe("full preserves existing behavior; incremental reconciles a compatible committed evidence baseline."),
       dry_run: z.boolean().default(false).describe("Preview the incremental delta without parser, LLM, or graph writes."),
       enrich: z.boolean().default(false).describe("Incremental only: explicitly run semantic enrichment after structural reconciliation. Default false."),
+      context_hops: z.number().int().min(0).max(MAX_ENRICHMENT_CONTEXT_HOPS).default(DEFAULT_ENRICHMENT_CONTEXT_HOPS)
+        .describe("Maximum semantic graph hops for enrichment (0 omits graph neighbors; default 3). Does not change filesystem scan depth."),
     },
-    async ({ depth, targets, repos, mode, dry_run, enrich }, extra) => {
+    async ({ depth, targets, repos, mode, dry_run, enrich, context_hops }, extra) => {
       const VALID_TARGETS = ["features", "workflows", "data_model", "ui"];
       const targetList = targets ?? [...VALID_TARGETS];
 
@@ -1735,11 +1746,11 @@ export function registerScanProjectTool(server: McpServer): void {
 
       const result = await safeExecute<ScanProjectResult>(async (): Promise<ToolResponse<ScanProjectResult>> => {
         try {
-          const scanResult = await runScanProject({ depth, targets: targetList, repos, mode, dry_run, enrich, onProgress });
+          const scanResult = await runScanProject({ depth, targets: targetList, repos, mode, dry_run, enrich, context_hops, onProgress });
           return success<ScanProjectResult>(scanResult);
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
-          return error("SCAN_FAILED", msg);
+          return error(err instanceof GraphOperationBusyError ? err.code : "SCAN_FAILED", msg);
         }
       });
 

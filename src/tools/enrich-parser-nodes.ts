@@ -64,6 +64,8 @@ import { atomicWriteFile } from "../utils/atomic-write.js";
 import { dataPath } from "../utils/paths.js";
 import { success, error, safeExecute } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
+import { DEFAULT_ENRICHMENT_CONTEXT_HOPS, MAX_ENRICHMENT_CONTEXT_HOPS, parseEnrichmentContextHops } from "../utils/enrichment-context.js";
+import { GraphOperationBusyError, withGraphOperation } from "../utils/graph-operation.js";
 import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { spawn } from "node:child_process";
@@ -85,6 +87,7 @@ import {
   persistEnrichmentRun,
   recordEnrichmentOutcome,
   resumableNodeIds,
+  unfinishedEnrichmentNodeIds,
   type EnrichmentRunState,
 } from "./enrichment-state.js";
 import type {
@@ -340,23 +343,36 @@ const UI_KNOWLEDGE_JSON_SCHEMA: Record<string, unknown> = {
   },
 };
 
-function enrichmentJsonSchema(batch: readonly ParserNodeRecord[]): Record<string, unknown> {
+export function enrichmentJsonSchema(
+  batch: readonly ParserNodeRecord[],
+  validAnchorIds: ReadonlySet<string>,
+  validRelationTargets: ReadonlyMap<string, GraphNodeType>,
+): Record<string, unknown> {
   const uiBatch = batch.some((node) => node.graph_type === "ui_element");
+  const anchorIds = [...validAnchorIds];
+  const relationIds = [...validRelationTargets.keys()];
+  // Keep large custom batches within Structured Outputs' enum count/string limits.
+  // Reserve 200 values for the shared relation vocabulary and UI contract enums.
+  const boundedEnum = (ids: string[], budget: number): { enum?: string[] } =>
+    ids.length <= budget && (ids.length <= 250 || ids.join("").length <= 15_000)
+      ? { enum: ids } : {};
+  const anchorIdEnum = boundedEnum(anchorIds, 800 - batch.length);
+  const relationIdEnum = boundedEnum(relationIds, 800 - batch.length - (anchorIdEnum.enum?.length ?? 0));
   const resultProperties: Record<string, unknown> = {
-    id: { type: "string" },
-    description: { type: "string" },
-    intent: { type: "string" },
+    id: { type: "string", enum: batch.map((node) => node.id) },
+    description: { type: "string", minLength: 80 },
+    intent: { type: "string", minLength: 24 },
     purpose: { type: "string" },
     tags: { type: "array", items: { type: "string" } },
     feature_anchors: {
       type: "array",
-      maxItems: 5,
+      maxItems: validAnchorIds.size > 0 ? 5 : 0,
       items: {
         type: "object",
         additionalProperties: false,
         required: ["target_id", "relationship", "rationale", "evidence_excerpt"],
         properties: {
-          target_id: { type: "string" },
+          target_id: { type: "string", ...(validAnchorIds.size > 0 ? anchorIdEnum : {}) },
           relationship: {
             type: "string",
             enum: ["implements", "supports", "belongs_to", "realizes", "documents", "tests", "uses", "depends_on", "composes", "related_to"],
@@ -368,13 +384,13 @@ function enrichmentJsonSchema(batch: readonly ParserNodeRecord[]): Record<string
     },
     relations: {
       type: "array",
-      maxItems: 8,
+      maxItems: validRelationTargets.size > 0 ? 8 : 0,
       items: {
         type: "object",
         additionalProperties: false,
         required: ["target_id", "target_type", "relationship", "rationale", "evidence_excerpt"],
         properties: {
-          target_id: { type: "string" },
+          target_id: { type: "string", ...(validRelationTargets.size > 0 ? relationIdEnum : {}) },
           target_type: { type: "string", enum: ["feature", "workflow", "data_model", "ui_element", "datastore", "capability"] },
           relationship: { type: "string" },
           rationale: { type: "string" },
@@ -396,6 +412,8 @@ function enrichmentJsonSchema(batch: readonly ParserNodeRecord[]): Record<string
   properties: {
     results: {
       type: "array",
+      minItems: batch.length,
+      maxItems: batch.length,
       items: {
         type: "object",
         additionalProperties: false,
@@ -411,20 +429,22 @@ const SYSTEM_PROMPT = `You are DreamGraph's graph-wide semantic knowledge enrich
 
 You receive a small batch of graph nodes, a deduplicated source-evidence catalog, confidence-qualified semantic cache entries from already-enriched neighbors, and an unresolved neighborhood expanded to multiple hops. For EVERY input node, infer rich knowledge from the supplied evidence only. Treat high-confidence semantic cache entries as reusable evidence for the areas identified by evidence_plan; do not require source excerpts again for covered areas. Use source evidence for uncovered, stale, conflicting, or low-confidence areas, and reconcile cache conflicts in favor of the supplied source catalog. source_evidence_refs point to entries in that catalog. Follow causal, data-flow, composition, invocation, rendering, persistence, contract, configuration, and verification relations through the neighborhood instead of stopping at names or directory proximity.
 
+The supplied semantic context depth is a maximum. At depth 0, use only the node and its source evidence, and return empty relations and feature_anchors arrays.
+
 Rules:
   1. Do NOT fabricate. If evidence is thin, state the evidence boundary in intent and lower confidence. Never invent a datastore, UI behavior, or code relation.
   2. description: write 2-4 substantive sentences explaining WHAT the node represents, WHY it exists, HOW it works or participates in a flow, and its meaningful relations to named neighbor nodes. Never return inventory prose such as "N source files in path/", "detected by scanner", or "auto-created from introspection".
   3. intent: one substantive sentence explaining the design need or user/system outcome this node serves.
   4. purpose: a concise semantic role tag such as configuration, service-locator, value-object, request-payload, domain-entity, workflow, datastore, or UI-shell.
   5. tags: 1-5 short lowercase indexing tokens.
-  6. feature_anchors: retained for compatibility; use only for evidenced Feature links and exact supplied ids.
-  7. relations: zero to eight deeper semantic links to exact ids in the supplied semantic cache or unresolved multi-hop neighborhoods. Prefer precise relations over related_to and include compact evidence for every relation.
+  6. feature_anchors: retained for compatibility; prefer an empty array and express links in relations. If used, select only IDs listed under "Feature anchors available". Data-model, workflow, UI, datastore, and capability IDs belong in relations, never in feature_anchors.
+  7. relations: zero to eight deeper semantic links to exact ids in the supplied semantic cache or unresolved multi-hop neighborhoods. Copy target_type from that target's graph_type, not from its name or semantic role. Prefer precise relations over related_to and include compact evidence for every relation. Never link a node to itself in relations or feature_anchors.
   8. For graph_type=ui_element, also return ui_knowledge. List every source-evidenced prop as a data_contract input and always include at least one output describing the rendered information or state. Capture evidenced user interactions (an empty list is valid only for a passive component), abstract appearance and visual hierarchy, layout/composition, owning features, and child UI elements.
   9. confidence: self-reported 0..1 score for the whole record.
   10. id: echo the input id verbatim.
 
 Allowed feature anchor relationships: implements, supports, belongs_to, realizes, documents, tests, uses, depends_on, composes, related_to.
-Return strict JSON: { "results": [ ... ] } with one entry per input node, in the same order. Every result includes relations; ui_knowledge is included for UI nodes.`;
+Return strict JSON: { "results": [ ... ] } with exactly one entry for EVERY input node, in the same order. Do not stop after a representative subset. Keep optional relations compact so the entire batch fits the output budget. Every result includes relations; ui_knowledge is included for UI nodes.`;
 
 // ---------------------------------------------------------------------------
 // Filtering & bucketing
@@ -684,6 +704,52 @@ const FEATURE_ANCHOR_RELATIONSHIPS = new Set([
 ]);
 const MAX_FEATURE_ANCHORS_PER_NODE = 5;
 
+function canonicalizeEnrichmentRelations(
+  enrichments: PerNodeEnrichment[],
+  validRelationTargets: ReadonlyMap<string, GraphNodeType>,
+): { enrichments: PerNodeEnrichment[]; correctedTypes: number; omittedSelfLinks: number; convertedAnchors: number } {
+  let correctedTypes = 0;
+  let omittedSelfLinks = 0;
+  let convertedAnchors = 0;
+  const normalized = enrichments.map((enrichment) => {
+    const converted: PerNodeEnrichment["relations"] = [];
+    const featureAnchors = enrichment.feature_anchors.filter((anchor) => {
+      if (anchor.target_id === enrichment.id) {
+        omittedSelfLinks++;
+        return false;
+      }
+      const targetType = validRelationTargets.get(anchor.target_id);
+      // Correct a misplaced typed link without adding an ID or inventing evidence.
+      // Invalid vocabulary/evidence remains subject to the anchor validator.
+      if (targetType && targetType !== "feature" && anchor.evidence_excerpt.trim() &&
+          FEATURE_ANCHOR_RELATIONSHIPS.has(anchor.relationship)) {
+        converted.push({ ...anchor, target_type: targetType });
+        convertedAnchors++;
+        return false;
+      }
+      return true;
+    });
+    return {
+      ...enrichment,
+      feature_anchors: featureAnchors,
+      relations: [...enrichment.relations, ...converted].filter((relation) => {
+        if (relation.target_id !== enrichment.id) return true;
+        omittedSelfLinks++;
+        return false;
+      }).map((relation) => {
+        // The supplied canonical ID determines the storage type. Correcting
+        // this metadata adds neither a target nor evidence; unknown IDs and
+        // missing evidence still go through the original strict validator.
+        const targetType = validRelationTargets.get(relation.target_id);
+        if (!targetType || targetType === relation.target_type) return relation;
+        correctedTypes++;
+        return { ...relation, target_type: targetType };
+      }),
+    };
+  });
+  return { enrichments: normalized, correctedTypes, omittedSelfLinks, convertedAnchors };
+}
+
 function validateBatchEnrichments(
   enrichments: PerNodeEnrichment[],
   batch: ParserNodeRecord[],
@@ -871,7 +937,7 @@ export function mergeEnrichment(
         source_files_covered: evidence.plan.source_files_covered,
         source_files_read: evidence.sourceFilesRead,
         conflicts: evidence.plan.conflicts,
-        context_hops: Math.max(2, evidence.contextHops),
+        context_hops: evidence.contextHops,
       },
     } : {}),
   };
@@ -1069,7 +1135,7 @@ function walkMultiHopContext(
   const visited = new Set<string>([root.id]);
   let frontier = [root.id];
   const result: ParserNodeRecord[] = [];
-  for (let hop = 1; hop <= Math.max(2, contextHops) && frontier.length > 0 && result.length < maxNodes; hop++) {
+  for (let hop = 1; hop <= contextHops && frontier.length > 0 && result.length < maxNodes; hop++) {
     const next: string[] = [];
     for (const id of frontier) {
       for (const neighbor of adjacency.get(id) ?? []) {
@@ -1442,8 +1508,18 @@ export { executeEnrichParserNodes };
 async function executeEnrichParserNodes(
   opts: EnrichOptions,
 ): Promise<ToolResponse<EnrichResult>> {
+  try {
+    return await withGraphOperation("enrichment", () => executeEnrichmentPass(opts));
+  } catch (err) {
+    if (err instanceof GraphOperationBusyError) return error(err.code, err.message);
+    throw err;
+  }
+}
+
+async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<EnrichResult>> {
   const started = Date.now();
   const route = await selectEnrichmentRoute(opts.modelSource);
+  logger.info(`enrich_parser_nodes: starting (model=${route.model ?? "none"}, provider=${route.provenance.provider ?? "none"}, context_hops=${opts.contextHops}, batch_size=${opts.batchSize})`);
   const standaloneFallbackRoute = opts.modelSource === "architect"
     ? await selectLlmRoute({
         task: "graph_enrichment",
@@ -1565,7 +1641,7 @@ async function executeEnrichParserNodes(
       llm_enriched: 0,
       fallback_nodes: 0,
       complete: false,
-      context_hops: Math.max(2, opts.contextHops),
+      context_hops: opts.contextHops,
       model_source: opts.modelSource,
     },
     semantic_cache: {
@@ -1745,6 +1821,7 @@ async function executeEnrichParserNodes(
         const userPrompt = [
           `Repo: ${repo}`,
           `Domain: ${domain}`,
+          `Required result IDs (${batch.length}; return each exactly once): ${batch.map((node) => node.id).join(", ")}`,
           "",
           "Feature anchors available in this domain (use only these ids in feature_anchors):",
           featureContext.length === 0
@@ -1753,7 +1830,7 @@ async function executeEnrichParserNodes(
                 .map((f) => `  - ${f.id}: ${f.name} — ${f.description}`)
                 .join("\n"),
           "",
-          `Semantic context depth: ${Math.max(2, opts.contextHops)} hops`,
+          `Semantic context depth: ${opts.contextHops} hops`,
           "Source evidence catalog (shared excerpts appear once and are referenced by evidence_id):",
           JSON.stringify([...evidenceCatalog.values()], null, 2),
           "",
@@ -1821,7 +1898,7 @@ async function executeEnrichParserNodes(
                     name: batch.some((node) => node.graph_type === "ui_element")
                       ? "dreamgraph_ui_enrichment_batch"
                       : "dreamgraph_node_enrichment_batch",
-                    schema: enrichmentJsonSchema(batch),
+                    schema: enrichmentJsonSchema(batch, validAnchorIds, relationTargets),
                   },
                 } satisfies LlmCompletionOptions;
                 let resp: LlmResponse;
@@ -1848,6 +1925,12 @@ async function executeEnrichParserNodes(
                 result.tokens_used += resp.tokensUsed ?? 0;
                 modelUsed = resp.model ?? route.model ?? standaloneFallbackRoute?.model ?? route.layer;
                 responseText = resp.text;
+                const finishReason = resp.finishReason ?? resp.stopReason;
+                if (finishReason && ["length", "max_tokens", "incomplete"].includes(finishReason)) {
+                  const note = `Batch (${bkey}, ${batch.length} nodes): model ${modelUsed} stopped with ${finishReason}; the output budget may have left results incomplete.`;
+                  result.notes.push(note);
+                  logger.warn(note);
+                }
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
                 throw new Error(`${llmRouteFailureReason("provider")}: ${msg}`);
@@ -1860,6 +1943,13 @@ async function executeEnrichParserNodes(
                 throw new Error(`${llmRouteFailureReason("invalid_output")}: ${msg}`);
               }
 
+              const canonical = canonicalizeEnrichmentRelations(parsed, relationTargets);
+              parsed = canonical.enrichments;
+              if (canonical.correctedTypes > 0 || canonical.omittedSelfLinks > 0 || canonical.convertedAnchors > 0) {
+                const note = `Batch (${bkey}, ${batch.length} nodes): canonicalized ${canonical.correctedTypes} relation target type(s) from graph IDs; omitted ${canonical.omittedSelfLinks} self link(s); converted ${canonical.convertedAnchors} non-feature anchor(s) to typed relations.`;
+                result.notes.push(note);
+                logger.info(note);
+              }
               const validationErrors = validateBatchEnrichments(parsed, batch, validAnchorIds, relationTargets);
               if (validationErrors.length > 0) {
                 const candidates = new Map(parsed.map((candidate) => [candidate.id, candidate]));
@@ -1993,7 +2083,7 @@ async function executeEnrichParserNodes(
           if (fallbackNodeIds.has(node.id)) result.semantic_coverage.fallback_nodes++;
           else result.semantic_coverage.llm_enriched++;
           if (!opts.dryRun) checkpoint = recordEnrichmentOutcome(checkpoint, node.id, {
-            state: "enriched",
+            state: fallbackNodeIds.has(node.id) ? "failed_retryable" : "enriched",
             ...(fallbackNodeIds.has(node.id) ? { reason: "evidence_only_fallback" } : {}),
           });
         }
@@ -2063,9 +2153,13 @@ async function executeEnrichParserNodes(
   }
 
   result.duration_ms = Date.now() - started;
-  const remainingCheckpointIds = resumableNodeIds(checkpoint);
+  const remainingCheckpointIds = unfinishedEnrichmentNodeIds(checkpoint);
   result.enrichment_checkpoint.remaining = remainingCheckpointIds.length;
   result.enrichment_checkpoint.complete = remainingCheckpointIds.length === 0;
+  const exhaustedCount = remainingCheckpointIds.length - resumableNodeIds(checkpoint).length;
+  if (exhaustedCount > 0) {
+    result.notes.push(`${exhaustedCount} node(s) remain unresolved after the retry limit or a terminal failure.`);
+  }
   if (!opts.dryRun) await persistEnrichmentRun(checkpointFile, checkpoint);
   if (result.ui_relation_gaps.length > 0) {
     result.notes.push(
@@ -2076,7 +2170,8 @@ async function executeEnrichParserNodes(
   result.semantic_coverage.complete =
     result.semantic_coverage.total_nodes === result.semantic_coverage.llm_enriched &&
     result.semantic_coverage.fallback_nodes === 0 &&
-    result.total_skipped === 0;
+    result.total_skipped === 0 &&
+    result.enrichment_checkpoint.complete;
   if (!opts.dryRun && result.semantic_coverage.llm_enriched > 0) {
     await updateGraphMaintenanceState({ last_enrichment_at: new Date().toISOString() }).catch((err) => {
       result.errors.push(`Graph maintenance timestamp: ${err instanceof Error ? err.message : String(err)}`);
@@ -2153,7 +2248,7 @@ export async function enrichParserNodesProgrammatic(
     dryRun: opts.dryRun ?? false,
     force: opts.force ?? false,
     featureContextSize: opts.featureContextSize ?? 20,
-    contextHops: Math.max(2, opts.contextHops ?? 3),
+    contextHops: parseEnrichmentContextHops(opts.contextHops),
     relationContextSize: opts.relationContextSize ?? 40,
     modelSource: opts.modelSource ?? "auto",
     scheduleStabilization: opts.scheduleStabilization ?? true,
@@ -2190,7 +2285,7 @@ export function registerEnrichParserNodesTool(server: McpServer): void {
     "enrich_parser_nodes",
     "Graph-wide batch enrichment for every canonical node. It uses the configured standalone " +
       "LLM or Architect model/adapter, confidence-aware semantic cache entries from enriched neighbors, " +
-      "selective source excerpts for uncovered or stale evidence, and at least two semantic graph hops " +
+      "selective source excerpts for uncovered or stale evidence, and configurable graph-neighbor depth " +
       "to write rich descriptions, intent, UI contracts and layout, and evidenced relations. " +
       "Targets include data_model, features, workflows, capabilities, UI, datastores, auxiliary, all, or " +
       "the deprecated 'both' (= features + data_model, no UI). Uses internal " +
@@ -2237,8 +2332,8 @@ export function registerEnrichParserNodesTool(server: McpServer): void {
         .max(100)
         .default(20)
         .describe("How many sibling features to include as anchor context per bucket."),
-      context_hops: z.number().int().min(2).max(6).default(3)
-        .describe("How many semantic graph hops to traverse for every node (minimum 2)."),
+      context_hops: z.number().int().min(0).max(MAX_ENRICHMENT_CONTEXT_HOPS).default(DEFAULT_ENRICHMENT_CONTEXT_HOPS)
+        .describe("Maximum semantic graph hops for every node (default 3; 0 omits graph-neighbor context)."),
       relation_context_size: z.number().int().min(5).max(100).default(40)
         .describe("Maximum related nodes supplied as semantic context for each node."),
       model_source: z.enum(["auto", "standalone", "architect"]).default("auto")

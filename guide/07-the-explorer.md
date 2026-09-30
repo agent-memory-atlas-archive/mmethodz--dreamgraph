@@ -31,11 +31,11 @@ Both surface the same SPA. The browser is nice on a second monitor.
 The toolbar has a **render mode toggle** between two canvases. Both show the same graph, the same selection, the same filters — they just paint differently:
 
 - **2D (Sigma.js)** — the default. Fast WebGL canvas with crisp labels, ideal for dense graphs and quick scans.
-- **3D (Three.js)** — a cinematic spatial layout with crystal-glass nodes, additive flow tubes, atmospheric depth, bloom, and anti-aliasing. Useful for exploring topology, presentations, or just enjoying your architecture.
+- **3D (Three.js)** — a spatial glass atlas with tinted reflections, soft depth, and restrained animated filaments. Connections use normal alpha compositing, fade at crowded junctions, and stay under two CSS pixels wide when zooming in. Dense hubs keep their color instead of accumulating white light.
 
 The 3D mode preserves your camera position, presets, and grid/bloom toggles in Explorer prefs (`renderMode`, `camera3d`, `cameraPresets3d`, `showGrid3d`, `bloom3d`). Switching back to 2D is instant; selection state is shared.
 
-Use 3D when you want to *see* the shape of the system. Use 2D when you want to *work* it.
+Both views use the same palette and related silhouettes: sapphire blocks for features, sea-glass directional prisms for workflows, amber hexagonal columns for data models, orchid rings for capabilities, aquamarine disc stacks for datastores, gold panes for UI, amethyst diamonds for dreams, and coral tetrahedra for tensions. The filter legend explains each shape. Health adds a restrained warning tint while keeping the type identifiable.
 
 ---
 
@@ -46,6 +46,12 @@ Use 3D when you want to *see* the shape of the system. Use 2D when you want to *
 - **Orbit** the 3D scene with left-drag.
 - **Click a node** to select it. Selection lights up the inspector and the connected edges.
 - **Hover** for a quick label tooltip.
+- **Fit graph** restores the overview. In 3D, **Pause flow** freezes connection motion; system reduced-motion preferences are respected in both views.
+- **Focus** isolates the selected node and its two-hop neighborhood in either view. Atlas restores the wider graph.
+
+Labels are packed into available screen space, with the selected node taking priority. At most 18 map labels appear (fewer in smaller viewports); overlapping and off-screen labels are omitted. In 3D, orbiting or zooming reveals a new set of nearby labels. Hover and the inspector remain available for every visible node, including unlabeled neighbors of large hubs such as `Public`.
+
+The **?** control shows navigation hints. 3D shortcuts include **F** (fit), **Space** (pause flow), **H** (activity heatmap), **L** (layout), **B** (bloom), and **Esc** (clear selection).
 
 The pulse overlay shows where activity is happening — recently changed nodes, new edges from the latest cycle, tensions getting hotter.
 
@@ -70,10 +76,9 @@ For ADRs, you'll also see status (active/deprecated), rationale, and which entit
 
 The filters panel narrows the canvas:
 
-- By entity type (feature, workflow, data-model, ui-element, ADR, tension)
-- By edge status (validated only / include latent / include rejected)
-- By age, confidence, evidence count
-- By repository (multi-repo setups)
+- By node type (feature, workflow, data model, capability, datastore, UI element, dream node, tension)
+- By connection kind (fact, validated, candidate, dream, tension)
+- By minimum confidence
 
 Filters are **client-side** — they reshape what's drawn, not what the engine knows.
 

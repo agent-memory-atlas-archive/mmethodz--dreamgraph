@@ -13,6 +13,7 @@ import {
   isProcessAlive,
 } from "../utils/daemon.js";
 import { mcpCallTool } from "../utils/mcp-call.js";
+import { parseEnrichmentContextHops } from "../../utils/enrichment-context.js";
 
 /** Deep project scans and mandatory per-node enrichment can be expensive. */
 const SCAN_TIMEOUT_MS = 7_200_000;
@@ -78,6 +79,8 @@ Options:
                             Multiple targets enrich the complete graph for relation context.
   --batch-size <n>          Nodes per LLM call during enrichment (default: 10, max: 50).
   --max-nodes <n>           Hard cap on nodes enriched per invocation (default: 1000000).
+  --max-hops <0-6>          Maximum enrichment graph hops in both passes (default: 3).
+                            0 omits graph neighbors; source/node evidence is still used.
   --model-source <source>   auto, standalone, or architect (default: auto).
   --no-semantic-cache      Disable enriched-neighborhood evidence reuse.
   --semantic-cache-min-confidence <n>
@@ -98,6 +101,8 @@ Options:
   const jsonOutput = flags.json === true;
   const skipScan = flags["skip-scan"] === true;
   const skipEnrich = flags["skip-enrich"] === true;
+  const maxHops = flags["max-hops"] === undefined ? undefined
+    : parseEnrichmentContextHops(flags["max-hops"], "--max-hops");
 
   // Resolve instance
   const { entry, instanceRoot } = await resolveInstanceForCommand(query, flags);
@@ -126,6 +131,7 @@ Options:
     }
 
     const scanArgs: Record<string, unknown> = { depth };
+    if (maxHops !== undefined) scanArgs.context_hops = maxHops;
     if (typeof flags.targets === "string") {
       scanArgs.targets = flags.targets.split(",").map((t) => t.trim());
     }
@@ -170,6 +176,7 @@ Options:
     }
 
     const enrichArgs: Record<string, unknown> = { target };
+    if (maxHops !== undefined) enrichArgs.context_hops = maxHops;
     if (typeof flags["batch-size"] === "string" || typeof flags["batch-size"] === "number") {
       const n = Number(flags["batch-size"]);
       if (Number.isFinite(n) && n > 0) enrichArgs.batch_size = Math.floor(n);

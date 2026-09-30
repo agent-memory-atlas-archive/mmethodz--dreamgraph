@@ -1,20 +1,15 @@
 /**
  * Density-aware ambient haze (Slice F next pass).
  *
- * Renders one additive Point per node with a soft circular sprite. Where
- * many nodes overlap on screen, additive blending stacks the haze and the
- * region glows softly — sparse outskirts stay dark, dense clusters
- * acquire a faint atmospheric bloom.
- *
- * Sized to be too dim to dominate (max additive ≈ 0.04 per sample), so
- * the bloom pass doesn't double-count it. The points are rendered just
- * before the tubes so they sit behind everything else colour-wise.
+ * One softly blended point per node gives dense clusters atmospheric
+ * depth. Normal compositing and a screen-size cap keep overlapping haze
+ * from becoming white light or expanding across the viewport at close zoom.
  *
  * Performance: one draw call, vertex shader only, no per-frame uploads.
  */
 
 import {
-  AdditiveBlending,
+  NormalBlending,
   BufferAttribute,
   BufferGeometry,
   Color,
@@ -34,7 +29,7 @@ void main() {
   // Distance-attenuated point size — closer clusters bleed wider, far
   // ones stay tight so distant nodes don't fog up the whole scene.
   float size = uSize * uPixelRatio * (300.0 / max(1.0, -mv.z));
-  gl_PointSize = size;
+  gl_PointSize = min(size, 36.0 * uPixelRatio);
   gl_Position = projectionMatrix * mv;
 }
 `;
@@ -50,7 +45,7 @@ void main() {
   // post-cutoff pixels (saves fillrate on the cheap blob edges).
   if (r > 0.5) discard;
   float a = exp(-r * r * 9.0) * uIntensity * vWeight;
-  gl_FragColor = vec4(uColor * a, a);
+  gl_FragColor = vec4(uColor, a);
 }
 `;
 
@@ -82,7 +77,7 @@ export class DensityHaze {
       fragmentShader: FRAGMENT,
       transparent: true,
       depthWrite: false,
-      blending: AdditiveBlending,
+      blending: NormalBlending,
     });
     this.points = new Points(this.geometry, this.material);
     this.points.frustumCulled = false;

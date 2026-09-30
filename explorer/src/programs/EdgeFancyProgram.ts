@@ -85,9 +85,10 @@ void main() {
   vec2 position = a_positionStart * (1.0 - a_positionCoef) + a_positionEnd * a_positionCoef;
 
   float normalLength = length(normal);
-  vec2 unitNormal = normal / normalLength;
+  vec2 unitNormal = normal / max(normalLength, 0.00001);
 
-  float pixelsThickness = max(normalLength, minThickness * u_sizeRatio);
+  // Keep a fine screen-space filament, including at extreme zoom.
+  float pixelsThickness = min(max(normalLength, minThickness * u_sizeRatio), 1.1 * u_sizeRatio);
   float webGLThickness = pixelsThickness * u_correctionRatio / u_sizeRatio;
 
   gl_Position = vec4((u_matrix * vec3(position + unitNormal * webGLThickness, 1)).xy, 0, 1);
@@ -144,22 +145,21 @@ void main(void) {
   float lenPx = v_meta.z * 255.0;
 
   // ── Style per kind ─────────────────────────────────────────────
-  float brightness = 0.7 + conf * 0.6;
+  float brightness = 0.55 + conf * 0.3;
   float coreBoost = 0.0;
   float dashMask = 1.0;
 
   // VALIDATED — bright core, soft outer glow.
   if (kind > 0.5 && kind < 1.5) {
     float center = 1.0 - abs(length(v_normal));
-    coreBoost = pow(center, 2.0) * 0.6;
-    brightness *= 1.1;
+    coreBoost = pow(center, 2.0) * 0.12;
   }
 
   // CANDIDATE — dashed marching ants. Density scales with edge length
   // so short edges still show 2–3 dashes; long edges scroll quickly.
   if (kind > 1.5 && kind < 2.5) {
     float density = max(8.0, lenPx * 0.04);
-    float phase = fract(v_t * density - u_time * 0.6);
+    float phase = fract(v_t * density - u_time * 0.18);
     // Dash duty-cycle: 60% on, 40% off, with soft edges.
     dashMask = smoothstep(0.0, 0.08, phase) * (1.0 - smoothstep(0.55, 0.65, phase));
     brightness *= 1.05;
@@ -170,28 +170,27 @@ void main(void) {
     float head = fract(u_time * 0.18);
     float d = abs(v_t - head);
     d = min(d, 1.0 - d); // wrap-around
-    float sparkle = exp(-d * 18.0) * 1.4;
-    grad.rgb = mix(grad.rgb, vec3(1.0, 0.95, 1.0), sparkle * 0.8);
-    brightness *= 0.85 + 0.5 * (0.5 + 0.5 * sin(u_time * 1.2 + v_t * 6.28));
+    float sparkle = exp(-d * 18.0) * 0.25;
+    brightness *= 0.8 + sparkle;
   }
 
   // TENSION — pulse the whole edge red-ward at ~1.4 Hz.
   if (kind > 3.5) {
     float pulse = 0.5 + 0.5 * sin(u_time * 2.8);
-    grad.rgb = mix(grad.rgb, vec3(1.0, 0.42, 0.42), 0.4 + pulse * 0.4);
-    brightness *= 0.85 + pulse * 0.6;
+    grad.rgb = mix(grad.rgb, vec3(0.9, 0.42, 0.48), 0.35);
+    brightness *= 0.85 + pulse * 0.15;
   }
 
-  // Compose: gradient * brightness, plus a small white core boost (validated),
-  // multiplied by dash mask and antialiasing.
-  vec3 rgb = grad.rgb * brightness + vec3(coreBoost);
-  float alpha = grad.a * aa * dashMask;
+  vec3 rgb = grad.rgb * (brightness + coreBoost);
+  float junction = smoothstep(0.0, 0.035, v_t) * (1.0 - smoothstep(0.965, 1.0, v_t));
+  float alpha = grad.a * aa * dashMask * junction;
 
   if (alpha < 0.005) {
     gl_FragColor = transparent;
     return;
   }
-  gl_FragColor = vec4(rgb, alpha);
+  // Sigma expects premultiplied colour, including the antialiased fringe.
+  gl_FragColor = vec4(rgb * alpha, alpha);
 }
 `;
 
@@ -214,6 +213,7 @@ export class EdgeFancyProgram<
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
 > extends EdgeProgram<Uniform, N, E, G> {
+  private readonly reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   getDefinition() {
     return {
       VERTICES: 6,
@@ -307,7 +307,7 @@ export class EdgeFancyProgram<
     gl.uniform1f(uniformLocations.u_pixelRatio, params.pixelRatio);
     gl.uniform1f(uniformLocations.u_feather, params.antiAliasingFeather);
     gl.uniform1f(uniformLocations.u_minEdgeThickness, params.minEdgeThickness);
-    gl.uniform1f(uniformLocations.u_time, performance.now() / 1000);
+    gl.uniform1f(uniformLocations.u_time, this.reducedMotion.matches ? 0 : performance.now() / 1000);
   }
 }
 
