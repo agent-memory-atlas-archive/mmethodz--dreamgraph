@@ -342,8 +342,8 @@ const REQUEST_COMPUTER_USE_TOOL: Tool = Object.freeze({
 });
 function requestComputerUse(args: unknown): LocalToolResult {
   const reason = typeof (args as { reason?: unknown })?.reason === "string" ? String((args as { reason: string }).reason).slice(0, 500) : "";
-  return localTextResult({ status: "requested", reason,
-    instruction: "Permission requested from the local operator. Do not attempt Computer Use now. End your turn with one short sentence describing what you need to do on the computer." }, false);
+  return { content: [{ type: "text", text: `Computer Use requested from the local operator: ${reason || "no reason given"}. `
+    + "Do not attempt Computer Use now. End your turn with one short sentence describing what you need to do on the computer." }] };
 }
 
 const RUN_COMMAND_DEFAULT_TIMEOUT_MS = 60_000;

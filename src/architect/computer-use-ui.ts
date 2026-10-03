@@ -130,7 +130,9 @@ export const COMPUTER_USE_SCRIPT=String.raw`
         sendChatMessage(originalMessage).catch(error=>{computerStateEl.textContent=String(error&&error.message||error);});});
       deny.addEventListener('click',()=>done('Not allowed. The request was not re-run.'));
       const actions=document.createElement('div');actions.className='computer-actions';actions.append(allow,deny);
-      box.append(title,why,actions);(messageEl&&messageEl.appendChild?messageEl:document.getElementById('chat-messages')||document.body).appendChild(box);
+      box.append(title,why,actions);
+      const host=messageEl&&messageEl.node&&messageEl.node.appendChild?messageEl.node:messageEl&&messageEl.appendChild?messageEl:document.getElementById('chat-log');
+      (host||document.body).appendChild(box);
       box.scrollIntoView({block:'nearest'});allow.focus();}
     void loadComputerPolicy(true);setInterval(()=>{if(!document.hidden)void loadComputerPolicy(true);},30000);
 `;
