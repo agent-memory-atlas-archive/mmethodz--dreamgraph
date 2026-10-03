@@ -2,8 +2,8 @@
   "schema": "dreamgraph.ashoka.release_evidence.v1",
   "version": "14.0.0",
   "release_name": "Ashoka",
-  "status": "qualified_for_publication",
-  "recorded_at": "2026-10-03T13:40:14.662Z",
+  "status": "published",
+  "recorded_at": "2026-10-03T13:51:26.532Z",
   "source_qualification": {
     "commit": "c761b90fc7e91fd3ea27ba7daf56fe36aaa44264",
     "git_archive_clean_checkout": true,
@@ -103,6 +103,107 @@
     "website": "https://dreamgraph.nofs.ai/",
     "website_commit": "0a094e28a21cd573891fb780babce17ead1ee9d6",
     "website_source_sha256": "96fa5ab8473dd5a5fa68b70442ee1cb941da83c7ebf974f949b1a733e600a61d",
-    "confirmed": false
+    "confirmed": true,
+    "checksum_asset": {
+      "bytes": 663,
+      "sha256": "410789ac60658dfdd33364218467ce315adffe0525af7228544bad3f52e3dc6b",
+      "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.0/SHA256SUMS.txt"
+    },
+    "release_commit": "672de6715938134ffc4b04d3a8dc66a4cb3eed70",
+    "published_at": "2026-10-03T13:43:54Z",
+    "assets": [
+      {
+        "sha256": "2138b30045e585eb1ca2329771d696b466ab9bea0c1fe4ce9f0927d5e414f3a0",
+        "file": "dreamgraph-14.0.0.tgz",
+        "bytes": 31559691,
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.0/dreamgraph-14.0.0.tgz"
+      },
+      {
+        "sha256": "df1bf5c50935768ea84f5ec4fc0b031ae98c6d0bb31f2cde25924d6a50a688f1",
+        "file": "dreamgraph-docs-14.0.0.zip",
+        "bytes": 4608540,
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.0/dreamgraph-docs-14.0.0.zip"
+      },
+      {
+        "sha256": "9aeb61edd6561b12b8ffc419a3aeb4ea62f5f3fbeb9aac1514aa06f2681fea49",
+        "file": "dreamgraph-easy-start-14.0.0.pdf",
+        "bytes": 85357,
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.0/dreamgraph-easy-start-14.0.0.pdf"
+      },
+      {
+        "sha256": "a932e0a9c9eccb6f740d6991d86a53fa112e9c4794348664d861e55a3a0ea6d6",
+        "file": "dreamgraph-host-14.0.0.tgz",
+        "bytes": 19660,
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.0/dreamgraph-host-14.0.0.tgz"
+      },
+      {
+        "sha256": "960aeb64dc9211b4c0cfcbe90e7995daefea25c095282e253caf7367322e5c51",
+        "file": "dreamgraph-sdk-14.0.0.tgz",
+        "bytes": 189200,
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.0/dreamgraph-sdk-14.0.0.tgz"
+      },
+      {
+        "sha256": "272511bb8dc78e21368ac7ca6b887ddaf2b4c2570f276f098e1cf78eeece89b2",
+        "file": "dreamgraph-token-economy-14.0.0.tgz",
+        "bytes": 17284,
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.0/dreamgraph-token-economy-14.0.0.tgz"
+      },
+      {
+        "sha256": "c0c1f7a14afd6755e1e5e2c38abdc8d3a4b39550b1ad8babd806f5485f175cbb",
+        "file": "dreamgraph-vscode-14.0.0.vsix",
+        "bytes": 2893385,
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.0/dreamgraph-vscode-14.0.0.vsix"
+      }
+    ],
+    "website_verification": {
+      "schema": "dreamgraph.website_deployment.v1",
+      "status": "completed",
+      "public_version": "14.0.0",
+      "verified_at": "2026-10-03T13:51:09.597Z",
+      "url": "https://dreamgraph.nofs.ai/",
+      "checks": [
+        {
+          "name": "Exact current website JavaScript",
+          "path": "/assets/index-PAhrFfRY.js",
+          "sha256": "effbf75a18664b356c41c688f1302087afbefa6e59c75291a57b34310bb62891"
+        },
+        {
+          "name": "Public Ashoka notes and CI limitation",
+          "path": "/docs/ashoka/release-notes.md"
+        },
+        {
+          "name": "Current Easy Start PDF",
+          "path": "/docs/easy-start.pdf",
+          "sha256": "9aeb61edd6561b12b8ffc419a3aeb4ea62f5f3fbeb9aac1514aa06f2681fea49",
+          "bytes": 85357
+        },
+        {
+          "name": "Current social image",
+          "path": "/images/og-card.svg",
+          "sha256": "c3f682e27ca5be629a40257a62ad3807a8a7ec42a0ce6d22f268bac782db3c05"
+        },
+        {
+          "name": "Rendered public page via CUA browser",
+          "path": "/",
+          "http": 200
+        },
+        {
+          "name": "Rendered public page via CUA browser",
+          "path": "/download",
+          "http": 200
+        },
+        {
+          "name": "Rendered public page via CUA browser",
+          "path": "/versions",
+          "http": 200
+        },
+        {
+          "name": "Rendered public page via CUA browser",
+          "path": "/guide/ashoka-upgrade",
+          "http": 200
+        }
+      ],
+      "scope": "Existing Hostinger website, its unchanged Node 22/Vite deployment settings, and public bytes/rendering on the already qualified Windows browser. No new DreamGraph platform qualification or account changes."
+    }
   }
 }
