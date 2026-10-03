@@ -7700,6 +7700,7 @@ function renderArchitectShell(): string {
                 <button id="chat-scope-pill" class="scope-pill" type="button" data-scope="project" aria-pressed="false" aria-label="Toggle chat scope">🌍 Project</button>
                 <button id="chat-native-task" class="scope-pill" type="button" hidden aria-label="Clear prepared native task"></button>
                 <button id="architect-welcome-reopen" class="scope-pill architect-welcome-reopen" type="button" hidden>Choose a mission</button>
+                <button id="chat-clear-history" class="scope-pill" type="button" style="margin-left:auto" title="Clear this conversation (project or plan scope). The knowledge graph is not affected." aria-label="Clear chat history">Clear chat</button>
               </div>
               <textarea id="chat-input" class="chat-input" name="message" rows="1" placeholder="Ask Architect about this project or the selected plan..."></textarea>
               <div class="chat-attachment-row">
@@ -10872,6 +10873,16 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       }
       appendHistoryReplayStatus(messages.length, rawMessages.length, replay.skipped, warnings);
     }
+
+    document.getElementById('chat-clear-history').addEventListener('click', async function() {
+      if (chatProcessing) { chatStatusEl.textContent = 'Wait for the running pass to finish (or stop it) before clearing the chat.'; return; }
+      const where = activeChatScope === 'plan' && activePlanId ? 'the conversation for this plan' : 'the project conversation';
+      if (!window.confirm('Clear ' + where + '? Only the chat transcript is removed; the knowledge graph, plans and ADRs are kept.')) return;
+      const button = this; button.disabled = true;
+      try { await clearPersistedChatHistory(); resetNode(chatLogEl); chatStatusEl.textContent = 'Chat history cleared.'; }
+      catch (error) { chatStatusEl.textContent = String(error instanceof Error ? error.message : error); }
+      finally { button.disabled = false; }
+    });
 
     async function clearPersistedChatHistory() {
       const response = await fetch('/api/architect/v1/chat-history', {
