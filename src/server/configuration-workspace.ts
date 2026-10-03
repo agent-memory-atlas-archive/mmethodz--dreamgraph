@@ -67,8 +67,8 @@ const CONFIGURATION_WORKSPACE_CSS = String.raw`
 .cfg-head h1{margin:0;font-size:19px}.cfg-head p{margin:2px 0 0;color:var(--c-dim);font-size:12px}
 .cfg-head-actions{display:flex;gap:10px;align-items:center}.cfg-head-actions a{color:var(--c-acc);text-decoration:none}
 .cfg-tabs{display:flex;gap:2px;flex:none;border-bottom:1px solid var(--c-line);overflow-x:auto}
-.cfg-tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--c-dim);padding:7px 11px;cursor:pointer;font:inherit;white-space:nowrap}
-.cfg-tabs button[aria-selected=true]{color:#fff;border-bottom-color:var(--c-acc)}.cfg-tabs button:hover{color:#fff}
+#configuration-workspace .cfg-tabs button{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;color:var(--c-dim);padding:7px 12px;cursor:pointer;font:inherit;white-space:nowrap}
+#configuration-workspace .cfg-tabs button[aria-selected=true]{color:#fff;border-bottom-color:var(--c-acc);background:none}#configuration-workspace .cfg-tabs button:hover{color:#fff;background:#1c2026}
 .cfg-tabs button .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--c-warn);margin-left:5px;vertical-align:middle}
 .cfg-message{flex:none;min-height:0;padding:0;font-size:12px}.cfg-message:not(:empty){padding:6px 9px;margin:6px 0 0;border-radius:4px;background:#1f2a35;border:1px solid #2f4a63}
 .cfg-message.is-error{background:#35201f;border-color:#6b3434;color:#f1c3c3}.cfg-message.is-ok{background:#1d2d22;border-color:#355c41}
@@ -85,7 +85,7 @@ const CONFIGURATION_WORKSPACE_CSS = String.raw`
 .cfg-field[data-dirty=true]>label::after{content:"edited";font-weight:400;font-size:10px;color:var(--c-warn);border:1px solid #6d5a30;border-radius:8px;padding:0 5px}
 .cfg-field .err{color:var(--c-bad);font-size:11.5px}
 #configuration-workspace input,#configuration-workspace select,#configuration-workspace textarea{font:inherit;color:#e7ecf2;background:#111418;border:1px solid #3a414a;border-radius:4px;padding:6px 8px;min-width:0;box-sizing:border-box;width:100%}
-#configuration-workspace input[type=checkbox],#configuration-workspace input[type=radio]{width:auto;accent-color:var(--c-acc)}
+#configuration-workspace input[type=checkbox],#configuration-workspace input[type=radio]{width:auto;padding:0;margin:2px 0 0;accent-color:var(--c-acc);flex:none}
 #configuration-workspace input[type=range]{padding:0;accent-color:var(--c-acc)}
 #configuration-workspace input:focus,#configuration-workspace select:focus,#configuration-workspace textarea:focus{outline:2px solid #4b77a3;outline-offset:0;border-color:#4b77a3}
 #configuration-workspace button{font:inherit;color:#e3e8ee;background:#262b31;border:1px solid #434b55;border-radius:4px;padding:5px 11px;cursor:pointer}
@@ -300,7 +300,7 @@ function roleStatus(roleNames) {
   if (!rows.length) return null;
   return h('div', { class: 'cfg-status' }, ...rows.map(r => h('div', {},
     h('b', {}, ROLE_TITLE[r.role] || r.role), ': ', r.effective.provider + ' · ' + r.effective.model + (r.effective.adapter && !/-api$/.test(r.effective.adapter) ? ' via ' + r.effective.adapter : ''),
-    r.status && r.status !== 'ready' && r.status !== 'active' ? h('span', { class: 'warn' }, ' · ' + r.status) : null,
+    r.status && !['configured', 'ready', 'active'].includes(r.status) ? h('span', { class: 'warn' }, ' · ' + String(r.status).replace(/_/g, ' ')) : h('span', { class: 'tag ok', style: 'margin-left:6px' }, 'ready'),
     ...(r.diagnostics || []).slice(0, 2).map(d => h('div', { class: 'warn' }, '⚠ ' + (d.message || d.code))))));
 }
 const ROLE_TITLE = { initial_scan: 'Initial scan', enrichment: 'Enrichment', dreamer: 'Dreamer', normalizer: 'Normalizer', architect: 'Architect', computer_use: 'Computer Use' };
@@ -481,8 +481,15 @@ function setPrice(provider, model, field, value) {
   setDraft('DREAMGRAPH_LLM_PRICING', JSON.stringify(list));
   for (const [r] of BUDGET_ROLES) { const pr = roles.find(x => x.role === r); if (pr && pr.effective.provider === provider && pr.effective.model === model) { setDraft('DREAMGRAPH_LLM_' + r.toUpperCase() + '_PRICING_VERSION', PRICE_VERSION); if (!cur('DREAMGRAPH_LLM_' + r.toUpperCase() + '_BUDGET_CURRENCY')) setDraft('DREAMGRAPH_LLM_' + r.toUpperCase() + '_BUDGET_CURRENCY', 'USD'); } }
 }
+const BUDGET_FIELD = { MAX_CALLS: 'requests', MAX_INPUT_TOKENS: 'input_tokens', MAX_OUTPUT_TOKENS: 'output_tokens', CONCURRENCY: 'concurrency', RUN_BUDGET: 'run_amount', DAY_BUDGET: 'day_amount' };
+/** Built-in budget the daemon resolved for this role (placeholder for empty cells). */
+function roleBudgetDefault(key) {
+  const m = key.match(/^DREAMGRAPH_LLM_([A-Z_]+?)_(MAX_CALLS|MAX_INPUT_TOKENS|MAX_OUTPUT_TOKENS|CONCURRENCY|RUN_BUDGET|DAY_BUDGET)$/);
+  if (!m) return null; const r = roles.find(x => x.role === m[1].toLowerCase());
+  const v = r && r.budget ? r.budget[BUDGET_FIELD[m[2]]] : undefined; return v === undefined || v === null ? null : String(v);
+}
 function cell(key, opts) {
-  opts = opts || {}; const scale = opts.scale || 1, c = cur(key), d = dflt(key);
+  opts = opts || {}; const scale = opts.scale || 1, c = cur(key), d = dflt(key) !== null ? dflt(key) : roleBudgetDefault(key);
   const input = h('input', { type: 'number', min: 0, step: opts.step || 'any', value: c === null ? '' : String(Number(c) / scale), placeholder: d !== null ? String(Number(d) / scale) : 'default', 'aria-label': label(key), title: key });
   input.addEventListener('input', () => { const n = Number(input.value); if (input.value === '') setDraft(key, null); else if (Number.isFinite(n) && n >= 0) setDraft(key, String(opts.integer === false ? n * scale : Math.round(n * scale))); });
   return h('td', {}, input);
@@ -521,7 +528,7 @@ function renderComputer(p) {
   const opt = (v, t, d) => { const r = h('input', { type: 'radio', name: 'cu-policy', value: v }); r.checked = c === v; r.addEventListener('change', () => { setDraft(key, v); markDirty(key); }); return h('label', {}, r, h('div', {}, h('strong', {}, t), h('span', {}, d))); };
   p.append(card('Allow the Architect to use this computer?', null, h('div', { class: 'cfg-field', 'data-key': key, 'data-dirty': String(has(key)) }, h('div', { class: 'cfg-choice', role: 'radiogroup', 'aria-label': 'Computer Use policy' },
     opt('allow', 'Allow', 'Use it whenever a task needs it.'),
-    opt('ask', 'Ask every time', 'Ask before a task that looks like it needs the computer. You can also pre-approve the next message in the Architect.'),
+    opt('ask', 'Ask every time', 'When the Architect needs the computer it asks you first, then continues if you allow it. You can also pre-approve the next message.'),
     opt('deny', 'Deny', 'Never operate this computer.'))),
     h('div', { class: 'cfg-status' }, 'Codex CLI uses its own built-in Computer Use. The API engine uses DreamGraph\'s browser harness, which is prepared per task from the Architect\'s Harness button.')));
   p.append(more('Time limit for tasks', grid(num('DREAMGRAPH_ARCHITECT_PASS_TIMEOUT_MS', 'Time limit per task', 'Tasks that use the computer usually need longer. Shared with the Architect page.', { unit: 'minutes', scale: 60000, min: 1, max: 240 }))));
