@@ -38,6 +38,8 @@ export interface CodexComputerUseServer {
   enabled_tools?: string[];
   /** Plugin `.mcp.json` the server was read from (provenance only). */
   source: string;
+  /** Set when DreamGraph hosts the server itself and Codex connects over Streamable HTTP. */
+  url?: string;
 }
 
 export interface CodexComputerUseDiscovery {
@@ -256,14 +258,17 @@ export function codexComputerUseServersToml(servers: readonly CodexComputerUseSe
       "",
       `# Codex native Computer Use (from ${server.source}).`,
       `[mcp_servers.${server.name}]`,
-      `command = ${s(server.command)}`,
-      `args = ${arr(server.args)}`,
     );
-    if (server.env_vars.length > 0) lines.push(`env_vars = ${arr(server.env_vars)}`);
+    if (server.url) {
+      lines.push(`url = ${s(server.url)}`);
+    } else {
+      lines.push(`command = ${s(server.command)}`, `args = ${arr(server.args)}`);
+      if (server.env_vars.length > 0) lines.push(`env_vars = ${arr(server.env_vars)}`);
+    }
     if (server.startup_timeout_sec) lines.push(`startup_timeout_sec = ${server.startup_timeout_sec}`);
     if (server.enabled_tools) lines.push(`enabled_tools = ${arr(server.enabled_tools)}`);
     lines.push(`default_tools_approval_mode = ${s("approve")}`);
-    const keys = Object.keys(server.env).sort();
+    const keys = server.url ? [] : Object.keys(server.env).sort();
     if (keys.length > 0) {
       lines.push("", `[mcp_servers.${server.name}.env]`);
       for (const key of keys) lines.push(`${key} = ${s(server.env[key] ?? "")}`);
@@ -447,4 +452,33 @@ export function createCodexItemClock(now: () => number = Date.now) {
     },
     durations,
   };
+}
+
+/**
+ * The Codex app's `unified-computer-use` plugin ends every turn with hooks that
+ * call `cua_repl.turn_ended` (claimed tabs released, agent tabs closed, the
+ * Chrome debugger detached). Codex CLI supports the same hooks inline in
+ * config.toml, so a granted run declares them itself: Codex then performs the
+ * cleanup inside its own lifecycle, before it shuts the server down.
+ */
+export function codexTurnEndHooksToml(serverName = "cua_repl"): string[] {
+  const s = (value: string) => JSON.stringify(value);
+  const lines: string[] = [];
+  const hook = (event: "Stop" | "Interrupt" | "SubagentStop", sessionField: string) => {
+    lines.push(
+      "",
+      `[[hooks.${event}]]`,
+      "",
+      `[[hooks.${event}.hooks]]`,
+      `type = ${s("mcp_tool")}`,
+      `server = ${s(serverName)}`,
+      `tool = ${s("turn_ended")}`,
+      "timeout = 30",
+      `input = { hook_event_name = ${s("${hook_event_name}")}, session_id = ${s("${" + sessionField + "}")}, turn_id = ${s("${turn_id}")} }`,
+    );
+  };
+  hook("Stop", "session_id");
+  hook("Interrupt", "session_id");
+  hook("SubagentStop", "agent_id");
+  return lines;
 }

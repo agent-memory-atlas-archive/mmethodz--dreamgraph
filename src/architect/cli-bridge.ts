@@ -21,7 +21,8 @@ import { executionPolicyProjection, type ExecutionApproval } from "../server/exe
 import { beginHostExecution, endHostExecution, withHostExecution } from "../server/managed-execution.js";
 import type { PlanExecutionIntent } from "../graph/contracts.js";
 import { deliverManagedContext, readManagedContext, type ManagedExecutionContext } from "../graph/execution-context.js";
-import { codexComputerUseServersToml, codexGrantedNotify, codexNativeToolTrace, createCodexItemClock, createCodexTranscriptWriter, createCodexSessionGrantWatcher, readCodexNotify, wrapCodexServersWithProxy, discoverCodexComputerUseServers, resolveCodexSourceHome, widenCodexComputerUseSurfaces, type CodexComputerUseServer } from "./codex-computer-use.js";
+import { startCodexCuaHost, type CodexCuaHost } from "./codex-cua-host.js";
+import { codexComputerUseServersToml, codexTurnEndHooksToml, codexNativeToolTrace, createCodexItemClock, createCodexTranscriptWriter, createCodexSessionGrantWatcher, readCodexNotify, discoverCodexComputerUseServers, resolveCodexSourceHome, widenCodexComputerUseSurfaces, type CodexComputerUseServer } from "./codex-computer-use.js";
 
 export type ArchitectCliAdapter = "codex-cli" | "copilot-cli";
 
@@ -57,7 +58,7 @@ export interface ArchitectCliBridgeRoute {
   computer_use_session?: string;
   /** Raw Codex JSONL transcript of the granted Computer Use run (local diagnostic file). */
   computer_use_transcript?: string;
-  /** Log of DreamGraph's cua_repl proxy (turn-end cleanup) for this run. */
+  /** Log of DreamGraph's cua_repl host (turn-end cleanup) for this run. */
   computer_use_cleanup_log?: string;
   effective_controls?: ReturnType<typeof executionPolicyProjection>;
   output_controls?: { provider: "configured_optional" | "unsupported"; prompt: "guided"; presentation: "enforced"; exact_density: "not_guaranteed" };
@@ -220,6 +221,8 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     throw error;
   }
 
+  const cuaHosts: CodexCuaHost[] = [];
+  const endCuaHosts = (reason: string) => Promise.all(cuaHosts.map((host) => host.end(reason).catch(() => undefined)));
   try {
     const capability = await probeCliControlCapability(input.adapter, executionSignal);
     await mkdir(auditDir, { recursive: true, mode: 0o700 });
@@ -234,7 +237,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       computerUseRequestable: input.adapter === "codex-cli" && input.computerUse !== true && input.computerUseRequestable === true,
     });
     const invocation = input.adapter === "codex-cli"
-      ? await prepareCodexInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames, verbosityMode: input.verbosityMode, reasoningEffort: input.reasoningEffort, computerUse: input.computerUse === true })
+      ? await prepareCodexInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames, verbosityMode: input.verbosityMode, reasoningEffort: input.reasoningEffort, computerUse: input.computerUse === true, registerCuaHost: (host) => { cuaHosts.push(host); } })
       : await prepareCopilotInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames });
 
     await deliverManagedContext(runId, prompt);
@@ -273,14 +276,14 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     const toolTrace: ArchitectToolTraceEntry[] = [...auditToolTrace, ...nativeToolTrace];
     const computerUseTranscript = transcript && transcriptText ? transcript.path : null;
     let computerUseCleanupLog: string | null = null;
-    if (invocation.cuaControlDir && transcript) {
-      // Give the proxy a moment to finish logging its turn_ended exchange, then keep the log beside the transcript.
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      try {
-        const log = await readFile(join(invocation.cuaControlDir, "cua-proxy.log"), "utf8");
-        computerUseCleanupLog = transcript.path.replace(/\.jsonl$/, ".cua-proxy.log");
-        await writeFile(computerUseCleanupLog, log, { mode: 0o600 });
-      } catch { computerUseCleanupLog = null; }
+    if (cuaHosts.length > 0) {
+      await endCuaHosts(executionSignal.aborted ? "cancelled" : "run finished");
+      if (transcript) {
+        try {
+          computerUseCleanupLog = transcript.path.replace(/\.jsonl$/, ".cua-host.log");
+          await writeFile(computerUseCleanupLog, cuaHosts.flatMap((host) => host.log).join("\n") + "\n", { mode: 0o600 });
+        } catch { computerUseCleanupLog = null; }
+      }
     }
     const computerUseRequestRecord = audit.find((record) => record.tool === "request_computer_use");
     let computerUseRequest: { reason: string } | undefined;
@@ -359,6 +362,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     try { if (!finished) await endHostExecution({ execution_id: runId, outcome: executionSignal.aborted ? "cancelled" : "failed",
       work_termination: dispatched ? "unconfirmed" : "confirmed" }); }
     finally {
+      await endCuaHosts(finished ? "run finished" : "run failed");
       await rm(scratchDir, { recursive: true, force: true }).catch(() => undefined);
     }
   }
@@ -560,6 +564,8 @@ async function prepareCodexInvocation(input: {
   verbosityMode?: ArchitectVerbosityMode;
   reasoningEffort?: string;
   computerUse?: boolean;
+  /** Receives each daemon-owned cua_repl host as soon as it starts (so it is always ended). */
+  registerCuaHost?: (host: CodexCuaHost) => void;
 }): Promise<{ command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string; outputPath: string | null; computerUseServers?: string[]; cuaControlDir?: string }> {
   const command = await resolveArchitectCliExecutable("codex-cli");
   // Granted Computer Use: wire the Codex app's own Computer Use MCP server(s) into the
@@ -573,15 +579,19 @@ async function prepareCodexInvocation(input: {
       throw new Error(`CODEX_COMPUTER_USE_RUNTIME_UNAVAILABLE: Computer Use was allowed, but the Codex app's Computer Use runtime was not found (${discovery.diagnostics.join("; ") || "no candidates"}). Install or enable Computer Use in the Codex desktop app, keep the app running, and try again.`);
     }
     computerUseServers = widenCodexComputerUseSurfaces(discovery.servers);
-    // Turn-end cleanup: route cua_repl through DreamGraph's proxy (it sends `turn_ended`, which the
-    // Codex app's plugin hook would do) and let Codex's notify tell it when the turn is complete.
-    const proxyScript = fileURLToPath(new URL("./codex-cua-proxy.js", import.meta.url));
-    if (existsSync(proxyScript)) {
-      cuaControlDir = join(input.scratchDir, "cua-control");
-      await mkdir(cuaControlDir, { recursive: true, mode: 0o700 });
-      computerUseServers = wrapCodexServersWithProxy(computerUseServers, process.execPath, proxyScript, cuaControlDir);
-      codexNotify = codexGrantedNotify(process.execPath, proxyScript, cuaControlDir, await readCodexNotify(resolveCodexSourceHome()));
+    // Turn-end cleanup: Codex kills its MCP servers outright on exit, so the daemon hosts cua_repl
+    // itself (outside Codex's process tree) and Codex connects over local HTTP. After the run the
+    // daemon sends `turn_ended` (what the Codex app's plugin hook does) and stops the server.
+    const hosted: CodexComputerUseServer[] = [];
+    for (const server of computerUseServers) {
+      const host = await startCodexCuaHost({ command: server.command, args: server.args, env: { ...stringEnv(process.env), ...server.env } });
+      input.registerCuaHost?.(host);
+      hosted.push({ ...server, url: host.url });
     }
+    computerUseServers = hosted;
+    // Keep the operator's own Codex notify (the desktop Computer Use helper's turn-ended).
+    const operatorNotify = await readCodexNotify(resolveCodexSourceHome());
+    if (operatorNotify.length > 0) codexNotify = operatorNotify;
   }
   const codexHome = join(input.scratchDir, "codex-home");
   const artifactsDir = join(input.scratchDir, "artifacts");
@@ -729,6 +739,8 @@ export function createArchitectCodexConfigToml(input: {
   }
   if (allow && input.computerUseServers && input.computerUseServers.length > 0) {
     lines.push(...codexComputerUseServersToml(input.computerUseServers));
+    // Same turn-end hooks as the Codex app's unified-computer-use plugin (cleanup inside Codex's lifecycle).
+    if (input.computerUseServers.some((server) => server.name === "cua_repl")) lines.push(...codexTurnEndHooksToml("cua_repl"));
   }
   return `${lines.join("\n")}\n`;
 }

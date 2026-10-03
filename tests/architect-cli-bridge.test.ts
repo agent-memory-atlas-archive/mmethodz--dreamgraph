@@ -90,3 +90,11 @@ it("puts the granted-run notify at the top level of the Codex config, before any
   expect(toml.indexOf('notify = ["node.exe", "proxy.js", "--notify", "D"]')).toBeLessThan(toml.indexOf("[computer_use]"));
   expect(createArchitectCodexConfigToml({ bridgeCommand: "node", bridgeArgs: [], env: {}, tools: [], computerUse: false, notify: ["x"] })).not.toContain("notify =");
 });
+
+it("granted runs with cua_repl declare Codex turn-end hooks; denied runs do not", () => {
+  const server = { name: "cua_repl", command: "", args: [], env: {}, env_vars: [], source: "s", url: "http://127.0.0.1:1/mcp/x" };
+  const granted = createArchitectCodexConfigToml({ bridgeCommand: "node", bridgeArgs: [], env: {}, tools: [], computerUse: true, computerUseServers: [server] });
+  expect(granted).toContain("[[hooks.Stop.hooks]]");
+  expect(granted).toContain('url = "http://127.0.0.1:1/mcp/x"');
+  expect(createArchitectCodexConfigToml({ bridgeCommand: "node", bridgeArgs: [], env: {}, tools: [], computerUse: false, computerUseServers: [server] })).not.toContain("hooks");
+});
