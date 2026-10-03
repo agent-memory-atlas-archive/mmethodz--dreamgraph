@@ -118,7 +118,7 @@ export const COMPUTER_USE_SCRIPT=String.raw`
     const computerPolicyEl=document.getElementById('computer-use-policy'),computerArmEl=document.getElementById('computer-use-arm');
     let computerPolicy='ask',computerPolicyReadAt=0,computerArmed=false;
     const COMPUTER_POLICY_LABEL={allow:'Computer Use: allowed',ask:'Computer Use: ask every time',deny:'Computer Use: denied'};
-    function renderComputerPolicy(){computerPolicyEl.textContent=COMPUTER_POLICY_LABEL[computerPolicy]||COMPUTER_POLICY_LABEL.ask;computerPolicyEl.dataset.policy=computerPolicy;
+    function renderComputerPolicy(){if(typeof document==='undefined'||!document)return;/* page torn down while the policy fetch was in flight */computerPolicyEl.textContent=COMPUTER_POLICY_LABEL[computerPolicy]||COMPUTER_POLICY_LABEL.ask;computerPolicyEl.dataset.policy=computerPolicy;
       const codex=computerAdapter()==='codex-cli';computerArmEl.hidden=!(codex&&computerPolicy==='ask');computerArmEl.setAttribute('aria-pressed',String(computerArmed));
       computerArmEl.textContent=computerArmed?'Allowed for next message ✓':'Allow for next message';
       if(!codex&&computerPolicy!=='deny')computerPolicyEl.title='Codex CLI uses its own Computer Use. Native API adapters use the Harness button.';else computerPolicyEl.title='Change in Config → Computer Use';}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { extractArchitectCodexUsage, createArchitectCliToolRequirementsSection, serializeCliPrompt,parseCodexComputerDiscovery } from "../src/architect/cli-bridge.js";
+import { extractArchitectCodexUsage, createArchitectCliToolRequirementsSection, serializeCliPrompt,parseCodexComputerDiscovery, createArchitectCodexConfigToml } from "../src/architect/cli-bridge.js";
 
 describe('Codex native computer discovery',()=>{
   it('reports an enabled native feature without converting detection into scope or Stop qualification',()=>{
@@ -56,4 +56,37 @@ it('reports actual native Codex token components without inventing missing usage
   expect(extractArchitectCodexUsage('diagnostic\n'+JSON.stringify({type:'turn.completed',usage:{input_tokens:50,cached_input_tokens:30,output_tokens:8}}))).toEqual({inputTokens:50,cachedInputTokens:30,outputTokens:8});
   expect(extractArchitectCodexUsage('done without telemetry')).toBeUndefined();
   expect(extractArchitectCodexUsage(JSON.stringify({type:'turn.completed',usage:{output_tokens:-1}}))).toBeUndefined();
+});
+
+describe("Codex isolated home Computer Use wiring", () => {
+  const server = { name: "cua_repl", command: "C:\\Codex\\node.exe", args: ["C:\\Codex\\cua-repl.mjs"], env: { SKY_CUA_NATIVE_PIPE: "1" },
+    env_vars: ["CODEX_WINDOWS_REGISTERED_CORE"], startup_timeout_sec: 120, enabled_tools: ["js", "js_reset"], source: "C:\\Codex\\.mcp.json" };
+  const base = { bridgeCommand: "node", bridgeArgs: ["bridge.js"], env: {}, tools: ["query_resource"] };
+
+  it("writes the Codex app's cua_repl server into the isolated config only when Computer Use is granted", () => {
+    const granted = createArchitectCodexConfigToml({ ...base, computerUse: true, computerUseServers: [server] });
+    expect(granted).toContain('default_app_access = "allow"');
+    expect(granted).toContain("[mcp_servers.cua_repl]");
+    expect(granted).toContain("[mcp_servers.cua_repl.env]");
+    expect(granted.indexOf("[mcp_servers.dreamgraph]")).toBeLessThan(granted.indexOf("[mcp_servers.cua_repl]"));
+
+    const denied = createArchitectCodexConfigToml({ ...base, computerUse: false, computerUseServers: [server] });
+    expect(denied).toContain('default_app_access = "deny"');
+    expect(denied).not.toContain("cua_repl");
+  });
+
+  it("names the native Computer Use server in the granted prompt contract", () => {
+    const prompt = serializeCliPrompt([], "open web64", "codex-cli", null, { autonomy: "manual", verbosity: "balanced", computerUse: "granted" });
+    expect(prompt).toContain("GRANTED full native Computer Use");
+    expect(prompt).toContain("pre-approved");
+    expect(prompt).toContain("cua.getTab");
+    expect(prompt).toContain("exclusively through the DreamGraph MCP tools");
+    expect(prompt).toContain("cua_repl");
+  });
+});
+
+it("puts the granted-run notify at the top level of the Codex config, before any table", () => {
+  const toml = createArchitectCodexConfigToml({ bridgeCommand: "node", bridgeArgs: [], env: {}, tools: ["query_resource"], computerUse: true, notify: ["node.exe", "proxy.js", "--notify", "D"] });
+  expect(toml.indexOf('notify = ["node.exe", "proxy.js", "--notify", "D"]')).toBeLessThan(toml.indexOf("[computer_use]"));
+  expect(createArchitectCodexConfigToml({ bridgeCommand: "node", bridgeArgs: [], env: {}, tools: [], computerUse: false, notify: ["x"] })).not.toContain("notify =");
 });

@@ -21,6 +21,7 @@ import { executionPolicyProjection, type ExecutionApproval } from "../server/exe
 import { beginHostExecution, endHostExecution, withHostExecution } from "../server/managed-execution.js";
 import type { PlanExecutionIntent } from "../graph/contracts.js";
 import { deliverManagedContext, readManagedContext, type ManagedExecutionContext } from "../graph/execution-context.js";
+import { codexComputerUseServersToml, codexGrantedNotify, codexNativeToolTrace, createCodexItemClock, createCodexTranscriptWriter, createCodexSessionGrantWatcher, readCodexNotify, wrapCodexServersWithProxy, discoverCodexComputerUseServers, resolveCodexSourceHome, widenCodexComputerUseSurfaces, type CodexComputerUseServer } from "./codex-computer-use.js";
 
 export type ArchitectCliAdapter = "codex-cli" | "copilot-cli";
 
@@ -50,6 +51,14 @@ export interface ArchitectCliBridgeRoute {
   signal: NodeJS.Signals | null;
   timed_out: boolean;
   adapter_version?: string;
+  /** Codex native Computer Use MCP servers wired into this granted pass (names only). */
+  computer_use_servers?: string[];
+  /** Codex thread whose browser session was pre-approved under the Computer Use grant. */
+  computer_use_session?: string;
+  /** Raw Codex JSONL transcript of the granted Computer Use run (local diagnostic file). */
+  computer_use_transcript?: string;
+  /** Log of DreamGraph's cua_repl proxy (turn-end cleanup) for this run. */
+  computer_use_cleanup_log?: string;
   effective_controls?: ReturnType<typeof executionPolicyProjection>;
   output_controls?: { provider: "configured_optional" | "unsupported"; prompt: "guided"; presentation: "enforced"; exact_density: "not_guaranteed" };
 }
@@ -231,6 +240,12 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     await deliverManagedContext(runId, prompt);
 
     const auditTail = startAuditTraceTail(auditPath, input.onToolTrace);
+    // Granted Computer Use: pre-approve browser access for this Codex session only.
+    const sessionGrant = invocation.computerUseServers ? createCodexSessionGrantWatcher(resolveCodexSourceHome()) : null;
+    const itemClock = invocation.computerUseServers ? createCodexItemClock() : null;
+    const transcript = invocation.computerUseServers
+      ? await createCodexTranscriptWriter(join(tmpdir(), "dreamgraph-codex-transcripts"), createHash("sha256").update(runId).digest("hex").slice(0, 32))
+      : null;
     let processResult: ProcessResult;
     try {
       const baseConfig = getArchitectLlmConfig();
@@ -239,7 +254,8 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         output_tokens: baseConfig.maxTokens, signal: executionSignal }, async signal => {
         signal.throwIfAborted(); dispatched = true;
         const result = await runProcess({ command: invocation.command, args: invocation.args, cwd: invocation.cwd,
-          env: invocation.env, stdin: invocation.stdin, timeoutMs, signal, onActivity: () => { renewExecution(); } });
+          env: invocation.env, stdin: invocation.stdin, timeoutMs, signal, onActivity: () => { renewExecution(); },
+          ...(sessionGrant || transcript ? { onStdout: (chunk: string) => { sessionGrant?.onStdout(chunk); transcript?.write(chunk); itemClock?.onStdout(chunk); } } : {}) });
         return { result, usage: input.adapter === "codex-cli" ? extractArchitectCodexUsage(result.stdout) : undefined,
           // runProcess resolves only on the child's close event: the native CLI is no longer running,
           // even when it was stopped (timeout/cancel/stale). It must not keep holding admission concurrency.
@@ -249,7 +265,23 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       await auditTail.stop();
     }
     const audit = await readAuditTrace(auditPath);
-    const toolTrace = auditRecordsToToolTrace(audit);
+    const auditToolTrace = auditRecordsToToolTrace(audit);
+    // Codex's own Computer Use actions (cua_repl) are invisible to DreamGraph's audit; take them from its JSON stream.
+    const transcriptText = transcript ? await transcript.close() : "";
+    const nativeToolTrace = invocation.computerUseServers && input.adapter === "codex-cli"
+      ? codexNativeToolTrace(transcriptText || processResult.stdout, auditToolTrace.length + 1, 500, itemClock?.durations) : [];
+    const toolTrace: ArchitectToolTraceEntry[] = [...auditToolTrace, ...nativeToolTrace];
+    const computerUseTranscript = transcript && transcriptText ? transcript.path : null;
+    let computerUseCleanupLog: string | null = null;
+    if (invocation.cuaControlDir && transcript) {
+      // Give the proxy a moment to finish logging its turn_ended exchange, then keep the log beside the transcript.
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      try {
+        const log = await readFile(join(invocation.cuaControlDir, "cua-proxy.log"), "utf8");
+        computerUseCleanupLog = transcript.path.replace(/\.jsonl$/, ".cua-proxy.log");
+        await writeFile(computerUseCleanupLog, log, { mode: 0o600 });
+      } catch { computerUseCleanupLog = null; }
+    }
     const computerUseRequestRecord = audit.find((record) => record.tool === "request_computer_use");
     let computerUseRequest: { reason: string } | undefined;
     if (computerUseRequestRecord) { let reason = ""; try { reason = String((JSON.parse(computerUseRequestRecord.inputJson ?? "{}") as { reason?: unknown }).reason ?? ""); } catch { /* bounded audit body */ }
@@ -301,6 +333,10 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         signal: processResult.signal,
         timed_out: processResult.timedOut,
         adapter_version: capability.version,
+        ...(invocation.computerUseServers ? { computer_use_servers: invocation.computerUseServers } : {}),
+        ...(sessionGrant?.threadId ? { computer_use_session: sessionGrant.threadId } : {}),
+        ...(computerUseTranscript ? { computer_use_transcript: computerUseTranscript } : {}),
+        ...(computerUseCleanupLog ? { computer_use_cleanup_log: computerUseCleanupLog } : {}),
         effective_controls: effectiveControls,
         output_controls: { provider: input.adapter === "codex-cli" ? "configured_optional" : "unsupported", prompt: "guided", presentation: "enforced", exact_density: "not_guaranteed" },
       },
@@ -524,8 +560,29 @@ async function prepareCodexInvocation(input: {
   verbosityMode?: ArchitectVerbosityMode;
   reasoningEffort?: string;
   computerUse?: boolean;
-}): Promise<{ command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string; outputPath: string | null }> {
+}): Promise<{ command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string; outputPath: string | null; computerUseServers?: string[]; cuaControlDir?: string }> {
   const command = await resolveArchitectCliExecutable("codex-cli");
+  // Granted Computer Use: wire the Codex app's own Computer Use MCP server(s) into the
+  // isolated home. Fail before the model is admitted if the runtime is not installed.
+  let computerUseServers: CodexComputerUseServer[] = [];
+  let cuaControlDir: string | null = null;
+  let codexNotify: string[] | null = null;
+  if (input.computerUse === true) {
+    const discovery = await discoverCodexComputerUseServers(resolveCodexSourceHome());
+    if (discovery.servers.length === 0) {
+      throw new Error(`CODEX_COMPUTER_USE_RUNTIME_UNAVAILABLE: Computer Use was allowed, but the Codex app's Computer Use runtime was not found (${discovery.diagnostics.join("; ") || "no candidates"}). Install or enable Computer Use in the Codex desktop app, keep the app running, and try again.`);
+    }
+    computerUseServers = widenCodexComputerUseSurfaces(discovery.servers);
+    // Turn-end cleanup: route cua_repl through DreamGraph's proxy (it sends `turn_ended`, which the
+    // Codex app's plugin hook would do) and let Codex's notify tell it when the turn is complete.
+    const proxyScript = fileURLToPath(new URL("./codex-cua-proxy.js", import.meta.url));
+    if (existsSync(proxyScript)) {
+      cuaControlDir = join(input.scratchDir, "cua-control");
+      await mkdir(cuaControlDir, { recursive: true, mode: 0o700 });
+      computerUseServers = wrapCodexServersWithProxy(computerUseServers, process.execPath, proxyScript, cuaControlDir);
+      codexNotify = codexGrantedNotify(process.execPath, proxyScript, cuaControlDir, await readCodexNotify(resolveCodexSourceHome()));
+    }
+  }
   const codexHome = join(input.scratchDir, "codex-home");
   const artifactsDir = join(input.scratchDir, "artifacts");
   await mkdir(codexHome, { recursive: true, mode: 0o700 });
@@ -538,6 +595,8 @@ async function prepareCodexInvocation(input: {
     tools: input.availableToolNames,
     modelVerbosity: resolveArchitectNarrativeDensity(input.verbosityMode).provider_text_verbosity,
     computerUse: input.computerUse === true,
+    computerUseServers,
+    ...(codexNotify ? { notify: codexNotify } : {}),
   }), { mode: 0o600 });
 
   const outputPath = join(artifactsDir, "last-message.txt");
@@ -569,6 +628,8 @@ async function prepareCodexInvocation(input: {
     },
     stdin: input.prompt,
     outputPath,
+    ...(computerUseServers.length > 0 ? { computerUseServers: computerUseServers.map((server) => server.name) } : {}),
+    ...(cuaControlDir ? { cuaControlDir } : {}),
   };
 }
 
@@ -586,7 +647,7 @@ async function prepareCopilotInvocation(input: {
   envBase: Record<string, string>;
   runId: string;
   availableToolNames: string[];
-}): Promise<{ command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string; outputPath: string | null }> {
+}): Promise<{ command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string; outputPath: string | null; computerUseServers?: string[]; cuaControlDir?: string }> {
   const command = await resolveArchitectCliExecutable("copilot-cli");
   const copilotHome = join(input.scratchDir, "copilot-home");
   const promptFilePath = join(input.scratchDir, "prompt.md");
@@ -627,11 +688,16 @@ export function createArchitectCodexConfigToml(input: {
   modelVerbosity?: "low" | "medium" | "high";
   /** Set only from the local operator's Computer Use policy/answer for this pass. */
   computerUse?: boolean;
+  /** Codex app Computer Use MCP servers; written only when computerUse is allowed. */
+  computerUseServers?: readonly CodexComputerUseServer[];
+  /** Top-level Codex `notify` argv (granted Computer Use turn-end cleanup). */
+  notify?: readonly string[];
 }): string {
   const allow = input.computerUse === true;
   const flag = allow ? "true" : "false";
   const lines = [
     "# Generated by DreamGraph for an isolated standalone Architect Codex CLI run.",
+    ...(allow && input.notify && input.notify.length > 0 ? [`notify = ${tomlArray(input.notify)}`] : []),
     ...(input.modelVerbosity ? [`model_verbosity = ${tomlString(input.modelVerbosity)}`, ""] : []),
     // Codex owns its native Computer Use. It is enabled only when the local
     // operator's policy (allow) or explicit per-request answer (ask) permits it.
@@ -660,6 +726,9 @@ export function createArchitectCodexConfigToml(input: {
   }
   for (const tool of input.tools) {
     lines.push("", `[mcp_servers.dreamgraph.tools.${tomlKey(tool)}]`, `approval_mode = ${tomlString("approve")}`);
+  }
+  if (allow && input.computerUseServers && input.computerUseServers.length > 0) {
+    lines.push(...codexComputerUseServersToml(input.computerUseServers));
   }
   return `${lines.join("\n")}\n`;
 }
@@ -724,7 +793,7 @@ export function createCliControlInstructions(autonomy: "manual" | "supervised" |
     : verbosity === "detailed" ? "Explain the outcome, relevant rationale, alternatives and uncertainty, with evidence links and diagnostic summary."
     : "Give the outcome with focused evidence and useful reasoning summary.";
   return `Effective controls: autonomy=${autonomy}; verbosity=${verbosity}. ${action} ${density} All modes preserve graph/ADR anchors, provenance, failures, scoped currency/completeness warnings and reconciliation obligations. Output density is guidance, never permission or guaranteed word count. The daemon enforces approved effect arguments and finite limits; ${computerUse === "granted"
-    ? "the local operator has ALLOWED native Computer Use for this pass: you may use your own computer/browser tools to operate applications and web pages on this machine to fulfil the request. Report what you did and observed."
+    ? "the local operator has GRANTED full native Computer Use for this pass: use your own tools (in Codex: the cua_repl MCP server, browser and desktop surfaces) to operate any web page or application on this machine to fulfil the request. Site and app access is pre-approved for this run; do not stop to ask for permission. If the request concerns a page or app that is already open, take over that existing tab or window (for a browser tab: cua.getTab({ url }) or browser.user.openTabs() then claimTab) instead of opening a new one. Native page dialogs (alert/confirm/prompt) block the page until answered: answer them with the browser dialog API (accept(), accept(text) or dismiss()) or the desktop surface, then continue. Computer Use is for operating web pages and applications only: never use it (or cua_repl JavaScript, editors, terminals or file dialogs) to read, write, run or change this project's repository; every project read, mutation and command still goes exclusively through the DreamGraph MCP tools. Report what you did and observed."
     : computerUse === "requestable"
       ? "Computer Use is NOT granted for this pass. If the request genuinely requires operating this computer (browser, apps, screen), call the DreamGraph tool request_computer_use with a one-sentence reason, then end your turn; the operator will be asked and the request re-run with Computer Use if allowed. Otherwise do not ask."
       : "no native Computer Use permission is implied."}`;
@@ -766,9 +835,7 @@ function normalizeCliRequirementTools(names: readonly string[]): string[] {
 }
 
 async function copyCodexHomeAuthArtifacts(runHomeDir: string): Promise<void> {
-  const sourceHome = process.env.CODEX_HOME && process.env.CODEX_HOME.length > 0
-    ? process.env.CODEX_HOME
-    : join(homedir(), ".codex");
+  const sourceHome = resolveCodexSourceHome();
   for (const filename of CODEX_HOME_AUTH_ARTIFACTS) {
     const source = join(sourceHome, filename);
     try {
@@ -873,6 +940,8 @@ function runProcess(input: {
   signal?: AbortSignal;
   /** Called on any process output; used as execution liveness evidence. */
   onActivity?: () => void;
+  /** Raw stdout chunks as they arrive (bounded consumers only). */
+  onStdout?: (chunk: string) => void;
 }): Promise<ProcessResult> {
   return new Promise((resolvePromise, reject) => {
     const startedAt = Date.now();
@@ -909,6 +978,7 @@ function runProcess(input: {
 
     child.stdout.on("data", (chunk) => {
       stdout = appendLimited(stdout, String(chunk));
+      try { input.onStdout?.(String(chunk)); } catch { /* observer must not break the run */ }
       input.onActivity?.();
     });
     child.stderr.on("data", (chunk) => {

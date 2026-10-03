@@ -820,3 +820,45 @@ The human owner authorized the complete Ashoka revision-7 implementation. Histor
 - Owned website main commit 0a094e28a21cd573891fb780babce17ead1ee9d6 was pushed and its exact source ZIP 96fa5ab8473dd5a5fa68b70442ee1cb941da83c7ebf974f949b1a733e600a61d uploaded through the existing Hostinger interface. Existing Vite/Node22/npm/dist settings were preserved. Hostinger reports Completed and Current at 16:44:44 local time. CUA verified public home, download, Versions and Ashoka upgrade pages. Public HTTP/byte checks verify the release notes including CI limitation, current PDF, social image and archive-built JavaScript SHA effbf75a18664b356c41c688f1302087afbefa6e59c75291a57b34310bb62891. The initial website byte check compared an earlier CRLF worktree build and failed; rebuilding the exact LF source ZIP explained the fingerprint difference and proved deployed bytes identical, without a source change or redeploy. A live public Versions screenshot is retained locally.
 - docs/ashoka/slice-28-release-evidence.json now records publication confirmed=true, tag/release/website identities, seven artifact hashes, the separately verified checksum asset and bounded public website checks. Metadata review required the exact seven-file manifest and checksum-upload verification before accepting publication. Source/package qualification, published documentation, model-quality limitations and accepted platform scope remain explicit. GitHub Actions was unavailable before any steps because of the billing lock; no passing remote CI claim or billing action is made.
 - Reviewer decision: Slice28 verified; all32 stable slices0-31 are verified and the unified Ashoka plan is completed. This is the first practical-testing release; subsequent user/community feedback belongs to patch work. The approved shared-bin/restart workflow remains, installation is not graph migration consent, and the original Windows installation/daemon/graph were not altered by this release pass. External Codex work does not fabricate an Architect running lease. No new paid model requests or platform qualification were introduced.
+
+### 2026-10-03T21:24:09.031Z — slice: cli-execution — status: completed
+
+- Plan id: `graph-trust-and-agent-effectiveness`
+- Actor/session id: `standalone-architect-browser`
+- Action: recorded daemon-governed plan action through `/api/architect/v1` without exposing direct filesystem authority
+- Request action: `architect_pass_completed`
+- Audit reason: Successful standalone Architect pass completed with a parsed continuation envelope; persist the plan cursor projection.
+- Actor: standalone-architect-browser
+- Evidence: runtime=codex-cli/none/gpt-6.1-sol; session=483e9283-b7b9-430e-9b17-282b453db830; completed_passes=1/50
+- Content: Computer Use access has been requested so I can open Web64, write and compile the C64 Hello World assembly program, and verify its output in the emulator.
+- Tool groups used: `/api/architect/v1/chat`, continuation envelope parsing, implementation-log projection
+- Result: successful Architect pass was captured as a completed implementation checkpoint for cursor projection
+- Resume note: no continuation action remains after this completed pass
+
+### 2026-10-03T21:26:00.026Z — slice: cli-execution — status: completed
+
+- Plan id: `graph-trust-and-agent-effectiveness`
+- Actor/session id: `standalone-architect-browser`
+- Action: recorded daemon-governed plan action through `/api/architect/v1` without exposing direct filesystem authority
+- Request action: `architect_pass_completed`
+- Audit reason: Successful standalone Architect pass completed with a parsed continuation envelope; persist the plan cursor projection.
+- Actor: standalone-architect-browser
+- Evidence: runtime=codex-cli/none/gpt-6.1-sol; session=483e9283-b7b9-430e-9b17-282b453db830; completed_passes=1/50
+- Content: I couldn’t perform the Web64 task because this session exposes **no computer-use or browser-control tool**. Your authorization is present, but the capability needed to open the page, type into its editor, and operate the compiler/emulator is unavailable. I checked the callable tool inventory and queried DreamGraph runtime capabilities and ADRs. I did **not** open Web64, enter a program, compile it, or observe emulator output. No repository or graph entities were changed, and no new architectural decision was needed. The bridge needs to expose a computer-use tool to this session before I can complete and visually verify the requested program.
+- Tool groups used: `/api/architect/v1/chat`, continuation envelope parsing, implementation-log projection
+- Result: successful Architect pass was captured as a completed implementation checkpoint for cursor projection
+- Resume note: no continuation action remains after this completed pass
+
+### 2026-10-03T22:10:32.370Z — slice: cli-execution — status: completed
+
+- Plan id: `graph-trust-and-agent-effectiveness`
+- Actor/session id: `standalone-architect-browser`
+- Action: recorded daemon-governed plan action through `/api/architect/v1` without exposing direct filesystem authority
+- Request action: `architect_pass_completed`
+- Audit reason: Successful standalone Architect pass completed with a parsed continuation envelope; persist the plan cursor projection.
+- Actor: standalone-architect-browser
+- Evidence: runtime=codex-cli/none/gpt-6.1-sol; session=483e9283-b7b9-430e-9b17-282b453db830; completed_passes=1/50
+- Content: I couldn’t open [Web64](https://web64.nofs.ai), so I haven’t entered, compiled, or run the program. The browser security policy rejected access, reporting that permission for this URL was declined. To continue, you’ll need to allow access to the site through the browser permission controls and ask me to retry.
+- Tool groups used: `/api/architect/v1/chat`, continuation envelope parsing, implementation-log projection
+- Result: successful Architect pass was captured as a completed implementation checkpoint for cursor projection
+- Resume note: no continuation action remains after this completed pass

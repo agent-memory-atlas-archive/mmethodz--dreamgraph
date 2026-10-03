@@ -9562,10 +9562,13 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       if (!text) return false;
       const startsStructured = text.startsWith('{') || text.startsWith('[') || text.indexOf('{') >= 0;
       const hasTruncationMarker = new RegExp('\\.\\.\\.$|\\[output truncated\\]|truncated', 'i').test(text);
-      const openObjectCount = (text.match(new RegExp(String.fromCharCode(123), 'g')) || []).length;
-      const closeObjectCount = (text.match(new RegExp(String.fromCharCode(125), 'g')) || []).length;
-      const openArrayCount = (text.match(new RegExp(String.fromCharCode(91), 'g')) || []).length;
-      const closeArrayCount = (text.match(new RegExp(String.fromCharCode(93), 'g')) || []).length;
+      // Count brackets without regexes: new RegExp('[') is invalid and used to throw here,
+      // which aborted trace/result rendering in the browser ("Invalid regular expression: /[/g").
+      const countChar = function(ch) { let n = 0; for (let k = 0; k < text.length; k += 1) { if (text.charAt(k) === ch) n += 1; } return n; };
+      const openObjectCount = countChar(String.fromCharCode(123));
+      const closeObjectCount = countChar(String.fromCharCode(125));
+      const openArrayCount = countChar(String.fromCharCode(91));
+      const closeArrayCount = countChar(String.fromCharCode(93));
       return startsStructured && (hasTruncationMarker || openObjectCount > closeObjectCount || openArrayCount > closeArrayCount);
     }
 
@@ -9744,7 +9747,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       status.textContent = item.status || 'updated';
       const duration = document.createElement('span');
       duration.className = 'tool-trace-pill';
-      duration.textContent = typeof item.duration_ms === 'number' && item.duration_ms > 0 ? String(item.duration_ms) + 'ms' : 'running';
+      duration.textContent = typeof item.duration_ms === 'number' && item.duration_ms > 0 ? String(item.duration_ms) + 'ms' : (item.status === 'running' || item.status === 'pending' ? 'running' : 'no timing');
       header.appendChild(name);
       header.appendChild(status);
       header.appendChild(duration);

@@ -1308,6 +1308,15 @@ export function getNormalizerLlmConfig(): CognitiveLlmConfig {
 }
 
 /**
+ * Architect-only provider defaults (Ashoka). Used only when neither an Architect
+ * model nor a general DREAMGRAPH_LLM_MODEL is configured; other roles keep the
+ * cheaper generic provider defaults.
+ */
+export const ARCHITECT_PROVIDER_DEFAULT_MODELS: Readonly<Partial<Record<LlmProviderType, string>>> = Object.freeze({
+  openai: "gpt-6.1-sol",
+});
+
+/**
  * Get Architect chat LLM settings and expose the exact fallback source.
  * Model order: ARCHITECT -> general -> normalizer -> dreamer.
  */
@@ -1317,7 +1326,7 @@ export function getArchitectLlmConfig(): ArchitectLlmConfig {
     const env = sessionEnvironment(), base = getLlmConfig();
     const provider = parseProviderOverride(env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER || null) ?? base.provider;
     const defaults = providerDefaults(provider, base);
-    return { component: "architect", provider, providerSource: "architect", model: env.DREAMGRAPH_LLM_ARCHITECT_MODEL || defaults.model,
+    return { component: "architect", provider, providerSource: "architect", model: env.DREAMGRAPH_LLM_ARCHITECT_MODEL || ARCHITECT_PROVIDER_DEFAULT_MODELS[provider] || defaults.model,
       modelSource: "architect", baseUrl: env.DREAMGRAPH_LLM_ARCHITECT_URL || (provider === base.provider ? base.baseUrl : defaults.baseUrl),
       apiKey: process.env.DREAMGRAPH_LLM_ARCHITECT_API_KEY || (provider === base.provider ? base.apiKey : defaults.apiKey),
       temperature: Number(env.DREAMGRAPH_LLM_ARCHITECT_TEMPERATURE ?? base.temperature),
@@ -1332,6 +1341,7 @@ export function getArchitectLlmConfig(): ArchitectLlmConfig {
     const defaults = providerDefaults(provider, base);
     const modelCandidates: Array<{ value: string | null; source: LlmConfigSource }> = [
       { value: envText("DREAMGRAPH_LLM_ARCHITECT_MODEL"), source: "architect" },
+      { value: envText("DREAMGRAPH_LLM_MODEL") ? null : ARCHITECT_PROVIDER_DEFAULT_MODELS[provider] ?? null, source: "provider_default" },
       { value: envText("DREAMGRAPH_LLM_MODEL") ?? base.model ?? defaults.model, source: "general" },
       { value: envText("DREAMGRAPH_LLM_NORMALIZER_MODEL"), source: "normalizer" },
       { value: envText("DREAMGRAPH_LLM_DREAMER_MODEL"), source: "dreamer" },
