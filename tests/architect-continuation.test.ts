@@ -160,6 +160,18 @@ describe("Architect continuation contract", () => {
     expect(decision.continuation_token).toBeTruthy();
   });
 
+  it("offers budget recovery instead of retrying a context admission failure", () => {
+    const context = { selected_plan_id: "ashoka", chat_scope: "plan" as const, completed_passes: 1, max_passes: 50, now };
+    const result = synthesizeArchitectRouteFailureContinuation({
+      reason: "architect_provider_failed: ADMISSION_CONTEXT_LIMIT: required_allocation=37000 configured_allocation=32768",
+      adapter: "codex-cli", provider: "none", model: "gpt-6.1-sol", context,
+    });
+    expect(result.report.recommended_next_step).toMatchObject({ id: "review-context-budget", kind: "pause", safe: true });
+    expect(result.report.continuation_options.find(action => action.id === "retry-route")).toMatchObject({ safe: false, recommended: false, disabled_reason: expect.stringContaining("fail again") });
+    expect(result.report.continuation_options.find(action => action.id === "manual-continue")).toMatchObject({ safe: false });
+    expect(decideArchitectContinuation({ parseResult: result, context, autonomyAllowsContinue: true }).status).toBe("stopped");
+  });
+
   it("accepts native-loop bare report JSON aliases", () => {
     const parseResult = parseArchitectContinuationEnvelope([
       "Investigated the displayed plan status from daemon-projected plan state.",

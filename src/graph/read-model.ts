@@ -57,6 +57,29 @@ export interface CanonicalGraphRead {
   entity_dependents: Map<string, Set<string>>;
 }
 const record = z.record(z.unknown());
+const legacyConflictHash = z.string().regex(/^sha256:[a-f0-9]{64}$/);
+/** Historical source rows withheld from active projection by an explicit legacy migration. */
+export const LegacyConflictEntrySchema = z.object({
+  schema: z.literal("dreamgraph.legacy_conflict.v1"), group_id: legacyConflictHash,
+  file: z.string().min(1), collection: z.string().min(1), index: z.number().int().nonnegative(),
+  original_id: z.string().nullable(), row_hash: legacyConflictHash, row: record,
+}).strict();
+const stableConflictRow = (value: unknown): string => value === null || typeof value !== "object" ? JSON.stringify(value)
+  : Array.isArray(value) ? "[" + value.map(stableConflictRow).join(",") + "]"
+  : "{" + Object.keys(value).sort().map(key => JSON.stringify(key) + ":" + stableConflictRow((value as Raw)[key])).join(",") + "}";
+export function legacyConflicts(raw: unknown, file: string): z.infer<typeof LegacyConflictEntrySchema>[] {
+  if (Array.isArray(raw) || !raw || typeof raw !== "object" || !("legacy_conflicts" in raw)) return [];
+  const entries = z.array(LegacyConflictEntrySchema).max(100_000).parse((raw as Raw).legacy_conflicts);
+  const locations = new Set<string>();
+  for (const entry of entries) {
+    if (entry.file !== file || createHash("sha256").update(stableConflictRow(entry.row)).digest("hex") !== entry.row_hash.slice(7))
+      throw new Error(`INVALID_LEGACY_CONFLICT_HISTORY: ${file}`);
+    const location = `${entry.group_id}:${entry.collection}:${entry.index}:${entry.row_hash}`;
+    if (locations.has(location)) throw new Error(`INVALID_LEGACY_CONFLICT_HISTORY: ${file}`);
+    locations.add(location);
+  }
+  return entries;
+}
 const strings = (value: unknown): string[] => Array.isArray(value) ? value.filter((v): v is string => typeof v === "string" && v.length > 0) : [];
 const text = (value: unknown): string | null => typeof value === "string" && value.length > 0 ? value : null;
 const confidence = (value: unknown): number | null => typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 1 ? value : null;
@@ -198,6 +221,7 @@ export async function loadCanonicalGraph(instance_id: string): Promise<Canonical
         store_hashes[family.file] = hash;
         if (publication.stores[family.file] && publication.stores[family.file].hash !== hash) throw new Error("UNPUBLISHED_STORE_CHANGE");
         rawStores.set(family.file, raw);
+        const historicalConflicts = legacyConflicts(raw, family.file);
         const typedPlans = family.file === "plan_state.json" && (raw as Raw)?.schema === "dreamgraph.plan_authority.v1";
         if (typedPlans && Buffer.byteLength(body, "utf8") > 32 * 1024 * 1024) throw new Error("PLAN_AUTHORITY_CAPACITY_EXHAUSTED");
         const items = typedPlans ? projectPlanAuthorityEntities(raw, instance_id, publication.epoch, asOf)
@@ -222,6 +246,10 @@ export async function loadCanonicalGraph(instance_id: string): Promise<Canonical
           addedKeys.add(key);
           by_legacy_id.set(id, [...(by_legacy_id.get(id) ?? []), identity]);
         }
+        const historicalGroups = new Map<string, number>();
+        for (const entry of historicalConflicts) historicalGroups.set(entry.group_id, (historicalGroups.get(entry.group_id) ?? 0) + 1);
+        for (const [group_id, variants] of historicalGroups) reasons.push({ code: "LEGACY_CONFLICT_PRESERVED",
+          scope: [family.file, group_id], detail: `${variants} historical variants are withheld from active graph authority; no winner was selected.` });
       } catch (error) {
         if ((error as NodeJS.ErrnoException).code === "ENOENT" && !publication.stores[family.file]) {
           store_hashes[family.file] = null;

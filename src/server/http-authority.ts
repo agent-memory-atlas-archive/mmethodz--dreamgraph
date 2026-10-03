@@ -5,13 +5,10 @@ import { resolveHttpPolicy, checkHttpRequest, publicHttpPolicy, tokenMatches, ty
 import { SessionAuthority } from "./session-authority.js";
 import type { SessionContext } from "./session-context.js";
 import { authenticateExecutionPolicy } from "./execution-policy.js";
+import { LEGACY_SESSION_COOKIE, sessionCookieName, readSessionCookie, bindAuthenticatedSessionBearer } from "./session-bearer.js";
 
-export const SESSION_COOKIE = "dg_session";
-function bearer(req: IncomingMessage): string | undefined {
-  const header = req.headers["x-dreamgraph-session"];
-  if (typeof header === "string") return header;
-  return req.headers.cookie?.split(";").map(value => value.trim()).find(value => value.startsWith(`${SESSION_COOKIE}=`))?.slice(SESSION_COOKIE.length + 1);
-}
+/** Legacy name only. New browsers use DaemonHttpAuthority.sessionCookie. */
+export const SESSION_COOKIE = LEGACY_SESSION_COOKIE;
 async function readBody(req: IncomingMessage): Promise<string> {
   const chunks:Buffer[]=[];let bytes=0;for await(const chunk of req){const part=Buffer.from(chunk);bytes+=part.length;
     if(bytes>16384)throw new Error("AUTHORITY_BODY_LIMIT");chunks.push(part);
@@ -23,9 +20,14 @@ function json(res: ServerResponse, status: number, body: unknown) {
 export class DaemonHttpAuthority {
   readonly policy: HttpPolicy;
   readonly sessions: SessionAuthority;
+  readonly sessionCookie: string;
   constructor(port: number, env: Record<string, string | undefined> = process.env) {
     this.policy = resolveHttpPolicy(port, env);
     this.sessions = new SessionAuthority(env.DREAMGRAPH_INSTANCE_UUID || directoryInstanceId(getDataDir()));
+    this.sessionCookie = sessionCookieName(this.sessions.instance_id);
+  }
+  private setSessionCookie(res: ServerResponse, token: string): void {
+    res.setHeader("Set-Cookie", `${this.sessionCookie}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200`);
   }
   publicStatus() { return publicHttpPolicy(this.policy); }
   async authorize(req: IncomingMessage, res?: ServerResponse, upgrade = false): Promise<SessionContext | null> {
@@ -39,21 +41,36 @@ export class DaemonHttpAuthority {
       if (req.method === "OPTIONS") { res.writeHead(204); res.end(); return null; }
     }
     const path = new URL(req.url || "/", "http://local").pathname;
-    const provided = bearer(req);
+    const header = req.headers["x-dreamgraph-session"], scoped = readSessionCookie(req, this.sessionCookie);
+    const legacy = typeof header !== "string" && scoped === undefined ? readSessionCookie(req, LEGACY_SESSION_COOKIE) : undefined;
+    const provided = typeof header === "string" ? header : scoped ?? legacy;
     const health = req.method === "GET" && path === "/health" && !upgrade;
     // Liveness belongs to the instance, not a conversation. Native probes have
     // no cookie jar; minting a durable identity here exhausts the session store.
     const healthContext = (): SessionContext => ({ principal: this.policy.principal, session_id: "stateless-health",
       channel: "stdio", directory: this.sessions.directory, environment: {}, continuation_key: "unbound-health" });
-    if (provided) {
+    if (provided !== undefined) {
       const executionPort = ["/api/architect/v1/execution/command", "/api/architect/v1/execution/context/refresh", "/api/architect/v1/execution/context/deliver"].includes(path);
       if (provided.startsWith("dgexec.") && !(["/mcp", "/mcp/"].includes(path) || executionPort && req.method === "POST")) {
         if (res) json(res, 403, { error: "EXECUTION_TRANSPORT_SCOPE_REJECTED" }); return null;
       }
       if (health && !this.policy.remote) return healthContext();
       try { const context = provided.startsWith("dgexec.") ? authenticateExecutionPolicy(provided, this.policy.principal, this.sessions.directory) : await this.sessions.authenticate(provided, this.policy.principal);
+        bindAuthenticatedSessionBearer(req, provided);
+        if (legacy !== undefined && res && !health) this.setSessionCookie(res, provided);
         return health ? healthContext() : context; }
-      catch { if (res) json(res, 401, { error: "SESSION_BEARER_REJECTED" }); return null; }
+      catch (error) {
+        // A global pre-fix cookie can belong to a different port/instance. Only
+        // fresh document navigation (or explicit remote login) may disregard it;
+        // scoped cookies, headers, API effects and WebSocket upgrades fail closed.
+        const document = req.method === "GET" && !path.startsWith("/api/") && !["/mcp", "/mcp/"].includes(path)
+          && (req.headers.accept?.includes("text/html") || ["/", "/architect", "/architect/", "/explorer", "/explorer/", "/config", "/schedules", "/status", "/docs"].includes(path));
+        const login = path === "/auth" && req.method === "POST";
+        const rejectedCredential = error instanceof Error && ["SESSION_BEARER_INVALID", "SESSION_AUTHORITY_REJECTED"].includes(error.message);
+        if (!(legacy !== undefined && !provided.startsWith("dgexec.") && rejectedCredential && !upgrade && (document || login))) {
+          if (res) json(res, 401, { error: "SESSION_BEARER_REJECTED" }); return null;
+        }
+      }
     }
     const authorization = req.headers.authorization;
     let authenticated = !this.policy.remote || tokenMatches(authorization?.startsWith("Bearer ") ? authorization.slice(7) : undefined, this.policy.token);
@@ -85,10 +102,11 @@ export class DaemonHttpAuthority {
       return null;
     }
     if (res) {
-      res.setHeader("Set-Cookie", `${SESSION_COOKIE}=${session.bearer}; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200`);
+      this.setSessionCookie(res, session.bearer);
       res.setHeader("X-DreamGraph-Session", session.bearer);
       if (path === "/auth" && req.method === "POST") { res.writeHead(303, { Location: "/" }); res.end(); return null; }
     }
+    bindAuthenticatedSessionBearer(req, session.bearer);
     return session.context;
   }
   async handle(req: IncomingMessage, res: ServerResponse, context: SessionContext): Promise<boolean> {

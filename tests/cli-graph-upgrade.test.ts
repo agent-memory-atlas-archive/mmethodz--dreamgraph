@@ -196,6 +196,34 @@ describe("graph-upgrade preview CLI output", () => {
     expect(output()).toContain("Analyzing legacy graph");
   });
 
+  it("upgrades conflicting history only with explicit preservation and keeps normal output bounded", async () => {
+    const rows = [
+      { dream_type: "node", dream_id: "collision", normalization_cycle: 1, status: "latent", confidence: 0.3 },
+      { dream_type: "node", dream_id: "collision", normalization_cycle: 1, status: "latent", confidence: 0.8 },
+      { dream_type: "node", dream_id: "unrelated", normalization_cycle: 1, status: "latent", confidence: 0.4 },
+    ];
+    await fs.writeFile(join(data, "candidate_edges.json"), JSON.stringify({ results: rows }));
+    await cmdGraphUpgrade(["fixture"], { "preserve-conflicts": true });
+    expect(output()).toContain("Migration complete.");
+    expect(output()).toContain("Conflicting revisions preserved in quarantined history: 2");
+    expect(output().length).toBeLessThan(15_000);
+    expect(output()).not.toContain('"confidence"');
+    const stored = JSON.parse(await fs.readFile(join(data, "candidate_edges.json"), "utf8"));
+    expect(stored.results).toEqual([rows[2]]);
+    expect(stored.legacy_conflicts.map((entry: { row: unknown }) => entry.row)).toEqual(rows.slice(0, 2));
+    const recovery = await savedRecovery();
+    const review = GraphUpgradePreviewSchema.parse(JSON.parse(await fs.readFile(recovery.preview_path, "utf8")));
+    expect(review.preserve_conflicts).toBe(true);
+    expect(review.blockers).toEqual([]);
+    vi.mocked(console.log).mockClear();
+    expect((await resume(recovery)).replayed).toBe(true);
+  });
+
+  it("rejects history policy flags on apply/restore before accessing an instance", async () => {
+    await expect(cmdGraphUpgrade(["fixture", "apply"], { "preserve-conflicts": true })).rejects.toThrow("policy bound in its saved preview");
+    expect(daemon.resolve).not.toHaveBeenCalled();
+  });
+
   it("cancels during backup without claiming completion or publishing source changes", async () => {
     const features = await danglingFixture(8, true);
     const workflows = await fs.readFile(join(data, "workflows.json"), "utf8");
@@ -203,7 +231,7 @@ describe("graph-upgrade preview CLI output", () => {
     vi.mocked(console.log).mockImplementation(value => {
       if (!interrupted && String(value).includes("Creating verified backup")) {
         interrupted = true;
-        process.emit("SIGINT");
+        process.listeners("SIGINT").at(-1)?.();
       }
     });
     const error = vi.spyOn(console, "error").mockImplementation(() => {});

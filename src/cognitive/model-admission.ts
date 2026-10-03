@@ -34,8 +34,9 @@ export const AdmissionLedgerSchema = z.object({
 }).strict();
 export type AdmissionAttempt = z.infer<typeof AttemptSchema>;
 export class ModelAdmissionError extends Error {
-  constructor(readonly code: string, readonly run_id: string, readonly attempt_id: string | null = null) {
-    super(`${code}: run ${run_id}${attempt_id ? `, attempt ${attempt_id}` : ""}`); this.name = "ModelAdmissionError";
+  constructor(readonly code: string, readonly run_id: string, readonly attempt_id: string | null = null,
+    readonly detail: string | null = null) {
+    super(`${code}: run ${run_id}${attempt_id ? `, attempt ${attempt_id}` : ""}${detail ? `; ${detail}` : ""}`); this.name = "ModelAdmissionError";
   }
 }
 export interface AdmissionRequest {

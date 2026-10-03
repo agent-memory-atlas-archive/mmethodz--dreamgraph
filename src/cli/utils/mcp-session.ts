@@ -4,14 +4,14 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import type { CallToolResult, ContentBlock, Tool } from "@modelcontextprotocol/sdk/types.js";
 import { CLI_VERSION } from "../version.js";
+import { authenticatedSessionBearer } from "../../server/session-bearer.js";
 export type McpCallResult = Omit<CallToolResult, "content"> & { content: Array<ContentBlock & { text?: string }> };
 export interface McpCallProgress { progress: number; total?: number; message?: string; }
 export interface McpConnectionOptions { headers?: Record<string, string>; signal?: AbortSignal; }
 /** Forward only the authenticated daemon bearer, never arbitrary headers. */
 export function architectMcpHeaders(req: IncomingMessage): Record<string, string> {
   const header = req.headers["x-dreamgraph-session"];
-  const cookie = req.headers.cookie?.split(";").map(value => value.trim()).find(value => value.startsWith("dg_session="))?.slice(11);
-  const token = typeof header === "string" ? header : cookie;
+  const token = authenticatedSessionBearer(req) ?? (typeof header === "string" ? header : undefined);
   return token ? { "X-DreamGraph-Session": token } : {};
 }
 /** Bounded discovery retains annotations, schemas and metadata on every page. */

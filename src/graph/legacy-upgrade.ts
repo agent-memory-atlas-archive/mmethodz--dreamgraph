@@ -8,7 +8,7 @@ import { withDataDirectory } from "../utils/paths.js";
 import { withGraphRead, withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
 import { atomicWriteFileRaw } from "../utils/atomic-write.js";
 import { assertGraphWriter } from "./writer-lease.js";
-import { CANONICAL_FAMILIES, legacyIdentity, loadCanonicalGraph, type CanonicalGraphRead } from "./read-model.js";
+import { CANONICAL_FAMILIES, legacyIdentity, legacyConflicts, loadCanonicalGraph, type CanonicalGraphRead } from "./read-model.js";
 import { EngineJobsStoreSchema } from "../cognitive/jobs.js";
 import { ManagedExecutionStoreSchema } from "./execution-context.js";
 import { decodePlanAuthorityStore } from "../discipline/plan-authority.js";
@@ -35,11 +35,11 @@ export type GraphUpgradeResolution = z.infer<typeof ResolutionSchema>;
 const FileStampSchema = z.object({ file, hash: sha.nullable(), semantic_hash: sha.nullable(), bytes: z.number().int().nonnegative() }).strict();
 const ConfigStampSchema = z.object({file:z.string().regex(/^[a-zA-Z0-9_.-]+$/),hash:sha,bytes:z.number().int().nonnegative()}).strict();
 const FindingSchema = z.object({ code: id, file, collection: z.string(), index: z.number().int().nonnegative(), row_hash: sha.nullable(),
-  original_id: z.string().nullable(), new_id: z.string().nullable(), disposition: z.enum(["retained", "assigned", "renamed", "archived", "blocked"]) }).strict();
+  original_id: z.string().nullable(), new_id: z.string().nullable(), disposition: z.enum(["retained", "assigned", "renamed", "archived", "blocked", "preserved"]) }).strict();
 export const GraphUpgradePreviewSchema = z.object({ schema: z.literal("dreamgraph.graph_upgrade_preview.v1"), instance_id: id, directory_hash: sha,
   created_at: z.string().datetime(), epoch: id, revision: RevisionVectorSchema, files: z.array(FileStampSchema).max(4096),
   config_directory_hash:sha.nullable(),config_files:z.array(ConfigStampSchema).max(64),
-  resolutions: z.array(ResolutionSchema).max(4096), findings: z.array(FindingSchema).max(MAX_ROWS), blockers: z.array(id).max(MAX_ROWS),
+  resolutions: z.array(ResolutionSchema).max(4096), preserve_conflicts: z.literal(true).optional(), findings: z.array(FindingSchema).max(MAX_ROWS), blockers: z.array(id).max(MAX_ROWS),
   unknown_baselines: z.array(id), readonly_owners: z.array(id),
   writes: z.array(z.object({ file, content: z.string(), before_hash: sha, after_hash: sha }).strict()).max(32),
   before: z.record(z.unknown()), after: z.record(z.unknown()), digest: sha }).strict();
@@ -123,15 +123,21 @@ export class LegacyGraphUpgrade {
     }
     return { physical, publication, files, stamps, config_directory_hash, config_files, config_bytes };
   }
-  private repair(snapshot: Snapshot, resolutions: GraphUpgradeResolution[]) {
+  private repair(snapshot: Snapshot, resolutions: GraphUpgradeResolution[], preserve_conflicts = false) {
     const findings: GraphUpgradePreview["findings"] = [], blockers: string[] = [], writes: GraphUpgradePreview["writes"] = [];
     const requested = new Map<string, GraphUpgradeResolution>(), used = new Set<string>();
     const address = (file: string, collection: string, index: number) => stable([file, collection, index]);
+    const grouping = (file: string, collection: string, row: Record<string, any>, identity: string) =>
+      file === "candidate_edges.json" && text(row.dream_id) && ["edge","node"].includes(row.dream_type) && Number.isSafeInteger(row.normalization_cycle)
+        ? stable(["assessment", row.dream_type, row.dream_id, row.normalization_cycle])
+        : stable(["identity", identity, row.source_repo ?? null]);
     for (const resolution of resolutions) { ResolutionSchema.parse(resolution); const key = address(resolution.file, resolution.collection, resolution.index);
       if (requested.has(key)) throw new Error("GRAPH_UPGRADE_RESOLUTION_DUPLICATE"); requested.set(key, resolution); }
     for (const family of CANONICAL_FAMILIES) {
       const input = snapshot.files.get(family.file); if (!input || ["plan", "slice"].includes(family.kind)) continue;
       const value = structuredClone(input.value), header = object(value) ? value : null;
+      const priorHistory = legacyConflicts(value, family.file);
+      const history = [...priorHistory];
       const version = text(header?.schema_version ?? header?.metadata?.schema_version);
       if (version && !["current", "previous"].includes(classifySchemaMajor(version, storeDefinition(family.file).schema_major))) { blockers.push("UNSUPPORTED_STORE_SCHEMA: " + family.file); continue; }
       const matching = header ? family.arrays.filter(key => Array.isArray(header[key])) : [];
@@ -142,31 +148,60 @@ export class LegacyGraphUpgrade {
       let changed = false;
       for (const [collection, entries] of collections) {
         if (entries.length > MAX_ROWS) throw new Error("GRAPH_UPGRADE_ROW_CAPACITY");
+        const conflicting = new Map<string,string>();
+        if (preserve_conflicts) {
+          const candidates = new Map<string, Array<{index:number; row:Record<string,any>}>>();
+          for (let index = 0; index < entries.length; index++) {
+            const original = entries[index]; if (!object(original) || original._schema || original._note) continue;
+            const resolution = requested.get(address(family.file, collection, index));
+            if (resolution?.action === "archive") continue;
+            const row = {...original}; if (resolution?.action === "set_id") row.id = resolution.new_id;
+            const identity = legacyIdentity(family, row) ?? "legacy:" + family.kind + ":" + hash(stable([family.file, collection, row])).slice(7,31);
+            const key = grouping(family.file, collection, row, identity);
+            candidates.set(key,[...(candidates.get(key) ?? []),{index,row}]);
+          }
+          for (const [key, variants] of candidates) if (variants.length > 1 && new Set(variants.map(item => stable(item.row))).size > 1)
+            conflicting.set(key, hash(stable([family.file,collection,key])));
+          if (conflicting.size && !header) { blockers.push("CONFLICT_HISTORY_REQUIRES_OBJECT_STORE: " + family.file); conflicting.clear(); }
+        }
         const retained: any[] = [], groups = new Map<string, { row: any; index: number; row_hash: string; identity: string }>();
         for (let index = 0; index < entries.length; index++) {
           const row = entries[index]; if (!object(row)) { blockers.push("INVALID_ENTITY: " + family.file + "/" + collection + "/" + index); continue; }
           if (row._schema || row._note) { retained.push(row); continue; }
+          const originalRow = structuredClone(row);
           const row_hash = hash(stable(row)), key = address(family.file, collection, index), resolution = requested.get(key);
           let identity = legacyIdentity(family, row);
           const original_id = identity;
+          let mapped = false;
           if (resolution) {
             used.add(key); if (resolution.row_hash !== row_hash) throw new Error("GRAPH_UPGRADE_RESOLUTION_CHANGED");
             if (resolution.action === "archive") { changed = true; findings.push({ code: "REVIEWED_ROW_ARCHIVE", file: family.file, collection, index, row_hash, original_id, new_id: null, disposition: "archived" }); continue; }
             if (!resolution.new_id || family.kind === "candidate" && Number.isSafeInteger(row.normalization_cycle) && text(row.dream_id)) throw new Error("GRAPH_UPGRADE_ASSESSMENT_REQUIRES_EXPLICIT_ARCHIVE_SELECTION");
-            row.id = resolution.new_id; identity = legacyIdentity(family, row)!; changed = true;
-            findings.push({ code: "REVIEWED_ID_MAPPING", file: family.file, collection, index, row_hash, original_id, new_id: identity, disposition: "renamed" });
+            row.id = resolution.new_id; identity = legacyIdentity(family, row)!; changed = true; mapped = true;
           }
+          const prospectiveIdentity = identity ?? "legacy:" + family.kind + ":" + hash(stable([family.file, collection, row])).slice(7,31);
+          const preservedGroup = conflicting.get(grouping(family.file, collection, row, prospectiveIdentity));
+          if (preservedGroup) {
+            if (history.length >= MAX_ROWS) throw new Error("GRAPH_UPGRADE_CONFLICT_HISTORY_CAPACITY");
+            history.push({
+              schema: "dreamgraph.legacy_conflict.v1", group_id: preservedGroup, file: family.file, collection, index,
+              original_id, row_hash, row: originalRow,
+            });
+            header!.legacy_conflicts = history;
+            changed = true;
+            findings.push({ code: "LEGACY_CONFLICT_PRESERVED", file: family.file, collection, index, row_hash, original_id, new_id: null, disposition: "preserved" });
+            continue;
+          }
+          if (mapped) findings.push({ code: "REVIEWED_ID_MAPPING", file: family.file, collection, index, row_hash, original_id, new_id: identity, disposition: "renamed" });
           if (!identity) { identity = "legacy:" + family.kind + ":" + hash(stable([family.file, collection, row])).slice(7,31); row.id = identity; changed = true;
             findings.push({ code: "MISSING_ID_ASSIGNED", file: family.file, collection, index, row_hash, original_id: null, new_id: identity, disposition: "assigned" }); }
           // Assessment history keeps its original artifact/cycle; no latest winner or independent support is invented.
-          const grouping = family.file === "candidate_edges.json" && text(row.dream_id) && ["edge","node"].includes(row.dream_type) && Number.isSafeInteger(row.normalization_cycle)
-            ? stable(["assessment", row.dream_type, row.dream_id, row.normalization_cycle]) : stable(["identity", identity, row.source_repo ?? null]);
-          const prior = groups.get(grouping);
+          const groupKey = grouping(family.file, collection, row, identity), prior = groups.get(groupKey);
           if (prior) {
             if (stable(prior.row) === stable(row)) { changed = true; findings.push({ code: "EXACT_DUPLICATE_ARCHIVED", file: family.file, collection, index, row_hash, original_id, new_id: prior.identity, disposition: "archived" }); continue; }
             blockers.push("CONFLICTING_DUPLICATE: " + family.file + "/" + collection + "/" + prior.index + "," + index);
             findings.push({ code: "CONFLICTING_DUPLICATE", file: family.file, collection, index, row_hash, original_id, new_id: null, disposition: "blocked" });
-          } else groups.set(grouping, { row, index, row_hash, identity });
+          } else groups.set(groupKey, { row, index, row_hash, identity });
           retained.push(row);
         }
         if (Array.isArray(value)) { value.length = 0; for (const row of retained) value.push(row); } else header![collection] = retained;
@@ -195,20 +230,20 @@ export class LegacyGraphUpgrade {
       return await withDataDirectory(directory, () => loadCanonicalGraph(this.instance_id));
     } finally { await fs.rm(directory, { recursive: true, force: true }); }
   }
-  preview(resolutions: GraphUpgradeResolution[] = []): Promise<GraphUpgradePreview> {
+  preview(resolutions: GraphUpgradeResolution[] = [], options: { preserve_conflicts?: boolean } = {}): Promise<GraphUpgradePreview> {
     return this.scope(() => withGraphRead(async () => {
       this.progress({ stage: "analyzing" });
       const snapshot = await this.readSnapshot(), before = await loadCanonicalGraph(this.instance_id);
       this.progress({ stage: "analyzed", entities: before.entities.length, relationships: before.relationships.length });
       this.progress({ stage: "mapping" });
-      const repair = this.repair(snapshot, resolutions);
+      const repair = this.repair(snapshot, resolutions, options.preserve_conflicts === true);
       this.progress({ stage: "validating" });
       const after = await this.stage(snapshot, repair.writes);
       repair.blockers.push(...this.introducedFailures(before, after));
       const result = { schema: "dreamgraph.graph_upgrade_preview.v1" as const, instance_id: this.instance_id, directory_hash: hash(fold(snapshot.physical)),
         created_at: new Date().toISOString(), epoch: snapshot.publication.epoch, revision: snapshot.publication.revision, files: snapshot.stamps,
         config_directory_hash:snapshot.config_directory_hash,config_files:snapshot.config_files,
-        resolutions, ...repair, unknown_baselines: ["scan_state.json", "enrichment_state.json"].filter(file => !snapshot.files.has(file)),
+        resolutions, ...(options.preserve_conflicts === true ? { preserve_conflicts: true as const } : {}), ...repair, unknown_baselines: ["scan_state.json", "enrichment_state.json"].filter(file => !snapshot.files.has(file)),
         readonly_owners: ["C14 plan/slice authority and recorded progress", "source/normalization evidence", "jobs/execution/grants/spend", "configuration", "unknown extension/history files"],
         before: this.summary(before), after: this.summary(after) };
       return GraphUpgradePreviewSchema.parse({ ...result, digest: hash(stable(result)) });
@@ -280,7 +315,7 @@ export class LegacyGraphUpgrade {
       const snapshot = await this.readSnapshot(); this.quiescent(snapshot);
       if (snapshot.publication.epoch !== preview.epoch || stable(snapshot.publication.revision) !== stable(preview.revision) || stable(snapshot.stamps) !== stable(preview.files)
         ||snapshot.config_directory_hash!==preview.config_directory_hash||stable(snapshot.config_files)!==stable(preview.config_files)) throw new Error("GRAPH_UPGRADE_REVISION_CONFLICT");
-      const repair = this.repair(snapshot,preview.resolutions);
+      const repair = this.repair(snapshot,preview.resolutions,preview.preserve_conflicts === true);
       if (stable(repair.writes) !== stable(preview.writes) || stable(repair.findings) !== stable(preview.findings) || repair.blockers.length) throw new Error("GRAPH_UPGRADE_PREVIEW_INVALID");
       const before = await loadCanonicalGraph(this.instance_id);
       if (stable(["scan_state.json","enrichment_state.json"].filter(file=>!snapshot.files.has(file)))!==stable(preview.unknown_baselines)

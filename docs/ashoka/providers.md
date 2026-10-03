@@ -1,5 +1,13 @@
 # Ashoka provider boundaries — implementation checkpoint
 
+## Native CLI context admission
+
+Architect's native CLI route retains its 128 KiB required-prompt transport ceiling. Its default context allocation is now 133,120: the full UTF-8 wire byte allowance plus 2,048 framing units. This is conservative admission allocation, **not measured model token usage**. API defaults remain 32,768; explicit session, role environment, saved profile and global limits retain their precedence and are never raised silently. Per-run cumulative input, request, retry and spend limits remain enforced.
+
+A context-limit refusal occurs before CLI/model dispatch and reports the required allocation, configured allowance and `DREAMGRAPH_LLM_ARCHITECT_CONTEXT_TOKENS` setting. Architect pauses and recommends reviewing the context budget; unchanged retry/manual-continue actions are disabled. Narrow optional context or explicitly revise the role setting before retrying. Required graph evidence, controls and the user request are not truncated to fit. Provider-reported usage remains the settlement measurement when available; subscription usage is not invented.
+
+## Earlier implementation evidence
+
 Slice 8 is in progress. This document describes implemented API boundaries and role dispatch, not paid-provider qualification or completed Computer Use integration.
 
 Daemon dreamer, semantic normalizer, tension proposal, initial-scan and enrichment routes resolve independent role settings, saved profiles and credential references. A provider binds an immutable policy snapshot; later profile changes affect subsequent bindings. The shared singleton is retained for older consumers and attached MCP sampling. A native CLI policy cannot fall through into an API provider. Unsupported settings block with a diagnostic rather than escalating reasoning or changing models.

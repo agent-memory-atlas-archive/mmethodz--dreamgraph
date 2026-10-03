@@ -12,6 +12,7 @@ import { MODEL_ROLES, ROLE_SETTING_FIELDS, ROLE_BUDGET_FIELDS, roleEnvKey } from
 import { modelTemperatureCapability, assertReasoningEffort, type TemperatureCapability } from "./model-temperature.js";
 import { cognitiveRoleInstruction } from "../cognitive/role-instructions.js";
 import { providerCapability, ProviderCapabilitySchema, type ProviderCapability } from "./provider-capabilities.js";
+import { NATIVE_CLI_DEFAULT_CONTEXT_ALLOCATION } from "./request-bounds.js";
 
 export { MODEL_ROLES } from "./role-env-fields.js";
 export type ModelRole = typeof MODEL_ROLES[number];
@@ -96,7 +97,8 @@ export function resolveRolePolicy(input: {
   const retention = choose("retention", env.DREAMGRAPH_LLM_RETENTION as RoleSettings["retention"], "provider_default")!;
   const timeout_ms = choose("timeout_ms", env.DREAMGRAPH_LLM_TIMEOUT_MS ? Number(env.DREAMGRAPH_LLM_TIMEOUT_MS) : input.legacy?.timeoutMs, 120_000)!;
   const output_tokens = choose("output_tokens", env.DREAMGRAPH_LLM_MAX_TOKENS ? Number(env.DREAMGRAPH_LLM_MAX_TOKENS) : input.legacy?.maxTokens, 2048)!;
-  const context_tokens = choose("context_tokens", env.DREAMGRAPH_LLM_CONTEXT_TOKENS ? Number(env.DREAMGRAPH_LLM_CONTEXT_TOKENS) : undefined, 32768)!;
+  const context_tokens = choose("context_tokens", env.DREAMGRAPH_LLM_CONTEXT_TOKENS ? Number(env.DREAMGRAPH_LLM_CONTEXT_TOKENS) : undefined,
+    api === "native_cli" ? NATIVE_CLI_DEFAULT_CONTEXT_ALLOCATION : 32768)!;
   const temperature = choose("temperature", env.DREAMGRAPH_LLM_TEMPERATURE ? Number(env.DREAMGRAPH_LLM_TEMPERATURE) : role === "normalizer" ? 0.1 : input.legacy?.temperature, role === "dreamer" ? 0.7 : 0.2)!;
   const strict_schema = choose("strict_schema", undefined, false)!;
   const base_url = choose("base_url", sameProvider ? env.DREAMGRAPH_LLM_URL ?? input.legacy?.baseUrl : undefined, defaults(provider).url)!;

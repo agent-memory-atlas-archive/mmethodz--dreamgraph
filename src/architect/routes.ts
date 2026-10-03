@@ -11067,6 +11067,11 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         button.dataset.actionDisabled = action.safe === false || Boolean(action.disabled_reason) ? 'true' : 'false';
         button.disabled = shouldDisableArchitectContinuationPill(button);
         button.addEventListener('click', function() {
+          if (action.id === 'review-context-budget') {
+            reviewArchitectContextBudget(action);
+            chatStatusEl.textContent = String(action.rationale || 'Review the configured context allocation before retrying.');
+            return;
+          }
           button.classList.add('running');
           button.id = 'standalone_architect_autonomy_auto_selection';
           sendChatMessage(action.prompt || action.label || action.id, {
@@ -11084,7 +11089,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
     }
 
     function shouldDisableArchitectContinuationPill(button) {
-      return chatProcessing || !activeContinuationToken || button.dataset.actionDisabled === 'true';
+      return chatProcessing || (button.dataset.actionId !== 'review-context-budget' && !activeContinuationToken) || button.dataset.actionDisabled === 'true';
     }
 
     function refreshArchitectContinuationPills() {

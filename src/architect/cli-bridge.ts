@@ -8,6 +8,7 @@ import { delimiter, isAbsolute, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { createRequire } from "node:module";
 import { nativeCliModelExecution } from "../cognitive/model-execution.js";
+import { NATIVE_CLI_PROMPT_MAX_BYTES } from "../config/request-bounds.js";
 import { getArchitectLlmConfig } from "../cognitive/llm.js";
 import { providerUsage } from "../cognitive/provider-outcome.js";
 import type { LlmMessage, TokenUsage } from "../cognitive/llm.js";
@@ -191,7 +192,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced",
       approved_actions: input.approvedActions, timeout_ms: Math.trunc(timeoutMs) }, input.signal, input.operatorReviewEnabled === true);
     prompt += "\n\n" + lease.execution.block;
-    if (Buffer.byteLength(prompt) > 128 * 1024) throw new Error("CLI_REQUIRED_PROMPT_BYTE_BOUND: narrow the task without clipping required evidence");
+    if (Buffer.byteLength(prompt) > NATIVE_CLI_PROMPT_MAX_BYTES) throw new Error("CLI_REQUIRED_PROMPT_BYTE_BOUND: narrow the task without clipping required evidence");
     executionSignal = await withHostExecution(runId, async () => getSessionContext()!.execution_policy!.signal);
     executionSignal.throwIfAborted();
   }

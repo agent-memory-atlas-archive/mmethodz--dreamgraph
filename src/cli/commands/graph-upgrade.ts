@@ -10,8 +10,8 @@ const help = `
 dg graph-upgrade — Review and migrate an existing graph (no model calls)
 
 Usage:
-  dg graph-upgrade <uuid|name> [--dry-run] [--out <file>] [--resolutions <file>] [--json]
-  dg graph-upgrade <uuid|name> preview [--out <file>] [--resolutions <file>] [--json]
+  dg graph-upgrade <uuid|name> [--dry-run] [--preserve-conflicts] [--out <file>] [--resolutions <file>] [--json]
+  dg graph-upgrade <uuid|name> preview [--preserve-conflicts] [--out <file>] [--resolutions <file>] [--json]
   dg graph-upgrade <uuid|name> apply --preview <file> --reviewed-digest <sha256:...> --review-id <id> --operation-id <id>
   dg graph-upgrade <uuid|name> restore-preview --original-operation <id> [--out <file>] [--json]
   dg graph-upgrade <uuid|name> restore --preview <file> --reviewed-digest <sha256:...> --review-id <id> --operation-id <id>
@@ -27,6 +27,10 @@ under the master directory's graph-upgrade-reviews/. Existing files are refused.
 Unresolved relationships are graph diagnostics, separate from
 structural migration blockers; they are preserved for explicit reviewed repair.
 Resolutions are explicit row hashes/indexes with archive or set_id and a reason.
+--preserve-conflicts explicitly preserves every conflicting revision in its
+store's quarantined legacy history. No revision is selected as canonical.
+Unrelated records remain usable; the affected identities stay unresolved.
+The same verified backup, reviewed publication and restore guarantees apply.
 Apply/restore require an offline instance and no unfinished jobs/executions.
 They never stop the daemon, scan sources, re-enrich, purchase or spend model credit.
 Apply verifies a byte-preserving backup of every root JSON store and instance
@@ -63,6 +67,16 @@ function printPreviewSummary(action: string, name: string, preview: Preview, tar
   ];
   for (const blocker of preview.blockers.slice(0, 5)) lines.push(`  ${excerpt(blocker)}`);
   if (preview.blockers.length > 5) lines.push(`  … ${count(preview.blockers.length - 5)} more blockers in the full review.`);
+  if ("findings" in preview) {
+    const preserved = preview.findings.filter(finding => finding.code === "LEGACY_CONFLICT_PRESERVED");
+    if (preserved.length) {
+      lines.push(`Conflicting revisions preserved in quarantined history: ${count(preserved.length)}. No canonical winner selected.`);
+      lines.push("Previously rejected stores can now expose unrelated records and additional diagnostics. Increased counts do not mean references were repaired.");
+    }
+    if (preview.blockers.some(blocker => blocker.startsWith("CONFLICTING_DUPLICATE:"))) {
+      lines.push("To retain all conflicting revisions without choosing a winner, use --preserve-conflicts; otherwise supply reviewed --resolutions.");
+    }
+  }
   lines.push(`Unresolved relationships: ${count(before.unresolved_endpoints)} → ${count(after.unresolved_endpoints)}`);
   if (typeof after.unresolved_endpoints === "number" && after.unresolved_endpoints > 0) {
     if (before.unresolved_endpoints === after.unresolved_endpoints) lines.push(`  ${count(after.unresolved_endpoints)} pre-existing unresolved references preserved.`);
@@ -99,7 +113,8 @@ function statistics(preview: Preview) {
       completeness: object(summary.state).completeness, unresolved_endpoints: summary.unresolved_endpoints, diagnostics };
   };
   return { before: summarize(preview.before), after: summarize(preview.after), blockers: preview.blockers.length,
-    changed_files: "writes" in preview ? preview.writes.length : preview.changes.length };
+    changed_files: "writes" in preview ? preview.writes.length : preview.changes.length,
+    preserved_conflicting_revisions: "findings" in preview ? preview.findings.filter(finding => finding.code === "LEGACY_CONFLICT_PRESERVED").length : 0 };
 }
 async function saveOutsideInstance(instanceRoot: string, target: string, value: unknown) {
   const parent = await fs.realpath(path.dirname(path.resolve(target))), physicalTarget = path.join(parent, path.basename(target));
@@ -113,6 +128,8 @@ export async function cmdGraphUpgrade(positional: string[], flags: ParsedArgs["f
   const [query,requested="upgrade"]=positional;
   if(!["upgrade","preview","apply","restore-preview","restore"].includes(requested)||positional.length>2)throw new Error("Unknown graph-upgrade action. Run dg graph-upgrade --help.");
   if(flags["dry-run"]&&!["upgrade","preview","restore-preview"].includes(requested))throw new Error("--dry-run cannot be combined with apply or restore. Use preview or restore-preview.");
+  if(flags["preserve-conflicts"]!==undefined&&flags["preserve-conflicts"]!==true)throw new Error("--preserve-conflicts is a boolean option.");
+  if(flags["preserve-conflicts"]&&!["upgrade","preview"].includes(requested))throw new Error("--preserve-conflicts applies to a new upgrade or preview; apply uses the policy bound in its saved preview.");
   const action=flags["dry-run"]&&requested==="upgrade"?"preview":requested;
   if(action==="upgrade"&&["preview","reviewed-digest","review-id","operation-id"].some(key=>flags[key]!==undefined))throw new Error("Use the apply action to resume an existing reviewed upgrade.");
   const working=(message:string)=>{if(!flags.json)console.log(message);};
@@ -141,7 +158,8 @@ export async function cmdGraphUpgrade(positional: string[], flags: ParsedArgs["f
       console.log(JSON.stringify(result,null,2));return;
     }
     const preview=action==="restore-preview"?await service.previewRestore(required(flags,"original-operation")):
-      await service.preview(flags.resolutions===undefined?[]:await read(required(flags,"resolutions"),2*1024*1024));
+      await service.preview(flags.resolutions===undefined?[]:await read(required(flags,"resolutions"),2*1024*1024),
+        flags["preserve-conflicts"] ? { preserve_conflicts: true } : {});
     controller.signal.throwIfAborted();
     if(action==="upgrade"){
       const token=randomUUID();let target:string;

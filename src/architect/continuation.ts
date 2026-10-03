@@ -418,6 +418,8 @@ export function synthesizeArchitectCliPassResult(input: {
 
 export function synthesizeArchitectRouteFailureContinuation(input: ArchitectRouteFailureContinuationInput): ArchitectContinuationParseResult {
   const reason = sanitizeText(input.reason || "architect_route_failed", 240);
+  const contextLimited = /ADMISSION_CONTEXT_LIMIT|CLI_REQUIRED_PROMPT_BYTE_BOUND/.test(reason);
+  const contextLimitRecovery = "Review the configured role context allocation and required prompt size before retrying. Narrow optional context or explicitly change the role budget; required graph evidence must remain intact.";
   const diagnostics = [reason, "architect_route_failed_before_envelope_parse"];
   const retryPrompt = [
     "Retry the previous DreamGraph Architect pass through the configured standalone route.",
@@ -451,17 +453,29 @@ export function synthesizeArchitectRouteFailureContinuation(input: ArchitectRout
     uncertainty: 1,
     stop_reason: reason,
     recommended_actions: [
-      {
-        id: "retry-route",
-        label: "Retry route",
-        rationale: "The adapter/provider failed before producing an envelope, so retrying the same bounded pass is safe.",
-        kind: "continue",
-        prompt: retryPrompt,
+      ...(contextLimited ? [{
+        id: "review-context-budget",
+        label: "Review context budget",
+        rationale: contextLimitRecovery,
+        kind: "pause" as const,
+        prompt: `Report the context admission diagnostic without dispatching another model pass or changing configuration.\n${reason}\n${contextLimitRecovery}`,
         safe: true,
         recommended: true,
         required_tools: [],
         preferred_tools: [],
         disabled_reason: null,
+      }] : []),
+      {
+        id: "retry-route",
+        label: "Retry route",
+        rationale: contextLimited ? contextLimitRecovery : "The adapter/provider failed before producing an envelope, so retrying the same bounded pass is safe.",
+        kind: "continue",
+        prompt: retryPrompt,
+        safe: !contextLimited,
+        recommended: !contextLimited,
+        required_tools: [],
+        preferred_tools: [],
+        disabled_reason: contextLimited ? "The same prompt exceeds its context allocation; retrying unchanged will fail again." : null,
       },
       {
         id: "report-only",
@@ -481,11 +495,11 @@ export function synthesizeArchitectRouteFailureContinuation(input: ArchitectRout
         rationale: "A human-selected continuation can proceed from the route failure with explicit intent.",
         kind: "continue",
         prompt: manualPrompt,
-        safe: true,
+        safe: !contextLimited,
         recommended: false,
         required_tools: [],
         preferred_tools: ["read_source_code", "search_source_code", "run_command"],
-        disabled_reason: null,
+        disabled_reason: contextLimited ? "Resolve the context admission limit before continuing." : null,
       },
     ],
   };

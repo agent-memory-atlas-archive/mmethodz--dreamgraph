@@ -77,7 +77,8 @@ it("discovers all pages with annotations and rejects cursor cycles/duplicates", 
   expect(seen).toEqual([undefined, { cursor: "next" }]);
   await expect(listAllMcpTools({ listTools: async () => ({ tools: [], nextCursor: "cycle" }) } as any)).rejects.toThrow("MCP_DISCOVERY_CURSOR_CYCLE");
   await expect(listAllMcpTools({ listTools: async () => ({ tools: [tool("a")], nextCursor: "next" }) } as any)).rejects.toThrow("MCP_DISCOVERY_DUPLICATE_TOOL");
-  expect(architectMcpHeaders({ headers: { cookie: "other=no; dg_session=private", authorization: "do not forward" } } as any)).toEqual({ "X-DreamGraph-Session": "private" });
+  expect(architectMcpHeaders({ headers: { cookie: "other=no; dg_session=private", authorization: "do not forward" } } as any)).toEqual({});
+  expect(architectMcpHeaders({ headers: { "x-dreamgraph-session": "private", authorization: "do not forward" } } as any)).toEqual({ "X-DreamGraph-Session": "private" });
 });
 it("source/database scans retain analysis discipline phases but require effect authority", () => {
   for (const name of ["scan_project", "scan_database"]) {

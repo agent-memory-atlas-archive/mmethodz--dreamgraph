@@ -5,6 +5,7 @@ import { getDataDir, withDataDirectory } from "../utils/paths.js";
 import { readRoleProfiles, resolveRolePolicy, snapshotRolePolicy, type ModelRole, type ResolvedRolePolicy } from "../config/role-policy.js";
 import { ModelPricingCatalogueSchema, type ModelPricing } from "../config/model-pricing.js";
 import { providerCapability } from "../config/provider-capabilities.js";
+import { MODEL_REQUEST_FRAMING_RESERVE_BYTES } from "../config/request-bounds.js";
 import { ModelAdmission, ModelAdmissionError } from "./model-admission.js";
 import { providerUsage } from "./provider-outcome.js";
 import { summarizeProviderUsage } from "./provider-usage.js";
@@ -69,8 +70,11 @@ export class ModelExecution {
     const bytes = Buffer.byteLength(input.payload);
     // Full UTF-8 wire bytes plus framing is a conservative allocation, not measured tokens.
     // Images are included in the wire allocation. Variance halts further account admission.
-    const input_tokens = bytes + 2048;
-    if (input_tokens > policy.effective.context_tokens) throw new ModelAdmissionError("ADMISSION_CONTEXT_LIMIT", this.run_id);
+    const input_tokens = bytes + MODEL_REQUEST_FRAMING_RESERVE_BYTES;
+    if (input_tokens > policy.effective.context_tokens) throw new ModelAdmissionError("ADMISSION_CONTEXT_LIMIT", this.run_id, null,
+      `setting=DREAMGRAPH_LLM_${this.role.toUpperCase()}_CONTEXT_TOKENS; `
+      + `required_allocation=${input_tokens}; context_allocation=${policy.effective.context_tokens}; `
+      + `origin=${policy.origins.context_tokens}; counting=utf8_wire_bytes_plus_${MODEL_REQUEST_FRAMING_RESERVE_BYTES}`);
     if (!Number.isSafeInteger(input.output_tokens) || input.output_tokens < 1 || input.output_tokens > policy.effective.output_tokens) {
       throw new ModelAdmissionError("ADMISSION_OUTPUT_REQUEST_LIMIT", this.run_id);
     }
