@@ -2685,6 +2685,24 @@ function architectAdapterField(body: Record<string, unknown>, field: string): Ar
   return architectAdapterFromText(textField(body, field));
 }
 
+/** Human-readable failure text: validation issues and JSON payloads never reach the UI raw. */
+function describeArchitectFailure(error: unknown): string {
+  const issuesText = (issues: Array<{ path?: unknown[]; message?: string; maximum?: unknown }>) => issues.slice(0, 4)
+    .map((issue) => `${Array.isArray(issue.path) && issue.path.length ? issue.path.join(".") : "request"}: ${String(issue.message ?? "invalid value")}`).join("; ");
+  const candidate = error as { issues?: unknown; message?: unknown } | null;
+  if (candidate && Array.isArray(candidate.issues)) return `invalid execution request (${issuesText(candidate.issues as never)})`;
+  const message = typeof candidate?.message === "string" ? candidate.message : String(error);
+  const trimmed = message.trim();
+  if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(trimmed) as unknown;
+      if (Array.isArray(parsed)) return `invalid execution request (${issuesText(parsed as never)})`;
+      if (parsed && typeof parsed === "object") { const record = parsed as Record<string, unknown>;
+        return String(record.message ?? record.error ?? record.code ?? "unexpected error"); }
+    } catch { /* not JSON */ }
+  }
+  return message.replace(/\s+/g, " ");
+}
 function getArchitectAdapterConfig(): { adapter: ArchitectAdapterType; source: "architect" | "default" } {
   const adapter = architectAdapterFromText(sessionEnvironment().DREAMGRAPH_LLM_ARCHITECT_ADAPTER?.trim() ?? null);
   return adapter ? { adapter, source: "architect" } : { adapter: "native_api_tool_loop", source: "default" };
@@ -4872,7 +4890,7 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
       if (architectBinding) revokeRoleQualification(architectBinding.policy.policy.role, architectBinding.policy.fingerprint);
       fallbackReason = executionController.signal.aborted
         ? "architect_execution_cancelled"
-        : `architect_provider_failed: ${(error as Error).message.slice(0, 240)}`;
+        : `architect_provider_failed: ${describeArchitectFailure(error).slice(0, 240)}`;
     }
   } else if (bindingError) {
     fallbackReason = `architect_policy_blocked: ${bindingError}`;
@@ -4954,7 +4972,7 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
       if (architectBinding) revokeRoleQualification(architectBinding.policy.policy.role, architectBinding.policy.fingerprint);
       fallbackReason = executionController.signal.aborted
         ? "architect_execution_cancelled"
-        : `architect_provider_failed: ${(error as Error).message.slice(0, 240)}`;
+        : `architect_provider_failed: ${describeArchitectFailure(error).slice(0, 240)}`;
     }
   }
 

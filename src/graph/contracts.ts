@@ -350,7 +350,8 @@ export const ManagedExecutionRequestSchema = z.object({
   plan_execution: PlanExecutionIntentSchema.optional(),
   token_budget: z.number().int().min(1).max(10000).default(6000),
   autonomy: AutonomySchema.default("manual"), verbosity: VerbositySchema.default("balanced"),
-  timeout_ms: z.number().int().min(1).max(300000).default(300000), approved_actions: ExecutionApprovalSchema.default([]),
+  // Whole-pass ceiling (see config/request-bounds ARCHITECT_PASS_MAX_MS). Liveness is enforced separately by the rolling lease.
+  timeout_ms: z.number().int().min(1).max(14_400_000).default(300000), approved_actions: ExecutionApprovalSchema.default([]),
 }).strict();
 export const ManagedExecutionStatusSchema = z.enum(["assembled", "running", "no_change", "state_committed", "graph_committed", "work_pending", "reconciliation_pending", "recovery_required"]);
 export const ManagedExecutionSnapshotSchema = z.object({

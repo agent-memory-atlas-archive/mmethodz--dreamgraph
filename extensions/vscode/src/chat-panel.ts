@@ -1582,7 +1582,8 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       id: `vscode:${this._createMessageId()}`, adapter: `vscode/${this.architectLlm?.provider}`,
       query, autonomy: canonicalAutonomyPolicy(this._autonomyState.mode).autonomy,
       verbosity: reporting === 'quiet' ? 'concise' : reporting === 'standard' ? 'balanced' : 'detailed',
-      timeout_ms: Math.min(300000, this._getLlmTimeoutMs({ mode: 'stream' })),
+      // Whole-pass ceiling; the daemon's rolling lease ends stale passes earlier.
+      timeout_ms: 1_800_000,
       approved_actions: [],
     }, this.abortController?.signal);
     // A delayed context build or connection change cannot redirect an already captured turn.
@@ -4133,7 +4134,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       id: `vscode:${this._createMessageId()}`, adapter: `vscode/${this.architectLlm?.provider}`, query,
       autonomy: canonicalAutonomyPolicy(this._autonomyState.mode).autonomy,
       verbosity: reporting === 'quiet' ? 'concise' : reporting === 'standard' ? 'balanced' : 'detailed',
-      timeout_ms: 300000, approved_actions: [],
+      timeout_ms: 1_800_000, approved_actions: [],
     }, this.abortController?.signal, expectedInstance);
   }
 
