@@ -23,7 +23,7 @@ Existing bindings: ADR-002 (discipline/evidence), ADR-045 (semantic source ancho
 
 ## Implementation authorization and checkpoint
 
-The owner authorized full Ashoka implementation on 2026-09-30. **Thirty-one slices are verified: 0–27 and 29–31. Slice 28 alone remains pending and unstarted.** The current checkpoint supersedes older aggregate counts and continuation instructions in historical log entries. Baseline revision 18 retains the 42 generated contracts, twelve task definitions, twenty-nine subsystem owners and eight vision excerpts.
+The owner authorized full Ashoka implementation on 2026-09-30. **Thirty-one slices are verified: 0–27 and 29–31. Slice 28 is in progress, completing exact release qualification and publication.** The current checkpoint supersedes older aggregate counts and continuation instructions in historical log entries. Baseline revision 18 retains the 42 generated contracts, twelve task definitions, twenty-nine subsystem owners and eight vision excerpts.
 
 [Slice 26 closure](../docs/ashoka/slice-26-closure.json) accepts converter/recovery behavior and an exact own-instance copy: reviewed conversion, original-receipt replay and byte-exact restoration. The original live graph was not migrated. Exact versioned package activation, existing-session compatibility and rollback limits belong to Slice 28.
 
@@ -35,7 +35,7 @@ The [Slice 27 closure](../docs/ashoka/slice-27-closure.json) accepts all 29 subs
 
 The [published supplied-context pilot](../docs/ashoka/benchmarks/2026-10-03-gpt-4.1/README.md) completed all fourteen pairs / twenty-eight real Responses calls. It includes answer-quality failures and does not establish improved understanding, superiority or cost saving. The maintainer's practical-testing disposition permits release without those stronger claims; functional, authority and recovery correctness remain required. Do not repeat paid collection as a release prerequisite.
 
-Product metadata stays **13.4.0** until Slice 28 synchronizes **14.0.0**. The [Sol 6.1 release handoff](../docs/ashoka/sol-6.1-release-handoff.md) is ready, with Slice 27 verified and Slice 28 unopened. This closure pass has not installed/restarted the Windows global daemon, migrated the original graph, changed the accepted WSL test bed, run remote GitHub CI or published a release. The usage watch remains paused.
+Slice 28 has synchronized product metadata to **14.0.0 — Ashoka**, completed the requested Architect operational-tab fixes and disposable package upgrade/recovery checks, and started clean-source release qualification. Tag, GitHub release and live website publication remain pending. GitHub Actions cannot start because of an account billing lock; remote CI is unavailable, not passing evidence. The Windows global daemon and original graph have not been installed/restarted or migrated by this pass. The accepted WSL scope is unchanged. The usage watch remains paused.
 
 ## Governance and execution rules
 

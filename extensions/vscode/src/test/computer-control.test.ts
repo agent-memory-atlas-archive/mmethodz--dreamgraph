@@ -53,11 +53,13 @@ test('foreign observation/fence cannot become selected evidence',async()=>{
  await assert.rejects(h.controller.inspectEvidence(h.port,'instance','one'),/OWNER_MISMATCH/);assert.equal(h.latest.evidence,undefined);h.port.readComputerEvidence=async()=>({...evidence(),fence:2});
  await assert.rejects(h.controller.inspectEvidence(h.port,'instance','one'),/OWNER_MISMATCH/);h.controller.dispose();
 });
-test('compiled drawer renders scoped pixels and literal summaries only when open, clearing them on close',()=>{
+test('compiled drawer renders scoped pixels and literal summaries only when open, clearing them on close',async()=>{
  const dom=new JSDOM(computerControlMarkup),sent:unknown[]=[];installComputerControl(dom.window.document,dom.window as unknown as Window,value=>sent.push(value));
  const panel=dom.window.document.getElementById('computer-control') as HTMLDetailsElement;panel.open=true;panel.dispatchEvent(new dom.window.Event('toggle'));
  const view={status:'ready',sessions:[snapshot()],selected:snapshot(),evidence:evidence()};dom.window.dispatchEvent(new dom.window.MessageEvent('message',{data:{type:'computerView',view}}));
  assert.equal(dom.window.document.querySelector('img')?.getAttribute('src'),'data:image/png;base64,aGVsbG8=');assert.match(dom.window.document.getElementById('computer-control-evidence-detail')!.textContent!,/<img/);
  const show=dom.window.document.getElementById('computer-control-evidence') as HTMLButtonElement;show.click();assert.deepEqual(sent.at(-1),{type:'computerEvidence',id:'one'});
- panel.open=false;panel.dispatchEvent(new dom.window.Event('toggle'));assert.equal(dom.window.document.querySelector('img'),null);assert.deepEqual(sent.at(-1),{type:'computerEvidenceClear'});dom.window.close();
+ panel.open=false;panel.dispatchEvent(new dom.window.Event('toggle'));assert.equal(dom.window.document.querySelector('img'),null);assert.deepEqual(sent.at(-1),{type:'computerEvidenceClear'});
+ // Changing open also queues a native toggle; let it finish with its DOM intact.
+ await new Promise<void>(resolve=>panel.addEventListener('toggle',()=>resolve(),{once:true}));dom.window.close();
 });
