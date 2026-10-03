@@ -55,7 +55,7 @@ async function boot(version){
  const health=await fetch(`http://127.0.0.1:${port}/health`,{signal:AbortSignal.timeout(10000)});assert.equal(health.status,200);
  record('Daemon health '+version,{http:health.status,start_ms:Math.round(performance.now()-start)});
 }
-const cli=async(args)=>JSON.parse((await command(process.execPath,[join(bin,'dist/cli/dg.js'),'graph-upgrade',instance.uuid,...args,'--master-dir',master])).stdout);
+const cli=async(args)=>JSON.parse((await command(process.execPath,[join(bin,'dist/cli/dg.js'),'graph-upgrade',instance.uuid,...args,'--master-dir',master,'--json'])).stdout);
 try{
  const old=await deploy('13.4.0');
  const make=`import {createInstance} from ${JSON.stringify(pathToFileURL(join(bin,'dist/instance/lifecycle.js')).href)};const {instance,scope}=await createInstance({name:'release-fixture',masterDir:process.env.DREAMGRAPH_MASTER_DIR,projectRoot:process.cwd(),repos:{fixture:process.cwd()},transport:{type:'http'}});console.log(JSON.stringify({instance,data:scope.dataDir}));`;

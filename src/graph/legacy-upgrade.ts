@@ -65,10 +65,24 @@ const BackupSchema = z.object({ schema: z.literal("dreamgraph.graph_upgrade_back
   config_directory_hash:sha.nullable(),config_files:z.array(ConfigStampSchema.extend({blob:z.string().regex(/^config-\d{4}\.bin$/)})).max(64) }).strict();
 export interface GraphUpgradeApproval { reviewed_digest: string; review_id: string; operation_id: string; signal?: AbortSignal;
   /** Disposable fault/restart tests only; never transported from CLI/HTTP. */ fault_inject?: CommitGraphInput["fault_inject"] }
+export type GraphUpgradeProgress =
+  | { stage: "analyzing" }
+  | { stage: "analyzed"; entities: number; relationships: number }
+  | { stage: "mapping" }
+  | { stage: "validating" }
+  | { stage: "backing_up" }
+  | { stage: "backup_verified" }
+  | { stage: "publishing" }
+  | { stage: "published"; replayed: boolean };
 
 /** Pins the physical instance. CLI mutation commands are offline and cannot steal a running daemon's writer. */
 export class LegacyGraphUpgrade {
-  constructor(readonly directory: string, readonly instance_id: string, readonly config_directory?:string) { id.parse(instance_id); }
+  constructor(readonly directory: string, readonly instance_id: string, readonly config_directory?:string,
+    private readonly onProgress?: (progress: GraphUpgradeProgress) => void | Promise<void>) { id.parse(instance_id); }
+  private progress(update: GraphUpgradeProgress): void {
+    try { const pending = this.onProgress?.(update); if (pending && typeof pending.then === "function") void Promise.resolve(pending).catch(() => {}); }
+    catch { /* Progress is observational and cannot change upgrade outcome. */ }
+  }
   private scope<T>(work: () => T): T { return withDataDirectory(this.directory, work); }
   private async readSnapshot(): Promise<Snapshot> {
     const physical = await fs.realpath(this.directory), publication = await loadPublicationState();
@@ -183,8 +197,13 @@ export class LegacyGraphUpgrade {
   }
   preview(resolutions: GraphUpgradeResolution[] = []): Promise<GraphUpgradePreview> {
     return this.scope(() => withGraphRead(async () => {
-      const snapshot = await this.readSnapshot(), repair = this.repair(snapshot, resolutions);
-      const before = await loadCanonicalGraph(this.instance_id), after = await this.stage(snapshot, repair.writes);
+      this.progress({ stage: "analyzing" });
+      const snapshot = await this.readSnapshot(), before = await loadCanonicalGraph(this.instance_id);
+      this.progress({ stage: "analyzed", entities: before.entities.length, relationships: before.relationships.length });
+      this.progress({ stage: "mapping" });
+      const repair = this.repair(snapshot, resolutions);
+      this.progress({ stage: "validating" });
+      const after = await this.stage(snapshot, repair.writes);
       repair.blockers.push(...this.introducedFailures(before, after));
       const result = { schema: "dreamgraph.graph_upgrade_preview.v1" as const, instance_id: this.instance_id, directory_hash: hash(fold(snapshot.physical)),
         created_at: new Date().toISOString(), epoch: snapshot.publication.epoch, revision: snapshot.publication.revision, files: snapshot.stamps,
@@ -255,7 +274,8 @@ export class LegacyGraphUpgrade {
     return this.scope(() => withGraphReconciliation(async () => {
       await assertGraphWriter(); await recoverGraphPublication(); approval.signal?.throwIfAborted();
       const prior = await findOperationReceipt(approval.operation_id,"graph_upgrade",preview.epoch === "uninitialized" ? undefined : preview.epoch);
-      if (prior) { if (prior.result?.preview_digest !== digest || prior.result?.review_id !== approval.review_id) throw new Error("GRAPH_UPGRADE_OPERATION_CONFLICT"); return { receipt: prior, replayed: true }; }
+      if (prior) { if (prior.result?.preview_digest !== digest || prior.result?.review_id !== approval.review_id) throw new Error("GRAPH_UPGRADE_OPERATION_CONFLICT");
+        this.progress({ stage: "published", replayed: true }); return { receipt: prior, replayed: true }; }
       if (preview.blockers.length) throw new Error("GRAPH_UPGRADE_RESOLUTIONS_REQUIRED: " + preview.blockers.length);
       const snapshot = await this.readSnapshot(); this.quiescent(snapshot);
       if (snapshot.publication.epoch !== preview.epoch || stable(snapshot.publication.revision) !== stable(preview.revision) || stable(snapshot.stamps) !== stable(preview.files)
@@ -267,18 +287,24 @@ export class LegacyGraphUpgrade {
         ||stable(this.summary(before))!==stable(preview.before))throw new Error("GRAPH_UPGRADE_PREVIEW_INVALID");
       const staged = await this.stage(snapshot,repair.writes); if (stable(this.summary(staged)) !== stable(preview.after)) throw new Error("GRAPH_UPGRADE_STAGE_CHANGED");
       if (this.introducedFailures(before, staged).length) throw new Error("GRAPH_UPGRADE_STAGE_INVALID");
-      const backup = await this.backup(snapshot,preview,approval.signal); await approval.fault_inject?.("upgrade_backup_verified"); approval.signal?.throwIfAborted();
+      this.progress({ stage: "backing_up" });
+      const backup = await this.backup(snapshot,preview,approval.signal);
+      this.progress({ stage: "backup_verified" });
+      await approval.fault_inject?.("upgrade_backup_verified"); approval.signal?.throwIfAborted();
       const log = this.log(snapshot); if (log.entries.length >= 128) throw new Error("GRAPH_UPGRADE_HISTORY_CAPACITY");
       log.entries.push({ operation_id: approval.operation_id, preview_digest: digest, review_id: approval.review_id, ...backup,
         prepared_at: new Date().toISOString(), changes: repair.writes.map(({file,before_hash,after_hash})=>({file,before_hash,after_hash})), restore_operations: [] });
       const unresolved = [...new Set([...preview.unknown_baselines.map(name=>`baseline:${name}`), ...staged.state.reasons.flatMap(reason=>reason.scope)])];
       const evidenceWrites = unresolved.length ? await prepareEvidenceGeneration({ id: "legacy-upgrade:"+approval.operation_id,
         scope: unresolved.length>100?[`legacy-graph:${this.instance_id}:unresolved-regions`,...unresolved.slice(0,99)]:unresolved, fingerprint:digest, unknown_impact:true }) : [];
-      return commitGraphWrites({ actor:"graph_upgrade",operation_id:approval.operation_id,...(preview.epoch === "uninitialized" ? {} : {operation_epoch:preview.epoch}),
+      this.progress({ stage: "publishing" });
+      const committed = await commitGraphWrites({ actor:"graph_upgrade",operation_id:approval.operation_id,...(preview.epoch === "uninitialized" ? {} : {operation_epoch:preview.epoch}),
         expected_sequence:preview.revision.publication_sequence,expected_store_hashes:Object.fromEntries(snapshot.stamps.map(input=>[input.file,input.semantic_hash])),
         writes:[...repair.writes.map(({file,content})=>({file,content})),...evidenceWrites,{file:FILE,content:JSON.stringify(LogSchema.parse(log))}],scope:["legacy-graph",this.instance_id],cause:"reviewed_legacy_identity_repair",
         intent:{preview_digest:digest,review_id:approval.review_id},result:{preview_digest:digest,review_id:approval.review_id,backup_id:backup.backup_id,changed_files:repair.writes.length,unresolved_regions:unresolved.length,unresolved_regions_limited:unresolved.length>100},fault_inject:approval.fault_inject,
         check_expected:async()=>{const latest=await this.readSnapshot();if(stable(latest.stamps)!==stable(snapshot.stamps)||stable(latest.config_files)!==stable(snapshot.config_files)||latest.config_directory_hash!==snapshot.config_directory_hash)throw new Error("GRAPH_UPGRADE_INPUT_CHANGED");} });
+      this.progress({ stage: "published", replayed: committed.replayed });
+      return committed;
     }));
   }
   previewRestore(operation_id: string): Promise<GraphUpgradeRestorePreview> {

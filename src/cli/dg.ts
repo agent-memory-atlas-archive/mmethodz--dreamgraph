@@ -71,7 +71,7 @@ Commands:
   export <query> --format <f> Export instance data (snapshot|docs|archetypes)
   fork <query> [--name <n>]   Fork an instance (copy all data)
   migrate                     Migrate legacy flat data/ to a UUID instance
-  graph-upgrade <query>       Preview/apply/restore a reviewed offline graph migration
+  graph-upgrade <query>       Upgrade an offline graph (--dry-run to preview)
   computer-use qualify        Qualify this installed isolated browser runtime
   plugin <subcmd> <query>     Manage host runtime plugins (list/inspect/enable/disable/trust/untrust/reload/unload)
   webhook <subcmd> <query>    Manage outbound webhook subscriptions (M5: list/add/remove/enable/disable/test/dead-letter/replay)

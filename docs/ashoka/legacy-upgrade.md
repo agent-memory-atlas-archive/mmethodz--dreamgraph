@@ -8,8 +8,28 @@ Architect checks legacy graph formats with bounded prefix reads and offers the e
 
 The operator workflow is independent of `dg migrate`, which creates an instance from the old flat layout:
 
+`dg graph-upgrade <instance>` **performs the structural upgrade**. It immediately announces that it is checking the instance, then reports analysis counts, identity mapping, validation, verified backup and publication as those stages actually execute. The final gathered statistics show records, relationships, changed stores, blockers and aggregated graph diagnostics. Completion is reported only after a committed receipt. No estimated percentages or individual unresolved-reference dumps appear in normal output.
+
+Use `--dry-run` (or the explicit `preview` action) for read-only analysis. `--json` opts into machine output: direct upgrades return a bounded result with aggregated statistics and their receipt; previews return the full revision-bound review. With preview `--out` and `--json` together, stdout retains the machine summary with the saved path, digest, blockers and before/after state. Explicit apply/restore receipts retain their JSON output.
+
+The direct command is the operator's authorization to apply the analyzed structural changes. It saves the exact review and a companion `.recovery.json` containing the digest, review ID, operation ID and `resume_arguments` **before applying**. Without `--out`, these files go under `<master-dir>/graph-upgrade-reviews/`; `--out <new-file>` selects the review path. Both files must be new and outside instance storage. After an uncertain reply, use the saved `apply` arguments to recover the original receipt, rather than starting another direct upgrade. A blocked migration saves its review, reports bounded diagnostics and exits unsuccessfully without applying graph changes. Conflicting rows still require explicit row-bound resolutions. Even with zero identity changes, a successful upgrade creates its verified backup and publishes the migration record; it does not invent missing historical baselines.
+
+For the normal upgrade:
+
+```powershell
+# Settle current scans/jobs first; the upgrade never stops a running instance itself.
+dg stop dreamgraph
+dg graph-upgrade dreamgraph
+dg start dreamgraph
+```
+
+For analysis and a separately reviewed apply:
+
+`UNRESOLVED_ENDPOINT` counts relationships with a missing, ambiguous or type-mismatched reference. The `fact:<hash>` or `dream:<hash>` scope is the relationship's identity, not a broken entity ID. Existing unresolved links are graph-quality diagnostics, separate from structural migration blockers. An ID migration preserves them rather than guessing a target, changing a declared type or inventing missing entities. A preview that reports zero blockers can still report a partial graph; inspect the full review and resolve graph references through a separately reviewed repair.
+
 ```powershell
 dg graph-upgrade dreamgraph preview --out ./graph-upgrade-review.json
+# Equivalent read-only command: dg graph-upgrade dreamgraph --dry-run --out ./graph-upgrade-review.json
 # Review all input hashes, changes, counts, unresolved references and blockers.
 # Resolve conflicting rows explicitly; the resolutions file contains the exact
 # file, collection, index, row_hash, action, new_id where needed, and reason.
@@ -20,7 +40,7 @@ dg graph-upgrade dreamgraph restore-preview --original-operation <operation-id> 
 dg graph-upgrade dreamgraph restore --preview ./graph-restore-review.json --reviewed-digest sha256:<restore-digest> --review-id <restore-review-id> --operation-id <restore-operation-id>
 ```
 
-Preview is read-only. Output must be a new file outside instance storage; protected paths and existing files are refused. A changing publication, unpublished store, unfinished job, unconfirmed external effect, active plan lease or another process's physical writer prevents cutover. No command silently stops a daemon or cancels work. Changed input/configuration invalidates approval. After an uncertain reply, reuse the exact preview, review and operation IDs to recover the original receipt.
+Preview is read-only. `--dry-run` combined with `apply` or `restore` is rejected before accessing the instance; use `preview` or `restore-preview` instead. Output must be a new file outside instance storage; protected paths and existing files are refused. A changing publication, unpublished store, unfinished job, unconfirmed external effect, active plan lease or another process's physical writer prevents cutover. No command silently stops a daemon or cancels work. Changed input/configuration invalidates approval. After an uncertain reply, reuse the exact preview, review and operation IDs to recover the original receipt.
 
 Known current and previous family schemas retain their original encoding and trust classes. Missing IDs receive deterministic physical mappings; exact duplicates remain in the original backup. Conflicting assertions and assessment-cycle duplicates block until a row-bound operator decision; confidence or recency cannot choose a winner. Source, human, dream, validation, decision, foreign-instance and historical identities retain their meaning. Unknown schemas, invalid encoding and newly introduced cross-collection collisions refuse activation. C14 plan/slice authority and recorded progress stay under their existing owner.
 
