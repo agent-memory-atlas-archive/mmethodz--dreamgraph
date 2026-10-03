@@ -1,0 +1,11 @@
+[2026-10-02T06:17:59.908Z] [INFO]  Creating instance a0ea1d6c-b08c-45eb-96d0-7d4797d4e624 (plan-consumers) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-HAc4Wo\master\a0ea1d6c-b08c-45eb-96d0-7d4797d4e624
+[2026-10-02T06:17:59.978Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-HAc4Wo\master\instances.json
+[2026-10-02T06:17:59.978Z] [INFO]  Registered new instance a0ea1d6c-b08c-45eb-96d0-7d4797d4e624 (plan-consumers)
+[2026-10-02T06:17:59.983Z] [INFO]  Instance a0ea1d6c-b08c-45eb-96d0-7d4797d4e624 created successfully
+dreamgraph:draft
+AssertionError [ERR_ASSERTION]: {"ok":false,"error":"plan_lifecycle_rejected","message":"PLAN_SLICE_OWNER_REJECTED"}
+
+403 !== 200
+
+    at post (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-plan-consumers.mjs:47:101)
+    at async file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-plan-consumers.mjs:79:229

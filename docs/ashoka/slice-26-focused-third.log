@@ -1,0 +1,57 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-02T14:18:37.883Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/plan-authority.test.ts (7 tests) 1675ms
+   ✓ PL04/GE14: a status receipt cannot count as implementation; an actual graph commit can, and accepted verification survives replay  436ms
+   ✓ GE14/CU22 effect contract: reconciliation must finish; optional unfunded digestion can remain pending  538ms
+ ✓ tests/plan-context-integration.test.ts (6 tests) 2124ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  945ms
+   ✓ verified implementation evidence is distinct from the next slice and recovers after a transcript-free read  486ms
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T14:18:39.089Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T14:18:39.115Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/onboarding-readiness.test.ts
+[2026-10-02T14:18:39.975Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/onboarding-readiness.test.ts
+[2026-10-02T14:18:40.067Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/onboarding-readiness.test.ts > daemon onboarding readiness projection > renders a plain-language Dashboard Start Here card with governed repair paths
+[2026-10-02T14:18:40.427Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/onboarding-readiness.test.ts (9 tests) 245ms
+ ✓ tests/graph-upgrade-notice.test.ts (5 tests) 668ms
+   ✓ requires a durable original review receipt, reopens a restored format and keeps notification read-only  455ms
+ ✓ tests/publication-read-cache.test.ts (4 tests) 460ms
+stderr | tests/architect-plan-authority.test.ts > actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan
+[2026-10-02T14:18:43.685Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+ ✓ tests/architect-plan-authority.test.ts (7 tests) 6568ms
+   ✓ reads never import legacy success; preview/import retain exact bytes and recover one lost reply  398ms
+   ✓ the frozen actual Ashoka definition and log keep completed cards muted and current work navigable before lifecycle import  3855ms
+   ✓ actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan  918ms
+   ✓ archive refuses a running/recovery lease and keeps original artifacts on failure  423ms
+   ✓ the real Architect script exposes readable running/current markers, slice filters and keyboard navigation  687ms
+ ✓ tests/legacy-graph-upgrade.test.ts (12 tests) 9434ms
+   ✓ reviewed offline legacy graph upgrade > previews all families without writing, preserves scoped identities and provenance, and never invents source/scan history  583ms
+   ✓ reviewed offline legacy graph upgrade > archives exact duplicates once but blocks conflicting claims until exact row-bound explicit choices  603ms
+   ✓ reviewed offline legacy graph upgrade > rejects unsupported majors, invalid UTF-8 and schema shapes, stale resolutions and changed previews  495ms
+   ✓ reviewed offline legacy graph upgrade > refuses cross-collection identity collisions even when a modified preview conceals the staged blocker  409ms
+   ✓ reviewed offline legacy graph upgrade > cancels before cutover and rejects input changes after backup; original mutation is retained  636ms
+   ✓ reviewed offline legacy graph upgrade > validates owner stores and refuses unfinished jobs instead of cancelling or reassigning them  530ms
+   ✓ reviewed offline legacy graph upgrade > restores exact original bytes as a new publication while preserving post-cutover debt, history and source currency  871ms
+   ✓ reviewed offline legacy graph upgrade > exposes restore conflicts and backup corruption before any restore; an uncertain old result is not overwritten  645ms
+   ✓ reviewed offline legacy graph upgrade > recovers a real killed writer at after_replace:0: without replaying a second graph effect  2223ms
+   ✓ reviewed offline legacy graph upgrade > recovers a real killed writer at publication_committed without replaying a second graph effect  1911ms
+
+ Test Files  7 passed (7)
+      Tests  50 passed (50)
+   Start at  17:18:30
+   Duration  15.41s (transform 3.30s, setup 0ms, collect 26.44s, tests 21.17s, environment 2ms, prepare 1.12s)
+

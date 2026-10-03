@@ -1,0 +1,24 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   `Uncaught EvalError: Evaluating a string as JavaScript violates the following Content Security Policy directive because 'unsafe-eval' is not an allowed source of script: script-src 'nonce-1790901080626-ra1y3rc6a9' https://editor-assets.local".\n`
++ ]
+- []
+
+    at file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-editor-operator.mjs:50:9 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [
+    `Uncaught EvalError: Evaluating a string as JavaScript violates the following Content Security Policy directive because 'unsafe-eval' is not an allowed source of script: script-src 'nonce-1790901080626-ra1y3rc6a9' https://editor-assets.local".\n`
+  ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v25.2.1

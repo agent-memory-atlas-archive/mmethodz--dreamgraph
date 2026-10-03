@@ -1,0 +1,4 @@
+
+> dreamgraph@13.4.0 providers:check
+> tsx scripts/generate-provider-contracts.mjs --check
+

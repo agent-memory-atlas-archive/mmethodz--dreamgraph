@@ -1,0 +1,36 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/agent-usefulness.test.ts (9 tests) 107ms
+ ✓ tests/editor-mcp-result.test.ts (7 tests) 213ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/host-managed-execution.test.ts [ tests/host-managed-execution.test.ts ]
+Error: Transform failed with 1 error:
+C:/Users/Mika Jussila/source/repos/dreamgraph/tests/host-managed-execution.test.ts:871:227: ERROR: Expected "}" but found ")"
+  Plugin: vite:esbuild
+  File: C:/Users/Mika Jussila/source/repos/dreamgraph/tests/host-managed-execution.test.ts:871:227
+  
+  Expected "}" but found ")"
+  869 |   const owner=[...contexts.values()].find(value=>!value.execution_policy)!,args={filePath:'source.ts',content:'source ...
+  870 |   const effect=withSessionContext(owner,()=>withHostExecution(lease.execution.execution_id,()=>invokeToolBoundary({nam...
+  871 |  ...y:()=>writeFile(join(root,'source.ts'),args.content)})})}]}))));
+      |                                                                 ^
+  872 |   try{
+  873 |    await vi.waitFor(()=>expect(review.view.status).toBe('pending'),{timeout:3000});const request=review.view.request!;
+  
+ ❯ failureErrorWithLog node_modules/esbuild/lib/main.js:1748:15
+ ❯ node_modules/esbuild/lib/main.js:1017:50
+ ❯ responseCallbacks.<computed> node_modules/esbuild/lib/main.js:884:9
+ ❯ handleIncomingPacket node_modules/esbuild/lib/main.js:939:12
+ ❯ Socket.readFromStdout node_modules/esbuild/lib/main.js:862:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  16 passed (16)
+   Start at  04:13:27
+   Duration  1.31s (transform 149ms, setup 0ms, collect 828ms, tests 319ms, environment 1ms, prepare 433ms)
+

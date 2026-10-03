@@ -1,0 +1,10 @@
+import {pathToFileURL} from 'node:url';
+import {CONTEXT_MENU_SCRIPT,CONTEXT_MENU_CSS} from '../../dist/server/context-menu.js';
+const {chromium}=await import(pathToFileURL(process.env.ASHOKA_PLAYWRIGHT_MODULE).href);
+const browser=await chromium.launch({executablePath:process.env.ASHOKA_BROWSER_EXECUTABLE,headless:true});
+const page=await browser.newPage({viewport:{width:720,height:260}});
+await page.setContent('<style>'+CONTEXT_MENU_CSS+'</style><button id="trigger">Test</button><script>'+CONTEXT_MENU_SCRIPT+'</script>');
+await page.evaluate(()=>{window.focusTrace=[];const nativeFocus=HTMLElement.prototype.focus;HTMLElement.prototype.focus=function(...args){const trace={connected:this.isConnected,same:this===document.querySelector('.dg-menu button'),visibility:getComputedStyle(this).visibility,rect:this.getBoundingClientRect().toJSON()};nativeFocus.apply(this,args);window.focusTrace.push({...trace,active:document.activeElement.textContent});};document.body.style.zoom='2';});await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));await page.evaluate(()=>{DreamGraphContextMenu.open({clientX:715,clientY:255},Array.from({length:6},(_,i)=>({label:'Action '+i,run:()=>{}})),document.getElementById('trigger'),'Test');});
+await page.waitForTimeout(200);
+console.log(JSON.stringify(await page.evaluate(()=>({trace:window.focusTrace,active:document.activeElement.textContent,rect:document.querySelector('.dg-menu').getBoundingClientRect().toJSON()})),null,2));
+await browser.close();

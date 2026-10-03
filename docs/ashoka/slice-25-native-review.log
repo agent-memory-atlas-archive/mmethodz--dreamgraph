@@ -1,0 +1,1 @@
+{"sessionId":"216f172f-947b-4e6b-910d-8e0874b05697","compliance":{"status":"compliant","parity_percentage":100,"total_entries":4,"matched":4,"gaps_remaining":0,"regressions":0},"recommendation":{"action":"accept","justification":"All entries match. No regressions detected."}}

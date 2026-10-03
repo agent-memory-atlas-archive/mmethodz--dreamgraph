@@ -1,0 +1,34 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/computer-use-ui.test.ts (6 tests) 727ms
+ ✓ tests/computer-journal.test.ts (13 tests) 4479ms
+   ✓ reconnect pages existing owner descriptors without reading archived transcripts or creating authority  402ms
+   ✓ changed and foreign reconnect cursors cannot turn partial pages into a current complete session list  424ms
+   ✓ the real HTTP reconnect projection keeps declared transport identities isolated, bounded and read-only  335ms
+   ✓ replays original intent/receipt across service recreation and never persists raw action text  377ms
+   ✓ reserves finite actions/images/bytes once and refuses oversize or unsupported operations  359ms
+   ✓ postcondition proof, terminal immutability and graph receipt owner remain separate  406ms
+   ✓ a lost physical result stays recoverable after acknowledged stop and cannot redispatch  446ms
+   ✓ active workers prevent completion and stopped proved work remains a state receipt, never graph truth  405ms
+   ✓ late unknown-result bookkeeping does not pretend worker termination was acknowledged  380ms
+ ✓ tests/computer-broker.test.ts (13 tests) 12142ms
+   ✓ single original host/job owns scoped dispatch, independent postcondition and replay  1525ms
+   ✓ native custom tools preserve scoped fresh observations and keep literal arguments out of preview metadata  1382ms
+   ✓ ephemeral image bytes are hash checked and atomically recorded as distinct pixel/DOM descriptors  992ms
+   ✓ an executor cannot pair arbitrary image bytes with a forged digest  792ms
+   ✓ full-access scope does not replace exact action approval; target changes remain fenced  1038ms
+   ✓ grant revocation stops without a model roundtrip and prevents later physical dispatch  764ms
+   ✓ lost reply after input has one durable unknown receipt and is never replayed  1061ms
+   ✓ failed independent termination retains the original worker for stop-only recovery  809ms
+   ✓ material source change stays reconciliation pending even though the GUI postcondition passed  1286ms
+   ✓ wrong-session and unqualified routes cannot open even a declared worker  515ms
+   ✓ a reviewed profile cannot be replaced by the worker  445ms
+   ✓ a reviewed backend cannot be replaced by the worker  457ms
+   ✓ observation-only operator approval cannot authorize interaction even with an exact action approval  1075ms
+
+ Test Files  3 passed (3)
+      Tests  32 passed (32)
+   Start at  21:07:26
+   Duration  18.76s (transform 2.18s, setup 0ms, collect 12.36s, tests 17.35s, environment 1ms, prepare 624ms)
+

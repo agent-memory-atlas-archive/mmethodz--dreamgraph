@@ -1,0 +1,3098 @@
+TAP version 13
+# Subtest: summary renderer disables privileged actions and suppresses mixed Do all
+ok 1 - summary renderer disables privileged actions and suppresses mixed Do all
+  ---
+  duration_ms: 3.5735
+  type: 'test'
+  ...
+# Subtest: summary renderer trusts host capability checks
+ok 2 - summary renderer trusts host capability checks
+  ---
+  duration_ms: 1.0151
+  type: 'test'
+  ...
+# Subtest: ReasoningPacket carries task preamble and adaptive future diagnostics
+ok 3 - ReasoningPacket carries task preamble and adaptive future diagnostics
+  ---
+  duration_ms: 1.103
+  type: 'test'
+  ...
+# Subtest: ContextBuilder compiles bounded task preamble metadata into rendered context
+ok 4 - ContextBuilder compiles bounded task preamble metadata into rendered context
+  ---
+  duration_ms: 0.3133
+  type: 'test'
+  ...
+# Subtest: ContextInspector exposes compact compiler and judgment diagnostics
+ok 5 - ContextInspector exposes compact compiler and judgment diagnostics
+  ---
+  duration_ms: 0.1971
+  type: 'test'
+  ...
+# Subtest: compiled agent dispatch preserves daemon error/metadata/commit receipts and marks its trace failed
+ok 6 - compiled agent dispatch preserves daemon error/metadata/commit receipts and marks its trace failed
+  ---
+  duration_ms: 120.5431
+  type: 'test'
+  ...
+# Subtest: compiled agent preserves the original owner receipt when local accounting fails after a result
+ok 7 - compiled agent preserves the original owner receipt when local accounting fails after a result
+  ---
+  duration_ms: 33.8397
+  type: 'test'
+  ...
+# Subtest: compiled history elision retains an earlier MCP text receipt as whole JSON with matching call ID
+ok 8 - compiled history elision retains an earlier MCP text receipt as whole JSON with matching call ID
+  ---
+  duration_ms: 74.4863
+  type: 'test'
+  ...
+# Subtest: a compiled provider reply delivered after operator abort cannot dispatch an MCP effect
+ok 9 - a compiled provider reply delivered after operator abort cannot dispatch an MCP effect
+  ---
+  duration_ms: 22.7465
+  type: 'test'
+  ...
+# Subtest: compiled ordinary native execution refuses missing daemon authority before a model or local effect
+ok 10 - compiled ordinary native execution refuses missing daemon authority before a model or local effect
+  ---
+  duration_ms: 0.5925
+  type: 'test'
+  ...
+# Subtest: Anthropic Fable/Mythos inventory is exposed without changing the governed default
+ok 11 - Anthropic Fable/Mythos inventory is exposed without changing the governed default
+  ---
+  duration_ms: 2.7781
+  type: 'test'
+  ...
+# Subtest: Anthropic request helpers route Fable/Mythos through effort and adaptive thinking
+ok 12 - Anthropic request helpers route Fable/Mythos through effort and adaptive thinking
+  ---
+  duration_ms: 1.1141
+  type: 'test'
+  ...
+# Subtest: Standalone and quarantined v2 Anthropic metadata include Fable/Mythos
+ok 13 - Standalone and quarantined v2 Anthropic metadata include Fable/Mythos
+  ---
+  duration_ms: 4.5648
+  type: 'test'
+  ...
+# Subtest: Anthropic migration docs do not claim Mythos is generally available
+ok 14 - Anthropic migration docs do not claim Mythos is generally available
+  ---
+  duration_ms: 0.7201
+  type: 'test'
+  ...
+# Subtest: runPass: text-only turn calls ports in canonical order and stops on no tool calls
+ok 15 - runPass: text-only turn calls ports in canonical order and stops on no tool calls
+  ---
+  duration_ms: 2.6054
+  type: 'test'
+  ...
+# Subtest: runPass: forwards content blocks to composer when attachments present
+ok 16 - runPass: forwards content blocks to composer when attachments present
+  ---
+  duration_ms: 0.5247
+  type: 'test'
+  ...
+# Subtest: runPass: surfaces dropped attachments without posting them itself
+ok 17 - runPass: surfaces dropped attachments without posting them itself
+  ---
+  duration_ms: 0.2925
+  type: 'test'
+  ...
+# Subtest: runPass: clears attachments exactly once, after persistence and before provider
+ok 18 - runPass: clears attachments exactly once, after persistence and before provider
+  ---
+  duration_ms: 0.3626
+  type: 'test'
+  ...
+# Subtest: runPass: runs the inner agentic loop across many tool batches in service of one pass
+ok 19 - runPass: runs the inner agentic loop across many tool batches in service of one pass
+  ---
+  duration_ms: 0.5309
+  type: 'test'
+  ...
+# Subtest: runPass: stops at maxIterations cap when provider keeps requesting tools
+ok 20 - runPass: stops at maxIterations cap when provider keeps requesting tools
+  ---
+  duration_ms: 0.3483
+  type: 'test'
+  ...
+# Subtest: runPass: surfaces provider error as 'error' stop reason without throwing
+ok 21 - runPass: surfaces provider error as 'error' stop reason without throwing
+  ---
+  duration_ms: 0.52
+  type: 'test'
+  ...
+# Subtest: runPass: aborts mid-loop when abortSignal fires before next iteration
+ok 22 - runPass: aborts mid-loop when abortSignal fires before next iteration
+  ---
+  duration_ms: 0.5542
+  type: 'test'
+  ...
+# Subtest: runPass: frames pass goal and task goal into composer additionalInstructions
+ok 23 - runPass: frames pass goal and task goal into composer additionalInstructions
+  ---
+  duration_ms: 0.8871
+  type: 'test'
+  ...
+# Subtest: runPass: propagates final iteration's providerRawAssistant unchanged to memory
+ok 24 - runPass: propagates final iteration's providerRawAssistant unchanged to memory
+  ---
+  duration_ms: 0.6239
+  type: 'test'
+  ...
+# Subtest: detectArchitectLens — silent default for empty / trivial prompts
+ok 25 - detectArchitectLens — silent default for empty / trivial prompts
+  ---
+  duration_ms: 1.2768
+  type: 'test'
+  ...
+# Subtest: detectArchitectLens — performance keywords select performance lens
+ok 26 - detectArchitectLens — performance keywords select performance lens
+  ---
+  duration_ms: 1.7608
+  type: 'test'
+  ...
+# Subtest: detectArchitectLens — security keywords select security lens
+ok 27 - detectArchitectLens — security keywords select security lens
+  ---
+  duration_ms: 1.2748
+  type: 'test'
+  ...
+# Subtest: detectArchitectLens — refactor keywords select refactor lens
+ok 28 - detectArchitectLens — refactor keywords select refactor lens
+  ---
+  duration_ms: 1.3263
+  type: 'test'
+  ...
+# Subtest: detectArchitectLens — debug keywords select debug lens
+ok 29 - detectArchitectLens — debug keywords select debug lens
+  ---
+  duration_ms: 0.3698
+  type: 'test'
+  ...
+# Subtest: detectArchitectLens — review keywords select review lens
+ok 30 - detectArchitectLens — review keywords select review lens
+  ---
+  duration_ms: 0.2685
+  type: 'test'
+  ...
+# Subtest: detectArchitectLens — reliability keywords select reliability lens
+ok 31 - detectArchitectLens — reliability keywords select reliability lens
+  ---
+  duration_ms: 0.2636
+  type: 'test'
+  ...
+# Subtest: detectArchitectLens — explanatory ask_dreamgraph downgrades weak performance hits
+ok 32 - detectArchitectLens — explanatory ask_dreamgraph downgrades weak performance hits
+  ---
+  duration_ms: 0.2184
+  type: 'test'
+  ...
+# Subtest: detectArchitectLens — security stays material under ask_dreamgraph
+ok 33 - detectArchitectLens — security stays material under ask_dreamgraph
+  ---
+  duration_ms: 0.3097
+  type: 'test'
+  ...
+# Subtest: detectArchitectLens — command source forces lens even without keywords
+ok 34 - detectArchitectLens — command source forces lens even without keywords
+  ---
+  duration_ms: 0.4425
+  type: 'test'
+  ...
+# Subtest: lensLabel — capitalised display labels
+ok 35 - lensLabel — capitalised display labels
+  ---
+  duration_ms: 0.1866
+  type: 'test'
+  ...
+# Subtest: ADR-171 + ADR-140 isolation lint reports zero violations
+ok 36 - ADR-171 + ADR-140 isolation lint reports zero violations
+  ---
+  duration_ms: 96.48
+  type: 'test'
+  ...
+# Subtest: do all eligible only for compatible actions
+ok 37 - do all eligible only for compatible actions
+  ---
+  duration_ms: 1.5846
+  type: 'test'
+  ...
+# Subtest: eager selects strongest action under medium uncertainty when defining
+ok 38 - eager selects strongest action under medium uncertainty when defining
+  ---
+  duration_ms: 0.4
+  type: 'test'
+  ...
+# Subtest: capability guards block graph release records without graph-write MCP tool
+ok 39 - capability guards block graph release records without graph-write MCP tool
+  ---
+  duration_ms: 1.176
+  type: 'test'
+  ...
+# Subtest: capability guards allow graph release records when enrich_seed_data is exposed
+ok 40 - capability guards allow graph release records when enrich_seed_data is exposed
+  ---
+  duration_ms: 0.3393
+  type: 'test'
+  ...
+# Subtest: capability guards block marketplace publish without VSCE_PAT
+ok 41 - capability guards block marketplace publish without VSCE_PAT
+  ---
+  duration_ms: 0.2637
+  type: 'test'
+  ...
+# Subtest: capability guards allow marketplace publish when a marketplace PAT is present
+ok 42 - capability guards allow marketplace publish when a marketplace PAT is present
+  ---
+  duration_ms: 1.0309
+  type: 'test'
+  ...
+# Subtest: blocked actions make Do all ineligible
+ok 43 - blocked actions make Do all ineligible
+  ---
+  duration_ms: 0.2698
+  type: 'test'
+  ...
+# Subtest: shouldContinueAfterPass stops with "pass budget exhausted" when remaining hits 0
+ok 44 - shouldContinueAfterPass stops with "pass budget exhausted" when remaining hits 0
+  ---
+  duration_ms: 1.2898
+  type: 'test'
+  ...
+# Subtest: budget exhaustion stops every mode, even with otherwise-eligible signal
+ok 45 - budget exhaustion stops every mode, even with otherwise-eligible signal
+  ---
+  duration_ms: 0.227
+  type: 'test'
+  ...
+# Subtest: decrementPassBudget bottoms out at 0 — never goes negative
+ok 46 - decrementPassBudget bottoms out at 0 — never goes negative
+  ---
+  duration_ms: 0.2678
+  type: 'test'
+  ...
+# Subtest: decrementPassBudget leaves remaining untouched when pass counting is inactive
+ok 47 - decrementPassBudget leaves remaining untouched when pass counting is inactive
+  ---
+  duration_ms: 0.1849
+  type: 'test'
+  ...
+# Subtest: exhausted-budget stop fires before the cautious/eager mode-specific gates
+ok 48 - exhausted-budget stop fires before the cautious/eager mode-specific gates
+  ---
+  duration_ms: 0.1749
+  type: 'test'
+  ...
+# Subtest: contract block includes json requirement
+ok 49 - contract block includes json requirement
+  ---
+  duration_ms: 1.1396
+  type: 'test'
+  ...
+# Subtest: extracts structured json envelope blocks
+ok 50 - extracts structured json envelope blocks
+  ---
+  duration_ms: 0.9542
+  type: 'test'
+  ...
+# Subtest: returns primary structured json envelope
+ok 51 - returns primary structured json envelope
+  ---
+  duration_ms: 0.259
+  type: 'test'
+  ...
+# Subtest: ignores malformed json blocks
+ok 52 - ignores malformed json blocks
+  ---
+  duration_ms: 1.9424
+  type: 'test'
+  ...
+# Subtest: extracts envelope from a fenced block with no language hint
+ok 53 - extracts envelope from a fenced block with no language hint
+  ---
+  duration_ms: 0.3878
+  type: 'test'
+  ...
+# Subtest: extracts bare top-level JSON envelope (no fence at all)
+ok 54 - extracts bare top-level JSON envelope (no fence at all)
+  ---
+  duration_ms: 0.3979
+  type: 'test'
+  ...
+# Subtest: repairs envelopes containing smart quotes and trailing commas
+ok 55 - repairs envelopes containing smart quotes and trailing commas
+  ---
+  duration_ms: 0.5328
+  type: 'test'
+  ...
+# Subtest: preserves // and , ] sequences inside string values during repair
+ok 56 - preserves // and , ] sequences inside string values during repair
+  ---
+  duration_ms: 0.2796
+  type: 'test'
+  ...
+# Subtest: does not falsely match a non-envelope JSON object that happens to have summary
+ok 57 - does not falsely match a non-envelope JSON object that happens to have summary
+  ---
+  duration_ms: 0.2991
+  type: 'test'
+  ...
+# Subtest: inferPassOutcomeSignal detects goal completion and stalled progress markers
+ok 58 - inferPassOutcomeSignal detects goal completion and stalled progress markers
+  ---
+  duration_ms: 4.1496
+  type: 'test'
+  ...
+# Subtest: inferPassOutcomeSignal detects awaiting-user prose at the message tail
+ok 59 - inferPassOutcomeSignal detects awaiting-user prose at the message tail
+  ---
+  duration_ms: 0.3395
+  type: 'test'
+  ...
+# Subtest: analyzePass pauses for user input when the assistant asks a question, even with action chips
+ok 60 - analyzePass pauses for user input when the assistant asks a question, even with action chips
+  ---
+  duration_ms: 1.9843
+  type: 'test'
+  ...
+# Subtest: analyzePass selects continuation prompt when autonomous mode has a strong next step
+ok 61 - analyzePass selects continuation prompt when autonomous mode has a strong next step
+  ---
+  duration_ms: 0.5096
+  type: 'test'
+  ...
+# Subtest: analyzePass stops when goal is sufficiently reached
+ok 62 - analyzePass stops when goal is sufficiently reached
+  ---
+  duration_ms: 0.3118
+  type: 'test'
+  ...
+# Subtest: analyzePass lets partial structured envelope override broad completion prose
+ok 63 - analyzePass lets partial structured envelope override broad completion prose
+  ---
+  duration_ms: 0.3189
+  type: 'test'
+  ...
+# Subtest: advanceAutonomyStateIfContinued decrements visible counters only when continuing
+ok 64 - advanceAutonomyStateIfContinued decrements visible counters only when continuing
+  ---
+  duration_ms: 0.2936
+  type: 'test'
+  ...
+# Subtest: analyzePass marks pure-read pass as empty once patch anchor is established
+ok 65 - analyzePass marks pure-read pass as empty once patch anchor is established
+  ---
+  duration_ms: 0.3918
+  type: 'test'
+  ...
+# Subtest: analyzePass does not mark read-only pass as empty before any anchor
+ok 66 - analyzePass does not mark read-only pass as empty before any anchor
+  ---
+  duration_ms: 0.2417
+  type: 'test'
+  ...
+# Subtest: mode switch preserves completed and remaining pass counters
+ok 67 - mode switch preserves completed and remaining pass counters
+  ---
+  duration_ms: 1.1006
+  type: 'test'
+  ...
+# Subtest: shouldContinueAfterPass re-evaluates against the new mode immediately
+ok 68 - shouldContinueAfterPass re-evaluates against the new mode immediately
+  ---
+  duration_ms: 0.4172
+  type: 'test'
+  ...
+# Subtest: decrementPassBudget counts correctly across a cautious→eager→autonomous→cautious sequence
+ok 69 - decrementPassBudget counts correctly across a cautious→eager→autonomous→cautious sequence
+  ---
+  duration_ms: 0.2401
+  type: 'test'
+  ...
+# Subtest: switching modes after exhaustion does not revive the budget
+ok 70 - switching modes after exhaustion does not revive the budget
+  ---
+  duration_ms: 0.3336
+  type: 'test'
+  ...
+# Subtest: Ashoka canonical profiles preserve legacy labels without widening approved scope
+ok 71 - Ashoka canonical profiles preserve legacy labels without widening approved scope
+  ---
+  duration_ms: 0.9526
+  type: 'test'
+  ...
+# Subtest: getAutonomyInstructionBlock returns instruction when enabled
+ok 72 - getAutonomyInstructionBlock returns instruction when enabled
+  ---
+  duration_ms: 1.2429
+  type: 'test'
+  ...
+# Subtest: getAutonomyInstructionBlock returns empty string when disabled
+ok 73 - getAutonomyInstructionBlock returns empty string when disabled
+  ---
+  duration_ms: 0.2041
+  type: 'test'
+  ...
+# Subtest: getAutonomyInstructionBlock returns empty when undefined
+ok 74 - getAutonomyInstructionBlock returns empty when undefined
+  ---
+  duration_ms: 0.1404
+  type: 'test'
+  ...
+# Subtest: getStructuredResponseContractBlock includes json envelope requirement
+ok 75 - getStructuredResponseContractBlock includes json envelope requirement
+  ---
+  duration_ms: 1.2062
+  type: 'test'
+  ...
+# Subtest: parseAutonomyRequest extracts autonomous mode from text
+ok 76 - parseAutonomyRequest extracts autonomous mode from text
+  ---
+  duration_ms: 1.2534
+  type: 'test'
+  ...
+# Subtest: parseAutonomyRequest extracts eager mode
+ok 77 - parseAutonomyRequest extracts eager mode
+  ---
+  duration_ms: 0.2649
+  type: 'test'
+  ...
+# Subtest: parseAutonomyRequest extracts conscientious mode
+ok 78 - parseAutonomyRequest extracts conscientious mode
+  ---
+  duration_ms: 0.1675
+  type: 'test'
+  ...
+# Subtest: parseAutonomyRequest keeps current mode when no keyword found
+ok 79 - parseAutonomyRequest keeps current mode when no keyword found
+  ---
+  duration_ms: 0.1932
+  type: 'test'
+  ...
+# Subtest: parseAutonomyRequest extracts budget from "for N passes" pattern
+ok 80 - parseAutonomyRequest extracts budget from "for N passes" pattern
+  ---
+  duration_ms: 0.1765
+  type: 'test'
+  ...
+# Subtest: extracts actions from recommended next steps section
+ok 81 - extracts actions from recommended next steps section
+  ---
+  duration_ms: 3.034
+  type: 'test'
+  ...
+# Subtest: prefers structured json envelope when present
+ok 82 - prefers structured json envelope when present
+  ---
+  duration_ms: 2.1827
+  type: 'test'
+  ...
+# Subtest: does not infer complete from successful tool-call prose alone
+ok 83 - does not infer complete from successful tool-call prose alone
+  ---
+  duration_ms: 0.6992
+  type: 'test'
+  ...
+# Subtest: ranks actions from assistant output
+ok 84 - ranks actions from assistant output
+  ---
+  duration_ms: 0.4964
+  type: 'test'
+  ...
+# Subtest: preserves structured action blockers and requirements
+ok 85 - preserves structured action blockers and requirements
+  ---
+  duration_ms: 0.4082
+  type: 'test'
+  ...
+# Subtest: extractProseAnchorPaths picks up file path co-occurring with edit verb
+ok 86 - extractProseAnchorPaths picks up file path co-occurring with edit verb
+  ---
+  duration_ms: 4.5068
+  type: 'test'
+  ...
+# Subtest: extractProseAnchorPaths picks up backtick-quoted bare filename with edit verb
+ok 87 - extractProseAnchorPaths picks up backtick-quoted bare filename with edit verb
+  ---
+  duration_ms: 0.4741
+  type: 'test'
+  ...
+# Subtest: extractProseAnchorPaths returns [] when there is no edit verb on the line
+ok 88 - extractProseAnchorPaths returns [] when there is no edit verb on the line
+  ---
+  duration_ms: 0.1659
+  type: 'test'
+  ...
+# Subtest: extractProseAnchorPaths deduplicates and preserves first-occurrence order
+ok 89 - extractProseAnchorPaths deduplicates and preserves first-occurrence order
+  ---
+  duration_ms: 0.2029
+  type: 'test'
+  ...
+# Subtest: setEqualsPaths is order-independent and treats undefined as empty
+ok 90 - setEqualsPaths is order-independent and treats undefined as empty
+  ---
+  duration_ms: 0.2945
+  type: 'test'
+  ...
+# Subtest: analyzePass treats prose anchor as patch anchor without tool binding
+ok 91 - analyzePass treats prose anchor as patch anchor without tool binding
+  ---
+  duration_ms: 1.9449
+  type: 'test'
+  ...
+# Subtest: continuation prompt includes anchor preamble when patch anchor is sticky
+ok 92 - continuation prompt includes anchor preamble when patch anchor is sticky
+  ---
+  duration_ms: 0.5503
+  type: 'test'
+  ...
+# Subtest: continuation prompt omits anchor preamble before any anchor
+ok 93 - continuation prompt omits anchor preamble before any anchor
+  ---
+  duration_ms: 0.2925
+  type: 'test'
+  ...
+# Subtest: continuation prompt authorizes one bounded read_source_code action
+ok 94 - continuation prompt authorizes one bounded read_source_code action
+  ---
+  duration_ms: 0.4403
+  type: 'test'
+  ...
+# Subtest: post-anchor re-reading does NOT trigger a two-strike token-economy STOP
+ok 95 - post-anchor re-reading does NOT trigger a two-strike token-economy STOP
+  ---
+  duration_ms: 1.4188
+  type: 'test'
+  ...
+# Subtest: decrementPassBudget increments completed and decrements remaining when budgeted
+ok 96 - decrementPassBudget increments completed and decrements remaining when budgeted
+  ---
+  duration_ms: 1.4493
+  type: 'test'
+  ...
+# Subtest: deriveAutonomyStatusView exposes visible counters when counting is active
+ok 97 - deriveAutonomyStatusView exposes visible counters when counting is active
+  ---
+  duration_ms: 0.3653
+  type: 'test'
+  ...
+# Subtest: rankRecommendedActions picks the top ranked action and enables Do all for compatible actions
+ok 98 - rankRecommendedActions picks the top ranked action and enables Do all for compatible actions
+  ---
+  duration_ms: 1.1024
+  type: 'test'
+  ...
+# Subtest: computeDoAllEligibility rejects mutually exclusive actions
+ok 99 - computeDoAllEligibility rejects mutually exclusive actions
+  ---
+  duration_ms: 0.2055
+  type: 'test'
+  ...
+# Subtest: chooseActionForMode keeps cautious mode user-driven unless near-trivial
+ok 100 - chooseActionForMode keeps cautious mode user-driven unless near-trivial
+  ---
+  duration_ms: 0.2951
+  type: 'test'
+  ...
+# Subtest: shouldContinueAfterPass stops on goal completion regardless of mode
+ok 101 - shouldContinueAfterPass stops on goal completion regardless of mode
+  ---
+  duration_ms: 0.3654
+  type: 'test'
+  ...
+# Subtest: shouldContinueAfterPass stops on stalled progress regardless of mode
+ok 102 - shouldContinueAfterPass stops on stalled progress regardless of mode
+  ---
+  duration_ms: 0.2042
+  type: 'test'
+  ...
+# Subtest: shouldContinueAfterPass keeps cautious mode asking often
+ok 103 - shouldContinueAfterPass keeps cautious mode asking often
+  ---
+  duration_ms: 0.1765
+  type: 'test'
+  ...
+# Subtest: shouldContinueAfterPass allows eager mode to continue on defining next steps
+ok 104 - shouldContinueAfterPass allows eager mode to continue on defining next steps
+  ---
+  duration_ms: 0.2034
+  type: 'test'
+  ...
+# Subtest: shouldContinueAfterPass makes autonomous mode self-directed within budget
+ok 105 - shouldContinueAfterPass makes autonomous mode self-directed within budget
+  ---
+  duration_ms: 0.2922
+  type: 'test'
+  ...
+# Subtest: getAutonomyInstructionBlock includes visible counters and reporting contract
+ok 106 - getAutonomyInstructionBlock includes visible counters and reporting contract
+  ---
+  duration_ms: 0.4212
+  type: 'test'
+  ...
+# Subtest: autonomous completion model continues after an intermediate checkpoint with actionable slices
+ok 107 - autonomous completion model continues after an intermediate checkpoint with actionable slices
+  ---
+  duration_ms: 0.2036
+  type: 'test'
+  ...
+# Subtest: autonomous completion model continues after verification while target remains incomplete
+ok 108 - autonomous completion model continues after verification while target remains incomplete
+  ---
+  duration_ms: 0.5678
+  type: 'test'
+  ...
+# Subtest: checkpoint summary with remaining actionable work is not final completion
+ok 109 - checkpoint summary with remaining actionable work is not final completion
+  ---
+  duration_ms: 0.127
+  type: 'test'
+  ...
+# Subtest: requested target completion stops autonomous execution
+ok 110 - requested target completion stops autonomous execution
+  ---
+  duration_ms: 0.148
+  type: 'test'
+  ...
+# Subtest: genuine blocker requiring user input stops autonomous execution
+ok 111 - genuine blocker requiring user input stops autonomous execution
+  ---
+  duration_ms: 0.2078
+  type: 'test'
+  ...
+# Subtest: external maintenance timeout does not terminate locally actionable implementation
+ok 112 - external maintenance timeout does not terminate locally actionable implementation
+  ---
+  duration_ms: 0.2299
+  type: 'test'
+  ...
+# Subtest: fresh coordinator with no snapshot has zero debt and full target
+ok 113 - fresh coordinator with no snapshot has zero debt and full target
+  ---
+  duration_ms: 2.9296
+  type: 'test'
+  ...
+# Subtest: estimate creates a reservation and is replaced by actual
+ok 114 - estimate creates a reservation and is replaced by actual
+  ---
+  duration_ms: 0.3188
+  type: 'test'
+  ...
+# Subtest: unreconciled estimates are discarded at finalize
+ok 115 - unreconciled estimates are discarded at finalize
+  ---
+  duration_ms: 0.3698
+  type: 'test'
+  ...
+# Subtest: debt carries forward after overspend
+ok 116 - debt carries forward after overspend
+  ---
+  duration_ms: 0.2382
+  type: 'test'
+  ...
+# Subtest: debt repaid by underspend on next turn
+ok 117 - debt repaid by underspend on next turn
+  ---
+  duration_ms: 0.2832
+  type: 'test'
+  ...
+# Subtest: pressure label crosses thresholds at 0 and 0.5
+ok 118 - pressure label crosses thresholds at 0 and 0.5
+  ---
+  duration_ms: 0.2488
+  type: 'test'
+  ...
+# Subtest: compression records do not affect debt math
+ok 119 - compression records do not affect debt math
+  ---
+  duration_ms: 0.2394
+  type: 'test'
+  ...
+# Subtest: history retains components only for the most recent N turns
+ok 120 - history retains components only for the most recent N turns
+  ---
+  duration_ms: 0.495
+  type: 'test'
+  ...
+# Subtest: model switch rescales debt with clamp + decay
+ok 121 - model switch rescales debt with clamp + decay
+  ---
+  duration_ms: 0.2788
+  type: 'test'
+  ...
+# Subtest: extreme downgrade resets debt and logs synthetic history entry
+ok 122 - extreme downgrade resets debt and logs synthetic history entry
+  ---
+  duration_ms: 0.4773
+  type: 'test'
+  ...
+# Subtest: graph slice emergency trim flag persisted in history
+ok 123 - graph slice emergency trim flag persisted in history
+  ---
+  duration_ms: 0.279
+  type: 'test'
+  ...
+# Subtest: finalize is idempotent
+ok 124 - finalize is idempotent
+  ---
+  duration_ms: 0.1899
+  type: 'test'
+  ...
+# Subtest: estimateTokensFromString uses chars/4 heuristic
+ok 125 - estimateTokensFromString uses chars/4 heuristic
+  ---
+  duration_ms: 0.2247
+  type: 'test'
+  ...
+# Subtest: Phase 2 — BudgetSnapshot is JSON round-trip identical (Plan §9 reload invariant)
+ok 126 - Phase 2 — BudgetSnapshot is JSON round-trip identical (Plan §9 reload invariant)
+  ---
+  duration_ms: 1.5263
+  type: 'test'
+  ...
+# (node:9616) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: canonical graph context reaches the actual model-facing packet at high pressure, with exact receipt and Unicode evidence
+ok 127 - canonical graph context reaches the actual model-facing packet at high pressure, with exact receipt and Unicode evidence
+  ---
+  duration_ms: 17.3515
+  type: 'test'
+  ...
+# Subtest: a missing canonical capability is visible in the prompt and does not silently call the legacy data projection
+ok 128 - a missing canonical capability is visible in the prompt and does not silently call the legacy data projection
+  ---
+  duration_ms: 1.134
+  type: 'test'
+  ...
+# Subtest: required graph records borrow optional space within the same total bound; they never disappear when too large
+ok 129 - required graph records borrow optional space within the same total bound; they never disappear when too large
+  ---
+  duration_ms: 1.9757
+  type: 'test'
+  ...
+# Subtest: repository-local ID collisions remain in the whole canonical pack without manufacturing a navigation identity
+ok 130 - repository-local ID collisions remain in the whole canonical pack without manufacturing a navigation identity
+  ---
+  duration_ms: 0.5644
+  type: 'test'
+  ...
+# Subtest: T-3.1: entity fence renders an entity card
+ok 131 - T-3.1: entity fence renders an entity card
+  ---
+  duration_ms: 6.3106
+  type: 'test'
+  ...
+# Subtest: T-3.2: adr fence renders an adr card
+ok 132 - T-3.2: adr fence renders an adr card
+  ---
+  duration_ms: 1.139
+  type: 'test'
+  ...
+# Subtest: T-3.3: tension fence renders a tension card
+ok 133 - T-3.3: tension fence renders a tension card
+  ---
+  duration_ms: 0.9019
+  type: 'test'
+  ...
+# Subtest: T-3.4: insight fence renders an insight card
+ok 134 - T-3.4: insight fence renders an insight card
+  ---
+  duration_ms: 0.7517
+  type: 'test'
+  ...
+# Subtest: T-3.5: unknown fence type falls back to regular code block
+ok 135 - T-3.5: unknown fence type falls back to regular code block
+  ---
+  duration_ms: 2.2595
+  type: 'test'
+  ...
+# Subtest: T-3.6: rendered cards are collapsible details blocks
+ok 136 - T-3.6: rendered cards are collapsible details blocks
+  ---
+  duration_ms: 0.655
+  type: 'test'
+  ...
+# Subtest: T-3.7: incomplete streaming-style fence remains a code block until complete
+ok 137 - T-3.7: incomplete streaming-style fence remains a code block until complete
+  ---
+  duration_ms: 0.6305
+  type: 'test'
+  ...
+# Subtest: Review \#8: malformed card body falls back to code block, no crash
+ok 138 - Review \#8: malformed card body falls back to code block, no crash
+  ---
+  duration_ms: 0.6043
+  type: 'test'
+  ...
+# Subtest: ChatMemory persists messages per instance
+ok 139 - ChatMemory persists messages per instance
+  ---
+  duration_ms: 2.1465
+  type: 'test'
+  ...
+# Subtest: ChatMemory clears a single instance history
+ok 140 - ChatMemory clears a single instance history
+  ---
+  duration_ms: 1.5433
+  type: 'test'
+  ...
+# Subtest: ChatMemory preserves canonical anchor identity across save and restore
+ok 141 - ChatMemory preserves canonical anchor identity across save and restore
+  ---
+  duration_ms: 0.4165
+  type: 'test'
+  ...
+# Subtest: ChatMemory round-trip preserves canonical anchor fields written by ChatPanel refresh flow
+ok 142 - ChatMemory round-trip preserves canonical anchor fields written by ChatPanel refresh flow
+  ---
+  duration_ms: 0.3117
+  type: 'test'
+  ...
+# Subtest: Phase 2 � ChatMemory persists and restores BudgetSnapshot per instance
+ok 143 - Phase 2 � ChatMemory persists and restores BudgetSnapshot per instance
+  ---
+  duration_ms: 0.916
+  type: 'test'
+  ...
+# Subtest: Phase 2 � restored BudgetSnapshot rehydrates a coordinator with identical pressure
+ok 144 - Phase 2 � restored BudgetSnapshot rehydrates a coordinator with identical pressure
+  ---
+  duration_ms: 0.4506
+  type: 'test'
+  ...
+# Subtest: Plan A: an owned workspace snapshot retains the original authority and resulting source baseline
+ok 145 - Plan A: an owned workspace snapshot retains the original authority and resulting source baseline
+  ---
+  duration_ms: 450.5007
+  type: 'test'
+  ...
+# Subtest: Plan A: copilot-cli turn reconciles via recordWorkspaceChanges in finally
+ok 146 - Plan A: copilot-cli turn reconciles via recordWorkspaceChanges in finally
+  ---
+  duration_ms: 0.7922
+  type: 'test'
+  ...
+# Subtest: Plan A: when changed paths exist the pending-review webview push fires
+ok 147 - Plan A: when changed paths exist the pending-review webview push fires
+  ---
+  duration_ms: 0.3824
+  type: 'test'
+  ...
+# Subtest: Plan A: review reconciliation errors are swallowed (do not break the turn)
+ok 148 - Plan A: review reconciliation errors are swallowed (do not break the turn)
+  ---
+  duration_ms: 0.5694
+  type: 'test'
+  ...
+# Subtest: deriveVerdict treats completed tool calls without delivered answer as partial progress
+ok 149 - deriveVerdict treats completed tool calls without delivered answer as partial progress
+  ---
+  duration_ms: 1.9871
+  type: 'test'
+  ...
+# Subtest: deriveVerdict keeps completed audited work partial when report says requested assessment remains incomplete
+ok 150 - deriveVerdict keeps completed audited work partial when report says requested assessment remains incomplete
+  ---
+  duration_ms: 0.4665
+  type: 'test'
+  ...
+# Subtest: deriveVerdict requires completion signal before showing verified tool-count banner
+ok 151 - deriveVerdict requires completion signal before showing verified tool-count banner
+  ---
+  duration_ms: 0.1785
+  type: 'test'
+  ...
+# Subtest: deriveVerdict honors partial structured envelope over successful tool trace
+ok 152 - deriveVerdict honors partial structured envelope over successful tool trace
+  ---
+  duration_ms: 0.2212
+  type: 'test'
+  ...
+# Subtest: help-probe: parses Codex root and exec surfaces
+ok 153 - help-probe: parses Codex root and exec surfaces
+  ---
+  duration_ms: 2.149
+  type: 'test'
+  ...
+# Subtest: help-probe: supports Codex exec help without ask-for-approval
+ok 154 - help-probe: supports Codex exec help without ask-for-approval
+  ---
+  duration_ms: 0.4557
+  type: 'test'
+  ...
+# Subtest: help-probe: missing exec help fails the support check
+ok 155 - help-probe: missing exec help fails the support check
+  ---
+  duration_ms: 0.4995
+  type: 'test'
+  ...
+# Subtest: help-probe: empty registry reports all minimum tools as missing
+ok 156 - help-probe: empty registry reports all minimum tools as missing
+  ---
+  duration_ms: 0.356
+  type: 'test'
+  ...
+# Subtest: allowlist: live registry with all catalog tools is ok
+ok 157 - allowlist: live registry with all catalog tools is ok
+  ---
+  duration_ms: 0.2807
+  type: 'test'
+  ...
+# Subtest: allowlist: bridge-local run_command is allowed even when absent upstream
+ok 158 - allowlist: bridge-local run_command is allowed even when absent upstream
+  ---
+  duration_ms: 0.1854
+  type: 'test'
+  ...
+# Subtest: allowlist: missing minimum grounding tool flips ok to false
+ok 159 - allowlist: missing minimum grounding tool flips ok to false
+  ---
+  duration_ms: 0.229
+  type: 'test'
+  ...
+# Subtest: mcp-config: builds deterministic Codex config.toml artifact
+ok 160 - mcp-config: builds deterministic Codex config.toml artifact
+  ---
+  duration_ms: 0.73
+  type: 'test'
+  ...
+# Subtest: mcp-config: rejects empty inputs with explicit messages
+ok 161 - mcp-config: rejects empty inputs with explicit messages
+  ---
+  duration_ms: 0.8371
+  type: 'test'
+  ...
+# Subtest: mcp-bridge: validates live registry before building isolated config
+ok 162 - mcp-bridge: validates live registry before building isolated config
+  ---
+  duration_ms: 0.795
+  type: 'test'
+  ...
+# Subtest: mcp-bridge: fails closed when required DreamGraph tools are missing
+ok 163 - mcp-bridge: fails closed when required DreamGraph tools are missing
+  ---
+  duration_ms: 0.3741
+  type: 'test'
+  ...
+# Subtest: argv: emits authoritative codex exec shape with stdin positional dash
+ok 164 - argv: emits authoritative codex exec shape with stdin positional dash
+  ---
+  duration_ms: 0.9392
+  type: 'test'
+  ...
+# Subtest: argv: gives gpt-6.1-sol xhigh reasoning and respects explicit overrides
+ok 165 - argv: gives gpt-6.1-sol xhigh reasoning and respects explicit overrides
+  ---
+  duration_ms: 0.4142
+  type: 'test'
+  ...
+# Subtest: argv: gives gpt-6-astra xhigh reasoning and respects explicit overrides
+ok 166 - argv: gives gpt-6-astra xhigh reasoning and respects explicit overrides
+  ---
+  duration_ms: 0.1528
+  type: 'test'
+  ...
+# Subtest: argv: gives gpt-6-sol xhigh reasoning and respects explicit overrides
+ok 167 - argv: gives gpt-6-sol xhigh reasoning and respects explicit overrides
+  ---
+  duration_ms: 0.1324
+  type: 'test'
+  ...
+# Subtest: argv: gives gpt-6-luna xhigh reasoning and respects explicit overrides
+ok 168 - argv: gives gpt-6-luna xhigh reasoning and respects explicit overrides
+  ---
+  duration_ms: 0.1477
+  type: 'test'
+  ...
+# Subtest: argv: gives gpt-5.6-sol xhigh reasoning and respects explicit overrides
+ok 169 - argv: gives gpt-5.6-sol xhigh reasoning and respects explicit overrides
+  ---
+  duration_ms: 0.1544
+  type: 'test'
+  ...
+# Subtest: argv: omits ask-for-approval when Codex exec does not advertise it
+ok 170 - argv: omits ask-for-approval when Codex exec does not advertise it
+  ---
+  duration_ms: 0.333
+  type: 'test'
+  ...
+# Subtest: argv: never emits elevated sandbox or approval from config overrides
+ok 171 - argv: never emits elevated sandbox or approval from config overrides
+  ---
+  duration_ms: 0.2936
+  type: 'test'
+  ...
+# Subtest: argv: rejects missing workspace and missing required help support
+ok 172 - argv: rejects missing workspace and missing required help support
+  ---
+  duration_ms: 0.5008
+  type: 'test'
+  ...
+# Subtest: classifier: dreamgraph + allowlisted tool is authoritative
+ok 173 - classifier: dreamgraph + allowlisted tool is authoritative
+  ---
+  duration_ms: 0.1862
+  type: 'test'
+  ...
+# Subtest: classifier: dreamgraph + non-allowlisted tool is rejected
+ok 174 - classifier: dreamgraph + non-allowlisted tool is rejected
+  ---
+  duration_ms: 0.1486
+  type: 'test'
+  ...
+# Subtest: classifier: third-party MCP server is generic context
+ok 175 - classifier: third-party MCP server is generic context
+  ---
+  duration_ms: 0.099
+  type: 'test'
+  ...
+# Subtest: classifier: inline sentinel is provider inline tool
+ok 176 - classifier: inline sentinel is provider inline tool
+  ---
+  duration_ms: 0.1252
+  type: 'test'
+  ...
+# Subtest: transcript: projects Codex MCP JSON events into tool observations
+ok 177 - transcript: projects Codex MCP JSON events into tool observations
+  ---
+  duration_ms: 3.7267
+  type: 'test'
+  ...
+# Subtest: transcript: strips ANSI, reports diagnostics, and detects login recovery signal
+ok 178 - transcript: strips ANSI, reports diagnostics, and detects login recovery signal
+  ---
+  duration_ms: 2.2528
+  type: 'test'
+  ...
+# Subtest: transcript: projects Codex item.completed agent messages from whitespace-separated json
+ok 179 - transcript: projects Codex item.completed agent messages from whitespace-separated json
+  ---
+  duration_ms: 0.7344
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: success writes isolated config, spawns codex exec with stdin dash, and cleans up
+ok 180 - codex orchestrator: success writes isolated config, spawns codex exec with stdin dash, and cleans up
+  ---
+  duration_ms: 11.597
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: empty invocation cwd uses neutral probe cwd and scratch exec cwd
+ok 181 - codex orchestrator: empty invocation cwd uses neutral probe cwd and scratch exec cwd
+  ---
+  duration_ms: 2.5204
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: missing binary fails before spawn
+ok 182 - codex orchestrator: missing binary fails before spawn
+  ---
+  duration_ms: 0.3977
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: unsupported help surface fails before spawn
+ok 183 - codex orchestrator: unsupported help surface fails before spawn
+  ---
+  duration_ms: 0.9954
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: codex login status failure returns clickable login recovery metadata
+ok 184 - codex orchestrator: codex login status failure returns clickable login recovery metadata
+  ---
+  duration_ms: 1.4559
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: login status policy noise is advisory unless it reports auth failure
+ok 185 - codex orchestrator: login status policy noise is advisory unless it reports auth failure
+  ---
+  duration_ms: 2.8188
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: codex login status exit 0 is authoritative even with misleading noise
+ok 186 - codex orchestrator: codex login status exit 0 is authoritative even with misleading noise
+  ---
+  duration_ms: 1.6634
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: exec MCP runtime failure fails closed instead of accepting ungrounded output
+ok 187 - codex orchestrator: exec MCP runtime failure fails closed instead of accepting ungrounded output
+  ---
+  duration_ms: 2.6144
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: transcript-only DreamGraph MCP events fail closed without audit results
+ok 188 - codex orchestrator: transcript-only DreamGraph MCP events fail closed without audit results
+  ---
+  duration_ms: 1.6782
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: cancelled DreamGraph MCP result without audit result fails closed
+ok 189 - codex orchestrator: cancelled DreamGraph MCP result without audit result fails closed
+  ---
+  duration_ms: 1.7461
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: audited read call clears MCP probe even with transcript witness noise
+ok 190 - codex orchestrator: audited read call clears MCP probe even with transcript witness noise
+  ---
+  duration_ms: 0.8203
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: rmcp transport EOF on shutdown is teardown noise, not a load failure
+ok 191 - codex orchestrator: rmcp transport EOF on shutdown is teardown noise, not a load failure
+  ---
+  duration_ms: 1.7125
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: missing required DreamGraph tool fails closed
+ok 192 - codex orchestrator: missing required DreamGraph tool fails closed
+  ---
+  duration_ms: 0.5508
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: wall timeout and idle timeout remain distinguishable
+ok 193 - codex orchestrator: wall timeout and idle timeout remain distinguishable
+  ---
+  duration_ms: 1.973
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: cancellation, signal, nonzero, and not-logged-in exec failures are classified
+ok 194 - codex orchestrator: cancellation, signal, nonzero, and not-logged-in exec failures are classified
+  ---
+  duration_ms: 2.2035
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: usage limit after audited DreamGraph tools is not classified as login failure
+ok 195 - codex orchestrator: usage limit after audited DreamGraph tools is not classified as login failure
+  ---
+  duration_ms: 1.4488
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: source snippets mentioning usage limit do not override policy/tool failures
+ok 196 - codex orchestrator: source snippets mentioning usage limit do not override policy/tool failures
+  ---
+  duration_ms: 2.7183
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: telemetry unknown terminal type is not unsupported model and failure tail stays compact
+ok 197 - codex orchestrator: telemetry unknown terminal type is not unsupported model and failure tail stays compact
+  ---
+  duration_ms: 2.3377
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: inspected source mentioning unsupported model does not poison failure classification
+ok 198 - codex orchestrator: inspected source mentioning unsupported model does not poison failure classification
+  ---
+  duration_ms: 0.9574
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: audited DreamGraph success suppresses false exec login classification
+ok 199 - codex orchestrator: audited DreamGraph success suppresses false exec login classification
+  ---
+  duration_ms: 0.8408
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: failed read_source_code schema args are not classified as missing tool
+ok 200 - codex orchestrator: failed read_source_code schema args are not classified as missing tool
+  ---
+  duration_ms: 1.9534
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: unsupported model and native policy denial are not login failures
+ok 201 - codex orchestrator: unsupported model and native policy denial are not login failures
+  ---
+  duration_ms: 0.932
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: read-only sandbox MCP block is policy denial, not audit mismatch
+ok 202 - codex orchestrator: read-only sandbox MCP block is policy denial, not audit mismatch
+  ---
+  duration_ms: 0.498
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: thrown spawn still drains audit and cleans scratch
+ok 203 - codex orchestrator: thrown spawn still drains audit and cleans scratch
+  ---
+  duration_ms: 0.5421
+  type: 'test'
+  ...
+# Subtest: codex orchestrator: validates required input
+ok 204 - codex orchestrator: validates required input
+  ---
+  duration_ms: 0.7218
+  type: 'test'
+  ...
+# Subtest: codex provider-port: a permit signal reaches native spawn and mandatory settlement is awaited
+ok 205 - codex provider-port: a permit signal reaches native spawn and mandatory settlement is awaited
+  ---
+  duration_ms: 10.4185
+  type: 'test'
+  ...
+# Subtest: codex provider-port: settlement loss is mandatory and cannot become a swallowed observer error
+ok 206 - codex provider-port: settlement loss is mandatory and cannot become a swallowed observer error
+  ---
+  duration_ms: 2.2826
+  type: 'test'
+  ...
+# Subtest: codex provider-port: getCapabilities reports text and image attachments
+ok 207 - codex provider-port: getCapabilities reports text and image attachments
+  ---
+  duration_ms: 1.0687
+  type: 'test'
+  ...
+# Subtest: codex provider-port: awaits mandatory prompt admission before spawn and propagates rejection
+ok 208 - codex provider-port: awaits mandatory prompt admission before spawn and propagates rejection
+  ---
+  duration_ms: 1.4578
+  type: 'test'
+  ...
+# Subtest: codex provider-port: invocation cwd is optional for multi-repo DreamGraph runs
+ok 209 - codex provider-port: invocation cwd is optional for multi-repo DreamGraph runs
+  ---
+  duration_ms: 1.2005
+  type: 'test'
+  ...
+# Subtest: codex provider-port: serializes conversation to stdin and projects proposal
+ok 210 - codex provider-port: serializes conversation to stdin and projects proposal
+  ---
+  duration_ms: 1.6549
+  type: 'test'
+  ...
+# Subtest: codex provider-port: advertises DreamGraph prompt policies and diagnostics
+ok 211 - codex provider-port: advertises DreamGraph prompt policies and diagnostics
+  ---
+  duration_ms: 1.7143
+  type: 'test'
+  ...
+# Subtest: codex provider-port: keeps bridge-local run_command visible with read-only upstream tools
+ok 212 - codex provider-port: keeps bridge-local run_command visible with read-only upstream tools
+  ---
+  duration_ms: 0.9513
+  type: 'test'
+  ...
+# Subtest: codex provider-port: forwards assistant text through onStreamChunk
+ok 213 - codex provider-port: forwards assistant text through onStreamChunk
+  ---
+  duration_ms: 1.2937
+  type: 'test'
+  ...
+# Subtest: codex provider-port: streams Codex assistant deltas live without duplicating final text
+ok 214 - codex provider-port: streams Codex assistant deltas live without duplicating final text
+  ---
+  duration_ms: 2.2581
+  type: 'test'
+  ...
+# Subtest: codex provider-port: streams completed assistant message when no deltas are available
+ok 215 - codex provider-port: streams completed assistant message when no deltas are available
+  ---
+  duration_ms: 1.2152
+  type: 'test'
+  ...
+# Subtest: codex provider-port: provider errors carry deterministic metadata
+ok 216 - codex provider-port: provider errors carry deterministic metadata
+  ---
+  duration_ms: 0.5031
+  type: 'test'
+  ...
+# Subtest: codex provider-port: streams live audit calls before final run reconciliation
+ok 217 - codex provider-port: streams live audit calls before final run reconciliation
+  ---
+  duration_ms: 0.9428
+  type: 'test'
+  ...
+# Subtest: codex provider-port: streams transcript MCP witnesses when audit records are absent
+ok 218 - codex provider-port: streams transcript MCP witnesses when audit records are absent
+  ---
+  duration_ms: 5.5931
+  type: 'test'
+  ...
+# Subtest: codex provider-port: onRunResult fires for ok and failed runs
+ok 219 - codex provider-port: onRunResult fires for ok and failed runs
+  ---
+  duration_ms: 0.9342
+  type: 'test'
+  ...
+# Subtest: codex provider-port: rejects missing or malformed options
+ok 220 - codex provider-port: rejects missing or malformed options
+  ---
+  duration_ms: 0.4645
+  type: 'test'
+  ...
+# Subtest: selection tests: file-aware routing selects the correct environment scopes
+ok 221 - selection tests: file-aware routing selects the correct environment scopes
+  ---
+  duration_ms: 21.348
+  type: 'test'
+  ...
+# Subtest: rendering stability and token-discipline: unchanged Layer 2 rendering remains identical, compact, and noise-controlled
+ok 222 - rendering stability and token-discipline: unchanged Layer 2 rendering remains identical, compact, and noise-controlled
+  ---
+  duration_ms: 13.1897
+  type: 'test'
+  ...
+# Subtest: evidence-order and omission contract: environment ranks below hard constraints and above notes, and optional evidence can be omitted under budget pressure
+ok 223 - evidence-order and omission contract: environment ranks below hard constraints and above notes, and optional evidence can be omitted under budget pressure
+  ---
+  duration_ms: 1.2733
+  type: 'test'
+  ...
+# Subtest: cache-churn and packet instrumentation: logically unchanged stable inputs produce stable prefix reuse and omission telemetry by kind
+ok 224 - cache-churn and packet instrumentation: logically unchanged stable inputs produce stable prefix reuse and omission telemetry by kind
+  ---
+  duration_ms: 0.7842
+  type: 'test'
+  ...
+# Subtest: evaluation fixture plan: representative task packets preserve sufficiency cues for runtime, scope role, module boundary, and graph identity
+ok 225 - evaluation fixture plan: representative task packets preserve sufficiency cues for runtime, scope role, module boundary, and graph identity
+  ---
+  duration_ms: 0.3097
+  type: 'test'
+  ...
+# Subtest: fallback planning contract keeps environment evidence in optional evidence
+ok 226 - fallback planning contract keeps environment evidence in optional evidence
+  ---
+  duration_ms: 1.0011
+  type: 'test'
+  ...
+# Subtest: environment evidence ranks ahead of low-priority notes and stays within a compact token budget
+ok 227 - environment evidence ranks ahead of low-priority notes and stays within a compact token budget
+  ---
+  duration_ms: 1.2994
+  type: 'test'
+  ...
+# Subtest: shimmed ContextBuilder evidence collection includes environment evidence with stable ordering and compact size
+ok 228 - shimmed ContextBuilder evidence collection includes environment evidence with stable ordering and compact size
+  ---
+  duration_ms: 2.0128
+  type: 'test'
+  ...
+# Subtest: Phase 3 — 'low' pressure fetches every deep-insight regardless of required/optional
+ok 229 - Phase 3 — 'low' pressure fetches every deep-insight regardless of required/optional
+  ---
+  duration_ms: 1.0354
+  type: 'test'
+  ...
+# Subtest: Phase 3 — 'normal' pressure fetches every deep-insight (tier-2 trim reserved for future)
+ok 230 - Phase 3 — 'normal' pressure fetches every deep-insight (tier-2 trim reserved for future)
+  ---
+  duration_ms: 0.1764
+  type: 'test'
+  ...
+# Subtest: Phase 3 — 'high' pressure skips optional deep-insights but keeps required ones
+ok 231 - Phase 3 — 'high' pressure skips optional deep-insights but keeps required ones
+  ---
+  duration_ms: 0.2017
+  type: 'test'
+  ...
+# Subtest: Phase 3 — 'high' pressure with all-optional needs drops everything
+ok 232 - Phase 3 — 'high' pressure with all-optional needs drops everything
+  ---
+  duration_ms: 0.1586
+  type: 'test'
+  ...
+# Subtest: Phase 3 — pressure decision is pure (same inputs → same outputs)
+ok 233 - Phase 3 — pressure decision is pure (same inputs → same outputs)
+  ---
+  duration_ms: 0.1514
+  type: 'test'
+  ...
+# [DreamGraph] deep-insights cache invalidated: tool:dream_cycle
+# [DreamGraph] deep-insights cache invalidated: tool:nightmare_cycle
+# [DreamGraph] deep-insights cache invalidated: tool:normalize_dreams
+# [DreamGraph] deep-insights cache invalidated: tool:resolve_tension
+# [DreamGraph] deep-insights cache invalidated: tool:clear_dreams
+# [DreamGraph] deep-insights cache invalidated: tool:lucid_action
+# [DreamGraph] deep-insights cache invalidated: tool:wake_from_lucid
+# [DreamGraph] deep-insights cache invalidated: tool:enrich_seed_data
+# [DreamGraph] deep-insights cache invalidated: tool:enrich_parser_nodes
+# [DreamGraph] deep-insights cache invalidated: tool:solidify_cognitive_insight
+# [DreamGraph] deep-insights cache invalidated: tool:init_graph
+# [DreamGraph] deep-insights cache invalidated: tool:scan_project
+# [DreamGraph] deep-insights cache invalidated: tool:record_architecture_decision
+# [DreamGraph] deep-insights cache invalidated: tool:register_ui_element
+# [DreamGraph] deep-insights cache invalidated: tool:import_dream_archetypes
+# [DreamGraph] deep-insights cache invalidated: tool:dispatch_cognitive_event
+# [DreamGraph] deep-insights cache invalidated: tool:metacognitive_analysis
+# [DreamGraph] deep-insights cache invalidated: test-eviction
+# [DreamGraph] deep-insights cache invalidated: tool:dream_cycle
+# [DreamGraph] deep-insights cache invalidated: tool:normalize_dreams
+# [DreamGraph] deep-insights cache invalidated: tool:record_architecture_decision
+# Subtest: every COGNITIVE_MUTATING_TOOL triggers deep-insights invalidation
+ok 234 - every COGNITIVE_MUTATING_TOOL triggers deep-insights invalidation
+  ---
+  duration_ms: 2.1213
+  type: 'test'
+  ...
+# Subtest: read-only tools do NOT trigger invalidation
+ok 235 - read-only tools do NOT trigger invalidation
+  ---
+  duration_ms: 0.2083
+  type: 'test'
+  ...
+# Subtest: invalidateDeepInsights drops the slot so the next get rebuilds it
+ok 236 - invalidateDeepInsights drops the slot so the next get rebuilds it
+  ---
+  duration_ms: 0.2665
+  type: 'test'
+  ...
+# Subtest: clearAll drops both env-snapshot and deep-insights slots
+ok 237 - clearAll drops both env-snapshot and deep-insights slots
+  ---
+  duration_ms: 0.2652
+  type: 'test'
+  ...
+# Subtest: getDeepInsightsSlot returns the same instance within the TTL window
+ok 238 - getDeepInsightsSlot returns the same instance within the TTL window
+  ---
+  duration_ms: 0.2503
+  type: 'test'
+  ...
+# Subtest: maybeInvalidateForTool only fires for the published mutating-tool set
+ok 239 - maybeInvalidateForTool only fires for the published mutating-tool set
+  ---
+  duration_ms: 0.2679
+  type: 'test'
+  ...
+# [DreamGraph] Context fetch timed out: f18_record_34832_1_h77hhp (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+# [DreamGraph] Context fetch timed out: f18_record_34832_1_h77hhp (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 2.
+# [DreamGraph] Context fetch timed out: f18_snapshot_34832_2_hnyuqb (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+# [DreamGraph] Context fetch timed out: f18_a_34832_3_d7syd7 (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+# [DreamGraph] Context fetch timed out: f18_a_34832_3_d7syd7 (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 2.
+# [DreamGraph] Context fetch timed out: f18_b_34832_4_fvkfqm (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+# Subtest: recordTimeout increments per-tool counters
+ok 240 - recordTimeout increments per-tool counters
+  ---
+  duration_ms: 1.6813
+  type: 'test'
+  ...
+# Subtest: getTimeoutStats returns an independent snapshot — mutating it does not affect the cache
+ok 241 - getTimeoutStats returns an independent snapshot — mutating it does not affect the cache
+  ---
+  duration_ms: 0.279
+  type: 'test'
+  ...
+# Subtest: per-tool counters are independent
+ok 242 - per-tool counters are independent
+  ---
+  duration_ms: 0.2622
+  type: 'test'
+  ...
+# Subtest: isTimeout matches the documented timeout/aborted error vocabulary
+ok 243 - isTimeout matches the documented timeout/aborted error vocabulary
+  ---
+  duration_ms: 0.3408
+  type: 'test'
+  ...
+# Subtest: isTimeout rejects unrelated errors and falsy values
+ok 244 - isTimeout rejects unrelated errors and falsy values
+  ---
+  duration_ms: 0.207
+  type: 'test'
+  ...
+# Subtest: MCP_CONTEXT_FETCH_TIMEOUT_MS is a positive finite number
+ok 245 - MCP_CONTEXT_FETCH_TIMEOUT_MS is a positive finite number
+  ---
+  duration_ms: 0.2038
+  type: 'test'
+  ...
+# Subtest: ChatPanel context logging uses the injected shared ContextInspector
+ok 246 - ChatPanel context logging uses the injected shared ContextInspector
+  ---
+  duration_ms: 1.8443
+  type: 'test'
+  ...
+# Subtest: extension activate wires the shared ContextInspector into ChatPanel
+ok 247 - extension activate wires the shared ContextInspector into ChatPanel
+  ---
+  duration_ms: 0.2406
+  type: 'test'
+  ...
+# Subtest: help-probe: parses full help surface
+ok 248 - help-probe: parses full help surface
+  ---
+  duration_ms: 2.0714
+  type: 'test'
+  ...
+# Subtest: help-probe: minimal help is supported (only required flags)
+ok 249 - help-probe: minimal help is supported (only required flags)
+  ---
+  duration_ms: 0.349
+  type: 'test'
+  ...
+# Subtest: help-probe: empty help fails the support check
+ok 250 - help-probe: empty help fails the support check
+  ---
+  duration_ms: 0.2812
+  type: 'test'
+  ...
+# Subtest: help-probe: missing single required flag fails the support check
+ok 251 - help-probe: missing single required flag fails the support check
+  ---
+  duration_ms: 0.2393
+  type: 'test'
+  ...
+# Subtest: help-probe: undefined help text yields zero-length surface, not throw
+ok 252 - help-probe: undefined help text yields zero-length surface, not throw
+  ---
+  duration_ms: 0.3773
+  type: 'test'
+  ...
+# Subtest: allowlist: live registry with all catalog tools is ok
+ok 253 - allowlist: live registry with all catalog tools is ok
+  ---
+  duration_ms: 1.3311
+  type: 'test'
+  ...
+# Subtest: allowlist: bridge-local run_command is allowed even when absent upstream
+ok 254 - allowlist: bridge-local run_command is allowed even when absent upstream
+  ---
+  duration_ms: 0.3126
+  type: 'test'
+  ...
+# Subtest: allowlist: missing minimum grounding tool flips ok to false
+ok 255 - allowlist: missing minimum grounding tool flips ok to false
+  ---
+  duration_ms: 0.2544
+  type: 'test'
+  ...
+# Subtest: allowlist: empty registry reports all minimum tools as missing
+ok 256 - allowlist: empty registry reports all minimum tools as missing
+  ---
+  duration_ms: 0.2117
+  type: 'test'
+  ...
+# Subtest: mcp-config: builds a deterministic single-server artifact
+ok 257 - mcp-config: builds a deterministic single-server artifact
+  ---
+  duration_ms: 0.7359
+  type: 'test'
+  ...
+# Subtest: mcp-config: caller env wins for arbitrary keys, never for token
+ok 258 - mcp-config: caller env wins for arbitrary keys, never for token
+  ---
+  duration_ms: 0.2261
+  type: 'test'
+  ...
+# Subtest: mcp-config: serialization is stable and ends in newline
+ok 259 - mcp-config: serialization is stable and ends in newline
+  ---
+  duration_ms: 0.2397
+  type: 'test'
+  ...
+# Subtest: mcp-config: rejects empty inputs with explicit messages
+ok 260 - mcp-config: rejects empty inputs with explicit messages
+  ---
+  duration_ms: 0.6261
+  type: 'test'
+  ...
+# Subtest: argv: emits model, allow-all-tools, native shell allow, deny-write, allow-tool per allowlist, prompt
+ok 261 - argv: emits model, allow-all-tools, native shell allow, deny-write, allow-tool per allowlist, prompt
+  ---
+  duration_ms: 0.4128
+  type: 'test'
+  ...
+# Subtest: argv: no native command tools are advertised; shell execution is routed exclusively through dreamgraph:run_command
+ok 262 - argv: no native command tools are advertised; shell execution is routed exclusively through dreamgraph:run_command
+  ---
+  duration_ms: 0.2984
+  type: 'test'
+  ...
+# Subtest: argv: emits one --add-dir per addDirs entry, ordered, after --disallow-temp-dir and before --prompt
+ok 263 - argv: emits one --add-dir per addDirs entry, ordered, after --disallow-temp-dir and before --prompt
+  ---
+  duration_ms: 0.1999
+  type: 'test'
+  ...
+# Subtest: argv: omits --add-dir entirely when addDirs is empty or absent
+ok 264 - argv: omits --add-dir entirely when addDirs is empty or absent
+  ---
+  duration_ms: 0.1863
+  type: 'test'
+  ...
+# Subtest: argv: omits --disallow-temp-dir when help surface lacks it
+ok 265 - argv: omits --disallow-temp-dir when help surface lacks it
+  ---
+  duration_ms: 0.1789
+  type: 'test'
+  ...
+# Subtest: argv: never emits --additional-mcp-config (data plane lives on disk)
+ok 266 - argv: never emits --additional-mcp-config (data plane lives on disk)
+  ---
+  duration_ms: 0.2279
+  type: 'test'
+  ...
+# Subtest: argv: always emits --allow-all-tools (required for non-interactive mode)
+ok 267 - argv: always emits --allow-all-tools (required for non-interactive mode)
+  ---
+  duration_ms: 0.1767
+  type: 'test'
+  ...
+# Subtest: argv: rejects empty prompt and empty allowlist
+ok 268 - argv: rejects empty prompt and empty allowlist
+  ---
+  duration_ms: 0.2315
+  type: 'test'
+  ...
+# Subtest: classifier: dreamgraph + allowlisted tool → authoritative
+ok 269 - classifier: dreamgraph + allowlisted tool → authoritative
+  ---
+  duration_ms: 0.1873
+  type: 'test'
+  ...
+# Subtest: classifier: dreamgraph + non-allowlisted tool → rejected
+ok 270 - classifier: dreamgraph + non-allowlisted tool → rejected
+  ---
+  duration_ms: 0.1296
+  type: 'test'
+  ...
+# Subtest: classifier: third-party MCP server → generic_context_mcp
+ok 271 - classifier: third-party MCP server → generic_context_mcp
+  ---
+  duration_ms: 0.1219
+  type: 'test'
+  ...
+# Subtest: classifier: inline sentinel → provider_inline_tool
+ok 272 - classifier: inline sentinel → provider_inline_tool
+  ---
+  duration_ms: 0.1892
+  type: 'test'
+  ...
+# Subtest: createHostAuditLive: rejects empty auditDirAbsPath
+ok 273 - createHostAuditLive: rejects empty auditDirAbsPath
+  ---
+  duration_ms: 1.351
+  type: 'test'
+  ...
+# Subtest: subscribe with no existing file → catch-up empty, future records delivered
+ok 274 - subscribe with no existing file → catch-up empty, future records delivered
+  ---
+  duration_ms: 86.1133
+  type: 'test'
+  ...
+# Subtest: subscribe after records exist → catch-up replays them
+ok 275 - subscribe after records exist → catch-up replays them
+  ---
+  duration_ms: 10.2758
+  type: 'test'
+  ...
+# Subtest: partial trailing line is buffered until newline arrives
+ok 276 - partial trailing line is buffered until newline arrives
+  ---
+  duration_ms: 98.1448
+  type: 'test'
+  ...
+# [copilot-cli audit-live] skipped malformed record at C:\\Users\\MIKAJU~1\\AppData\\Local\\Temp\\dg-audit-live-bad-fOWbkC\\run-4.ndjson
+# Subtest: malformed line is skipped silently
+ok 277 - malformed line is skipped silently
+  ---
+  duration_ms: 9.5608
+  type: 'test'
+  ...
+# Subtest: close() stops further deliveries and is idempotent
+ok 278 - close() stops further deliveries and is idempotent
+  ---
+  duration_ms: 245.2386
+  type: 'test'
+  ...
+# [copilot-cli audit-live] handler threw; subsequent events will still deliver: boom
+# Subtest: handler exception does not break subsequent deliveries
+ok 279 - handler exception does not break subsequent deliveries
+  ---
+  duration_ms: 10.3242
+  type: 'test'
+  ...
+# Subtest: resultJson larger than 4 KB is truncated for the live channel
+ok 280 - resultJson larger than 4 KB is truncated for the live channel
+  ---
+  duration_ms: 25.3168
+  type: 'test'
+  ...
+# Subtest: auditFilePathFor: composes a deterministic path under the dir
+ok 281 - auditFilePathFor: composes a deterministic path under the dir
+  ---
+  duration_ms: 1.4222
+  type: 'test'
+  ...
+# Subtest: auditFilePathFor: rejects empty inputs
+ok 282 - auditFilePathFor: rejects empty inputs
+  ---
+  duration_ms: 0.3064
+  type: 'test'
+  ...
+# Subtest: auditFilePathFor: sanitizes unsafe runId characters
+ok 283 - auditFilePathFor: sanitizes unsafe runId characters
+  ---
+  duration_ms: 0.1695
+  type: 'test'
+  ...
+# Subtest: createHostAudit: rejects empty auditDirAbsPath
+ok 284 - createHostAudit: rejects empty auditDirAbsPath
+  ---
+  duration_ms: 0.2633
+  type: 'test'
+  ...
+# Subtest: createHostAudit: missing file â†’ empty array, no throw
+ok 285 - createHostAudit: missing file â†’ empty array, no throw
+  ---
+  duration_ms: 12.6495
+  type: 'test'
+  ...
+# [copilot-cli audit] skipped malformed record at C:\\Users\\MIKAJU~1\\AppData\\Local\\Temp\\dg-audit-parse-AahGQd\\run-mixed.ndjson:2
+# [copilot-cli audit] skipped malformed record at C:\\Users\\MIKAJU~1\\AppData\\Local\\Temp\\dg-audit-parse-AahGQd\\run-mixed.ndjson:3
+# Subtest: createHostAudit: parses NDJSON, drops malformed lines, deletes file
+ok 286 - createHostAudit: parses NDJSON, drops malformed lines, deletes file
+  ---
+  duration_ms: 14.297
+  type: 'test'
+  ...
+# Subtest: createHostAudit: finishRecording without startRecording â†’ empty
+ok 287 - createHostAudit: finishRecording without startRecording â†’ empty
+  ---
+  duration_ms: 2.0181
+  type: 'test'
+  ...
+# Subtest: createHostAudit: second finishRecording for same runId â†’ empty
+ok 288 - createHostAudit: second finishRecording for same runId â†’ empty
+  ---
+  duration_ms: 6.2211
+  type: 'test'
+  ...
+# Subtest: bridge: forwards tools/list to the HTTP upstream
+ok 289 - bridge: forwards tools/list to the HTTP upstream
+  ---
+  duration_ms: 2322.1126
+  type: 'test'
+  ...
+# Subtest: bridge: run_command delegates to the daemon command port and does not call the upstream MCP handler
+ok 290 - bridge: run_command delegates to the daemon command port and does not call the upstream MCP handler
+  ---
+  duration_ms: 2286.7367
+  type: 'test'
+  ...
+# Subtest: createHostAudit: unfinished intent fails honestly and retains the physical audit for recovery
+ok 291 - createHostAudit: unfinished intent fails honestly and retains the physical audit for recovery
+  ---
+  duration_ms: 9.2626
+  type: 'test'
+  ...
+# [copilot-cli audit] skipped malformed record at C:\\Users\\MIKAJU~1\\AppData\\Local\\Temp\\dg-audit-invalid-terminal-lXvkMf\\invalid-terminal.ndjson:2
+# Subtest: createHostAudit: malformed terminal acknowledgement cannot settle a running intent
+ok 292 - createHostAudit: malformed terminal acknowledgement cannot settle a running intent
+  ---
+  duration_ms: 8.3964
+  type: 'test'
+  ...
+# Subtest: bridge: forwards tools/call and retains paired intent/terminal audit records per call
+ok 293 - bridge: forwards tools/call and retains paired intent/terminal audit records per call
+  ---
+  duration_ms: 2293.7602
+  type: 'test'
+  ...
+# Subtest: bridge: marks JSON-RPC error responses with isError=true
+ok 294 - bridge: marks JSON-RPC error responses with isError=true
+  ---
+  duration_ms: 2288.1901
+  type: 'test'
+  ...
+# Subtest: bridge: Unicode audit safety ceiling is bytes and never cuts through a UTF-8 character
+ok 295 - bridge: Unicode audit safety ceiling is bytes and never cuts through a UTF-8 character
+  ---
+  duration_ms: 2266.2255
+  type: 'test'
+  ...
+# Subtest: bridge: only tools/call generates audit records (tools/list does not)
+ok 296 - bridge: only tools/call generates audit records (tools/list does not)
+  ---
+  duration_ms: 2293.7432
+  type: 'test'
+  ...
+# Subtest: bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is unset
+ok 297 - bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is unset
+  ---
+  duration_ms: 161.4958
+  type: 'test'
+  ...
+# Subtest: bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is malformed
+ok 298 - bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is malformed
+  ---
+  duration_ms: 242.2398
+  type: 'test'
+  ...
+# Subtest: bridge: fails closed when upstream is unreachable
+ok 299 - bridge: fails closed when upstream is unreachable
+  ---
+  duration_ms: 217.373
+  type: 'test'
+  ...
+# Subtest: event-stream: parses a tool.execution_start with mcpServerName/mcpToolName
+ok 300 - event-stream: parses a tool.execution_start with mcpServerName/mcpToolName
+  ---
+  duration_ms: 1.8681
+  type: 'test'
+  ...
+# Subtest: event-stream: parses a CLI-native tool.execution_start without mcp fields
+ok 301 - event-stream: parses a CLI-native tool.execution_start without mcp fields
+  ---
+  duration_ms: 0.2935
+  type: 'test'
+  ...
+# Subtest: event-stream: pairs start+complete by toolCallId across chunks split mid-line
+ok 302 - event-stream: pairs start+complete by toolCallId across chunks split mid-line
+  ---
+  duration_ms: 1.372
+  type: 'test'
+  ...
+# Subtest: event-stream: accumulates assistant deltas and snapshotAssistantText concatenates them
+ok 303 - event-stream: accumulates assistant deltas and snapshotAssistantText concatenates them
+  ---
+  duration_ms: 0.3425
+  type: 'test'
+  ...
+# Subtest: event-stream: assistant.message replaces accumulated deltas as authoritative
+ok 304 - event-stream: assistant.message replaces accumulated deltas as authoritative
+  ---
+  duration_ms: 0.3169
+  type: 'test'
+  ...
+# Subtest: event-stream: reasoning deltas are emitted but do NOT contribute to assistant text
+ok 305 - event-stream: reasoning deltas are emitted but do NOT contribute to assistant text
+  ---
+  duration_ms: 0.2225
+  type: 'test'
+  ...
+# Subtest: event-stream: result event is parsed with sessionId/exitCode/usage
+ok 306 - event-stream: result event is parsed with sessionId/exitCode/usage
+  ---
+  duration_ms: 1.0297
+  type: 'test'
+  ...
+# Subtest: event-stream: unknown event types surface as `other` without losing data
+ok 307 - event-stream: unknown event types surface as `other` without losing data
+  ---
+  duration_ms: 0.199
+  type: 'test'
+  ...
+# Subtest: event-stream: malformed JSON lines and blank lines are skipped silently
+ok 308 - event-stream: malformed JSON lines and blank lines are skipped silently
+  ---
+  duration_ms: 0.2842
+  type: 'test'
+  ...
+# Subtest: event-stream: events missing required fields are dropped
+ok 309 - event-stream: events missing required fields are dropped
+  ---
+  duration_ms: 0.2811
+  type: 'test'
+  ...
+# Subtest: event-stream: flush() emits a buffered trailing line missing its newline
+ok 310 - event-stream: flush() emits a buffered trailing line missing its newline
+  ---
+  duration_ms: 0.2625
+  type: 'test'
+  ...
+# Subtest: event-stream: handles \\r\\n line endings
+ok 311 - event-stream: handles \\r\\n line endings
+  ---
+  duration_ms: 0.2813
+  type: 'test'
+  ...
+# Subtest: event-stream: assistant.message_delta with empty deltaContent is dropped (no zero-byte events)
+ok 312 - event-stream: assistant.message_delta with empty deltaContent is dropped (no zero-byte events)
+  ---
+  duration_ms: 0.1621
+  type: 'test'
+  ...
+# Subtest: event-stream: tool.execution_complete defaults success=true when field missing
+ok 313 - event-stream: tool.execution_complete defaults success=true when field missing
+  ---
+  duration_ms: 0.1655
+  type: 'test'
+  ...
+# Subtest: event-stream: feed() returns events in arrival order across multiple lines in one chunk
+ok 314 - event-stream: feed() returns events in arrival order across multiple lines in one chunk
+  ---
+  duration_ms: 0.1869
+  type: 'test'
+  ...
+# Subtest: event-stream: assistant.message with empty content is dropped
+ok 315 - event-stream: assistant.message with empty content is dropped
+  ---
+  duration_ms: 0.1752
+  type: 'test'
+  ...
+# Subtest: HOST_CLOCK.nowMs returns a wall-clock millisecond reading
+ok 316 - HOST_CLOCK.nowMs returns a wall-clock millisecond reading
+  ---
+  duration_ms: 1.3329
+  type: 'test'
+  ...
+# Subtest: HOST_CLOCK.nowMs is monotonic-ish across two reads
+ok 317 - HOST_CLOCK.nowMs is monotonic-ish across two reads
+  ---
+  duration_ms: 5.5505
+  type: 'test'
+  ...
+# Subtest: HOST_CRYPTO.randomToken is URL-safe and unique
+ok 318 - HOST_CRYPTO.randomToken is URL-safe and unique
+  ---
+  duration_ms: 0.944
+  type: 'test'
+  ...
+# Subtest: HOST_CRYPTO.randomToken rejects invalid byte lengths
+ok 319 - HOST_CRYPTO.randomToken rejects invalid byte lengths
+  ---
+  duration_ms: 0.5568
+  type: 'test'
+  ...
+# Subtest: HOST_CRYPTO.randomRunId is path-safe and unique
+ok 320 - HOST_CRYPTO.randomRunId is path-safe and unique
+  ---
+  duration_ms: 0.4273
+  type: 'test'
+  ...
+# Subtest: HOST_FS round-trip: mkdtemp → mkdir → writeFile → rmRecursive
+ok 321 - HOST_FS round-trip: mkdtemp → mkdir → writeFile → rmRecursive
+  ---
+  duration_ms: 23.5684
+  type: 'test'
+  ...
+# Subtest: HOST_FS.rmRecursive is idempotent (force:true)
+ok 322 - HOST_FS.rmRecursive is idempotent (force:true)
+  ---
+  duration_ms: 2.3392
+  type: 'test'
+  ...
+# Subtest: HOST_FS.joinPath delegates to node:path
+ok 323 - HOST_FS.joinPath delegates to node:path
+  ---
+  duration_ms: 0.2385
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.resolveExecutable: absolute path round-trips
+ok 324 - HOST_PROCESS.resolveExecutable: absolute path round-trips
+  ---
+  duration_ms: 378.3735
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.resolveExecutable: missing binary returns null
+ok 325 - HOST_PROCESS.resolveExecutable: missing binary returns null
+  ---
+  duration_ms: 531.0359
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.resolveExecutable: rejects empty name
+ok 326 - HOST_PROCESS.resolveExecutable: rejects empty name
+  ---
+  duration_ms: 0.3707
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.runHelp captures Node --help output
+ok 327 - HOST_PROCESS.runHelp captures Node --help output
+  ---
+  duration_ms: 122.0623
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.spawn captures stdout, exitCode 0, durationMs >= 0
+ok 328 - HOST_PROCESS.spawn captures stdout, exitCode 0, durationMs >= 0
+  ---
+  duration_ms: 101.0175
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.spawn surfaces nonzero exit codes verbatim
+ok 329 - HOST_PROCESS.spawn surfaces nonzero exit codes verbatim
+  ---
+  duration_ms: 93.9805
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.spawn streams chunks live via onStdoutChunk
+ok 330 - HOST_PROCESS.spawn streams chunks live via onStdoutChunk
+  ---
+  duration_ms: 97.3408
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.spawn enforces timeoutMs and reports timedOut=true
+ok 331 - HOST_PROCESS.spawn enforces timeoutMs and reports timedOut=true
+  ---
+  duration_ms: 235.289
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.spawn honors abortSignal and reports aborted=true
+ok 332 - HOST_PROCESS.spawn honors abortSignal and reports aborted=true
+  ---
+  duration_ms: 122.0881
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.spawn rejects non-positive timeoutMs
+ok 333 - HOST_PROCESS.spawn rejects non-positive timeoutMs
+  ---
+  duration_ms: 0.8135
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.spawn surfaces ENOENT as a thrown error
+ok 334 - HOST_PROCESS.spawn surfaces ENOENT as a thrown error
+  ---
+  duration_ms: 2.0109
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.spawn: aborting twice is idempotent and still settles
+ok 335 - HOST_PROCESS.spawn: aborting twice is idempotent and still settles
+  ---
+  duration_ms: 0.6445
+  type: 'test'
+  ...
+# Subtest: both native process ports refuse an already-cancelled child before it can create a source effect
+ok 336 - both native process ports refuse an already-cancelled child before it can create a source effect
+  ---
+  duration_ms: 211.0145
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.spawn: aborted child stops emitting stdout chunks before resolve
+ok 337 - HOST_PROCESS.spawn: aborted child stops emitting stdout chunks before resolve
+  ---
+  duration_ms: 98.5994
+  type: 'test'
+  ...
+# Subtest: HOST_PROCESS.spawn: cooperative SIGINT child exits cleanly inside the escalation window
+ok 338 - HOST_PROCESS.spawn: cooperative SIGINT child exits cleanly inside the escalation window
+  ---
+  duration_ms: 0.2539
+  type: 'test'
+  ...
+# Subtest: orchestrator: happy path runs all six steps and returns ok=true
+ok 339 - orchestrator: happy path runs all six steps and returns ok=true
+  ---
+  duration_ms: 6.3596
+  type: 'test'
+  ...
+# Subtest: orchestrator: missing binary → COPILOT_CLI_NOT_FOUND, no spawn
+ok 340 - orchestrator: missing binary → COPILOT_CLI_NOT_FOUND, no spawn
+  ---
+  duration_ms: 0.4795
+  type: 'test'
+  ...
+# Subtest: orchestrator: incomplete help surface → COPILOT_HELP_SURFACE_UNSUPPORTED
+ok 341 - orchestrator: incomplete help surface → COPILOT_HELP_SURFACE_UNSUPPORTED
+  ---
+  duration_ms: 0.8535
+  type: 'test'
+  ...
+# Subtest: orchestrator: missing Copilot config → COPILOT_NOT_LOGGED_IN, no spawn
+ok 342 - orchestrator: missing Copilot config → COPILOT_NOT_LOGGED_IN, no spawn
+  ---
+  duration_ms: 0.4173
+  type: 'test'
+  ...
+# Subtest: orchestrator: config.json with empty loggedInUsers → COPILOT_NOT_LOGGED_IN
+ok 343 - orchestrator: config.json with empty loggedInUsers → COPILOT_NOT_LOGGED_IN
+  ---
+  duration_ms: 0.3592
+  type: 'test'
+  ...
+# Subtest: orchestrator: COPILOT_HOME env override is honoured by the login check
+ok 344 - orchestrator: COPILOT_HOME env override is honoured by the login check
+  ---
+  duration_ms: 0.6281
+  type: 'test'
+  ...
+# Subtest: orchestrator: missing minimum MCP tool → DREAMGRAPH_TOOL_REGISTRY_MISMATCH
+ok 345 - orchestrator: missing minimum MCP tool → DREAMGRAPH_TOOL_REGISTRY_MISMATCH
+  ---
+  duration_ms: 0.4611
+  type: 'test'
+  ...
+# Subtest: orchestrator: nonzero exit → COPILOT_RUN_NONZERO_EXIT, transcript captured
+ok 346 - orchestrator: nonzero exit → COPILOT_RUN_NONZERO_EXIT, transcript captured
+  ---
+  duration_ms: 1.5953
+  type: 'test'
+  ...
+# Subtest: orchestrator: empty-output nonzero exit includes spawn context
+ok 347 - orchestrator: empty-output nonzero exit includes spawn context
+  ---
+  duration_ms: 0.934
+  type: 'test'
+  ...
+# Subtest: orchestrator: timeout → TIMEOUT
+ok 348 - orchestrator: timeout → TIMEOUT
+  ---
+  duration_ms: 0.9606
+  type: 'test'
+  ...
+# Subtest: orchestrator: abort → CANCELLED
+ok 349 - orchestrator: abort → CANCELLED
+  ---
+  duration_ms: 0.5751
+  type: 'test'
+  ...
+# Subtest: orchestrator: signal w/o abort/timeout → COPILOT_RUN_SIGNALED
+ok 350 - orchestrator: signal w/o abort/timeout → COPILOT_RUN_SIGNALED
+  ---
+  duration_ms: 0.5367
+  type: 'test'
+  ...
+# Subtest: orchestrator: spawn throws → scratch dir still cleaned + audit drained
+ok 351 - orchestrator: spawn throws → scratch dir still cleaned + audit drained
+  ---
+  duration_ms: 1.1012
+  type: 'test'
+  ...
+# Subtest: orchestrator: rejects empty prompt / cwd / invalid timeout
+ok 352 - orchestrator: rejects empty prompt / cwd / invalid timeout
+  ---
+  duration_ms: 0.4328
+  type: 'test'
+  ...
+# Subtest: transcript: strips ANSI, trims, surfaces stderr diagnostics
+ok 353 - transcript: strips ANSI, trims, surfaces stderr diagnostics
+  ---
+  duration_ms: 0.2809
+  type: 'test'
+  ...
+# Subtest: transcript: clean stderr → hasStderrErrors=false
+ok 354 - transcript: clean stderr → hasStderrErrors=false
+  ---
+  duration_ms: 0.1354
+  type: 'test'
+  ...
+# Subtest: orchestrator: classifier wired to dreamgraph authoritative server
+ok 355 - orchestrator: classifier wired to dreamgraph authoritative server
+  ---
+  duration_ms: 0.1429
+  type: 'test'
+  ...
+# Subtest: serializeConversationForCopilotCli: rejects empty conversations
+ok 356 - serializeConversationForCopilotCli: rejects empty conversations
+  ---
+  duration_ms: 1.2098
+  type: 'test'
+  ...
+# Subtest: serializeConversationForCopilotCli: renders [system]/[user]/[assistant] headers in order
+ok 357 - serializeConversationForCopilotCli: renders [system]/[user]/[assistant] headers in order
+  ---
+  duration_ms: 0.2247
+  type: 'test'
+  ...
+# Subtest: serializeConversationForCopilotCli: joins multiple text blocks with newlines
+ok 358 - serializeConversationForCopilotCli: joins multiple text blocks with newlines
+  ---
+  duration_ms: 0.1851
+  type: 'test'
+  ...
+# Subtest: serializeConversationForCopilotCli: replaces image blocks with placeholder
+ok 359 - serializeConversationForCopilotCli: replaces image blocks with placeholder
+  ---
+  duration_ms: 0.2913
+  type: 'test'
+  ...
+# Subtest: serializeConversationForCopilotCli: honors custom role headers
+ok 360 - serializeConversationForCopilotCli: honors custom role headers
+  ---
+  duration_ms: 0.1828
+  type: 'test'
+  ...
+# Subtest: serializeConversationForCopilotCli: tools manifest advertises mutation and verification routing
+ok 361 - serializeConversationForCopilotCli: tools manifest advertises mutation and verification routing
+  ---
+  duration_ms: 0.7493
+  type: 'test'
+  ...
+# Subtest: serializeConversationForCopilotCli: command policy names disabled routes explicitly
+ok 362 - serializeConversationForCopilotCli: command policy names disabled routes explicitly
+  ---
+  duration_ms: 0.2655
+  type: 'test'
+  ...
+# Subtest: copilot provider-port: permit cancellation reaches the native spawn and accounting precedes observers
+ok 363 - copilot provider-port: permit cancellation reaches the native spawn and accounting precedes observers
+  ---
+  duration_ms: 5.6822
+  type: 'test'
+  ...
+# Subtest: copilot provider-port: mandatory settlement failure fences native continuation
+ok 364 - copilot provider-port: mandatory settlement failure fences native continuation
+  ---
+  duration_ms: 1.1488
+  type: 'test'
+  ...
+# Subtest: provider-port: getCapabilities reports text and image attachments
+ok 365 - provider-port: getCapabilities reports text and image attachments
+  ---
+  duration_ms: 0.2198
+  type: 'test'
+  ...
+# Subtest: provider-port: awaits mandatory prompt admission before spawn and propagates rejection
+ok 366 - provider-port: awaits mandatory prompt admission before spawn and propagates rejection
+  ---
+  duration_ms: 0.9155
+  type: 'test'
+  ...
+# Subtest: provider-port: exposes hostLlm reference verbatim through `llm`
+ok 367 - provider-port: exposes hostLlm reference verbatim through `llm`
+  ---
+  duration_ms: 0.2187
+  type: 'test'
+  ...
+# Subtest: provider-port: callProvider serializes the conversation into --prompt
+ok 368 - provider-port: callProvider serializes the conversation into --prompt
+  ---
+  duration_ms: 0.8565
+  type: 'test'
+  ...
+# Subtest: provider-port: advertises the live authoritative tool catalog to Copilot CLI
+ok 369 - provider-port: advertises the live authoritative tool catalog to Copilot CLI
+  ---
+  duration_ms: 1.6451
+  type: 'test'
+  ...
+# Subtest: provider-port: keeps bridge-local run_command visible with read-only upstream tools
+ok 370 - provider-port: keeps bridge-local run_command visible with read-only upstream tools
+  ---
+  duration_ms: 0.9855
+  type: 'test'
+  ...
+# Subtest: provider-port: callProvider forwards onStreamChunk with full assistant text
+ok 371 - provider-port: callProvider forwards onStreamChunk with full assistant text
+  ---
+  duration_ms: 1.3636
+  type: 'test'
+  ...
+# Subtest: provider-port: callProvider forwards abortSignal to the spawn port
+ok 372 - provider-port: callProvider forwards abortSignal to the spawn port
+  ---
+  duration_ms: 0.6368
+  type: 'test'
+  ...
+# Subtest: provider-port: callProvider throws annotated Error when orchestrator returns ok=false
+ok 373 - provider-port: callProvider throws annotated Error when orchestrator returns ok=false
+  ---
+  duration_ms: 0.4634
+  type: 'test'
+  ...
+# Subtest: provider-port: onRunResult fires for both ok and failed runs
+ok 374 - provider-port: onRunResult fires for both ok and failed runs
+  ---
+  duration_ms: 0.6078
+  type: 'test'
+  ...
+# Subtest: provider-port: onRunResult exceptions are swallowed
+ok 375 - provider-port: onRunResult exceptions are swallowed
+  ---
+  duration_ms: 0.4607
+  type: 'test'
+  ...
+# Subtest: provider-port: rejects missing or malformed options
+ok 376 - provider-port: rejects missing or malformed options
+  ---
+  duration_ms: 0.396
+  type: 'test'
+  ...
+# Subtest: T-2.1: feature:// URIs are linkified
+ok 377 - T-2.1: feature:// URIs are linkified
+  ---
+  duration_ms: 2.1108
+  type: 'test'
+  ...
+# Subtest: T-2.2: all recognised schemes are linkified
+ok 378 - T-2.2: all recognised schemes are linkified
+  ---
+  duration_ms: 0.6914
+  type: 'test'
+  ...
+# Subtest: T-2.3: generated anchor has correct data-type and data-uri
+ok 379 - T-2.3: generated anchor has correct data-type and data-uri
+  ---
+  duration_ms: 0.24
+  type: 'test'
+  ...
+# Subtest: T-2.4: URIs inside <pre>…</pre> are NOT linkified
+ok 380 - T-2.4: URIs inside <pre>…</pre> are NOT linkified
+  ---
+  duration_ms: 0.1872
+  type: 'test'
+  ...
+# Subtest: T-2.4b: URIs inside inline <code>…</code> are NOT linkified
+ok 381 - T-2.4b: URIs inside inline <code>…</code> are NOT linkified
+  ---
+  duration_ms: 1.1021
+  type: 'test'
+  ...
+# Subtest: T-2.5: URIs inside existing href="" are NOT double-linkified
+ok 382 - T-2.5: URIs inside existing href="" are NOT double-linkified
+  ---
+  duration_ms: 0.2967
+  type: 'test'
+  ...
+# Subtest: T-S1.4: javascript: scheme is NOT linkified
+ok 383 - T-S1.4: javascript: scheme is NOT linkified
+  ---
+  duration_ms: 0.1822
+  type: 'test'
+  ...
+# Subtest: T-S1.4b: data: scheme is NOT linkified
+ok 384 - T-S1.4b: data: scheme is NOT linkified
+  ---
+  duration_ms: 0.1494
+  type: 'test'
+  ...
+# Subtest: T-S1.4c: vscode: scheme is NOT linkified
+ok 385 - T-S1.4c: vscode: scheme is NOT linkified
+  ---
+  duration_ms: 0.1742
+  type: 'test'
+  ...
+# Subtest: T-S3.1: data-uri only contains the allowlisted URI, not injected content
+ok 386 - T-S3.1: data-uri only contains the allowlisted URI, not injected content
+  ---
+  duration_ms: 0.4126
+  type: 'test'
+  ...
+# Subtest: T-2: multiple entity links in one paragraph
+ok 387 - T-2: multiple entity links in one paragraph
+  ---
+  duration_ms: 0.1881
+  type: 'test'
+  ...
+# Subtest: T-2: plain text outside tags is linkified
+ok 388 - T-2: plain text outside tags is linkified
+  ---
+  duration_ms: 0.1412
+  type: 'test'
+  ...
+# Subtest: normalizes nested-summary envelope drift (autonomy + summary wrapper)
+ok 389 - normalizes nested-summary envelope drift (autonomy + summary wrapper)
+  ---
+  duration_ms: 1.4598
+  type: 'test'
+  ...
+# Subtest: promotes singular recommended_next_step to plural array
+ok 390 - promotes singular recommended_next_step to plural array
+  ---
+  duration_ms: 0.1924
+  type: 'test'
+  ...
+# Subtest: preserves canonical envelope unchanged
+ok 391 - preserves canonical envelope unchanged
+  ---
+  duration_ms: 0.215
+  type: 'test'
+  ...
+# Subtest: environment context selects the most specific matching scope for a file
+ok 392 - environment context selects the most specific matching scope for a file
+  ---
+  duration_ms: 24.2211
+  type: 'test'
+  ...
+# Subtest: environment context rendering is stable and bounded for a given file
+ok 393 - environment context rendering is stable and bounded for a given file
+  ---
+  duration_ms: 11.4522
+  type: 'test'
+  ...
+# Subtest: environment context excludes non-curated dependency noise
+ok 394 - environment context excludes non-curated dependency noise
+  ---
+  duration_ms: 9.0318
+  type: 'test'
+  ...
+# Subtest: claude-opus-5-5: preserves signed thinking and tool calls through the next request
+ok 395 - claude-opus-5-5: preserves signed thinking and tool calls through the next request
+  ---
+  duration_ms: 75.8401
+  type: 'test'
+  ...
+# Subtest: claude-sonnet-5-5: preserves signed thinking and tool calls through the next request
+ok 396 - claude-sonnet-5-5: preserves signed thinking and tool calls through the next request
+  ---
+  duration_ms: 23.4374
+  type: 'test'
+  ...
+# Subtest: claude-fable-5-1: preserves signed thinking and tool calls through the next request
+ok 397 - claude-fable-5-1: preserves signed thinking and tool calls through the next request
+  ---
+  duration_ms: 17.9274
+  type: 'test'
+  ...
+# Subtest: claude-mythos-5-1: preserves signed thinking and tool calls through the next request
+ok 398 - claude-mythos-5-1: preserves signed thinking and tool calls through the next request
+  ---
+  duration_ms: 18.4914
+  type: 'test'
+  ...
+# Subtest: Claude reasoning drops produce diagnostics without exposing signatures
+ok 399 - Claude reasoning drops produce diagnostics without exposing signatures
+  ---
+  duration_ms: 1.3851
+  type: 'test'
+  ...
+# Subtest: GPT-6.1 Sol uses Responses for tools and supports images
+ok 400 - GPT-6.1 Sol uses Responses for tools and supports images
+  ---
+  duration_ms: 15.3707
+  type: 'test'
+  ...
+# Subtest: switching providers translates neutral history instead of replaying foreign raw blocks
+ok 401 - switching providers translates neutral history instead of replaying foreign raw blocks
+  ---
+  duration_ms: 1.377
+  type: 'test'
+  ...
+# Subtest: Responses streaming preserves actual usage and validates the authoritative final response
+ok 402 - Responses streaming preserves actual usage and validates the authoritative final response
+  ---
+  duration_ms: 13.2484
+  type: 'test'
+  ...
+# Subtest: Responses truncated/refused streams and invalid strict outputs are never accepted
+ok 403 - Responses truncated/refused streams and invalid strict outputs are never accepted
+  ---
+  duration_ms: 11.834
+  type: 'test'
+  ...
+# Subtest: explicit Chat preserves model/effort and rejects GPT-6 tool reasoning before dispatch
+ok 404 - explicit Chat preserves model/effort and rejects GPT-6 tool reasoning before dispatch
+  ---
+  duration_ms: 12.146
+  type: 'test'
+  ...
+# Subtest: Claude opt-in native schemas retain effort and locally validate the original output
+ok 405 - Claude opt-in native schemas retain effort and locally validate the original output
+  ---
+  duration_ms: 10.4607
+  type: 'test'
+  ...
+# Subtest: openai: whole serialized Unicode request above the byte ceiling is refused before provider dispatch
+ok 406 - openai: whole serialized Unicode request above the byte ceiling is refused before provider dispatch
+  ---
+  duration_ms: 45.2028
+  type: 'test'
+  ...
+# Subtest: anthropic: whole serialized Unicode request above the byte ceiling is refused before provider dispatch
+ok 407 - anthropic: whole serialized Unicode request above the byte ceiling is refused before provider dispatch
+  ---
+  duration_ms: 44.0419
+  type: 'test'
+  ...
+# Subtest: routes current OpenAI reasoning families to the Responses API
+ok 408 - routes current OpenAI reasoning families to the Responses API
+  ---
+  duration_ms: 1.374
+  type: 'test'
+  ...
+# Subtest: builds a GPT-5.5 Responses request with reasoning, verbosity, and function tools
+ok 409 - builds a GPT-5.5 Responses request with reasoning, verbosity, and function tools
+  ---
+  duration_ms: 1.7389
+  type: 'test'
+  ...
+# Subtest: translates Architect tool history into Responses function-call items
+ok 410 - translates Architect tool history into Responses function-call items
+  ---
+  duration_ms: 0.7489
+  type: 'test'
+  ...
+# Subtest: skips malformed raw replay items instead of emitting invalid Responses items
+ok 411 - skips malformed raw replay items instead of emitting invalid Responses items
+  ---
+  duration_ms: 0.244
+  type: 'test'
+  ...
+# Subtest: extracts text while safely ignoring unknown Responses output items
+ok 412 - extracts text while safely ignoring unknown Responses output items
+  ---
+  duration_ms: 0.4655
+  type: 'test'
+  ...
+# Subtest: inserts a paragraph break between adjacent verbose-mode message items lacking surrounding whitespace
+ok 413 - inserts a paragraph break between adjacent verbose-mode message items lacking surrounding whitespace
+  ---
+  duration_ms: 0.3273
+  type: 'test'
+  ...
+# Subtest: keeps streamed sub-blocks within a single message tightly joined
+ok 414 - keeps streamed sub-blocks within a single message tightly joined
+  ---
+  duration_ms: 0.1944
+  type: 'test'
+  ...
+# Subtest: normalizes Responses output to the provider boundary contract
+ok 415 - normalizes Responses output to the provider boundary contract
+  ---
+  duration_ms: 0.7426
+  type: 'test'
+  ...
+# Subtest: normalizes Responses tool calls as tool_use finish reason
+ok 416 - normalizes Responses tool calls as tool_use finish reason
+  ---
+  duration_ms: 0.2745
+  type: 'test'
+  ...
+# Subtest: extracts function calls and hardens malformed or unknown items
+ok 417 - extracts function calls and hardens malformed or unknown items
+  ---
+  duration_ms: 0.8451
+  type: 'test'
+  ...
+# Subtest: Responses item identity cannot replace the required tool call identity
+ok 418 - Responses item identity cannot replace the required tool call identity
+  ---
+  duration_ms: 0.2368
+  type: 'test'
+  ...
+# Subtest: T-1.1: bold, italic, inline code
+ok 419 - T-1.1: bold, italic, inline code
+  ---
+  duration_ms: 6.6708
+  type: 'test'
+  ...
+# Subtest: T-1.2: fenced code block with language class
+ok 420 - T-1.2: fenced code block with language class
+  ---
+  duration_ms: 0.4559
+  type: 'test'
+  ...
+# Subtest: T-1.3: fenced code block without language still produces pre>code
+ok 421 - T-1.3: fenced code block without language still produces pre>code
+  ---
+  duration_ms: 0.208
+  type: 'test'
+  ...
+# Subtest: T-1.4: headings h2 and h3
+ok 422 - T-1.4: headings h2 and h3
+  ---
+  duration_ms: 0.8304
+  type: 'test'
+  ...
+# Subtest: T-1.5: tables produce table/th/td
+ok 423 - T-1.5: tables produce table/th/td
+  ---
+  duration_ms: 0.4727
+  type: 'test'
+  ...
+# Subtest: T-1.6: unordered and ordered lists
+ok 424 - T-1.6: unordered and ordered lists
+  ---
+  duration_ms: 0.4651
+  type: 'test'
+  ...
+# Subtest: T-1.7: partial markdown (incomplete bold) does not produce unclosed tag
+ok 425 - T-1.7: partial markdown (incomplete bold) does not produce unclosed tag
+  ---
+  duration_ms: 0.3283
+  type: 'test'
+  ...
+# Subtest: T-1.9: external links get rendered as <a href>
+ok 426 - T-1.9: external links get rendered as <a href>
+  ---
+  duration_ms: 1.7115
+  type: 'test'
+  ...
+# Subtest: T-1.8: raw script tag is escaped, not passed through
+ok 427 - T-1.8: raw script tag is escaped, not passed through
+  ---
+  duration_ms: 0.9022
+  type: 'test'
+  ...
+# Subtest: T-1.8b: javascript: URI in link is not rendered as active href
+ok 428 - T-1.8b: javascript: URI in link is not rendered as active href
+  ---
+  duration_ms: 0.5184
+  type: 'test'
+  ...
+# Subtest: T-1.8c: raw img tag is escaped as text when html:false is used
+ok 429 - T-1.8c: raw img tag is escaped as text when html:false is used
+  ---
+  duration_ms: 0.2297
+  type: 'test'
+  ...
+# Subtest: T-S3.4: rendered output contains no active <script> tags
+ok 430 - T-S3.4: rendered output contains no active <script> tags
+  ---
+  duration_ms: 0.5449
+  type: 'test'
+  ...
+# Subtest: T-S2.1: key-value secrets are redacted
+ok 431 - T-S2.1: key-value secrets are redacted
+  ---
+  duration_ms: 1.3993
+  type: 'test'
+  ...
+# Subtest: T-S2.2: token-like prefixes are partially masked
+ok 432 - T-S2.2: token-like prefixes are partially masked
+  ---
+  duration_ms: 0.2344
+  type: 'test'
+  ...
+# Subtest: T-S2.3: private key blocks are redacted
+ok 433 - T-S2.3: private key blocks are redacted
+  ---
+  duration_ms: 0.1994
+  type: 'test'
+  ...
+# Subtest: T-5.1/T-5.2: verdict banner renders structured verdict level and summary
+ok 434 - T-5.1/T-5.2: verdict banner renders structured verdict level and summary
+  ---
+  duration_ms: 1.0388
+  type: 'test'
+  ...
+# Subtest: T-S4.1/T-S4.2/T-S4.3: provenance label distinguishes executed-tool grounding
+ok 435 - T-S4.1/T-S4.2/T-S4.3: provenance label distinguishes executed-tool grounding
+  ---
+  duration_ms: 0.2733
+  type: 'test'
+  ...
+# Subtest: T-4.5: verification names are batched to max 50
+ok 436 - T-4.5: verification names are batched to max 50
+  ---
+  duration_ms: 1.2226
+  type: 'test'
+  ...
+# Subtest: T-S7.4: verification list is capped at 100 unique names
+ok 437 - T-S7.4: verification list is capped at 100 unique names
+  ---
+  duration_ms: 0.2674
+  type: 'test'
+  ...
+# Subtest: T-4.1/T-4.2/T-4.3/T-4.4: verification semantics distinguish verified, tension, latent, and unverified
+ok 438 - T-4.1/T-4.2/T-4.3/T-4.4: verification semantics distinguish verified, tension, latent, and unverified
+  ---
+  duration_ms: 0.2987
+  type: 'test'
+  ...
+# Subtest: T-5.3/T-5.4: tool trace renders collapsible entries from real call records
+ok 439 - T-5.3/T-5.4: tool trace renders collapsible entries from real call records
+  ---
+  duration_ms: 0.3662
+  type: 'test'
+  ...
+# Subtest: Slice 5 source includes show_full storage and action state messaging
+ok 440 - Slice 5 source includes show_full storage and action state messaging
+  ---
+  duration_ms: 2.6
+  type: 'test'
+  ...
+# Subtest: operator actions without daemon authority refuse rather than falling back to a local file write
+ok 441 - operator actions without daemon authority refuse rather than falling back to a local file write
+  ---
+  duration_ms: 436.2157
+  type: 'test'
+  ...
+# Subtest: Slice 5 source logs action provenance with outcome and detail
+ok 442 - Slice 5 source logs action provenance with outcome and detail
+  ---
+  duration_ms: 2.0388
+  type: 'test'
+  ...
+# Subtest: Slice 5 audit: hover actions are wired for copy, retry, and pin
+ok 443 - Slice 5 audit: hover actions are wired for copy, retry, and pin
+  ---
+  duration_ms: 2.7549
+  type: 'test'
+  ...
+# Subtest: Slice 5 audit: action execution remains allowlisted and explicit-click only
+ok 444 - Slice 5 audit: action execution remains allowlisted and explicit-click only
+  ---
+  duration_ms: 2.8511
+  type: 'test'
+  ...
+# Subtest: Slice 5 audit: resource guards remain in place
+ok 445 - Slice 5 audit: resource guards remain in place
+  ---
+  duration_ms: 1.7991
+  type: 'test'
+  ...
+# Subtest: Slice 5 audit: styles include context footer, action buttons, and implicit entity notice
+ok 446 - Slice 5 audit: styles include context footer, action buttons, and implicit entity notice
+  ---
+  duration_ms: 0.8087
+  type: 'test'
+  ...
+# Subtest: Slice 5 audit: codex-cli is selectable and routes through native ProviderPort
+ok 447 - Slice 5 audit: codex-cli is selectable and routes through native ProviderPort
+  ---
+  duration_ms: 2.539
+  type: 'test'
+  ...
+# Subtest: Slice 6 audit: codex-cli live tool trace and final reconciliation are wired
+ok 448 - Slice 6 audit: codex-cli live tool trace and final reconciliation are wired
+  ---
+  duration_ms: 3.0972
+  type: 'test'
+  ...
+# Subtest: Slice 6 audit: codex-cli host timeout and forced-report evidence preserve partial progress
+ok 449 - Slice 6 audit: codex-cli host timeout and forced-report evidence preserve partial progress
+  ---
+  duration_ms: 2.0951
+  type: 'test'
+  ...
+# Subtest: Slice 5 next pass adds instance scoping to chat messages
+ok 450 - Slice 5 next pass adds instance scoping to chat messages
+  ---
+  duration_ms: 2.7493
+  type: 'test'
+  ...
+# Subtest: Slice 5 next pass restoreMessages filters messages to the active instance
+ok 451 - Slice 5 next pass restoreMessages filters messages to the active instance
+  ---
+  duration_ms: 3.0478
+  type: 'test'
+  ...
+# Subtest: Slice 5 next pass adds context footer metadata
+ok 452 - Slice 5 next pass adds context footer metadata
+  ---
+  duration_ms: 1.6847
+  type: 'test'
+  ...
+# Subtest: Slice 5 next pass adds implicit entity detection and capping
+ok 453 - Slice 5 next pass adds implicit entity detection and capping
+  ---
+  duration_ms: 1.8589
+  type: 'test'
+  ...
+# Subtest: Slice 5 next pass adds implicit entity notice styling
+ok 454 - Slice 5 next pass adds implicit entity notice styling
+  ---
+  duration_ms: 0.5788
+  type: 'test'
+  ...
+# Subtest: slice 5 runtime renders action buttons with loading/error styles
+ok 455 - slice 5 runtime renders action buttons with loading/error styles
+  ---
+  duration_ms: 2.9169
+  type: 'test'
+  ...
+# Subtest: slice 5 runtime renders implicit entity notice separately from message content
+ok 456 - slice 5 runtime renders implicit entity notice separately from message content
+  ---
+  duration_ms: 2.3967
+  type: 'test'
+  ...
+# Subtest: slice 5 runtime keeps explicit click requirement for actions
+ok 457 - slice 5 runtime keeps explicit click requirement for actions
+  ---
+  duration_ms: 2.1232
+  type: 'test'
+  ...
+# Subtest: Slice 5 TDD references action safety and limits
+ok 458 - Slice 5 TDD references action safety and limits
+  ---
+  duration_ms: 1.8303
+  type: 'test'
+  ...
+# Subtest: chat panel contains Slice 5 action and render limit scaffolding
+ok 459 - chat panel contains Slice 5 action and render limit scaffolding
+  ---
+  duration_ms: 1.5502
+  type: 'test'
+  ...
+# Subtest: chat panel persists header autonomy dropdown selections
+ok 460 - chat panel persists header autonomy dropdown selections
+  ---
+  duration_ms: 3.7865
+  type: 'test'
+  ...
+# Subtest: styles include role header, hover actions, and action block styles
+ok 461 - styles include role header, hover actions, and action block styles
+  ---
+  duration_ms: 0.713
+  type: 'test'
+  ...
+# Subtest: ContextInspector exposes a logTimeoutDiagnostics method with structured fields
+ok 462 - ContextInspector exposes a logTimeoutDiagnostics method with structured fields
+  ---
+  duration_ms: 1.0981
+  type: 'test'
+  ...
+# Subtest: ContextInspector includes provider, model, tool count, and reduced-context flags
+ok 463 - ContextInspector includes provider, model, tool count, and reduced-context flags
+  ---
+  duration_ms: 0.2309
+  type: 'test'
+  ...
+# Subtest: ChatPanel defines _logTimeoutDiagnostics and forwards to the inspector
+ok 464 - ChatPanel defines _logTimeoutDiagnostics and forwards to the inspector
+  ---
+  duration_ms: 0.309
+  type: 'test'
+  ...
+# Subtest: ChatPanel actually invokes _logTimeoutDiagnostics from the recovery path
+ok 465 - ChatPanel actually invokes _logTimeoutDiagnostics from the recovery path
+  ---
+  duration_ms: 0.3134
+  type: 'test'
+  ...
+# Subtest: getLlmTimeoutMs returns Anthropic stream/tool budgets by default
+ok 466 - getLlmTimeoutMs returns Anthropic stream/tool budgets by default
+  ---
+  duration_ms: 1.1958
+  type: 'test'
+  ...
+# Subtest: getLlmTimeoutMs uses provider-specific budgets
+ok 467 - getLlmTimeoutMs uses provider-specific budgets
+  ---
+  duration_ms: 0.1578
+  type: 'test'
+  ...
+# Subtest: getLlmTimeoutMs falls back to REQUEST_TIMEOUT_MS for unknown providers
+ok 468 - getLlmTimeoutMs falls back to REQUEST_TIMEOUT_MS for unknown providers
+  ---
+  duration_ms: 0.1575
+  type: 'test'
+  ...
+# Subtest: getLlmTimeoutMs adds 30s when toolCount > 12
+ok 469 - getLlmTimeoutMs adds 30s when toolCount > 12
+  ---
+  duration_ms: 1.013
+  type: 'test'
+  ...
+# Subtest: getLlmTimeoutMs reduces budget by 30s when reducedContext=true (floor 60s)
+ok 470 - getLlmTimeoutMs reduces budget by 30s when reducedContext=true (floor 60s)
+  ---
+  duration_ms: 0.2508
+  type: 'test'
+  ...
+# Subtest: isTimeoutError matches the canonical timeout error shapes
+ok 471 - isTimeoutError matches the canonical timeout error shapes
+  ---
+  duration_ms: 0.3699
+  type: 'test'
+  ...
+# Subtest: isTimeoutError ignores unrelated errors
+ok 472 - isTimeoutError ignores unrelated errors
+  ---
+  duration_ms: 0.213
+  type: 'test'
+  ...
+# Subtest: buildTimeoutRecoveryPrompt prepends the original text and recovery instructions
+ok 473 - buildTimeoutRecoveryPrompt prepends the original text and recovery instructions
+  ---
+  duration_ms: 0.2966
+  type: 'test'
+  ...
+# Subtest: createTimeoutAbortSignal aborts when the timer fires
+ok 474 - createTimeoutAbortSignal aborts when the timer fires
+  ---
+  duration_ms: 68.3877
+  type: 'test'
+  ...
+# Subtest: createTimeoutAbortSignal aborts when the parent signal aborts
+ok 475 - createTimeoutAbortSignal aborts when the parent signal aborts
+  ---
+  duration_ms: 0.5031
+  type: 'test'
+  ...
+# Subtest: createTimeoutAbortSignal aborts immediately if parent already aborted
+ok 476 - createTimeoutAbortSignal aborts immediately if parent already aborted
+  ---
+  duration_ms: 0.1778
+  type: 'test'
+  ...
+# Subtest: createTimeoutAbortSignal works without a parent controller
+ok 477 - createTimeoutAbortSignal works without a parent controller
+  ---
+  duration_ms: 65.2599
+  type: 'test'
+  ...
+# Subtest: createTimeoutAbortSignal dispose() clears the timer (no late aborts)
+ok 478 - createTimeoutAbortSignal dispose() clears the timer (no late aborts)
+  ---
+  duration_ms: 65.0789
+  type: 'test'
+  ...
+# Subtest: chat-panel.ts imports from chat-panel/timeout.ts
+ok 479 - chat-panel.ts imports from chat-panel/timeout.ts
+  ---
+  duration_ms: 0.3835
+  type: 'test'
+  ...
+# Subtest: chat-panel.ts still calls _getLlmTimeoutMs and _createRequestSignal at the streaming + tool sites
+ok 480 - chat-panel.ts still calls _getLlmTimeoutMs and _createRequestSignal at the streaming + tool sites
+  ---
+  duration_ms: 0.3678
+  type: 'test'
+  ...
+# Subtest: chat-panel.ts still invokes the recovery flow on stream timeouts
+ok 481 - chat-panel.ts still invokes the recovery flow on stream timeouts
+  ---
+  duration_ms: 0.2264
+  type: 'test'
+  ...
+# Subtest: isWriteToolName recognizes host-local write tools
+ok 482 - isWriteToolName recognizes host-local write tools
+  ---
+  duration_ms: 1.3944
+  type: 'test'
+  ...
+# Subtest: isWriteToolName recognizes MCP-prefixed write tools
+ok 483 - isWriteToolName recognizes MCP-prefixed write tools
+  ---
+  duration_ms: 0.2186
+  type: 'test'
+  ...
+# Subtest: isWriteToolName rejects pure-read tools
+ok 484 - isWriteToolName rejects pure-read tools
+  ---
+  duration_ms: 0.1906
+  type: 'test'
+  ...
+# Subtest: isVerifyToolName recognizes verification + execution tools
+ok 485 - isVerifyToolName recognizes verification + execution tools
+  ---
+  duration_ms: 0.2467
+  type: 'test'
+  ...
+# Subtest: isVerifyToolName rejects locator/search tools
+ok 486 - isVerifyToolName rejects locator/search tools
+  ---
+  duration_ms: 1.2215
+  type: 'test'
+  ...
+# Subtest: narrowToWriteAndVerify keeps writes + verifies and drops pure searches
+ok 487 - narrowToWriteAndVerify keeps writes + verifies and drops pure searches
+  ---
+  duration_ms: 1.1643
+  type: 'test'
+  ...
+# Subtest: narrowToWriteAndVerify falls back to full catalog when filter would be empty
+ok 488 - narrowToWriteAndVerify falls back to full catalog when filter would be empty
+  ---
+  duration_ms: 0.2122
+  type: 'test'
+  ...
+# Subtest: pickPreferredWriteTool prefers multi_replace then replace then create
+ok 489 - pickPreferredWriteTool prefers multi_replace then replace then create
+  ---
+  duration_ms: 0.2524
+  type: 'test'
+  ...
+# Subtest: pickPreferredWriteTool falls back to the first write-classified tool
+ok 490 - pickPreferredWriteTool falls back to the first write-classified tool
+  ---
+  duration_ms: 0.2333
+  type: 'test'
+  ...
+# Subtest: pickPreferredWriteTool returns undefined when no write tools exist
+ok 491 - pickPreferredWriteTool returns undefined when no write tools exist
+  ---
+  duration_ms: 0.3271
+  type: 'test'
+  ...
+# Subtest: APPLY_LABEL_PATTERN matches the canonical apply/patch verbs
+ok 492 - APPLY_LABEL_PATTERN matches the canonical apply/patch verbs
+  ---
+  duration_ms: 0.5117
+  type: 'test'
+  ...
+# Subtest: APPLY_LABEL_PATTERN does NOT match pure read/locate verbs
+ok 493 - APPLY_LABEL_PATTERN does NOT match pure read/locate verbs
+  ---
+  duration_ms: 0.169
+  type: 'test'
+  ...
+# Subtest: primed tool is exposed even when next prompt is terse
+ok 494 - primed tool is exposed even when next prompt is terse
+  ---
+  duration_ms: 1.713
+  type: 'test'
+  ...
+# Subtest: priming a tool also exposes its sibling group members
+ok 495 - priming a tool also exposes its sibling group members
+  ---
+  duration_ms: 0.3298
+  type: 'test'
+  ...
+# Subtest: primed tools that are not in availableToolNames are skipped
+ok 496 - primed tools that are not in availableToolNames are skipped
+  ---
+  duration_ms: 0.2851
+  type: 'test'
+  ...
+# Subtest: no primed tools behaves identically to omitting the field
+ok 497 - no primed tools behaves identically to omitting the field
+  ---
+  duration_ms: 1.0129
+  type: 'test'
+  ...
+# Subtest: envelope tool/tool_args fields survive structured extraction
+ok 498 - envelope tool/tool_args fields survive structured extraction
+  ---
+  duration_ms: 1.4137
+  type: 'test'
+  ...
+# Subtest: envelope without tool field leaves action.tool undefined
+ok 499 - envelope without tool field leaves action.tool undefined
+  ---
+  duration_ms: 0.2653
+  type: 'test'
+  ...
+# Subtest: Phase 4 — pressure ≤ 0 returns content verbatim
+ok 500 - Phase 4 — pressure ≤ 0 returns content verbatim
+  ---
+  duration_ms: 1.3497
+  type: 'test'
+  ...
+# Subtest: Phase 4 — server-side envelope passthrough preserved under any pressure
+ok 501 - Phase 4 — server-side envelope passthrough preserved under any pressure
+  ---
+  duration_ms: 0.2559
+  type: 'test'
+  ...
+# Subtest: Phase 4 — mild tier (0 < pressure ≤ 0.5) leaves small payloads verbatim
+ok 502 - Phase 4 — mild tier (0 < pressure ≤ 0.5) leaves small payloads verbatim
+  ---
+  duration_ms: 0.347
+  type: 'test'
+  ...
+# Subtest: Phase 4 — mild tier trims when content exceeds expected slice
+ok 503 - Phase 4 — mild tier trims when content exceeds expected slice
+  ---
+  duration_ms: 0.3281
+  type: 'test'
+  ...
+# Subtest: Phase 4 — aggressive tier (pressure > 0.5) trims hard with high-pressure marker
+ok 504 - Phase 4 — aggressive tier (pressure > 0.5) trims hard with high-pressure marker
+  ---
+  duration_ms: 1.266
+  type: 'test'
+  ...
+# Subtest: Phase 4 — coordinator that throws does not break the pipeline
+ok 505 - Phase 4 — coordinator that throws does not break the pipeline
+  ---
+  duration_ms: 0.1904
+  type: 'test'
+  ...
+# Subtest: Phase 4 — recordCompression that throws does not break the pipeline
+ok 506 - Phase 4 — recordCompression that throws does not break the pipeline
+  ---
+  duration_ms: 0.2664
+  type: 'test'
+  ...
+# Subtest: Phase 4 — pressure-tier ordering is monotonic (verbatim ≤ mild ≤ aggressive in trim depth)
+ok 507 - Phase 4 — pressure-tier ordering is monotonic (verbatim ≤ mild ≤ aggressive in trim depth)
+  ---
+  duration_ms: 0.3102
+  type: 'test'
+  ...
+# Subtest: Slice 3 build migration: bundled webview runtime is emitted
+ok 508 - Slice 3 build migration: bundled webview runtime is emitted
+  ---
+  duration_ms: 1.6091
+  type: 'test'
+  ...
+# Subtest: Slice 3 build migration: chat panel loads bundled runtime via script src
+ok 509 - Slice 3 build migration: chat panel loads bundled runtime via script src
+  ---
+  duration_ms: 1.3586
+  type: 'test'
+  ...
+1..509
+# tests 509
+# suites 0
+# pass 509
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18056.0914

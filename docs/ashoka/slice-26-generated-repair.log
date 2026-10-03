@@ -1,0 +1,15 @@
+
+> dreamgraph@13.4.0 config:inventory
+> tsx scripts/generate-configuration-inventory.mjs
+
+Configuration inventory: 308 typed entries, 105 literal source keys, 0 documentation-only names
+
+> dreamgraph@13.4.0 config:check
+> tsx scripts/generate-configuration-inventory.mjs --check
+
+Configuration inventory: 308 typed entries, 105 literal source keys, 0 documentation-only names
+
+> dreamgraph@13.4.0 ashoka:baseline:check
+> tsx scripts/freeze-ashoka-baseline.mjs
+
+{"status":"verified","owners":29,"cases":12,"evidence":8,"sha256":"94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"}

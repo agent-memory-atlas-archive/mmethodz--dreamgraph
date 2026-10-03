@@ -1,0 +1,12 @@
+
+> dreamgraph@13.4.0 config:check
+> tsx scripts/generate-configuration-inventory.mjs --check
+
+file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/generate-configuration-inventory.mjs:51
+if(check){if(await fs.readFile(target,'utf8')!==body)throw new Error('Configuration inventory drift: run npm run config:inventory');}
+                                                           ^
+
+Error: Configuration inventory drift: run npm run config:inventory
+    at file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/generate-configuration-inventory.mjs:51:60
+
+Node.js v25.2.1

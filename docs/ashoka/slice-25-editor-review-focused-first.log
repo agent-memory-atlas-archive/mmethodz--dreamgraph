@@ -1,0 +1,22 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/host-managed-execution.test.ts (22 tests) 8305ms
+   ✓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass  473ms
+   ✓ parallel host passes share their authenticated owner while another client cannot read or close them  329ms
+   ✓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable  501ms
+   ✓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block  305ms
+   ✓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts  320ms
+   ✓ the actual editor host records exact review before activation; replay cannot replenish consumed effects  425ms
+   ✓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads  364ms
+   ✓ a published review alone grants no effect; the unchanged live host can recover activation exactly once  312ms
+   ✓ a saved review cannot reactivate after the actual lease expires  1628ms
+   ✓ the actual editor rendezvous waits before the graph writer, then publishes approval before one unchanged source effect  495ms
+   ✓ the editor review controller retains literal exact proposals and retries lost acknowledgement without repeating effects  483ms
+   ✓ editor review decisions cannot redirect through a changed endpoint  300ms
+
+ Test Files  1 passed (1)
+      Tests  22 passed (22)
+   Start at  02:06:15
+   Duration  14.18s (transform 1.96s, setup 0ms, collect 5.48s, tests 8.30s, environment 0ms, prepare 142ms)
+

@@ -1,0 +1,130 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/strategy-portfolio.test.ts > actual dream publication retains only post-dedup yield and survives new reader instances
+[2026-10-01T09:26:59.446Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/strategy-portfolio.test.ts > actual dream publication retains only post-dedup yield and survives new reader instances
+[2026-10-01T09:26:59.471Z] [INFO]  REM dream cycle #1 starting (strategy: missing_abstraction, max: 3)
+
+stderr | tests/strategy-portfolio.test.ts > actual dream publication retains only post-dedup yield and survives new reader instances
+[2026-10-01T09:26:59.513Z] [INFO]  REM dream cycle #1 complete: 1 nodes, 2 edges (0 duplicates suppressed; speculative output remains untrusted)
+
+stderr | tests/strategy-portfolio.test.ts > actual dream publication retains only post-dedup yield and survives new reader instances
+[2026-10-01T09:26:59.529Z] [INFO]  REM dream cycle #2 starting (strategy: missing_abstraction, max: 3)
+
+stderr | tests/strategy-portfolio.test.ts > actual dream publication retains only post-dedup yield and survives new reader instances
+[2026-10-01T09:26:59.561Z] [INFO]  REM dream cycle #2 complete: 0 nodes, 0 edges (3 duplicates suppressed; speculative output remains untrusted)
+
+stderr | tests/strategy-portfolio.test.ts > actual dream publication retains only post-dedup yield and survives new reader instances
+[2026-10-01T09:26:59.566Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/strategy-portfolio.test.ts > actual dream publication retains only post-dedup yield and survives new reader instances
+[2026-10-01T09:26:59.568Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+stderr | tests/explorer-mutations.test.ts > Audit row contract > writes the full contract on a successful tension.resolve
+[2026-10-01T09:26:59.612Z] [INFO]  Tension resolved: "ten_42" by human as confirmed_fixed (evidence: operator confirmed fixed)
+
+stderr | tests/strategy-portfolio.test.ts > reset archives observations atomically, retains analysis and detects competing revisions
+[2026-10-01T09:26:59.624Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/strategy-portfolio.test.ts > reset archives observations atomically, retains analysis and detects competing revisions
+[2026-10-01T09:26:59.631Z] [INFO]  REM dream cycle #3 starting (strategy: missing_abstraction, max: 3)
+
+stderr | tests/curation-retention.test.ts > latest human rejection is durable without rewriting normalization history and suppresses rediscovery
+[2026-10-01T09:26:59.651Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/strategy-portfolio.test.ts > reset archives observations atomically, retains analysis and detects competing revisions
+[2026-10-01T09:26:59.658Z] [INFO]  REM dream cycle #3 complete: 1 nodes, 2 edges (0 duplicates suppressed; speculative output remains untrusted)
+
+stderr | tests/curation-retention.test.ts > latest human rejection is durable without rewriting normalization history and suppresses rediscovery
+[2026-10-01T09:26:59.697Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/strategy-portfolio.test.ts > reset archives observations atomically, retains analysis and detects competing revisions
+[2026-10-01T09:26:59.700Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/explorer-mutations.test.ts > tension.resolve > removes the tension from active signals
+[2026-10-01T09:26:59.712Z] [INFO]  Tension resolved: "ten_x" by human as confirmed_fixed (evidence: fixed by hand)
+
+stderr | tests/curation-retention.test.ts > latest human rejection is durable without rewriting normalization history and suppresses rediscovery
+[2026-10-01T09:26:59.725Z] [WARN]  Quarantined 1 in-progress dream items
+
+stderr | tests/curation-retention.test.ts > latest human rejection is durable without rewriting normalization history and suppresses rediscovery
+[2026-10-01T09:26:59.726Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+stderr | tests/strategy-portfolio.test.ts > reset archives observations atomically, retains analysis and detects competing revisions
+[2026-10-01T09:26:59.732Z] [WARN]  Quarantined 3 in-progress dream items
+
+stderr | tests/strategy-portfolio.test.ts > reset archives observations atomically, retains analysis and detects competing revisions
+[2026-10-01T09:26:59.732Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+stderr | tests/strategy-portfolio.test.ts > malformed portfolio is unavailable, missing provider usage is unknown and own promotion rates never auto-tune truth
+[2026-10-01T09:26:59.749Z] [INFO]  Metacognitive analysis: window=50, auto_apply=true
+
+stderr | tests/strategy-portfolio.test.ts > malformed portfolio is unavailable, missing provider usage is unknown and own promotion rates never auto-tune truth
+[2026-10-01T09:26:59.795Z] [INFO]  Metacognitive analysis complete: 11 strategies, 0 recommendations, 0 actions taken
+
+ ✓ tests/strategy-portfolio.test.ts (7 tests) 364ms
+stderr | tests/explorer-mutations.test.ts > tension.resolve > returns 404 when the tension does not exist
+[2026-10-01T09:26:59.812Z] [WARN]  Mutation "tension.resolve" failed: Tension ghost_id is not active.
+
+ ✓ tests/explorer-mutations.test.ts (12 tests) 636ms
+stderr | tests/curation-retention.test.ts > expiry archives speculation and dependent edges together while source facts and human assertions survive
+[2026-10-01T09:27:00.286Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/curation-retention.test.ts > expiry archives speculation and dependent edges together while source facts and human assertions survive
+[2026-10-01T09:27:00.350Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/curation-retention.test.ts > expiry archives speculation and dependent edges together while source facts and human assertions survive
+[2026-10-01T09:27:00.377Z] [WARN]  Quarantined 1 in-progress dream items
+
+stderr | tests/curation-retention.test.ts > expiry archives speculation and dependent edges together while source facts and human assertions survive
+[2026-10-01T09:27:00.377Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+ ❯ tests/curation-retention.test.ts (8 tests | 2 failed) 1286ms
+   ✓ latest human rejection is durable without rewriting normalization history and suppresses rediscovery 272ms
+   ✓ retire, restart read, scoped reopen and restore retain the exact before state and do not restore factual authority 196ms
+   × curation is CAS-bound, dry run is read-only and unknown reply replay does not duplicate decisions 175ms
+     → OPERATION_IDENTITY_CONFLICT
+   ✓ interruption before publication restores both graph and dispositions 109ms
+   × expiry archives speculation and dependent edges together while source facts and human assertions survive 167ms
+     → Cannot read properties of undefined (reading 'confidence')
+   ✓ human acceptance remains human assertion with preserved assessment history and no independent root credit 120ms
+   ✓ direct validated deletion creates a reversible tombstone and retargeting cannot inherit the old proof 179ms
+   ✓ malformed maintenance state is unavailable and cannot erase human dispositions 67ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/curation-retention.test.ts > curation is CAS-bound, dry run is read-only and unknown reply replay does not duplicate decisions
+Error: OPERATION_IDENTITY_CONFLICT
+ ❯ src/graph/publication.ts:254:58
+    252|     const prior = current.receipts[receiptKey];
+    253|     if (prior) {
+    254|       if (prior.payload_digest !== payload_digest) throw new Error("OP…
+       |                                                          ^
+    255|       return { receipt: prior, result: prior.result, replayed: true };
+    256|     }
+ ❯ src/cognitive/curation.ts:53:22
+ ❯ withBarrier src/utils/graph-reconciliation-barrier.ts:83:12
+ ❯ tests/curation-retention.test.ts:54:48
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/curation-retention.test.ts > expiry archives speculation and dependent edges together while source facts and human assertions survive
+TypeError: Cannot read properties of undefined (reading 'confidence')
+ ❯ tests/curation-retention.test.ts:72:109
+     70|   expect((await engine.loadDreamGraph()).edges.map(e=>e.id)).toEqual([…
+     71|   expect((await loadGraphMaintenanceState()).curation?.decisions).toHa…
+     72|   const dedup=await engine.publishDreamCandidates([],[{...edge("reappe…
+       |                                                                                                             ^
+     73| });
+     74| it("human acceptance remains human assertion with preserved assessment…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 25 passed (27)
+   Start at  12:26:54
+   Duration  6.36s (transform 2.00s, setup 0ms, collect 12.35s, tests 2.29s, environment 1ms, prepare 539ms)
+

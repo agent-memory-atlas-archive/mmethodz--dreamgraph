@@ -1,0 +1,26 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/agent-usefulness.test.ts (9 tests) 115ms
+ ✓ tests/plan-context-integration.test.ts (6 tests) 1902ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  881ms
+   ✓ verified implementation evidence is distinct from the next slice and recovers after a transcript-free read  381ms
+ ✓ tests/plan-runtime.test.ts (10 tests) 2378ms
+   ✓ native termination closes only the execution lease, leaving current implementation and verification evidence unchanged  316ms
+   ✓ a cancelled wait cannot release running ownership or upgrade an uncertain stop on retry  302ms
+ ✓ tests/managed-plan-execution.test.ts (9 tests) 9709ms
+   ✓ selection alone stays read-only, while explicit execution injects the post-admission canonical running projection  1169ms
+   ✓ refuses foreign project, selection mismatch, changed source semantics and stale approval before returning native authority  536ms
+   ✓ external plan edits block delivery and worker/model dispatch; source restoration cannot renew a closed pass  729ms
+   ✓ unconfirmed termination remains recovery on exact retry and cannot be strengthened through another public finish  850ms
+   ✓ lost C14 closure acknowledgment replays the persisted original command after host revocation without another event  741ms
+   ✓ finite authority expiry leaves canonical recovery and a later claimed confirmed stop cannot erase missing live observation  1979ms
+   ✓ a fresh compiled daemon process recovers the saved closure without live launch authority or another C14 event  1493ms
+   ✓ actual compiled editor and SDK native passes preserve explicit purpose and close canonical ownership without claiming verification  1538ms
+   ✓ foreign hosts and execution workers cannot request C14 closure or another implementation lease  673ms
+
+ Test Files  4 passed (4)
+      Tests  34 passed (34)
+   Start at  11:31:53
+   Duration  14.94s (transform 2.20s, setup 0ms, collect 14.29s, tests 14.10s, environment 1ms, prepare 597ms)
+

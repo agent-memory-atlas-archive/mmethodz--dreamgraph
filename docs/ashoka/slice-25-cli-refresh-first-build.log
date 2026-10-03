@@ -1,0 +1,7 @@
+
+> dreamgraph@13.4.0 build:server
+> tsc -b
+
+src/architect/cli-mcp-bridge.ts(168,31): error TS2339: Property 'id' does not exist on type '{ method: "tools/call"; params: { name: string; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; "io.modelcontextprotocol/related-task"?: { taskId: string; } | undefined; } | undefined; task?: { ...; } | undefined; arguments?: Record<...> | undefined; }; }'.
+src/architect/cli-mcp-bridge.ts(192,28): error TS2339: Property 'id' does not exist on type '{ method: "tools/call"; params: { name: string; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; "io.modelcontextprotocol/related-task"?: { taskId: string; } | undefined; } | undefined; task?: { ...; } | undefined; arguments?: Record<...> | undefined; }; }'.
+src/architect/cli-mcp-bridge.ts(207,36): error TS2339: Property 'id' does not exist on type '{ method: "tools/call"; params: { name: string; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; "io.modelcontextprotocol/related-task"?: { taskId: string; } | undefined; } | undefined; task?: { ...; } | undefined; arguments?: Record<...> | undefined; }; }'.

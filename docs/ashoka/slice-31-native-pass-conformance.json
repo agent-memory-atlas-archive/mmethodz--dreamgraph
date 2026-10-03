@@ -1,0 +1,750 @@
+{
+  "schema": "dreamgraph.ashoka.computer_checkpoint.v1",
+  "recorded_at": "2026-10-03T03:12:32.139Z",
+  "status": "native_editor_api_integrated_slice31_in_progress",
+  "model_requests": 0,
+  "root": {
+    "passed": 2006,
+    "failed": 0,
+    "skipped": 2,
+    "files": 178,
+    "max_workers": 4,
+    "exit_code": 0,
+    "elapsed_seconds": 199.28911669921874
+  },
+  "focused": {
+    "actual_windows_sdk_browser_graph_stop": 10,
+    "compiled_editor_control_transport_chat_dom": 41,
+    "failed": 0
+  },
+  "editor": {
+    "passed": 546,
+    "failed": 0,
+    "exit_code": 0
+  },
+  "transport": {
+    "preparation": "/api/executions/v1/computer-preparation/",
+    "pass": "/api/executions/v1/computer-pass",
+    "role": "computer_use",
+    "selection": "Explicit daemon native API; ordinary editor model/CLI is unchanged",
+    "authority": "Original private native owner only; worker/cookie/browser-origin context cannot grant or start",
+    "contract": "Core-generated private DTOs above canonical C17/C05/C14",
+    "preparation_capacity": {
+      "global": 128,
+      "owner_unused": 4,
+      "insertion_rechecked": true
+    }
+  },
+  "stop": {
+    "worker": "Acknowledged original physical Stop",
+    "authority": "Revoked",
+    "agent_outcome": "recovery_required",
+    "reason": "Original API adapter termination remains unconfirmed; physical Stop and aborted RPC wait do not attest all work termination",
+    "source_write": false,
+    "input_replay": false
+  },
+  "wsl": {
+    "installation": {
+      "schema": "dreamgraph.wsl_installation_proof.v1",
+      "recorded_at": "2026-10-03T03:11:34.876Z",
+      "platform": "linux",
+      "architecture": "x64",
+      "kernel": "6.6.87.2-microsoft-standard-WSL2",
+      "distribution": "PRETTY_NAME=\"Ubuntu 24.04.4 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.4 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+      "node": "20.20.2",
+      "npm": "10.8.2",
+      "master": "/home/mmethodz/.dreamgraph",
+      "source": "/tmp/dg-ashoka-wsl-ed732336-ddb9-4b87-86c8-a19cd75b569a/source",
+      "version": "13.4.0",
+      "cli_version": "DreamGraph CLI v13.4.0 (Glass Atlas)",
+      "workspaces": [
+        {
+          "name": "@dreamgraph/sdk",
+          "version": "13.4.0",
+          "files": 92
+        },
+        {
+          "name": "@dreamgraph/host",
+          "version": "13.4.0",
+          "files": 28
+        },
+        {
+          "name": "@dreamgraph/token-economy",
+          "version": "13.4.0",
+          "files": 20
+        }
+      ],
+      "files": [
+        {
+          "file": "package.json",
+          "sha256": "ae49847cb390d7f728160a465f74590c7a235e1039e3cdc960d718a76032eefe"
+        },
+        {
+          "file": "dist/cli/dg.js",
+          "sha256": "d904dff72a0c6cc925b4f1dfbbb900cab2adb944f56114e2c89848d05d223578"
+        },
+        {
+          "file": "dist/computer/browser-harness.js",
+          "sha256": "8398de70aa91ce95d8c85a598056f3c91dcad8915c5ab8600ff2e05749b5e681"
+        },
+        {
+          "file": "dist/computer/browser-worker-entry.js",
+          "sha256": "c4b63f0a5345bee097ea33bb1683bbc1ae01f11119ac6c503b71a606d7fdded0"
+        }
+      ],
+      "runtime_version": "1.62.1",
+      "browser_executable": "/tmp/dg-ashoka-wsl-3e20aba0-2617-4c9e-8b89-93779607a2a6/browsers/chromium-1234/chrome-linux64/chrome",
+      "browser_version": "151.0.7922.34",
+      "model_requests": 0,
+      "native_sdk_contract": {
+        "control_methods": [
+          "readComputerPassSetup",
+          "prepareComputerPass",
+          "confirmComputerPass",
+          "cancelComputerPass",
+          "runComputerPass"
+        ],
+        "role": "computer_use",
+        "scope": "Installed export/schema readback only; no daemon request, grant or model dispatch."
+      },
+      "support_scope": "Actual WSL Linux test-bed installer and isolated headless browser only. No native desktop, CLI computer adapter, macOS, Linux Mint GUI or VS Code activation qualification.",
+      "browser_artifact_hash": "sha256:b8f1f4a6922a76209f9461995bb9710c3008c5777597265dd0efd35ff0370409",
+      "cli_output": {
+        "qualification_path": "/tmp/dg-ashoka-wsl-ed732336-ddb9-4b87-86c8-a19cd75b569a/browser-qualification.json",
+        "worker_id": "ashoka-wsl-ubuntu-browser",
+        "platform": "linux",
+        "architecture": "x64",
+        "browser_version": "151.0.7922.34",
+        "node": "20.20.2",
+        "model_requests": 0,
+        "measured_checks": 11,
+        "evidence_hash": "sha256:b8f1f4a6922a76209f9461995bb9710c3008c5777597265dd0efd35ff0370409",
+        "stop_release_ms": 189.47482900000068,
+        "control_loss_stop_ms": 2675.2532770000016,
+        "note": "Qualification only. Instance setup, target review and explicit scoped permission are separate."
+      }
+    },
+    "qualification": {
+      "schema": "dreamgraph.computer_qualification.v1",
+      "backend": "isolated_playwright",
+      "backend_version": "playwright-core@1.62.1/chromium@151.0.7922.34/node@20.20.2",
+      "platform": "linux",
+      "architecture": "x64",
+      "source_hash": "sha256:7b0e28ad46cae9cb21f2075eaabdf7470796fe1c33e796e696821b866152b814",
+      "protocol_hash": "sha256:ec4bb77daacf9faeb874bc313e0f3fbcc431d6aef7ce7a60ab2a90448bbbfc65",
+      "qualified_at": "2026-10-03T03:11:34.588Z",
+      "evidence_scope": "actual_runtime",
+      "scope_negative_passed": true,
+      "privacy_passed": true,
+      "bounded_actions_passed": true,
+      "stop_release_ms": 189.47482900000068,
+      "control_loss_stop_ms": 2675.2532770000016,
+      "cases": [
+        "CU04",
+        "CU05",
+        "CU10",
+        "CU20",
+        "CU24"
+      ],
+      "artifact_hash": "sha256:b8f1f4a6922a76209f9461995bb9710c3008c5777597265dd0efd35ff0370409"
+    },
+    "source_inventory_files": 480,
+    "measured_checks": 11,
+    "note": "Authorized separate Linux force install. Actual installed browser and SDK export/schema readback only; no daemon pass, physical VS Code, native desktop/CLI/Mint/macOS qualification inferred."
+  },
+  "failures": {
+    "retained": true,
+    "first_sdk": "C07 retention is structured, not a string; DTO now reuses canonical RolePolicy retention.",
+    "first_stop": "Authority revocation was read before durable closure; test now waits for both rather than treating revocation as completion.",
+    "second_stop": "Actual acknowledged browser Stop retains unconfirmed adapter termination. Test now requires recovery_required and its original unknown effect instead of expecting state_committed.",
+    "concurrency": "Actual five-way native preparation admission proves exactly four accepted, one capacity refusal and no grant/model/input. Admission is rechecked after awaited setup reads."
+  },
+  "scope": "Actual Windows private SDK/API browser source/graph/Stop plus compiled controller, native transport, ChatPanel and DOM. Provider answers are declared deterministic local fixtures, not real model understanding; model_requests counts real providers only.",
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "remaining": [
+    "Full native workers/native CLI/provider built-ins, physical VS Code/platform qualification, C14/CU/XS joins.",
+    "Slice26 reviewed live cutover,27 actual paired usefulness/system gate,28 synchronized release. Version13.4.0; no Windows install/restart, live migration or paid inference."
+  ],
+  "artifacts": [
+    {
+      "path": "src/computer/native-pass-schema.ts",
+      "bytes": 3441,
+      "sha256": "d88ea55d32ecba84fe5d77029bd697ce568a9d5e279483eff86b9070ac19ff19"
+    },
+    {
+      "path": "src/computer/browser-registry.ts",
+      "bytes": 21038,
+      "sha256": "b588672c7f42eb5dd88498f370376233c1e81700aa28b3eeca054c848f753125"
+    },
+    {
+      "path": "src/computer/http.ts",
+      "bytes": 10509,
+      "sha256": "b9e8a4b975ad28bdabb1d3172e224c368dab30c2c7edf3f924b7665e2079c5a3"
+    },
+    {
+      "path": "src/architect/routes.ts",
+      "bytes": 655085,
+      "sha256": "61ef989f72947565506833fa6874dfc0619618cbca4c31c36501ba45fb55ed67"
+    },
+    {
+      "path": "src/server/managed-execution.ts",
+      "bytes": 24500,
+      "sha256": "74b6f27a4c9f0be9fe22cb29374daa091a7d54391bf3bb129beb8c5a0f2d0471"
+    },
+    {
+      "path": "src/computer/browser-worker-entry.ts",
+      "bytes": 4224,
+      "sha256": "7ef7b11919f30415e9161141fe9a5326eedf635eb77d5151d640034d05ea4124"
+    },
+    {
+      "path": "packages/sdk/src/seams/computer-pass.ts",
+      "bytes": 3530,
+      "sha256": "404203b01bbe4e72e7e5180c04a5289a62a8d3858b607304d251b9b4a381df8b"
+    },
+    {
+      "path": "packages/sdk/src/seams/graph-execution.ts",
+      "bytes": 37983,
+      "sha256": "0132e78490e5bb7e876806ab89fa2a1421207cdfd48ac128647c29a0b75bf4df"
+    },
+    {
+      "path": "packages/sdk/package.json",
+      "bytes": 1634,
+      "sha256": "412752d2a973c2e0566591a6811477bbd03e75355a33e939e8c2f6ae6f478a39"
+    },
+    {
+      "path": "scripts/generate-graph-contracts.mjs",
+      "bytes": 4264,
+      "sha256": "ae1e6d3eb7efff1717d8a8271217127a862d9cb4aad6e41ad16808b7e59e486e"
+    },
+    {
+      "path": "scripts/qualify-ashoka-wsl-browser.mjs",
+      "bytes": 11407,
+      "sha256": "2765c4aa046b4b197886e623d64a0281a4c747a6ab460038cd68fb74acf9e394"
+    },
+    {
+      "path": "extensions/vscode/src/generated/computer-pass.ts",
+      "bytes": 3532,
+      "sha256": "5750e725c5a7b6b36502c5b31348f358ebea8b13656c2bc7ad67f977b6158587"
+    },
+    {
+      "path": "extensions/vscode/src/daemon-client.ts",
+      "bytes": 30175,
+      "sha256": "deefffea8af5154f693bb74110f9409ab8dbdc3b3295b242f71444e3c2de403f"
+    },
+    {
+      "path": "extensions/vscode/src/computer-pass.ts",
+      "bytes": 16462,
+      "sha256": "fbd5fd00f4899d509969ae3127fcdaa995534edfe390d1e023aed3f03437e7e1"
+    },
+    {
+      "path": "extensions/vscode/src/computer-control.ts",
+      "bytes": 9828,
+      "sha256": "8ce05daeceb6063dd03192f5a49e15b9a06ca2649144d8e68112895cccb4ed9f"
+    },
+    {
+      "path": "extensions/vscode/src/webview/computer-pass.ts",
+      "bytes": 5681,
+      "sha256": "3f1f8662e81907aeb4f5e3cd6da8fa4e371f7bb72f1b166f1ed460a848e086aa"
+    },
+    {
+      "path": "extensions/vscode/src/webview/computer-control.ts",
+      "bytes": 8623,
+      "sha256": "fed81dd1a4f1e60eeec113add884c2caa71511ba5a45f0a2b1f025713b24b361"
+    },
+    {
+      "path": "extensions/vscode/src/chat-panel.ts",
+      "bytes": 321224,
+      "sha256": "0b8fe809cf4dfbe2ec5f20648cbb244788b10eb59607d546e5af10b67a9bd886"
+    },
+    {
+      "path": "extensions/vscode/src/test/computer-pass.test.ts",
+      "bytes": 13394,
+      "sha256": "d6c9e68ca2fd9634983fb31b90329f28e09a6cd5570122caf917823e0bb64216"
+    },
+    {
+      "path": "extensions/vscode/src/test/daemon-computer-control.test.ts",
+      "bytes": 13241,
+      "sha256": "8af1cbec4c6cd7ae5efb7b293fd5a7ccc449bbe0df70cc8e34e6b788d9ec3e79"
+    },
+    {
+      "path": "extensions/vscode/src/test/agent-tool-result-handoff.test.ts",
+      "bytes": 12974,
+      "sha256": "4540609f9e43661cc659145466ef5c64576902f102f6b91672eaf58d8b8495d2"
+    },
+    {
+      "path": "tests/computer-native-graph-loop.test.ts",
+      "bytes": 22504,
+      "sha256": "6fa28f24e3f93277112c19227f1535d5aa0da2cb17cfff0eb4286749e399a91b"
+    },
+    {
+      "path": "tests/computer-native-operator.test.ts",
+      "bytes": 9746,
+      "sha256": "ef600ba659f6634509c23c3b2a956f260ba0ef24a98da6d4c295c4d64e694a40"
+    },
+    {
+      "path": "scripts/record-ashoka-native-pass-evidence.mjs",
+      "bytes": 7696,
+      "sha256": "b188b35868e33e21467ac5a9ce23d2cafe3fbfe0bfd699c26b50c0a4ac84c2d0"
+    },
+    {
+      "path": "scripts/qualify-ashoka-native-review.mjs",
+      "bytes": 3779,
+      "sha256": "869010915193c2af57c98324590a52033d1f64640e805cae5082fe0cdd96a7ec"
+    },
+    {
+      "path": "docs/ashoka/native-review-31-pass.mjs",
+      "bytes": 8626,
+      "sha256": "1c2d4a484c9104c0e95453a755fe4984506b81a751b9b9517e25215cf3bb0492"
+    },
+    {
+      "path": "docs/ashoka/computer-use.md",
+      "bytes": 22486,
+      "sha256": "5abf49b9b1d6d2250530ca6e13e3f6c7441d356bcb051f36ef9fa089ec3a806f"
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 46932,
+      "sha256": "3ffe6c62c9d6a8e267fa291700efef174962f80c6923b3a5200afb2947051013"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-build-first-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-build-first.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-build-second-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-build-second.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-check-ashoka-baseline-check.log",
+      "bytes": 224,
+      "sha256": "792d472654d07394f907ad469cc61d970a3a03ea24517436a05ac9950fe8cf4b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-check-build-server.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-check-config-check.log",
+      "bytes": 195,
+      "sha256": "399f55de75e9c35bd778ce1af8cb4601077d163ba8af794cc175223ba859ba38"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-check-config-inventory.log",
+      "bytes": 191,
+      "sha256": "c6b54fc079487c330d619f4b40fc0e94bfa9e2efaabb168e12cc4c203ea37a4f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-check-contracts-check.log",
+      "bytes": 214,
+      "sha256": "f07539ed26e1c65d0b64ae44313eb4d70d70c328f98dddfdd6f5bbe3718970c8"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-check-docs-architecture-tree.log",
+      "bytes": 146,
+      "sha256": "25516603743c30853b9a0a41cb2542c35c033d72331e773efe0e3451788d3a72"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-check-mcp-check.log",
+      "bytes": 1992,
+      "sha256": "95c9e095d70c013cfb0a3da0dd9e16512b462a40863c53ec118f00e9f2a2c30f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-check-metrics-check.log",
+      "bytes": 134,
+      "sha256": "80323cae2b6b39df4f20ff8e1171eb2436d2e059eb4cc426f377181baa2b471a"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-check-providers-check.log",
+      "bytes": 96,
+      "sha256": "06118bee7b5506c11123a1c0d2590c5c3ec5bda449dd82ceeac8696b8fe1d237"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-checks-final.json",
+      "bytes": 905,
+      "sha256": "f64bfda9061e5f73636bd51825e1b23cc0c7dabb9548b30aa3ad4b01070a0096"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-checks.json",
+      "bytes": 905,
+      "sha256": "602a377f4a4ae9a7a658bbf4e705bebae54d7be3e62fdbfd04b9e00bb9b39432"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-contracts-first.log",
+      "bytes": 210,
+      "sha256": "306d48da5c843037371e4867f8a70c4cafb2baef6c149aaeeda037bd47e3b526"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-contracts-second.log",
+      "bytes": 210,
+      "sha256": "306d48da5c843037371e4867f8a70c4cafb2baef6c149aaeeda037bd47e3b526"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-contracts-third.log",
+      "bytes": 210,
+      "sha256": "306d48da5c843037371e4867f8a70c4cafb2baef6c149aaeeda037bd47e3b526"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-build-fifth-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-build-fifth.log",
+      "bytes": 1628,
+      "sha256": "5d48fd680bf07345154669ed2a37bc18c7625bfac0e43f4d1744ff8f2e04c49b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-build-first-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-build-first.log",
+      "bytes": 1628,
+      "sha256": "047af1127539cc67322f37b28cbe02b7bf2c1de1008f16ce3bd99894747bfd6b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-build-fourth-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-build-fourth.log",
+      "bytes": 1628,
+      "sha256": "75da88623e1387ccb332ab345358f643244050b126886a85c0f979ded51af743"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-build-second-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-build-second.log",
+      "bytes": 1628,
+      "sha256": "1a8d984ad27bb49c2b50cacca53fefed352469d95fa80fece5456162b02d8c68"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-build-third-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-build-third.log",
+      "bytes": 1628,
+      "sha256": "c3854248d4e49a6eb33aa236ba8fc2c07cf3a401b87e82afba7e6f54377036e7"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-focus-first-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-focus-first.log",
+      "bytes": 5521,
+      "sha256": "ea911a71d01df7a24ee91fe0e05a44ad867a4941cd94b628271c2e99f5c36f97"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-focus-second-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-focus-second.log",
+      "bytes": 6974,
+      "sha256": "84333fe2dbc7701c901ca366abd9321c9daef31b3bad0b4aa5b74f3e391f3d87"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-focus-third-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-focus-third.log",
+      "bytes": 7077,
+      "sha256": "782e552fb336c7764522b8b7832728df9da7284da9379b4109655a69180f7baa"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-full-first-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-editor-full-first.log",
+      "bytes": 52716,
+      "sha256": "1aec6e5c86cc0efde5b893f904e7512b51c45417c98ea5d74d06b58e5d824962"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-final-ashoka-baseline-check.log",
+      "bytes": 224,
+      "sha256": "792d472654d07394f907ad469cc61d970a3a03ea24517436a05ac9950fe8cf4b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-final-build-server.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-final-config-check.log",
+      "bytes": 195,
+      "sha256": "399f55de75e9c35bd778ce1af8cb4601077d163ba8af794cc175223ba859ba38"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-final-config-inventory.log",
+      "bytes": 191,
+      "sha256": "c6b54fc079487c330d619f4b40fc0e94bfa9e2efaabb168e12cc4c203ea37a4f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-final-contracts-check.log",
+      "bytes": 214,
+      "sha256": "f07539ed26e1c65d0b64ae44313eb4d70d70c328f98dddfdd6f5bbe3718970c8"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-final-docs-architecture-tree.log",
+      "bytes": 146,
+      "sha256": "25516603743c30853b9a0a41cb2542c35c033d72331e773efe0e3451788d3a72"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-final-mcp-check.log",
+      "bytes": 1992,
+      "sha256": "0b6512bfc6e0d96e4eefdb4ee19f31bf1ba351b304f309f926fa36bd16b9628a"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-final-metrics-check.log",
+      "bytes": 134,
+      "sha256": "80323cae2b6b39df4f20ff8e1171eb2436d2e059eb4cc426f377181baa2b471a"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-final-providers-check.log",
+      "bytes": 96,
+      "sha256": "06118bee7b5506c11123a1c0d2590c5c3ec5bda449dd82ceeac8696b8fe1d237"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-fifth-exit.json",
+      "bytes": 24,
+      "sha256": "50d7caf03dd967e4363a5bc7babbf450452b31dd1ec7fb605b2abc6465759571"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-fifth.json",
+      "bytes": 4330,
+      "sha256": "cc54dbd6843d281e3d7568af2fadc0aa111ebf9efe697a1d88b7aebe317779f0"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-fifth.log",
+      "bytes": 120,
+      "sha256": "2c5281b791b42d1ddadddccfce2ed1b3ac9db93d32be209a56b92fe025eb0809"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-first-exit.json",
+      "bytes": 24,
+      "sha256": "50d7caf03dd967e4363a5bc7babbf450452b31dd1ec7fb605b2abc6465759571"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-first.json",
+      "bytes": 4403,
+      "sha256": "56fa370c947408eb3ccc84765f3e55d51d74d22af244822ffe5cf14baf1432eb"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-first.log",
+      "bytes": 120,
+      "sha256": "4a13a4428125d0948ce9118d67b01488c69fd06ab80420774a809423728dfd08"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-fourth-exit.json",
+      "bytes": 24,
+      "sha256": "50d7caf03dd967e4363a5bc7babbf450452b31dd1ec7fb605b2abc6465759571"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-fourth.json",
+      "bytes": 4328,
+      "sha256": "289d6fd7e849af06227db066970d8a9d1a751b6820cc8221099ae18ebde1ad28"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-fourth.log",
+      "bytes": 121,
+      "sha256": "a837b26dc2c6c8db048dd4b5deb93522ef2e592f22a75a8f4cb3054f34d76498"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-second-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-second.json",
+      "bytes": 1371,
+      "sha256": "18b216aff69c06efdfc119d28847edef2bd7745068e22f05242ff9914806a2dc"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-second.log",
+      "bytes": 121,
+      "sha256": "1b3d474faeedc2ee680fe0db1a80399a7a72d872b56fc2fa015ad00eae091859"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-seventh-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-seventh.json",
+      "bytes": 4002,
+      "sha256": "18cfcb80d9bf8845bc60ec2cb08dd851781a4761f21d5d642435ed94d18d93df"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-seventh.log",
+      "bytes": 122,
+      "sha256": "a16864de084758058750d066336dea6a500738b2c5fa18494f7fbe5968839c6f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-sixth-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-sixth.json",
+      "bytes": 4005,
+      "sha256": "95b8f0664fa0b98cc9c7320bd982e4deaed63678ba95cc9a82cbeeaf1d41229f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-sixth.log",
+      "bytes": 120,
+      "sha256": "8424b6bfdd343ea09ab8c4ae2a52abc7cdcde401d51fda7f0b526ed313854b17"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-third-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-third.json",
+      "bytes": 3719,
+      "sha256": "00e998d89972df5a13fc11111534b1208d4963518dabafc3acaf301bb1ee85fe"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-focus-third.log",
+      "bytes": 120,
+      "sha256": "5407ebb5a2bc7f6a019bf42327494a996c24dad1d2d75ac9c9c43c2f14606e54"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-root-first-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-root-first.json",
+      "bytes": 680442,
+      "sha256": "fed9a8e7d912712af663abf65dd8e7e95f8da722526f4242249bf30f7297af47"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-root-first.log",
+      "bytes": 119,
+      "sha256": "2f6dd1d7e6a1e30b18251538fb50d5a5f649f1c405236d82ba98cadca9be1429"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-root-second-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-root-second.json",
+      "bytes": 680389,
+      "sha256": "74e7eddaa56dad817905f3e3c3139a60ea286fce36cb9896cd1a43eec7c68eec"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-pass-root-second.log",
+      "bytes": 120,
+      "sha256": "0b8b185b4dae01eefffd7516011f9e809cde00456ad6e07840bf6b731ead44bb"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass-run-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass-run.log",
+      "bytes": 514,
+      "sha256": "aa334d7b97b08b1cf7f475705fd010c71b18f058f53e93e0d4ebb61597a6d691"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass-second-run-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass-second-run.log",
+      "bytes": 522,
+      "sha256": "078e7282c97e5d4e8230fe7396d09fc14c732f2efaa21d3912c5ad0ab52197f6"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass/browser-qualification.json",
+      "bytes": 4964,
+      "sha256": "859f7850dda8d2cbad47e90e3b59ca1ee87c206e35f7c80f2d816c0f6090ba49"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass/installation-proof.json",
+      "bytes": 3251,
+      "sha256": "78a4a52a60f25687814f63d1df1d6a83cbbb35663c5db3edbfa8472b8036c747"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass/installer-browser.log",
+      "bytes": 5395,
+      "sha256": "6ae6f131d189d385e5f2ab0f077d0af21e1ecb279687ffa78ab598b3d277125d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass/run-scope.json",
+      "bytes": 493,
+      "sha256": "faf715f4715ffe7cccb7154acbb4804fa5f373be4e764da5019af4fc0fc6409b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass/source-inventory.json",
+      "bytes": 127193,
+      "sha256": "6cdfc9158aaffb2647432b6a5b83ffbc01c2020cab7fcd613a14e363d030afa5"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass-second/browser-qualification.json",
+      "bytes": 4972,
+      "sha256": "afbe87cd4138a294c1fdb129a2c05e4dfbb4c790e5cc11a47abb5fef4eaaa8c3"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass-second/installation-proof.json",
+      "bytes": 3252,
+      "sha256": "748bb782b99ffb0c812e099e1a74813f9485e71e7b7fbdc4bde1b4aeea32c06d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass-second/installer-browser.log",
+      "bytes": 5384,
+      "sha256": "b7785dd7a330ae5dfcb4e89ab518a8b784e6d933e6d17213eb2ce6594dc69270"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass-second/run-scope.json",
+      "bytes": 493,
+      "sha256": "80777078a0a97437c685dddb942e7fd9fa602be1335a17840142f6ca25f94a66"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-native-pass-second/source-inventory.json",
+      "bytes": 127474,
+      "sha256": "13eef8a66fea3c00f756ba0352c8e4ca3e6a45b2bb311deb9d8b6374c2102621"
+    }
+  ]
+}

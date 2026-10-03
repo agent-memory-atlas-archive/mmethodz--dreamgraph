@@ -1,0 +1,67 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on disconnect without another model call
+Computer control-loss evidence { mode: 'disconnect', elapsed_ms: 267.5593000000008, local_stop: null }
+
+ ✓ tests/computer-broker.test.ts (16 tests) 18283ms
+   ✓ single original host/job owns scoped dispatch, independent postcondition and replay  1428ms
+   ✓ pause fences input and model continuation; resume preserves finite original authority and requires fresh graph/target evidence  2207ms
+   ✓ pause drains an already delivered atomic operation to its observed receipt while independent Stop remains separate  1563ms
+   ✓ Stop breaks a paused model wait without renewing a grant or turning unresolved work into a completed task  900ms
+   ✓ native custom tools preserve scoped fresh observations and keep literal arguments out of preview metadata  1429ms
+   ✓ ephemeral image bytes are hash checked and atomically recorded as distinct pixel/DOM descriptors  989ms
+   ✓ an executor cannot pair arbitrary image bytes with a forged digest  1001ms
+   ✓ full-access scope does not replace exact action approval; target changes remain fenced  1202ms
+   ✓ grant revocation stops without a model roundtrip and prevents later physical dispatch  898ms
+   ✓ lost reply after input has one durable unknown receipt and is never replayed  1201ms
+   ✓ failed independent termination retains the original worker for stop-only recovery  1094ms
+   ✓ material source change stays reconciliation pending even though the GUI postcondition passed  1491ms
+   ✓ wrong-session and unqualified routes cannot open even a declared worker  578ms
+   ✓ a reviewed profile cannot be replaced by the worker  519ms
+   ✓ a reviewed backend cannot be replaced by the worker  486ms
+   ✓ observation-only operator approval cannot authorize interaction even with an exact action approval  1294ms
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on watchdog without another model call
+Computer control-loss evidence {
+  mode: 'watchdog',
+  elapsed_ms: 3314.0818,
+  local_stop: {
+    epoch: '8075526f-f563-4544-b2a6-08ac804bccf9',
+    input_released: true,
+    terminated: true,
+    reason: 'watchdog',
+    heartbeat_age_ms: 2567,
+    stop_elapsed_ms: 1059
+  }
+}
+
+ ✓ tests/computer-browser-worker.test.ts (12 tests) 29908ms
+   ✓ performs real Unicode, checked, click/readback and scrolling using opaque current references  2942ms
+   ✓ moved/covered controls, disabled and credential controls never receive a guessed action  1933ms
+   ✓ forbidden posts, redirects, popups and frames cannot reach another origin or authority  3177ms
+   ✓ exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime  466ms
+   ✓ explicit navigation stays inside the approved origin and segment path and verifies independent destination state  2609ms
+   ✓ private worker process preserves typed observations and responsive independent termination  2386ms
+   ✓ original worker pause fences capture/input and resumes with new references before independent Stop  2417ms
+   ✓ stop bypasses a pending browser navigation and never waits for its ten-second server response  1392ms
+   ✓ masked frames have a verified digest and image exhaustion refuses before another input  2225ms
+   ✓ a real worker closes its dedicated browser on disconnect without another model call  2330ms
+   ✓ a real worker closes its dedicated browser on watchdog without another model call  5400ms
+   ✓ lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input  2628ms
+ ✓ tests/computer-journal.test.ts (13 tests) 5323ms
+   ✓ reconnect pages existing owner descriptors without reading archived transcripts or creating authority  412ms
+   ✓ changed and foreign reconnect cursors cannot turn partial pages into a current complete session list  1259ms
+   ✓ replays original intent/receipt across service recreation and never persists raw action text  336ms
+   ✓ invalidates old observations on target changes and cannot verify a model interpretation  328ms
+   ✓ reserves finite actions/images/bytes once and refuses oversize or unsupported operations  482ms
+   ✓ postcondition proof, terminal immutability and graph receipt owner remain separate  449ms
+   ✓ a lost physical result stays recoverable after acknowledged stop and cannot redispatch  439ms
+   ✓ active workers prevent completion and stopped proved work remains a state receipt, never graph truth  344ms
+   ✓ late unknown-result bookkeeping does not pretend worker termination was acknowledged  354ms
+ ✓ tests/computer-use-ui.test.ts (10 tests) 1190ms
+
+ Test Files  4 passed (4)
+      Tests  51 passed (51)
+   Start at  22:10:03
+   Duration  33.38s (transform 2.37s, setup 0ms, collect 8.70s, tests 54.70s, environment 1ms, prepare 565ms)
+

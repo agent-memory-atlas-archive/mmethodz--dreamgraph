@@ -1,0 +1,33 @@
+{
+  "scope": "Actual compiled Windows daemon/Architect, CLI and Chrome. Read-only graph-family copy plus original receipt history for navigation scale; publication store dependencies narrowed to copied files and fresh disposable authority. No live mutation, scan, paid inference or production migration claimed.",
+  "checks": [
+    {
+      "name": "NAV01",
+      "detail": "Actual shell/list load at original receipt and graph-family scale; no mocked plan-index route."
+    }
+  ],
+  "errors": [],
+  "publication_bytes": 7771027,
+  "copied_graph_files": [
+    "features.json",
+    "workflows.json",
+    "data_model.json",
+    "capabilities.json",
+    "datastores.json",
+    "auxiliary_entities.json",
+    "ui_registry.json",
+    "dream_graph.json",
+    "candidate_edges.json",
+    "validated_edges.json",
+    "tension_log.json",
+    "adr_log.json",
+    "dream_archetypes.json",
+    "system_story.json"
+  ],
+  "browser": "153.0.8010.50",
+  "shell_ms": 1188,
+  "plans_visible_ms": 5180,
+  "success": false,
+  "failure": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-slice-id].slice-current') to be visible\u001b[22m\n\u001b[2m    28 × locator resolved to hidden <li tabindex=\"0\" role=\"button\" class=\"dg-context-target slice-current\" data-slice-id=\"slice-26-refresh-the-legacy-dreamgraph-graph-safely\" aria-label=\"Slice 26 — Refresh the legacy DreamGraph graph safely, Current · in_progress (reported). Open definition\">…</li>\u001b[22m\n\n    at C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\scripts\\qualify-ashoka-navigation.mjs:39:104",
+  "daemon_diagnostic": "[2026-10-02T13:56:26.462Z] [INFO]  Loaded 24 env vars from C:\\Users\\MIKAJU~1\\AppData\\Local\\Temp\\dg-navigation-browser-r2MKwQ\\master\\d2532825-e36f-4e16-ba2e-194f0b273cdc\\config\\engine.env\n[2026-10-02T13:56:26.463Z] [INFO]  Auto-registered attached project_root as repo 'dreamgraph': C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\n[2026-10-02T13:56:26.464Z] [INFO]  Instance mode activated: InstanceScope(d2532825…, project=C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph)\n[2026-10-02T13:56:26.464Z] [INFO]  Repos available: fixture, dreamgraph\n[2026-10-02T13:56:26.715Z] [INFO]  Cognitive engine hydrated: 2125 dream cycles, 1842 normalization cycles, bootstrap=graduated\n[2026-10-02T13:56:26.715Z] [INFO]  LLM provider: none (model: n/a)\n[2026-10-02T13:56:26.716Z] [WARN]  LLM provider \"none\" is NOT reachable — dreams will be structural-only (degraded)\n[2026-10-02T13:56:26.731Z] [INFO]  Plugin discovery: no plugins found in <instance>/plugins or instance.json\n[2026-10-02T13:56:26.741Z] [INFO]  Data dir watcher active on C:\\Users\\MIKAJU~1\\AppData\\Local\\Temp\\dg-navigation-browser-r2MKwQ\\master\\d2532825-e36f-4e16-ba2e-194f0b273cdc\\data\n[2026-10-02T13:56:26.748Z] [INFO]  DreamGraph MCP Server running on 127.0.0.1:52986 — remote=false, authentication=local-machine\n[2026-10-02T13:56:28.194Z] [INFO]  LLM architect config: provider=none (general), model=n/a (provider_default), temp=0.7, maxTokens=2048\n"
+}

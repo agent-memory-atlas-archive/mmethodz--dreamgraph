@@ -1,0 +1,5 @@
+
+> dreamgraph@13.4.0 contracts:check
+> tsx scripts/generate-graph-contracts.mjs --check
+
+{"status":"verified","contracts":41,"source_sha256":"4c3fcdddf943e6ce6d43d6f67f2b8bcf19f070a8036603865247a04280c7225d"}

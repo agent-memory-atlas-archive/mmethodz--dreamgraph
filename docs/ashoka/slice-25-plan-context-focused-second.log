@@ -1,0 +1,49 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/plan-authority.test.ts (7 tests) 1436ms
+   ✓ PL04/GE14: a status receipt cannot count as implementation; an actual graph commit can, and accepted verification survives replay  396ms
+   ✓ GE14/CU22 effect contract: reconciliation must finish; optional unfunded digestion can remain pending  467ms
+ ✓ tests/context-pack.test.ts (36 tests) 2081ms
+ ✓ tests/graph-read-model.test.ts (11 tests) 452ms
+ ✓ tests/plan-workflow.test.ts (17 tests) 83ms
+ ❯ tests/plan-context-integration.test.ts (5 tests | 1 failed) 1651ms
+   ✓ PL16 graph consumers retrieve the actual typed plan and selected slice with the same authority revision and gates 219ms
+   ✓ local slice IDs repeating across plans remain distinct, while an unscoped request is explicitly ambiguous 121ms
+   ✓ invalid typed authority removes all its plan and slice projections while preserving an independently valid legacy slice store 122ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  866ms
+   × verified implementation evidence is distinct from the next slice and recovers after a transcript-free read 322ms
+     → expected { identity: { …(3) }, …(5) } to match object { assertion_class: 'historical', …(2) }
+(53 matching properties omitted from actual)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/plan-context-integration.test.ts > verified implementation evidence is distinct from the next slice and recovers after a transcript-free read
+AssertionError: expected { identity: { …(3) }, …(5) } to match object { assertion_class: 'historical', …(2) }
+(53 matching properties omitted from actual)
+
+- Expected
++ Received
+
+@@ -6,9 +6,8 @@
+        "implementation",
+      ],
+      "status": "verified",
+      "verification": {
+        "fresh": true,
+-       "passed": true,
+      },
+    },
+  }
+
+ ❯ tests/plan-context-integration.test.ts:84:16
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 75 passed (76)
+   Start at  08:56:47
+   Duration  10.15s (transform 2.00s, setup 0ms, collect 12.19s, tests 5.70s, environment 1ms, prepare 676ms)
+

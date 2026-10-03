@@ -1,0 +1,35 @@
+{
+  "schema": "dreamgraph.offline_verification.v1",
+  "wave": "slice-8-adapters-progress",
+  "started_at": "2026-09-30T21:58:58.270Z",
+  "success": true,
+  "contract_sha256": "ab290876adc7d9b6e14cab7904c9841e2f726d0d2fdfcbfc029a7f9296a90850",
+  "baseline_revision": 7,
+  "baseline_sha256": "d8acba015369963165acef92ad8933a02608efeb8fbde036a10d32857fec3521",
+  "suites": {
+    "total": 109,
+    "passed": 109,
+    "failed": 0
+  },
+  "tests": {
+    "passed": 1114,
+    "failed": 0,
+    "skipped": 2
+  },
+  "checks": [
+    "server TypeScript build",
+    "provider artifact drift",
+    "31-contract drift",
+    "reviewed baseline revision 7",
+    "VS Code TypeScript compile",
+    "17 targeted extension provider/replay fixtures",
+    "VS Code full build, isolation lint and complete extension suite: 482 passed, zero failed"
+  ],
+  "limitations": [
+    "Slice 8 remains in_progress",
+    "remaining Architect policy/client/C17 capability integration",
+    "no live model qualification or paid canary",
+    "process-tree stop unqualified",
+    "spend admission/settlement and final client context delivery pending in later slices"
+  ]
+}

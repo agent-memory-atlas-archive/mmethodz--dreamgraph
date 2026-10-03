@@ -1,0 +1,105 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:23.804Z] [INFO]  enrich_parser_nodes: starting (model=gpt-4.1, provider=openai, context_hops=0, batch_size=10)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:24.212Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:24.262Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:24.615Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:24.631Z] [INFO]  REM dream cycle #1 starting (strategy: all, max: 24)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:24.912Z] [INFO]  LLM dream grounding: read 2 source files for 2 entities
+[2026-10-03T09:03:24.912Z] [INFO]  LLM dream: sending prompt (2 entities, 0 edges) to model=gpt-4.1, temp=0.7, maxTokens=2048
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:25.078Z] [INFO]  LLM dream: received 290 chars from gpt-4.1
+[2026-10-03T09:03:25.080Z] [INFO]  LLM dream: 1 edges, 0 nodes from gpt-4.1 (100 tokens)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:25.153Z] [INFO]  REM dream cycle #1 complete: 0 nodes, 3 edges (0 duplicates suppressed; speculative output remains untrusted)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:25.153Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:25.166Z] [INFO]  Cold-start bootstrap started at 2026-10-03T09:03:25.166Z (cycle 0); relaxed promotion gate active until exit (entities≥50 & validated_edges≥10, OR 20 cycles, OR 24h, whichever first)
+[2026-10-03T09:03:25.166Z] [INFO]  Normalization cycle #1 starting (threshold: 0.55)
+[2026-10-03T09:03:25.166Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":null,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.55,"promotion_plausibility":0.4,"promotion_evidence":0.35,"promotion_evidence_count":1,"retention_plausibility":0.3,"max_contradiction":0.35},"applied_promotion_config":{"promotion_confidence":0.55,"promotion_plausibility":0.4,"promotion_evidence":0.35,"promotion_evidence_count":1,"retention_plausibility":0.2,"max_contradiction":0.35},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:25.367Z] [INFO]  Semantic validation: 3/3 edges evaluated (100 tokens)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:25.368Z] [INFO]  Semantic validation boosted 3 edges
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:25.446Z] [INFO]  Normalization cycle #1 complete: 3 processed (0 validated, 3 latent, 0 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T09:03:25.462Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/system-digestion-integration.test.ts > a real production enrichment refusal preserves measured spend, explicit optional partial debt and current reconciled source without automatic retry
+[2026-10-03T09:03:26.141Z] [INFO]  enrich_parser_nodes: starting (model=gpt-4.1, provider=openai, context_hops=0, batch_size=10)
+
+stderr | tests/system-digestion-integration.test.ts > a real production enrichment refusal preserves measured spend, explicit optional partial debt and current reconciled source without automatic retry
+[2026-10-03T09:03:26.344Z] [WARN]  Batch (fixture::widgets, 2 nodes): provider_failed: PROVIDER_REFUSAL: openai/gpt-4.1 (completed); deterministic fallback used.
+
+stderr | tests/system-digestion-integration.test.ts > a real production enrichment refusal preserves measured spend, explicit optional partial debt and current reconciled source without automatic retry
+[2026-10-03T09:03:26.390Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 2 fallback
+[2026-10-03T09:03:26.390Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=1 dry_run=false
+
+ ✓ tests/system-digestion-integration.test.ts (2 tests) 3187ms
+   ✓ production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan  2300ms
+   ✓ a real production enrichment refusal preserves measured spend, explicit optional partial debt and current reconciled source without automatic retry  886ms
+stderr | tests/scheduler-authority.test.ts > manual lost reply replays one immutable occurrence even after definition edit and archive
+[2026-10-03T09:03:28.417Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/scheduler-authority.test.ts > manual lost reply replays one immutable occurrence even after definition edit and archive
+[2026-10-03T09:03:28.458Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/scheduler-authority.test.ts > manual lost reply replays one immutable occurrence even after definition edit and archive
+[2026-10-03T09:03:28.463Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+stderr | tests/scheduler-authority.test.ts > pause changes future admission and retains completed original definition history
+[2026-10-03T09:03:29.837Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/scheduler-authority.test.ts > pause changes future admission and retains completed original definition history
+[2026-10-03T09:03:29.899Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/scheduler-authority.test.ts > pause changes future admission and retains completed original definition history
+[2026-10-03T09:03:29.904Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+ ✓ tests/scheduler-authority.test.ts (14 tests) 2973ms
+   ✓ manual lost reply replays one immutable occurrence even after definition edit and archive  508ms
+   ✓ automatic timer coalesces wake-ups while a tick is in flight instead of queueing writers  587ms
+   ✓ pause changes future admission and retains completed original definition history  441ms
+   ✓ zero dreams stay zero and excessive allocations are rejected before engine work  317ms
+ ✓ tests/schedule-workspace.test.ts (8 tests) 1597ms
+   ✓ actual served browser script saves disabled, preserves invalid drafts, and supports keyboard tabs/filter/edit  437ms
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-03T09:03:36.314Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-03T09:03:36.350Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-03T09:03:36.355Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+ ✓ tests/schedule-http.test.ts (2 tests) 684ms
+   ✓ shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay  506ms
+
+ Test Files  4 passed (4)
+      Tests  26 passed (26)
+   Start at  12:03:17
+   Duration  19.58s (transform 2.26s, setup 0ms, collect 9.65s, tests 8.44s, environment 1ms, prepare 545ms)
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/slice-27-scheduler-stall-fix-first.json

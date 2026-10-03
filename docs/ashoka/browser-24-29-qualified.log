@@ -1,0 +1,15 @@
+SC04
+SC05
+SC11-future
+SC01/SC03
+SC09/SC10-history
+SC09/SC11-cancel
+SC12
+SC13
+XS07/XS13-context
+XS13/XS21-render
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert((await page.locator('.sidebar-reopen.right').boundingBox()).width<=25)
+
+    at <anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-surfaces.mjs:70:370)

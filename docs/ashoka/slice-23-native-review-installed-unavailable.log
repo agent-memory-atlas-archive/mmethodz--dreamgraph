@@ -1,0 +1,14 @@
+file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/node_modules/@modelcontextprotocol/sdk/dist/esm/types.js:2035
+        return new McpError(code, message, data);
+               ^
+
+McpError: MCP error -32001: Request timed out
+    at McpError.fromError (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/node_modules/@modelcontextprotocol/sdk/dist/esm/types.js:2035:16)
+    at Timeout.timeoutHandler (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/node_modules/@modelcontextprotocol/sdk/dist/esm/shared/protocol.js:705:58)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7) {
+  code: -32001,
+  data: { timeout: 30000 }
+}
+
+Node.js v25.2.1

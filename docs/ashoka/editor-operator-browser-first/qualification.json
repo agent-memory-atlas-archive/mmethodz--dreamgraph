@@ -1,0 +1,16 @@
+{
+  "scope": "Actual compiled editor HTML and webview bundle in Windows Chrome; host messages/VSCode shell are declared doubles, no native editor/model/other-platform claim",
+  "checks": [
+    {
+      "name": "E25-03",
+      "detail": "Compiled production UI sends captured file/review identity, disables competing actions while an operator owns execution, keeps Stop available and retains the composer draft."
+    },
+    {
+      "name": "E25-04",
+      "detail": "Unconfirmed Undo visibly disables Keep/Undo, offers keyboard-accessible original-ID readback, refuses a foreign binding, and retains the draft. Host outcome replies remain declared doubles."
+    }
+  ],
+  "browser": "153.0.8010.50",
+  "success": false,
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   `Uncaught EvalError: Evaluating a string as JavaScript violates the following Content Security Policy directive because 'unsafe-eval' is not an allowed source of script: script-src 'nonce-1790901080626-ra1y3rc6a9' https://editor-assets.local\".\\n`\n+ ]\n- []\n\n    at file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-editor-operator.mjs:50:9"
+}

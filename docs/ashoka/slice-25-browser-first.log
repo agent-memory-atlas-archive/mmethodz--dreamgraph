@@ -1,0 +1,15 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Actual plan projection required for fixture shape
+    at <anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-architect.mjs:21:100) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v25.2.1

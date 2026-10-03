@@ -1,0 +1,22 @@
+
+> dreamgraph-vscode@13.4.0 build
+> npm run lint:isolation && npm run build:webview && tsc -p ./tsconfig.json && npm run build:extension && npm run build:bridge && npm run build:vendor
+
+
+> dreamgraph-vscode@13.4.0 lint:isolation
+> node scripts/lint-isolation.mjs
+
+lint:isolation OK — architect-v2 quarantined; 0 violations.
+
+> dreamgraph-vscode@13.4.0 build:webview
+> node scripts/build-webview.cjs
+
+
+  dist\webview.js  27.2kb
+
+Done in 7ms
+src/test/copilot-cli-host-adapters.test.ts(289,38): error TS2345: Argument of type '{ command: string; args: string[]; cwd: string; env: Record<string, string>; timeoutMs: number; }' is not assignable to parameter of type 'CodexCliSpawnInput'.
+  Property 'stdin' is missing in type '{ command: string; args: string[]; cwd: string; env: Record<string, string>; timeoutMs: number; }' but required in type 'CodexCliSpawnInput'.
+src/test/copilot-cli-host-adapters.test.ts(292,36): error TS2345: Argument of type '{ command: string; args: string[]; cwd: string; env: Record<string, string>; timeoutMs: number; abortSignal: AbortSignal; }' is not assignable to parameter of type 'CodexCliSpawnInput'.
+  Property 'stdin' is missing in type '{ command: string; args: string[]; cwd: string; env: Record<string, string>; timeoutMs: number; abortSignal: AbortSignal; }' but required in type 'CodexCliSpawnInput'.
+src/test/copilot-cli-host-adapters.test.ts(293,61): error TS2339: Property 'spawnError' does not exist on type 'CopilotCliSpawnResult'.

@@ -1,0 +1,148 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/host-managed-execution.test.ts > compiled command Cancel propagates to native HTTP and cannot publish a successful answer or confirm remote termination
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":41892,"approxTokens":10473}
+
+ ❯ tests/host-managed-execution.test.ts (120 tests | 1 failed | 109 skipped) 5017ms
+   ↓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass
+   ↓ parallel host passes share their authenticated owner while another client cannot read or close them
+   ↓ a worker credential cannot issue a new grant, close another host pass or change its chosen identity
+   ↓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable
+   ✓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block  437ms
+   ↓ editor initialization cancellation stops only its caller and preserves another caller on the shared handshake
+   ↓ sdk initialization cancellation stops only its caller and preserves another caller on the shared handshake
+   ↓ editor freezes nested exact approvals before the shared session wait
+   ↓ sdk freezes nested exact approvals before the shared session wait
+   ↓ editor disposal prevents a delayed noncooperative handshake from dispatching or restoring authority
+   ↓ sdk disposal prevents a delayed noncooperative handshake from dispatching or restoring authority
+   ↓ editor session readiness cannot redirect a queued authority call to a replacement endpoint
+   ↓ editor changed endpoints reject late handshake replies rather than adopting a new owner
+   ↓ SDK constructor options cannot be mutated into a different transport after construction
+   ↓ SDK native lifecycle captures request/port identities, refreshes each continuation and preserves whole literal results
+   ↓ SDK handoff rejects a clipped exact checkpoint before worker dispatch and never acknowledges it
+   ↓ SDK native worker performs one actual governed source effect and retains durable source debt rather than graph completion
+   ↓ SDK wait cancellation keeps a noncooperative callback and late successful reply termination-unconfirmed
+   ↓ SDK native termination requires explicit harness evidence and never derives it from settled successful prose
+   ↓ SDK refuses missing native termination evidence instead of treating callback settlement as confirmation
+   ↓ SDK total pass deadline cancels a noncooperative native wait without claiming that underlying work stopped
+   ↓ SDK lost admission retains its original ID, inspects only that owner and can close without repeating admission
+   ↓ SDK lost closure retries only its captured confirmed termination after actual owner closure, without repeating native work
+   ↓ SDK lost closure retries only its captured unconfirmed termination after actual owner closure, without repeating native work
+   ↓ SDK late inspection cannot replace its confirmed inactive closure with an earlier active snapshot
+   ↓ SDK refresh rejects a foreign execution receipt before handoff or new worker dispatch
+   ↓ SDK worker reads canonical plugin graph evidence through the actual manager/resource transport without inheriting host authority
+   ↓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts
+   ↓ editor CLI byte admission refuses the whole over-budget request before acknowledging or launching it
+   ↓ editor CLI cancellation preserves unconfirmed descendant termination instead of proving a no-change pass
+   ↓ editor CLI pre-launch failure settles without model work; cancellation during acknowledgement cannot yield a launchable prompt
+   ↓ the actual editor host records exact review before activation; replay cannot replenish consumed effects
+   ↓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads
+   ↓ an authenticated owner fences in-flight review; queued HTTP review cannot bypass the changed checkpoint
+   ↓ review cannot exceed the original effect ceiling or approve a changed named source
+   ✓ the actual portable SDK recovers a lost approval reply without reissuing a grant or extending expiry  316ms
+   ↓ a published review alone grants no effect; the unchanged live host can recover activation exactly once
+   ↓ a saved review cannot reactivate after the actual lease expires
+   ↓ the actual editor rendezvous waits before the graph writer, then publishes approval before one unchanged source effect
+   ↓ the actual SDK operator decline settles the pending tool without granting or executing an effect
+   ↓ request cancellation removes an enabled review wait without invoking the effect owner
+   ↓ the editor review controller retains literal exact proposals and retries lost acknowledgement without repeating effects
+   ↓ the editor controller declines the captured daemon action without dispatch or approval publication
+   ↓ editor review decisions cannot redirect through a changed endpoint
+   ↓ native editor admission delivers whole replacement evidence, uses the actual worker MCP fence and closes unchanged source with durable review
+   ↓ native editor source changes retain reconciliation debt rather than reporting a graph commit
+   ↓ native editor commands execute at the actual daemon owner with exact review and complete source observation
+   ↓ native editor cancelled waiting closes promptly with underlying callback termination unconfirmed
+   ↓ native editor Unicode request byte refusal happens before delivery and dispatch
+   ↓ native editor captured instance mismatch refuses before delivery and revokes the owned lease
+   ↓ an independently cancelled native round blocks fresh dispatch until its unknown outcome closes
+   ↓ the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+   ↓ the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+   ↓ compiled editor Undo restores exact Unicode/BOM/mixed newline bytes through actual HTTP/MCP source owners and retains graph debt
+   ↓ compiled editor Undo for a created file uses the actual source owner and exact absent/hash precondition
+   ↓ compiled editor Undo for a deleted file uses the actual source owner and exact absent/hash precondition
+   ↓ Undo refuses a file changed after its review without dispatching authority or overwriting user bytes
+   ↓ a changed editor authority refuses Undo before admission and retains a retryable original review
+   ↓ a lost operator closure acknowledgement retains recovery and duplicate Undo/Keep cannot repeat or erase it
+   ↓ captured review copies cannot mutate the baseline/authority and stale IDs cannot clear or undo a later edit
+   ↓ lost operator admission can close the same original lease without dispatching any tool or minting a replacement
+   ↓ operator recovery cannot turn actual unknown termination into a successful closure or redirect to a different instance
+   ↓ Stop invalidates queued review clicks before their second owner dispatch
+   ↓ operator message-action errors retain the complete actual owner payload and a failed trace, with no local alias fallback
+   ↓ an explicit operator message action records changed-file review under its original daemon and retains the actual source closure
+   ↓ a returned message action persists its original instance outcome and never labels pending source debt as completed after selection changes
+   ↓ expired lost-ack review recovers only by reading the original settled closure, without renewing approval or repeating its effect
+   ↓ review inspection retains actual unknown termination and disables historical approval after revocation
+   ↓ inspection of a pending review fences continuation when its original authority was revoked with unknown termination
+   ↓ Stop during a noncooperative inspection cannot resurrect a retired pending review from a late original-host reply
+   ↓ a compiled palette command uses the original daemon owner, records actual source change and keeps reconciliation separate from exit zero
+   ↓ a compiled palette capture refuses a later instance selection before any execution admission or local shell fallback
+   ↓ palette invocation without an original daemon refuses before dispatch and leaves source unchanged
+   ↓ the actual palette captures before prompting and shows complete owner evidence with a pending warning despite exit zero
+   ↓ the actual build palette preserves literal root ext-prefixed script identity and refuses unsafe script names without dispatch
+   ↓ native-host API accounting reserves the complete Unicode wire before any provider dispatch and recovers exact settlement after closure
+   ↓ native-host permits require whole delivered context, original owner and host-only transport
+   ↓ zero paid allocation or unknown exact tariff cannot issue native-host permits
+   ↓ native-host requests keep one policy and a shared cumulative run/retry ceiling across changed configuration
+   ↓ a lost native permit response retains liability, read-only recovery and unknown closure instead of authorizing retry
+   ↓ native-host deadline stops permit waiting without attesting native work stopped or dropping its liability
+   ↓ CLI host accounting stays subscription-unmeasured and cannot borrow an API monetary allowance
+   ✓ the portable SDK admission port preserves original permit/report identities and read-only outcomes  419ms
+   ↓ native wire model/output/retention/effort and frontier temperature mismatches refuse before ledger dispatch
+   ↓ an unconfirmed native report keeps actual partial usage, blocks another permit and cannot strengthen termination on retry
+   ↓ native-host permits preserve a shorter configured model timeout independently of the longer host authority
+   ↓ the actual compiled native serializer reserves the whole Unicode wire before provider HTTP and reports real reply usage
+   ↓ a known zero paid allocation refuses the compiled native provider before dispatch without inventing unsettled work
+   ↓ a lost native permit reply cannot launch or retry through the compiled adapter
+   ↓ a lost actual native settlement report fences continuation while preserving settled usage and the original report
+   ↓ successive native requests share the original cumulative call ceiling and a refused continuation cannot reach provider HTTP
+   ↓ native Responses streaming remains live while admission and terminal usage stay with the original host
+   ↓ an actual native stream ending without provider completion retains uncertainty and never authorizes another request
+   ↓ native local streaming handles fragmented NDJSON and reports local usage only after an explicit completion
+   ↓ native Anthropic messages retain the selected model, finite output and actual terminal usage without transporting credentials to the daemon
+   ↓ a native 429 is a known request rejection while a disallowed explicit retry remains fenced before another provider request
+   ↓ native API cancellation stops the host wait without claiming a still-running provider fixture terminated
+   ↓ an oversized native provider response is refused whole with unknown liability and cannot resume model dispatch
+   ↓ the production native model guard refuses all bare API methods before provider dispatch
+   ↓ the compiled read-only model helper supplies whole fresh graph context and closes its original host scope
+   ↓ read-only native admission refuses a changed selected instance before provider dispatch
+   ↓ a read-only native admission acknowledgement loss retains the exact original identity and cannot call the provider
+   ↓ an uncertain managed timeout cannot silently spend through a fresh recovery stream
+   ↓ compiled Explain File and ADR Compliance use the same original host graph/model authority
+   ✓ compiled command authority is captured before asynchronous context reads and refuses changed selection without inference  498ms
+   ↓ compiled native commands honour an already-cancelled progress token before context or paid work starts
+   ✓ compiled command Cancel propagates to native HTTP and cannot publish a successful answer or confirm remote termination  629ms
+   ↓ native CLI prompt reserves original invocation liability with unclaimed API provenance and unmeasured usage
+   ↓ native CLI continues under the same cumulative ledger, never a fresh allocation after each prompt
+   ↓ lost native CLI permit acknowledgement cannot allocate a replacement or confirm closure
+   ↓ native CLI cancellation/report loss retains original liability and cannot strengthen descendant termination
+   ↓ native CLI enforces its shorter core permit deadline without proving native work stopped
+   ↓ native API still refuses an unresolved provider despite the CLI binding amendment
+   ↓ compiled native CLI option builders require the original pass and await its model reservation and report
+   × portable SDK model execution reserves before actual native HTTP and reports observed protocol usage under the same graph pass 550ms
+     → expected [Function] to throw error including 'REQUEST_LIMIT' but got 'EXECUTION_MODEL_REQUEST_FAILED: retai…'
+   ✓ portable SDK lost model admission keeps original inspection and never invokes a replacement callback  392ms
+   ✓ portable SDK report loss permits exact report recovery without a stronger termination claim or new request  372ms
+   ✓ portable SDK model timeout rejects waiting while its declared noncooperative callback remains running  691ms
+   ✓ portable SDK rejects successful prose without explicit provider observation and preserves unknown work  388ms
+   ✓ portable SDK callback gets the captured final request despite mutation during asynchronous admission  324ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/host-managed-execution.test.ts > portable SDK model execution reserves before actual native HTTP and reports observed protocol usage under the same graph pass
+AssertionError: expected [Function] to throw error including 'REQUEST_LIMIT' but got 'EXECUTION_MODEL_REQUEST_FAILED: retai…'
+
+Expected: "REQUEST_LIMIT"
+Received: "EXECUTION_MODEL_REQUEST_FAILED: retain sdk-native-http/sdk-second; Error: EXECUTION_REQUEST_REJECTED: HTTP 409: {"error":"HOST_EXECUTION_REJECTED","message":"Error: HOST_MODEL_REQUIRED_CONTEXT_MISSING"}; never redispatch"
+
+ ❯ tests/host-managed-execution.test.ts:1604:36
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed | 109 skipped (120)
+   Start at  07:53:10
+   Duration  13.77s (transform 2.94s, setup 0ms, collect 8.35s, tests 5.02s, environment 0ms, prepare 135ms)
+

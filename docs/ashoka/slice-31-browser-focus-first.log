@@ -1,0 +1,50 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ❯ tests/computer-browser-worker.test.ts (7 tests | 3 failed) 11265ms
+   ✓ performs real Unicode, checked, click/readback and scrolling using opaque current references  2923ms
+   ✓ moved/covered controls, disabled and credential controls never receive a guessed action  1563ms
+   ✓ forbidden posts, redirects, popups and frames cannot reach another origin or authority  5184ms
+   ✓ exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime  1559ms
+   × private worker process preserves typed observations and responsive independent termination 14ms
+     → __vite_ssr_import_meta__.resolve is not a function
+   × stop bypasses a pending browser navigation and never waits for its ten-second server response 11ms
+     → __vite_ssr_import_meta__.resolve is not a function
+   × masked frames have a verified digest and image exhaustion refuses before another input 9ms
+     → __vite_ssr_import_meta__.resolve is not a function
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-browser-worker.test.ts > private worker process preserves typed observations and responsive independent termination
+TypeError: __vite_ssr_import_meta__.resolve is not a function
+ ❯ BrowserHarnessWorker.create src/computer/browser-harness.ts:44:100
+
+ ❯ harness tests/computer-browser-worker.test.ts:79:14
+ ❯ tests/computer-browser-worker.test.ts:81:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/computer-browser-worker.test.ts > stop bypasses a pending browser navigation and never waits for its ten-second server response
+TypeError: __vite_ssr_import_meta__.resolve is not a function
+ ❯ BrowserHarnessWorker.create src/computer/browser-harness.ts:44:100
+
+ ❯ harness tests/computer-browser-worker.test.ts:79:14
+ ❯ tests/computer-browser-worker.test.ts:87:70
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/computer-browser-worker.test.ts > masked frames have a verified digest and image exhaustion refuses before another input
+TypeError: __vite_ssr_import_meta__.resolve is not a function
+ ❯ BrowserHarnessWorker.create src/computer/browser-harness.ts:44:100
+
+ ❯ harness tests/computer-browser-worker.test.ts:79:14
+ ❯ tests/computer-browser-worker.test.ts:92:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 4 passed (7)
+   Start at  18:44:54
+   Duration  12.03s (transform 152ms, setup 0ms, collect 329ms, tests 11.27s, environment 0ms, prepare 162ms)
+

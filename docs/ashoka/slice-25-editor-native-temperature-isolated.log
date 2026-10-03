@@ -1,0 +1,95 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.1
+[2026-10-01T23:42:30.100Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.2
+[2026-10-01T23:42:30.107Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.4
+[2026-10-01T23:42:30.112Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-6-sol
+[2026-10-01T23:42:30.117Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-6-luna
+[2026-10-01T23:42:30.121Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > omits sampling for gpt-5.5 even when none is requested without sampling qualification
+[2026-10-01T23:42:30.125Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > omits sampling for gpt-5.6-sol even when none is requested without sampling qualification
+[2026-10-01T23:42:30.129Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5
+[2026-10-01T23:42:30.134Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5-mini
+[2026-10-01T23:42:30.138Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5-nano
+[2026-10-01T23:42:30.143Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to o3
+[2026-10-01T23:42:30.147Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-6-astra
+[2026-10-01T23:42:30.151Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-6.1-sol
+[2026-10-01T23:42:30.155Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves dreamer role, prompt/schema, effort and selected model in Responses
+[2026-10-01T23:42:30.361Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves normalizer role, prompt/schema, effort and selected model in Responses
+[2026-10-01T23:42:30.500Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in responses without changing the role
+[2026-10-01T23:42:30.714Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in chat-completions without changing the role
+[2026-10-01T23:42:30.917Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > retains GPT-4.1 sampling and conservatively omits unqualified future/custom sampling
+[2026-10-01T23:42:31.234Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-opus-4-7
+[2026-10-01T23:42:31.335Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-opus-4-8
+[2026-10-01T23:42:31.440Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-sonnet-5-5
+[2026-10-01T23:42:31.543Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-fable-5-1
+[2026-10-01T23:42:31.640Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-mythos-preview
+[2026-10-01T23:42:31.742Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > keeps requested temperature in policy/migration while exposing effective omission and role intent
+[2026-10-01T23:42:31.750Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > does not let capability evidence for another model enable temperature
+[2026-10-01T23:42:31.755Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > blocks unsupported none without a provider request or automatic effort escalation
+[2026-10-01T23:42:31.762Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves daemon role and exposes omitted temperature in route provenance
+[2026-10-01T23:42:31.766Z] [INFO]  LLM provider: openai (model: gpt-4.1)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves daemon role and exposes omitted temperature in route provenance
+[2026-10-01T23:42:31.772Z] [INFO]  LLM provider: none (model: n/a)
+
+ ✓ tests/model-temperature.test.ts (27 tests) 1698ms
+   ✓ cognitive roles without unsupported temperature > retains GPT-4.1 sampling and conservatively omits unqualified future/custom sampling  317ms
+
+ Test Files  1 passed (1)
+      Tests  27 passed (27)
+   Start at  02:42:28
+   Duration  3.15s (transform 355ms, setup 0ms, collect 1.06s, tests 1.70s, environment 0ms, prepare 160ms)
+

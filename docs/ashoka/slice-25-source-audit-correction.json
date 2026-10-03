@@ -1,0 +1,517 @@
+{
+  "at": "2026-10-01T17:52:05.6524206Z",
+  "original_manifest": "docs/ashoka/slice-25-source-audit.json",
+  "correction": "The original manifest named architect-panel.ts, which did not exist. Original physical reads totaled 83 files. This is a new actual read of chat-panel.ts, not a historical read assertion.",
+  "inventory": [
+    {
+      "path": "src/graph/contracts.ts",
+      "historically_present": true,
+      "original_bytes": 20767,
+      "original_sha256": "33a249a9d9604c483e667dae3db73d907917cdd1976552373a680b8dded6f2e1"
+    },
+    {
+      "path": "src/tools/reconciliation-transaction.ts",
+      "historically_present": true,
+      "original_bytes": 3020,
+      "original_sha256": "e962c857fe509ab4202f83441c17bd066ca13f66937f911083799a62ecf0ba19"
+    },
+    {
+      "path": "src/tools/query-resource.ts",
+      "historically_present": true,
+      "original_bytes": 3245,
+      "original_sha256": "10fdd8864bd1f8db5a0dfa0241a44ec20625b7318669e1e49a7575ec57e4f794"
+    },
+    {
+      "path": "src/tools/enrich-parser-nodes.ts",
+      "historically_present": true,
+      "original_bytes": 120416,
+      "original_sha256": "a46f4e17bc0348dde43bf3d427299f9a53f2f1e16d3520f51c8b32ac9376aff3"
+    },
+    {
+      "path": "src/cognitive/llm.ts",
+      "historically_present": true,
+      "original_bytes": 78345,
+      "original_sha256": "f2fe12b1075f983ce25ad351bea7b25d26f3fd3da65d6a75e788d38836b2b6f7"
+    },
+    {
+      "path": "src/cognitive/graph-rag.ts",
+      "historically_present": true,
+      "original_bytes": 44204,
+      "original_sha256": "9e44706bbe3157f5402c555404cd7fb3eb24b03b81ee4e0c49bc126903cc99a0"
+    },
+    {
+      "path": "src/utils/engine-env.ts",
+      "historically_present": true,
+      "original_bytes": 16655,
+      "original_sha256": "8ed402b232753b4e974daecf2ac9a88818cd64843eda7214d771d6fda88baa99"
+    },
+    {
+      "path": "src/cognitive/strategies/llm-dream.ts",
+      "historically_present": true,
+      "original_bytes": 24912,
+      "original_sha256": "1e873124e32ebd6e4747ce67b7bcf18b7cc409cd131a3ffcd4f75fbb2c4efd73"
+    },
+    {
+      "path": "src/index.ts",
+      "historically_present": true,
+      "original_bytes": 17429,
+      "original_sha256": "7a864362184bc325698feaaa25c5caa7e593c0a8ac189c6e42689cf77ddc47bb"
+    },
+    {
+      "path": "src/server/server.ts",
+      "historically_present": true,
+      "original_bytes": 13863,
+      "original_sha256": "eaaa8a2e857386fec251c01d9a0fb916c9d1d4e2bed11d80245c0165a0b5c6ea"
+    },
+    {
+      "path": "src/cognitive/dreamer.ts",
+      "historically_present": true,
+      "original_bytes": 10313,
+      "original_sha256": "2a0f6b2e112c21162baa75dc9647b16fd57d7d70a437d525d3f4881eeffc1586"
+    },
+    {
+      "path": "src/architect/plan-registry.ts",
+      "historically_present": true,
+      "original_bytes": 54840,
+      "original_sha256": "08cbc18fc13df24739a92bd16d86769921fbcbc41572732c8ec8c8653118b692"
+    },
+    {
+      "path": "src/cognitive/normalizer.ts",
+      "historically_present": true,
+      "original_bytes": 53823,
+      "original_sha256": "c56ae0577d7c7ec624f8dd14428ea83c05904485ef31748399d6493d6c6a4242"
+    },
+    {
+      "path": "src/architect/cli-bridge.ts",
+      "historically_present": true,
+      "original_bytes": 45148,
+      "original_sha256": "be03269857cd72aa39e77b7d19734333febd5478e19a52eeb6a93c58dc6239a4"
+    },
+    {
+      "path": "src/cognitive/engine.ts",
+      "historically_present": true,
+      "original_bytes": 96273,
+      "original_sha256": "c23b42bd186feb82b3a4798e793abf9bc4c0410b724d52205069b18f02f52517"
+    },
+    {
+      "path": "src/cognitive/scheduler.ts",
+      "historically_present": true,
+      "original_bytes": 43690,
+      "original_sha256": "9d5fa9cbb74436485a5c37b23a98d9b0c8bf482359ad374cba4a4dc909b48f63"
+    },
+    {
+      "path": "src/cognitive/federation.ts",
+      "historically_present": true,
+      "original_bytes": 14726,
+      "original_sha256": "440e69177921a3229eaac23ca3d21fb8c0c2deaa2ff9cdb3b18022abda0dd515"
+    },
+    {
+      "path": "src/cognitive/intervention.ts",
+      "historically_present": true,
+      "original_bytes": 78085,
+      "original_sha256": "b5ac1902866ed30eae4743d086b1d4e5ead5d8f8ebcc970ae3aa5984104329c8"
+    },
+    {
+      "path": "src/cognitive/narrator.ts",
+      "historically_present": true,
+      "original_bytes": 28718,
+      "original_sha256": "2fbf52fbac469d47e04c6c7fc4113f078ce8283063624941d80e1f5290165de2"
+    },
+    {
+      "path": "src/tools/graph-health.ts",
+      "historically_present": true,
+      "original_bytes": 33282,
+      "original_sha256": "2274ac39b189e0020c9e3fb525f605d1455888904b29245b36dac8eeff868583"
+    },
+    {
+      "path": "src/graph/snapshot.ts",
+      "historically_present": true,
+      "original_bytes": 18629,
+      "original_sha256": "f0b699651a860d9c77b13379141669b4d0a03645dec2d6f4b48e8d8ea13af855"
+    },
+    {
+      "path": "src/graph/read-model.ts",
+      "historically_present": true,
+      "original_bytes": 35304,
+      "original_sha256": "20876c3016523a72b31c0aad2f3245957d829762fb315f815910820c1a721b6f"
+    },
+    {
+      "path": "src/graph/store.ts",
+      "historically_present": true,
+      "original_bytes": 4367,
+      "original_sha256": "abc927de84d99f91dfb31c8c5eb81a19ac14d77f8bf5754ae7e18ac44d5066a9"
+    },
+    {
+      "path": "src/explorer/queries.ts",
+      "historically_present": true,
+      "original_bytes": 19860,
+      "original_sha256": "d4f90c5c81ac22a250102c9ca9812262acd329cac1ed0cbafdda44827a3a06bd"
+    },
+    {
+      "path": "src/explorer/routes.ts",
+      "historically_present": true,
+      "original_bytes": 13523,
+      "original_sha256": "444a128c2d702064d5dfa808918b20248aca5b251fab2d39291594ba5bca1f15"
+    },
+    {
+      "path": "src/explorer/mutations.ts",
+      "historically_present": true,
+      "original_bytes": 17264,
+      "original_sha256": "fb35e7313c830412617a5f61f89aa8965575b1a14a0878730bab5f2cd9e1460e"
+    },
+    {
+      "path": "explorer/src/App.tsx",
+      "historically_present": true,
+      "original_bytes": 20417,
+      "original_sha256": "c93eb0e9ec689ab03c813214daeed4188d69709d84ce94fcd4160b9cc80269be"
+    },
+    {
+      "path": "explorer/src/Inspector.tsx",
+      "historically_present": true,
+      "original_bytes": 16570,
+      "original_sha256": "82270621d2f9ec4f29bdd0c308c385af0e8bf47daf7180a3581f73a3c4228a30"
+    },
+    {
+      "path": "explorer/src/types.ts",
+      "historically_present": true,
+      "original_bytes": 4555,
+      "original_sha256": "5d9e03d945b36844cfcd108b936bdf9d78f9eadcb43e905cb444bc640da3b9b0"
+    },
+    {
+      "path": "explorer/src/api.ts",
+      "historically_present": true,
+      "original_bytes": 10832,
+      "original_sha256": "5faafcb6ec8ea608c28d693ea95c138e747742c181c269b26ff0a0601f639d61"
+    },
+    {
+      "path": "explorer/src/sse.ts",
+      "historically_present": true,
+      "original_bytes": 4928,
+      "original_sha256": "e461697e0372b90e6e70ea3872c41da16b13c50973dc2400cfd1865d91228b20"
+    },
+    {
+      "path": "explorer/src/GraphCanvas.tsx",
+      "historically_present": true,
+      "original_bytes": 28055,
+      "original_sha256": "46badced7773642acbbce9316554fa28825781df4c33afea40ac1bc7f2d7579f"
+    },
+    {
+      "path": "explorer/src/Graph3DCanvas.tsx",
+      "historically_present": true,
+      "original_bytes": 67647,
+      "original_sha256": "fe74c2e296ee90bf7585099b10a7a59cd9b76232a0830de9058758508226c685"
+    },
+    {
+      "path": "explorer/src/three/LabelOverlay.ts",
+      "historically_present": true,
+      "original_bytes": 5020,
+      "original_sha256": "c84aeab9c254cc65cc74abec5ffde5fcbbf4b58f38ce3d9cd2d69e9379876ca1"
+    },
+    {
+      "path": "explorer/src/label-layout.ts",
+      "historically_present": true,
+      "original_bytes": 1338,
+      "original_sha256": "654a7b8404f41a08645211c80ace3cb86c349282688f8e248828e310378db229"
+    },
+    {
+      "path": "src/server/dashboard.ts",
+      "historically_present": true,
+      "original_bytes": 98143,
+      "original_sha256": "184445134d1621c013f2cd237bbb750c6b6cccb75a6a54f189943f7433e19034"
+    },
+    {
+      "path": "src/server/schedule-api.ts",
+      "historically_present": true,
+      "original_bytes": 7454,
+      "original_sha256": "97118e8636abd59410924da176b941db32d7a16cfb7ee277a11437e4ff9b849b"
+    },
+    {
+      "path": "src/cognitive/schedule-definition.ts",
+      "historically_present": true,
+      "original_bytes": 8828,
+      "original_sha256": "5e369d74f99853e099d841be44cc3adeb26e14a0b7f7dfc71e5a50dab142e471"
+    },
+    {
+      "path": "src/cli/commands/schedule.ts",
+      "historically_present": true,
+      "original_bytes": 14539,
+      "original_sha256": "50557a198c8ca606b86bf1da06d8fe1b4899746ee36dcea78a8e88f506dc4e9b"
+    },
+    {
+      "path": "tests/scheduler-authority.test.ts",
+      "historically_present": true,
+      "original_bytes": 8607,
+      "original_sha256": "c7340fb8ac6d9cab8ff848e09b2ba06e475807d52dcf085e16f7d68de4f5ba2f"
+    },
+    {
+      "path": "tests/schedule-http.test.ts",
+      "historically_present": true,
+      "original_bytes": 4066,
+      "original_sha256": "fb969c99aa69a20dd19bc469ee8ee79a42379b6134607086e482d3b1dd720b7a"
+    },
+    {
+      "path": "tests/explorer-snapshot.test.ts",
+      "historically_present": true,
+      "original_bytes": 8458,
+      "original_sha256": "4ca9ebdc84de1577b00f0004547027cb98969cb8d1c9895526a7b5f647863802"
+    },
+    {
+      "path": "tests/explorer-mutations.test.ts",
+      "historically_present": true,
+      "original_bytes": 14714,
+      "original_sha256": "dc9d922ac231b85fb0153a86ffc06df17dc6d89b0c5304e96268fd9d691d69bf"
+    },
+    {
+      "path": "docs/audits/2026-09-30-coverage/execution-simulation.md",
+      "historically_present": true,
+      "original_bytes": 120130,
+      "original_sha256": "cf57c3e4c53c02e46ffa90e75c3f6a598d5b7a63522a27514009777b3c262b6e"
+    },
+    {
+      "path": "docs/audits/2026-09-30-coverage/plan-refinement.md",
+      "historically_present": true,
+      "original_bytes": 66254,
+      "original_sha256": "947678ac8f491c3e221c07c7ea94a7052fa9a163c98964bbe20f9d0560d38525"
+    },
+    {
+      "path": "plans/graph-trust-and-agent-effectiveness.md",
+      "historically_present": true,
+      "original_bytes": 143947,
+      "original_sha256": "1e637940a7d1bf74708f60b4eba48f7570e7ea33ddc01f23085665d0295fc411"
+    },
+    {
+      "path": "src/server/schedule-workspace.ts",
+      "historically_present": true,
+      "original_bytes": 32650,
+      "original_sha256": "100a0ce9b8e13c6aaf15336959b2773450356ac17bcf3beea5710f8f1981f798"
+    },
+    {
+      "path": "src/server/schedule-workspace-contract.ts",
+      "historically_present": true,
+      "original_bytes": 5245,
+      "original_sha256": "c1d86ebc06a39ac8586bb0bce6da92c69f9595c9e3dc13f5875be3e6922ef055"
+    },
+    {
+      "path": "src/api/routes.ts",
+      "historically_present": true,
+      "original_bytes": 44611,
+      "original_sha256": "8f1e6853f463d6fc8748e0bd14bfa989f8f42b18ef4027bfd86d8a3c45991674"
+    },
+    {
+      "path": "src/cognitive/jobs.ts",
+      "historically_present": true,
+      "original_bytes": 25621,
+      "original_sha256": "3dc8bb02e2eec224e554ab67beb1a31f9054647da8630e25cca4cb4888978621"
+    },
+    {
+      "path": "explorer/src/view-contract.ts",
+      "historically_present": true,
+      "original_bytes": 2205,
+      "original_sha256": "78d2aef4d46d063cb32278eab363c2c2d9b78fa25df8960f3b8a7a070466f142"
+    },
+    {
+      "path": "explorer/src/CandidatesPanel.tsx",
+      "historically_present": true,
+      "original_bytes": 11490,
+      "original_sha256": "f1b18108b3390f596deda726fb4ede5b8e08a13f51e6c0b9570c2b91f7dbe80c"
+    },
+    {
+      "path": "explorer/src/TensionsPanel.tsx",
+      "historically_present": true,
+      "original_bytes": 7089,
+      "original_sha256": "d08a055b9eefa05add5f557aed22126e604e25cbeb05b7636eabc41e92dbda0f"
+    },
+    {
+      "path": "explorer/src/styles.css",
+      "historically_present": true,
+      "original_bytes": 39800,
+      "original_sha256": "c9bef254378bb26537efb0a275d79e3a1f9021c8e3a5d638ba853bebe5a8133e"
+    },
+    {
+      "path": "tests/schedule-workspace.test.ts",
+      "historically_present": true,
+      "original_bytes": 9960,
+      "original_sha256": "04303289fe1de85b2b4f3fd6383c4894f221c4e3e941ecd1545ae7b42b1789bf"
+    },
+    {
+      "path": "tests/explorer-canonical-navigation.test.ts",
+      "historically_present": true,
+      "original_bytes": 7808,
+      "original_sha256": "b446341d2d3ab0b6c13d535946a2c13a5ae705e803e52e9e43f36563db8209b0"
+    },
+    {
+      "path": "tests/normalization-evidence.test.ts",
+      "historically_present": true,
+      "original_bytes": 32382,
+      "original_sha256": "6412d3e6814a3b50edc79ffbfde1a2059321ff533ec2e4c297052025ed64999b"
+    },
+    {
+      "path": "tests/engine-jobs.test.ts",
+      "historically_present": true,
+      "original_bytes": 14249,
+      "original_sha256": "67ff360cbb6ebdcceab18e47ddfcea99aba7e8fadcb192a9aba17f66a2cb321b"
+    },
+    {
+      "path": "scripts/qualify-ashoka-surfaces.mjs",
+      "historically_present": true,
+      "original_bytes": 15871,
+      "original_sha256": "48ec6bbaeefa3ec1a512fedbb6f664821251ca5661f3add2d5534d0a7d5f3124"
+    },
+    {
+      "path": "docs/ashoka/explorer-evidence.md",
+      "historically_present": true,
+      "original_bytes": 3243,
+      "original_sha256": "17344429d4050548e4557f9455fe3b1d91ebb933cfe912b1b5cae713332a8bc1"
+    },
+    {
+      "path": "docs/ashoka/schedule-workspace.md",
+      "historically_present": true,
+      "original_bytes": 3698,
+      "original_sha256": "2c874175f7c5d8fc840537ac0f445b184ff11aa50ac9bf3a99dc3db369f4c236"
+    },
+    {
+      "path": "docs/architecture.md",
+      "historically_present": true,
+      "original_bytes": 40447,
+      "original_sha256": "b8c8cbdbed55415a5dd88079881c0360c719949e11d8a6885378cd6f5a05ef77"
+    },
+    {
+      "path": "docs/data-model.md",
+      "historically_present": true,
+      "original_bytes": 40394,
+      "original_sha256": "32ce97b3817684944b20cb998c5c5347b159505a144c52b8ecafbb6b2604c412"
+    },
+    {
+      "path": "docs/ashoka/configuration-inventory.json",
+      "historically_present": true,
+      "original_bytes": 307420,
+      "original_sha256": "f67beb2419cb4f0287cbf353f214b57eaf0c39445872f60ac493d73632826471"
+    },
+    {
+      "path": "src/architect/routes.ts",
+      "historically_present": true,
+      "original_bytes": 630637,
+      "original_sha256": "bbf837703a6792a6c9287a23e14fd3e8002260b7a0bb3cf6afc40a36d33ef9f1"
+    },
+    {
+      "path": "src/architect/native-tool-loop.ts",
+      "historically_present": true,
+      "original_bytes": 42651,
+      "original_sha256": "8b00396defd1e03fc505bcadc95b310ecafc87709a05f1495b57b32d01c3e3b5"
+    },
+    {
+      "path": "src/architect/cli-mcp-bridge.ts",
+      "historically_present": true,
+      "original_bytes": 13006,
+      "original_sha256": "366d754ac5cbde21d2ff74929ae9a8ef53859af51facc617e0a54e76c4fbcc46"
+    },
+    {
+      "path": "src/utils/mcp-result.ts",
+      "historically_present": true,
+      "original_bytes": 1728,
+      "original_sha256": "d2710b2de76579cc478053112144ba2f8b0402d46e61e742a37a630c56390140"
+    },
+    {
+      "path": "src/graph/context-pack.ts",
+      "historically_present": true,
+      "original_bytes": 19771,
+      "original_sha256": "c2d66138f56b4c0e3d11f54e077e86608bd5b51950bcf1df32cd4e79e6ce8cff"
+    },
+    {
+      "path": "src/graph/change-obligations.ts",
+      "historically_present": true,
+      "original_bytes": 18153,
+      "original_sha256": "a71beb8bb8c99f835a20a1ae10444043a80074d4dbacdb3575d52d5bba8cb440"
+    },
+    {
+      "path": "src/server/tool-boundary.ts",
+      "historically_present": true,
+      "original_bytes": 6269,
+      "original_sha256": "658bac46085166ca48df2c641e0b93207f7775cbf6479b081a3ac292a1ebdbac"
+    },
+    {
+      "path": "src/server/execution-policy.ts",
+      "historically_present": true,
+      "original_bytes": 5679,
+      "original_sha256": "94e34862977fa9f8ecd30a09327a702fb252c150b2d98bc3eea66e95f00a20d6"
+    },
+    {
+      "path": "extensions/vscode/src/daemon-client.ts",
+      "historically_present": true,
+      "original_bytes": 5525,
+      "original_sha256": "29d98cdbb3a31126781521c7072701a3f886c3770a2143180360978f933a5bba"
+    },
+    {
+      "path": "extensions/vscode/src/request-compaction.ts",
+      "historically_present": true,
+      "original_bytes": 14113,
+      "original_sha256": "1f37f4ae457fe066da5b6d494d6caa505c3727f2bd7941007842f303c8309661"
+    },
+    {
+      "path": "extensions/vscode/src/context-builder.ts",
+      "historically_present": true,
+      "original_bytes": 92572,
+      "original_sha256": "80635671b76fb35343a4cca3d5ceb4a1153ad893d22185c267d0df70a72263cc"
+    },
+    {
+      "path": "extensions/vscode/src/architect-panel.ts",
+      "historically_present": false,
+      "original_bytes": null,
+      "original_sha256": null
+    },
+    {
+      "path": "packages/token-economy/src/tool-result-compression.ts",
+      "historically_present": true,
+      "original_bytes": 6753,
+      "original_sha256": "bbd1683b6fc4243b5cbc41e684a21de521ffe69ba9929fdd33e98e5b02ff9cc8"
+    },
+    {
+      "path": "packages/token-economy/src/index.ts",
+      "historically_present": true,
+      "original_bytes": 335,
+      "original_sha256": "1bc1a83253a5f73f599b21a037aa48d777148cd1496a97b1bac1f7ba03326f07"
+    },
+    {
+      "path": "packages/sdk/src/seams/architect.ts",
+      "historically_present": true,
+      "original_bytes": 1908,
+      "original_sha256": "f9d9cc09e86f07bce310b5a99ebf5771964243a2a5c4732141e80553114927a5"
+    },
+    {
+      "path": "packages/host/src/context.ts",
+      "historically_present": true,
+      "original_bytes": 7162,
+      "original_sha256": "266d9a376b291791e54167a9bad43dc3a823df0acef161722e80ec238f1d95f2"
+    },
+    {
+      "path": "packages/host/src/loader.ts",
+      "historically_present": true,
+      "original_bytes": 11116,
+      "original_sha256": "4ff669c593bb15c2aa3c7e59df0971cefefb11a53d15bd27d292f9c873f9e86f"
+    },
+    {
+      "path": "packages/host/src/watchdog.ts",
+      "historically_present": true,
+      "original_bytes": 3262,
+      "original_sha256": "a868a9d2f8f2bf76a3e905762e0a5f75f72e1360ba058092492c0f030c229a6b"
+    },
+    {
+      "path": "docs/audits/2026-09-30-coverage/architect-context-actions.md",
+      "historically_present": true,
+      "original_bytes": 18677,
+      "original_sha256": "098a43a430c961ec62b4ef4f3eb3e3d002a69254a90f7278bae2e6a650425be6"
+    },
+    {
+      "path": "docs/audits/2026-09-30-coverage/graph-centered-execution.md",
+      "historically_present": true,
+      "original_bytes": 38616,
+      "original_sha256": "5a9f286e53d69c7e69039f26d9f8f7af30d87c9c9792c6c0f6ad60e93e76e207"
+    }
+  ],
+  "new_read": {
+    "path": "extensions/vscode/src/chat-panel.ts",
+    "bytes": 281211,
+    "sha256": "176b9fc5c39376c41dafb4c88d0044812a1d4320b3b583d554d74acdc12156bb",
+    "lines": 6008
+  }
+}

@@ -1,0 +1,1 @@
+{"status":"transport_navigation_qualified_live_cutover_pending","root":{"passed":1977,"failed":0,"skipped":2,"files":173,"exit_code":0},"affected_tests":46,"hashes":44,"navigation_ms":4233,"selection_ms":950,"health_probes":{"count":528,"p95_ms":16,"max_ms":34,"unchanged_authority":true,"unchanged_publication":true}}

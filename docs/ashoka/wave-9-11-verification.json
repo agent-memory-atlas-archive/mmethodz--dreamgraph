@@ -1,0 +1,20 @@
+{
+  "schema": "dreamgraph.wave_verification.v1",
+  "session": "ea472546-116f-46df-a577-1946736958f7",
+  "approved_items": 12,
+  "native_response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"success\": true,\n  \"compliance\": {\n    \"status\": \"compliant\",\n    \"parity_percentage\": 100,\n    \"total_entries\": 12,\n    \"matched\": 12,\n    \"gaps_remaining\": 0,\n    \"regressions\": 0\n  },\n  \"regressions\": 0,\n  \"recommendation\": {\n    \"action\": \"accept\",\n    \"justification\": \"All entries match. No regressions detected.\"\n  },\n  \"message\": \"Verification: COMPLIANT — 100% parity, 0 gaps, 0 regressions. Recommendation: accept\"\n}"
+      }
+    ]
+  },
+  "scope": "9/11dependency handoff; prior12exits preserved",
+  "remaining_gates": [
+    "15 source truth",
+    "17 durable jobs/restart",
+    "27 paid and client usefulness",
+    "31 actual native CU/seat"
+  ]
+}

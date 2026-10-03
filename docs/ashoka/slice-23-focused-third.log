@@ -1,0 +1,142 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+[2026-10-02T11:53:07.167Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-02T11:53:07.211Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-02T11:53:07.254Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-02T11:53:07.261Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+ ✓ tests/engine-configuration.test.ts (18 tests) 706ms
+ ✓ tests/schedule-http.test.ts (2 tests) 949ms
+   ✓ shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay  745ms
+stderr | tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+[2026-10-02T11:53:08.883Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T11:53:08.996Z] [INFO]  LLM provider: none (model: old-model)
+
+ ✓ tests/schedule-workspace.test.ts (8 tests) 1947ms
+   ✓ actual served browser script saves disabled, preserves invalid drafts, and supports keyboard tabs/filter/edit  514ms
+stderr | tests/configuration-http.test.ts > configuration HTTP parity > saves scheduler settings through the rendered form and reloads exactly
+[2026-10-02T11:53:09.124Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:53:09.125Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T11:53:09.252Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:53:09.252Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+ ✓ tests/configuration-http.test.ts (4 tests) 341ms
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T11:53:09.312Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T11:53:09.329Z] [ERROR] Scheduler tick: Error: ENOENT: no such file or directory, rename 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-auqHVy\data\reconciliation_journal.json.0e21bbfc-e295-4abb-843a-7f1690db2144.tmp' -> 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-auqHVy\data\reconciliation_journal.json'
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T11:53:09.429Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T11:53:09.621Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":0,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:53:09.621Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T11:53:09.681Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T11:53:09.693Z] [ERROR] Scheduler tick: Error: ENOENT: no such file or directory, rename 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-op10tz\data\reconciliation_journal.json.0da5b07d-b41a-45f1-97ad-5af334134741.tmp' -> 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-op10tz\data\reconciliation_journal.json'
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T11:53:09.782Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T11:53:09.964Z] [INFO]  LLM provider: none (model: new-model)
+[2026-10-02T11:53:09.964Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:53:09.964Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T11:53:10.080Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T11:53:10.095Z] [ERROR] Scheduler tick: Error: GRAPH_REVISION_CONFLICT: read publication changed; retry the whole snapshot
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T11:53:10.181Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T11:53:10.394Z] [INFO]  LLM provider: none (model: other-writer)
+[2026-10-02T11:53:10.395Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:53:10.395Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T11:53:10.438Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+[2026-10-02T11:53:10.539Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+[2026-10-02T11:53:11.099Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:53:11.195Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:53:11.227Z] [WARN]  LLM: OpenAI provider configured but no API key set (DREAMGRAPH_LLM_API_KEY)
+[2026-10-02T11:53:11.227Z] [INFO]  LLM provider: openai (model: gpt-5.4)
+[2026-10-02T11:53:11.227Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:53:11.227Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:53:11.238Z] [INFO]  LLM dreamer config: model=gpt-5.4-mini, temp=0, maxTokens=1600
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:53:11.297Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T11:53:11.393Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T11:53:11.450Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T11:53:11.460Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T11:53:11.573Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T11:53:11.726Z] [INFO]  LLM architect config: provider=none (general), model=old-model (general), temp=0.7, maxTokens=2048
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T11:53:11.915Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ❯ tests/configuration-workspace.test.ts (9 tests | 1 failed) 4871ms
+   ✓ maps every consumed setting to one typed control or named read-only exception without leaking stored secrets  1845ms
+   ✓ keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work  432ms
+   ✓ edits structured component settings and retains explicit zeros/default inheritance through restart parsing  363ms
+   ✓ retains a whole captured save after a committed lost reply and recovers that receipt without a second effect  402ms
+   × keeps drafts on concurrent revision refusal and never overwrites the intervening file 356ms
+     → ENOTEMPTY: directory not empty, rmdir 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-OOc4n2'
+   ✓ previews a scoped template without writes, applies protected staging and undoes the original bytes  658ms
+   ✓ generic apply refreshes actual cached model controls and daemon role readback without touching session overrides 197ms
+   ✓ reports a staged deletion as a mismatch until restart clears the old runtime override 164ms
+   ✓ root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry  453ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+Error: ENOTEMPTY: directory not empty, rmdir 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-OOc4n2'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 40 passed (41)
+   Start at  14:53:01
+   Duration  10.47s (transform 2.36s, setup 0ms, collect 21.14s, tests 8.81s, environment 1ms, prepare 751ms)
+

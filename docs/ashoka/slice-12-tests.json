@@ -1,0 +1,26 @@
+{
+  "schema": "dreamgraph.verification_packet.v1",
+  "slice": 12,
+  "files": 125,
+  "passed": 1391,
+  "failed": 0,
+  "skipped": 2,
+  "success": true,
+  "provider_calls": 0,
+  "server_build": "passed",
+  "catalog": {
+    "tools": 93,
+    "resources": 31,
+    "classifications": 94,
+    "local_extension": "read_local_file"
+  },
+  "configuration_inventory": 308,
+  "checks": {
+    "mcp_catalog": "passed",
+    "graph_contracts": 31,
+    "baseline": 8,
+    "provider_capabilities": "r3 passed",
+    "configuration": "passed"
+  },
+  "scope": "Dependency handoff; common handler doubles are not positive-effect qualification for every owner; final coverage/platform/native CLI/usefulness gates remain."
+}

@@ -1,0 +1,78 @@
+{
+  "scope": "Complete source bytes read after frozen root qualification. Offline provider/native-executor reports and VSCode UI boundaries are declared fixtures; real local HTTP/core/SDK/native Node process tests do not claim paid models/native GUI/other OS",
+  "baseline_revision": 16,
+  "baseline_sha256": "386d82ee2db8882312e2686cf087f39f16a0a60a1d18fda539f489d403c55f9d",
+  "frozen_owners_cases_evidence": "equal to archived baseline15",
+  "files": [
+    {
+      "path": "src/graph/contracts.ts",
+      "bytes": 27933,
+      "sha256": "1d3c12816580b319c7db07a097ee4cbe7ef3aaafa4d44130956060dfb37666b0"
+    },
+    {
+      "path": "src/server/host-model-admission.ts",
+      "bytes": 12837,
+      "sha256": "37c9460b20557bddc18d7a80b99ff020125a6f2e42cd046730aca3fd68e7aead"
+    },
+    {
+      "path": "extensions/vscode/src/managed-cli-pass.ts",
+      "bytes": 6702,
+      "sha256": "bf86524a4192afcfca1dd8b5450fd4686f0f56de52bf551022954e43828629d9"
+    },
+    {
+      "path": "extensions/vscode/src/chat-panel.ts",
+      "bytes": 312793,
+      "sha256": "0f5985215c2c7df5745dd523b45c0c52805538b8978f159e1246468bcae81882"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/adapters/codex-cli/provider-port.ts",
+      "bytes": 14382,
+      "sha256": "083dfa289f6d8871a1a976c1328fb25572b93948b8fe17b9efd006ea627ae3d4"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/adapters/copilot-cli/provider-port.ts",
+      "bytes": 30062,
+      "sha256": "726ccdeea701104e0846819e89d81cb2fe9eb90006683f675097e944d3a6d93e"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/adapters/codex-cli/orchestrator.ts",
+      "bytes": 35412,
+      "sha256": "516be85b3b61ff041a0ce54492c836124962407837adb43868be42af14134a57"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/adapters/copilot-cli/orchestrator.ts",
+      "bytes": 35681,
+      "sha256": "10b11f9c93450d413aa58c1dc3e1ed38a1eaf707cedd3a1f5e07f19b96e7bba8"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/adapters/codex-cli/host/process-adapter.ts",
+      "bytes": 11689,
+      "sha256": "a189dcb2d33ced7d0ece29a4b0b266c8eb01584195289ef89131458e28010878"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/adapters/copilot-cli/host/process-adapter.ts",
+      "bytes": 28087,
+      "sha256": "c4ae3f7ad046cc51bc5c0bc2e794b6ec76377b99113a19adf17d0ef35bb20982"
+    },
+    {
+      "path": "extensions/vscode/src/commands.ts",
+      "bytes": 36777,
+      "sha256": "de842fc23f9db12e82794a08657956af64e9deadd1a08506fd99f294aae1883f"
+    },
+    {
+      "path": "packages/sdk/src/seams/graph-execution.ts",
+      "bytes": 30698,
+      "sha256": "905af07c071455683b157cf46f669318058b9373fbdaa124fa48e37b08865289"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 163156,
+      "sha256": "f868d5fa8fe1337bddb764ccad9f20d9fe5b5a9b12e5c36b92a85436ce6c476a"
+    },
+    {
+      "path": "extensions/vscode/src/test/copilot-cli-host-adapters.test.ts",
+      "bytes": 14701,
+      "sha256": "5868c4f94ce9cf42359bb83db8b6f77e10e9296755f052cb372b03ff48d2f611"
+    }
+  ]
+}

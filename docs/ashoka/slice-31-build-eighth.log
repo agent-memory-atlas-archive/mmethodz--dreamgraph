@@ -1,0 +1,5 @@
+
+> dreamgraph@13.4.0 build:server
+> tsc -b
+
+src/computer/browser-harness.ts(44,165): error TS2353: Object literal may only specify known properties, and 'windowsHide' does not exist in type 'ForkOptions'.

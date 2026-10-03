@@ -1,0 +1,6 @@
+
+> dreamgraph@13.4.0 build:server
+> tsc -b
+
+src/computer/qualify-browser.ts(92,12): error TS2540: Cannot assign to 'repos' because it is a read-only property.
+src/computer/qualify-browser.ts(123,12): error TS2540: Cannot assign to 'repos' because it is a read-only property.

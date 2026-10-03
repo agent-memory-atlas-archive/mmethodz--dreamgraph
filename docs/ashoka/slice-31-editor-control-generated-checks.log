@@ -1,0 +1,45 @@
+
+> dreamgraph@13.4.0 contracts:check
+> tsx scripts/generate-graph-contracts.mjs --check
+
+{"status":"verified","contracts":42,"source_sha256":"5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"}
+
+> dreamgraph@13.4.0 providers:check
+> tsx scripts/generate-provider-contracts.mjs --check
+
+
+> dreamgraph@13.4.0 metrics:check
+> tsx scripts/generate-metric-definitions.mjs --check
+
+Qualified 13 shared metric definitions
+
+> dreamgraph@13.4.0 mcp:check
+> tsx scripts/generate-mcp-catalog.mjs --check
+
+[2026-10-02T21:13:00.835Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-02T21:13:00.838Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T21:13:00.838Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T21:13:00.839Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-02T21:13:00.839Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-02T21:13:00.839Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-02T21:13:00.840Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-02T21:13:00.840Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-02T21:13:00.842Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-02T21:13:00.842Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-02T21:13:00.845Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-02T21:13:00.845Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-02T21:13:00.849Z] [INFO]  Registered 17 cognitive resources
+[2026-10-02T21:13:00.852Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-02T21:13:00.853Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-02T21:13:00.854Z] [INFO]  Registered 10 discipline execution tools
+{"tools":93,"resources":31,"parity":true,"provider_calls":0}
+
+> dreamgraph@13.4.0 ashoka:baseline:check
+> tsx scripts/freeze-ashoka-baseline.mjs
+
+{"status":"verified","owners":29,"cases":12,"evidence":8,"sha256":"94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"}
+
+> dreamgraph@13.4.0 config:check
+> tsx scripts/generate-configuration-inventory.mjs --check
+
+Configuration inventory: 308 typed entries, 105 literal source keys, 0 documentation-only names

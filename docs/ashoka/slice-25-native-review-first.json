@@ -1,0 +1,25 @@
+{
+  "trace": [
+    {
+      "name": "discipline_start_session",
+      "args": {
+        "type": "verification",
+        "description": "Complete the human-authorized bounded Slice25 source verification after the external daemon restart interrupted the prior audit transport. Preserve that record and all later Ashoka gates.",
+        "target_scope": [
+          "src/architect/plan-registry.ts",
+          "src/server/managed-execution.ts",
+          "scripts/workspace-artifacts.mjs",
+          "docs/ashoka/slice-25-conformance.json"
+        ],
+        "requires_ground_truth": true
+      },
+      "value": {
+        "success": false,
+        "error": {
+          "code": "INVALID_INPUT",
+          "message": "Arguments do not match the registered owner schema."
+        }
+      }
+    }
+  ]
+}

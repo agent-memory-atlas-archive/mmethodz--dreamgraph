@@ -1,0 +1,80 @@
+{
+  "schema": "dreamgraph.wsl_installation_proof.v1",
+  "recorded_at": "2026-10-03T02:43:19.078Z",
+  "platform": "linux",
+  "architecture": "x64",
+  "kernel": "6.6.87.2-microsoft-standard-WSL2",
+  "distribution": "PRETTY_NAME=\"Ubuntu 24.04.4 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.4 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+  "node": "20.20.2",
+  "npm": "10.8.2",
+  "master": "/home/mmethodz/.dreamgraph",
+  "source": "/tmp/dg-ashoka-wsl-6fc2ee52-529f-4662-ac22-ada9e448cd0d/source",
+  "version": "13.4.0",
+  "cli_version": "DreamGraph CLI v13.4.0 (Glass Atlas)",
+  "workspaces": [
+    {
+      "name": "@dreamgraph/sdk",
+      "version": "13.4.0",
+      "files": 92
+    },
+    {
+      "name": "@dreamgraph/host",
+      "version": "13.4.0",
+      "files": 28
+    },
+    {
+      "name": "@dreamgraph/token-economy",
+      "version": "13.4.0",
+      "files": 20
+    }
+  ],
+  "files": [
+    {
+      "file": "package.json",
+      "sha256": "ae49847cb390d7f728160a465f74590c7a235e1039e3cdc960d718a76032eefe"
+    },
+    {
+      "file": "dist/cli/dg.js",
+      "sha256": "d904dff72a0c6cc925b4f1dfbbb900cab2adb944f56114e2c89848d05d223578"
+    },
+    {
+      "file": "dist/computer/browser-harness.js",
+      "sha256": "8398de70aa91ce95d8c85a598056f3c91dcad8915c5ab8600ff2e05749b5e681"
+    },
+    {
+      "file": "dist/computer/browser-worker-entry.js",
+      "sha256": "c4b63f0a5345bee097ea33bb1683bbc1ae01f11119ac6c503b71a606d7fdded0"
+    }
+  ],
+  "runtime_version": "1.62.1",
+  "browser_executable": "/tmp/dg-ashoka-wsl-3e20aba0-2617-4c9e-8b89-93779607a2a6/browsers/chromium-1234/chrome-linux64/chrome",
+  "browser_version": "151.0.7922.34",
+  "model_requests": 0,
+  "native_sdk_contract": {
+    "control_methods": [
+      "readComputerPassSetup",
+      "prepareComputerPass",
+      "confirmComputerPass",
+      "cancelComputerPass",
+      "runComputerPass"
+    ],
+    "role": "computer_use",
+    "scope": "Installed export/schema readback only; no daemon request, grant or model dispatch."
+  },
+  "support_scope": "Actual WSL Linux test-bed installer and isolated headless browser only. No native desktop, CLI computer adapter, macOS, Linux Mint GUI or VS Code activation qualification.",
+  "browser_artifact_hash": "sha256:989e047721d1027a4c466900400905dfdb1b42ae614eb2e99dda9f303275f8fa",
+  "cli_output": {
+    "qualification_path": "/tmp/dg-ashoka-wsl-6fc2ee52-529f-4662-ac22-ada9e448cd0d/browser-qualification.json",
+    "worker_id": "ashoka-wsl-ubuntu-browser",
+    "platform": "linux",
+    "architecture": "x64",
+    "browser_version": "151.0.7922.34",
+    "node": "20.20.2",
+    "model_requests": 0,
+    "measured_checks": 11,
+    "evidence_hash": "sha256:989e047721d1027a4c466900400905dfdb1b42ae614eb2e99dda9f303275f8fa",
+    "stop_release_ms": 193.9729980000002,
+    "control_loss_stop_ms": 2605.4285689999997,
+    "note": "Qualification only. Instance setup, target review and explicit scoped permission are separate."
+  }
+}

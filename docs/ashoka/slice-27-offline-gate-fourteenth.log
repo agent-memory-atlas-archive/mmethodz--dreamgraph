@@ -1,0 +1,24 @@
+
+> dreamgraph@13.4.0 ashoka:system:check
+> node scripts/run-ashoka-system-checks.mjs --out docs/ashoka/slice-27-offline-gate-fourteenth
+
+Ashoka offline gate: server
+Ashoka offline gate: explorer
+Ashoka offline gate: editor
+Ashoka offline gate: contracts-check
+Ashoka offline gate: providers-check
+Ashoka offline gate: mcp-check
+Ashoka offline gate: metrics-check
+Ashoka offline gate: config-check
+Ashoka offline gate: ashoka-baseline-check
+Ashoka offline gate: editor-tests
+Ashoka offline gate: root-tests
+file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/run-ashoka-system-checks.mjs:109
+   if(result.reason||!result.closed||result.code!==0||result.signal)throw new Error((result.reason??'ASHOKA_GATE_STEP_FAILED')+':'+name);
+                                                                          ^
+
+Error: ASHOKA_GATE_STEP_FAILED:root-tests
+    at main (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/run-ashoka-system-checks.mjs:109:75)
+    at async file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/run-ashoka-system-checks.mjs:123:79
+
+Node.js v25.2.1

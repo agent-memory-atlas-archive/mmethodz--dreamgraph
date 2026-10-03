@@ -1,0 +1,45 @@
+{
+  "scope": "Slice25 ordinary editor API tool-turn/wrap-up admission; other entry points/CLI/SDK and full GE/UX gates remain open",
+  "artifacts": [
+    {
+      "path": "extensions/vscode/src/managed-model-session.ts",
+      "bytes": 4284,
+      "sha256": "ce13567aaab40e994c191dda8157ded834493f754df770fdec85d62d0f1e20bd"
+    },
+    {
+      "path": "extensions/vscode/src/managed-native-pass.ts",
+      "bytes": 8915,
+      "sha256": "a49fa6a888175f2bf7311308a8320cb9514736dcf9c422562c24cae3b4f52825"
+    },
+    {
+      "path": "extensions/vscode/src/architect-llm.ts",
+      "bytes": 69418,
+      "sha256": "94add36ebb14f530cd3f56c976df9370643615d8001744670ee7faee9c5a7fd7"
+    },
+    {
+      "path": "extensions/vscode/src/chat-panel.ts",
+      "bytes": 310797,
+      "sha256": "3b8dc8163a877e2ae27a6394af96565f1c4b2979b8c939b78b8d12f521e6c7a3"
+    },
+    {
+      "path": "src/server/managed-execution.ts",
+      "bytes": 17172,
+      "sha256": "f19269a6b9f31e35b7518a3b398ec8fe2c9aad1dff8b8b4a7f8510074a7d4c5d"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 139803,
+      "sha256": "b3924565968a7615d3b5b95fc31360eb0c2757f50616c0a769e84e5ab9a1b2e0"
+    },
+    {
+      "path": "tests/helpers/compiled-editor.cjs",
+      "bytes": 2319,
+      "sha256": "bb82e88829775151ca6946899d16eb721dfda43436ddb187f4b9d5e39f21f89a"
+    },
+    {
+      "path": "extensions/vscode/src/test/agent-tool-result-handoff.test.ts",
+      "bytes": 9173,
+      "sha256": "7b76631482106f25c165fd7b7257462985cf2405e162b38b2ff968f7d0e67418"
+    }
+  ]
+}

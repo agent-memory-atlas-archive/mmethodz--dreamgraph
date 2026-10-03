@@ -1,0 +1,86 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/computer-native-graph-loop.test.ts
+Actual graph-loop browser qualification: {
+  schema: 'dreamgraph.browser_qualification_failure_details.v1',
+  completed_checks: [ 'BW01', 'BW02', 'BW03A', 'BW03', 'BW04', 'BW05' ],
+  worker_phase: 'stop'
+} [{"ms":7025.770200000001,"worker":1,"event":"stop_called"},{"ms":7360.2294999999995,"worker":1,"event":"original_stop_reply","terminated":true,"input_released":true},{"ms":7390.387199999999,"worker":1,"event":"original_child_exit","code":null,"signal":"SIGKILL"},{"ms":7390.708499999999,"worker":1,"event":"stop_resolved","elapsed_ms":364.98169999999664},{"ms":9372.8235,"worker":2,"event":"stop_called"},{"ms":9610.6778,"worker":2,"event":"original_stop_reply","terminated":true,"input_released":true},{"ms":9638.260400000001,"worker":2,"event":"original_child_exit","code":null,"signal":"SIGKILL"},{"ms":9638.4157,"worker":2,"event":"stop_resolved","elapsed_ms":265.60169999999925},{"ms":11519.439799999998,"worker":3,"event":"stop_called"},{"ms":12430.7416,"worker":3,"event":"stop_rejected","elapsed_ms":911.279599999998,"reason":"COMPUTER_WORKER_REPLY_UNKNOWN"},{"ms":12431.1553,"worker":1,"event":"stop_called"},{"ms":12431.167899999999,"worker":1,"event":"stop_resolved","elapsed_ms":0.018899999999121064},{"ms":12431.173700000001,"worker":2,"event":"stop_called"},{"ms":12431.179399999999,"worker":2,"event":"stop_resolved","elapsed_ms":0.006299999997281702},{"ms":12431.1828,"worker":3,"event":"stop_called"},{"ms":13332.3951,"worker":3,"event":"stop_rejected","elapsed_ms":901.2091999999975,"reason":"COMPUTER_WORKER_REPLY_UNKNOWN"}]
+
+ ❯ tests/computer-native-graph-loop.test.ts (6 tests | 6 skipped) 13344ms
+   ↓ native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on disconnect without another model call
+Computer control-loss evidence {
+  mode: 'disconnect',
+  elapsed_ms: 323.33680000000095,
+  local_stop: null
+}
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on watchdog without another model call
+Computer control-loss evidence {
+  mode: 'watchdog',
+  elapsed_ms: 2527.8582000000024,
+  local_stop: {
+    epoch: '9104a01c-c7b9-4c51-820c-971da3b42160',
+    input_released: true,
+    terminated: true,
+    reason: 'watchdog',
+    heartbeat_age_ms: 2509.9656,
+    stop_elapsed_ms: 330.5676000000003
+  }
+}
+
+ ❯ tests/computer-browser-worker.test.ts (13 tests | 1 failed) 33655ms
+   ✓ performs real Unicode, checked, click/readback and scrolling using opaque current references  2887ms
+   ✓ moved/covered controls, disabled and credential controls never receive a guessed action  1498ms
+   ✓ forbidden posts, redirects, popups and frames cannot reach another origin or authority  3159ms
+   ✓ exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime  442ms
+   ✓ explicit navigation stays inside the approved origin and segment path and verifies independent destination state  2378ms
+   ✓ private worker process preserves typed observations and responsive independent termination  2255ms
+   × Stop terminates its original browser within the same deadline when graceful close is deliberately ignored 3805ms
+     → COMPUTER_WORKER_REPLY_UNKNOWN
+   ✓ original worker pause fences capture/input and resumes with new references before independent Stop  3523ms
+   ✓ stop bypasses a pending browser navigation and never waits for its ten-second server response  1719ms
+   ✓ masked frames have a verified digest and image exhaustion refuses before another input  2375ms
+   ✓ a real worker closes its dedicated browser on disconnect without another model call  2419ms
+   ✓ a real worker closes its dedicated browser on watchdog without another model call  4603ms
+   ✓ lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input  2590ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-native-graph-loop.test.ts [ tests/computer-native-graph-loop.test.ts ]
+Error: COMPUTER_WORKER_REPLY_UNKNOWN
+ ❯ qualifyBrowserRuntime src/computer/qualify-browser.ts:153:11
+    151|     const phase=z.enum(["bootstrap","open","observe","act","pause","re…
+    152|       cause&&typeof cause==="object"&&"phase" in cause?cause.phase:und…
+    153|     throw new Error(reason,{cause:QualificationFailureDetailsSchema.pa…
+       |           ^
+    154|       completed_checks:traces.map(trace=>trace.id),worker_phase:phase.…
+    155|   }finally{
+ ❯ tests/computer-native-graph-loop.test.ts:53:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-browser-worker.test.ts > Stop terminates its original browser within the same deadline when graceful close is deliberately ignored
+Error: COMPUTER_WORKER_REPLY_UNKNOWN
+ ❯ Timeout._onTimeout src/computer/browser-harness.ts:78:110
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  1 failed | 12 passed | 6 skipped (19)
+   Start at  11:16:16
+   Duration  61.02s (transform 5.44s, setup 0ms, collect 11.39s, tests 47.00s, environment 0ms, prepare 1.19s)
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/slice-27-stop-escalation-first.json

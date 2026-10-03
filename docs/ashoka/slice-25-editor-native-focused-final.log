@@ -1,0 +1,24 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/host-managed-execution.test.ts (29 tests) 10657ms
+   ✓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass  455ms
+   ✓ parallel host passes share their authenticated owner while another client cannot read or close them  346ms
+   ✓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable  536ms
+   ✓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts  325ms
+   ✓ the actual editor host records exact review before activation; replay cannot replenish consumed effects  423ms
+   ✓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads  358ms
+   ✓ a saved review cannot reactivate after the actual lease expires  1647ms
+   ✓ the actual editor rendezvous waits before the graph writer, then publishes approval before one unchanged source effect  516ms
+   ✓ the editor review controller retains literal exact proposals and retries lost acknowledgement without repeating effects  489ms
+   ✓ native editor admission delivers whole replacement evidence, uses the actual worker MCP fence and closes unchanged source with durable review  648ms
+   ✓ native editor source changes retain reconciliation debt rather than reporting a graph commit  307ms
+   ✓ native editor commands execute at the actual daemon owner with exact review and complete source observation  650ms
+ ✓ tests/editor-mcp-result.test.ts (7 tests) 222ms
+ ✓ tests/agent-usefulness.test.ts (9 tests) 129ms
+
+ Test Files  3 passed (3)
+      Tests  45 passed (45)
+   Start at  02:23:39
+   Duration  18.42s (transform 2.06s, setup 0ms, collect 6.35s, tests 11.01s, environment 1ms, prepare 393ms)
+

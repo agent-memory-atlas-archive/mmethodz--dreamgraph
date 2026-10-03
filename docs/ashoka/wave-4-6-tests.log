@@ -1,0 +1,1966 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.1
+[2026-10-01T00:12:44.599Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.2
+[2026-10-01T00:12:44.608Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.4
+[2026-10-01T00:12:44.616Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6.1-sol through Responses without sampling parameters
+[2026-10-01T00:12:44.604Z] [INFO]  LLM provider: openai (model: gpt-6.1-sol)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-6-sol
+[2026-10-01T00:12:44.623Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-6-luna
+[2026-10-01T00:12:44.629Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > omits sampling for gpt-5.5 even when none is requested without sampling qualification
+[2026-10-01T00:12:44.635Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > omits sampling for gpt-5.6-sol even when none is requested without sampling qualification
+[2026-10-01T00:12:44.645Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5
+[2026-10-01T00:12:44.651Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5-mini
+[2026-10-01T00:12:44.657Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5-nano
+[2026-10-01T00:12:44.664Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to o3
+[2026-10-01T00:12:44.670Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-6-astra
+[2026-10-01T00:12:44.679Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-6.1-sol
+[2026-10-01T00:12:44.690Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > keeps normalizer and dreamer provider/model/secret/protocol independent
+[2026-10-01T00:12:44.699Z] [INFO]  LLM provider: none (model: none)
+
+ ✓ tests/auxiliary-entities.test.ts (15 tests) 1441ms
+   ✓ auxiliary store integration > merges incoming entities into a fresh store and round-trips  1212ms
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-astra through Responses without sampling parameters
+[2026-10-01T00:12:45.014Z] [INFO]  LLM provider: openai (model: gpt-6-astra)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves dreamer role, prompt/schema, effort and selected model in Responses
+[2026-10-01T00:12:45.166Z] [INFO]  LLM provider: none (model: n/a)
+
+ ✓ tests/scanner/python-extractor.test.ts (25 tests) 1511ms
+   ✓ Python extractor — bridge integration > UserRepository data-model entry carries model_kind=python:class and bucketed fields via owner_qualified_name  1333ms
+ ✓ tests/scanner/csharp-extractor.test.ts (26 tests) 1527ms
+   ✓ C# extractor — bridge integration > UserRepository data-model entry has model_kind=csharp:class and bucketed fields/properties via owner_qualified_name  1307ms
+ ✓ tests/scanner/kotlin-extractor.test.ts (22 tests) 1536ms
+   ✓ Kotlin extractor — bridge integration > Class data-model entries carry correct model_kind and key_fields buckets via owner_qualified_name  1337ms
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-sol through Responses without sampling parameters
+[2026-10-01T00:12:45.351Z] [INFO]  LLM provider: openai (model: gpt-6-sol)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > binds saved configuration and request limits once despite later profile changes
+[2026-10-01T00:12:45.408Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves normalizer role, prompt/schema, effort and selected model in Responses
+[2026-10-01T00:12:45.475Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-luna through Responses without sampling parameters
+[2026-10-01T00:12:45.667Z] [INFO]  LLM provider: openai (model: gpt-6-luna)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > rejects model/storage/schema-guarantee substitutions before dispatch
+[2026-10-01T00:12:45.851Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > allows exact qualified custom models but blocks unsupported effort without escalation
+[2026-10-01T00:12:45.940Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-sol through Responses without sampling parameters
+[2026-10-01T00:12:45.930Z] [INFO]  LLM provider: openai (model: gpt-5.6-sol)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in responses without changing the role
+[2026-10-01T00:12:45.992Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > routes enrichment through its own role rather than the dreamer model
+[2026-10-01T00:12:46.033Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > never treats native CLI policy as an API transport
+[2026-10-01T00:12:46.055Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-10-01T00:12:46.082Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-10-01T00:12:46.119Z] [INFO]  LLM readiness: initial state=unknown (reason=completion_unqualified, fingerprint=5387ac80757e25b4, models=gpt-4.1/gpt-4.1)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-terra through Responses without sampling parameters
+[2026-10-01T00:12:46.202Z] [INFO]  LLM provider: openai (model: gpt-5.6-terra)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in chat-completions without changing the role
+[2026-10-01T00:12:46.469Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-luna through Responses without sampling parameters
+[2026-10-01T00:12:46.481Z] [INFO]  LLM provider: openai (model: gpt-5.6-luna)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-10-01T00:12:46.795Z] [INFO]  LLM readiness: unknown → ready (reason=ok, fingerprint=5387ac80757e25b4, models=gpt-4.1/gpt-4.1)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-10-01T00:12:46.827Z] [INFO]  LLM readiness: ready → unknown (reason=completion_unqualified, fingerprint=a2415cbe9a06f5de, models=gpt-4.1/gpt-5.4)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-opus-5-5
+[2026-10-01T00:12:46.829Z] [INFO]  LLM provider: anthropic (model: claude-opus-5-5)
+
+ ✓ tests/role-provider.test.ts (7 tests) 2146ms
+   ✓ role policy dispatch > keeps normalizer and dreamer provider/model/secret/protocol independent  713ms
+   ✓ role policy dispatch > binds saved configuration and request limits once despite later profile changes  444ms
+   ✓ qualifies independent roles from real work without recurring paid probes  757ms
+ ✓ tests/utils/atomic-write.test.ts (1 test) 574ms
+   ✓ atomicWriteFile > retries transient Windows rename failures before cleaning up  571ms
+ ✓ tests/model-execution.test.ts (6 tests) 2414ms
+   ✓ physical inference admission > preserves refusal usage and bounds a continued run even with another provider object  395ms
+   ✓ physical inference admission > counts schema fallback as an admitted retry and cannot dispatch it with zero retry allocation  691ms
+   ✓ physical inference admission > records usage before rejecting malformed output and blocks measured reservation variance  426ms
+   ✓ physical inference admission > bounds simultaneous factories through one ledger and never turns an unknown reply into zero usage  512ms
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-sonnet-5-5
+[2026-10-01T00:12:47.044Z] [INFO]  LLM provider: anthropic (model: claude-sonnet-5-5)
+
+ ✓ tests/llm.json-fallback.test.ts (7 tests) 2615ms
+   ✓ explicit schema contracts > does not silently downgrade a qualified strict request  339ms
+   ✓ explicit schema contracts > uses explicit local validation, discloses it, and never poisons later contracts  1157ms
+   ✓ explicit schema contracts > validates original schema after explicit unqualified JSON mode  346ms
+   ✓ explicit schema contracts > discloses only an authorized Responses schema retry with one shared signal  470ms
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > retains GPT-4.1 sampling and conservatively omits unqualified future/custom sampling
+[2026-10-01T00:12:47.224Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-fable-5-1
+[2026-10-01T00:12:47.290Z] [INFO]  LLM provider: anthropic (model: claude-fable-5-1)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-opus-4-7
+[2026-10-01T00:12:47.459Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-mythos-5-1
+[2026-10-01T00:12:47.497Z] [INFO]  LLM provider: anthropic (model: claude-mythos-5-1)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-opus-4-8
+[2026-10-01T00:12:47.745Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-sonnet-5-5
+[2026-10-01T00:12:47.925Z] [INFO]  LLM provider: none (model: n/a)
+
+ ✓ tests/model-admission.test.ts (16 tests) 3320ms
+   ✓ durable model admission > retains unknown usage liabilities and conflict slots across restart  408ms
+   ✓ durable model admission > bounds reasoning, elapsed time and cancellation separately  333ms
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-fable-5-1
+[2026-10-01T00:12:48.085Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-mythos-preview
+[2026-10-01T00:12:48.314Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > keeps requested temperature in policy/migration while exposing effective omission and role intent
+[2026-10-01T00:12:48.329Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > does not let capability evidence for another model enable temperature
+[2026-10-01T00:12:48.340Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > blocks unsupported none without a provider request or automatic effort escalation
+[2026-10-01T00:12:48.360Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves daemon role and exposes omitted temperature in route provenance
+[2026-10-01T00:12:48.367Z] [INFO]  LLM provider: openai (model: gpt-4.1)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves daemon role and exposes omitted temperature in route provenance
+[2026-10-01T00:12:48.388Z] [INFO]  LLM provider: none (model: n/a)
+
+ ✓ tests/model-temperature.test.ts (27 tests) 3820ms
+   ✓ cognitive roles without unsupported temperature > preserves dreamer role, prompt/schema, effort and selected model in Responses  476ms
+   ✓ cognitive roles without unsupported temperature > preserves normalizer role, prompt/schema, effort and selected model in Responses  309ms
+   ✓ cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in responses without changing the role  517ms
+   ✓ cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in chat-completions without changing the role  477ms
+   ✓ cognitive roles without unsupported temperature > retains GPT-4.1 sampling and conservatively omits unqualified future/custom sampling  755ms
+ ✓ tests/latest-model-support.test.ts (14 tests) 4069ms
+   ✓ September 2026 model support > routes gpt-6.1-sol through Responses without sampling parameters  427ms
+   ✓ September 2026 model support > routes gpt-6-astra through Responses without sampling parameters  335ms
+   ✓ September 2026 model support > routes gpt-6-sol through Responses without sampling parameters  318ms
+   ✓ September 2026 model support > routes gpt-5.6-luna through Responses without sampling parameters  352ms
+   ✓ September 2026 model support > replays opaque openai assistant state on the next tool turn  383ms
+   ✓ September 2026 model support > replays opaque anthropic assistant state on the next tool turn  495ms
+ ✓ tests/tools/scan-state.test.ts (5 tests) 4067ms
+   ✓ scan-state v1 read-only delta oracle > classifies an unchanged repository without parser invocations or graph writes  567ms
+   ✓ scan-state v1 read-only delta oracle > detects material changes and only reports an unambiguous content-preserving rename  463ms
+   ✓ scan-state v1 read-only delta oracle > keeps ambiguous duplicate-content moves as explicit additions and deletions  485ms
+   ✓ scan-state v1 read-only delta oracle > classifies five material changes in a 300-file repository without parsing unchanged files  1965ms
+   ✓ scan-state v1 read-only delta oracle > reports incompatible depth without parsing or mutation  583ms
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=undefined through to mandatory enrichment
+[2026-10-01T00:12:48.776Z] [INFO]  scan_project: Phase 1 — scanning file system…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=undefined through to mandatory enrichment
+[2026-10-01T00:12:48.826Z] [INFO]  scan_project: fixture — 1 files, 0 UI files, tech: Unknown, dirs: src
+[2026-10-01T00:12:48.827Z] [INFO]  scan_project: Scanned fixture: 1 files, tech: Unknown
+
+ ✓ tests/graph-publication.test.ts (20 tests) 4269ms
+   ✓ canonical graph publication > drains stable notification IDs without losing failures or changing graph currency  313ms
+   ✓ canonical graph publication > requires delivery and quiescence before explicit epoch retirement; rejects archived and unqualified replay  512ms
+   ✓ canonical graph publication > holds sole kernel writer ownership across processes and releases it on crash  1440ms
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=undefined through to mandatory enrichment
+[2026-10-01T00:12:48.931Z] [INFO]  scan_project: Phase 2 — LLM unavailable, structural-only mode
+[2026-10-01T00:12:48.932Z] [INFO]  scan_project: Phase 2 — LLM unavailable, using structural analysis…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=undefined through to mandatory enrichment
+[2026-10-01T00:12:49.024Z] [INFO]  scan_project: Merging auxiliary entities (tests/configs/scripts/MCP tools)…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=undefined through to mandatory enrichment
+[2026-10-01T00:12:49.025Z] [INFO]  scan_project: Enriching every graph node with semantic context (max hops: 2)…
+
+stderr | tests/tools/scan-project-incremental-e2e.test.ts > Slice 5 runScanProject authoritative orchestration > commits one added file through the existing target registry and preserves unrequested state
+[2026-10-01T00:12:49.041Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=undefined through to mandatory enrichment
+[2026-10-01T00:12:49.026Z] [INFO]  scan_project: Rebuilding resource index…
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint
+[2026-10-01T00:12:49.161Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=undefined through to mandatory enrichment
+[2026-10-01T00:12:49.191Z] [INFO]  scan_project: index rebuilt with 1 entries
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > registers an inline provider when capability + effect declared
+[2026-10-01T00:12:49.413Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:49.416Z] [WARN]  plugin examples.arch-ok@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > registers an inline provider when capability + effect declared
+[2026-10-01T00:12:49.417Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > registers a UI element and tags it with plugin provenance
+[2026-10-01T00:12:49.426Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:49.429Z] [WARN]  plugin examples.ui-ok@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > registers a UI element and tags it with plugin provenance
+[2026-10-01T00:12:49.431Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > succeeds with zero plugins when plugins dir is empty
+[2026-10-01T00:12:49.440Z] [INFO]  Plugin discovery: no plugins found in <instance>/plugins or instance.json
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > journals a proposal when capability + effect declared
+[2026-10-01T00:12:49.449Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:49.452Z] [WARN]  plugin examples.policy-ok@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > registers a fence when capability + effect declared
+[2026-10-01T00:12:49.464Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:49.467Z] [WARN]  plugin examples.fence-ok@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > journals a proposal when capability + effect declared
+[2026-10-01T00:12:49.453Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > is idempotent — second call is a no-op
+[2026-10-01T00:12:49.479Z] [INFO]  Plugin discovery: no plugins found in <instance>/plugins or instance.json
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > registers a fence when capability + effect declared
+[2026-10-01T00:12:49.468Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > registers an inline provider when capability + effect declared
+[2026-10-01T00:12:49.518Z] [INFO]  Plugin examples.arch-ok registered archetype provider 'examples.arch-ok:starter-pack'
+
+stderr | tests/release-version.test.ts > synchronized release version > exposes the same version through MCP initialization, instructions and capabilities
+[2026-10-01T00:12:49.419Z] [INFO]  Initializing dreamgraph v13.4.0
+[2026-10-01T00:12:49.532Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T00:12:49.533Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-01T00:12:49.534Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > discovers a manifest under <instance>/plugins/<id>/ and emits telemetry
+[2026-10-01T00:12:49.523Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=false
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > registers an inline provider when capability + effect declared
+[2026-10-01T00:12:49.519Z] [INFO]  Plugin examples.arch-ok activated (0 subscription(s))
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > discovers a manifest under <instance>/plugins/<id>/ and emits telemetry
+[2026-10-01T00:12:49.525Z] [INFO]  Plugins loaded: 0; rejected: 1
+
+ ✓ tests/role-policy.test.ts (17 tests) 690ms
+   ✓ independent model role policies > persists configuration with CAS/replay and explicit rollback while keeping graph time unchanged  437ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint
+[2026-10-01T00:12:49.602Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > invokes activate() and bridges ctx.events.subscribe to graphEventBus when trusted in-process
+[2026-10-01T00:12:49.588Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:49.589Z] [WARN]  plugin examples.activate@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint
+[2026-10-01T00:12:49.604Z] [WARN]  Batch (openrct2::core, 1 nodes): ADMISSION_REQUEST_LIMIT: run fixture; checkpointed as retryable.
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > invokes activate() and bridges ctx.events.subscribe to graphEventBus when trusted in-process
+[2026-10-01T00:12:49.589Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > registers a UI element and tags it with plugin provenance
+[2026-10-01T00:12:49.622Z] [INFO]  Plugin examples.ui-ok activated (0 subscription(s))
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > journals a proposal when capability + effect declared
+[2026-10-01T00:12:49.651Z] [INFO]  Plugin examples.policy-ok activated (0 subscription(s))
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > registers a fence when capability + effect declared
+[2026-10-01T00:12:49.665Z] [INFO]  Plugin examples.fence-ok registered markdown fence 'dg-flow'
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > rejects when archetypes:provide capability is missing
+[2026-10-01T00:12:49.675Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:49.675Z] [WARN]  plugin examples.arch-no-cap@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > registers a UI element and tags it with plugin provenance
+[2026-10-01T00:12:49.694Z] [INFO]  Plugin examples.ui-ok registered UI element 'examples.ui-ok.greeting'
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > journals a proposal when capability + effect declared
+[2026-10-01T00:12:49.724Z] [INFO]  Plugin examples.policy-ok proposed policy 'examples.policy-ok:no-undeclared-write'
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint
+[2026-10-01T00:12:49.723Z] [INFO]  Semantic enrichment batch 2: 0/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > registers a fence when capability + effect declared
+[2026-10-01T00:12:49.665Z] [INFO]  Plugin examples.fence-ok activated (0 subscription(s))
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > rejects when archetypes:provide capability is missing
+[2026-10-01T00:12:49.675Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+ ✓ tests/release-version.test.ts (2 tests) 331ms
+stderr | tests/cognitive/quarantine-source-less-facts.test.ts > quarantineSourceLessFacts > keeps grounded canonical entities and quarantines source-less ones
+[2026-10-01T00:12:49.760Z] [WARN]  Source-less fact quarantine complete: 2 canonical nodes, 0 dream nodes, 0 dream edges, 0 validated edges, 0 candidates, 0 tensions. Report: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-quarantine-iiQexi\source_less_fact_quarantine_2026-10-01T00-12-49-172Z.json
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > invokes activate() and bridges ctx.events.subscribe to graphEventBus when trusted in-process
+[2026-10-01T00:12:49.772Z] [INFO]  Plugin examples.activate activated (1 subscription(s))
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > rejects ui.register when capability ui:register is missing
+[2026-10-01T00:12:49.807Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:49.807Z] [WARN]  plugin examples.ui-no-cap@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > rejects when markdown:register_fence capability is missing
+[2026-10-01T00:12:49.809Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:49.809Z] [WARN]  plugin examples.fence-no-cap@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > rejects ui.register when capability ui:register is missing
+[2026-10-01T00:12:49.807Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > rejects when markdown:register_fence capability is missing
+[2026-10-01T00:12:49.809Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint
+[2026-10-01T00:12:49.844Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=3 batches=2 anchors=0 errors=2 dry_run=false
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > rejects when policy:propose capability is missing
+[2026-10-01T00:12:49.855Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:49.856Z] [WARN]  plugin examples.policy-no-cap@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > rejects when policy:propose capability is missing
+[2026-10-01T00:12:49.856Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed MCP tool when manifest declares tools:register + emit_tool
+[2026-10-01T00:12:49.867Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:49.867Z] [WARN]  plugin examples.contrib-tool@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects an overlapping enrichment before another provider call or graph write
+[2026-10-01T00:12:49.884Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed MCP tool when manifest declares tools:register + emit_tool
+[2026-10-01T00:12:49.868Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > rejects when archetypes:provide capability is missing
+[2026-10-01T00:12:49.916Z] [WARN]  Plugin examples.arch-no-cap archetype 'x' rejected: archetype_capability_missing (manifest.capabilities must include 'archetypes:provide')
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > rejects when archetypes:provide capability is missing
+[2026-10-01T00:12:49.917Z] [INFO]  Plugin examples.arch-no-cap activated (0 subscription(s))
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > rejects ui.register when capability ui:register is missing
+[2026-10-01T00:12:49.969Z] [WARN]  Plugin examples.ui-no-cap ui 'examples.ui-no-cap.x' rejected: ui_capability_missing (manifest.capabilities must include 'ui:register')
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > rejects ui.register when capability ui:register is missing
+[2026-10-01T00:12:49.970Z] [INFO]  Plugin examples.ui-no-cap activated (0 subscription(s))
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > rejects when markdown:register_fence capability is missing
+[2026-10-01T00:12:49.979Z] [WARN]  Plugin examples.fence-no-cap markdown_fence 'dg-x' rejected: markdown_fence_capability_missing (manifest.capabilities must include 'markdown:register_fence')
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > rejects when markdown:register_fence capability is missing
+[2026-10-01T00:12:49.979Z] [INFO]  Plugin examples.fence-no-cap activated (0 subscription(s))
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > rejects when policy:propose capability is missing
+[2026-10-01T00:12:49.996Z] [WARN]  Plugin examples.policy-no-cap policy 'x' rejected: policy_capability_missing (manifest.capabilities must include 'policy:propose')
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > rejects when policy:propose capability is missing
+[2026-10-01T00:12:49.996Z] [INFO]  Plugin examples.policy-no-cap activated (0 subscription(s))
+
+stderr | tests/explorer-mutations.test.ts > Audit row contract > writes the full contract on a successful tension.resolve
+[2026-10-01T00:12:50.013Z] [INFO]  Tension resolved: "ten_42" by human as confirmed_fixed (evidence: operator confirmed fixed)
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed MCP tool when manifest declares tools:register + emit_tool
+[2026-10-01T00:12:50.018Z] [INFO]  Plugin examples.contrib-tool registered tool 'examples_contrib_tool_hello'
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed MCP tool when manifest declares tools:register + emit_tool
+[2026-10-01T00:12:50.018Z] [INFO]  Plugin examples.contrib-tool activated (0 subscription(s))
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > rejects providers with no url, inline, or fetch
+[2026-10-01T00:12:50.082Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.082Z] [WARN]  plugin examples.arch-empty@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > rejects proposals with weakens=true
+[2026-10-01T00:12:50.086Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.087Z] [WARN]  plugin examples.policy-weak@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > rejects providers with no url, inline, or fetch
+[2026-10-01T00:12:50.083Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > rejects proposals with weakens=true
+[2026-10-01T00:12:50.087Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > rejects tool registration with tool_name_unprefixed when name lacks plugin id prefix
+[2026-10-01T00:12:50.111Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.112Z] [WARN]  plugin examples.bad-name@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > rejects ui.register when element id is not prefixed with plugin id
+[2026-10-01T00:12:50.115Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.115Z] [WARN]  plugin examples.ui-bad-id@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > rejects collisions across plugins on the same language
+[2026-10-01T00:12:50.120Z] [INFO]  Plugin discovery: 2 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.120Z] [WARN]  plugin examples.fence-a@0.1.0 loaded with FULL HOST TRUST (in-process)
+[2026-10-01T00:12:50.120Z] [WARN]  plugin examples.fence-b@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/tools/scan-project-incremental-e2e.test.ts > Slice 5 runScanProject authoritative orchestration > commits one added file through the existing target registry and preserves unrequested state
+[2026-10-01T00:12:50.121Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > rejects tool registration with tool_name_unprefixed when name lacks plugin id prefix
+[2026-10-01T00:12:50.112Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > rejects ui.register when element id is not prefixed with plugin id
+[2026-10-01T00:12:50.116Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > rejects collisions across plugins on the same language
+[2026-10-01T00:12:50.120Z] [INFO]  Plugins loaded: 2; rejected: 0
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > rejects providers with no url, inline, or fetch
+[2026-10-01T00:12:50.203Z] [WARN]  Plugin examples.arch-empty archetype 'empty' rejected: archetype_schema_invalid (provider must specify one of url, inline, or fetch())
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > rejects providers with no url, inline, or fetch
+[2026-10-01T00:12:50.203Z] [INFO]  Plugin examples.arch-empty activated (0 subscription(s))
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > rejects tool registration with tool_name_unprefixed when name lacks plugin id prefix
+[2026-10-01T00:12:50.212Z] [WARN]  Plugin examples.bad-name tool 'wrong_prefix.foo' rejected: tool_name_unprefixed (tool name must start with 'examples_bad_name_')
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > rejects tool registration with tool_name_unprefixed when name lacks plugin id prefix
+[2026-10-01T00:12:50.212Z] [INFO]  Plugin examples.bad-name activated (0 subscription(s))
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > rejects proposals with weakens=true
+[2026-10-01T00:12:50.220Z] [WARN]  Plugin examples.policy-weak policy 'loosen' rejected: policy_weakening_rejected (proposals that weaken existing rules are not accepted)
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > rejects proposals with weakens=true
+[2026-10-01T00:12:50.221Z] [INFO]  Plugin examples.policy-weak activated (0 subscription(s))
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > rejects collisions across plugins on the same language
+[2026-10-01T00:12:50.234Z] [INFO]  Plugin examples.fence-a registered markdown fence 'dg-shared'
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > rejects collisions across plugins on the same language
+[2026-10-01T00:12:50.234Z] [INFO]  Plugin examples.fence-a activated (0 subscription(s))
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > rejects ui.register when element id is not prefixed with plugin id
+[2026-10-01T00:12:50.236Z] [WARN]  Plugin examples.ui-bad-id ui 'wrong.prefix.x' rejected: ui_id_unprefixed (ui element id must start with 'examples.ui-bad-id.')
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > rejects ui.register when element id is not prefixed with plugin id
+[2026-10-01T00:12:50.236Z] [INFO]  Plugin examples.ui-bad-id activated (0 subscription(s))
+
+stderr | tests/tension-resolution.test.ts > Phase 4 #8 — tension resolution lifecycle > validateResolutionCandidates confirms when a bridging edge exists in validated_edges
+[2026-10-01T00:12:50.256Z] [INFO]  Tension resolved: "tension_1790813569867_1" by system as confirmed_fixed (evidence: validated_edges contains a bridging connection between tension entities)
+
+stderr | tests/explorer-mutations.test.ts > tension.resolve > removes the tension from active signals
+[2026-10-01T00:12:50.282Z] [INFO]  Tension resolved: "ten_x" by human as confirmed_fixed (evidence: fixed by hand)
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > rejects collisions across plugins on the same language
+[2026-10-01T00:12:50.292Z] [WARN]  Plugin examples.fence-b markdown_fence 'dg-shared' rejected: markdown_fence_language_collision (language already owned by plugin 'examples.fence-a')
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > rejects collisions across plugins on the same language
+[2026-10-01T00:12:50.292Z] [INFO]  Plugin examples.fence-b activated (0 subscription(s))
+
+stderr | tests/configuration-http.test.ts > configuration HTTP parity > saves scheduler settings through the rendered form and reloads exactly
+[2026-10-01T00:12:50.302Z] [INFO]  Scheduler config updated: {"enabled":false,"tick_interval_ms":30000,"max_runs_per_hour":0,"global_cooldown_ms":0,"nightmare_cooldown_ms":300000,"max_history":500,"max_error_streak":3,"execution_timeout_ms":600000}
+[2026-10-01T00:12:50.303Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-01T00:12:50.304Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed resource and gates uri namespace
+[2026-10-01T00:12:50.307Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.307Z] [WARN]  plugin examples.contrib-res@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > unloadPluginById prunes plugin-owned proposals
+[2026-10-01T00:12:50.313Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.314Z] [WARN]  plugin examples.policy-prune@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed resource and gates uri namespace
+[2026-10-01T00:12:50.307Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > unloadPluginById prunes plugin-owned proposals
+[2026-10-01T00:12:50.314Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > unloadPluginById prunes plugin-tagged UI elements
+[2026-10-01T00:12:50.335Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.335Z] [WARN]  plugin examples.ui-prune@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > unloadPluginById prunes plugin-tagged UI elements
+[2026-10-01T00:12:50.335Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > unloadPluginById prunes plugin-owned providers
+[2026-10-01T00:12:50.346Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.346Z] [WARN]  plugin examples.arch-prune@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=undefined through to mandatory enrichment
+[2026-10-01T00:12:50.368Z] [INFO]  scan_project: Scan complete: 1 repo(s), 1 files. Semantic enrichment incomplete. Features: 1 new / 1 total. Workflows: 0 new / 0 total. Data model: 0 new / 0 total. Index: 1 entries. 3 warning(s).
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > unloadPluginById prunes plugin-owned providers
+[2026-10-01T00:12:50.347Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects an overlapping enrichment before another provider call or graph write
+[2026-10-01T00:12:50.394Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=0 through to mandatory enrichment
+[2026-10-01T00:12:50.414Z] [INFO]  scan_project: Phase 1 — scanning file system…
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed resource and gates uri namespace
+[2026-10-01T00:12:50.416Z] [INFO]  Plugin examples.contrib-res registered resource 'plugin://examples.contrib-res/data'
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > unloadPluginById prunes plugin-owned proposals
+[2026-10-01T00:12:50.423Z] [INFO]  Plugin examples.policy-prune activated (0 subscription(s))
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed resource and gates uri namespace
+[2026-10-01T00:12:50.416Z] [INFO]  Plugin examples.contrib-res activated (0 subscription(s))
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > unloadPluginById prunes plugin-owned fences
+[2026-10-01T00:12:50.435Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.435Z] [WARN]  plugin examples.fence-prune@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > unloadPluginById prunes plugin-tagged UI elements
+[2026-10-01T00:12:50.435Z] [INFO]  Plugin examples.ui-prune activated (0 subscription(s))
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=0 through to mandatory enrichment
+[2026-10-01T00:12:50.441Z] [INFO]  scan_project: fixture — 1 files, 0 UI files, tech: Unknown, dirs: src
+[2026-10-01T00:12:50.442Z] [INFO]  scan_project: Scanned fixture: 1 files, tech: Unknown
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > unloadPluginById prunes plugin-owned providers
+[2026-10-01T00:12:50.448Z] [INFO]  Plugin examples.arch-prune registered archetype provider 'examples.arch-prune:prune-target'
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > unloadPluginById prunes plugin-owned fences
+[2026-10-01T00:12:50.436Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > unloadPluginById prunes plugin-owned providers
+[2026-10-01T00:12:50.449Z] [INFO]  Plugin examples.arch-prune activated (0 subscription(s))
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=0 through to mandatory enrichment
+[2026-10-01T00:12:50.470Z] [INFO]  scan_project: Phase 2 — LLM unavailable, structural-only mode
+[2026-10-01T00:12:50.471Z] [INFO]  scan_project: Phase 2 — LLM unavailable, using structural analysis…
+
+stderr | tests/cognitive/quarantine-source-less-facts.test.ts > quarantineSourceLessFacts > cascades quarantine to validated edges and tensions that reference ungrounded nodes
+[2026-10-01T00:12:50.472Z] [WARN]  Source-less fact quarantine complete: 1 canonical nodes, 0 dream nodes, 0 dream edges, 1 validated edges, 0 candidates, 1 tensions. Report: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-quarantine-TCwmXm\source_less_fact_quarantine_2026-10-01T00-12-49-829Z.json
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > unloadPluginById deactivates and drops contributions
+[2026-10-01T00:12:50.488Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.488Z] [WARN]  plugin examples.unload-me@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > unloadPluginById deactivates and drops contributions
+[2026-10-01T00:12:50.489Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > unloadPluginById prunes plugin-owned proposals
+[2026-10-01T00:12:50.495Z] [INFO]  Plugin examples.policy-prune proposed policy 'examples.policy-prune:alpha'
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > unloadPluginById prunes plugin-owned fences
+[2026-10-01T00:12:50.498Z] [INFO]  Plugin examples.fence-prune registered markdown fence 'dg-prune'
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > unloadPluginById prunes plugin-owned fences
+[2026-10-01T00:12:50.498Z] [INFO]  Plugin examples.fence-prune activated (0 subscription(s))
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > unloadPluginById prunes plugin-tagged UI elements
+[2026-10-01T00:12:50.508Z] [INFO]  Plugin examples.ui-prune registered UI element 'examples.ui-prune.alpha'
+
+stderr | tests/plugins/archetypes-seam.test.ts > plugin archetype provider seam (M6 closure) > unloadPluginById prunes plugin-owned providers
+[2026-10-01T00:12:50.513Z] [INFO]  Plugin examples.arch-prune unload pruned 1 archetype provider(s)
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > unloadPluginById deactivates and drops contributions
+[2026-10-01T00:12:50.545Z] [INFO]  Plugin examples.unload-me registered tool 'examples_unload_me_ping'
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > unloadPluginById deactivates and drops contributions
+[2026-10-01T00:12:50.545Z] [INFO]  Plugin examples.unload-me activated (0 subscription(s))
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=0 through to mandatory enrichment
+[2026-10-01T00:12:50.551Z] [INFO]  scan_project: Merging auxiliary entities (tests/configs/scripts/MCP tools)…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=0 through to mandatory enrichment
+[2026-10-01T00:12:50.551Z] [INFO]  scan_project: Enriching every graph node with semantic context (max hops: 0)…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=0 through to mandatory enrichment
+[2026-10-01T00:12:50.552Z] [INFO]  scan_project: Rebuilding resource index…
+
+stderr | tests/plugins/markdown-fences-seam.test.ts > plugin markdown fence seam (M6 closure) > unloadPluginById prunes plugin-owned fences
+[2026-10-01T00:12:50.560Z] [INFO]  Plugin examples.fence-prune unload pruned 1 markdown fence(s)
+
+ ✓ tests/plugins/archetypes-seam.test.ts (4 tests) 1223ms
+   ✓ plugin archetype provider seam (M6 closure) > rejects when archetypes:provide capability is missing  398ms
+stderr | tests/explorer-mutations.test.ts > tension.resolve > returns 404 when the tension does not exist
+[2026-10-01T00:12:50.566Z] [WARN]  Mutation "tension.resolve" failed: Tension ghost_id is not active.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects an overlapping enrichment before another provider call or graph write
+[2026-10-01T00:12:50.570Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/plugins/policies-seam.test.ts > plugin policy seam (M6 closure) > unloadPluginById prunes plugin-owned proposals
+[2026-10-01T00:12:50.587Z] [INFO]  Plugin examples.policy-prune unload pruned 1 policy proposal(s)
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > unloadPluginById prunes plugin-tagged UI elements
+[2026-10-01T00:12:50.603Z] [INFO]  Plugin examples.ui-prune registered UI element 'examples.ui-prune.beta'
+
+ ✓ tests/plugins/markdown-fences-seam.test.ts (4 tests) 1257ms
+   ✓ plugin markdown fence seam (M6 closure) > registers a fence when capability + effect declared  418ms
+   ✓ plugin markdown fence seam (M6 closure) > rejects when markdown:register_fence capability is missing  312ms
+   ✓ plugin markdown fence seam (M6 closure) > rejects collisions across plugins on the same language  307ms
+ ✓ tests/plugins/policies-seam.test.ts (4 tests) 1274ms
+   ✓ plugin policy seam (M6 closure) > journals a proposal when capability + effect declared  455ms
+   ✓ plugin policy seam (M6 closure) > unloadPluginById prunes plugin-owned proposals  354ms
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-01T00:12:50.638Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:50.638Z] [WARN]  plugin examples.reload-me@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-01T00:12:50.638Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-01T00:12:50.681Z] [INFO]  Plugin examples.reload-me registered tool 'examples_reload_me_ping'
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-01T00:12:50.682Z] [INFO]  Plugin examples.reload-me activated (0 subscription(s))
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-01T00:12:50.693Z] [WARN]  plugin examples.reload-me@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > restricts structured output to the complete input batch and the supplied typed target IDs
+[2026-10-01T00:12:50.697Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=2)
+
+stderr | tests/tension-resolution.test.ts > Phase 4 #8 — tension resolution lifecycle > validateResolutionCandidates accepts wont_fix candidates without bridging evidence
+[2026-10-01T00:12:50.709Z] [INFO]  Tension resolved: "tension_1790813570290_1" by system as wont_fix (evidence: resolution candidate proposed wont_fix and validation window expired)
+
+stderr | tests/plugins/ui-seam.test.ts > plugin UI seam (M6) > unloadPluginById prunes plugin-tagged UI elements
+[2026-10-01T00:12:50.713Z] [INFO]  Plugin examples.ui-prune unload pruned 2 UI element(s) from ui_registry.json
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=0 through to mandatory enrichment
+[2026-10-01T00:12:50.736Z] [INFO]  scan_project: index rebuilt with 1 entries
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-01T00:12:50.788Z] [INFO]  Plugin examples.reload-me registered tool 'examples_reload_me_ping'
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-01T00:12:50.788Z] [INFO]  Plugin examples.reload-me activated (0 subscription(s))
+
+ ✓ tests/plugins/ui-seam.test.ts (4 tests) 1444ms
+   ✓ plugin UI seam (M6) > registers a UI element and tags it with plugin provenance  419ms
+   ✓ plugin UI seam (M6) > unloadPluginById prunes plugin-tagged UI elements  494ms
+ ✓ tests/plugins/manager.test.ts (10 tests) 1474ms
+stderr | tests/explorer-mutations.test.ts > candidate.promote > appends a validated edge and removes the candidate
+[2026-10-01T00:12:50.869Z] [INFO]  User-promoted candidate dream_1 → validated edge
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > restricts structured output to the complete input batch and the supplied typed target IDs
+[2026-10-01T00:12:51.001Z] [WARN]  Batch (openrct2::core, 2 nodes): validation_failed: 1 node(s) used deterministic fallback; missing enrichment for node contract-b
+
+stderr | tests/explorer-mutations.test.ts > candidate.reject > flips status to rejected without adding a validated edge
+[2026-10-01T00:12:51.030Z] [INFO]  User-rejected candidate dream_2
+
+stderr | tests/change-obligations.test.ts > durable source change obligations > tracks real MCP create/edit/rename/delete commands through durable obligations
+[2026-10-01T00:12:50.996Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-01T00:12:50.998Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-01T00:12:51.001Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+ ✓ tests/configuration-http.test.ts (4 tests) 1417ms
+   ✓ configuration HTTP parity > returns redacted typed catalogue and rejects unsupported fields  333ms
+   ✓ configuration HTTP parity > saves scheduler settings through the rendered form and reloads exactly  441ms
+   ✓ configuration HTTP parity > previews, applies and restores a named template without exposing secrets or resetting unrelated data  507ms
+ ✓ tests/explorer-mutations.test.ts (12 tests) 1435ms
+   ✓ candidate.promote > appends a validated edge and removes the candidate  326ms
+stderr | tests/cognitive/quarantine-source-less-facts.test.ts > quarantineSourceLessFacts > is a no-op when every canonical entity is grounded
+[2026-10-01T00:12:51.145Z] [WARN]  Source-less fact quarantine complete: 0 canonical nodes, 0 dream nodes, 0 dream edges, 0 validated edges, 0 candidates, 0 tensions. Report: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-quarantine-wMYkMC\source_less_fact_quarantine_2026-10-01T00-12-50-515Z.json
+
+stderr | tests/tools/scan-project-incremental-e2e.test.ts > Slice 5 runScanProject authoritative orchestration > replaces only modified-file support, preserves governed and unchanged knowledge, and converges with a fresh B extraction
+[2026-10-01T00:12:51.160Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+ ✓ tests/cognitive/quarantine-source-less-facts.test.ts (3 tests) 2044ms
+   ✓ quarantineSourceLessFacts > keeps grounded canonical entities and quarantines source-less ones  662ms
+   ✓ quarantineSourceLessFacts > cascades quarantine to validated edges and tensions that reference ungrounded nodes  699ms
+   ✓ quarantineSourceLessFacts > is a no-op when every canonical entity is grounded  679ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > restricts structured output to the complete input batch and the supplied typed target IDs
+[2026-10-01T00:12:51.236Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 1 fallback
+
+ ✓ tests/engine-configuration.test.ts (18 tests) 2018ms
+ ✓ tests/provider-outcome.test.ts (31 tests) 6771ms
+   ✓ provider outcome boundary > rejects Responses incomplete and retains usage  370ms
+   ✓ provider outcome boundary > rejects Responses failed and retains usage  306ms
+   ✓ provider outcome boundary > rejects Responses cancelled and retains usage  380ms
+   ✓ provider outcome boundary > rejects Chat length before accepting generated JSON  310ms
+   ✓ provider outcome boundary > rejects Claude model_context_window_exceeded with usage retained  391ms
+   ✓ provider outcome boundary > cancels the active openai HTTP request  330ms
+   ✓ provider outcome boundary > cancels the active anthropic HTTP request  304ms
+   ✓ provider outcome boundary > retains usage on malformed tool JSON  464ms
+   ✓ provider outcome boundary > rejects invalid or unadvertised native tools before dispatch  1199ms
+   ✓ provider outcome boundary > preserves nested tool schemas and validates their constraints locally  380ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > restricts structured output to the complete input batch and the supplied typed target IDs
+[2026-10-01T00:12:51.444Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > activates and exercises every seam declared in plugin.json
+[2026-10-01T00:12:51.448Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:51.451Z] [WARN]  plugin examples.hello-events@0.2.0 loaded with FULL HOST TRUST (in-process)
+
+ ✓ tests/tools/ui-registry-scanner-merge.test.ts (8 tests) 810ms
+ ✓ tests/graph-read-model.test.ts (11 tests) 2245ms
+   ✓ canonical graph read contract > compares legacy and canonical projections at one publication without accepting lossy meanings  419ms
+   ✓ canonical graph read contract > does not judge old scan dates stale, and cannot hide a concrete gap with a newer dream  433ms
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > activates and exercises every seam declared in plugin.json
+[2026-10-01T00:12:51.452Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced data_model link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:51.483Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > activates and exercises every seam declared in plugin.json
+[2026-10-01T00:12:51.537Z] [INFO]  plugin:examples.hello-events hello-events activating (full seam demo)
+[2026-10-01T00:12:51.538Z] [INFO]  Plugin examples.hello-events registered tool 'examples_hello_events_greet'
+[2026-10-01T00:12:51.538Z] [INFO]  Plugin examples.hello-events registered resource 'plugin://examples.hello-events/manifest'
+[2026-10-01T00:12:51.540Z] [INFO]  Plugin examples.hello-events registered archetype provider 'examples.hello-events:starter-pack'
+[2026-10-01T00:12:51.541Z] [INFO]  Plugin examples.hello-events registered markdown fence 'dg-hello'
+[2026-10-01T00:12:51.541Z] [INFO]  plugin:examples.hello-events hello-events activated (all seams exercised)
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > activates and exercises every seam declared in plugin.json
+[2026-10-01T00:12:51.543Z] [INFO]  Plugin examples.hello-events activated (1 subscription(s))
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced data_model link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:51.733Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 0 relation target type(s) from graph IDs; omitted 0 self link(s); converted 1 non-feature anchor(s) to typed relations.
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > activates and exercises every seam declared in plugin.json
+[2026-10-01T00:12:51.615Z] [INFO]  Plugin examples.hello-events registered UI element 'examples.hello-events.greeting'
+
+ ✓ tests/provider-images.test.ts (7 tests) 1634ms
+   ✓ bounded image transport > uses the responses native image envelope  561ms
+   ✓ bounded image transport > uses the chat-completions native image envelope  359ms
+   ✓ bounded image transport > preserves supplied images in the native tool loop  369ms
+ ✓ tests/tension-resolution.test.ts (8 tests) 2586ms
+   ✓ Phase 4 #8 — tension resolution lifecycle > runTensionResolverCycle uses heuristic fallback when no proposer is supplied  339ms
+   ✓ Phase 4 #8 — tension resolution lifecycle > validateResolutionCandidates confirms when a bridging edge exists in validated_edges  422ms
+   ✓ Phase 4 #8 — tension resolution lifecycle > validateResolutionCandidates accepts wont_fix candidates without bridging evidence  446ms
+   ✓ Phase 4 #8 — tension resolution lifecycle > validateResolutionCandidates escalates when window expires without bridging evidence  488ms
+   ✓ Phase 4 #8 — tension resolution lifecycle > validateResolutionCandidates leaves candidates with non-zero window untouched  444ms
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > activates and exercises every seam declared in plugin.json
+[2026-10-01T00:12:51.663Z] [INFO]  Plugin examples.hello-events proposed policy 'examples.hello-events:declare-effects'
+
+stderr | tests/cognitive-producers.test.ts > cognitive producers — bus emissions > resolveTension emits tension.resolved with entity affected_ids
+[2026-10-01T00:12:51.825Z] [INFO]  Tension resolved: "tension_1790813571662_1" by system as confirmed_fixed
+
+stderr | tests/cognitive-producers.test.ts > cognitive producers — bus emissions > appendValidationResults emits candidate.added per latent result
+[2026-10-01T00:12:51.848Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T00:12:51.849Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced data_model link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:51.851Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > persists bounded focused schedules and reuses the same stabilization request
+[2026-10-01T00:12:51.864Z] [INFO]  Schedule created: "targeted_graph_stabilization_orphan_bridging_4623ceb2" (dream_cycle, interval)
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > unload prunes UI, policies, archetypes, and markdown fences
+[2026-10-01T00:12:51.876Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-01T00:12:51.876Z] [WARN]  plugin examples.hello-events@0.2.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > unload prunes UI, policies, archetypes, and markdown fences
+[2026-10-01T00:12:51.876Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=0 through to mandatory enrichment
+[2026-10-01T00:12:51.894Z] [INFO]  scan_project: Scan complete: 1 repo(s), 1 files. Semantic enrichment incomplete. Features: 1 new / 1 total. Workflows: 0 new / 0 total. Data model: 0 new / 0 total. Index: 1 entries. 3 warning(s).
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=1 through to mandatory enrichment
+[2026-10-01T00:12:51.923Z] [INFO]  scan_project: Phase 1 — scanning file system…
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > persists bounded focused schedules and reuses the same stabilization request
+[2026-10-01T00:12:51.930Z] [INFO]  Schedule created: "targeted_graph_stabilization_llm_dream_089d543d" (dream_cycle, interval)
+
+ ✓ tests/webhooks/store.test.ts (9 tests) 1046ms
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=1 through to mandatory enrichment
+[2026-10-01T00:12:51.943Z] [INFO]  scan_project: fixture — 1 files, 0 UI files, tech: Unknown, dirs: src
+[2026-10-01T00:12:51.943Z] [INFO]  scan_project: Scanned fixture: 1 files, tech: Unknown
+
+stderr | tests/cognitive-producers.test.ts > cognitive producers — bus emissions > appendValidationResults emits candidate.added per latent result
+[2026-10-01T00:12:51.951Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > unload prunes UI, policies, archetypes, and markdown fences
+[2026-10-01T00:12:51.952Z] [INFO]  plugin:examples.hello-events hello-events activating (full seam demo)
+[2026-10-01T00:12:51.952Z] [INFO]  Plugin examples.hello-events registered tool 'examples_hello_events_greet'
+[2026-10-01T00:12:51.952Z] [INFO]  Plugin examples.hello-events registered resource 'plugin://examples.hello-events/manifest'
+[2026-10-01T00:12:51.952Z] [INFO]  Plugin examples.hello-events registered archetype provider 'examples.hello-events:starter-pack'
+[2026-10-01T00:12:51.953Z] [INFO]  Plugin examples.hello-events registered markdown fence 'dg-hello'
+[2026-10-01T00:12:51.953Z] [INFO]  plugin:examples.hello-events hello-events activated (all seams exercised)
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=1 through to mandatory enrichment
+[2026-10-01T00:12:51.959Z] [INFO]  scan_project: Phase 2 — LLM unavailable, structural-only mode
+[2026-10-01T00:12:51.959Z] [INFO]  scan_project: Phase 2 — LLM unavailable, using structural analysis…
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > unload prunes UI, policies, archetypes, and markdown fences
+[2026-10-01T00:12:51.954Z] [INFO]  Plugin examples.hello-events activated (1 subscription(s))
+
+stderr | tests/cognitive-producers.test.ts > cognitive producers — bus emissions > promoteEdges emits candidate.promoted per edge with from/to as affected_ids
+[2026-10-01T00:12:51.961Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T00:12:51.961Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced data_model link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:51.974Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > persists bounded focused schedules and reuses the same stabilization request
+[2026-10-01T00:12:51.990Z] [INFO]  Targeted dream stabilization: 2 created, 0 reused, 2 focus entities
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced workflow link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:52.012Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > persists bounded focused schedules and reuses the same stabilization request
+[2026-10-01T00:12:52.015Z] [INFO]  Targeted dream stabilization: 0 created, 2 reused, 2 focus entities
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > unload prunes UI, policies, archetypes, and markdown fences
+[2026-10-01T00:12:52.033Z] [INFO]  Plugin examples.hello-events registered UI element 'examples.hello-events.greeting'
+
+stderr | tests/cognitive-producers.test.ts > cognitive producers — bus emissions > promoteEdges emits candidate.promoted per edge with from/to as affected_ids
+[2026-10-01T00:12:52.035Z] [INFO]  Promoted 2 dream edges to validated status
+
+stderr | tests/cognitive-producers.test.ts > cognitive producers — bus emissions > promoteEdges emits candidate.promoted per edge with from/to as affected_ids
+[2026-10-01T00:12:52.037Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=1 through to mandatory enrichment
+[2026-10-01T00:12:52.038Z] [INFO]  scan_project: Merging auxiliary entities (tests/configs/scripts/MCP tools)…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=1 through to mandatory enrichment
+[2026-10-01T00:12:52.039Z] [INFO]  scan_project: Enriching every graph node with semantic context (max hops: 1)…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=1 through to mandatory enrichment
+[2026-10-01T00:12:52.039Z] [INFO]  scan_project: Rebuilding resource index…
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > unload prunes UI, policies, archetypes, and markdown fences
+[2026-10-01T00:12:52.104Z] [INFO]  Plugin examples.hello-events proposed policy 'examples.hello-events:declare-effects'
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > unload prunes UI, policies, archetypes, and markdown fences
+[2026-10-01T00:12:52.118Z] [INFO]  plugin:examples.hello-events hello-events deactivated
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > automatically schedules stabilization after a major curated graph write
+[2026-10-01T00:12:52.122Z] [INFO]  enrich_seed_data: wrote features.json — 2 new, 0 updated, 2 total
+
+stderr | tests/project-plans-scaffold.test.ts > project plans scaffold > creates plans when an instance is initialized with a project
+[2026-10-01T00:12:52.137Z] [INFO]  Creating instance b92e3b23-1265-490d-8800-9043df986c47 (new-project) at C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-plans-scaffold-mdG4Tl\master\b92e3b23-1265-490d-8800-9043df986c47
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > unload prunes UI, policies, archetypes, and markdown fences
+[2026-10-01T00:12:52.200Z] [INFO]  Plugin examples.hello-events unload pruned 1 UI element(s) from ui_registry.json
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=1 through to mandatory enrichment
+[2026-10-01T00:12:52.201Z] [INFO]  scan_project: index rebuilt with 1 entries
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced workflow link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:52.211Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 0 relation target type(s) from graph IDs; omitted 0 self link(s); converted 1 non-feature anchor(s) to typed relations.
+
+stderr | tests/cognitive-producers.test.ts > cognitive producers — MCP behavior unchanged > recordTension result is identical with vs without subscribers
+[2026-10-01T00:12:52.232Z] [INFO]  Tension resolved: "tension_1790813572124_1" by system as confirmed_fixed
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced workflow link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:52.354Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/plugins/hello-events-e2e.test.ts > examples/hello-events full-seam smoke > unload prunes UI, policies, archetypes, and markdown fences
+[2026-10-01T00:12:52.363Z] [INFO]  Plugin examples.hello-events unload pruned 1 policy proposal(s)
+[2026-10-01T00:12:52.363Z] [INFO]  Plugin examples.hello-events unload pruned 1 archetype provider(s)
+[2026-10-01T00:12:52.363Z] [INFO]  Plugin examples.hello-events unload pruned 1 markdown fence(s)
+
+stderr | tests/project-plans-scaffold.test.ts > project plans scaffold > creates plans when an instance is initialized with a project
+[2026-10-01T00:12:52.366Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-plans-scaffold-mdG4Tl\master\instances.json
+
+stderr | tests/project-plans-scaffold.test.ts > project plans scaffold > creates plans when an instance is initialized with a project
+[2026-10-01T00:12:52.368Z] [INFO]  Registered new instance b92e3b23-1265-490d-8800-9043df986c47 (new-project)
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > inherits strict normalization from the active policy and reports the applied receipt
+[2026-10-01T00:12:52.370Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T00:12:52.370Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/project-plans-scaffold.test.ts > project plans scaffold > creates plans when an instance is initialized with a project
+[2026-10-01T00:12:52.383Z] [INFO]  Instance b92e3b23-1265-490d-8800-9043df986c47 created successfully
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > inherits strict normalization from the active policy and reports the applied receipt
+[2026-10-01T00:12:52.373Z] [INFO]  Cold-start bootstrap started at 2026-10-01T00:12:52.373Z (cycle 0); relaxed promotion gate active until exit (entities≥50 & validated_edges≥10, OR 20 cycles, OR 24h, whichever first)
+[2026-10-01T00:12:52.373Z] [INFO]  Normalization cycle #1 starting (threshold: 0.5)
+[2026-10-01T00:12:52.373Z] [INFO]  Normalization receipt: {"profile":"strict","requested_strict":null,"inherited_strict":true,"override_applied":false,"effective_strict":true,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.5,"promotion_plausibility":0.4,"promotion_evidence":0.3,"promotion_evidence_count":1,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["promotion_confidence","promotion_plausibility","promotion_evidence","promotion_evidence_count"]}}
+
+stderr | tests/project-plans-scaffold.test.ts > project plans scaffold > creates plans when an existing instance is attached to a project
+[2026-10-01T00:12:52.459Z] [INFO]  Creating instance 71d99546-cfe4-4c6e-8149-987419b60f02 (existing-project) at C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-plans-scaffold-0ArPWK\master\71d99546-cfe4-4c6e-8149-987419b60f02
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced workflow link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:52.471Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+ ✓ tests/plugins/hello-events-e2e.test.ts (2 tests) 1174ms
+   ✓ examples/hello-events full-seam smoke > activates and exercises every seam declared in plugin.json  405ms
+   ✓ examples/hello-events full-seam smoke > unload prunes UI, policies, archetypes, and markdown fences  766ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced capability link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:52.526Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+ ✓ tests/scanner/cpp-methods.test.ts (9 tests) 352ms
+stderr | tests/project-plans-scaffold.test.ts > project plans scaffold > creates plans when an existing instance is attached to a project
+[2026-10-01T00:12:52.628Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-plans-scaffold-0ArPWK\master\instances.json
+
+stderr | tests/project-plans-scaffold.test.ts > project plans scaffold > creates plans when an existing instance is attached to a project
+[2026-10-01T00:12:52.628Z] [INFO]  Registered new instance 71d99546-cfe4-4c6e-8149-987419b60f02 (existing-project)
+ ✓ tests/scanner/swift-extractor.test.ts (18 tests) 368ms
+
+ ✓ tests/tools/reconciliation-transaction.test.ts (9 tests) 3605ms
+   ✓ instance graph reconciliation barrier > rolls back interruptions before the durable publication marker without exposing a mixed read  1818ms
+   ✓ instance graph reconciliation barrier > blocks enrichment, dream, scheduler, and manual atomic mutations at the same boundary  587ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced capability link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:52.705Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 0 relation target type(s) from graph IDs; omitted 0 self link(s); converted 1 non-feature anchor(s) to typed relations.
+
+stderr | tests/project-plans-scaffold.test.ts > project plans scaffold > creates plans when an existing instance is attached to a project
+[2026-10-01T00:12:52.636Z] [INFO]  Instance 71d99546-cfe4-4c6e-8149-987419b60f02 created successfully
+
+stdout | tests/project-plans-scaffold.test.ts > project plans scaffold > creates plans when an existing instance is attached to a project
+✓ Instance existing-project (71d99546-cfe4-4c6e-8149-987419b60f02) attached to C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-plans-scaffold-0ArPWK\existing-project
+
+ ✓ tests/project-plans-scaffold.test.ts (2 tests) 600ms
+   ✓ project plans scaffold > creates plans when an instance is initialized with a project  331ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced capability link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:52.838Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > automatically schedules stabilization after a major curated graph write
+[2026-10-01T00:12:52.847Z] [INFO]  enrich_seed_data: index rebuilt with 2 entries
+
+stderr | tests/resource-query.test.ts > shared resource query authority > defines query behavior for every baseline URI and separates runtime/project capabilities
+[2026-10-01T00:12:52.692Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T00:12:52.860Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T00:12:52.866Z] [INFO]  Registered discipline://manifest — 78 tools classified, 19 data files protected
+[2026-10-01T00:12:52.873Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-01T00:12:52.883Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced capability link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:52.897Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/scan-project-incremental-e2e.test.ts > Slice 5 runScanProject authoritative orchestration > withdraws deleted support without purging governed knowledge
+[2026-10-01T00:12:52.958Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > inherits strict normalization from the active policy and reports the applied receipt
+[2026-10-01T00:12:52.982Z] [INFO]  Normalization cycle #1 complete: 1 processed (0 validated, 0 latent, 1 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+ ✓ tests/scanner/cpp-extractor.test.ts (12 tests) 322ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced datastore link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:52.927Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > inherits strict normalization from the active policy and reports the applied receipt
+[2026-10-01T00:12:52.984Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > does not create tensions for weak low-signal rejections by default
+[2026-10-01T00:12:53.027Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T00:12:53.027Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > does not create tensions for weak low-signal rejections by default
+[2026-10-01T00:12:53.028Z] [INFO]  Normalization cycle #2 starting (threshold: 0.5)
+[2026-10-01T00:12:53.028Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":null,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.5,"promotion_plausibility":0.4,"promotion_evidence":0.3,"promotion_evidence_count":1,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["promotion_confidence","promotion_plausibility","promotion_evidence","promotion_evidence_count"]}}
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > automatically schedules stabilization after a major curated graph write
+[2026-10-01T00:12:53.099Z] [INFO]  Schedule created: "targeted_graph_stabilization_llm_dream_294214e5" (dream_cycle, interval)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced datastore link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:53.110Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 0 relation target type(s) from graph IDs; omitted 0 self link(s); converted 1 non-feature anchor(s) to typed relations.
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=1 through to mandatory enrichment
+[2026-10-01T00:12:53.168Z] [INFO]  scan_project: Scan complete: 1 repo(s), 1 files. Semantic enrichment incomplete. Features: 1 new / 1 total. Workflows: 0 new / 0 total. Data model: 0 new / 0 total. Index: 1 entries. 3 warning(s).
+
+stderr | tests/llm.lmstudio.test.ts > initLlmProvider — lmstudio > constructs an OpenAI-compat provider whose name is reported as 'lmstudio'
+[2026-10-01T00:12:53.167Z] [INFO]  LLM provider: lmstudio (model: test-model)
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > automatically schedules stabilization after a major curated graph write
+[2026-10-01T00:12:53.199Z] [INFO]  Schedule created: "targeted_graph_stabilization_missing_abstraction_db1b0660" (dream_cycle, interval)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced datastore link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:53.203Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > does not create tensions for weak low-signal rejections by default
+[2026-10-01T00:12:53.234Z] [INFO]  Normalization cycle #2 complete: 1 processed (0 validated, 0 latent, 1 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > automatically schedules stabilization after a major curated graph write
+[2026-10-01T00:12:53.255Z] [INFO]  Targeted dream stabilization: 2 created, 0 reused, 2 focus entities
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced datastore link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:12:53.255Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > does not create tensions for weak low-signal rejections by default
+[2026-10-01T00:12:53.236Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+ ✓ tests/tools/native-ui-scanner.test.ts (11 tests) 500ms
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=2 through to mandatory enrichment
+[2026-10-01T00:12:53.195Z] [INFO]  scan_project: Phase 1 — scanning file system…
+
+stderr | tests/llm.lmstudio.test.ts > initLlmProvider — lmstudio > hits /chat/completions on the LM Studio base URL and parses LM-Studio-shaped responses
+[2026-10-01T00:12:53.195Z] [INFO]  LLM provider: lmstudio (model: test-model)
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=2 through to mandatory enrichment
+[2026-10-01T00:12:53.212Z] [INFO]  scan_project: fixture — 1 files, 0 UI files, tech: Unknown, dirs: src
+[2026-10-01T00:12:53.212Z] [INFO]  scan_project: Scanned fixture: 1 files, tech: Unknown
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("")
+[2026-10-01T00:12:53.277Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > still surfaces recurrent rejected links as tension candidates
+[2026-10-01T00:12:53.262Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T00:12:53.262Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+ ✓ tests/parser-bootstrap.test.ts (8 tests) 261ms
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=2 through to mandatory enrichment
+[2026-10-01T00:12:53.230Z] [INFO]  scan_project: Phase 2 — LLM unavailable, structural-only mode
+[2026-10-01T00:12:53.230Z] [INFO]  scan_project: Phase 2 — LLM unavailable, using structural analysis…
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > still surfaces recurrent rejected links as tension candidates
+[2026-10-01T00:12:53.262Z] [INFO]  Normalization cycle #3 starting (threshold: 0.5)
+[2026-10-01T00:12:53.263Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":null,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.5,"promotion_plausibility":0.4,"promotion_evidence":0.3,"promotion_evidence_count":1,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["promotion_confidence","promotion_plausibility","promotion_evidence","promotion_evidence_count"]}}
+
+ ✓ tests/cognitive/targeted-dreams.test.ts (3 tests) 1524ms
+   ✓ targeted graph stabilization > automatically schedules stabilization after a major curated graph write  1236ms
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=2 through to mandatory enrichment
+[2026-10-01T00:12:53.281Z] [INFO]  scan_project: Merging auxiliary entities (tests/configs/scripts/MCP tools)…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=2 through to mandatory enrichment
+[2026-10-01T00:12:53.281Z] [INFO]  scan_project: Enriching every graph node with semantic context (max hops: 2)…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=2 through to mandatory enrichment
+[2026-10-01T00:12:53.281Z] [INFO]  scan_project: Rebuilding resource index…
+
+stderr | tests/task-preamble-compiler.test.ts > compileTaskPreamble > does not fail or add prompt context when no provider and no evidence are available
+[2026-10-01T00:12:53.363Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/task-preamble-compiler.test.ts > compileTaskPreamble > does not fail or add prompt context when no provider and no evidence are available
+[2026-10-01T00:12:53.395Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=2 through to mandatory enrichment
+[2026-10-01T00:12:53.438Z] [INFO]  scan_project: index rebuilt with 1 entries
+
+stderr | tests/task-preamble-compiler.test.ts > compileTaskPreamble > does not fail or add prompt context when no provider and no evidence are available
+[2026-10-01T00:12:53.425Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/task-preamble-compiler.test.ts > compileTaskPreamble > includes bounded relevant evidence when the prompt cost is economical
+[2026-10-01T00:12:53.462Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("")
+[2026-10-01T00:12:53.482Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; contract: unknown feature anchor neighbor; contract: missing feature anchor evidence excerpt for neighbor
+
+stderr | tests/task-preamble-compiler.test.ts > compileTaskPreamble > includes bounded relevant evidence when the prompt cost is economical
+[2026-10-01T00:12:53.495Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > still surfaces recurrent rejected links as tension candidates
+[2026-10-01T00:12:53.516Z] [INFO]  Normalization: 1 tension-worthy rejections identified
+[2026-10-01T00:12:53.517Z] [INFO]  Normalization cycle #3 complete: 1 processed (0 validated, 0 latent, 1 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/cognitive-producers.test.ts > envoy review fix regressions > still surfaces recurrent rejected links as tension candidates
+[2026-10-01T00:12:53.518Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+ ✓ tests/cognitive-producers.test.ts (12 tests) 2225ms
+   ✓ envoy review fix regressions > inherits strict normalization from the active policy and reports the applied receipt  650ms
+stderr | tests/task-preamble-compiler.test.ts > compileTaskPreamble > omits valid evidence when it is relevant but not economical
+[2026-10-01T00:12:53.561Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/task-preamble-compiler.test.ts > compileTaskPreamble > omits valid evidence when it is relevant but not economical
+[2026-10-01T00:12:53.598Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("")
+[2026-10-01T00:12:53.607Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:12:53.608Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/standalone-architect-routes.test.ts
+[2026-10-01T00:12:53.609Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("   ")
+[2026-10-01T00:12:53.639Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/task-preamble-compiler.test.ts > compileTaskPreamble > rejects invented or malformed evidence anchors before adding context
+[2026-10-01T00:12:53.659Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/task-preamble-compiler.test.ts > compileTaskPreamble > rejects invented or malformed evidence anchors before adding context
+[2026-10-01T00:12:53.691Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/standalone-architect-routes.test.ts
+[2026-10-01T00:12:53.619Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ✓ tests/tools/enrichment-publication.test.ts (18 tests) 4822ms
+   ✓ enrichment publication boundary > commits entity/index/checkpoint together while retaining wrappers and concurrent unrelated records (wrapper=true)  322ms
+   ✓ enrichment publication boundary > preserves concurrent source and leaves generated enrichment retryable  349ms
+   ✓ enrichment publication boundary > preserves concurrent deletion and leaves generated enrichment retryable  344ms
+   ✓ enrichment publication boundary > never acknowledges uncommitted work at after_replace:0:features.json  307ms
+   ✓ enrichment publication boundary > never acknowledges uncommitted work at before_replace:1:index.json  306ms
+   ✓ enrichment publication boundary > never acknowledges uncommitted work at after_replace:2:enrichment_state.json  374ms
+stderr | tests/task-preamble-compiler.test.ts > compileTaskPreamble > omits evidence that cannot fit the configured prompt budget
+[2026-10-01T00:12:53.734Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/task-preamble-compiler.test.ts > compileTaskPreamble > omits evidence that cannot fit the configured prompt budget
+[2026-10-01T00:12:53.766Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("   ")
+[2026-10-01T00:12:53.805Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; contract: unknown feature anchor neighbor; contract: missing feature anchor evidence excerpt for neighbor
+
+ ✓ tests/scanner/cpp-shapes.test.ts (9 tests) 306ms
+stderr | tests/resource-query.test.ts > shared resource query authority > defines query behavior for every baseline URI and separates runtime/project capabilities
+[2026-10-01T00:12:53.775Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/task-preamble-compiler.test.ts > explicit legacy getCognitivePreamble adaptive_future comparison > omits advisory next steps when no bounded preamble evidence qualifies
+[2026-10-01T00:12:53.892Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/task-preamble-compiler.test.ts > explicit legacy getCognitivePreamble adaptive_future comparison > omits advisory next steps when no bounded preamble evidence qualifies
+[2026-10-01T00:12:53.898Z] [INFO]  Generating cognitive preamble: max_tokens=120
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("   ")
+[2026-10-01T00:12:53.924Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:12:53.925Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+ ✓ tests/scanner/go-extractor.test.ts (19 tests) 575ms
+stderr | tests/utils/ui-index.test.ts > loadIndexableUIElements > returns [] when ui_registry.json is malformed JSON
+[2026-10-01T00:12:53.947Z] [WARN]  ui-index: ui_registry.json is not valid JSON: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+
+ ✓ tests/llm.lmstudio.test.ts (4 tests) 873ms
+   ✓ initLlmProvider — lmstudio > hits /chat/completions on the LM Studio base URL and parses LM-Studio-shaped responses  766ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 0 in traversal, prompts and persisted metadata
+[2026-10-01T00:12:53.978Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=0, batch_size=10)
+
+stderr | tests/task-preamble-compiler.test.ts > explicit legacy getCognitivePreamble adaptive_future comparison > omits advisory next steps when no bounded preamble evidence qualifies
+[2026-10-01T00:12:54.000Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > serves an executable browser bootstrap script for runtime binding
+[2026-10-01T00:12:54.015Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/task-preamble-compiler.test.ts > explicit legacy getCognitivePreamble adaptive_future comparison > rejects invalid anchors before ranking adaptive future preamble evidence
+[2026-10-01T00:12:54.034Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/task-preamble-compiler.test.ts > explicit legacy getCognitivePreamble adaptive_future comparison > rejects invalid anchors before ranking adaptive future preamble evidence
+[2026-10-01T00:12:54.061Z] [INFO]  Generating cognitive preamble: max_tokens=160
+
+ ✓ tests/utils/ui-index.test.ts (6 tests) 172ms
+ ✓ tests/scanner/c-extractor.test.ts (12 tests) 191ms
+stderr | tests/llm.routing.test.ts > selectLlmRoute > prefers an available connected caller model without probing daemon config
+[2026-10-01T00:12:54.124Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > falls through to an available daemon model when the connected model is unavailable
+[2026-10-01T00:12:54.131Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/task-preamble-compiler.test.ts > explicit legacy getCognitivePreamble adaptive_future comparison > rejects invalid anchors before ranking adaptive future preamble evidence
+[2026-10-01T00:12:54.160Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 0 in traversal, prompts and persisted metadata
+[2026-10-01T00:12:54.231Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/task-preamble-compiler.test.ts > explicit legacy getCognitivePreamble adaptive_future comparison > records budget-trim provenance when lower-priority preamble context is omitted
+[2026-10-01T00:12:54.191Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > falls through to an available daemon model when the connected model is unavailable
+[2026-10-01T00:12:54.239Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 0 in traversal, prompts and persisted metadata
+[2026-10-01T00:12:54.279Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/task-preamble-compiler.test.ts > explicit legacy getCognitivePreamble adaptive_future comparison > records budget-trim provenance when lower-priority preamble context is omitted
+[2026-10-01T00:12:54.218Z] [INFO]  Generating cognitive preamble: max_tokens=20
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > uses normalizer daemon settings and caller max tokens when requested
+[2026-10-01T00:12:54.241Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+ ✓ tests/scanner/java-extractor.test.ts (15 tests) 168ms
+ ✓ tests/webhooks/worker.test.ts (3 tests) 605ms
+stderr | tests/llm.routing.test.ts > selectLlmRoute > uses normalizer daemon settings and caller max tokens when requested
+[2026-10-01T00:12:54.285Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 1 in traversal, prompts and persisted metadata
+[2026-10-01T00:12:54.296Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=1, batch_size=10)
+
+ ✓ tests/scanner/cpp-templates.test.ts (5 tests) 331ms
+stderr | tests/task-preamble-compiler.test.ts > explicit legacy getCognitivePreamble adaptive_future comparison > records budget-trim provenance when lower-priority preamble context is omitted
+[2026-10-01T00:12:54.265Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > returns deterministic fallback when no connected or daemon model is configured
+[2026-10-01T00:12:54.287Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > returns deterministic fallback when no connected or daemon model is configured
+[2026-10-01T00:12:54.315Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > returns deterministic fallback when the configured daemon provider is unavailable
+[2026-10-01T00:12:54.316Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+ ✓ tests/task-preamble-compiler.test.ts (8 tests) 940ms
+stderr | tests/llm.routing.test.ts > selectLlmRoute > returns deterministic fallback when the configured daemon provider is unavailable
+[2026-10-01T00:12:54.346Z] [INFO]  LLM provider: none (model: n/a)
+
+ ✓ tests/llm.routing.test.ts (8 tests) 237ms
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=2 through to mandatory enrichment
+[2026-10-01T00:12:54.457Z] [INFO]  scan_project: Scan complete: 1 repo(s), 1 files. Semantic enrichment incomplete. Features: 1 new / 1 total. Workflows: 0 new / 0 total. Data model: 0 new / 0 total. Index: 1 entries. 3 warning(s).
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 1 in traversal, prompts and persisted metadata
+[2026-10-01T00:12:54.522Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+ ✓ tests/tools/native-data-model.test.ts (5 tests) 361ms
+ ✓ tests/retrieval-index.test.ts (4 tests) 988ms
+   ✓ content-bound retrieval index > matches rebuilt reference selection and mandatory insufficiency over frozen project tasks and budget sweeps  846ms
+ ✓ tests/scanner/rust-extractor.test.ts (13 tests) 172ms
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=3 through to mandatory enrichment
+[2026-10-01T00:12:54.482Z] [INFO]  scan_project: Phase 1 — scanning file system…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=3 through to mandatory enrichment
+[2026-10-01T00:12:54.501Z] [INFO]  scan_project: fixture — 1 files, 0 UI files, tech: Unknown, dirs: src
+[2026-10-01T00:12:54.501Z] [INFO]  scan_project: Scanned fixture: 1 files, tech: Unknown
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=3 through to mandatory enrichment
+[2026-10-01T00:12:54.517Z] [INFO]  scan_project: Phase 2 — LLM unavailable, structural-only mode
+[2026-10-01T00:12:54.517Z] [INFO]  scan_project: Phase 2 — LLM unavailable, using structural analysis…
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 1 in traversal, prompts and persisted metadata
+[2026-10-01T00:12:54.583Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=3 through to mandatory enrichment
+[2026-10-01T00:12:54.574Z] [INFO]  scan_project: Merging auxiliary entities (tests/configs/scripts/MCP tools)…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=3 through to mandatory enrichment
+[2026-10-01T00:12:54.574Z] [INFO]  scan_project: Enriching every graph node with semantic context (max hops: 3)…
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=3 through to mandatory enrichment
+[2026-10-01T00:12:54.575Z] [INFO]  scan_project: Rebuilding resource index…
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses canonical graph types for known relation IDs instead of discarding rich node knowledge
+[2026-10-01T00:12:54.622Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=3 through to mandatory enrichment
+[2026-10-01T00:12:54.706Z] [INFO]  scan_project: index rebuilt with 1 entries
+
+stderr | tests/tools/scan-project-incremental-e2e.test.ts > Slice 5 runScanProject authoritative orchestration > rebinds an unambiguous same-content rename and keeps identity active
+[2026-10-01T00:12:54.763Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses canonical graph types for known relation IDs instead of discarding rich node knowledge
+[2026-10-01T00:12:54.799Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 3 relation target type(s) from graph IDs; omitted 0 self link(s); converted 0 non-feature anchor(s) to typed relations.
+
+ ✓ tests/scanner/orchestrator.test.ts (13 tests) 317ms
+ ✓ tests/scanner/gradle-extractor.test.ts (14 tests) 170ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses canonical graph types for known relation IDs instead of discarding rich node knowledge
+[2026-10-01T00:12:55.266Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+ ✓ tests/architect-continuation.test.ts (14 tests) 95ms
+stderr | tests/instance-isolation.test.ts > InstanceScope — guard functions > assertWithinBounds throws ScopeViolationError for cross-instance access
+[2026-10-01T00:12:55.445Z] [ERROR] BLOCKED: Attempted to access another instance's data. Path: C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-test-BJKbP8\bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb\data\dream_graph.json, Instance: aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa, Context: test cross-instance
+
+stderr | tests/instance-isolation.test.ts > InstanceScope — guard functions > assertWithinBounds throws for out-of-bounds paths
+[2026-10-01T00:12:55.456Z] [ERROR] BLOCKED: Path outside instance scope. Path: C:\tmp\random\file.json, Instance: aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa
+
+ ✓ tests/cli-status.test.ts (1 test) 142ms
+ ✓ tests/architect-root-route.test.ts (1 test) 13ms
+stderr | tests/instance-isolation.test.ts > InstanceScope — guard functions > assertOwnDataPath rejects config dir (stricter than assertWithinBounds)
+[2026-10-01T00:12:55.476Z] [ERROR] BLOCKED: Path is not within instance data directory. Path: C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-test-Jhg4ef\aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa\config\policies.json, Instance: aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa
+
+stderr | tests/instance-isolation.test.ts > InstanceScope — guard functions > assertOwnDataPath rejects project paths
+[2026-10-01T00:12:55.484Z] [ERROR] BLOCKED: Path is not within instance data directory. Path: C:\Users\MIKAJU~1\AppData\Local\Temp\project\data.json, Instance: aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa
+
+stderr | tests/instance-isolation.test.ts > Cross-instance contamination prevention > scope A cannot access scope B's paths
+[2026-10-01T00:12:55.510Z] [ERROR] BLOCKED: Attempted to access another instance's data. Path: C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-test-nwiQuD\bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb\data\dream_graph.json, Instance: aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa, Context: cross-instance test
+
+stderr | tests/instance-isolation.test.ts > Cross-instance contamination prevention > scope B cannot access scope A's config
+[2026-10-01T00:12:55.517Z] [ERROR] BLOCKED: Attempted to access another instance's data. Path: C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-test-MgyJoO\aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa\config\policies.json, Instance: bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses canonical graph types for known relation IDs instead of discarding rich node knowledge
+[2026-10-01T00:12:55.536Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=1 errors=0 dry_run=false
+
+ ✓ tests/shell-integration-slice5-slice6.test.ts (8 tests) 60ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > omits redundant self links without losing otherwise valid semantic enrichment
+[2026-10-01T00:12:55.554Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes full scan context_hops=3 through to mandatory enrichment
+[2026-10-01T00:12:55.625Z] [INFO]  scan_project: Scan complete: 1 repo(s), 1 files. Semantic enrichment incomplete. Features: 1 new / 1 total. Workflows: 0 new / 0 total. Data model: 0 new / 0 total. Index: 1 entries. 3 warning(s).
+
+ ✓ tests/instance-isolation.test.ts (44 tests) 205ms
+ ✓ tests/sdk/architect-plan-state.test.ts (2 tests) 294ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > omits redundant self links without losing otherwise valid semantic enrichment
+[2026-10-01T00:12:55.673Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 0 relation target type(s) from graph IDs; omitted 2 self link(s); converted 0 non-feature anchor(s) to typed relations.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > omits redundant self links without losing otherwise valid semantic enrichment
+[2026-10-01T00:12:55.752Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/explorer-prefs.test.ts > Explorer prefs — disk I/O > returns defaults when the file is malformed
+[2026-10-01T00:12:55.738Z] [WARN]  explorer_prefs.json malformed (Unexpected token 'o', "not json {" is not valid JSON); falling back to defaults
+
+ ✓ tests/explorer-3d-radial.test.ts (11 tests) 40ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > omits redundant self links without losing otherwise valid semantic enrichment
+[2026-10-01T00:12:55.824Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+ ✓ tests/living-dreamgraph-projections.test.ts (5 tests) 48ms
+ ✓ tests/agent-usefulness.test.ts (6 tests) 54ms
+stderr | tests/tools/scan-enrichment-hops.test.ts > scan enrichment hop budget > passes a zero-hop budget through explicit incremental enrichment
+[2026-10-01T00:12:55.844Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+stderr | tests/resource-query.test.ts > shared resource query authority > unions pages without missing middle records, duplicates or byte overflow
+[2026-10-01T00:12:55.753Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T00:12:55.864Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T00:12:55.868Z] [INFO]  Registered discipline://manifest — 78 tools classified, 19 data files protected
+[2026-10-01T00:12:55.869Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-01T00:12:55.874Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'unknown relation IDs' after canonical relation normalization
+[2026-10-01T00:12:55.845Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'unknown relation IDs' after canonical relation normalization
+[2026-10-01T00:12:55.973Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; guarded-contract: unknown relation target missing
+
+ ✓ tests/explorer-label-layout.test.ts (3 tests) 53ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'unknown relation IDs' after canonical relation normalization
+[2026-10-01T00:12:56.063Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:12:56.064Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'known relations without evidence' after canonical relation normalization
+[2026-10-01T00:12:56.083Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+ ✓ tests/explorer-prefs.test.ts (22 tests) 469ms
+ ✓ tests/explorer-3d-polish.test.ts (6 tests) 48ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'known relations without evidence' after canonical relation normalization
+[2026-10-01T00:12:56.236Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 1 relation target type(s) from graph IDs; omitted 0 self link(s); converted 0 non-feature anchor(s) to typed relations.
+[2026-10-01T00:12:56.236Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; guarded-contract: incomplete relation evidence for neighbor
+
+ ✓ tests/tools/coverage-ledger.test.ts (2 tests) 36ms
+ ✓ tests/explorer-3d-flow.test.ts (10 tests | 2 skipped) 46ms
+ ✓ tests/explorer-3d-systems.test.ts (6 tests) 75ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'known relations without evidence' after canonical relation normalization
+[2026-10-01T00:12:56.325Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:12:56.325Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/explorer-heatmap.test.ts > heatmap — disk + route > returns empty when event_log.json is malformed
+[2026-10-01T00:12:56.333Z] [WARN]  event_log.json malformed (Unexpected token 'o', "not json" is not valid JSON); heatmap returns empty
+
+stderr | tests/tools/scan-project-incremental-e2e.test.ts > Slice 5 runScanProject authoritative orchestration > uses a stable captured snapshot when the file stable
+[2026-10-01T00:12:56.419Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+ ✓ tests/sdk/manifest-schema.test.ts (5 tests) 83ms
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-01T00:12:56.384Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:12:56.341Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+ ✓ tests/sdk/host-loader.test.ts (4 tests) 208ms
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-01T00:12:56.393Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+ ✓ tests/explorer-heatmap.test.ts (14 tests) 176ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:12:56.459Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; retry-fallback: semantic description or intent is too shallow
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:12:56.535Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:12:56.535Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/onboarding-readiness.test.ts
+[2026-10-01T00:12:56.561Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:12:56.583Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/onboarding-readiness.test.ts
+[2026-10-01T00:12:56.573Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ✓ tests/change-obligations.test.ts (10 tests) 7491ms
+   ✓ durable source change obligations > retains C17 effect-double evidence across a lost action result without repeating input or claiming graph reconciliation  1592ms
+   ✓ durable source change obligations > tracks real MCP create/edit/rename/delete commands through durable obligations  2414ms
+   ✓ durable source change obligations > publishes the reconciled obligation at the same graph boundary and retains later enrichment/digestion debt  1172ms
+   ✓ durable source change obligations > recovers the exact effect after intent_committed without repeating input  651ms
+   ✓ durable source change obligations > recovers the exact effect after effect_applied without repeating input  338ms
+   ✓ durable source change obligations > recovers the exact effect after effect_recorded without repeating input  502ms
+stderr | tests/onboarding-readiness.test.ts > daemon onboarding readiness projection > renders a plain-language Dashboard Start Here card with governed repair paths
+[2026-10-01T00:12:56.906Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/tools/scan-enrichment-hops.test.ts (9 tests) 8211ms
+   ✓ scan enrichment hop budget > passes full scan context_hops=undefined through to mandatory enrichment  1640ms
+   ✓ scan enrichment hop budget > passes full scan context_hops=0 through to mandatory enrichment  1513ms
+   ✓ scan enrichment hop budget > passes full scan context_hops=1 through to mandatory enrichment  1273ms
+   ✓ scan enrichment hop budget > passes full scan context_hops=2 through to mandatory enrichment  1290ms
+   ✓ scan enrichment hop budget > passes full scan context_hops=3 through to mandatory enrichment  1165ms
+   ✓ scan enrichment hop budget > passes a zero-hop budget through explicit incremental enrichment  1192ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:12:56.945Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+ ✓ tests/tools/graph-health.test.ts (2 tests) 178ms
+ ✓ tests/tools/incremental-reconciliation.test.ts (8 tests) 47ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:12:57.006Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+ ✓ tests/architect-cli.test.ts (8 tests) 392ms
+ ✓ tests/architect-native-tool-loop.test.ts (23 tests) 112ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:12:57.026Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-01T00:12:57.123Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:12:57.154Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; retry-fallback: semantic description or intent is too shallow
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:12:57.224Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:12:57.224Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-01T00:12:57.128Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+ ✓ tests/onboarding-readiness.test.ts (7 tests) 452ms
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-01T00:12:57.137Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+ ✓ tests/cli-enrichment-hops.test.ts (15 tests) 36ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:12:57.288Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+ ✓ tests/graph-contracts.test.ts (5 tests) 20ms
+ ✓ tests/sdk/action-checklist-example.test.ts (1 test) 27ms
+ ✓ tests/explorer-root-route.test.ts (2 tests) 23ms
+ ✓ tests/explorer-inspector.test.ts (10 tests) 39ms
+ ✓ tests/architect-timeout-streaming.test.ts (9 tests) 16ms
+stderr | tests/explorer-events.test.ts > GraphEventBus > isolates subscriber exceptions
+[2026-10-01T00:12:57.648Z] [ERROR] GraphEventBus subscriber threw on cache.invalidated: boom
+
+ ✓ tests/explorer-events.test.ts (11 tests) 28ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:12:57.689Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+ ✓ tests/sdk/host-gates.test.ts (15 tests) 12ms
+ ✓ tests/explorer-3d-wavefront.test.ts (5 tests) 62ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:12:57.753Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:12:57.795Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-01T00:12:57.799Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/tools/scan-project-incremental-e2e.test.ts > Slice 5 runScanProject authoritative orchestration > uses a stable captured snapshot when the file changes once
+[2026-10-01T00:12:57.856Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists and returns refreshed plan cursors for completed standalone Architect passes
+[2026-10-01T00:12:57.811Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists and returns refreshed plan cursors for completed standalone Architect passes
+[2026-10-01T00:12:57.843Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+ ✓ tests/sdk/architect-contract.test.ts (5 tests) 14ms
+ ✓ tests/architect-pulse.test.ts (7 tests) 13ms
+stderr | tests/resource-query.test.ts > shared resource query authority > filters documented wrapper arrays and returns successful empty matches
+[2026-10-01T00:12:57.853Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T00:12:57.953Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T00:12:57.956Z] [INFO]  Registered discipline://manifest — 78 tools classified, 19 data files protected
+[2026-10-01T00:12:57.958Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-01T00:12:57.962Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:12:57.969Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; exhausted-fallback: semantic description or intent is too shallow
+
+ ✓ tests/webhooks/sign.test.ts (9 tests) 15ms
+ ✓ tests/context-pack.test.ts (35 tests) 8587ms
+   ✓ canonical bounded graph context > retrieves the literal auxiliary family instead of silently excluding it  366ms
+   ✓ canonical bounded graph context > retrieves the literal adr family instead of silently excluding it  333ms
+   ✓ canonical bounded graph context > retrieves the literal causal family instead of silently excluding it  454ms
+   ✓ canonical bounded graph context > supplies structured knowledge as whole provenance-bound fields and makes oversized fields visibly omitted  867ms
+   ✓ canonical bounded graph context > budgets complete serialized Unicode evidence, headings and provenance at 100  476ms
+   ✓ canonical bounded graph context > keeps corrupt-store uncertainty scoped and does not call an old full scan stale  340ms
+   ✓ canonical bounded graph context > exposes managed source debt only for affected context and clears it at reconciliation, before optional cognition  561ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:12:58.029Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:12:58.030Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:12:58.030Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:12:58.154Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; exhausted-fallback: semantic description or intent is too shallow
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:12:58.223Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:12:58.224Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:12:58.224Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/solidify-insight.test.ts > solidify_cognitive_insight fallback > preserves explicit EDGE mutation when ADR-203 routing falls back
+[2026-10-01T00:12:58.250Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-01T00:12:58.254Z] [INFO]  solidify_cognitive_insight called: type=EDGE, source=feature_source, target=data_model_target, confidence=0.82
+
+ ✓ tests/tools/ui-migration-plan.test.ts (6 tests) 24ms
+ ✓ tests/tools/solidify-insight.test.ts (7 tests) 29ms
+ ✓ tests/adaptive-future-scaffold.test.ts (2 tests) 12ms
+ ✓ tests/sdk/event-import-boundaries.test.ts (3 tests) 12ms
+ ✓ tests/provider-usage.test.ts (3 tests) 11ms
+stderr | tests/resource-query.test.ts > shared resource query authority > pages complete history and actual scheduler executions rather than invented backing files
+[2026-10-01T00:12:58.249Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T00:12:58.332Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T00:12:58.336Z] [INFO]  Registered discipline://manifest — 78 tools classified, 19 data files protected
+[2026-10-01T00:12:58.336Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-01T00:12:58.340Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:12:58.369Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; exhausted-fallback: semantic description or intent is too shallow
+
+ ✓ tests/tools/enrichment-state.test.ts (7 tests) 15ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:12:58.423Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:12:58.423Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+ ✓ tests/standalone-token-economy-store.test.ts (1 test) 10ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:12:58.424Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/scan-project-incremental-e2e.test.ts > Slice 5 runScanProject authoritative orchestration > uses a stable captured snapshot when the file changes once
+[2026-10-01T00:12:58.507Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:12:58.536Z] [INFO]  enrich_parser_nodes: enriched=0 eligible=0 batches=0 anchors=0 errors=0 dry_run=false
+
+ ✓ tests/cli-mcp-call.test.ts (1 test) 10ms
+ ✓ tests/cognitive/provenance-regression.test.ts (3 tests) 7ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reuses a fresh enriched neighborhood as semantic cache without rereading covered source
+[2026-10-01T00:12:58.559Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/resource-query.test.ts > shared resource query authority > rejects revision/scope/filter changes and tampered cursors
+[2026-10-01T00:12:58.659Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T00:12:58.718Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T00:12:58.723Z] [INFO]  Registered discipline://manifest — 78 tools classified, 19 data files protected
+[2026-10-01T00:12:58.725Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-01T00:12:58.730Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reuses a fresh enriched neighborhood as semantic cache without rereading covered source
+[2026-10-01T00:12:58.739Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reuses a fresh enriched neighborhood as semantic cache without rereading covered source
+[2026-10-01T00:12:58.787Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > deduplicates shared source excerpts across nodes in one batch
+[2026-10-01T00:12:58.823Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=2)
+
+ ✓ tests/architect-provider-usage.test.ts (2 tests) 23ms
+stderr | tests/sdk/architect-routes.test.ts
+[2026-10-01T00:12:58.974Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > deduplicates shared source excerpts across nodes in one batch
+[2026-10-01T00:12:58.989Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > deduplicates shared source excerpts across nodes in one batch
+[2026-10-01T00:12:59.034Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/sdk/architect-routes.test.ts
+[2026-10-01T00:12:58.987Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > makes an enriched node available to later batches in the same run
+[2026-10-01T00:12:59.058Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+ ✓ tests/graph-operation.test.ts (5 tests) 14ms
+ ✓ tests/sdk/architect-contributions.test.ts (2 tests) 12ms
+ ✓ tests/sdk/architect-routes.test.ts (1 test) 95ms
+stderr | tests/resource-query.test.ts > shared resource query authority > binds cursors to the physical instance and expires them
+[2026-10-01T00:12:59.107Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T00:12:59.165Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T00:12:59.168Z] [INFO]  Registered discipline://manifest — 78 tools classified, 19 data files protected
+[2026-10-01T00:12:59.169Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-01T00:12:59.173Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > makes an enriched node available to later batches in the same run
+[2026-10-01T00:12:59.216Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+ ✓ tests/remediation-drafting-validation.test.ts (24 tests) 30ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > makes an enriched node available to later batches in the same run
+[2026-10-01T00:12:59.278Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > makes an enriched node available to later batches in the same run
+[2026-10-01T00:12:59.319Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=2 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses deterministic structural fallback when no provider is available
+[2026-10-01T00:12:59.345Z] [INFO]  enrich_parser_nodes: starting (model=none, provider=none, context_hops=2, batch_size=10)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists and returns refreshed plan cursors for completed standalone Architect passes
+[2026-10-01T00:12:59.353Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-01T00:12:59.372Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/resource-query.test.ts > shared resource query authority > binds cursors to the physical instance and expires them
+[2026-10-01T00:12:59.387Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-01T00:12:59.399Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses deterministic structural fallback when no provider is available
+[2026-10-01T00:12:59.490Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:12:59.490Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > enriches every non-enriched graph node regardless of scanner origin
+[2026-10-01T00:12:59.504Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+ ✓ tests/architect-cli-bridge.test.ts (4 tests) 8ms
+stderr | tests/tools/scan-project-incremental-e2e.test.ts > Slice 5 runScanProject authoritative orchestration > uses a stable captured snapshot when the file keeps changing
+[2026-10-01T00:12:59.584Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+ ✓ tests/tools/scan-project-gitignore.test.ts (1 test) 14ms
+stderr | tests/resource-query.test.ts > shared resource query authority > retains candidate uncertainty and refuses newer raw store schemas
+[2026-10-01T00:12:59.569Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T00:12:59.621Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T00:12:59.624Z] [INFO]  Registered discipline://manifest — 78 tools classified, 19 data files protected
+[2026-10-01T00:12:59.625Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-01T00:12:59.628Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > enriches every non-enriched graph node regardless of scanner origin
+[2026-10-01T00:12:59.642Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 0 fallback
+
+ ✓ tests/explorer-snapshot.test.ts (9 tests) 15ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > enriches every non-enriched graph node regardless of scanner origin
+[2026-10-01T00:12:59.682Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > re-enriches when force=true
+[2026-10-01T00:12:59.695Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-01T00:12:59.761Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > replaces a stale local model when codex-cli is selected
+[2026-10-01T00:12:59.777Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+[2026-10-01T00:12:59.777Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-01T00:12:59.792Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-01T00:12:59.796Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-01T00:12:59.799Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-01T00:12:59.803Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > re-enriches when force=true
+[2026-10-01T00:12:59.827Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > exposes one active session runtime across config and chat payloads
+[2026-10-01T00:12:59.845Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.4, temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > re-enriches when force=true
+[2026-10-01T00:12:59.858Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects batch_size — multiple LLM calls for larger inputs
+[2026-10-01T00:12:59.869Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=2)
+
+stderr | tests/resource-query.test.ts > shared resource query authority > never skips or clips an oversized record or treats malformed data as empty
+[2026-10-01T00:12:59.827Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T00:12:59.869Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T00:12:59.873Z] [INFO]  Registered discipline://manifest — 78 tools classified, 19 data files protected
+[2026-10-01T00:12:59.874Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-01T00:12:59.879Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists token economy config changes in engine.env
+[2026-10-01T00:12:59.929Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists token economy config changes in engine.env
+[2026-10-01T00:12:59.964Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects batch_size — multiple LLM calls for larger inputs
+[2026-10-01T00:12:59.986Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 0 fallback
+
+ ✓ tests/tools/wire-links.test.ts (6 tests) 8ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects batch_size — multiple LLM calls for larger inputs
+[2026-10-01T00:13:00.040Z] [INFO]  Semantic enrichment batch 2: 2/2 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/scan-project-incremental-e2e.test.ts > Slice 5 runScanProject authoritative orchestration > uses a stable captured snapshot when the file keeps changing
+[2026-10-01T00:13:00.046Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects batch_size — multiple LLM calls for larger inputs
+[2026-10-01T00:13:00.096Z] [INFO]  Semantic enrichment batch 3: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/resource-query.test.ts > shared resource query authority > gives MCP resource and tool reads the same meaning and sets the MCP error signal
+[2026-10-01T00:13:00.080Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T00:13:00.125Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T00:13:00.128Z] [INFO]  Registered discipline://manifest — 78 tools classified, 19 data files protected
+[2026-10-01T00:13:00.128Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-01T00:13:00.131Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects batch_size — multiple LLM calls for larger inputs
+[2026-10-01T00:13:00.135Z] [INFO]  enrich_parser_nodes: enriched=5 eligible=5 batches=3 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects max_nodes cap
+[2026-10-01T00:13:00.146Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=5)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects max_nodes cap
+[2026-10-01T00:13:00.264Z] [INFO]  Semantic enrichment batch 1: 3/3 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects max_nodes cap
+[2026-10-01T00:13:00.296Z] [INFO]  enrich_parser_nodes: enriched=3 eligible=10 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > dry_run does not persist changes but still calls the LLM
+[2026-10-01T00:13:00.305Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > dry_run does not persist changes but still calls the LLM
+[2026-10-01T00:13:00.349Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+[2026-10-01T00:13:00.349Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=true
+
+stderr | tests/resource-query.test.ts > shared resource query authority > delivers one bounded canonical context pack through MCP tools and the context resource
+[2026-10-01T00:13:00.312Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T00:13:00.350Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T00:13:00.353Z] [INFO]  Registered discipline://manifest — 78 tools classified, 19 data files protected
+[2026-10-01T00:13:00.353Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-01T00:13:00.357Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > writes feature anchors as weak GraphLinks
+[2026-10-01T00:13:00.359Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/resource-query.test.ts > shared resource query authority > delivers one bounded canonical context pack through MCP tools and the context resource
+[2026-10-01T00:13:00.364Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+
+stderr | tests/tools/scan-project-incremental-e2e.test.ts > Slice 5 runScanProject authoritative orchestration > uses a stable captured snapshot when the file keeps changing
+[2026-10-01T00:13:00.369Z] [INFO]  scan_project: Previewing incremental repository evidence delta…
+
+ ✓ tests/explorer-3d-minimap.test.ts (5 tests) 103ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > writes feature anchors as weak GraphLinks
+[2026-10-01T00:13:00.483Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+ ✓ tests/resource-query.test.ts (10 tests) 8292ms
+   ✓ shared resource query authority > defines query behavior for every baseline URI and separates runtime/project capabilities  3224ms
+   ✓ shared resource query authority > unions pages without missing middle records, duplicates or byte overflow  2190ms
+   ✓ shared resource query authority > filters documented wrapper arrays and returns successful empty matches  453ms
+   ✓ shared resource query authority > pages complete history and actual scheduler executions rather than invented backing files  429ms
+   ✓ shared resource query authority > rejects revision/scope/filter changes and tampered cursors  448ms
+   ✓ shared resource query authority > binds cursors to the physical instance and expires them  488ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > writes feature anchors as weak GraphLinks
+[2026-10-01T00:13:00.513Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=1 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects unknown feature anchors before persistence and uses structural fallback
+[2026-10-01T00:13:00.522Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects unknown feature anchors before persistence and uses structural fallback
+[2026-10-01T00:13:00.570Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; n-invalid: unknown feature anchor missing-feature
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects unknown feature anchors before persistence and uses structural fallback
+[2026-10-01T00:13:00.623Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:13:00.623Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid node ids before persistence and uses structural fallback
+[2026-10-01T00:13:00.633Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid node ids before persistence and uses structural fallback
+[2026-10-01T00:13:00.689Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; unknown node id other-node; missing enrichment for node n-invalid
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid node ids before persistence and uses structural fallback
+[2026-10-01T00:13:00.734Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:13:00.734Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid relationship vocabulary before persistence and uses structural fallback
+[2026-10-01T00:13:00.743Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+ ✓ tests/standalone-architect-routes.test.ts (55 tests) 7008ms
+   ✓ standalone Architect route hardening > executes browser bootstrap and bounds poisoned persisted chat history replay  1005ms
+   ✓ standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution  747ms
+   ✓ standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat  677ms
+   ✓ standalone Architect route hardening > persists and returns refreshed plan cursors for completed standalone Architect passes  1565ms
+   ✓ standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports  405ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid relationship vocabulary before persistence and uses structural fallback
+[2026-10-01T00:13:00.801Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; n-invalid: invalid feature anchor relationship not_allowed
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid relationship vocabulary before persistence and uses structural fallback
+[2026-10-01T00:13:00.838Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:13:00.838Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects excessive anchor counts before persistence and uses structural fallback
+[2026-10-01T00:13:00.846Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+ ✓ tests/tools/scan-project-incremental-e2e.test.ts (7 tests) 12155ms
+   ✓ Slice 5 runScanProject authoritative orchestration > commits one added file through the existing target registry and preserves unrequested state  1757ms
+   ✓ Slice 5 runScanProject authoritative orchestration > replaces only modified-file support, preserves governed and unchanged knowledge, and converges with a fresh B extraction  1879ms
+   ✓ Slice 5 runScanProject authoritative orchestration > withdraws deleted support without purging governed knowledge  1848ms
+   ✓ Slice 5 runScanProject authoritative orchestration > rebinds an unambiguous same-content rename and keeps identity active  1552ms
+   ✓ Slice 5 runScanProject authoritative orchestration > uses a stable captured snapshot when the file stable  1683ms
+   ✓ Slice 5 runScanProject authoritative orchestration > uses a stable captured snapshot when the file changes once  1772ms
+   ✓ Slice 5 runScanProject authoritative orchestration > uses a stable captured snapshot when the file keeps changing  1661ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects excessive anchor counts before persistence and uses structural fallback
+[2026-10-01T00:13:00.883Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; n-invalid: excessive feature anchors (6 > 5)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects excessive anchor counts before persistence and uses structural fallback
+[2026-10-01T00:13:00.919Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:13:00.919Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects missing evidence excerpts before persistence and uses structural fallback
+[2026-10-01T00:13:00.927Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects missing evidence excerpts before persistence and uses structural fallback
+[2026-10-01T00:13:00.967Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; n-invalid: missing feature anchor evidence excerpt for f1
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects missing evidence excerpts before persistence and uses structural fallback
+[2026-10-01T00:13:01.004Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:13:01.004Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > salvages valid nodes when another result in the same batch fails validation
+[2026-10-01T00:13:01.013Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=2)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > salvages valid nodes when another result in the same batch fails validation
+[2026-10-01T00:13:01.049Z] [WARN]  Batch (openrct2::core, 2 nodes): validation_failed: 1 node(s) used deterministic fallback; invalid-node: semantic description or intent is too shallow
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > salvages valid nodes when another result in the same batch fails validation
+[2026-10-01T00:13:01.085Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 1 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > salvages valid nodes when another result in the same batch fails validation
+[2026-10-01T00:13:01.109Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > malformed LLM response for a batch is recorded and run continues
+[2026-10-01T00:13:01.117Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > malformed LLM response for a batch is recorded and run continues
+[2026-10-01T00:13:01.153Z] [WARN]  Batch (openrct2::core, 1 nodes): invalid_output: LLM did not return parseable JSON; deterministic fallback used.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > malformed LLM response for a batch is recorded and run continues
+[2026-10-01T00:13:01.188Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > malformed LLM response for a batch is recorded and run continues
+[2026-10-01T00:13:01.222Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > malformed LLM response for a batch is recorded and run continues
+[2026-10-01T00:13:01.249Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=2 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists after each batch (crash-safety check)
+[2026-10-01T00:13:01.257Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists after each batch (crash-safety check)
+[2026-10-01T00:13:01.333Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists after each batch (crash-safety check)
+[2026-10-01T00:13:01.334Z] [WARN]  Batch (openrct2::core, 1 nodes): provider_failed: simulated LLM failure; deterministic fallback used.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists after each batch (crash-safety check)
+[2026-10-01T00:13:01.371Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 1 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists after each batch (crash-safety check)
+[2026-10-01T00:13:01.397Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=2 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target=both processes features too
+[2026-10-01T00:13:01.404Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target=both processes features too
+[2026-10-01T00:13:01.478Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target=both processes features too
+[2026-10-01T00:13:01.526Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target=both processes features too
+[2026-10-01T00:13:01.552Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=2 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="both" emits a deprecation note
+[2026-10-01T00:13:01.560Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="both" emits a deprecation note
+[2026-10-01T00:13:01.629Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="both" emits a deprecation note
+[2026-10-01T00:13:01.654Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" enriches scanner-origin UI elements with source_repo
+[2026-10-01T00:13:01.663Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" enriches scanner-origin UI elements with source_repo
+[2026-10-01T00:13:01.735Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" enriches scanner-origin UI elements with source_repo
+[2026-10-01T00:13:01.761Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > keeps rich UI enrichment and unions scanner facts when the model adds no relation
+[2026-10-01T00:13:01.771Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > keeps rich UI enrichment and unions scanner facts when the model adds no relation
+[2026-10-01T00:13:01.842Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > keeps rich UI enrichment and unions scanner facts when the model adds no relation
+[2026-10-01T00:13:01.866Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" skips UI elements without source_repo (manual entries)
+[2026-10-01T00:13:01.875Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" skips UI elements without source_repo (manual entries)
+[2026-10-01T00:13:01.950Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" skips UI elements without source_repo (manual entries)
+[2026-10-01T00:13:01.974Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" skips already-enriched elements unless force=true
+[2026-10-01T00:13:01.983Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" skips already-enriched elements unless force=true
+[2026-10-01T00:13:02.020Z] [INFO]  enrich_parser_nodes: enriched=0 eligible=0 batches=0 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:13:02.029Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:13:02.102Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:13:02.137Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:13:02.174Z] [INFO]  Semantic enrichment batch 3: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:13:02.211Z] [INFO]  Semantic enrichment batch 4: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:13:02.238Z] [INFO]  enrich_parser_nodes: enriched=4 eligible=4 batches=4 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:13:02.246Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:13:02.319Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:13:02.322Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:13:02.383Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:13:02.419Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:13:02.445Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=2 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:13:02.445Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:13:02.481Z] [INFO]  enrich_parser_nodes: enriched=0 eligible=0 batches=0 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:13:02.488Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:13:02.528Z] [WARN]  Batch (openrct2::core, 1 nodes): provider_failed: simulated transient timeout; checkpointed as retryable.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:13:02.555Z] [INFO]  Semantic enrichment batch 1: 0/1 committed, 0 uncommitted, 0 fallback
+[2026-10-01T00:13:02.555Z] [INFO]  enrich_parser_nodes: enriched=0 eligible=1 batches=1 anchors=0 errors=2 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:13:02.559Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:13:02.624Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:13:02.649Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+ ✓ tests/tools/enrich-parser-nodes.test.ts (66 tests) 13667ms
+   ✓ enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint  736ms
+   ✓ enrichParserNodesProgrammatic — integration > rejects an overlapping enrichment before another provider call or graph write  754ms
+   ✓ enrichParserNodesProgrammatic — integration > restricts structured output to the complete input batch and the supplied typed target IDs  842ms
+   ✓ enrichParserNodesProgrammatic — integration > converts an evidenced data_model link misplaced in feature_anchors into its canonical typed relation  525ms
+   ✓ enrichParserNodesProgrammatic — integration > converts an evidenced workflow link misplaced in feature_anchors into its canonical typed relation  513ms
+   ✓ enrichParserNodesProgrammatic — integration > converts an evidenced capability link misplaced in feature_anchors into its canonical typed relation  406ms
+   ✓ enrichParserNodesProgrammatic — integration > converts an evidenced datastore link misplaced in feature_anchors into its canonical typed relation  354ms
+   ✓ enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("")  351ms
+   ✓ enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("   ")  349ms
+   ✓ enrichParserNodesProgrammatic — integration > honors a maximum context depth of 0 in traversal, prompts and persisted metadata  319ms
+   ✓ enrichParserNodesProgrammatic — integration > honors a maximum context depth of 1 in traversal, prompts and persisted metadata  310ms
+   ✓ enrichParserNodesProgrammatic — integration > uses canonical graph types for known relation IDs instead of discarding rich node knowledge  949ms
+   ✓ enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)  684ms
+   ✓ enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)  746ms
+   ✓ enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again  781ms
+
+ Test Files  117 passed (117)
+      Tests  1177 passed | 2 skipped (1179)
+   Start at  03:12:41
+   Duration  21.02s (transform 35.19s, setup 0ms, collect 254.19s, tests 154.66s, environment 1.65s, prepare 44.83s)
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/wave-4-6-tests.raw.json

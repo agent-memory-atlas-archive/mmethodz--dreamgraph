@@ -1,0 +1,43 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/architect-native-tool-loop.test.ts (23 tests) 38ms
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:26:24.153Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:26:24.164Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:26:24.170Z] [INFO]  Architect native tool loop: calling edit_file
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:26:24.607Z] [INFO]  Architect native tool loop: calling scan_project
+
+ ✓ tests/architect-cli-bridge.test.ts (4 tests) 6ms
+ ✓ tests/architect-managed-context.test.ts (3 tests) 2177ms
+   ✓ native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt  1637ms
+stderr | tests/architect-cli-controls.test.ts > codex-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity
+[2026-10-01T22:26:26.042Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/host-managed-execution.test.ts (16 tests) 6855ms
+   ✓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass  581ms
+   ✓ parallel host passes share their authenticated owner while another client cannot read or close them  418ms
+   ✓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable  579ms
+   ✓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block  340ms
+   ✓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts  326ms
+   ✓ the actual editor host records exact review before activation; replay cannot replenish consumed effects  466ms
+   ✓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads  446ms
+   ✓ an authenticated owner fences in-flight review; queued HTTP review cannot bypass the changed checkpoint  351ms
+   ✓ a published review alone grants no effect; the unchanged live host can recover activation exactly once  310ms
+   ✓ a saved review cannot reactivate after the actual lease expires  1677ms
+ ✓ tests/architect-cli-controls.test.ts (8 tests) 34414ms
+   ✓ daemon command perimeter rejects missing/excess grants and observes actual process cancellation  565ms
+   ✓ codex-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity  17340ms
+   ✓ copilot-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity  16476ms
+
+ Test Files  5 passed (5)
+      Tests  54 passed (54)
+   Start at  01:26:19
+   Duration  38.54s (transform 2.46s, setup 0ms, collect 16.02s, tests 43.49s, environment 1ms, prepare 736ms)
+

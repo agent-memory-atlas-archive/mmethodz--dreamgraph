@@ -1,0 +1,7 @@
+
+> dreamgraph@13.4.0 build:server
+> tsc -b
+
+src/server/host-model-admission.ts(109,48): error TS2339: Property 'temperature' does not exist on type '{ source: string; model: string; provider: "openai" | "anthropic" | "ollama" | "lmstudio"; strict_schema: boolean; version: string; apis: ("responses" | "chat-completions" | "anthropic-messages" | "ollama-chat")[]; ... 4 more ...; tool_api_efforts?: Record<...> | undefined; }'.
+src/server/managed-execution.ts(101,12): error TS2339: Property 'pack' does not exist on type 'void'.
+src/server/managed-execution.ts(102,36): error TS2345: Argument of type 'void' is not assignable to parameter of type '{ instance_id: string; id: string; status: "no_change" | "running" | "recovery_required" | "reconciliation_pending" | "graph_committed" | "assembled" | "state_committed" | "work_pending"; ... 13 more ...; approval_reviews: { ...; }[]; }'.

@@ -1,0 +1,7 @@
+
+> dreamgraph@13.4.0 build:server
+> tsc -b
+
+src/architect/routes.ts(3688,12): error TS2304: Cannot find name 'continuationToken'.
+src/architect/routes.ts(4726,9): error TS2304: Cannot find name 'computer'.
+src/architect/routes.ts(4869,9): error TS18004: No value exists in scope for the shorthand property 'computer'. Either declare one or provide an initializer.

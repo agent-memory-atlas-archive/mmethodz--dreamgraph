@@ -1,0 +1,12 @@
+
+> dreamgraph@13.4.0 ashoka:baseline:check
+> tsx scripts/freeze-ashoka-baseline.mjs
+
+file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/freeze-ashoka-baseline.mjs:23
+ for(const name of Object.keys(CANONICAL_CONTRACTS))if(!baseline.contracts.includes(name))throw Error('Contract added without a reviewed baseline amendment: '+name);
+                                                                                                ^
+
+Error: Contract added without a reviewed baseline amendment: context_query
+    at file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/freeze-ashoka-baseline.mjs:23:97
+
+Node.js v25.2.1

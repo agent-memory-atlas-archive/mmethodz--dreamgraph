@@ -1,0 +1,376 @@
+{
+  "schema": "dreamgraph.ashoka.dashboard_evidence.v1",
+  "recorded_at": "2026-10-02T12:36:10.639Z",
+  "status": "offline_dashboard_qualified",
+  "scope": "Actual compiled daemon/CLI and Windows Chrome on disposable instance; complete catalogue, settings CAS/activation/template/undo, canonical graph currency and scoped jobs. Queued scan producer is explicitly declared; no inference, live migration, global install or platform Computer Use claim.",
+  "root": {
+    "passed": 1863,
+    "failed": 0,
+    "skipped": 2,
+    "files": 160
+  },
+  "focused": [
+    {
+      "file": "client-context-integration.test.ts",
+      "name": "serves the exact canonical core context with an unattested external receipt and rejects oversized input",
+      "status": "passed"
+    },
+    {
+      "file": "client-context-integration.test.ts",
+      "name": "the actual VSCode client validates the generated canonical pack and preserves an HTTP failure",
+      "status": "passed"
+    },
+    {
+      "file": "client-context-integration.test.ts",
+      "name": "oversized model-facing results retain mandatory graph receipts, mutation uncertainty and errors as whole JSON",
+      "status": "passed"
+    },
+    {
+      "file": "client-context-integration.test.ts",
+      "name": "prose compaction cannot remove required ADR/graph anchors or alter literal tool source",
+      "status": "passed"
+    },
+    {
+      "file": "client-context-integration.test.ts",
+      "name": "timeout of a streaming response cannot cancel another request; disposal cancels all outstanding bodies",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "maps every consumed setting to one typed control or named read-only exception without leaking stored secrets",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "edits structured component settings and retains explicit zeros/default inheritance through restart parsing",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "retains a whole captured save after a committed lost reply and recovers that receipt without a second effect",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "keeps drafts on concurrent revision refusal and never overwrites the intervening file",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "previews a scoped template without writes, applies protected staging and undoes the original bytes",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "generic apply refreshes actual cached model controls and daemon role readback without touching session overrides",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "structured edits remove only corresponding legacy aliases and preserve unrelated zero limits",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "a runtime activation failure preserves the committed save, restores prior runtime and excludes secret error text",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "recent and active pagination retains session isolation and refuses cancellation of another session job",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "preserves fragmented UTF-8 configuration bytes and rejects invalid encoding before any file write",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "reports a staged deletion as a mismatch until restart clears the old runtime override",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-workspace.test.ts",
+      "name": "root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry",
+      "status": "passed"
+    },
+    {
+      "file": "schedule-workspace.test.ts",
+      "name": "schema-derived action fields and draft preview validate without creating files/jobs or changing definitions",
+      "status": "passed"
+    },
+    {
+      "file": "schedule-workspace.test.ts",
+      "name": "duplicate is atomic/new/disabled and original receipt replays after later source edits",
+      "status": "passed"
+    },
+    {
+      "file": "schedule-workspace.test.ts",
+      "name": "enable and enqueue bind reviewed policy; lost replies replay originals rather than applying new ambient policy",
+      "status": "passed"
+    },
+    {
+      "file": "schedule-workspace.test.ts",
+      "name": "actual served browser script saves disabled, preserves invalid drafts, and supports keyboard tabs/filter/edit",
+      "status": "passed"
+    },
+    {
+      "file": "schedule-workspace.test.ts",
+      "name": "captured menu targets survive selection changes and stale edits fail while source history survives",
+      "status": "passed"
+    },
+    {
+      "file": "schedule-workspace.test.ts",
+      "name": "captured schedule navigation opens the exact draft or run preview without mutating definitions or enqueueing work",
+      "status": "passed"
+    },
+    {
+      "file": "schedule-workspace.test.ts",
+      "name": "stale captured schedule navigation shows inspection and never opens or dispatches a replacement action",
+      "status": "passed"
+    },
+    {
+      "file": "schedule-workspace.test.ts",
+      "name": "missing captured schedule navigation retains an honest unavailable selection rather than opening another definition",
+      "status": "passed"
+    }
+  ],
+  "browser": {
+    "version": "153.0.8010.50",
+    "checks": [
+      {
+        "name": "CW01",
+        "detail": "Root has working Explorer/Architect navigation and actual canonical graph/queued scan status. The queued producer does not claim a dispatched scan."
+      },
+      {
+        "name": "CW02",
+        "detail": "Actual original-fence queued cancellation commits without claiming running work stopped or dispatching a retry."
+      },
+      {
+        "name": "CW03",
+        "detail": "Every supported setting maps to a typed control or named read-only exception; global search reveals imported redacted values without writes."
+      },
+      {
+        "name": "CW04",
+        "detail": "Model suggestions consume the current core provider registry and still permit explicit adapter-qualified identifiers."
+      },
+      {
+        "name": "CW05",
+        "detail": "Keyboard tabs retain invalid drafts and accessible field errors; exact zero limits remain zero."
+      },
+      {
+        "name": "CW06",
+        "detail": "Structured component edits remove only their corresponding legacy alias and preserve unrelated zero/paused policy."
+      },
+      {
+        "name": "CW07",
+        "detail": "Committed lost save acknowledgement recovers the original request/receipt after readback, with no second mutation or unrelated scheduler activation."
+      },
+      {
+        "name": "CW08",
+        "detail": "A concurrent save is refused without overwriting intervening intent; drafts remain until explicitly discarded/rebased."
+      },
+      {
+        "name": "CW09",
+        "detail": "Scoped template preview writes nothing, apply stages protected intent and exact undo restores original config bytes without touching graph data."
+      },
+      {
+        "name": "CW10",
+        "detail": "Actual narrow layout and forced-colors keyboard navigation remain usable with visible selection, draft/errors and bounded geometry."
+      },
+      {
+        "name": "CW11",
+        "detail": "Computer Use configuration is finite setup, not an execution grant or platform qualification; actual role allocations remain zero."
+      },
+      {
+        "name": "CW12",
+        "detail": "Offline readback retains the known settings/drafts and shows failure; reconnect reloads authoritative values."
+      },
+      {
+        "name": "CW13",
+        "detail": "Actual compiled daemon stop/start activates a staged removal and readback clears the saved/effective mismatch while preserving graph bytes. Browser never claims the CLI command already ran."
+      },
+      {
+        "name": "CW14",
+        "detail": "Actual compiled CLI reaches this isolated restarted daemon; server metadata is pinned to the local compiled build."
+      },
+      {
+        "name": "CW15",
+        "detail": "Schedule navigation reuses the existing workspace and canonical job/debt authority; six effective model allocations remain zero."
+      }
+    ],
+    "errors": []
+  },
+  "baseline": {
+    "revision": 17,
+    "contracts": 42,
+    "owners": 29,
+    "cases": 12,
+    "evidence": 8,
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "compound": {
+    "XS06": "Actual zero/alias/model activation plus unchanged original job admission and shared tests.",
+    "XS07": "Scoped protected template preview/apply/undo and separate saved/effective activation; actual restart readback.",
+    "XS12": "Actual keyboard tabs, retained validation, narrow/forced-colors and shared schedule workspace.",
+    "XS21": "Canonical mutation/full-scan/reconciliation/debt are separate; no scan-age staleness or hidden scan request."
+  },
+  "limits": [
+    "Queued scan fixture qualifies authoritative job state/cancel, not dispatched scan or numerical substep progress.",
+    "Provider, native GUI, other-platform and paired model-understanding evidence remain owning Slice31/27 gates.",
+    "Product remains13.4.0 until Slice28. The existing509 editor cases are unchanged; actual editor/client HTTP integration participates in the current root run."
+  ],
+  "artifacts": [
+    {
+      "path": "src/server/configuration-workspace.ts",
+      "bytes": 34815,
+      "sha256": "aa675dc9ce7bbb6f3981d8e1bcd56dfa263570b6ce0255b7e11cb0ac3593b442"
+    },
+    {
+      "path": "src/server/runtime-workspace.ts",
+      "bytes": 8660,
+      "sha256": "cdbbabdf9f2648da44d39991a783a2f24139624ea85ca08241287688603c3395"
+    },
+    {
+      "path": "src/server/dashboard.ts",
+      "bytes": 76076,
+      "sha256": "f3b3c74e903ef9b7177114881b0630b4128e68e8f4178e26c4dfd8f27f572bf7"
+    },
+    {
+      "path": "src/api/routes.ts",
+      "bytes": 46291,
+      "sha256": "c70946cbd007e1551787a9bb55355379d0a506ee5c5a86c1956415a6ce1fe27e"
+    },
+    {
+      "path": "src/config/engine-setting-catalogue.ts",
+      "bytes": 15768,
+      "sha256": "cc289f0806bea45510be0d12b0e40e757c06b84c7469aec40d4871a9a654f01d"
+    },
+    {
+      "path": "src/config/engine-configuration.ts",
+      "bytes": 12639,
+      "sha256": "d7588568a4a246547eb6a0f73affba3776e888737425b9f6b0055f828232fe5d"
+    },
+    {
+      "path": "src/cognitive/llm.ts",
+      "bytes": 78847,
+      "sha256": "e0bb034d22d8936b81b43c63f087afdfd449907e31bef2c5f74ae0a92472420d"
+    },
+    {
+      "path": "tests/configuration-workspace.test.ts",
+      "bytes": 23853,
+      "sha256": "0d1990615c459bc3275eaaed464ce0423df5d7b522d892594a4563f0d8dd7f42"
+    },
+    {
+      "path": "tests/latest-model-support.test.ts",
+      "bytes": 5257,
+      "sha256": "ae4d03f4ec0a5c01815aa320595cc5c8c7d328627561acd9d9836a5963f430d3"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 175981,
+      "sha256": "2c8464daafda18f3aa2c4ce3fa61a24222b564439930985677c95642b7b746b5"
+    },
+    {
+      "path": "scripts/qualify-ashoka-configuration.mjs",
+      "bytes": 19307,
+      "sha256": "565c002853eaee41bea29482436c34d47b4235815c54d9f04697759566acc39a"
+    },
+    {
+      "path": "docs/ashoka/configuration-workspace.md",
+      "bytes": 3818,
+      "sha256": "e79f34b715c8993238f5b58c3d744b79383ad936c257502d2c7340849110efa1"
+    },
+    {
+      "path": "docs/ashoka/configuration.md",
+      "bytes": 5433,
+      "sha256": "96e4756ba4e2221350eb800f2da744b368c5d06000c0779c628ef64acd9063b2"
+    },
+    {
+      "path": "docs/ashoka/slice-23-qualified-root-tests-second.json",
+      "bytes": 630744,
+      "sha256": "c1b397a4efe6be90e893ee22a79484b7ca1ad2472f89108d5d019a4398b29269"
+    },
+    {
+      "path": "docs/ashoka/slice-23-qualified-root-tests-second.log",
+      "bytes": 359781,
+      "sha256": "1389936b7aef4acefe3da4fd54583dc9ec48fabd8a4bf85f3b678655119a242d"
+    },
+    {
+      "path": "docs/ashoka/slice-23-build-fifth.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-23-focused-seventh.log",
+      "bytes": 10060,
+      "sha256": "b002defb7da630cb22014916a8e003751f9c9c1dcf83f3ad400ef3657675e240"
+    },
+    {
+      "path": "docs/ashoka/browser-23-final/qualification.json",
+      "bytes": 4623,
+      "sha256": "124dd4281a4c6317cecb0c02d2a309f39449074226b7a8a9f38880a87c3138fb"
+    },
+    {
+      "path": "docs/ashoka/browser-23-final/root.png",
+      "bytes": 109777,
+      "sha256": "c6f806850c6cbb6fc63c69c6a30a3a0ec9f76545741a990aa6a9e512f4664deb"
+    },
+    {
+      "path": "docs/ashoka/browser-23-final/configuration.png",
+      "bytes": 325533,
+      "sha256": "69fa95197a804156e9482539f2e9fb336414c1ee9a3f00839108f7f243fcfcce"
+    },
+    {
+      "path": "docs/ashoka/browser-23-final/configuration-narrow.png",
+      "bytes": 68582,
+      "sha256": "289a6528b1e0a0dd49e190a9a1df94538339932aa37805fb0da5bd30f77353c4"
+    },
+    {
+      "path": "docs/ashoka/slice-23-contracts-check.log",
+      "bytes": 214,
+      "sha256": "f07539ed26e1c65d0b64ae44313eb4d70d70c328f98dddfdd6f5bbe3718970c8"
+    },
+    {
+      "path": "docs/ashoka/slice-23-providers-check.log",
+      "bytes": 96,
+      "sha256": "06118bee7b5506c11123a1c0d2590c5c3ec5bda449dd82ceeac8696b8fe1d237"
+    },
+    {
+      "path": "docs/ashoka/slice-23-baseline-check.log",
+      "bytes": 224,
+      "sha256": "820a68479b9066ee23019438734f9c24f2b13be68b54abf63f045bba2d0dcb19"
+    },
+    {
+      "path": "docs/ashoka/slice-23-mcp-check.log",
+      "bytes": 1992,
+      "sha256": "0928c9787a0b872b5bcb46ed5da9f28315349f3cbdc320ef62105be06741796d"
+    },
+    {
+      "path": "docs/ashoka/slice-23-metrics-check.log",
+      "bytes": 134,
+      "sha256": "80323cae2b6b39df4f20ff8e1171eb2436d2e059eb4cc426f377181baa2b471a"
+    },
+    {
+      "path": "docs/ashoka/slice-23-configuration-check.log",
+      "bytes": 195,
+      "sha256": "399f55de75e9c35bd778ce1af8cb4601077d163ba8af794cc175223ba859ba38"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 82798,
+      "sha256": "b79c8a1020973cccc7e3a6f94b85dc064c8649b67e86ff0caa802fd5ffed438e"
+    },
+    {
+      "path": "src/graph/contracts.ts",
+      "bytes": 28760,
+      "sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+    }
+  ]
+}

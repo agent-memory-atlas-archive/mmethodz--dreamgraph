@@ -1,0 +1,88 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5933,"approxTokens":1484}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":6833,"approxTokens":1709}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5924,"approxTokens":1481}
+
+ ❯ tests/host-managed-execution.test.ts (31 tests | 2 failed | 29 skipped) 8446ms
+   ↓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass
+   ↓ parallel host passes share their authenticated owner while another client cannot read or close them
+   ↓ a worker credential cannot issue a new grant, close another host pass or change its chosen identity
+   ↓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable
+   ↓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block
+   ↓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts
+   ↓ editor CLI byte admission refuses the whole over-budget request before acknowledging or launching it
+   ↓ editor CLI cancellation preserves unconfirmed descendant termination instead of proving a no-change pass
+   ↓ editor CLI pre-launch failure settles without model work; cancellation during acknowledgement cannot yield a launchable prompt
+   ↓ the actual editor host records exact review before activation; replay cannot replenish consumed effects
+   ↓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads
+   ↓ an authenticated owner fences in-flight review; queued HTTP review cannot bypass the changed checkpoint
+   ↓ review cannot exceed the original effect ceiling or approve a changed named source
+   ↓ the actual portable SDK recovers a lost approval reply without reissuing a grant or extending expiry
+   ↓ a published review alone grants no effect; the unchanged live host can recover activation exactly once
+   ↓ a saved review cannot reactivate after the actual lease expires
+   ↓ the actual editor rendezvous waits before the graph writer, then publishes approval before one unchanged source effect
+   ↓ the actual SDK operator decline settles the pending tool without granting or executing an effect
+   ↓ request cancellation removes an enabled review wait without invoking the effect owner
+   ↓ the editor review controller retains literal exact proposals and retries lost acknowledgement without repeating effects
+   ↓ the editor controller declines the captured daemon action without dispatch or approval publication
+   ↓ editor review decisions cannot redirect through a changed endpoint
+   ↓ native editor admission delivers whole replacement evidence, uses the actual worker MCP fence and closes unchanged source with durable review
+   ↓ native editor source changes retain reconciliation debt rather than reporting a graph commit
+   ↓ native editor commands execute at the actual daemon owner with exact review and complete source observation
+   ↓ native editor cancelled waiting closes promptly with underlying callback termination unconfirmed
+   ↓ native editor Unicode request byte refusal happens before delivery and dispatch
+   ↓ native editor captured instance mismatch refuses before delivery and revokes the owned lease
+   ↓ an independently cancelled native round blocks fresh dispatch until its unknown outcome closes
+   × the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation 4357ms
+     → TypeError [ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING]: A dynamic import callback was not specified.: expected true to be false // Object.is equality
+   × the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation 4087ms
+     → TypeError [ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING]: A dynamic import callback was not specified.: expected true to be false // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+AssertionError: TypeError [ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING]: A dynamic import callback was not specified.: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ vi.waitFor.timeout tests/host-managed-execution.test.ts:549:55
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 29 skipped (31)
+   Start at  02:29:17
+   Duration  14.53s (transform 1.98s, setup 0ms, collect 5.67s, tests 8.45s, environment 0ms, prepare 141ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+AssertionError: TypeError [ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING]: A dynamic import callback was not specified.: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ vi.waitFor.timeout tests/host-managed-execution.test.ts:569:55
+    567|  const running=panel.runAgenticLoop([{role:'user',content:'Change sour…
+    568|  try{
+    569|   await vi.waitFor(()=>{expect(settled,String(early)).toBe(false);expe…
+       |                                                       ^
+    570|   await panel._executionReview.decide(request.execution_id,request.app…
+    571|   expect(String(await running)).toContain('MANAGED_NATIVE_RECONCILIATI…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

@@ -1,0 +1,47 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/daemon-transport-isolation.test.ts (3 tests) 10166ms
+   ✓ isolates real native MCP transports, rejects foreign browser binding and removes closed sessions  4471ms
+   ✓ carries its stdio stream owner through tools and resources  2563ms
+   ✓ the actual daemon admits one exact managed MCP action once, retains source debt and refuses consumed replay  3130ms
+stderr | tests/http-session-isolation.test.ts
+[2026-10-02T20:01:31.873Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > defaults to loopback, refuses unsafe remote combinations and redacts authentication
+[2026-10-02T20:01:31.955Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > rejects hostile origin/host/fetch metadata before creating session state
+[2026-10-02T20:01:31.991Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > keeps Architect selection/model/history private across overlapping clients and reload
+[2026-10-02T20:01:32.109Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > keeps Architect selection/model/history private across overlapping clients and reload
+[2026-10-02T20:01:32.357Z] [INFO]  LLM architect config: provider=none (general), model=none (general), temp=0, maxTokens=1024
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > authenticates explicit remote mode and resumes only the authenticated principal
+[2026-10-02T20:01:32.436Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > isolates overlapping execution and cancellation, and reconnects to its own running pass
+[2026-10-02T20:01:32.503Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > isolates overlapping execution and cancellation, and reconnects to its own running pass
+[2026-10-02T20:01:32.658Z] [INFO]  LLM architect config: provider=none (general), model=none (general), temp=0, maxTokens=1024
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > requires the human browser control port for full-access confirmation
+[2026-10-02T20:01:32.940Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > keeps scoped computer permission on the human control port and reports unavailable native routes without substitution
+[2026-10-02T20:01:33.172Z] [INFO]  LLM provider: none (model: none)
+
+ ✓ tests/http-session-isolation.test.ts (7 tests) 1489ms
+   ✓ actual local HTTP session boundaries > keeps Architect selection/model/history private across overlapping clients and reload  328ms
+   ✓ actual local HTTP session boundaries > isolates overlapping execution and cancellation, and reconnects to its own running pass  437ms
+ ✓ tests/http-health-authority.test.ts (4 tests) 331ms
+
+ Test Files  3 passed (3)
+      Tests  14 passed (14)
+   Start at  23:01:12
+   Duration  21.60s (transform 2.87s, setup 0ms, collect 8.52s, tests 11.99s, environment 1ms, prepare 418ms)
+

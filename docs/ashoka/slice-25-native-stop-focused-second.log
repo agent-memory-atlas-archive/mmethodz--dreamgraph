@@ -1,0 +1,34 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/managed-plan-execution.test.ts
+[2026-10-02T09:48:55.401Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/managed-plan-execution.test.ts > selection alone stays read-only, while explicit execution injects the post-admission canonical running projection
+[2026-10-02T09:48:55.623Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ✓ tests/plan-runtime.test.ts (10 tests) 2262ms
+ ✓ tests/managed-plan-execution.test.ts (17 tests) 17049ms
+   ✓ selection alone stays read-only, while explicit execution injects the post-admission canonical running projection  1156ms
+   ✓ refuses foreign project, selection mismatch, changed source semantics and stale approval before returning native authority  566ms
+   ✓ external plan edits block delivery and worker/model dispatch; source restoration cannot renew a closed pass  712ms
+   ✓ a real pending native model permit cannot be reported as confirmed plan termination  1013ms
+   ✓ the SDK native model callback uses the delivered running plan and original spend permit but cannot mark the slice implemented  845ms
+   ✓ unconfirmed termination remains recovery on exact retry and cannot be strengthened through another public finish  791ms
+   ✓ independent original-native stop observations release only stopped ownership, preserve first closure, and require every outstanding model attempt  1494ms
+   ✓ native stop recovery refuses live authority, unconfirmed and forged attempts, foreign hosts and workers  1122ms
+   ✓ a committed independent stop with a lost reply replays its saved command without changing the first outcome or issuing more work  1111ms
+   ✓ the original SDK native worker can report a separately observed stop after its cancelled wait without renewing the pass  1111ms
+   ✓ rejected admission can close only a durably undelivered context with no lease or effects  521ms
+   ✓ lost C14 closure acknowledgment replays the persisted original command after host revocation without another event  683ms
+   ✓ finite authority expiry leaves canonical recovery and a later claimed confirmed stop cannot erase missing live observation  1964ms
+   ✓ a fresh compiled daemon process recovers the saved closure without live launch authority or another C14 event  1376ms
+   ✓ actual compiled editor and SDK native passes preserve explicit purpose and close canonical ownership without claiming verification  1454ms
+   ✓ foreign hosts and execution workers cannot request C14 closure or another implementation lease  643ms
+   ✓ browser chat refuses forged purpose, unrelated selection, fallback and continuation before a native task can start  483ms
+
+ Test Files  2 passed (2)
+      Tests  27 passed (27)
+   Start at  12:48:48
+   Duration  24.25s (transform 2.71s, setup 0ms, collect 11.65s, tests 19.31s, environment 0ms, prepare 318ms)
+

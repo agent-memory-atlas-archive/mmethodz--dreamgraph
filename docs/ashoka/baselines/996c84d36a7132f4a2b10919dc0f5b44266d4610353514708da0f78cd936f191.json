@@ -1,0 +1,1746 @@
+{
+  "schema": "dreamgraph.ashoka_foundation.v1",
+  "revision": 9,
+  "previous_sha256": "dedd54b50636e6fbcbff9c67275074cf407c4699bb133b414d79a6f9e658efaf",
+  "amendment": "C14 current-and-previous-major typed plan state; preserve all 12 frozen task labels, 29 owners and eight original evidence excerpts while adding the reviewed v2 schema.",
+  "plan_id": "graph-trust-and-agent-effectiveness",
+  "plan_revision": 7,
+  "date": "2026-09-30",
+  "authorization": "Implement the Ashoka; human owner, 2026-09-30",
+  "source_commit": "563d10c8109cbe3388cde71168bdcff149c96e0f",
+  "contract_source_sha256": "33a249a9d9604c483e667dae3db73d907917cdd1976552373a680b8dded6f2e1",
+  "contracts": [
+    "graph_identity",
+    "evidence_reference",
+    "graph_entity",
+    "graph_relationship",
+    "graph_currency",
+    "revision_vector",
+    "result_state",
+    "graph_result",
+    "resource_result",
+    "operation_receipt",
+    "job",
+    "budget",
+    "authority_grant",
+    "config_snapshot",
+    "command_target",
+    "command_availability",
+    "role_policy",
+    "plan_state",
+    "context_receipt",
+    "context_record",
+    "context_pack",
+    "change_obligation",
+    "dirty_partition",
+    "schedule_occurrence",
+    "effective_controls",
+    "computer_capability",
+    "computer_target",
+    "computer_session",
+    "computer_observation",
+    "computer_action",
+    "computer_receipt"
+  ],
+  "owners": [
+    {
+      "family": "Instance and transport authority",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Instance and transport authority module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/instance",
+        "src/index.ts",
+        "src/server"
+      ],
+      "producer_consumer_obligation": "Instance/project/session/execution identity and permissions",
+      "integration_check": "Two clients, same daemon, independent cancellation; wrong-project request rejected",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Canonical graph and persistence",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Canonical graph and persistence module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/graph",
+        "src/utils/atomic-write.ts",
+        "src/utils/cache.ts"
+      ],
+      "producer_consumer_obligation": "Typed IDs, graph revision, snapshot/transaction and cache invalidation",
+      "integration_check": "Write failure/restart/concurrent edits yield one coherent revision",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Repository and language scanners",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Repository and language scanners module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/scanner",
+        "src/tools/scan-project.ts"
+      ],
+      "producer_consumer_obligation": "Source revision, deletion/rename semantics, native/UI/DB evidence",
+      "integration_check": "Full then incremental scan converges while preserving human curation",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Coverage and scan ledger",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Coverage and scan ledger module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/tools/coverage-ledger.ts",
+        "src/tools/scan-state.ts"
+      ],
+      "producer_consumer_obligation": "Eligible/observed/removed/semantic coverage and baseline",
+      "integration_check": "Coverage denominator agrees with graph and retrieval after deletion",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Enrichment and recovery",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Enrichment and recovery module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/tools/enrich-parser-nodes.ts",
+        "src/tools/enrichment-state.ts"
+      ],
+      "producer_consumer_obligation": "Job/attempt states, commit acknowledgment, fallback and spend",
+      "integration_check": "Fallback, cancel, resume and writer race preserve graph/checkpoint agreement",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Provider routing and model readiness",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Provider routing and model readiness module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/llm.ts",
+        "src/cognitive/llm-readiness.ts"
+      ],
+      "producer_consumer_obligation": "Requested/effective role route, API capability, usage and failure reason",
+      "integration_check": "Scan and dreamer use different profiles; unavailable model never silently escalates cost",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Core cognitive state machine",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Core cognitive state machine module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/engine.ts",
+        "src/cognitive/types.ts"
+      ],
+      "producer_consumer_obligation": "AWAKE/REM/NORMALIZING/NIGHTMARE/LUCID and persistence",
+      "integration_check": "Exception, cancel and restart release state/locks and preserve committed work",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Dream strategy portfolio",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Dream strategy portfolio module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/dreamer.ts",
+        "src/cognitive/strategies"
+      ],
+      "producer_consumer_obligation": "Candidate-only output, bounded generation, novelty and attribution",
+      "integration_check": "Every advertised strategy executes; seed-repeatability and tiny/zero budgets",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Truth filter and promotion",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Truth filter and promotion module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/normalizer.ts"
+      ],
+      "producer_consumer_obligation": "Evidence-gated promotion, rejection/latent memory, provenance",
+      "integration_check": "Repeated correlated signals cannot become independent evidence",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Trust and evidence projections",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Trust and evidence projections module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/trust-state.ts",
+        "src/cognitive/evidence-ledger.ts"
+      ],
+      "producer_consumer_obligation": "Common trust vocabulary and evidence groups",
+      "integration_check": "Same candidate displays same trust/evidence in RAG, Explorer and Architect",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Calibration and metacognition",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Calibration and metacognition module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/calibration-evaluation.ts",
+        "src/cognitive/metacognition.ts"
+      ],
+      "producer_consumer_obligation": "Metric meaning, denominator, uncertainty and labeled accuracy",
+      "integration_check": "Operational yield is never presented as empirical truth precision",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Decay and graph maintenance",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Decay and graph maintenance module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/engine.ts",
+        "src/cognitive/graph-maintenance-state.ts"
+      ],
+      "producer_consumer_obligation": "TTL, reinforcement, rejection memory, tombstones and maintenance jobs",
+      "integration_check": "Reject/decay/delete then dream again does not resurrect forbidden facts",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Tension detection and clustering",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Tension detection and clustering module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/adversarial.ts",
+        "src/cognitive/tension-clustering.ts"
+      ],
+      "producer_consumer_obligation": "Actionable vs noise, stable tension identity, resolve/reappear",
+      "integration_check": "Resolved risk remains traceable and reopens only on changed evidence",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Remediation and adaptive futures",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Remediation and adaptive futures module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/intervention.ts",
+        "src/cognitive/adaptive-future-scaffold.ts"
+      ],
+      "producer_consumer_obligation": "Advisory candidates, scoring, branch/outcome and review gates",
+      "integration_check": "Proposed remediation cannot mark itself implemented or verified",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Temporal and causal reasoning",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Temporal and causal reasoning module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/temporal.ts",
+        "src/cognitive/causal.ts"
+      ],
+      "producer_consumer_obligation": "Event time vs observation time; correlation vs causal hypothesis",
+      "integration_check": "Out-of-order/duplicate history cannot silently strengthen causal claims",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Scheduling and cognitive events",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Scheduling and cognitive events module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/scheduler.ts",
+        "src/cognitive/event-router.ts"
+      ],
+      "producer_consumer_obligation": "Persisted policies, rate limits, idempotent triggers and cancellation",
+      "integration_check": "Manual scan plus event storm stays within shared concurrency/spend budget",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Targeted dreams and bootstrap",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Targeted dreams and bootstrap module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/targeted-dreams.ts",
+        "src/cognitive/bootstrap-driver.ts",
+        "src/cognitive/bootstrap-registry.ts"
+      ],
+      "producer_consumer_obligation": "Eligibility, bounded bootstrap, targeting and one job owner",
+      "integration_check": "Empty/new/mature graph chooses documented bounded work, no double bootstrap",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Federation",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Federation module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/federation.ts"
+      ],
+      "producer_consumer_obligation": "External origin, schema compatibility, trust boundary and deduplication",
+      "integration_check": "Import is speculative until local validation; export strips private provenance as configured",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Lucid interaction",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Lucid interaction module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/lucid.ts"
+      ],
+      "producer_consumer_obligation": "Human intent, explicit assertions, review and exit-state ownership",
+      "integration_check": "Human review survives new cycles without becoming fabricated source evidence",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Narrative, story and playback",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Narrative, story and playback module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/narrator.ts",
+        "src/cognitive/playback.ts",
+        "src/cognitive/lifecycle-visibility.ts"
+      ],
+      "producer_consumer_obligation": "Revision-bound summaries, history, transitions and resume",
+      "integration_check": "Replay/summarization distinguish current facts from historical speculation",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Agent retrieval and preamble",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Agent retrieval and preamble module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cognitive/graph-rag.ts",
+        "src/cognitive/register.ts"
+      ],
+      "producer_consumer_obligation": "Complete typed retrieval, provenance, freshness and bounded context",
+      "integration_check": "Agent answers a task with mandatory evidence or explicitly abstains",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "MCP tools and resources",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "MCP tools and resources module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/tools",
+        "src/resources",
+        "src/cognitive/register.ts"
+      ],
+      "producer_consumer_obligation": "Catalog, input/output/error contracts, effect hints and pagination",
+      "integration_check": "Every advertised URI/tool resolves consistently on native and bridge transports",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "CLI and client adapters",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "CLI and client adapters module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/cli",
+        "extensions/vscode/src",
+        "packages/sdk"
+      ],
+      "producer_consumer_obligation": "Capability negotiation, timeouts, stream/tool IDs, structured output",
+      "integration_check": "Native API, Codex CLI and other CLI bridges preserve evidence/errors/cancel",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Architect planning and governance",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Architect planning and governance module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/architect",
+        "src/discipline"
+      ],
+      "producer_consumer_obligation": "Plan/slice/checkpoint/ADR ownership and legal transitions",
+      "integration_check": "Blocked/reviewed/verified states survive all clients and restart",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Dashboard and configuration",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Dashboard and configuration module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/server/dashboard.ts",
+        "src/config"
+      ],
+      "producer_consumer_obligation": "Validated persisted/effective config and understandable readiness",
+      "integration_check": "Invalid save is rejected; valid save survives restart and reaches each consumer",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "2D/3D Explorer",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "2D/3D Explorer module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/explorer",
+        "explorer/src"
+      ],
+      "producer_consumer_obligation": "Shared facts/trust, freshness, selection, layout and accessibility",
+      "integration_check": "Dense graph stays navigable; selected evidence matches agent retrieval",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Analytics and observability",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Analytics and observability module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "python/analytics",
+        "src/observability",
+        "src/webhooks"
+      ],
+      "producer_consumer_obligation": "Versioned metrics, revision/freshness, trace/job IDs and event semantics",
+      "integration_check": "Reports agree on denominators; webhook retry does not duplicate cognition",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Plugins and host/SDK packages",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Plugins and host/SDK packages module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "src/plugins",
+        "packages/host",
+        "packages/sdk",
+        "packages/token-economy"
+      ],
+      "producer_consumer_obligation": "Capability/effect/authority contracts, context reservations and compatibility",
+      "integration_check": "Plugin failure is isolated; reserved graph evidence survives compression",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    },
+    {
+      "family": "Docs, release and install",
+      "semantic_owner": "core/daemon contract maintainer",
+      "implementation_owner": "Docs, release and install module maintainer",
+      "accountable": "project maintainer",
+      "executor": "GPT-6.1 Sol",
+      "anchors": [
+        "README.md",
+        "guide",
+        "scripts",
+        "scripts/install.ps1"
+      ],
+      "producer_consumer_obligation": "Claim-to-evidence mapping, synchronized version and reversible deployment",
+      "integration_check": "Install/restart existing sessions reports actual versions and config migration",
+      "foundation_review": "source-reviewed under the user-approved revision-7 implementation scope",
+      "integration_status": "pending"
+    }
+  ],
+  "formats": [
+    {
+      "file": "features.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "workflows.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "data_model.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "capabilities.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "datastores.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "auxiliary_entities.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "dream_graph.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "candidate_edges.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "validated_edges.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "tension_log.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 2,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "adr_log.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "dream_history.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "remediation_log.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "ui_registry.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "system_story.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "threat_log.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "dream_archetypes.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "structural_evidence.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "temporal_graph.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "causal_graph.json",
+      "domain": "graph",
+      "graph": true,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "scan_state.json",
+      "domain": "scan",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "enrichment_state.json",
+      "domain": "enrichment",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "index.json",
+      "domain": "index",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "graph_maintenance.json",
+      "domain": "maintenance",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": "1.0.0",
+      "legacy_classification": "explicit version; family-specific adapter",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "schedules.json",
+      "domain": "schedules",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "event_log.json",
+      "domain": "events",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "meta_log.json",
+      "domain": "metrics",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "bootstrap_registry.json",
+      "domain": "bootstrap",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "jobs.json",
+      "domain": "jobs",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "plan_state.json",
+      "domain": "plans",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "slice_state.json",
+      "domain": "plans",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "role_profiles.json",
+      "domain": "config",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "spend_ledger.json",
+      "domain": "spend",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "session_authority.json",
+      "domain": "authority",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "change_obligations.json",
+      "domain": "changes",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "dirty_partitions.json",
+      "domain": "maintenance",
+      "graph": false,
+      "optional_at_bootstrap": true,
+      "schema_major": 1,
+      "template_declared_version": null,
+      "legacy_classification": "unversioned/unknown; known legacy shape adapter only, no invented historical major",
+      "writes": "canonical publication boundary; original physical encoding retained until migration"
+    },
+    {
+      "file": "publication_state.json",
+      "domain": "publication",
+      "graph": false,
+      "schema_major": 1,
+      "declared_schema": "dreamgraph.publication.v1",
+      "owner": "core/daemon publication authority",
+      "writes": "internal only; final durable publication participant; receipt and outbox share the commit"
+    },
+    {
+      "file": "reconciliation_journal.json",
+      "domain": "publication",
+      "graph": false,
+      "schema_major": 2,
+      "declared_schema": "dreamgraph.reconciliation_journal.v2",
+      "previous_schema": "dreamgraph.reconciliation_journal.v1",
+      "owner": "core/daemon recovery authority",
+      "writes": "internal only; v2 receipt determines rollback/roll-forward; v1 retains rollback semantics"
+    }
+  ],
+  "cases": [
+    {
+      "id": "dreamgraph:AT01",
+      "family": "AT01",
+      "project": "dreamgraph",
+      "prompt": "Recover the governed current slice, a blocker and the next eligible slice from a revisioned test plan; ignore another session selection.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "authoritative_plan_id",
+        "current_slice_id",
+        "blocker",
+        "last_verified_checkpoint",
+        "resume_reason"
+      ],
+      "forbidden_assertions": [
+        "completion inferred from prose",
+        "pending first slice reported as running",
+        "another session selection used as authority"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "plan": {
+          "id": "fixture:dreamgraph:plan",
+          "revision": 3,
+          "lifecycle": "implementing",
+          "current_slice_ids": [
+            "fixture:dreamgraph:plan:blocked"
+          ],
+          "running_slice_ids": [],
+          "last_verified_slice_id": "fixture:dreamgraph:plan:done",
+          "slices": [
+            {
+              "id": "fixture:dreamgraph:plan:done",
+              "status": "verified",
+              "depends_on": [],
+              "evidence_ids": [
+                "checkpoint:done"
+              ],
+              "blockers": []
+            },
+            {
+              "id": "fixture:dreamgraph:plan:blocked",
+              "status": "blocked",
+              "depends_on": [
+                "fixture:dreamgraph:plan:done"
+              ],
+              "evidence_ids": [],
+              "blockers": [
+                "required source unavailable"
+              ]
+            },
+            {
+              "id": "fixture:dreamgraph:plan:dependent",
+              "status": "pending",
+              "depends_on": [
+                "fixture:dreamgraph:plan:blocked"
+              ],
+              "evidence_ids": [],
+              "blockers": []
+            },
+            {
+              "id": "fixture:dreamgraph:plan:independent",
+              "status": "pending",
+              "depends_on": [
+                "fixture:dreamgraph:plan:done"
+              ],
+              "evidence_ids": [],
+              "blockers": []
+            }
+          ]
+        },
+        "other_session_selection": "fixture:dreamgraph:plan:dependent",
+        "historical_checkpoint": {
+          "slice_id": "fixture:dreamgraph:plan:done",
+          "status": "verified"
+        }
+      },
+      "expected": {
+        "plan_id": "fixture:dreamgraph:plan",
+        "current_slice_ids": [
+          "fixture:dreamgraph:plan:blocked"
+        ],
+        "running_slice_ids": [],
+        "next_slice_ids": [
+          "fixture:dreamgraph:plan:independent"
+        ],
+        "last_verified_slice_id": "fixture:dreamgraph:plan:done",
+        "preserved_blocker": "required source unavailable"
+      }
+    },
+    {
+      "id": "dreamgraph:AT02",
+      "family": "AT02",
+      "project": "dreamgraph",
+      "prompt": "Explain scan-to-publication-to-agent retrieval, distinguishing scan and graph revisions.",
+      "mandatory_evidence_ids": [
+        "dg-scan",
+        "dg-rag"
+      ],
+      "required_outcomes": [
+        "required_source_anchors",
+        "correct_boundary",
+        "unsupported_parts_disclosed"
+      ],
+      "forbidden_assertions": [
+        "wrong source attribution",
+        "unsupported architecture relationship"
+      ],
+      "fixture_kind": "source-reviewed project task",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "query": "Explain scan-to-publication-to-agent retrieval, distinguishing scan and graph revisions.",
+        "required_evidence_ids": [
+          "dg-scan",
+          "dg-rag"
+        ],
+        "token_budgets": [
+          100,
+          500,
+          2000
+        ],
+        "distractors": {
+          "count": 300,
+          "prefix": "fixture:dreamgraph:unrelated:",
+          "description": "Unrelated UI styling and build configuration."
+        }
+      },
+      "expected": {
+        "mandatory_anchors": [
+          "dg-scan",
+          "dg-rag"
+        ],
+        "if_evidence_cannot_fit": "explicit_insufficiency_or_continuation",
+        "unsupported_claim_count": 0
+      }
+    },
+    {
+      "id": "dreamgraph:AT03",
+      "family": "AT03",
+      "project": "dreamgraph",
+      "prompt": "Classify a mixed graph containing a source assertion, human assertion, dream, validated insight, decision and tension.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "origin_classification",
+        "confidence_not_independent_evidence",
+        "shared_ancestry",
+        "contradiction"
+      ],
+      "forbidden_assertions": [
+        "hypothesis promoted by confidence",
+        "tension called a proven defect",
+        "circulated evidence counted twice"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "records": [
+          {
+            "id": "source",
+            "source_repo": "dreamgraph",
+            "source_files": [
+              "fixture/source.ts"
+            ],
+            "source_verified": false,
+            "confidence": 1
+          },
+          {
+            "id": "human",
+            "origin": "lucid",
+            "confidence": 1
+          },
+          {
+            "id": "dream",
+            "origin": "rem",
+            "confidence": 1,
+            "inspiration": [
+              "source"
+            ]
+          },
+          {
+            "id": "validated",
+            "kind": "validated",
+            "evidence_ancestry": [
+              "source"
+            ],
+            "confidence": 0.9
+          },
+          {
+            "id": "decision",
+            "kind": "adr",
+            "decided_by": "human"
+          },
+          {
+            "id": "tension",
+            "kind": "tension",
+            "description": "Possible contradiction",
+            "entities": [
+              "source",
+              "dream"
+            ]
+          }
+        ],
+        "independent_source_groups": [
+          [
+            "source",
+            "dream",
+            "validated"
+          ]
+        ]
+      },
+      "expected": {
+        "class_by_id": {
+          "source": "source_assertion",
+          "human": "human_assertion",
+          "dream": "hypothesis",
+          "validated": "validated_insight",
+          "decision": "decision",
+          "tension": "tension"
+        },
+        "independent_source_count": 1,
+        "proven_defect": false
+      }
+    },
+    {
+      "id": "dreamgraph:AT04",
+      "family": "AT04",
+      "project": "dreamgraph",
+      "prompt": "Retrieve DreamGraph schedule dispatch/ownership without dashboard styling noise.",
+      "mandatory_evidence_ids": [
+        "dg-scheduler"
+      ],
+      "required_outcomes": [
+        "required_source_anchors",
+        "scope",
+        "within_budget",
+        "omissions"
+      ],
+      "forbidden_assertions": [
+        "mandatory anchor lost",
+        "false completeness",
+        "relevant evidence buried in noise"
+      ],
+      "fixture_kind": "source-reviewed project task",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "query": "Retrieve DreamGraph schedule dispatch/ownership without dashboard styling noise.",
+        "required_evidence_ids": [
+          "dg-scheduler"
+        ],
+        "token_budgets": [
+          100,
+          500,
+          2000
+        ],
+        "distractors": {
+          "count": 300,
+          "prefix": "fixture:dreamgraph:unrelated:",
+          "description": "Unrelated UI styling and build configuration."
+        }
+      },
+      "expected": {
+        "mandatory_anchors": [
+          "dg-scheduler"
+        ],
+        "if_evidence_cannot_fit": "explicit_insufficiency_or_continuation",
+        "unsupported_claim_count": 0
+      }
+    },
+    {
+      "id": "dreamgraph:AT05",
+      "family": "AT05",
+      "project": "dreamgraph",
+      "prompt": "Apply an authorized mutation to disposable state, lose the reply, retry, conflict and read back.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "durable_receipt",
+        "same_revision_readback",
+        "single_effect",
+        "stale_write_rejected",
+        "recoverable_interruption"
+      ],
+      "forbidden_assertions": [
+        "success before commit",
+        "duplicate effect",
+        "unrelated state overwritten"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "instance_id": "fixture:dreamgraph",
+        "actor": "fixture:authorized-agent",
+        "operation_id": "fixture:mutation:1",
+        "before": {
+          "features": []
+        },
+        "requested_delta": {
+          "features": [
+            {
+              "id": "fixture:added",
+              "source_repo": "dreamgraph",
+              "source_files": [
+                "fixture/source.ts"
+              ]
+            }
+          ]
+        },
+        "interruptions": [
+          "before_publication",
+          "after_publication_reply_lost"
+        ],
+        "retry_same_payload": true,
+        "conflicting_payload": {
+          "features": []
+        }
+      },
+      "expected": {
+        "before_publication": "rolled_back",
+        "after_publication": "committed",
+        "retry": "same_receipt",
+        "conflicting_payload": "identity_conflict",
+        "effect_count": 1
+      }
+    },
+    {
+      "id": "dreamgraph:AT06",
+      "family": "AT06",
+      "project": "dreamgraph",
+      "prompt": "Use incomplete or changed evidence; distinguish an old full scan from a concrete scope gap.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "scoped_limit",
+        "no_age_only_staleness",
+        "unknown_is_unknown",
+        "justified_abstention",
+        "recovery"
+      ],
+      "forbidden_assertions": [
+        "bluffing",
+        "old scan equated with stale graph",
+        "recent unrelated dream hides source gap"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "last_full_scan_at": "2001-01-01T00:00:00Z",
+        "managed_source_revision": "source:3",
+        "covered_scope": [
+          "fixture/source.ts"
+        ],
+        "concrete_gap": {
+          "path": "fixture/other.ts",
+          "expected_hash": "sha256:before",
+          "observed_hash": "sha256:after"
+        },
+        "unrelated_recent_dream": {
+          "scope": [
+            "fixture/unrelated.ts"
+          ],
+          "graph_revision": "graph:4"
+        },
+        "unavailable_source": "fixture/missing.ts"
+      },
+      "expected": {
+        "covered_scope_freshness": "current",
+        "changed_scope_freshness": "stale",
+        "unavailable_source_freshness": "unknown",
+        "age_only_warning": false,
+        "unrelated_dream_closes_gap": false
+      }
+    },
+    {
+      "id": "web64-react:AT01",
+      "family": "AT01",
+      "project": "web64-react",
+      "prompt": "Recover the governed current slice, a blocker and the next eligible slice from a revisioned test plan; ignore another session selection.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "authoritative_plan_id",
+        "current_slice_id",
+        "blocker",
+        "last_verified_checkpoint",
+        "resume_reason"
+      ],
+      "forbidden_assertions": [
+        "completion inferred from prose",
+        "pending first slice reported as running",
+        "another session selection used as authority"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "plan": {
+          "id": "fixture:web64-react:plan",
+          "revision": 3,
+          "lifecycle": "implementing",
+          "current_slice_ids": [
+            "fixture:web64-react:plan:blocked"
+          ],
+          "running_slice_ids": [],
+          "last_verified_slice_id": "fixture:web64-react:plan:done",
+          "slices": [
+            {
+              "id": "fixture:web64-react:plan:done",
+              "status": "verified",
+              "depends_on": [],
+              "evidence_ids": [
+                "checkpoint:done"
+              ],
+              "blockers": []
+            },
+            {
+              "id": "fixture:web64-react:plan:blocked",
+              "status": "blocked",
+              "depends_on": [
+                "fixture:web64-react:plan:done"
+              ],
+              "evidence_ids": [],
+              "blockers": [
+                "required source unavailable"
+              ]
+            },
+            {
+              "id": "fixture:web64-react:plan:dependent",
+              "status": "pending",
+              "depends_on": [
+                "fixture:web64-react:plan:blocked"
+              ],
+              "evidence_ids": [],
+              "blockers": []
+            },
+            {
+              "id": "fixture:web64-react:plan:independent",
+              "status": "pending",
+              "depends_on": [
+                "fixture:web64-react:plan:done"
+              ],
+              "evidence_ids": [],
+              "blockers": []
+            }
+          ]
+        },
+        "other_session_selection": "fixture:web64-react:plan:dependent",
+        "historical_checkpoint": {
+          "slice_id": "fixture:web64-react:plan:done",
+          "status": "verified"
+        }
+      },
+      "expected": {
+        "plan_id": "fixture:web64-react:plan",
+        "current_slice_ids": [
+          "fixture:web64-react:plan:blocked"
+        ],
+        "running_slice_ids": [],
+        "next_slice_ids": [
+          "fixture:web64-react:plan:independent"
+        ],
+        "last_verified_slice_id": "fixture:web64-react:plan:done",
+        "preserved_blocker": "required source unavailable"
+      }
+    },
+    {
+      "id": "web64-react:AT02",
+      "family": "AT02",
+      "project": "web64-react",
+      "prompt": "Explain the Web64 compiler/runtime boundary: compileWeb64IdeProject produces program artifacts; handoffProgram passes program bytes to runtime.loadMedia after readiness.",
+      "mandatory_evidence_ids": [
+        "web-compiler",
+        "web-handoff"
+      ],
+      "required_outcomes": [
+        "required_source_anchors",
+        "correct_boundary",
+        "unsupported_parts_disclosed"
+      ],
+      "forbidden_assertions": [
+        "wrong source attribution",
+        "unsupported architecture relationship"
+      ],
+      "fixture_kind": "source-reviewed project task",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "query": "Explain the Web64 compiler/runtime boundary: compileWeb64IdeProject produces program artifacts; handoffProgram passes program bytes to runtime.loadMedia after readiness.",
+        "required_evidence_ids": [
+          "web-compiler",
+          "web-handoff"
+        ],
+        "token_budgets": [
+          100,
+          500,
+          2000
+        ],
+        "distractors": {
+          "count": 300,
+          "prefix": "fixture:web64-react:unrelated:",
+          "description": "Unrelated UI styling and build configuration."
+        }
+      },
+      "expected": {
+        "mandatory_anchors": [
+          "web-compiler",
+          "web-handoff"
+        ],
+        "if_evidence_cannot_fit": "explicit_insufficiency_or_continuation",
+        "unsupported_claim_count": 0
+      }
+    },
+    {
+      "id": "web64-react:AT03",
+      "family": "AT03",
+      "project": "web64-react",
+      "prompt": "Classify a mixed graph containing a source assertion, human assertion, dream, validated insight, decision and tension.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "origin_classification",
+        "confidence_not_independent_evidence",
+        "shared_ancestry",
+        "contradiction"
+      ],
+      "forbidden_assertions": [
+        "hypothesis promoted by confidence",
+        "tension called a proven defect",
+        "circulated evidence counted twice"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "records": [
+          {
+            "id": "source",
+            "source_repo": "web64-react",
+            "source_files": [
+              "fixture/source.ts"
+            ],
+            "source_verified": false,
+            "confidence": 1
+          },
+          {
+            "id": "human",
+            "origin": "lucid",
+            "confidence": 1
+          },
+          {
+            "id": "dream",
+            "origin": "rem",
+            "confidence": 1,
+            "inspiration": [
+              "source"
+            ]
+          },
+          {
+            "id": "validated",
+            "kind": "validated",
+            "evidence_ancestry": [
+              "source"
+            ],
+            "confidence": 0.9
+          },
+          {
+            "id": "decision",
+            "kind": "adr",
+            "decided_by": "human"
+          },
+          {
+            "id": "tension",
+            "kind": "tension",
+            "description": "Possible contradiction",
+            "entities": [
+              "source",
+              "dream"
+            ]
+          }
+        ],
+        "independent_source_groups": [
+          [
+            "source",
+            "dream",
+            "validated"
+          ]
+        ]
+      },
+      "expected": {
+        "class_by_id": {
+          "source": "source_assertion",
+          "human": "human_assertion",
+          "dream": "hypothesis",
+          "validated": "validated_insight",
+          "decision": "decision",
+          "tension": "tension"
+        },
+        "independent_source_count": 1,
+        "proven_defect": false
+      }
+    },
+    {
+      "id": "web64-react:AT04",
+      "family": "AT04",
+      "project": "web64-react",
+      "prompt": "Retrieve Web64 emulator speed policy without compiler or color-picker noise.",
+      "mandatory_evidence_ids": [
+        "web-speed"
+      ],
+      "required_outcomes": [
+        "required_source_anchors",
+        "scope",
+        "within_budget",
+        "omissions"
+      ],
+      "forbidden_assertions": [
+        "mandatory anchor lost",
+        "false completeness",
+        "relevant evidence buried in noise"
+      ],
+      "fixture_kind": "source-reviewed project task",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "query": "Retrieve Web64 emulator speed policy without compiler or color-picker noise.",
+        "required_evidence_ids": [
+          "web-speed"
+        ],
+        "token_budgets": [
+          100,
+          500,
+          2000
+        ],
+        "distractors": {
+          "count": 300,
+          "prefix": "fixture:web64-react:unrelated:",
+          "description": "Unrelated UI styling and build configuration."
+        }
+      },
+      "expected": {
+        "mandatory_anchors": [
+          "web-speed"
+        ],
+        "if_evidence_cannot_fit": "explicit_insufficiency_or_continuation",
+        "unsupported_claim_count": 0
+      }
+    },
+    {
+      "id": "web64-react:AT05",
+      "family": "AT05",
+      "project": "web64-react",
+      "prompt": "Apply an authorized mutation to disposable state, lose the reply, retry, conflict and read back.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "durable_receipt",
+        "same_revision_readback",
+        "single_effect",
+        "stale_write_rejected",
+        "recoverable_interruption"
+      ],
+      "forbidden_assertions": [
+        "success before commit",
+        "duplicate effect",
+        "unrelated state overwritten"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "instance_id": "fixture:web64-react",
+        "actor": "fixture:authorized-agent",
+        "operation_id": "fixture:mutation:1",
+        "before": {
+          "features": []
+        },
+        "requested_delta": {
+          "features": [
+            {
+              "id": "fixture:added",
+              "source_repo": "web64-react",
+              "source_files": [
+                "fixture/source.ts"
+              ]
+            }
+          ]
+        },
+        "interruptions": [
+          "before_publication",
+          "after_publication_reply_lost"
+        ],
+        "retry_same_payload": true,
+        "conflicting_payload": {
+          "features": []
+        }
+      },
+      "expected": {
+        "before_publication": "rolled_back",
+        "after_publication": "committed",
+        "retry": "same_receipt",
+        "conflicting_payload": "identity_conflict",
+        "effect_count": 1
+      }
+    },
+    {
+      "id": "web64-react:AT06",
+      "family": "AT06",
+      "project": "web64-react",
+      "prompt": "Use incomplete or changed evidence; distinguish an old full scan from a concrete scope gap.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "scoped_limit",
+        "no_age_only_staleness",
+        "unknown_is_unknown",
+        "justified_abstention",
+        "recovery"
+      ],
+      "forbidden_assertions": [
+        "bluffing",
+        "old scan equated with stale graph",
+        "recent unrelated dream hides source gap"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "last_full_scan_at": "2001-01-01T00:00:00Z",
+        "managed_source_revision": "source:3",
+        "covered_scope": [
+          "fixture/source.ts"
+        ],
+        "concrete_gap": {
+          "path": "fixture/other.ts",
+          "expected_hash": "sha256:before",
+          "observed_hash": "sha256:after"
+        },
+        "unrelated_recent_dream": {
+          "scope": [
+            "fixture/unrelated.ts"
+          ],
+          "graph_revision": "graph:4"
+        },
+        "unavailable_source": "fixture/missing.ts"
+      },
+      "expected": {
+        "covered_scope_freshness": "current",
+        "changed_scope_freshness": "stale",
+        "unavailable_source_freshness": "unknown",
+        "age_only_warning": false,
+        "unrelated_dream_closes_gap": false
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "id": "dg-scan",
+      "project": "dreamgraph",
+      "file": "src/tools/scan-project.ts",
+      "semantic_anchor": "export async function runScanProject",
+      "line": 730,
+      "source_sha256": "bafbe3bb79a7b248a6b5360f5abbfd00338631adfcd30cef5898688f18bd52e2",
+      "excerpt": "export async function runScanProject(opts: RunScanOptions = {}): Promise<ScanProjectResult> {\n  return withGraphOperation(\"scan\", () => executeScanProject(opts));\n}\n\nasync function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResult> {\n  const contextHops = parseEnrichmentContextHops(opts.context_hops);\n  const VALID_TARGETS = [\"features\", \"workflows\", \"data_model\", \"ui\"];\n  const depth = opts.depth ?? \"deep\";\n  const targetList = opts.targets ?? [...VALID_TARGETS];\n  const repos = opts.repos;\n\n  // Validate targets\n  const invalidTargets = targetList.filter(t => !VALID_TARGETS.includes(t));\n  if (invalidTargets.length > 0) {\n    throw new Error(`Invalid target(s): ${invalidTargets.join(\", \")}. Must be one of: ${VALID_TARGETS.join(\", \")}`);\n  }\n\n  // ---- Progress helper ----\n  let _step = 0;\n  const _totalSteps = 2 + targetList.length + 1;\n  function progress(message: string): void {\n    _step++;\n    logger.info(`scan_project: ${message}`);\n    opts.onProgress?.(message, _step, _totalSteps);\n  }\n\n  // Validate repos\n  const availableRepos = Object.keys(config.repos);\n  if (availableRepos.length === 0) {\n    throw new Error(\"No repositories configured. Set project root or DREAMGRAPH_REPOS.\");\n  }\n  const targetRepos = repos ?? availableRepos;\n  const unknown = targetRepos.filter(r => !config.repos[r]);\n  if (unknown.length > 0) {\n    throw new Error(`Unknown repos: ${unknown.join(\", \")}. Available: ${availableRepos.join(\", \")}`);\n  }",
+      "excerpt_sha256": "a70f5f667aa7e47b5eef79023626c015d56db40f7b8eb1257bba8fa707396378",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "dg-rag",
+      "project": "dreamgraph",
+      "file": "src/cognitive/graph-rag.ts",
+      "semantic_anchor": "export async function",
+      "line": 60,
+      "source_sha256": "9e44706bbe3157f5402c555404cd7fb3eb24b03b81ee4e0c49bc126903cc99a0",
+      "excerpt": "export async function graphRagRetrieve(input: GraphRAGQuery): Promise<GraphRAGContext> {\n  if (input.representation === \"legacy\" || !input.representation && process.env.DG_GRAPH_CONTEXT_REPRESENTATION === \"legacy\") {\n    if (input.mandatory_identities?.length || input.mandatory_evidence_ids?.length || input.changed_files?.length ||\n      input.kinds?.length || input.domains?.length || input.repositories?.length || input.assertion_classes?.length ||\n      input.plan_id || input.slice_id || input.execution_id || input.adapter && input.adapter !== \"unbound\" ||\n      input.max_neighbors !== undefined && input.max_neighbors !== 20 || input.max_records !== undefined && input.max_records !== 40 ||\n      input.metadata_budget_bytes !== undefined && input.metadata_budget_bytes !== 32768 || input.depth === 0) {\n      throw new Error(\"LEGACY_CONTEXT_CONTROL_UNSUPPORTED: use canonical retrieval for filters, required anchors, receipts and cardinality limits\");\n    }\n    return { ...await legacyGraphRagRetrieve(input), representation: \"legacy\", limitations: [\n      \"Legacy comparison: only features/workflows/data models, validated edges, tensions and story; raw IDs may collide and token counts are estimates.\",\n    ] };\n  }\n  const { representation: _representation, ...query } = input;\n  const pack = await canonicalContext(query);\n  return {\n    representation: \"canonical\", context_pack: pack, context_text: pack.context_text,\n    entities_included: pack.records.filter(record => record.record_type === \"entity\").map(record => record.id),\n    edges_included: pack.records.filter(record => record.record_type === \"relationship\").length,\n    tensions_included: pack.records.filter(record => record.identity?.kind === \"tension\").length,\n    narrative_chapters_included: pack.records.filter(record => record.identity?.kind === \"narrative\").length,\n    token_count: pack.token_count, retrieval_mode: input.mode ?? \"comprehensive\", relevance_scores: [],\n    limitations: [\"Token counts are UTF-8 byte upper bounds; selection reasons are in context_pack.records. The receipt attests assembly, not adapter delivery.\"],\n  };\n}\n\n// ---------------------------------------------------------------------------\n// Token estimation (chars / 4 heuristic â€” conservative)\n// ---------------------------------------------------------------------------\n\nfunction estimateTokens(text: string): number {\n  return Math.ceil(text.length / 4);",
+      "excerpt_sha256": "c4bdddbe0d245d41e674eb1f5181fe0d2dc8e11419a12706c4cfbea8f1f471f9",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "dg-scheduler",
+      "project": "dreamgraph",
+      "file": "src/cognitive/scheduler.ts",
+      "semantic_anchor": "export async function runScheduleNow",
+      "line": 1078,
+      "source_sha256": "ed7547eccff21df11f6b50807e46c93054c363a6af7d936d50d9f83cc8e69a62",
+      "excerpt": "export async function runScheduleNow(scheduleId: string): Promise<ScheduleExecution> {\n  // Phase 1: snapshot the schedule under the file lock and stamp it as\n  // in-flight so a concurrent tick cannot also pick it up. Released before\n  // executeAction starts so UI calls remain responsive even if the action\n  // takes 30+ seconds (LLM round-trip).\n  const snapshot = await withFileLock(\"schedules.json\", async () => {\n    const file = await loadScheduleFile();\n    const schedule = file.schedules.find((s) => s.id === scheduleId);\n    if (!schedule) {\n      throw new Error(`Schedule not found: ${scheduleId}`);\n    }\n    if (inFlightSchedules.has(scheduleId)) {\n      throw new Error(`Schedule already running: ${schedule.name}`);\n    }\n    inFlightSchedules.add(scheduleId);\n    const claim: ScheduleClaim = {\n      scheduleId: schedule.id,\n      scheduleName: schedule.name,\n      action: schedule.action,\n      startTime: Date.now(),\n      schedule: { ...schedule },\n    };\n    return claim;\n  });\n\n  // Phase 2: execute under the cognitive-execution mutex (no file lock).\n  let resultSummary = \"\";\n  let success = true;\n  let errorMsg: string | undefined;\n\n  try {\n    await withFileLock(SCHEDULER_EXEC_LOCK, async () => {\n      try {\n        logger.info(`Scheduler (forced): ${snapshot.scheduleName} (${snapshot.action})`);\n        resultSummary = await executeActionWithTimeout(snapshot.schedule);\n      } catch (err) {\n        success = false;\n        errorMsg = err instanceof Error ? err.message : String(err);\n        resultSummary = `Error: ${errorMsg}`;\n      }\n    });\n  } finally {\n    inFlightSchedules.delete(scheduleId);\n  }\n\n  // Phase 3: write the execution record back. We rebuild the execution\n  // object here (rather than relying on writeBackExecution) so we can return\n  // the manual-execution id with its `_manual_` infix, preserving the\n  // public surface of this function.\n  return withFileLock(\"schedules.json\", async () => {\n    const file = await loadScheduleFile();\n    const schedule = file.schedules.find((s) => s.id === scheduleId);\n    const completedAt = new Date();\n    const duration = completedAt.getTime() - snapshot.startTime;\n\n    if (schedule) {\n      if (success) {\n        schedule.error_count = 0;\n        schedule.last_error = null;\n      } else {\n        schedule.error_count++;\n        schedule.last_error = errorMsg ?? \"unknown error\";\n      }\n      schedule.last_run_at = completedAt.toISOString();\n      schedule.run_count++;\n      schedule.updated_at = completedAt.toISOString();\n      computeNextRun(schedule);\n    }\n\n    const execution: ScheduleExecution = {",
+      "excerpt_sha256": "0631d1e9a021a697052c473fd4f1d06fed150e83c014b6e770b0daa56a99ac55",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "dg-evidence",
+      "project": "dreamgraph",
+      "file": "src/cognitive/evidence-ledger.ts",
+      "semantic_anchor": "export function buildCandidateEvidenceLedger",
+      "line": 89,
+      "source_sha256": "0ebcd3eb9b026ab189197c45436619329594b1a1872b341bdaaac2cc621856ee",
+      "excerpt": "export function buildCandidateEvidenceLedger(args: {\n  result: ValidationResult;\n  trust: CognitiveTrustDescriptor;\n  model?: string | null;\n  fallbackReason?: string | null;\n}): EvidenceLedger {\n  const groups = emptyEvidenceGroups();\n  const evidence = args.result.evidence;\n\n  for (const entity of evidence.shared_entities) {\n    pushEntry(groups, {\n      id: `${args.result.dream_id}:entity:${entity}`,\n      source_class: \"source_entity\",\n      summary: \"Shared fact-graph entity used as semantic validation evidence.\",\n      semantic_anchor: entity,\n      optional_hints: [],\n    });\n  }\n  for (const workflow of evidence.shared_workflows) {\n    pushEntry(groups, {\n      id: `${args.result.dream_id}:workflow:${workflow}`,\n      source_class: \"workflow\",\n      summary: \"Workflow overlap used as semantic validation evidence.\",\n      semantic_anchor: workflow,\n      optional_hints: [],\n    });\n  }\n  if (evidence.source_repo_match) {\n    pushEntry(groups, {\n      id: `${args.result.dream_id}:runtime:source-repo-match`,\n      source_class: \"runtime_observation\",\n      summary: \"Candidate endpoints share source repository provenance.\",\n      semantic_anchor: \"validation.evidence.source_repo_match\",\n      optional_hints: [],\n    });\n  }\n  pushEntry(groups, {\n    id: `${args.result.dream_id}:model:${args.result.normalization_cycle}`,\n    source_class: \"model_output\",\n    summary: args.result.reason,\n    semantic_anchor: args.result.reason_code,\n    optional_hints: [\n      `confidence:${args.result.confidence}`,\n      `plausibility:${args.result.plausibility}`,\n      `evidence_score:${args.result.evidence_score}`,\n      `contradiction_score:${args.result.contradiction_score}`,\n    ],\n  });\n\n  return {\n    claim_id: args.result.dream_id,\n    claim_type: \"candidate\",\n    trust: args.trust,\n    semantic_anchors: anchorsFromValidationEvidence(evidence),\n    grouped_evidence: groups,\n    validation: {\n      status: args.result.status,\n      reason_code: args.result.reason_code,\n      reason: args.result.reason,\n      evidence_count: args.result.evidence_count,\n    },\n    provenance: {\n      model: args.model ?? null,\n      strategy: args.result.strategy ?? null,\n      normalization_cycle: args.result.normalization_cycle,",
+      "excerpt_sha256": "fb1fad7bba40136ac457d2e5ccdc4cdc7315294a8bcd5f2a13fc68e28b24f328",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "web-compiler",
+      "project": "web64-react",
+      "file": "src/web64-ide/compiler.mjs",
+      "semantic_anchor": "export function compileWeb64IdeProject",
+      "line": 31,
+      "source_sha256": "b39fc4c1747fafcebca3e7da76738a0a78141e57c33cb9bf94c27208ba7fab9b",
+      "excerpt": "export function compileWeb64IdeProject(project = {}, options = {}) {\n    const origin = normalizeAddress(options.origin ?? project.origin ?? project.main?.origin ?? DEFAULT_LOAD_ADDRESS, DEFAULT_LOAD_ADDRESS);\n    let projectSource = '';\n    let fileStore = null;\n    try {\n        projectSource = normalizeProjectSource(project);\n        const hasCInputs = hasWeb64CInputs(project);\n        const requestedAssemblyDialect = options.assemblyDialect\n            ?? project.assemblyDialect\n            ?? project.assembler?.dialect\n            ?? (project.kickAssemblerCompatibilityMode === true ? KICK5_ASSEMBLY_DIALECT : undefined);\n        const assemblyDialect = hasCInputs ? 'web64-native' : requestedAssemblyDialect;\n        const kickCompatibilityEnabled = assemblyDialect === KICK5_ASSEMBLY_DIALECT;\n        const compatibilitySelection = normalizeC64libCompatibilityModules(kickCompatibilityEnabled\n            ? []\n            : project.compatibilityModules || project.c64libCompatibility?.modules || []);\n        const compatibilityManifest = createC64libCompatibilityManifest(compatibilitySelection.modules);\n        const compatibilityFiles = createC64libCompatibilityVirtualFiles(compatibilitySelection.modules);\n        const kickLibraryFiles = kickCompatibilityEnabled ? createWeb64KickC64libVirtualFiles() : [];\n        fileStore = createProjectFileStore(project, { ...options, compatibilityFiles, kickLibraryFiles });\n        const compatibilityUsageSource = [projectSource, ...fileStore.records.map((record) => record.source || '')].join('\\n');\n        let buildGraph = null;\n        let cCompiled = null;\n        let assemblyRuntimeModules = [];\n        let imported = null;\n        let compatibilityRuntime = Object.freeze({ source: '', routines: Object.freeze([]), zeroPageClaims: Object.freeze([]), diagnostics: Object.freeze([]) });\n        let source = '';\n        let sourceOrigins = [];\n        const rootPath = project.path || project.fileName || project.name || 'main.asm';\n        if (hasCInputs) {\n            buildGraph = createWeb64BuildGraph({ ...project, files: [...(project.files || []), ...fileStore.records] }, options);\n            cCompiled = compileWeb64CProject(project, { ...options, buildGraph });\n            const assemblyBundle = collectAssemblySourceForBuild(isLikelyWeb64CSource(projectSource) ? '' : projectSource, fileStore, rootPath, project.compileInputs);\n            const cBundle = {\n                source: cCompiled.assemblySource || '',\n                lineOrigins: (cCompiled.instructionRecords || []).map((record) => record.provenance || null)\n            };\n            const generatedAssetBundle = createGeneratedCAssetSourceBundle(cCompiled, assemblyBundle);",
+      "excerpt_sha256": "80502cacb876f09903d40f09423014491da2234e82c17f13832a2a19d723fb25",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "web-handoff",
+      "project": "web64-react",
+      "file": "src/web64-ide/runtime-handoff.mjs",
+      "semantic_anchor": "export async function handoffProgram",
+      "line": 9,
+      "source_sha256": "78c0b54666d3b74b6ddd34653a96c23bb0a5ccab3a30b227773f6d3f643ee317",
+      "excerpt": "export async function handoffProgram(runtime, bytes, metadata = {}, options = {}) {\n    if (!runtime || typeof runtime.loadMedia !== 'function') {\n        throw new TypeError('runtime must expose loadMedia(media)');\n    }\n    await ensureRuntimeReady(runtime, options);\n    const programBytes = normalizeProgramBytes(bytes);\n    const name = String(options.fileName || metadata.fileName || metadata.name || `${metadata.artifactId || 'web64-ide'}.prg`);\n    const media = Object.freeze({\n        name,\n        kind: 'program',\n        bytes: programBytes,\n        autorun: options.autorun !== false,\n        metadata: freezeMetadata(metadata)\n    });\n    const record = await runtime.loadMedia(media);\n    return Object.freeze({\n        ok: true,\n        record,\n        media,\n        artifactId: metadata.artifactId || null,\n        loadAddress: metadata.loadAddress ?? readPrgLoadAddress(programBytes),\n        byteLength: programBytes.byteLength,\n        autorun: media.autorun\n    });\n}\n\nexport async function ensureRuntimeReady(runtime, options = {}) {\n    if (!runtime || runtime.state !== 'created') {\n        return runtime;\n    }",
+      "excerpt_sha256": "74b5a2ca8452fd47100b06ba46122345d12c49108eafeb1b3782c3fb6fc2e4fd",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "web-speed",
+      "project": "web64-react",
+      "file": "src/web64-emulator-speed.mjs",
+      "semantic_anchor": "export const WEB64_EMULATOR_SPEED_MULTIPLIERS",
+      "line": 1,
+      "source_sha256": "40d75610025912034eebf89720cd3b79d196ed68ceb3ad05daf4339957d429ec",
+      "excerpt": "export const WEB64_EMULATOR_SPEED_MULTIPLIERS = Object.freeze([1, 2, 4, 8, 16]);\n\nexport function normalizeEmulatorSpeedMultiplier(value) {\n  const multiplier = Number(value);\n  return WEB64_EMULATOR_SPEED_MULTIPLIERS.includes(multiplier) ? multiplier : 1;\n}\n\nexport function emulatorSpeedResourceValue(value) {\n  return String(normalizeEmulatorSpeedMultiplier(value) * 100);\n}",
+      "excerpt_sha256": "36c4ab6b3a54315c93f05bca5f6c0e94d8a97a5855d04c8507575eb7c1da5024",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "web-compile-worker",
+      "project": "web64-react",
+      "file": "src/web64-compile.worker.mjs",
+      "semantic_anchor": "self.onmessage",
+      "line": 12,
+      "source_sha256": "52a8b7c0d6038dbf64e08971a7ac6770e2a1a81e3edb7374b9da4d7d70bdba0d",
+      "excerpt": "self.onmessage = async (event) => {\n    const request = event.data || {};\n    if (request.type === 'selection-timing') {\n        try {\n            if (!selectionTimingService) {\n                const { createSelectionTimingService } = await import('./web64-ide/selection-timing.mjs');\n                selectionTimingService ||= createSelectionTimingService(() => latestResult);\n            }\n            const summary = await selectionTimingService(request);\n            self.postMessage({ type: 'selection-timing-result', selectionId: request.selectionId, summary });\n        } catch {\n            self.postMessage({ type: 'selection-timing-result', selectionId: request.selectionId, summary: { status: 'unavailable' } });\n        }\n        return;\n    }\n    if (request.type === 'reset-kick-cache') {\n        kickCompilationCache.clear();\n        latestResult = null;\n        selectionTimingService?.reset();\n        self.postMessage({ type: 'kick-cache-reset', id: request.id });\n        return;\n    }\n    if (request.type === 'compile-targets') {\n        try {\n            const result = await compileWeb64BuildTargetsAsync(request.project || {}, {",
+      "excerpt_sha256": "af828c712743db38a21aae4404f13500d7505fc3cc05a865f449723293c003a0",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    }
+  ],
+  "preserved_reviewed_evidence": true,
+  "invariants": [
+    "core/daemon owns canonical semantics",
+    "current and previous schema major; product version independent",
+    "unknown legacy provenance/time remains unknown",
+    "old full scan does not imply stale graph",
+    "managed changes publish source reconciliation and receipts",
+    "no API continuation assumptions in CLI contracts",
+    "no provider/model/host fallback without explicit policy",
+    "no paid CI or model call without allocated finite run/day budget"
+  ],
+  "tolerances": {
+    "mandatory_evidence_failures": 0,
+    "unsupported_truth_claims": 0,
+    "token_budget_overflow": 0,
+    "duplicate_mutation_effects": 0,
+    "cross_session_disclosures": 0,
+    "default_paid_calls": 0,
+    "paired_task_rubric": "All mandatory outcomes pass independently. Score architecture/history understanding, provenance, contradictions and justified abstention on the same cases; established-instance material gain requires a reviewed improvement in at least one substantive category in each project and no mandatory regression. Baseline timings and acceptance latency bounds are recorded in Slice 4 before index tuning; no invented p50/p95 or model superiority."
+  },
+  "adr_applicability_source": "docs/audits/2026-09-30-coverage/execution-adr-evidence.json",
+  "adr_disposition": "Existing accepted decisions remain unchanged. Review scoped amendments in their owning slice before changed promotion/routing/lifecycle policy activates; ADR-240 API/CLI separation remains binding.",
+  "production_qualification": "pending; foundation fixtures do not qualify clients, live migrations, paid providers or native computer workers"
+}

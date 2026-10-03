@@ -1,0 +1,5 @@
+
+> dreamgraph@13.4.0 build:server
+> tsc -b
+
+src/graph/execution-context.ts(180,11): error TS2741: Property 'model_reports' is missing in type '{ plan_execution?: { kind: "implementation" | "verification" | "final_verification"; slice_id: string | null; scope: { id: string; instance_id: string; project_id: string; }; expected_revision: number; expected_definition_hash: string; approval_id: string; } | undefined; ... 18 more ...; updated_at: string; }' but required in type '{ id: string; principal: string; session_id: string; instance_id: string; status: "assembled" | "running" | "no_change" | "state_committed" | "graph_committed" | "work_pending" | "reconciliation_pending" | "recovery_required"; ... 18 more ...; plan_stop_recovery?: { ...; } | undefined; }'.

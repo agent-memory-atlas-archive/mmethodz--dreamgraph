@@ -1,0 +1,290 @@
+[
+  {
+    "path": "src/graph/contracts.ts",
+    "sha256": "33a249a9d9604c483e667dae3db73d907917cdd1976552373a680b8dded6f2e1",
+    "bytes": 20767,
+    "lines": 347
+  },
+  {
+    "path": "src/tools/reconciliation-transaction.ts",
+    "sha256": "e962c857fe509ab4202f83441c17bd066ca13f66937f911083799a62ecf0ba19",
+    "bytes": 3020,
+    "lines": 59
+  },
+  {
+    "path": "src/tools/query-resource.ts",
+    "sha256": "10fdd8864bd1f8db5a0dfa0241a44ec20625b7318669e1e49a7575ec57e4f794",
+    "bytes": 3245,
+    "lines": 34
+  },
+  {
+    "path": "src/tools/enrich-parser-nodes.ts",
+    "sha256": "a46f4e17bc0348dde43bf3d427299f9a53f2f1e16d3520f51c8b32ac9376aff3",
+    "bytes": 120416,
+    "lines": 2524
+  },
+  {
+    "path": "src/cognitive/llm.ts",
+    "sha256": "f2fe12b1075f983ce25ad351bea7b25d26f3fd3da65d6a75e788d38836b2b6f7",
+    "bytes": 78345,
+    "lines": 1693
+  },
+  {
+    "path": "src/cognitive/graph-rag.ts",
+    "sha256": "9e44706bbe3157f5402c555404cd7fb3eb24b03b81ee4e0c49bc126903cc99a0",
+    "bytes": 44204,
+    "lines": 1120
+  },
+  {
+    "path": "src/utils/engine-env.ts",
+    "sha256": "8ed402b232753b4e974daecf2ac9a88818cd64843eda7214d771d6fda88baa99",
+    "bytes": 16655,
+    "lines": 440
+  },
+  {
+    "path": "src/cognitive/strategies/llm-dream.ts",
+    "sha256": "1e873124e32ebd6e4747ce67b7bcf18b7cc409cd131a3ffcd4f75fbb2c4efd73",
+    "bytes": 24912,
+    "lines": 548
+  },
+  {
+    "path": "src/index.ts",
+    "sha256": "4cc962f065d535143ece402c3f673d0cdf2a327337bd3a75dc2396679dce5262",
+    "bytes": 17163,
+    "lines": 396
+  },
+  {
+    "path": "src/server/server.ts",
+    "sha256": "ff7fa8bdadc03c3b8ed3929829e528ca3565010501274a2d230da09badc42baf",
+    "bytes": 13793,
+    "lines": 244
+  },
+  {
+    "path": "src/cognitive/dreamer.ts",
+    "sha256": "2a0f6b2e112c21162baa75dc9647b16fd57d7d70a437d525d3f4881eeffc1586",
+    "bytes": 10313,
+    "lines": 186
+  },
+  {
+    "path": "src/architect/plan-registry.ts",
+    "sha256": "08cbc18fc13df24739a92bd16d86769921fbcbc41572732c8ec8c8653118b692",
+    "bytes": 54840,
+    "lines": 1263
+  },
+  {
+    "path": "src/cognitive/normalizer.ts",
+    "sha256": "c56ae0577d7c7ec624f8dd14428ea83c05904485ef31748399d6493d6c6a4242",
+    "bytes": 53823,
+    "lines": 1256
+  },
+  {
+    "path": "src/architect/cli-bridge.ts",
+    "sha256": "be03269857cd72aa39e77b7d19734333febd5478e19a52eeb6a93c58dc6239a4",
+    "bytes": 45148,
+    "lines": 1041
+  },
+  {
+    "path": "src/cognitive/engine.ts",
+    "sha256": "c23b42bd186feb82b3a4798e793abf9bc4c0410b724d52205069b18f02f52517",
+    "bytes": 96273,
+    "lines": 1940
+  },
+  {
+    "path": "src/cognitive/scheduler.ts",
+    "sha256": "ac7d5dc29947a8458312955fd417aaee8e5e589cdaaf0fdbdb8756fad067d9cc",
+    "bytes": 38939,
+    "lines": 616
+  },
+  {
+    "path": "src/cognitive/federation.ts",
+    "sha256": "440e69177921a3229eaac23ca3d21fb8c0c2deaa2ff9cdb3b18022abda0dd515",
+    "bytes": 14726,
+    "lines": 168
+  },
+  {
+    "path": "src/cognitive/temporal-evidence.ts",
+    "sha256": "058c7aec2a31b549e2fe585b054a16f7c9d3d924f38e3af704e05aaf5395474f",
+    "bytes": 6660,
+    "lines": 89
+  },
+  {
+    "path": "src/cognitive/temporal.ts",
+    "sha256": "463d42bb94983646644e8f8075d478c3a1ff98881dc115b350e835f54f213bae",
+    "bytes": 4862,
+    "lines": 56
+  },
+  {
+    "path": "src/cognitive/causal.ts",
+    "sha256": "871ac30f8020ab85c4a1ea26be5835cb7b0ec6f4a621e59e63fea82832f92f70",
+    "bytes": 10967,
+    "lines": 113
+  },
+  {
+    "path": "src/cognitive/types.ts",
+    "sha256": "6a019f94d85cf46d1bad27042ab0acb9d278800f9a1d3657ca80aab0b01b73c2",
+    "bytes": 95749,
+    "lines": 2861
+  },
+  {
+    "path": "src/cognitive/digestion.ts",
+    "sha256": "96c78943ec471466ee7ad57ca123806367927aeb6ef1e4c9a857b6b2be40a821",
+    "bytes": 14136,
+    "lines": 138
+  },
+  {
+    "path": "src/graph/change-obligations.ts",
+    "sha256": "a71beb8bb8c99f835a20a1ae10444043a80074d4dbacdb3575d52d5bba8cb440",
+    "bytes": 18153,
+    "lines": 244
+  },
+  {
+    "path": "src/graph/read-model.ts",
+    "sha256": "44c9882dacd0309fb583fe432573545bf1c66413f0c44e86c8efa5654f2130c7",
+    "bytes": 35274,
+    "lines": 452
+  },
+  {
+    "path": "src/graph/store-registry.ts",
+    "sha256": "4aa3242d4e3c56d2aace93411712e5512a0f81e0b7fd868d15d87d08a8106d31",
+    "bytes": 1882,
+    "lines": 23
+  },
+  {
+    "path": "src/config/engine-settings.ts",
+    "sha256": "f01be8d6135ddce1e9f7573fda7cd33c12b929c270d9ad0b1a6d97e9370eba5e",
+    "bytes": 3471,
+    "lines": 45
+  },
+  {
+    "path": "src/config/engine-setting-catalogue.ts",
+    "sha256": "3583d71709ca8c12aee26b4c1a161b9e82aa56a64905ad0579ffeacd3fcad51f",
+    "bytes": 15209,
+    "lines": 119
+  },
+  {
+    "path": "src/tools/register.ts",
+    "sha256": "f6312e570086bc87e8692e007587a6a9af6112698798a4a751cbabb9b2535627",
+    "bytes": 2835,
+    "lines": 62
+  },
+  {
+    "path": "src/evaluation/agent-usefulness.ts",
+    "sha256": "30b37dc52641a851436fce941bbc4e5c7176d649f9b6d708a3b50f0b9159e280",
+    "bytes": 9946,
+    "lines": 126
+  },
+  {
+    "path": "tests/temporal-federation.test.ts",
+    "sha256": "ef76d6baee4a5ebd852a96447974006b2ec8304b80e582cca38891aa9d67c391",
+    "bytes": 17831,
+    "lines": 168
+  },
+  {
+    "path": "tests/normalization-evidence.test.ts",
+    "sha256": "2fa5624c4db931c3305164dd234b831c07721bda8149632ffec837e9ea932dd6",
+    "bytes": 29626,
+    "lines": 313
+  },
+  {
+    "path": "tests/graph-read-model.test.ts",
+    "sha256": "5c4ab5ffcc221755c3f0bf78fd4f54aa31a125bf43097b804c98407498dc0d87",
+    "bytes": 11103,
+    "lines": 161
+  },
+  {
+    "path": "tests/context-pack.test.ts",
+    "sha256": "75778e3a46e9eb524d9ab75599548c8d57f0d44359e3dcdd33b789a3a4ae012e",
+    "bytes": 19610,
+    "lines": 239
+  },
+  {
+    "path": "tests/agent-usefulness.test.ts",
+    "sha256": "b40c00b725e00b7fc5df066119062422f97ce305b1861921b1bcd8275ccd6afb",
+    "bytes": 8605,
+    "lines": 92
+  },
+  {
+    "path": "docs/ashoka/temporal-federation.md",
+    "sha256": "f9f75972eb3a2157423484094fda498a21600808a3ca2bc6dfb987bfbdb4716e",
+    "bytes": 5501,
+    "lines": 26
+  },
+  {
+    "path": "docs/ashoka/slice-18-qualified-tests.json",
+    "sha256": "a50c2f7f3272812a305c7cbb75e0d727705fa570c8ad9d2388556ebb68a0d709",
+    "bytes": 531637,
+    "lines": 1
+  },
+  {
+    "path": "docs/ashoka/slice-18-coalescing-tests.json",
+    "sha256": "fc89f6645b11dc10f3b7a05682401f1ad9c8743d857a5fa180cd85d2a3ac7caa",
+    "bytes": 12280,
+    "lines": 1
+  },
+  {
+    "path": "docs/ashoka/slice-18-extension-build.log",
+    "sha256": "e65bb850339087ae29cc11884abf1d654ce760bcfdded16500215619c190b7bf",
+    "bytes": 1720,
+    "lines": 40
+  },
+  {
+    "path": "docs/ashoka/slice-18-extension-tests.log",
+    "sha256": "2ef105752d33dda3270cd9791c1d7821c664f77ed8573a5087be1bc1410a80f2",
+    "bytes": 43421,
+    "lines": 528
+  },
+  {
+    "path": "src/cognitive/risk-lifecycle.ts",
+    "sha256": "e3dc79a7fa4d8927306539f59d1d1857163c934bf9f157ad469febafc4321f90",
+    "bytes": 6269,
+    "lines": 60
+  },
+  {
+    "path": "src/cognitive/adversarial.ts",
+    "sha256": "6becd77823adb74a236854cef6f7ea95f727ef2d8f085cd363807e22d63a1188",
+    "bytes": 24659,
+    "lines": 629
+  },
+  {
+    "path": "src/cognitive/intervention.ts",
+    "sha256": "b5ac1902866ed30eae4743d086b1d4e5ead5d8f8ebcc970ae3aa5984104329c8",
+    "bytes": 78085,
+    "lines": 1901
+  },
+  {
+    "path": "src/cognitive/tension-clustering.ts",
+    "sha256": "4280f09b4fa8980433c66bf0d92857ca1f01905c782c668d1694b1166a7e6f55",
+    "bytes": 6486,
+    "lines": 123
+  },
+  {
+    "path": "src/cognitive/register.ts",
+    "sha256": "a5b87844c18001a3678869215e28c54595883eff4214a604576489299502c2a9",
+    "bytes": 114408,
+    "lines": 2917
+  },
+  {
+    "path": "tests/risk-remediation.test.ts",
+    "sha256": "b339661c9cbc4849f8626275ff73615b9faa46acb763068267c04b0230e9151c",
+    "bytes": 12458,
+    "lines": 106
+  },
+  {
+    "path": "tests/tension-resolution.test.ts",
+    "sha256": "60b128ba7a43cf8d5b69555f8c0dbf23497a846e217d2080e3b521d234a9e449",
+    "bytes": 9675,
+    "lines": 269
+  },
+  {
+    "path": "tests/cognitive-producers.test.ts",
+    "sha256": "0ee2b29b99c5f48b010b42c5865f39c3f380bc705ebce314fed4359e120b4c38",
+    "bytes": 15081,
+    "lines": 433
+  },
+  {
+    "path": "docs/ashoka/risk-remediation.md",
+    "sha256": "196ee39b07c7c574719467ddd99bc1814ccd0e3c5e624456e84bb2c142551801",
+    "bytes": 3296,
+    "lines": 18
+  }
+]

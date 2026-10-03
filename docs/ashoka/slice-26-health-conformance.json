@@ -1,0 +1,763 @@
+{
+  "schema": "dreamgraph.ashoka.transport_navigation_checkpoint.v1",
+  "recorded_at": "2026-10-02T20:37:24.060Z",
+  "status": "transport_navigation_qualified_live_cutover_pending",
+  "root": {
+    "passed": 1977,
+    "failed": 0,
+    "skipped": 2,
+    "files": 173,
+    "exit_code": 0
+  },
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "live_observation": {
+    "recorded_at": "2026-10-02T20:28:37.5990100Z",
+    "scope": "Read-only installed session metadata; no tokens, identities or private preferences recorded, no session eviction or daemon restart",
+    "session_count": 512,
+    "grant_count": 0,
+    "earliest_expiry": "2026-10-02T21:46:42.665Z",
+    "latest_created_at": "2026-10-02T11:12:53.633Z",
+    "authority_bytes": 148752,
+    "authority_sha256": "f11c8d72cbe8b88291f5f8a281129b8bf513cfe35dead9263f6c5f209b52b69b"
+  },
+  "navigation": {
+    "scope": "Actual compiled Windows daemon/Architect, CLI and Chrome. Read-only graph-family copy plus original receipt history for navigation scale; publication store dependencies narrowed to copied files and fresh disposable authority. No live mutation, scan, paid inference or production migration claimed.",
+    "checks": [
+      {
+        "name": "NAV08",
+        "detail": "528 real compiled daemon health probes create no sessions, cookies, grants or publication writes before actual browser navigation."
+      },
+      {
+        "name": "NAV01",
+        "detail": "Actual shell/list load at original receipt and graph-family scale; no mocked plan-index route."
+      },
+      {
+        "name": "NAV02",
+        "detail": "Actual source plan/log progress appears with completed cards dimmed and current ownership visible; no running lease invented."
+      },
+      {
+        "name": "NAV03",
+        "detail": "Bounded format notice offers the exact instance preview command without a full migration analysis or automatic migration."
+      },
+      {
+        "name": "NAV07",
+        "detail": "Actual daemon preserves a deliberately old map timestamp without an age-only stale verdict. Scope currency remains separately owned."
+      },
+      {
+        "name": "NAV04",
+        "detail": "Actual compiled CLI previews without writes, applies a reviewed backup/publication and replays one lost acknowledgement identity."
+      },
+      {
+        "name": "NAV05",
+        "detail": "Actual compiled CLI restore uses a separately reviewed current snapshot and returns original bytes through a new publication."
+      },
+      {
+        "name": "NAV06",
+        "detail": "Preview output cannot write inside instance storage; existing files and private authority remain protected."
+      }
+    ],
+    "errors": [],
+    "input_snapshot": {
+      "publication_sha256": "20a82d4b67683f44a5952f57fa1b27a9fc053bfdb44691858ed9fcece0855105",
+      "epoch": "26106937-91a6-4a74-adc7-594cc4cb7685",
+      "revision": {
+        "publication_sequence": 15959,
+        "graph_revision": null,
+        "domains": {
+          "authority": 523,
+          "extension_state": 10,
+          "schedules": 15426
+        }
+      },
+      "boundary": "Original publication bytes remained identical and no journal was present across the read-only family copy. This fixture is not a live cutover approval."
+    },
+    "publication_bytes": 13078620,
+    "copied_graph_files": [
+      "features.json",
+      "workflows.json",
+      "data_model.json",
+      "capabilities.json",
+      "datastores.json",
+      "auxiliary_entities.json",
+      "ui_registry.json",
+      "dream_graph.json",
+      "candidate_edges.json",
+      "validated_edges.json",
+      "tension_log.json",
+      "adr_log.json",
+      "dream_archetypes.json",
+      "system_story.json"
+    ],
+    "health_probes": {
+      "count": 528,
+      "p95_ms": 16,
+      "max_ms": 34,
+      "unchanged_authority": true,
+      "unchanged_publication": true
+    },
+    "browser": "153.0.8010.50",
+    "shell_ms": 1797,
+    "plans_visible_ms": 4233,
+    "selected_plan_data_ms": 870,
+    "selected_plan_visible_ms": 950,
+    "success": true
+  },
+  "browser": {
+    "schema": "dreamgraph.browser_runtime_qualification.v1",
+    "evidence": {
+      "schema": "dreamgraph.browser_runtime_evidence.v1",
+      "recorded_at": "2026-10-02T20:25:56.399Z",
+      "source_hash": "sha256:1858683e03c29345f10640d5e98d825f697cc819e03346511c4de43da197418f",
+      "platform": "win32",
+      "architecture": "x64",
+      "node": "25.2.1",
+      "browser_version": "153.0.8010.50",
+      "runtime_version": "1.62.1",
+      "model_requests": 0,
+      "provider_scope": "none",
+      "traces": [
+        {
+          "id": "BW01",
+          "requirements": [
+            "CU02",
+            "CU20"
+          ],
+          "evidence": {
+            "unicode_postcondition": true,
+            "filtered_structural_observation": true
+          }
+        },
+        {
+          "id": "BW02",
+          "requirements": [
+            "CU03",
+            "CU14"
+          ],
+          "evidence": {
+            "stale_reference_rejected": true
+          }
+        },
+        {
+          "id": "BW03A",
+          "requirements": [
+            "CU03",
+            "CU12"
+          ],
+          "evidence": {
+            "original_peer_pause": true,
+            "fresh_resume_observation": true,
+            "no_input_during_pause": true
+          }
+        },
+        {
+          "id": "BW03",
+          "requirements": [
+            "CU04",
+            "CU14"
+          ],
+          "evidence": {
+            "forbidden_requests": 0,
+            "forbidden_posts": 0
+          }
+        },
+        {
+          "id": "BW04",
+          "requirements": [
+            "CU05"
+          ],
+          "evidence": {
+            "stop_release_ms": 254.0709999999999
+          }
+        },
+        {
+          "id": "BW05",
+          "requirements": [
+            "CU13",
+            "CU20"
+          ],
+          "evidence": {
+            "finite_image_reservation": true,
+            "frame_hash_verified": true
+          }
+        },
+        {
+          "id": "BW05A",
+          "requirements": [
+            "CU13"
+          ],
+          "evidence": {
+            "finite_action_limit": true
+          }
+        },
+        {
+          "id": "BW06",
+          "requirements": [
+            "CU05",
+            "CU11"
+          ],
+          "evidence": {
+            "mode": "disconnect",
+            "elapsed_ms": 267.85529999999926,
+            "local_stop": null,
+            "proof": "original_child_exited_after_local_browser_closure",
+            "browser_requests_quiescent": true
+          }
+        },
+        {
+          "id": "BW07",
+          "requirements": [
+            "CU05",
+            "CU11"
+          ],
+          "evidence": {
+            "mode": "watchdog",
+            "elapsed_ms": 2598.2970000000005,
+            "local_stop": {
+              "epoch": "5529e87c-96f4-4f9c-a7ea-3cac18c2a85a",
+              "input_released": true,
+              "terminated": true,
+              "reason": "watchdog",
+              "heartbeat_age_ms": 2507,
+              "stop_elapsed_ms": 242
+            },
+            "proof": "original_child_exited_after_local_browser_closure",
+            "browser_requests_quiescent": true
+          }
+        },
+        {
+          "id": "BW08",
+          "requirements": [
+            "CU10",
+            "CU22",
+            "CU24"
+          ],
+          "evidence": {
+            "actual_input_deliveries": 1,
+            "durable_outcome": "unknown",
+            "exact_retry_no_input": true,
+            "route": "dreamgraph_harness"
+          }
+        },
+        {
+          "id": "BW09",
+          "requirements": [
+            "CU10",
+            "CU22"
+          ],
+          "evidence": {
+            "execution_status": "recovery_required",
+            "unknown_action_retained": true
+          }
+        }
+      ],
+      "support_scope": "This installed isolated browser/runtime only. CU IDs map to measured subchecks, not full CU acceptance, other operating systems, native desktops or CLI adapters."
+    },
+    "worker": {
+      "schema": "dreamgraph.browser_install.v1",
+      "id": "local-browser",
+      "browser_executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "browser_version": "153.0.8010.50",
+      "runtime_version": "1.62.1",
+      "qualification": {
+        "schema": "dreamgraph.computer_qualification.v1",
+        "backend": "isolated_playwright",
+        "backend_version": "playwright-core@1.62.1/chromium@153.0.8010.50/node@25.2.1",
+        "platform": "win32",
+        "architecture": "x64",
+        "source_hash": "sha256:1858683e03c29345f10640d5e98d825f697cc819e03346511c4de43da197418f",
+        "protocol_hash": "sha256:ec4bb77daacf9faeb874bc313e0f3fbcc431d6aef7ce7a60ab2a90448bbbfc65",
+        "qualified_at": "2026-10-02T20:25:56.399Z",
+        "evidence_scope": "actual_runtime",
+        "scope_negative_passed": true,
+        "privacy_passed": true,
+        "bounded_actions_passed": true,
+        "stop_release_ms": 254.0709999999999,
+        "control_loss_stop_ms": 2598.2970000000005,
+        "cases": [
+          "CU04",
+          "CU05",
+          "CU10",
+          "CU20",
+          "CU24"
+        ],
+        "artifact_hash": "sha256:3c4d601f54447f1a0cb55a1022aedacdbd0cd65465506ae08e50c8c0b8723a62"
+      }
+    }
+  },
+  "tests": [
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "reads never import legacy success; preview/import retain exact bytes and recover one lost reply",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "legacy progress keeps explicit statuses, reads exact structured log events and refuses to infer completion or execution",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "the frozen actual Ashoka definition and log keep completed cards muted and current work navigable before lifecycle import",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "rejects client-forged identity/leases and stale concurrent transitions without another effect",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "archive refuses a running/recovery lease and keeps original artifacts on failure",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "the real Architect script exposes readable running/current markers, slice filters and keyboard navigation",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "performs real Unicode, checked, click/readback and scrolling using opaque current references",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "moved/covered controls, disabled and credential controls never receive a guessed action",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "forbidden posts, redirects, popups and frames cannot reach another origin or authority",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "explicit navigation stays inside the approved origin and segment path and verifies independent destination state",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "private worker process preserves typed observations and responsive independent termination",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "original worker pause fences capture/input and resumes with new references before independent Stop",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "stop bypasses a pending browser navigation and never waits for its ten-second server response",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "masked frames have a verified digest and image exhaustion refuses before another input",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "a real worker closes its dedicated browser on disconnect without another model call",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "a real worker closes its dedicated browser on watchdog without another model call",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input",
+      "status": "passed"
+    },
+    {
+      "file": "computer-native-graph-loop.test.ts",
+      "name": "real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass",
+      "status": "passed"
+    },
+    {
+      "file": "daemon-transport-isolation.test.ts",
+      "name": "isolates real native MCP transports, rejects foreign browser binding and removes closed sessions",
+      "status": "passed"
+    },
+    {
+      "file": "daemon-transport-isolation.test.ts",
+      "name": "carries its stdio stream owner through tools and resources",
+      "status": "passed"
+    },
+    {
+      "file": "daemon-transport-isolation.test.ts",
+      "name": "the actual daemon admits one exact managed MCP action once, retains source debt and refuses consumed replay",
+      "status": "passed"
+    },
+    {
+      "file": "http-health-authority.test.ts",
+      "name": "native and browser health probes create no identity, cookie, grant, publication or private preference",
+      "status": "passed"
+    },
+    {
+      "file": "http-health-authority.test.ts",
+      "name": "full session capacity leaves health available, refuses new identities promptly, and preserves existing owners",
+      "status": "passed"
+    },
+    {
+      "file": "http-health-authority.test.ts",
+      "name": "an interrupted publication cannot make a liveness probe recover or mutate the graph",
+      "status": "passed"
+    },
+    {
+      "file": "http-health-authority.test.ts",
+      "name": "stateless health keeps remote authentication, origin and execution-transport restrictions",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection keeps required checks separate from optional follow-up work",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection reports a ready map and an Architect next action after required setup is complete",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection keeps an old valid map available without inferring age-only staleness",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection revalidates changed map bytes and reports unreadable maps without proposing an automatic scan",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection renders a plain-language Dashboard Start Here card with governed repair paths",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection exposes the same readiness facts through Dashboard and Architect daemon routes",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection sanitizes local onboarding telemetry without retaining sensitive payload fields",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection rejects duplicate repository paths before guided setup persistence",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection persists a validated multi-repo setup and projects it into onboarding readiness",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "PL16 graph consumers retrieve the actual typed plan and selected slice with the same authority revision and gates",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "local slice IDs repeating across plans remain distinct, while an unscoped request is explicitly ambiguous",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "invalid typed authority removes all its plan and slice projections while preserving an independently valid legacy slice store",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "colliding plan IDs in separate projects cannot select one authority by insertion order",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "expired typed plan leases change effective graph/context receipts without writing or reviving running work",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "verified implementation evidence is distinct from the next slice and recovers after a transcript-free read",
+      "status": "passed"
+    },
+    {
+      "file": "publication-read-cache.test.ts",
+      "name": "amortizes large receipt reads across simultaneous plan-size requests while snapshots stay immutable",
+      "status": "passed"
+    },
+    {
+      "file": "publication-read-cache.test.ts",
+      "name": "revalidates rewritten bytes even when mtime and size are preserved, and never caches a parse failure",
+      "status": "passed"
+    },
+    {
+      "file": "publication-read-cache.test.ts",
+      "name": "detects atomic replacement, absence, and a journal despite a warm physical version",
+      "status": "passed"
+    },
+    {
+      "file": "publication-read-cache.test.ts",
+      "name": "isolates equal-sized physical instances and leaves mutable acknowledgement state private to its writer",
+      "status": "passed"
+    }
+  ],
+  "scope": "Actual source daemon/session/publication integration, disposable compiled Windows Chrome/CLI and source graph/receipt scale. Health liveness neither creates authority nor attests graph recovery. Installed users and grants remain untouched.",
+  "joins": {
+    "XS01": "Health host/origin/remote authentication and execution-bearer restrictions remain; no competing identity owner or bypass to graph operations.",
+    "XS18": "Disposable compiled navigation/legacy notices and reviewed CLI apply/replay/restore pass; original live migration is not authorized by these checks.",
+    "XS20": "Actual browser/native declared-provider loop retains pause, source debt, separate graph receipt and current next-agent evidence; no paid-model understanding claim."
+  },
+  "retained_failures": [
+    "Installed authority had 512 twelve-hour sessions and zero grants; repeated GET /health logged SESSION_CAPACITY. Read-only metadata and original expiries are recorded without secrets or eviction.",
+    "First current full root failed early isolated worker pairing at its five-second cold-start bound. Pairing now has a finite fifteen-second module-loading window before any browser launch; one-second Stop/pause and five-second control loss remain unchanged. Phase diagnostics expose future timeout location.",
+    "First refreshed browser fixture passed health and list checks but its broad current-slice locator matched both reported in-progress slices26/31. The final fixture explicitly selects Slice26; no product status, evidence or assertion of a running lease was weakened.",
+    "A read-only live graph preview refused a pending publication journal. It did not recover, rewrite or migrate active data; transient writer activity is not a claim of persistent corruption."
+  ],
+  "remaining": [
+    "Unexpired probe-created identities are not retroactively evicted. Existing users can retain their owner or let original expiry reclaim slots after installing/restarting the source repair.",
+    "Full Slice26 reviewed own-instance conflict dispositions, coherent cutover/fence, verified backup and U0–U8 gates remain open.",
+    "Full Slice31 native/platform/provider/CLI/editor/forced-crash qualification, Slice27 actual model usefulness and Slice28 synchronized release remain open. Product13.4.0; no global install/restart or paid inference."
+  ],
+  "artifacts": [
+    {
+      "path": "src/server/http-authority.ts",
+      "bytes": 9279,
+      "sha256": "8b57ebdf2b6a15f9e3c698d0834df84abd22932219209c7de3b6c1ccff67315e"
+    },
+    {
+      "path": "src/server/http-policy.ts",
+      "bytes": 4253,
+      "sha256": "7a680236016e23936b28bdd78588faa2262adce5d32bf0f6565d3c29e598438d"
+    },
+    {
+      "path": "src/server/session-authority.ts",
+      "bytes": 14274,
+      "sha256": "009d897f5692ae5d6374ae5987516e91fcf4e9b46ed09c66b072d7eac9f347c7"
+    },
+    {
+      "path": "src/index.ts",
+      "bytes": 17429,
+      "sha256": "7a864362184bc325698feaaa25c5caa7e593c0a8ac189c6e42689cf77ddc47bb"
+    },
+    {
+      "path": "src/computer/browser-harness.ts",
+      "bytes": 12601,
+      "sha256": "b521c521b8a1a5a7ace5ebe6fbfa2b84257a61b62b3fbef8404a614143846c27"
+    },
+    {
+      "path": "src/computer/browser-worker-entry.ts",
+      "bytes": 4144,
+      "sha256": "954945f1b346393f29b91952aaa9fe0a987b72ec3ca6b29483aab5f55cb3aba4"
+    },
+    {
+      "path": "src/computer/browser-driver.ts",
+      "bytes": 15160,
+      "sha256": "0a8ec99054bbcd9c7806cf701f804d639c142b369df9a4efb74be68d1b2c8d0f"
+    },
+    {
+      "path": "src/computer/qualify-browser.ts",
+      "bytes": 19167,
+      "sha256": "bb73aa5aca43d43a944ed1c794311730f371b634431d5298bae9c6998cadad60"
+    },
+    {
+      "path": "src/graph/publication.ts",
+      "bytes": 25637,
+      "sha256": "05cfa85d4f3cf40d88d39243f34e879c20773fdf86143e0d7b933deedd4401cf"
+    },
+    {
+      "path": "src/architect/plan-registry.ts",
+      "bytes": 64482,
+      "sha256": "041ae29e0b2dc9e7b6fb616c3f45434fe258fd9c8a0ed73d93933856c4643ede"
+    },
+    {
+      "path": "src/architect/onboarding-readiness.ts",
+      "bytes": 8195,
+      "sha256": "e004af394dbb4fca6fcee7a8da33a3a68191a456115a9120af2057365300b09b"
+    },
+    {
+      "path": "tests/http-health-authority.test.ts",
+      "bytes": 6468,
+      "sha256": "bc084af7b39b9963d36eb7e8f334b89008119af474a9e026d69a221e3d4bc626"
+    },
+    {
+      "path": "tests/daemon-transport-isolation.test.ts",
+      "bytes": 13860,
+      "sha256": "804bdab7e0d7f6589301ffd5c18c425c2a0fa5f1cff991bf4e8094e08e37323b"
+    },
+    {
+      "path": "tests/computer-native-graph-loop.test.ts",
+      "bytes": 15879,
+      "sha256": "fa0a307d92be17a39a5a86b4f09c23e48d541a21b39d057adbdb621fea25cc01"
+    },
+    {
+      "path": "tests/computer-browser-worker.test.ts",
+      "bytes": 17536,
+      "sha256": "7ddfcf2c8c3b56739dd43c6c083964262c6fc7d2f2fb5ff0b429037eebd6cfb0"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "scripts/qualify-ashoka-navigation.mjs",
+      "bytes": 12552,
+      "sha256": "f948cc423d773ff07f9a589efbbc814bb6b2bfde93df92e66c34554cb42e8e4d"
+    },
+    {
+      "path": "scripts/record-ashoka-health-evidence.mjs",
+      "bytes": 7596,
+      "sha256": "a203c0bf37998e09087b7c53e4d43b4440d26dcdf375b49e96e3eef063284326"
+    },
+    {
+      "path": "docs/ashoka/native-review-26-health.mjs",
+      "bytes": 7778,
+      "sha256": "3ea511e489efe84236492032e0dd3f37ff8b20e636ee1ca5bd4ba1e0a1ebf3d7"
+    },
+    {
+      "path": "scripts/qualify-ashoka-native-review.mjs",
+      "bytes": 3718,
+      "sha256": "55e5d52ffc2e6990bf1c64b200dd12d16e0e71f4660e98f48424d00401646726"
+    },
+    {
+      "path": "docs/ashoka/session-authority.md",
+      "bytes": 4909,
+      "sha256": "9687212b439fb8a5aec76c52ea67e07f012de1acdb9c028d49233b48b6551adb"
+    },
+    {
+      "path": "docs/ashoka/legacy-upgrade.md",
+      "bytes": 7358,
+      "sha256": "9caf330a1c53ec06e08b3feb8e7737bcf3557439d42fef33b15b680a7d2e48b1"
+    },
+    {
+      "path": "docs/ashoka/computer-use.md",
+      "bytes": 10923,
+      "sha256": "2588002a1a00368ceaef7ebbf6839b4a4944db3809d8440e1d6ad356a91631f7"
+    },
+    {
+      "path": "README.md",
+      "bytes": 41535,
+      "sha256": "a7fd309a64cd27f710acd6ec093dc04dd2956ce5eb22d9dd3832ee032ac7d86a"
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 45979,
+      "sha256": "0a523a980da6c2832a5c682ac40658177b893544106762a20cd7fa96a0c5b9e1"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-root-tests-second.json",
+      "bytes": 670208,
+      "sha256": "6c034fb71c6deb3d42493a674cbfc90e7eb5a0d906a5f0a418978d6209534974"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-root-tests-second.log",
+      "bytes": 367331,
+      "sha256": "4f67206f6f229dd8473d8aff5c8aeed3886a6eb498ead0879785a76bbddc7525"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-root-tests-second-exit.json",
+      "bytes": 75,
+      "sha256": "2b41789c2a87ab6a2a82d4344d7d74dc95e5be9dfe3a521b78fb717533a38530"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-root-tests.json",
+      "bytes": 670468,
+      "sha256": "f4e92b905efc9ecdd28505fb8dce1683a50b142bffff391955577493ff29130e"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-root-tests.log",
+      "bytes": 366573,
+      "sha256": "3b1f0adda786d68a895b978af5916c397b201073e00938083816971225226e08"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-root-tests-exit.json",
+      "bytes": 75,
+      "sha256": "4e2fa0f52805964e7a29f98cb03c3fbf96034f3dd25ccdf4101ea28435aef3aa"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-build-second.log",
+      "bytes": 2107,
+      "sha256": "f80ac14267006c9ba5922cadde779ff29577fc1b1052539a2eddabc1e2f49c08"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-generated-checks-second.log",
+      "bytes": 2855,
+      "sha256": "51853fb05b844ef0775c4359999db3f880bdb616e9ebd5c16416c7630a56589f"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-browser-focus-second.log",
+      "bytes": 3840,
+      "sha256": "8f8ade203686abe9b8670a4a93b9933f536438d2db706c866539a2abf7e1f054"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-focus-first.log",
+      "bytes": 3541,
+      "sha256": "bcf006f456f21f8618b7f82ad7a522a5e77b3991213db9a743eaeaaf3ca91421"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-browser-qualification.json",
+      "bytes": 4886,
+      "sha256": "b2979f0ae1d0342d6f1c81e9bb6d6abf868c00a3ca2b0752d0a185ab95bd37ec"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-browser-qualification.log",
+      "bytes": 627,
+      "sha256": "207f03fe65c723c279f150817e6b8d50db0812968bbcfdd8acdef5895a320462"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-live-observation.json",
+      "bytes": 470,
+      "sha256": "8a504e81159c3e33b9cee621834bfab316e92589400970d0a4cb401be6df7319"
+    },
+    {
+      "path": "docs/ashoka/slice-26-live-preview-current.log",
+      "bytes": 64,
+      "sha256": "23d6493aa50070118657496eb0ae03be40f2a74fcef3a3f97c171f65c2ea3515"
+    },
+    {
+      "path": "docs/ashoka/browser-26-health/qualification.json",
+      "bytes": 4467,
+      "sha256": "4707f1094adc423edee4b1885638295e83f9523d3942c43a863e6f2469844ce3"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-navigation.log",
+      "bytes": 1662,
+      "sha256": "5495890f6788b95b662ad1c4d2a8225bbf5d1b3d0083b551b43aceda92af14ad"
+    },
+    {
+      "path": "docs/ashoka/browser-26-health-second/qualification.json",
+      "bytes": 3020,
+      "sha256": "c93fc10f098e228c7e6876c24b4b68ebfdae5a0854e79aa788e55acb00ed8291"
+    },
+    {
+      "path": "docs/ashoka/browser-26-health-second/architect.png",
+      "bytes": 189888,
+      "sha256": "f717b706108887200e77595cdbbe56f204e42715d14319d00548f57133d95d5c"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-navigation-second.log",
+      "bytes": 1113,
+      "sha256": "1aaf73f9741f247c214336c5404ec7d4c6cc712f59d024b06832e9570c8f7809"
+    }
+  ]
+}

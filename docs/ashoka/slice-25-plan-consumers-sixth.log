@@ -1,0 +1,13 @@
+[2026-10-02T06:23:41.581Z] [INFO]  Creating instance 4589a630-2568-4456-92cb-7f64c8f29d68 (plan-consumers) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-lVgE6T\master\4589a630-2568-4456-92cb-7f64c8f29d68
+[2026-10-02T06:23:41.655Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-lVgE6T\master\instances.json
+[2026-10-02T06:23:41.655Z] [INFO]  Registered new instance 4589a630-2568-4456-92cb-7f64c8f29d68 (plan-consumers)
+[2026-10-02T06:23:41.660Z] [INFO]  Instance 4589a630-2568-4456-92cb-7f64c8f29d68 created successfully
+dreamgraph:draft
+dreamgraph:implemented
+dreamgraph:verified
+dreamgraph:blocked
+web64:draft
+web64:implemented
+web64:verified
+web64:blocked
+Explorer scope

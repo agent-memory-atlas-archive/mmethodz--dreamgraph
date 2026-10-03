@@ -1,0 +1,107 @@
+{
+  "schema": "dreamgraph.ashoka.offline_gate.v1",
+  "status": "failed",
+  "source_hash": "0416bb7376820dd16f5e819b61eee83c52ef6c52fb4c3d995eb4039516ba4cb4",
+  "platform": "win32",
+  "architecture": "x64",
+  "node": "25.2.1",
+  "model_requests": 0,
+  "scope": "Offline builds, contracts, compiled consumers and actual isolated browser only. No release or real-model usefulness claim.",
+  "steps": [
+    {
+      "name": "server",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 0.6235625000000001
+    },
+    {
+      "name": "explorer",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 10.9003312
+    },
+    {
+      "name": "editor",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 12.575738800000002
+    },
+    {
+      "name": "contracts-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 0.8364223999999995
+    },
+    {
+      "name": "providers-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 0.8106810000000005
+    },
+    {
+      "name": "mcp-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 3.2447008999999998
+    },
+    {
+      "name": "metrics-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 2.1525322000000013
+    },
+    {
+      "name": "config-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 3.720895999999997
+    },
+    {
+      "name": "ashoka-baseline-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 0.8409600999999965
+    },
+    {
+      "name": "editor-tests",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 17.736625200000002
+    },
+    {
+      "name": "root-tests",
+      "exit_code": 1,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 384.5332487
+    }
+  ],
+  "editor": {
+    "passed": 546,
+    "failed": 0,
+    "skipped": 0
+  },
+  "reason": "ASHOKA_GATE_STEP_FAILED:root-tests",
+  "finished_at": "2026-10-03T07:40:35.512Z"
+}

@@ -1,0 +1,63 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/computer-journal.test.ts (13 tests) 4681ms
+   ✓ reconnect pages existing owner descriptors without reading archived transcripts or creating authority  357ms
+   ✓ changed and foreign reconnect cursors cannot turn partial pages into a current complete session list  344ms
+   ✓ the real HTTP reconnect projection keeps declared transport identities isolated, bounded and read-only  374ms
+   ✓ replays original intent/receipt across service recreation and never persists raw action text  449ms
+   ✓ invalidates old observations on target changes and cannot verify a model interpretation  307ms
+   ✓ reserves finite actions/images/bytes once and refuses oversize or unsupported operations  367ms
+   ✓ postcondition proof, terminal immutability and graph receipt owner remain separate  402ms
+   ✓ a lost physical result stays recoverable after acknowledged stop and cannot redispatch  491ms
+   ✓ active workers prevent completion and stopped proved work remains a state receipt, never graph truth  409ms
+   ✓ late unknown-result bookkeeping does not pretend worker termination was acknowledged  452ms
+ ❯ tests/computer-native-operator.test.ts (4 tests | 1 failed) 1454ms
+   ✓ native SDK reads only its original owner and publishes neither input nor a new grant  478ms
+   ✓ real execution workers and browser cookies/origins cannot use the native operator port  346ms
+   ✓ the native seam exposes no preparation, confirmation, images, configuration or physical dispatch  352ms
+   × missing original workers cannot be substituted for pause/resume/stop recovery 277ms
+     → expected [Function] to throw error including 'COMPUTER_ORIGINAL_WORKER_UNAVAILABLE' but got 'EXECUTION_REQUEST_REJECTED: HTTP 400:…'
+ ✓ tests/http-health-authority.test.ts (4 tests) 342ms
+stderr | tests/computer-native-graph-loop.test.ts > real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass
+[2026-10-02T20:58:34.463Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass
+[2026-10-02T20:58:34.472Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass
+[2026-10-02T20:58:37.229Z] [INFO]  Architect native tool loop: calling scan_project
+
+stderr | tests/computer-native-graph-loop.test.ts > real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass
+[2026-10-02T20:58:38.651Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass
+[2026-10-02T20:58:38.655Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+ ✓ tests/computer-native-graph-loop.test.ts (1 test) 30200ms
+   ✓ real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass  30198ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-native-operator.test.ts > missing original workers cannot be substituted for pause/resume/stop recovery
+AssertionError: expected [Function] to throw error including 'COMPUTER_ORIGINAL_WORKER_UNAVAILABLE' but got 'EXECUTION_REQUEST_REJECTED: HTTP 400:…'
+
+Expected: "COMPUTER_ORIGINAL_WORKER_UNAVAILABLE"
+Received: "EXECUTION_REQUEST_REJECTED: HTTP 400: {"error":"COMPUTER_INVALID_CONTROL_REQUEST","fields":[{"field":"fence","message":"Number must be greater than or equal to 1"}]}"
+
+ ❯ tests/computer-native-operator.test.ts:51:2
+     49|  }expect((await authority.sessions.ownGrants(original.context)).length…
+     50| it('missing original workers cannot be substituted for pause/resume/st…
+     51|  await expect(client.controlComputer('original','computer',action,0)).…
+       |  ^
+     52|  expect((await client.readComputerStatus('original','computer')).sessi…
+     53| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 21 passed (22)
+   Start at  23:58:02
+   Duration  36.52s (transform 2.39s, setup 0ms, collect 13.00s, tests 36.68s, environment 1ms, prepare 588ms)
+

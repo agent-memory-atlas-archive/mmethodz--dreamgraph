@@ -1,0 +1,148 @@
+✔ codex provider-port: getCapabilities reports text and image attachments (2.2071ms)
+✔ codex provider-port: awaits mandatory prompt admission before spawn and propagates rejection (8.8694ms)
+✔ codex provider-port: invocation cwd is optional for multi-repo DreamGraph runs (1.7568ms)
+✔ codex provider-port: serializes conversation to stdin and projects proposal (1.415ms)
+✔ codex provider-port: advertises DreamGraph prompt policies and diagnostics (1.7341ms)
+✔ codex provider-port: keeps bridge-local run_command visible with read-only upstream tools (1.1772ms)
+✔ codex provider-port: forwards assistant text through onStreamChunk (0.8833ms)
+✔ codex provider-port: streams Codex assistant deltas live without duplicating final text (1.8155ms)
+✔ codex provider-port: streams completed assistant message when no deltas are available (0.9243ms)
+✔ codex provider-port: provider errors carry deterministic metadata (0.6496ms)
+✔ codex provider-port: streams live audit calls before final run reconciliation (1.0087ms)
+✔ codex provider-port: streams transcript MCP witnesses when audit records are absent (3.8791ms)
+✔ codex provider-port: onRunResult fires for ok and failed runs (0.8345ms)
+✔ codex provider-port: rejects missing or malformed options (0.3319ms)
+✔ auditFilePathFor: composes a deterministic path under the dir (1.3446ms)
+✔ auditFilePathFor: rejects empty inputs (0.3317ms)
+✔ auditFilePathFor: sanitizes unsafe runId characters (0.1664ms)
+✔ createHostAudit: rejects empty auditDirAbsPath (0.2235ms)
+✔ createHostAudit: missing file â†’ empty array, no throw (12.6997ms)
+[copilot-cli audit] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-parse-mkq42X\run-mixed.ndjson:2
+[copilot-cli audit] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-parse-mkq42X\run-mixed.ndjson:3
+✔ createHostAudit: parses NDJSON, drops malformed lines, deletes file (16.9304ms)
+✔ createHostAudit: finishRecording without startRecording â†’ empty (2.4634ms)
+✔ createHostAudit: second finishRecording for same runId â†’ empty (15.1407ms)
+✔ bridge: forwards tools/list to the HTTP upstream (2308.8268ms)
+✖ bridge: run_command is bridge-local and does not call the upstream handler (2334.8123ms)
+✖ bridge: forwards tools/call and writes one NDJSON audit record per call (2280.8847ms)
+✖ bridge: marks JSON-RPC error responses with isError=true (2266.2956ms)
+✖ bridge: only tools/call generates audit records (tools/list does not) (2284.2533ms)
+✔ bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is unset (157.5708ms)
+✔ bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is malformed (197.0532ms)
+✖ bridge: fails closed when upstream is unreachable (203.2846ms)
+✔ provider-port: getCapabilities reports text and image attachments (1.4221ms)
+✔ provider-port: awaits mandatory prompt admission before spawn and propagates rejection (4.7791ms)
+✔ provider-port: exposes hostLlm reference verbatim through `llm` (0.2411ms)
+✔ provider-port: callProvider serializes the conversation into --prompt (1.2224ms)
+✔ provider-port: advertises the live authoritative tool catalog to Copilot CLI (1.4486ms)
+✔ provider-port: keeps bridge-local run_command visible with read-only upstream tools (0.7857ms)
+✔ provider-port: callProvider forwards onStreamChunk with full assistant text (1.5209ms)
+✔ provider-port: callProvider forwards abortSignal to the spawn port (0.8528ms)
+✔ provider-port: callProvider throws annotated Error when orchestrator returns ok=false (0.75ms)
+✔ provider-port: onRunResult fires for both ok and failed runs (5.968ms)
+✔ provider-port: onRunResult exceptions are swallowed (0.7005ms)
+✔ provider-port: rejects missing or malformed options (0.4584ms)
+ℹ tests 42
+ℹ suites 0
+ℹ pass 37
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12511.6503
+
+✖ failing tests:
+
+test at dist\test\copilot-cli-bridge-audit.test.js:345:25
+✖ bridge: run_command is bridge-local and does not call the upstream handler (2334.8123ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /bridge-local-ok/. Input:
+  
+  '{\n' +
+    '  "jsonrpc": "2.0",\n' +
+    '  "error": {\n' +
+    '    "code": -32000,\n' +
+    '    "message": "Not Acceptable: Client must accept both application/json and text/event-stream"\n' +
+    '  },\n' +
+    '  "id": null\n' +
+    '}\n'
+  
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\copilot-cli-bridge-audit.test.js:361:26)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '{\n  "jsonrpc": "2.0",\n  "error": {\n    "code": -32000,\n    "message": "Not Acceptable: Client must accept both application/json and text/event-stream"\n  },\n  "id": null\n}\n',
+    expected: /bridge-local-ok/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at dist\test\copilot-cli-bridge-audit.test.js:375:25
+✖ bridge: forwards tools/call and writes one NDJSON audit record per call (2280.8847ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  4 !== 2
+  
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\copilot-cli-bridge-audit.test.js:397:26)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at dist\test\copilot-cli-bridge-audit.test.js:415:25
+✖ bridge: marks JSON-RPC error responses with isError=true (2266.2956ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  2 !== 1
+  
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\copilot-cli-bridge-audit.test.js:427:26)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at dist\test\copilot-cli-bridge-audit.test.js:438:25
+✖ bridge: only tools/call generates audit records (tools/list does not) (2284.2533ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  2 !== 1
+  
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\copilot-cli-bridge-audit.test.js:447:26)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at dist\test\copilot-cli-bridge-audit.test.js:490:25
+✖ bridge: fails closed when upstream is unreachable (203.2846ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /failed to connect to architect MCP/. Input:
+  
+  '[architect-cli-mcp-bridge] upstream MCP transport closed before initialize completed: http://127.0.0.1:58493/mcp\n'
+  
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\copilot-cli-bridge-audit.test.js:515:22)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '[architect-cli-mcp-bridge] upstream MCP transport closed before initialize completed: http://127.0.0.1:58493/mcp\n',
+    expected: /failed to connect to architect MCP/,
+    operator: 'match',
+    diff: 'simple'
+  }

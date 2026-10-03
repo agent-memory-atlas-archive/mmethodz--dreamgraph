@@ -1,0 +1,273 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.1
+[2026-09-30T23:52:05.738Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.lmstudio.test.ts > initLlmProvider — lmstudio > constructs an OpenAI-compat provider whose name is reported as 'lmstudio'
+[2026-09-30T23:52:05.739Z] [INFO]  LLM provider: lmstudio (model: test-model)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > keeps normalizer and dreamer provider/model/secret/protocol independent
+[2026-09-30T23:52:05.741Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.2
+[2026-09-30T23:52:05.747Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.lmstudio.test.ts > initLlmProvider — lmstudio > hits /chat/completions on the LM Studio base URL and parses LM-Studio-shaped responses
+[2026-09-30T23:52:05.749Z] [INFO]  LLM provider: lmstudio (model: test-model)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.4
+[2026-09-30T23:52:05.753Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-6-sol
+[2026-09-30T23:52:05.760Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-6-luna
+[2026-09-30T23:52:05.765Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > omits sampling for gpt-5.5 even when none is requested without sampling qualification
+[2026-09-30T23:52:05.770Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > omits sampling for gpt-5.6-sol even when none is requested without sampling qualification
+[2026-09-30T23:52:05.778Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6.1-sol through Responses without sampling parameters
+[2026-09-30T23:52:05.732Z] [INFO]  LLM provider: openai (model: gpt-6.1-sol)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5
+[2026-09-30T23:52:05.785Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5-mini
+[2026-09-30T23:52:05.793Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5-nano
+[2026-09-30T23:52:05.800Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to o3
+[2026-09-30T23:52:05.807Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-6-astra
+[2026-09-30T23:52:05.813Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-6.1-sol
+[2026-09-30T23:52:05.819Z] [INFO]  LLM provider: none (model: n/a)
+
+ ✓ tests/llm.lmstudio.test.ts (4 tests) 262ms
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-astra through Responses without sampling parameters
+[2026-09-30T23:52:06.049Z] [INFO]  LLM provider: openai (model: gpt-6-astra)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves dreamer role, prompt/schema, effort and selected model in Responses
+[2026-09-30T23:52:06.143Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > binds saved configuration and request limits once despite later profile changes
+[2026-09-30T23:52:06.215Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-sol through Responses without sampling parameters
+[2026-09-30T23:52:06.271Z] [INFO]  LLM provider: openai (model: gpt-6-sol)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves normalizer role, prompt/schema, effort and selected model in Responses
+[2026-09-30T23:52:06.351Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-luna through Responses without sampling parameters
+[2026-09-30T23:52:06.476Z] [INFO]  LLM provider: openai (model: gpt-6-luna)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > rejects model/storage/schema-guarantee substitutions before dispatch
+[2026-09-30T23:52:06.521Z] [INFO]  LLM provider: none (model: none)
+
+ ✓ tests/provider-images.test.ts (7 tests) 824ms
+stderr | tests/role-provider.test.ts > role policy dispatch > allows exact qualified custom models but blocks unsupported effort without escalation
+[2026-09-30T23:52:06.593Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > routes enrichment through its own role rather than the dreamer model
+[2026-09-30T23:52:06.671Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-sol through Responses without sampling parameters
+[2026-09-30T23:52:06.668Z] [INFO]  LLM provider: openai (model: gpt-5.6-sol)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > never treats native CLI policy as an API transport
+[2026-09-30T23:52:06.685Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in responses without changing the role
+[2026-09-30T23:52:06.691Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-09-30T23:52:06.698Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-09-30T23:52:06.718Z] [INFO]  LLM readiness: initial state=unknown (reason=completion_unqualified, fingerprint=5387ac80757e25b4, models=gpt-4.1/gpt-4.1)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-terra through Responses without sampling parameters
+[2026-09-30T23:52:06.847Z] [INFO]  LLM provider: openai (model: gpt-5.6-terra)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in chat-completions without changing the role
+[2026-09-30T23:52:07.007Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-luna through Responses without sampling parameters
+[2026-09-30T23:52:07.019Z] [INFO]  LLM provider: openai (model: gpt-5.6-luna)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-09-30T23:52:07.082Z] [INFO]  LLM readiness: unknown → ready (reason=ok, fingerprint=5387ac80757e25b4, models=gpt-4.1/gpt-4.1)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-09-30T23:52:07.101Z] [INFO]  LLM readiness: ready → unknown (reason=completion_unqualified, fingerprint=a2415cbe9a06f5de, models=gpt-4.1/gpt-5.4)
+
+ ✓ tests/role-provider.test.ts (7 tests) 1372ms
+   ✓ role policy dispatch > keeps normalizer and dreamer provider/model/secret/protocol independent  475ms
+   ✓ role policy dispatch > binds saved configuration and request limits once despite later profile changes  307ms
+   ✓ qualifies independent roles from real work without recurring paid probes  412ms
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > retains GPT-4.1 sampling and conservatively omits unqualified future/custom sampling
+[2026-09-30T23:52:07.187Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-opus-5-5
+[2026-09-30T23:52:07.189Z] [INFO]  LLM provider: anthropic (model: claude-opus-5-5)
+
+ ✓ tests/model-admission.test.ts (10 tests) 1545ms
+   ✓ durable model admission > retains unknown usage liabilities and conflict slots across restart  300ms
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-opus-4-7
+[2026-09-30T23:52:07.331Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-sonnet-5-5
+[2026-09-30T23:52:07.333Z] [INFO]  LLM provider: anthropic (model: claude-sonnet-5-5)
+
+ ✓ tests/llm.json-fallback.test.ts (7 tests) 1734ms
+   ✓ explicit schema contracts > uses explicit local validation, discloses it, and never poisons later contracts  753ms
+   ✓ explicit schema contracts > discloses only an authorized Responses schema retry with one shared signal  307ms
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-opus-4-8
+[2026-09-30T23:52:07.463Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-fable-5-1
+[2026-09-30T23:52:07.464Z] [INFO]  LLM provider: anthropic (model: claude-fable-5-1)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-sonnet-5-5
+[2026-09-30T23:52:07.586Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-mythos-5-1
+[2026-09-30T23:52:07.589Z] [INFO]  LLM provider: anthropic (model: claude-mythos-5-1)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-fable-5-1
+[2026-09-30T23:52:07.705Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-mythos-preview
+[2026-09-30T23:52:07.821Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > keeps requested temperature in policy/migration while exposing effective omission and role intent
+[2026-09-30T23:52:07.830Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > does not let capability evidence for another model enable temperature
+[2026-09-30T23:52:07.836Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > blocks unsupported none without a provider request or automatic effort escalation
+[2026-09-30T23:52:07.844Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves daemon role and exposes omitted temperature in route provenance
+[2026-09-30T23:52:07.847Z] [INFO]  LLM provider: openai (model: gpt-4.1)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves daemon role and exposes omitted temperature in route provenance
+[2026-09-30T23:52:07.855Z] [INFO]  LLM provider: none (model: n/a)
+
+ ❯ tests/model-temperature.test.ts (27 tests | 1 failed) 2144ms
+   ✓ cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.1 27ms
+   ✓ cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.2 7ms
+   ✓ cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.4 6ms
+   ✓ cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-6-sol 7ms
+   ✓ cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-6-luna 5ms
+   ✓ cognitive roles without unsupported temperature > omits sampling for gpt-5.5 even when none is requested without sampling qualification 5ms
+   ✓ cognitive roles without unsupported temperature > omits sampling for gpt-5.6-sol even when none is requested without sampling qualification 8ms
+   ✓ cognitive roles without unsupported temperature > never sends temperature to gpt-5 7ms
+   ✓ cognitive roles without unsupported temperature > never sends temperature to gpt-5-mini 8ms
+   ✓ cognitive roles without unsupported temperature > never sends temperature to gpt-5-nano 7ms
+   ✓ cognitive roles without unsupported temperature > never sends temperature to o3 6ms
+   ✓ cognitive roles without unsupported temperature > never sends temperature to gpt-6-astra 6ms
+   ✓ cognitive roles without unsupported temperature > never sends temperature to gpt-6.1-sol 6ms
+   ✓ cognitive roles without unsupported temperature > preserves dreamer role, prompt/schema, effort and selected model in Responses  324ms
+   ✓ cognitive roles without unsupported temperature > preserves normalizer role, prompt/schema, effort and selected model in Responses 208ms
+   ✓ cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in responses without changing the role  340ms
+   ✓ cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in chat-completions without changing the role  316ms
+   × cognitive roles without unsupported temperature > retains GPT-4.1 sampling and conservatively omits unqualified future/custom sampling 180ms
+     → ADMISSION_EXACT_PRICING_REQUIRED: run inference:988eef9a-d814-4596-94a9-a34d2d7d0062, attempt inference:988eef9a-d814-4596-94a9-a34d2d7d0062:1
+   ✓ cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-opus-4-7 144ms
+   ✓ cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-opus-4-8 133ms
+   ✓ cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-sonnet-5-5 123ms
+   ✓ cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-fable-5-1 119ms
+   ✓ cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-mythos-preview 116ms
+   ✓ cognitive roles without unsupported temperature > keeps requested temperature in policy/migration while exposing effective omission and role intent 9ms
+   ✓ cognitive roles without unsupported temperature > does not let capability evidence for another model enable temperature 6ms
+   ✓ cognitive roles without unsupported temperature > blocks unsupported none without a provider request or automatic effort escalation 8ms
+   ✓ cognitive roles without unsupported temperature > preserves daemon role and exposes omitted temperature in route provenance 11ms
+ ✓ tests/latest-model-support.test.ts (14 tests) 2512ms
+   ✓ September 2026 model support > routes gpt-6.1-sol through Responses without sampling parameters  335ms
+ ❯ tests/provider-outcome.test.ts (31 tests | 2 failed) 2873ms
+   ✓ provider outcome boundary > rejects Responses incomplete and retains usage  304ms
+   ✓ provider outcome boundary > rejects Responses failed and retains usage 216ms
+   ✓ provider outcome boundary > rejects Responses cancelled and retains usage 189ms
+   ✓ provider outcome boundary > rejects Responses in_progress and retains usage 188ms
+   ✓ provider outcome boundary > rejects Responses queued and retains usage 161ms
+   ✓ provider outcome boundary > detects a refusal despite successful HTTP/response status 147ms
+   ✓ provider outcome boundary > rejects Chat length before accepting generated JSON 164ms
+   ✓ provider outcome boundary > rejects Chat content_filter before accepting generated JSON 163ms
+   ✓ provider outcome boundary > does not equate valid JSON with valid evidence shape 153ms
+   ✓ provider outcome boundary > compiles invalid schemas before spending tokens 16ms
+   ✓ provider outcome boundary > preserves Claude effort/native schema and validates original numeric limits 148ms
+   ✓ provider outcome boundary > rejects Claude refusal with usage retained 121ms
+   ✓ provider outcome boundary > rejects Claude max_tokens with usage retained 118ms
+   ✓ provider outcome boundary > rejects Claude pause_turn with usage retained 123ms
+   ✓ provider outcome boundary > rejects Claude model_context_window_exceeded with usage retained 114ms
+   ✓ provider outcome boundary > does not fabricate missing usage or double-count cache/reasoning 6ms
+   ✓ provider outcome boundary > preserves property names and original schema during grammar adaptation 5ms
+   × provider outcome boundary > cancels the active openai HTTP request 16ms
+     → expected undefined to be true // Object.is equality
+   × provider outcome boundary > cancels the active anthropic HTTP request 10ms
+     → expected undefined to be true // Object.is equality
+   ✓ provider outcome boundary > rejects pre-aborted requests without dispatch 5ms
+   ✓ provider outcome boundary > does not grant future/custom/CLI identifiers API capabilities 5ms
+   ✓ provider outcome boundary > rejects malformed provider envelopes with usage intact 5ms
+   ✓ provider outcome boundary > rejects malformed provider envelopes with usage intact 5ms
+   ✓ provider outcome boundary > rejects malformed provider envelopes with usage intact 4ms
+   ✓ provider outcome boundary > rejects malformed provider envelopes with usage intact 5ms
+   ✓ provider outcome boundary > rejects malformed provider envelopes with usage intact 4ms
+   ✓ provider outcome boundary > uses model-specific documented APIs and efforts 7ms
+   ✓ provider outcome boundary > retains usage on malformed tool JSON 121ms
+   ✓ provider outcome boundary > rejects invalid or unadvertised native tools before dispatch 233ms
+   ✓ provider outcome boundary > preserves nested tool schemas and validates their constraints locally 111ms
+   ✓ provider outcome boundary > requires Responses for GPT-6 tool reasoning without implicit protocol/effort changes 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/model-temperature.test.ts > cognitive roles without unsupported temperature > retains GPT-4.1 sampling and conservatively omits unqualified future/custom sampling
+ModelAdmissionError: ADMISSION_EXACT_PRICING_REQUIRED: run inference:988eef9a-d814-4596-94a9-a34d2d7d0062, attempt inference:988eef9a-d814-4596-94a9-a34d2d7d0062:1
+ ❯ reject src/cognitive/model-admission.ts:105:55
+    103|       }
+    104|       const now = this.clock(), timestamp = now.toISOString(), day = t…
+    105|       const reject = (code: string): never => { throw new ModelAdmissi…
+       |                                                       ^
+    106|       const run = ledger.runs[request.run_id] ?? { id: request.run_id,…
+    107|         budget, created_at: timestamp, cancel_requested_at: null };
+ ❯ src/cognitive/model-admission.ts:130:58
+ ❯ withBarrier src/utils/graph-reconciliation-barrier.ts:83:12
+ ❯ ModelExecution.request src/cognitive/model-execution.ts:62:5
+ ❯ OpenAiCompatibleProvider.complete src/cognitive/llm.ts:456:15
+ ❯ tests/model-temperature.test.ts:52:66
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/provider-outcome.test.ts > provider outcome boundary > cancels the active openai HTTP request
+ FAIL  tests/provider-outcome.test.ts > provider outcome boundary > cancels the active anthropic HTTP request
+AssertionError: expected undefined to be true // Object.is equality
+
+- Expected: 
+true
+
++ Received: 
+undefined
+
+ ❯ tests/provider-outcome.test.ts:58:139
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ Test Files  2 failed | 6 passed (8)
+      Tests  3 failed | 104 passed (107)
+   Start at  02:52:03
+   Duration  4.78s (transform 972ms, setup 0ms, collect 7.21s, tests 13.27s, environment 2ms, prepare 1.76s)
+

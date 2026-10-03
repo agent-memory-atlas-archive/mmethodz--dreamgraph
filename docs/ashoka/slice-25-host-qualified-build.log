@@ -1,0 +1,38 @@
+
+> dreamgraph@13.4.0 build
+> tsc -b && npm run build:explorer
+
+
+> dreamgraph@13.4.0 build:explorer
+> npm --prefix explorer install --no-audit --no-fund && npm --prefix explorer run build
+
+
+up to date in 669ms
+
+> dreamgraph-explorer@13.4.0 build
+> tsc -b && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 190 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/explorer-spa/index.html                            0.50 kB │ gzip:   0.32 kB
+../dist/explorer-spa/assets/layoutWorker-NMKJRz_Y.js      28.93 kB
+../dist/explorer-spa/assets/index-DxybMiib.css            30.89 kB │ gzip:   7.10 kB
+../dist/explorer-spa/assets/CopyShader-BzTUYzf6.js         0.49 kB │ gzip:   0.32 kB │ map:     1.27 kB
+../dist/explorer-spa/assets/Pass-BO10_j78.js               0.74 kB │ gzip:   0.45 kB │ map:     5.71 kB
+../dist/explorer-spa/assets/RenderPass-Dm94S2Xr.js         1.17 kB │ gzip:   0.48 kB │ map:     6.01 kB
+../dist/explorer-spa/assets/OutputPass-lxt5CQRO.js         3.19 kB │ gzip:   1.09 kB │ map:     8.83 kB
+../dist/explorer-spa/assets/EffectComposer-cISchNaM.js     4.77 kB │ gzip:   1.49 kB │ map:    23.52 kB
+../dist/explorer-spa/assets/UnrealBloomPass-CS9QKVx-.js    9.38 kB │ gzip:   2.46 kB │ map:    25.08 kB
+../dist/explorer-spa/assets/OrbitControls-BPnpqVgt.js     19.82 kB │ gzip:   4.52 kB │ map:    64.46 kB
+../dist/explorer-spa/assets/SMAAPass-Dr-MFf5z.js          61.34 kB │ gzip:  38.34 kB │ map:    72.83 kB
+../dist/explorer-spa/assets/index-dmyhs2zM.js            456.82 kB │ gzip: 127.50 kB │ map: 1,532.20 kB
+../dist/explorer-spa/assets/Graph3DCanvas-BC-G4qNY.js    624.85 kB │ gzip: 166.82 kB │ map: 3,235.58 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 4.93s

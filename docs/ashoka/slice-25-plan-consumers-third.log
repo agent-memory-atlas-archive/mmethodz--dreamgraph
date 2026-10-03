@@ -1,0 +1,21 @@
+[2026-10-02T06:16:49.715Z] [INFO]  Creating instance c585f8de-29e4-4a44-b579-6efb79b0c85d (plan-consumers) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-ks716J\master\c585f8de-29e4-4a44-b579-6efb79b0c85d
+[2026-10-02T06:16:49.789Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-ks716J\master\instances.json
+[2026-10-02T06:16:49.790Z] [INFO]  Registered new instance c585f8de-29e4-4a44-b579-6efb79b0c85d (plan-consumers)
+[2026-10-02T06:16:49.795Z] [INFO]  Instance c585f8de-29e4-4a44-b579-6efb79b0c85d created successfully
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
+    domains: {
++     authority: 4,
+-     authority: 2,
+      graph: 1,
+      plans: 1
+    },
+    graph_revision: 'graph:1',
++   publication_sequence: 6
+-   publication_sequence: 4
+  }
+
+    at compare (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-plan-consumers.mjs:65:375)
+    at async file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-plan-consumers.mjs:76:3

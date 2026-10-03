@@ -1,0 +1,24 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/host-managed-execution.test.ts > compiled command Cancel propagates to native HTTP and cannot publish a successful answer or confirm remote termination
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":41892,"approxTokens":10473}
+
+ ✓ tests/host-managed-execution.test.ts (120 tests | 109 skipped) 5022ms
+   ✓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block  413ms
+   ✓ the actual portable SDK recovers a lost approval reply without reissuing a grant or extending expiry  326ms
+   ✓ the portable SDK admission port preserves original permit/report identities and read-only outcomes  442ms
+   ✓ compiled command authority is captured before asynchronous context reads and refuses changed selection without inference  500ms
+   ✓ compiled command Cancel propagates to native HTTP and cannot publish a successful answer or confirm remote termination  623ms
+   ✓ portable SDK model execution reserves before actual native HTTP and reports observed protocol usage under the same graph pass  503ms
+   ✓ portable SDK lost model admission keeps original inspection and never invokes a replacement callback  372ms
+   ✓ portable SDK report loss permits exact report recovery without a stronger termination claim or new request  394ms
+   ✓ portable SDK model timeout rejects waiting while its declared noncooperative callback remains running  732ms
+   ✓ portable SDK rejects successful prose without explicit provider observation and preserves unknown work  364ms
+   ✓ portable SDK callback gets the captured final request despite mutation during asynchronous admission  351ms
+
+ Test Files  1 passed (1)
+      Tests  11 passed | 109 skipped (120)
+   Start at  07:54:49
+   Duration  13.70s (transform 2.95s, setup 0ms, collect 8.26s, tests 5.02s, environment 0ms, prepare 145ms)
+

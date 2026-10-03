@@ -1,0 +1,12 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/computer-browser-worker.test.ts (13 tests | 12 skipped) 2434ms
+   ✓ original worker pause fences capture/input and resumes with new references before independent Stop  2433ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 12 skipped (13)
+   Start at  11:40:05
+   Duration  3.14s (transform 173ms, setup 0ms, collect 337ms, tests 2.43s, environment 0ms, prepare 136ms)
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/slice-27-pause-repeat-4.json

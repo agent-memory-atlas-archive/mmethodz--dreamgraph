@@ -1,0 +1,213 @@
+[
+  {
+    "phase": "open",
+    "state": "start",
+    "at": 1790988557886
+  },
+  {
+    "phase": "open",
+    "state": "end",
+    "at": 1790988560922
+  },
+  {
+    "phase": "observe",
+    "state": "start",
+    "at": 1790988560922
+  },
+  {
+    "phase": "observe",
+    "state": "end",
+    "at": 1790988561238
+  },
+  {
+    "phase": "act",
+    "state": "start",
+    "at": 1790988561238
+  },
+  {
+    "phase": "act",
+    "state": "end",
+    "at": 1790988561612
+  },
+  {
+    "phase": "act",
+    "state": "start",
+    "at": 1790988561612
+  },
+  {
+    "phase": "act",
+    "state": "end",
+    "at": 1790988561965
+  },
+  {
+    "phase": "act",
+    "state": "start",
+    "at": 1790988561965
+  },
+  {
+    "phase": "act",
+    "state": "error",
+    "at": 1790988561966,
+    "code": "COMPUTER_BROWSER_OBSERVATION_STALE"
+  },
+  {
+    "phase": "pause",
+    "state": "start",
+    "at": 1790988561966
+  },
+  {
+    "phase": "pause",
+    "state": "end",
+    "at": 1790988561967
+  },
+  {
+    "phase": "observe",
+    "state": "start",
+    "at": 1790988561967
+  },
+  {
+    "phase": "observe",
+    "state": "error",
+    "at": 1790988561968,
+    "code": "COMPUTER_BROWSER_PAUSED"
+  },
+  {
+    "phase": "resume",
+    "state": "start",
+    "at": 1790988561969
+  },
+  {
+    "phase": "resume",
+    "state": "end",
+    "at": 1790988562121
+  },
+  {
+    "phase": "observe",
+    "state": "start",
+    "at": 1790988562121
+  },
+  {
+    "phase": "observe",
+    "state": "end",
+    "at": 1790988562258
+  },
+  {
+    "phase": "act",
+    "state": "start",
+    "at": 1790988562258
+  },
+  {
+    "phase": "act",
+    "state": "error",
+    "at": 1790988562395,
+    "code": "COMPUTER_BROWSER_ELEMENT_REJECTED"
+  },
+  {
+    "phase": "observe",
+    "state": "start",
+    "at": 1790988562395
+  },
+  {
+    "phase": "observe",
+    "state": "end",
+    "at": 1790988562531
+  },
+  {
+    "phase": "act",
+    "state": "start",
+    "at": 1790988562531
+  },
+  {
+    "phase": "act",
+    "state": "end",
+    "at": 1790988562847
+  },
+  {
+    "phase": "observe",
+    "state": "start",
+    "at": 1790988562847
+  },
+  {
+    "phase": "observe",
+    "state": "end",
+    "at": 1790988562992
+  },
+  {
+    "phase": "act",
+    "state": "start",
+    "at": 1790988562992
+  },
+  {
+    "phase": "act",
+    "state": "end",
+    "at": 1790988563317
+  },
+  {
+    "phase": "observe",
+    "state": "start",
+    "at": 1790988563317
+  },
+  {
+    "phase": "observe",
+    "state": "end",
+    "at": 1790988563476
+  },
+  {
+    "phase": "act",
+    "state": "start",
+    "at": 1790988563476
+  },
+  {
+    "phase": "act",
+    "state": "end",
+    "at": 1790988563878
+  },
+  {
+    "phase": "observe",
+    "state": "start",
+    "at": 1790988563878
+  },
+  {
+    "phase": "observe",
+    "state": "end",
+    "at": 1790988564018
+  },
+  {
+    "phase": "act",
+    "state": "start",
+    "at": 1790988564018
+  },
+  {
+    "phase": "act",
+    "state": "end",
+    "at": 1790988567628
+  },
+  {
+    "phase": "observe",
+    "state": "start",
+    "at": 1790988567628
+  },
+  {
+    "phase": "observe",
+    "state": "error",
+    "at": 1790988567680,
+    "code": "COMPUTER_WORKER_OPERATION_FAILED"
+  },
+  {
+    "phase": "stop",
+    "state": "start",
+    "at": 1790988567680
+  },
+  {
+    "kind": "local-stop",
+    "worker": 1,
+    "reason": "watchdog",
+    "heartbeat_age_ms": 3781,
+    "stop_elapsed_ms": 182
+  },
+  {
+    "phase": "stop",
+    "state": "end",
+    "at": 1790988567891
+  }
+]

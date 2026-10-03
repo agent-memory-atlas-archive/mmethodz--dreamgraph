@@ -1,0 +1,10 @@
+SC04
+SC05
+SC11-future
+SC01/SC03
+SC09/SC10-history
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+0 !== 1
+
+    at <anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-surfaces.mjs:57:46)

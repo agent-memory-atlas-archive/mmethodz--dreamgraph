@@ -1,0 +1,272 @@
+{
+  "schema": "dreamgraph.ashoka.slice_verification.v1",
+  "slice": 17,
+  "status": "verified",
+  "native_review": { "status": "compliant", "declared_entries": 20, "matched": 20, "gaps": 0, "regressions": 0, "decision": "accept", "source_audit_id": "tc_1790854795918_bbd78u" },
+  "recorded_at": "2026-10-01T11:38:28.347552+00:00",
+  "root": {
+    "command": "npx vitest run --maxWorkers=4 --reporter=json --outputFile=docs/ashoka/slice-17-stable-tests.json",
+    "files": 140,
+    "passed": 1557,
+    "failed": 0,
+    "skipped": 2
+  },
+  "extension": {
+    "build": "passed",
+    "passed": 488,
+    "failed": 0
+  },
+  "server_build": "passed",
+  "catalog": {
+    "tools": 93,
+    "resources": 31,
+    "classifications": 94
+  },
+  "contracts": 31,
+  "baseline": 10,
+  "provider_artifact": "r3",
+  "configuration": {
+    "typed": 308,
+    "literal": 101
+  },
+  "source_hashes": [
+    {
+      "path": "src/cognitive/jobs.ts",
+      "sha256": "184286756d96756c349e6a26e3719a8ae23e1f27c3e0d98bc522ff4c3e4e8f9e",
+      "bytes": 25431
+    },
+    {
+      "path": "src/cognitive/job-context.ts",
+      "sha256": "a1a1434bd2915fbecdb2963deaada89ff742c28c58c74fd9f607b0dc8419764c",
+      "bytes": 1251
+    },
+    {
+      "path": "src/cognitive/scheduler.ts",
+      "sha256": "ac7d5dc29947a8458312955fd417aaee8e5e589cdaaf0fdbdb8756fad067d9cc",
+      "bytes": 38939
+    },
+    {
+      "path": "src/cognitive/schedule-definition.ts",
+      "sha256": "5d446e055d9127ad0678332397fc60a429bc735432da758ab4062e0a437f7881",
+      "bytes": 8444
+    },
+    {
+      "path": "src/cognitive/digestion.ts",
+      "sha256": "2901d1fe6867b48df9942a9cd956fcdc7867bb5428d1bf04172314750884a63d",
+      "bytes": 14031
+    },
+    {
+      "path": "src/cognitive/event-router.ts",
+      "sha256": "0a8bbf4c678e14628cefb8582b55da23f5ea23bfb7a1bd108157b142fa0fe1a4",
+      "bytes": 13348
+    },
+    {
+      "path": "src/cognitive/bootstrap-driver.ts",
+      "sha256": "eb50cd0a31ad8b0362c8d89a5f4496f13457f4331479a62844d3e42eda0eb607",
+      "bytes": 2779
+    },
+    {
+      "path": "src/cognitive/bootstrap-registry.ts",
+      "sha256": "7cbf19c65d83e5bff891a63e8ed09ee3582d167193104133abc1e2a26e64914a",
+      "bytes": 4404
+    },
+    {
+      "path": "src/cognitive/graph-maintenance-state.ts",
+      "sha256": "dfe4332f3f336f37897acd95b677e7e7a6ee107b5a205869793a582894bd256a",
+      "bytes": 4713
+    },
+    {
+      "path": "src/cognitive/model-admission.ts",
+      "sha256": "753aa038ef473fb5b235b64fd8f9f8cba4fa2283f9fd075ffb58cc695de67047",
+      "bytes": 21785
+    },
+    {
+      "path": "src/cognitive/model-execution.ts",
+      "sha256": "e21fce7a21d2bb6d9ca03e07dbad97ff067f67f02cb70ecaa6d348c26c0cd4c4",
+      "bytes": 12351
+    },
+    {
+      "path": "src/cognitive/llm.ts",
+      "sha256": "f2fe12b1075f983ce25ad351bea7b25d26f3fd3da65d6a75e788d38836b2b6f7",
+      "bytes": 78345
+    },
+    {
+      "path": "src/cognitive/engine.ts",
+      "sha256": "403fce88821d155e9a9242dbc1a0d4108bf2419f9b9939206d3331a546d33e57",
+      "bytes": 93362
+    },
+    {
+      "path": "src/cognitive/normalizer.ts",
+      "sha256": "f7ff8d895302d5e6fe5607448acc565996e3c0d80fef04dc0be767ffdfeb1c9b",
+      "bytes": 53484
+    },
+    {
+      "path": "src/cognitive/register.ts",
+      "sha256": "cac29767d3cfcd2ff019eea0e465032a50804e8d9951ac232596096b3b11e873",
+      "bytes": 113777
+    },
+    {
+      "path": "src/graph/publication.ts",
+      "sha256": "58ae77864bd5ce4d21bcb0e84638463f66851b2d5ac49228f855da3234fa8777",
+      "bytes": 23851
+    },
+    {
+      "path": "src/graph/change-obligations.ts",
+      "sha256": "e947afa1d43d68bbbf9bc53a55df0a0b5d5f7c548ea0b29a45f01c9ad15fbd87",
+      "bytes": 16127
+    },
+    {
+      "path": "src/tools/scan-project.ts",
+      "sha256": "49b905a2fd7f9249ace99eb8da7719a675b2fd2824d7371db2933ee5f445a97f",
+      "bytes": 85771
+    },
+    {
+      "path": "src/tools/enrich-parser-nodes.ts",
+      "sha256": "a46f4e17bc0348dde43bf3d427299f9a53f2f1e16d3520f51c8b32ac9376aff3",
+      "bytes": 120416
+    },
+    {
+      "path": "src/server/server.ts",
+      "sha256": "ff7fa8bdadc03c3b8ed3929829e528ca3565010501274a2d230da09badc42baf",
+      "bytes": 13793
+    },
+    {
+      "path": "src/server/dashboard.ts",
+      "sha256": "af76bb6799ccdc23bf959c92654b9d4672f2c207ad27682e301a32681eff5e01",
+      "bytes": 117563
+    },
+    {
+      "path": "src/server/schedule-api.ts",
+      "sha256": "cd8fdfec1f5f90dcd7d2ccced1d956599caee6fc68c232a5a6019a45fd670fae",
+      "bytes": 5107
+    },
+    {
+      "path": "src/server/tool-boundary.ts",
+      "sha256": "658bac46085166ca48df2c641e0b93207f7775cbf6479b081a3ac292a1ebdbac",
+      "bytes": 6269
+    },
+    {
+      "path": "src/instance/bootstrap.ts",
+      "sha256": "b5fb5dfd94fc147ddf1cb9016c6f7a9f085a80c8257e0c151ce77758164fc6bb",
+      "bytes": 18607
+    },
+    {
+      "path": "src/architect/routes.ts",
+      "sha256": "8f62a4dadd0b6a4455be89c4f093ba34a64e893307d5d6369e2462cc7c7ad453",
+      "bytes": 630041
+    },
+    {
+      "path": "tests/engine-jobs.test.ts",
+      "sha256": "a24592e92dafc06290a0f212abaa2ead10670752348e0a38e9e1c693c6ae8410",
+      "bytes": 12991
+    },
+    {
+      "path": "tests/scheduler-authority.test.ts",
+      "sha256": "c7340fb8ac6d9cab8ff848e09b2ba06e475807d52dcf085e16f7d68de4f5ba2f",
+      "bytes": 8607
+    },
+    {
+      "path": "tests/dirty-digestion.test.ts",
+      "sha256": "fcae22f745f2ae708200da02819741392b243ae74c434ab08493769f7ac6823f",
+      "bytes": 5613
+    },
+    {
+      "path": "tests/event-job-intake.test.ts",
+      "sha256": "aa276f1b7c0f43d217e47cda7738ad7b265059285b8588528525e41e34708d72",
+      "bytes": 2450
+    },
+    {
+      "path": "tests/schedule-http.test.ts",
+      "sha256": "b585b5d617a28cf4e4486cf01075c0876986693e2faaeb83c51a75c1d5c5b366",
+      "bytes": 4015
+    },
+    {
+      "path": "tests/webhooks/worker.test.ts",
+      "sha256": "220903d2ec04c34e839ee82aaf2049e197fc87823b540410fb66bcfbfdd6d978",
+      "bytes": 6007
+    },
+    {
+      "path": "tests/mcp-catalog-boundary.test.ts",
+      "sha256": "2a241ca5ac0d562090e0755287fe8633e9570634eedc5d85626701e085dde63a",
+      "bytes": 6710
+    },
+    {
+      "path": "tests/llm.json-fallback.test.ts",
+      "sha256": "24c9b6b23c4253dbba0894be1da05074bf5f068451b8cffb7c25a2807176049f",
+      "bytes": 5334
+    },
+    {
+      "path": "tests/change-obligations.test.ts",
+      "sha256": "d2ab368f414e653d1390649326e85418c73c35ff3219921ad02516e707db8d21",
+      "bytes": 13423
+    },
+    {
+      "path": "tests/model-execution.test.ts",
+      "sha256": "cfb534e8fc1edfcac9e8d041f8163793f772eb8186fa638914af5acdfdffaf46",
+      "bytes": 7144
+    },
+    {
+      "path": "tests/role-provider.test.ts",
+      "sha256": "01c1e08df26ca33e2f8d814d759539048e295bab1a5830bc01bbb7bc4ec28ded",
+      "bytes": 8492
+    },
+    {
+      "path": "src/webhooks/store.ts",
+      "sha256": "146f1ca5345f066fbd0f9da127f780cab9ca8a0fcc03f43b8fbc25b3a75c0a9f",
+      "bytes": 10843
+    },
+    {
+      "path": "src/webhooks/worker.ts",
+      "sha256": "3af470e1a961ad394456202ec5df672836f64c8e539b351aca81184a20b09721",
+      "bytes": 14679
+    },
+    {
+      "path": "README.md",
+      "sha256": "b4453696e9cb2dbb26a2ed470634d83f0b828d0e2971209b92fb0849449fffb6",
+      "bytes": 35546
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "b9bf2257068621c2c82da2d1882711af7227cb0c45615184ed0901cfb16de637",
+      "bytes": 38213
+    },
+    {
+      "path": "docs/cognitive-engine.md",
+      "sha256": "923d07a4757b57637f81f62737362ca6cd51e22e18ab261cc5bd4b9cf0e5b416",
+      "bytes": 25479
+    },
+    {
+      "path": "docs/data-model.md",
+      "sha256": "8e63b3cdf0d3fa5b6279ee86b9feec65908003e9f38e4f4992cb503a0f59ccc7",
+      "bytes": 38044
+    },
+    {
+      "path": "docs/tools-reference.md",
+      "sha256": "ed93a4de0d7337cc3a87a8af9c306fcdff7ca64745b568f19d42d91188702aeb",
+      "bytes": 72982
+    },
+    {
+      "path": "docs/workflows.md",
+      "sha256": "0de10b170f6cbc6aeba0d9eb4427948c53005e21a0b754c9d44bbf4dc46a6dff",
+      "bytes": 33551
+    },
+    {
+      "path": "docs/ashoka/engine-jobs.md",
+      "sha256": "7f573b5e55ea03d5e28fff3ee678e405bc7086c383c22b6524655852e9a3b9d7",
+      "bytes": 5321
+    }
+  ],
+  "failed_runs": [
+    "slice-17-focused-tests.json",
+    "slice-17-tests.json",
+    "slice-17-final-tests.json",
+    "slice-17-qualified-tests.json"
+  ],
+  "limits": [
+    "Dependency handoff; complete client task/continuation and C14 joins close in25, schedule workspace/accessibility in29, actual native/platform Computer Use in31, established-instance/model usefulness in27 and release/install/rollback in28.",
+    "No paid request, live scan/migration, global install/restart or product version bump.",
+    "Unknown effects remain recovery-required; waiting cancellation does not establish action termination.",
+    "Core cron recovery has a32-day lookback and one latest missed occurrence; missing cycle context is explicit.",
+    "Webhook receiver deduplication is required; transport acknowledgement is not exactly-once remote execution or rollback."
+  ]
+}

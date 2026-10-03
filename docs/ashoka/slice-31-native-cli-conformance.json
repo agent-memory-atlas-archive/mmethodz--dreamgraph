@@ -1,0 +1,445 @@
+{
+  "schema": "dreamgraph.ashoka.computer_checkpoint.v1",
+  "recorded_at": "2026-10-02T23:36:31.443Z",
+  "status": "native_cli_policy_restart_qualified_slice31_in_progress",
+  "root": {
+    "passed": 1985,
+    "failed": 0,
+    "skipped": 2,
+    "files": 175,
+    "exit_code": 0,
+    "max_workers": 4,
+    "elapsed_seconds": 165.72120751953125
+  },
+  "editor": {
+    "passed": 522,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "scope": "Actual compiled adapter and editor fixtures; no physical VS Code activation or editor-started CU claim."
+  },
+  "focused": {
+    "passed": 69,
+    "failed": 0
+  },
+  "metadata": {
+    "schema": "dreamgraph.ashoka.codex_native_metadata.v1",
+    "at": "2026-10-02T23:25:11.651Z",
+    "platform": "win32",
+    "node": "25.2.1",
+    "version": "0.159.0",
+    "detected": {
+      "adapter": "codex-cli",
+      "version": "0.159.0",
+      "features": {
+        "browser_use": {
+          "stage": "stable",
+          "enabled": true
+        },
+        "browser_use_external": {
+          "stage": "stable",
+          "enabled": true
+        },
+        "browser_use_full_cdp_access": {
+          "stage": "stable",
+          "enabled": true
+        },
+        "computer_use": {
+          "stage": "stable",
+          "enabled": true
+        },
+        "in_app_browser": {
+          "stage": "stable",
+          "enabled": true
+        }
+      },
+      "checked_at": "2026-10-02T23:25:11.068Z",
+      "native_feature_detected": true,
+      "qualified": false,
+      "qualification_missing": [
+        "scoped_target_grant",
+        "bounded_native_actions",
+        "privacy_and_disclosure",
+        "independent_physical_stop",
+        "durable_normalized_receipts"
+      ]
+    },
+    "isolated_features": {
+      "browser_use": {
+        "stage": "stable",
+        "enabled": false
+      },
+      "browser_use_external": {
+        "stage": "stable",
+        "enabled": false
+      },
+      "browser_use_full_cdp_access": {
+        "stage": "stable",
+        "enabled": false
+      },
+      "computer_use": {
+        "stage": "stable",
+        "enabled": false
+      },
+      "in_app_browser": {
+        "stage": "stable",
+        "enabled": false
+      }
+    },
+    "default_app_access": "deny",
+    "config_sha256": "43fd94215a65091efd00ef830dd1266e53a4c7bc2c34e845cf3bae8baf8a978d",
+    "model_requests": 0,
+    "threads": 0,
+    "native_input": 0,
+    "qualified": false,
+    "scope": "Actual CLI version/features and app-server config/read only. Native scope, action budgets, privacy, independent physical Stop and normalized receipts remain unqualified. No personal config/auth artifacts copied."
+  },
+  "restart": {
+    "windows": "Chrome153.0.8010.50/Node25.2.1/Playwright1.62.1",
+    "linux": "Ubuntu24.04.4/WSL2 x64/Chromium151.0.7922.34/Node20.20.2/Playwright1.62.1",
+    "scope": "Real peer death/source write followed by an actual fresh daemon over its disposable named instance. Original owner sees unknown receipts and unavailable worker; controls refuse replacement, foreign owner is isolated and no grant/source-debt byte changes occur. Not every daemon/process crash point."
+  },
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "retained_failures": [
+    "First restart fixture used a legacy rather than named instance identity; scope admission refused before input.",
+    "Second restart fixture incorrectly expected an unbound native request to have operator authority; the real403 denial was correct.",
+    "First Codex metadata proof passed config checks but failed Windows temporary-directory cleanup. The second fresh run passed bounded cleanup.",
+    "First two compiled editor invocations ran from the repository root and failed extension-relative source-file reads. The third ran from the extension directory and passed522 tests."
+  ],
+  "remaining": [
+    "Slice31 native workers, native CLI permission/event/control and provider built-ins, complete editor execution and CU/XS joins.",
+    "Slice26 reviewed live cutover,27 actual paired usefulness,28 synchronized release. No Windows global installation/restart, paid inference or live migration; version13.4.0."
+  ],
+  "artifacts": [
+    {
+      "path": "src/architect/cli-bridge.ts",
+      "bytes": 50287,
+      "sha256": "460513dfbf94a73420db52b4b93dbfc44521643376943349a0dc0130433ef65b"
+    },
+    {
+      "path": "src/computer/browser-registry.ts",
+      "bytes": 18002,
+      "sha256": "0ffc745fbfe4911c38d9fedda4aac8dc1ad666844e49976f80e602b1b2784359"
+    },
+    {
+      "path": "src/computer/http.ts",
+      "bytes": 7983,
+      "sha256": "5969247e9fa001a18e1bec996b6d16c83717b6167536ccbdd19b114b0a68ab6e"
+    },
+    {
+      "path": "src/computer/broker.ts",
+      "bytes": 26082,
+      "sha256": "72e28a3a4d728bfcf89fbe6282b4633192671edff0a4dc073260f3d18e7f95e4"
+    },
+    {
+      "path": "src/computer/journal.ts",
+      "bytes": 14263,
+      "sha256": "4102666334d06f9977fa241e399d592e787420c7b8bb8fdd125b6b538f7898e7"
+    },
+    {
+      "path": "src/server/managed-execution.ts",
+      "bytes": 24234,
+      "sha256": "c8b721457a061e0b2b5a9355b6eb4746331fb14b5684ffece5b126e42ab4de71"
+    },
+    {
+      "path": "src/server/session-authority.ts",
+      "bytes": 14274,
+      "sha256": "009d897f5692ae5d6374ae5987516e91fcf4e9b46ed09c66b072d7eac9f347c7"
+    },
+    {
+      "path": "src/graph/execution-context.ts",
+      "bytes": 42134,
+      "sha256": "391ce141b2888f645848828127e236c1177340b5fb1568122a6b761e3526ce56"
+    },
+    {
+      "path": "src/graph/change-obligations.ts",
+      "bytes": 23574,
+      "sha256": "ea6630023de2b9fa72f4794ed236ea6b128b12a7748e7e161c76d0fca6dc24d2"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/adapters/codex-cli/argv.ts",
+      "bytes": 6984,
+      "sha256": "cceb08fc6ceecf7c664a0f165a6cc8e5db53e1a3954053399c6298d98d1b5aa0"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/adapters/codex-cli/mcp-config.ts",
+      "bytes": 5060,
+      "sha256": "a6cfd219d0e598ab081832a21d56051337df7960f3262f7aaed0faa74071a05a"
+    },
+    {
+      "path": "extensions/vscode/src/test/codex-cli-adapter.test.ts",
+      "bytes": 21363,
+      "sha256": "c5663ab372307654e24cdc825dc29f3f6d8090ac4a8db454f1fb975b9ed88e15"
+    },
+    {
+      "path": "tests/architect-cli-bridge.test.ts",
+      "bytes": 3970,
+      "sha256": "7840c27d4ad490b3f8b1abfb05056a0c525162adf52c2dda4a90373fd00f15aa"
+    },
+    {
+      "path": "tests/standalone-architect-routes.test.ts",
+      "bytes": 149945,
+      "sha256": "6fc153368cf9cf8aeccd53ee154073e5e9833cf79e49c1596fa371fa85c2cf0d"
+    },
+    {
+      "path": "tests/computer-peer-crash.test.ts",
+      "bytes": 12795,
+      "sha256": "68c18cc370d7794ce7746bc9fc6fb0a7622a9c41ba606b2878ab1dc66d542fed"
+    },
+    {
+      "path": "tests/helpers/computer-restart.ts",
+      "bytes": 5959,
+      "sha256": "fe2d6ed45a97881ed71db1de055b1ea3399ef147da8762316f68cace81c807ed"
+    },
+    {
+      "path": "tests/helpers/browser-process-tree.ts",
+      "bytes": 2753,
+      "sha256": "d058c466cf00848040591b353576322762673cf2f15204bf838225225b00c32c"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "scripts/qualify-ashoka-codex-computer-policy.mjs",
+      "bytes": 5121,
+      "sha256": "0dd7069574d2e58722d875251f8c21485d59c1eb2844d4ff34b891416ebe031b"
+    },
+    {
+      "path": "scripts/record-ashoka-native-cli-evidence.mjs",
+      "bytes": 6075,
+      "sha256": "ab64f50e77c417eb4af2ce88ce06068bc4f98640d88089b172c766dbd065d9d7"
+    },
+    {
+      "path": "scripts/qualify-ashoka-native-review.mjs",
+      "bytes": 3746,
+      "sha256": "03780db5b1341a8220e754de2f1e2337d7fca69368708acd2d9a36b0e1437ba4"
+    },
+    {
+      "path": "docs/ashoka/native-review-31-cli.mjs",
+      "bytes": 7948,
+      "sha256": "1c2c20d2ca3d5b3104a4cb83ea74e8cd2b10b778111df0eebcaa4a31e6537248"
+    },
+    {
+      "path": "docs/ashoka/computer-use.md",
+      "bytes": 16385,
+      "sha256": "6462de94e041745bf58ff1a59ccb1714e1e2d09c6d12c4ea6ba7445ecc1343f8"
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 46514,
+      "sha256": "c4c9b118db109211ccbd7c14e7d4ac49cea8d7acc7fedfdc2170c958bde6aa67"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-conformance.json",
+      "bytes": 17896,
+      "sha256": "908146606049e96490491ee50b979c22d8ca4275638a4cc9fc81124bf8cf605b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-recovery-conformance.json",
+      "bytes": 11216,
+      "sha256": "2e7813924f18bdc07e84062bbf4fe0dbd04b231d01d80ea0afe8f7b6565db65e"
+    },
+    {
+      "path": "docs/ashoka/slice-31-codex-native-metadata-exit.json",
+      "bytes": 17,
+      "sha256": "db6a3774e8dfa924f26c0bd5919423bc43913ba73af57830fc67b90b1ae2923d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-codex-native-metadata-second-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-codex-native-metadata-second.json",
+      "bytes": 1880,
+      "sha256": "bd053a7911609e1887d89b60e64a04fb43371ee6076d744d4ec24fa929e08a4c"
+    },
+    {
+      "path": "docs/ashoka/slice-31-codex-native-metadata-second.log",
+      "bytes": 101,
+      "sha256": "d2580144f626618754d55a0533b224a82a03c328e324dd5b7f1c6d8f62c56cf1"
+    },
+    {
+      "path": "docs/ashoka/slice-31-codex-native-metadata.json",
+      "bytes": 1880,
+      "sha256": "d7d65cc865ded6b3ec6821ea0b42b80cbebe97bfc2824145070ea847763ca200"
+    },
+    {
+      "path": "docs/ashoka/slice-31-codex-native-metadata.log",
+      "bytes": 444,
+      "sha256": "6d45f0e9512cf74a2ecaa138e6cf383c7f822352ee0323e98703585a3bdca9fb"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-focus-first-exit.json",
+      "bytes": 17,
+      "sha256": "db6a3774e8dfa924f26c0bd5919423bc43913ba73af57830fc67b90b1ae2923d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-focus-first.json",
+      "bytes": 1458,
+      "sha256": "e8b6e95e1ec566a3ed03164a9d163dfffc9f3b5cec1a1a01eac730988d6e967d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-focus-first.log",
+      "bytes": 123,
+      "sha256": "865ada5a7fd8e8c6d9721aec6dd8e7449fba3db913a33a830e68947a708e3a07"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-focus-second-exit.json",
+      "bytes": 17,
+      "sha256": "db6a3774e8dfa924f26c0bd5919423bc43913ba73af57830fc67b90b1ae2923d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-focus-second.json",
+      "bytes": 1554,
+      "sha256": "11ddb099c92591703f83e1182f8d81df50cf46ac124171e967b21a726d976c73"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-focus-second.log",
+      "bytes": 124,
+      "sha256": "fe1213fc34d9db63cf50eec028ffa4427814488430e2896095f49bced385beae"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-focus-third-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-focus-third.json",
+      "bytes": 1042,
+      "sha256": "fe8d7a2da96927a4e9636fa9df40dffdfb30d59fca1389365ed13a4f18e30926"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-focus-third.log",
+      "bytes": 123,
+      "sha256": "5c297e040833277cae7c19f85f7d0bff8cb1561deb9365eeb4bbbfecdd637fef"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-linux-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-linux-first.json",
+      "bytes": 1052,
+      "sha256": "771ec6be06c9ff309f6597f56b15e80fdb40fdaa605b4300497e0ac44b948e92"
+    },
+    {
+      "path": "docs/ashoka/slice-31-daemon-restart-linux-first.log",
+      "bytes": 100,
+      "sha256": "6f6434cc944fea3e34e1d21515726af413a45b4be06d32729e7a7409dce8daeb"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-architecture.log",
+      "bytes": 146,
+      "sha256": "25516603743c30853b9a0a41cb2542c35c033d72331e773efe0e3451788d3a72"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-build-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-build-first.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-config-regeneration.log",
+      "bytes": 191,
+      "sha256": "c6b54fc079487c330d619f4b40fc0e94bfa9e2efaabb168e12cc4c203ea37a4f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-editor-build-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-editor-build-first.log",
+      "bytes": 1629,
+      "sha256": "3b035528eb78aa4a7127ed074be10bea03fe2f181b4f6da554869ec268131fd2"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-editor-build-second-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-editor-build-second.log",
+      "bytes": 1628,
+      "sha256": "1bb1bbd3101986b7ce017bdb2a5a7fd6adfced83254883ca8807b0abff639fdc"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-editor-tests-first-exit.json",
+      "bytes": 17,
+      "sha256": "db6a3774e8dfa924f26c0bd5919423bc43913ba73af57830fc67b90b1ae2923d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-editor-tests-first.log",
+      "bytes": 79545,
+      "sha256": "1ef640d9d84f3a13ed937301843e7a2711a605eae98a8d1aa1ebea215590ff45"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-editor-tests-second-exit.json",
+      "bytes": 17,
+      "sha256": "db6a3774e8dfa924f26c0bd5919423bc43913ba73af57830fc67b90b1ae2923d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-editor-tests-second.log",
+      "bytes": 79562,
+      "sha256": "ed16cd90bd6376d22d060db3f1803024de6836412e33ce41bb5625edba5bde40"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-editor-tests-third-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-editor-tests-third.log",
+      "bytes": 47480,
+      "sha256": "e7f0930c1c337684c79d517a5f018dc7c538daedd9c9176df6ec05ee5ca47e5e"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-focus-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-focus-first.json",
+      "bytes": 24361,
+      "sha256": "cd8638114ba7c16e7f8923ca6469af37a3fd22c44e2035a85906ff3fd9c355ab"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-focus-first.log",
+      "bytes": 119,
+      "sha256": "fc107d65dc155a88ed22749b3dfd9e3ec87578e722d9c7fbaf97c11b014f5f3f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-generated-checks.log",
+      "bytes": 2855,
+      "sha256": "75e0ffabc4fb78eb10acd658ecd9af593ba055a35fc251b22469b68459f34625"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-root-tests-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-root-tests-first.json",
+      "bytes": 673225,
+      "sha256": "faeceec220dcf34eab7a7bc6134235a80d1ff09b37afcbff7afb3c8af670bc3a"
+    },
+    {
+      "path": "docs/ashoka/slice-31-native-cli-root-tests-first.log",
+      "bytes": 124,
+      "sha256": "d8fef775bce1d9f3ae689ed10789cf0a97065d7b39591f32507cfe4b1b5b28cf"
+    }
+  ]
+}

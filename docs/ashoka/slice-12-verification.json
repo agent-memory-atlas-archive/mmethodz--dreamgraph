@@ -1,0 +1,19 @@
+{
+  "schema": "dreamgraph.wave_verification.v1",
+  "session": "ea472546-116f-46df-a577-1946736958f7",
+  "approved_items": 13,
+  "native_response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"success\": true,\n  \"compliance\": {\n    \"status\": \"compliant\",\n    \"parity_percentage\": 100,\n    \"total_entries\": 13,\n    \"matched\": 13,\n    \"gaps_remaining\": 0,\n    \"regressions\": 0\n  },\n  \"regressions\": 0,\n  \"recommendation\": {\n    \"action\": \"accept\",\n    \"justification\": \"All entries match. No regressions detected.\"\n  },\n  \"message\": \"Verification: COMPLIANT — 100% parity, 0 gaps, 0 regressions. Recommendation: accept\"\n}"
+      }
+    ]
+  },
+  "scope": "Slice 12 dependency handoff; thirteen accepted exits preserved",
+  "remaining_gates": [
+    "All real owner positive effects and client qualification at 25/27",
+    "Native CLI and CU/platform at 30/31",
+    "Paid canaries only under separate consent/allocation"
+  ]
+}

@@ -1,0 +1,12 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/cli-start-health.test.ts (3 tests) 14ms
+ ✓ tests/workspace-installation.test.ts (1 test) 7840ms
+   ✓ refreshes changed workspace bytes at the same release and rejects a stale installed daemon dependency  7839ms
+
+ Test Files  2 passed (2)
+      Tests  4 passed (4)
+   Start at  12:30:52
+   Duration  8.42s (transform 132ms, setup 0ms, collect 239ms, tests 7.85s, environment 0ms, prepare 295ms)
+

@@ -1,0 +1,553 @@
+{
+  "schema": "dreamgraph.ashoka.admitted_pair_checkpoint.v1",
+  "recorded_at": "2026-10-03T04:57:14.136Z",
+  "status": "offline_admitted_collection_checkpoint_slice27_in_progress",
+  "gate": {
+    "source_hash": "a3901ef49cfd3e66fedf092eaa65714e6b86c9b6bb62fad87eb8f7c01a347074",
+    "platform": "win32",
+    "architecture": "x64",
+    "node": "25.2.1",
+    "steps": [
+      {
+        "name": "server",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 0.6013445000000001
+      },
+      {
+        "name": "explorer",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 10.6670393
+      },
+      {
+        "name": "editor",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 12.291586599999999
+      },
+      {
+        "name": "contracts-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 0.9174238000000005
+      },
+      {
+        "name": "providers-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 0.8135887999999977
+      },
+      {
+        "name": "mcp-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 3.7569497999999983
+      },
+      {
+        "name": "metrics-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 2.0927874999999987
+      },
+      {
+        "name": "config-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 3.3710723000000034
+      },
+      {
+        "name": "ashoka-baseline-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 0.7972885999999999
+      },
+      {
+        "name": "editor-tests",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 16.226359499999997
+      },
+      {
+        "name": "root-tests",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 327.3213955
+      },
+      {
+        "name": "browser",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 18.14802919999999
+      }
+    ],
+    "root": {
+      "passed": 2022,
+      "failed": 0,
+      "skipped": 2,
+      "skip_names": [
+        "pushParticlesForEdge ParticleSystem removed in Slice F1 — flow now lives on the tube shader",
+        "ParticleSystem ParticleSystem removed in Slice F1"
+      ],
+      "files": 181
+    },
+    "editor": {
+      "passed": 546,
+      "failed": 0,
+      "skipped": 0
+    },
+    "browser": {
+      "platform": "win32",
+      "architecture": "x64",
+      "checks": 11,
+      "stop_release_ms": 248.84549999999945,
+      "control_loss_stop_ms": 2698.098899999999
+    }
+  },
+  "actual_provider_admission_fixtures": [
+    {
+      "name": "pure disclosure preview creates no job/provider/reservation and pins exact policy, contexts, prices and retention",
+      "status": "passed"
+    },
+    {
+      "name": "refuses unfunded/unpriced/mismatched/expanded routes and malformed disclosure before any dispatch",
+      "status": "passed"
+    },
+    {
+      "name": "collects exact native answers through one shared job/day ledger, checkpoints both, and never scores unreviewed understanding",
+      "status": "passed"
+    },
+    {
+      "name": "preserves the first answer on second-arm refusal and cannot replay the failed original job",
+      "status": "passed"
+    },
+    {
+      "name": "reported-model mismatch retains observed provenance and stops before the other arm",
+      "status": "passed"
+    },
+    {
+      "name": "abort reaches the owned provider, preserves unknown liability and never starts the second arm",
+      "status": "passed"
+    }
+  ],
+  "actual_compiled_helper_fixtures": [
+    {
+      "name": "compiled preview has no dispatch/job/graph writes and refuses overwrite, live stores and in-ledger output",
+      "status": "passed"
+    },
+    {
+      "name": "compiled owner/context/expiry refusals preserve failure output without allocating or dispatching",
+      "status": "passed"
+    },
+    {
+      "name": "compiled collection and later original readback share exactly two fixture dispatches and retain unscored answers",
+      "status": "passed"
+    }
+  ],
+  "focused": {
+    "passed": 47,
+    "failed": 0,
+    "files": 5
+  },
+  "assertions": {
+    "ordinary_callbacks_refuse_real_model": true,
+    "preview_no_provider_or_job_write": true,
+    "original_operator_and_physical_ledger_digest": true,
+    "immutable_explicit_tariff_in_original_job": true,
+    "one_shared_parent_run_and_daily_ledger": true,
+    "no_retry_or_model_escalation": true,
+    "partial_answer_preserved_on_failure": true,
+    "reported_model_mismatch_retained": true,
+    "successful_replay_no_redispatch": true,
+    "cancellation_retains_unknown_liability": true,
+    "read_only_context_scope": true,
+    "unreviewed_answers_not_scored": true
+  },
+  "failures": {
+    "retained": true,
+    "focus_first": "Whitespace-only JSON reformatting did not corrupt canonical content; fixture now changes the retained answer and verifies refusal.",
+    "focus_third": "Windows temporary logical8.3 path differs from physical realpath; the approval correctly bound the physical ledger. Fixed the assertion, not the physical identity rule."
+  },
+  "evidence_scope": "Actual compiled operator, durable job/admission/provider code with intercepted official HTTP and synthetic tariffs/replies. Full local offline gate and isolated browser are actual. No model-quality claim.",
+  "real_provider_requests": 0,
+  "remote_ci_jobs_run": 0,
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "remaining": [
+    "Exact disclosed human allocation/retention approval before any real provider collection. No actual answers or usefulness gain are claimed.",
+    "Full frozen twelve AT project tasks, GE16 established-instance understanding, required owner/compound evidence, Slice31 platform/native routes and Slice26 live cutover.",
+    "Slice28 synchronized14.0.0 packaging/install/release only after complete feature acceptance."
+  ],
+  "product_version": "13.4.0",
+  "windows_global_changed": false,
+  "artifacts": [
+    {
+      "path": "src/evaluation/agent-usefulness.ts",
+      "bytes": 19125,
+      "sha256": "eb5e40635e0d614a30785876288e956d8e67bb04f0dd6c949ba6d0116f2d2c01"
+    },
+    {
+      "path": "src/cognitive/jobs.ts",
+      "bytes": 27633,
+      "sha256": "1b4151f57aca96d2f1a645b248eb90ab328b0f10c081e4182406d16dac10df21"
+    },
+    {
+      "path": "src/cognitive/job-context.ts",
+      "bytes": 1251,
+      "sha256": "a1a1434bd2915fbecdb2963deaada89ff742c28c58c74fd9f607b0dc8419764c"
+    },
+    {
+      "path": "src/cognitive/model-admission.ts",
+      "bytes": 21785,
+      "sha256": "753aa038ef473fb5b235b64fd8f9f8cba4fa2283f9fd075ffb58cc695de67047"
+    },
+    {
+      "path": "src/cognitive/llm.ts",
+      "bytes": 79219,
+      "sha256": "fc354939d7aae9b0022c5794bc3abab7d6338502a5ddbb00bf67c375405fb160"
+    },
+    {
+      "path": "src/config/role-policy.ts",
+      "bytes": 22160,
+      "sha256": "98f05e9cb6bfd2011227f4059718ea24c330d24c09c9146758258e41da59a6fe"
+    },
+    {
+      "path": "src/config/model-pricing.ts",
+      "bytes": 2079,
+      "sha256": "3b6095aa30b359590b30c574f8665b9649d28e464d9c93a5f518fff3e565c834"
+    },
+    {
+      "path": "src/config/provider-capabilities.ts",
+      "bytes": 7870,
+      "sha256": "def667d2935c93fe0bb6f489488ef4b2fca64f2bfe398dccf9f45497250e2716"
+    },
+    {
+      "path": "scripts/collect-agent-pair.mjs",
+      "bytes": 7820,
+      "sha256": "37c1e366490eb0d77332b27ee58ae5ee45cde8055497d165c761924edcef008b"
+    },
+    {
+      "path": "tests/admitted-agent-evaluation.test.ts",
+      "bytes": 9035,
+      "sha256": "118701bba14f62cf7b2f3f218a6cddd47f22eec033bbd568ce05fd86cdefee30"
+    },
+    {
+      "path": "tests/admitted-agent-evaluation-cli.test.ts",
+      "bytes": 6374,
+      "sha256": "5a045844e07554895280e394bad979ac671b9d9eb88d3e161b89e1a47f4fdb50"
+    },
+    {
+      "path": "tests/helpers/completion-pair-fixture.ts",
+      "bytes": 1792,
+      "sha256": "bf8ac5482f036dcac0720429ac3a55cc53d08c79139a9b17b1cd6c05b7e85730"
+    },
+    {
+      "path": "tests/agent-usefulness.test.ts",
+      "bytes": 8920,
+      "sha256": "716a05f07b0149979f39c5a0175434695d32c4f77dcb7ba028e997a847732f2b"
+    },
+    {
+      "path": "tests/engine-jobs.test.ts",
+      "bytes": 14249,
+      "sha256": "67ff360cbb6ebdcceab18e47ddfcea99aba7e8fadcb192a9aba17f66a2cb321b"
+    },
+    {
+      "path": "tests/model-admission.test.ts",
+      "bytes": 12159,
+      "sha256": "38d2b1ce5cc32cb7e2fc462377485646dc0d39f0eb480b804df1a02ef14bf8ef"
+    },
+    {
+      "path": "dist/evaluation/agent-usefulness.js",
+      "bytes": 18050,
+      "sha256": "34fac199c0162bbf69ebac0f41ff70cf9870c1eab5c132a90a75af85c465482d"
+    },
+    {
+      "path": "dist/cognitive/jobs.js",
+      "bytes": 29245,
+      "sha256": "ebf781cd0a330aeae252483d2e69f41c349870c3d6e92eb708a0f55a21544c8b"
+    },
+    {
+      "path": "docs/ashoka/admitted-agent-evaluation.md",
+      "bytes": 7363,
+      "sha256": "84cc00f224a90d0d4ea1077d7660a0940801600576ecc734e0d31842af70006e"
+    },
+    {
+      "path": "docs/ashoka/record-27-admitted-pair.mjs",
+      "bytes": 6207,
+      "sha256": "36842d44bba66fd509ab3d3df198b54d2caad43b9621c29fc23f458808352e66"
+    },
+    {
+      "path": "docs/ashoka/native-review-27-provider.mjs",
+      "bytes": 9069,
+      "sha256": "b7cb647c605d10dcab9fbafdffb838af1bda114342cf6568740666e6403c690e"
+    },
+    {
+      "path": "docs/ashoka/system-coverage.md",
+      "bytes": 2102,
+      "sha256": "899baff0aa01069a19aadacad7f80ed52a85a40e6d69e354bbc96b95f3df0b2a"
+    },
+    {
+      "path": "docs/ashoka/record-27-owner-map.mjs",
+      "bytes": 9166,
+      "sha256": "651800049cf9698a39663aa5cd9301d3af7eeb5825796278f5296b1aababc4a1"
+    },
+    {
+      "path": "docs/ashoka/slice-27-owner-evidence-map.json",
+      "bytes": 415423,
+      "sha256": "0b2c9bab09714fbd9a37b1b88fcd999130dc4b75a29372258a1251f8db5c5619"
+    },
+    {
+      "path": "docs/ashoka/slice-27-owner-map-second.log",
+      "bytes": 111,
+      "sha256": "67e637336d24ff1e3bed08ccf38ba427b915187841666d783a579665c0ca3843"
+    },
+    {
+      "path": "docs/ashoka/slice-27-owner-map-second-exit.json",
+      "bytes": 74,
+      "sha256": "22769c913ec2134d2ed1c16f8d20b8492a71ee7aaf9a7ec508eb1e3882160303"
+    },
+    {
+      "path": "docs/ashoka/agent-evaluation-protocol.json",
+      "bytes": 45441,
+      "sha256": "499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488"
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 47074,
+      "sha256": "e0a0e35974059bfebf9b6b6d7b932c9b2f0982e7b841350c88e6392d7b9197ee"
+    },
+    {
+      "path": "docs/README.md",
+      "bytes": 5496,
+      "sha256": "2fbea5aa7061222b09dd616542579ecdab54ade825f6e25013eaa35763e16bcb"
+    },
+    {
+      "path": "docs/workflows.md",
+      "bytes": 50216,
+      "sha256": "6b4b9f7f3490ee9348eaf02c6421f4fc0c14d394c94cf5ba6cb09d30f70334c9"
+    },
+    {
+      "path": "docs/cognitive-engine.md",
+      "bytes": 27516,
+      "sha256": "93b095b45466806eb7837fd31c58b6ab64fad7fdb381b1df98e9b5a3afd729e1"
+    },
+    {
+      "path": "README.md",
+      "bytes": 41991,
+      "sha256": "62e637401a0bf6f46fba594bd06b8cdfec616342e8849b7b0c34f32330c99ab8"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/ashoka-baseline-check.log",
+      "bytes": 219,
+      "sha256": "7f0b2e76c814517bde04d07532f2058196c91530fef4e8e10b954ed00de808b5"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/browser-qualification.json",
+      "bytes": 4909,
+      "sha256": "cb408ea16b3f02e2b8274e6979132b4a1e8b621696680879f0e8d8a89a2a180b"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/browser.log",
+      "bytes": 630,
+      "sha256": "98084f479104bb59fab24132f9106a5557a7b5d84949a8b96b15901c213e393c"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/config-check.log",
+      "bytes": 190,
+      "sha256": "0d8abdedc82ac49f3809a8f8e1eecd10e655fbeb2ac1a7992c067da162de93fb"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/contracts-check.log",
+      "bytes": 209,
+      "sha256": "c6217692983e2d57e0822d5caf0ef6c7b19b25aa7c2d521f5cd87c8956e6b77b"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/editor-tests.log",
+      "bytes": 52119,
+      "sha256": "48b499b4e8c6e04e8a731fd2ff1d31cbf6e48861e3b0b49926134a4f5806fbd5"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/editor.log",
+      "bytes": 1589,
+      "sha256": "55310c4e418695164f02ebf53875897c701a1cc6e94d2844aeb04cd089f5884f"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/explorer.log",
+      "bytes": 1860,
+      "sha256": "95d3babf70466fc125b2b1c1fdf07feee4df5756f61b1ba4311809b24393e056"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/mcp-check.log",
+      "bytes": 1971,
+      "sha256": "2f31910e5d93f6841575e38fb885ae5bbc73737074481c81cfde2ddd6248f2b2"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/metrics-check.log",
+      "bytes": 129,
+      "sha256": "54eff59fb6201c5947a34afd42019f667cbe81c62ab739ece7861cd754c01904"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/providers-check.log",
+      "bytes": 92,
+      "sha256": "89cd883323ab82f11bb5083bef408b6792d5b0a51ae4f5f580fcaee22deef328"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/result.json",
+      "bytes": 3135,
+      "sha256": "4c8078cb60b1495465d1a63e50079f81d96bc51a05794217009ce9f16289a60e"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/root-tests.json",
+      "bytes": 686451,
+      "sha256": "e086c4318ffddec6c9c5528cd18a3cd72a529b60f64cf904d97d40374e9498af"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/root-tests.log",
+      "bytes": 125,
+      "sha256": "d13adbd8ad3a5f07363419c8ebefcc311903a6e54421e9e6f0351fbc1e2c8b24"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/server.log",
+      "bytes": 44,
+      "sha256": "7afbb4529bf4fe561cf07ce6721a86eda26f781124390c93d326b236dae33c7e"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth/source-inventory.json",
+      "bytes": 157279,
+      "sha256": "0da1f850abbc7a4b1a88fec4bc3a43b74e36a2be435b70cce48a043ef32aa00e"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-build-first-exit.json",
+      "bytes": 74,
+      "sha256": "69251daebfd4830ad8fe9be20cce579ac085407e212de82469658dc48bf2add5"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-build-first.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-build-second-exit.json",
+      "bytes": 74,
+      "sha256": "f1a231e8b5dbca7346a9adb26d487775b6f34d74790404d82272080f40da733c"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-build-second.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-docs-first-exit.json",
+      "bytes": 74,
+      "sha256": "51c6c743bc2e6bc2be3338b99b691b676aa832d78d29a20058a7461d8be852fd"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-docs-first.log",
+      "bytes": 337,
+      "sha256": "3998dc0bf9477443cda90832d21e906255d965eb9f354ebefac8d468fcd27885"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-first-exit.json",
+      "bytes": 74,
+      "sha256": "bf7b16e97f9cce62c74a93eab6a0d4b7a6ea36ce868fcb0ef3b5c8bbb7a2863e"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-first.json",
+      "bytes": 13313,
+      "sha256": "46826f65e45ce5255ac6ff880e4fd4025f6c4d88d4f0ed8785ca81580089f8d6"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-first.log",
+      "bytes": 122,
+      "sha256": "5b483ef19cccbf7d18bcafb0c5687d0b6833711810896abcb7f3c385ec01353e"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-fourth-exit.json",
+      "bytes": 74,
+      "sha256": "01f0d5e709c4028981cba27029808bc264fe75c2bc8aa64e288cb2ed1e7250e7"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-fourth.json",
+      "bytes": 16442,
+      "sha256": "99ff43ae2817227e169fd2290aecc69aa39cd8e1372815c4827795fc2a78130e"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-fourth.log",
+      "bytes": 123,
+      "sha256": "84ae63bf1a35c08f4f91b9e7bae89050e4c48648f64eecacaf966291135d7ac5"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-second-exit.json",
+      "bytes": 74,
+      "sha256": "0024ab0bb53a0a52c8e5179ffaed3474c258547e2dfc19ef47e9760d7b17dabd"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-second.json",
+      "bytes": 12591,
+      "sha256": "313025e0f7d26b9743a24074a7fb037466c1a01be7a4fd87dfdb1af00ac18f81"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-second.log",
+      "bytes": 123,
+      "sha256": "7d74948682c49df601efe86f7772abb90a54fb48c59e54afa469aa134d5e829d"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-third-exit.json",
+      "bytes": 74,
+      "sha256": "1829d515f5e8a505e4e21a09e406852904c8f890687f69d63f981ffdb3309313"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-third.json",
+      "bytes": 16828,
+      "sha256": "dd72e53b528d5e49e81dfa329b0e3f0a59b1d05ebae89ac25f2379b1d10a76eb"
+    },
+    {
+      "path": "docs/ashoka/slice-27-admitted-pair-focus-third.log",
+      "bytes": 122,
+      "sha256": "9cac8592326671b6749bdb99804473fbfede103d553c25a35477ce03f39fa0f3"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth-exit.json",
+      "bytes": 74,
+      "sha256": "106eb310a946f424982a3dae42759cd9673c7e2cbfb162e389fbd7b2108c6363"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-sixth.log",
+      "bytes": 2824,
+      "sha256": "9e6beda95b8609a5179e057739cb06962bfdf2b1734517353bb6d93adde3e360"
+    }
+  ]
+}

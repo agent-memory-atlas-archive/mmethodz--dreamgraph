@@ -1,0 +1,497 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/scheduler-authority.test.ts > creation is disabled and reads/preview/enable never dispatch a job 124ms
+ ✓ tests/scheduler-authority.test.ts > strict invalid parameters and cron do not broaden into action defaults 16ms
+stderr | tests/normalization-evidence.test.ts > Slice18: only currently applicable local proofs export; prose/IDs/source paths stay out, artifacts replay exactly
+[2026-10-01T16:15:58.801Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:15:58.802Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > Slice18: only currently applicable local proofs export; prose/IDs/source paths stay out, artifacts replay exactly
+[2026-10-01T16:15:58.813Z] [INFO]  Cold-start bootstrap started at 2026-10-01T16:15:58.813Z (cycle 0); relaxed promotion gate active until exit (entities≥50 & validated_edges≥10, OR 20 cycles, OR 24h, whichever first)
+[2026-10-01T16:15:58.813Z] [INFO]  Normalization cycle #1 starting (threshold: 0.62)
+[2026-10-01T16:15:58.813Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+ ✓ tests/scheduler-authority.test.ts > two-client definition CAS and lost edit reply preserve the original receipt 161ms
+stderr | tests/normalization-evidence.test.ts > Slice18: only currently applicable local proofs export; prose/IDs/source paths stay out, artifacts replay exactly
+[2026-10-01T16:15:58.944Z] [INFO]  Normalization cycle #1 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+ ✓ tests/schedule-workspace.test.ts > schema-derived action fields and draft preview validate without creating files/jobs or changing definitions 134ms
+stderr | tests/scheduler-authority.test.ts > manual lost reply replays one immutable occurrence even after definition edit and archive
+[2026-10-01T16:15:59.046Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/scheduler-authority.test.ts > manual lost reply replays one immutable occurrence even after definition edit and archive
+[2026-10-01T16:15:59.092Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/scheduler-authority.test.ts > manual lost reply replays one immutable occurrence even after definition edit and archive
+[2026-10-01T16:15:59.099Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+ ✓ tests/schedule-workspace.test.ts > duplicate is atomic/new/disabled and original receipt replays after later source edits 164ms
+stderr | tests/normalization-evidence.test.ts > Slice18: only currently applicable local proofs export; prose/IDs/source paths stay out, artifacts replay exactly
+[2026-10-01T16:15:59.256Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+ ✓ tests/explorer-canonical-navigation.test.ts > preserves typed collisions and current trust instead of raw historical validated styling 318ms
+ ✓ tests/normalization-evidence.test.ts > Slice18: only currently applicable local proofs export; prose/IDs/source paths stay out, artifacts replay exactly 630ms
+ ✓ tests/schedule-workspace.test.ts > enable and enqueue bind reviewed policy; lost replies replay originals rather than applying new ambient policy 179ms
+ ✓ tests/scheduler-authority.test.ts > manual lost reply replays one immutable occurrence even after definition edit and archive 544ms
+stderr | tests/scheduler-authority.test.ts > pause changes future admission and retains completed original definition history
+[2026-10-01T16:15:59.568Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/scheduler-authority.test.ts > pause changes future admission and retains completed original definition history
+[2026-10-01T16:15:59.607Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/scheduler-authority.test.ts > pause changes future admission and retains completed original definition history
+[2026-10-01T16:15:59.613Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+stderr | tests/normalization-evidence.test.ts > Slice19: action alone cannot resolve; current exact independent proof verifies and withdrawal reopens the same risk
+[2026-10-01T16:15:59.711Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:15:59.711Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > Slice19: action alone cannot resolve; current exact independent proof verifies and withdrawal reopens the same risk
+[2026-10-01T16:15:59.724Z] [INFO]  Normalization cycle #2 starting (threshold: 0.62)
+[2026-10-01T16:15:59.724Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+ ✓ tests/explorer-canonical-navigation.test.ts > bounds dense neighborhoods and adjacency and rejects a later revision rather than joining mixed snapshots 461ms
+ ✓ tests/schedule-workspace.test.ts > actual served browser script saves disabled, preserves invalid drafts, and supports keyboard tabs/filter/edit 456ms
+stderr | tests/normalization-evidence.test.ts > Slice19: action alone cannot resolve; current exact independent proof verifies and withdrawal reopens the same risk
+[2026-10-01T16:15:59.843Z] [INFO]  Normalization cycle #2 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-01T16:15:59.866Z] [ERROR] /explorer route error (/explorer/api/node/Public): { name: 'Error', message: 'EXPLORER_AMBIGUOUS_ID' }
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-01T16:15:59.939Z] [ERROR] /explorer route error (/explorer/api/node/legacy%2Ffeature%2FPublic): { name: 'Error', message: 'EXPLORER_REVISION_CONFLICT' }
+
+ ✓ tests/scheduler-authority.test.ts > pause changes future admission and retains completed original definition history 470ms
+ ✓ tests/scheduler-authority.test.ts > preview and dispatch use identical named-zone DST gap/fold identities 62ms
+ ✓ tests/schedule-workspace.test.ts > captured menu targets survive selection changes and stale edits fail while source history survives 278ms
+ ✓ tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict 258ms
+ ✓ tests/explorer-canonical-navigation.test.ts > discloses render exclusions and keeps metadata-only revisions from rebuilding the layout 341ms
+ ✓ tests/scheduler-authority.test.ts > zero dreams stay zero and excessive allocations are rejected before engine work 294ms
+ ✓ tests/scheduler-authority.test.ts > malformed or changed persisted state fails closed rather than returning an empty registry 67ms
+ ✓ tests/scheduler-authority.test.ts > cycle and idle cursors remain deterministic across repeated evaluation 67ms
+ ✓ tests/scheduler-authority.test.ts > missed cron chooses only the latest bounded occurrence and archive retries are payload-bound 112ms
+stderr | tests/normalization-evidence.test.ts > Slice19: action alone cannot resolve; current exact independent proof verifies and withdrawal reopens the same risk
+[2026-10-01T16:16:00.496Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/normalization-evidence.test.ts > Slice20 XS16: re-ingested narrative JSON retains derived origin and never becomes a fresh independent witness
+[2026-10-01T16:16:00.538Z] [INFO]  Generating system narrative (depth: technical)
+
+stderr | tests/normalization-evidence.test.ts > Slice20 XS16: re-ingested narrative JSON retains derived origin and never becomes a fresh independent witness
+[2026-10-01T16:16:00.560Z] [INFO]  Narrative generated: 0 chapters, 0 cycles covered
+
+ ✓ tests/normalization-evidence.test.ts > Slice19: action alone cannot resolve; current exact independent proof verifies and withdrawal reopens the same risk 1234ms
+ ✓ tests/normalization-evidence.test.ts > Slice20 XS16: re-ingested narrative JSON retains derived origin and never becomes a fresh independent witness 91ms
+stderr | tests/normalization-evidence.test.ts > human rejection survives independently supported normalization; reviewed reopen requires a fresh normalization receipt
+[2026-10-01T16:16:00.694Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:00.694Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > human rejection survives independently supported normalization; reviewed reopen requires a fresh normalization receipt
+[2026-10-01T16:16:00.703Z] [INFO]  Normalization cycle #3 starting (threshold: 0.62)
+[2026-10-01T16:16:00.703Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > human rejection survives independently supported normalization; reviewed reopen requires a fresh normalization receipt
+[2026-10-01T16:16:00.797Z] [INFO]  Normalization cycle #3 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > human rejection survives independently supported normalization; reviewed reopen requires a fresh normalization receipt
+[2026-10-01T16:16:00.891Z] [INFO]  Normalization cycle #4 starting (threshold: 0.62)
+[2026-10-01T16:16:00.891Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > human rejection survives independently supported normalization; reviewed reopen requires a fresh normalization receipt
+[2026-10-01T16:16:00.924Z] [INFO]  Normalization: 1 tension-worthy rejections identified
+
+stderr | tests/normalization-evidence.test.ts > human rejection survives independently supported normalization; reviewed reopen requires a fresh normalization receipt
+[2026-10-01T16:16:00.991Z] [INFO]  Normalization cycle #4 complete: 1 processed (0 validated, 0 latent, 1 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > human rejection survives independently supported normalization; reviewed reopen requires a fresh normalization receipt
+[2026-10-01T16:16:01.074Z] [INFO]  Normalization cycle #5 starting (threshold: 0.62)
+[2026-10-01T16:16:01.074Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > human rejection survives independently supported normalization; reviewed reopen requires a fresh normalization receipt
+[2026-10-01T16:16:01.182Z] [INFO]  Normalization cycle #5 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > human rejection survives independently supported normalization; reviewed reopen requires a fresh normalization receipt
+[2026-10-01T16:16:01.220Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/normalization-evidence.test.ts > GE08: repetition, domain/keyword overlap and source_verified flags never manufacture corroboration
+[2026-10-01T16:16:01.253Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:01.253Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > GE08: repetition, domain/keyword overlap and source_verified flags never manufacture corroboration
+[2026-10-01T16:16:01.263Z] [INFO]  Normalization cycle #6 starting (threshold: 0.62)
+[2026-10-01T16:16:01.263Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+ ✓ tests/normalization-evidence.test.ts > human rejection survives independently supported normalization; reviewed reopen requires a fresh normalization receipt 632ms
+stderr | tests/normalization-evidence.test.ts > GE08: repetition, domain/keyword overlap and source_verified flags never manufacture corroboration
+[2026-10-01T16:16:01.335Z] [INFO]  Normalization cycle #6 complete: 1 processed (0 validated, 1 latent, 0 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE08: repetition, domain/keyword overlap and source_verified flags never manufacture corroboration
+[2026-10-01T16:16:01.349Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+ ✓ tests/normalization-evidence.test.ts > GE08: repetition, domain/keyword overlap and source_verified flags never manufacture corroboration 126ms
+stderr | tests/normalization-evidence.test.ts > GE12: independently attributed current claims promote atomically, emit a committed pulse and replay without duplicate history
+[2026-10-01T16:16:01.451Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:01.451Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > GE12: independently attributed current claims promote atomically, emit a committed pulse and replay without duplicate history
+[2026-10-01T16:16:01.460Z] [INFO]  Normalization cycle #7 starting (threshold: 0.62)
+[2026-10-01T16:16:01.460Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > GE12: independently attributed current claims promote atomically, emit a committed pulse and replay without duplicate history
+[2026-10-01T16:16:01.555Z] [INFO]  Normalization cycle #7 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE12: independently attributed current claims promote atomically, emit a committed pulse and replay without duplicate history
+[2026-10-01T16:16:01.609Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-01T16:16:01.615Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-01T16:16:01.663Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-01T16:16:01.669Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+ ✓ tests/normalization-evidence.test.ts > GE12: independently attributed current claims promote atomically, emit a committed pulse and replay without duplicate history 263ms
+stderr | tests/normalization-evidence.test.ts > GE13/XS15: withdrawal revokes applicability while preserving original evidence, promotion and assessment history
+[2026-10-01T16:16:01.723Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:01.723Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > GE13/XS15: withdrawal revokes applicability while preserving original evidence, promotion and assessment history
+[2026-10-01T16:16:01.733Z] [INFO]  Normalization cycle #8 starting (threshold: 0.62)
+[2026-10-01T16:16:01.733Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13/XS15: withdrawal revokes applicability while preserving original evidence, promotion and assessment history
+[2026-10-01T16:16:01.834Z] [INFO]  Normalization cycle #8 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13/XS15: withdrawal revokes applicability while preserving original evidence, promotion and assessment history
+[2026-10-01T16:16:01.921Z] [INFO]  Normalization cycle #9 starting (threshold: 0.62)
+[2026-10-01T16:16:01.921Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+ ✓ tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay 619ms
+stderr | tests/normalization-evidence.test.ts > GE13/XS15: withdrawal revokes applicability while preserving original evidence, promotion and assessment history
+[2026-10-01T16:16:02.024Z] [INFO]  Normalization cycle #9 complete: 1 processed (0 validated, 1 latent, 0 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13/XS15: withdrawal revokes applicability while preserving original evidence, promotion and assessment history
+[2026-10-01T16:16:02.047Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+ ✓ tests/schedule-http.test.ts > queued fence-zero cancellation is supported and changed replay cannot bypass its original CAS 172ms
+stderr | tests/normalization-evidence.test.ts > GE13: changed source proof is material; an old scan date alone is irrelevant
+[2026-10-01T16:16:02.153Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:02.153Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+ ✓ tests/normalization-evidence.test.ts > GE13/XS15: withdrawal revokes applicability while preserving original evidence, promotion and assessment history 439ms
+stderr | tests/normalization-evidence.test.ts > GE13: changed source proof is material; an old scan date alone is irrelevant
+[2026-10-01T16:16:02.162Z] [INFO]  Normalization cycle #10 starting (threshold: 0.62)
+[2026-10-01T16:16:02.162Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13: changed source proof is material; an old scan date alone is irrelevant
+[2026-10-01T16:16:02.248Z] [INFO]  Normalization cycle #10 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13: changed source proof is material; an old scan date alone is irrelevant
+[2026-10-01T16:16:02.289Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/normalization-evidence.test.ts > GE08/GE12: changed wrapper bytes, repeated model/narrative/federation copies and renamed source copies retain one ancestry
+[2026-10-01T16:16:02.394Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:02.394Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+ ✓ tests/normalization-evidence.test.ts > GE13: changed source proof is material; an old scan date alone is irrelevant 240ms
+stderr | tests/normalization-evidence.test.ts > GE08/GE12: changed wrapper bytes, repeated model/narrative/federation copies and renamed source copies retain one ancestry
+[2026-10-01T16:16:02.397Z] [INFO]  Normalization cycle #11 starting (threshold: 0.62)
+[2026-10-01T16:16:02.397Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > GE08/GE12: changed wrapper bytes, repeated model/narrative/federation copies and renamed source copies retain one ancestry
+[2026-10-01T16:16:02.478Z] [INFO]  Normalization cycle #11 complete: 1 processed (0 validated, 1 latent, 0 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE08/GE12: changed wrapper bytes, repeated model/narrative/federation copies and renamed source copies retain one ancestry
+[2026-10-01T16:16:02.489Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+ ✓ tests/normalization-evidence.test.ts > GE08/GE12: changed wrapper bytes, repeated model/narrative/federation copies and renamed source copies retain one ancestry 200ms
+ ✓ tests/normalization-evidence.test.ts > GE08: copying identical source bytes with different lineage IDs cannot create independent roots 109ms
+ ✓ tests/normalization-evidence.test.ts > GE12: corroboration is directed and claim-specific; adjacent source references do not validate another relation 118ms
+stderr | tests/normalization-evidence.test.ts > GE13: fresh contradictory source prevents promotion even with multiple strong supporting roots
+[2026-10-01T16:16:02.849Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:02.849Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > GE13: fresh contradictory source prevents promotion even with multiple strong supporting roots
+[2026-10-01T16:16:02.860Z] [INFO]  Normalization cycle #12 starting (threshold: 0.62)
+[2026-10-01T16:16:02.860Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13: fresh contradictory source prevents promotion even with multiple strong supporting roots
+[2026-10-01T16:16:02.888Z] [INFO]  Normalization: 1 tension-worthy rejections identified
+
+stderr | tests/normalization-evidence.test.ts > GE13: fresh contradictory source prevents promotion even with multiple strong supporting roots
+[2026-10-01T16:16:02.946Z] [INFO]  Normalization cycle #12 complete: 1 processed (0 validated, 0 latent, 1 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13: fresh contradictory source prevents promotion even with multiple strong supporting roots
+[2026-10-01T16:16:02.966Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/normalization-evidence.test.ts > XS21: interruption before publication rolls back every participant; lost reply after commit recovers one original result
+[2026-10-01T16:16:03.060Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:03.060Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > XS21: interruption before publication rolls back every participant; lost reply after commit recovers one original result
+[2026-10-01T16:16:03.068Z] [INFO]  Normalization cycle #13 starting (threshold: 0.62)
+[2026-10-01T16:16:03.068Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+ ✓ tests/normalization-evidence.test.ts > GE13: fresh contradictory source prevents promotion even with multiple strong supporting roots 249ms
+stderr | tests/normalization-evidence.test.ts > XS21: interruption before publication rolls back every participant; lost reply after commit recovers one original result
+[2026-10-01T16:16:03.150Z] [INFO]  Normalization cycle #14 starting (threshold: 0.62)
+[2026-10-01T16:16:03.150Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > XS21: interruption before publication rolls back every participant; lost reply after commit recovers one original result
+[2026-10-01T16:16:03.249Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/normalization-evidence.test.ts > GE08: actual semantic model agreement changes plausibility, never independent evidence; unchanged context avoids another call
+[2026-10-01T16:16:03.311Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:03.311Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > GE08: actual semantic model agreement changes plausibility, never independent evidence; unchanged context avoids another call
+[2026-10-01T16:16:03.319Z] [INFO]  Normalization cycle #15 starting (threshold: 0.62)
+[2026-10-01T16:16:03.319Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > GE08: actual semantic model agreement changes plausibility, never independent evidence; unchanged context avoids another call
+[2026-10-01T16:16:03.337Z] [INFO]  Semantic validation: 1/1 edges evaluated (20 tokens)
+
+stderr | tests/normalization-evidence.test.ts > GE08: actual semantic model agreement changes plausibility, never independent evidence; unchanged context avoids another call
+[2026-10-01T16:16:03.337Z] [INFO]  Semantic validation boosted 1 edges
+
+ ✓ tests/normalization-evidence.test.ts > XS21: interruption before publication rolls back every participant; lost reply after commit recovers one original result 283ms
+ ✓ tests/normalization-evidence.test.ts > XS11: labeled precision and recall are independent of promotion volume and missing labels remain unmeasured 31ms
+stderr | tests/normalization-evidence.test.ts > GE08: actual semantic model agreement changes plausibility, never independent evidence; unchanged context avoids another call
+[2026-10-01T16:16:03.388Z] [INFO]  Normalization cycle #15 complete: 1 processed (0 validated, 1 latent, 0 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE08: actual semantic model agreement changes plausibility, never independent evidence; unchanged context avoids another call
+[2026-10-01T16:16:03.401Z] [INFO]  Normalization cycle #16 starting (threshold: 0.62)
+[2026-10-01T16:16:03.401Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > GE08: actual semantic model agreement changes plausibility, never independent evidence; unchanged context avoids another call
+[2026-10-01T16:16:03.421Z] [INFO]  Semantic validation boosted 1 edges
+
+stderr | tests/normalization-evidence.test.ts > GE08: actual semantic model agreement changes plausibility, never independent evidence; unchanged context avoids another call
+[2026-10-01T16:16:03.472Z] [INFO]  Normalization cycle #16 complete: 1 processed (0 validated, 1 latent, 0 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE08: actual semantic model agreement changes plausibility, never independent evidence; unchanged context avoids another call
+[2026-10-01T16:16:03.485Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+ ✓ tests/normalization-evidence.test.ts > GE08: actual semantic model agreement changes plausibility, never independent evidence; unchanged context avoids another call 204ms
+stderr | tests/normalization-evidence.test.ts > GE12: supported node publication commits source seeds, index and promotion marker together without laundering speculative intent
+[2026-10-01T16:16:03.605Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:03.605Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > GE12: supported node publication commits source seeds, index and promotion marker together without laundering speculative intent
+[2026-10-01T16:16:03.614Z] [INFO]  Normalization cycle #17 starting (threshold: 0.62)
+[2026-10-01T16:16:03.614Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > GE12: supported node publication commits source seeds, index and promotion marker together without laundering speculative intent
+[2026-10-01T16:16:03.715Z] [INFO]  Normalization cycle #17 complete: 1 processed (1 validated, 0 latent, 0 rejected), 0 edges promoted, 1 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE12: supported node publication commits source seeds, index and promotion marker together without laundering speculative intent
+[2026-10-01T16:16:03.813Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/normalization-evidence.test.ts > GE13: known managed source debt blocks only affected claims; changing an unrelated file does not invalidate the graph
+[2026-10-01T16:16:03.913Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:03.913Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+ ✓ tests/normalization-evidence.test.ts > GE12: supported node publication commits source seeds, index and promotion marker together without laundering speculative intent 332ms
+stderr | tests/normalization-evidence.test.ts > GE13: known managed source debt blocks only affected claims; changing an unrelated file does not invalidate the graph
+[2026-10-01T16:16:03.922Z] [INFO]  Normalization cycle #18 starting (threshold: 0.62)
+[2026-10-01T16:16:03.922Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13: known managed source debt blocks only affected claims; changing an unrelated file does not invalidate the graph
+[2026-10-01T16:16:04.004Z] [INFO]  Normalization cycle #18 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13: known managed source debt blocks only affected claims; changing an unrelated file does not invalidate the graph
+[2026-10-01T16:16:04.220Z] [INFO]  Normalization cycle #19 starting (threshold: 0.62)
+[2026-10-01T16:16:04.220Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13: known managed source debt blocks only affected claims; changing an unrelated file does not invalidate the graph
+[2026-10-01T16:16:04.317Z] [INFO]  Normalization cycle #19 complete: 1 processed (0 validated, 1 latent, 0 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13: known managed source debt blocks only affected claims; changing an unrelated file does not invalidate the graph
+[2026-10-01T16:16:04.330Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+ ✓ tests/normalization-evidence.test.ts > GE13: known managed source debt blocks only affected claims; changing an unrelated file does not invalidate the graph 516ms
+stderr | tests/normalization-evidence.test.ts > retired promoted nodes retain history but restored authority requires a fresh receipt without duplicating the entity
+[2026-10-01T16:16:04.448Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:04.448Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > retired promoted nodes retain history but restored authority requires a fresh receipt without duplicating the entity
+[2026-10-01T16:16:04.456Z] [INFO]  Normalization cycle #20 starting (threshold: 0.62)
+[2026-10-01T16:16:04.456Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.2,"max_contradiction":0.3},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/normalization-evidence.test.ts > retired promoted nodes retain history but restored authority requires a fresh receipt without duplicating the entity
+[2026-10-01T16:16:04.547Z] [INFO]  Normalization cycle #20 complete: 1 processed (1 validated, 0 latent, 0 rejected), 0 edges promoted, 1 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > retired promoted nodes retain history but restored authority requires a fresh receipt without duplicating the entity
+[2026-10-01T16:16:04.557Z] [INFO]  Cold-start bootstrap exited at 2026-10-01T16:16:04.557Z (exit_reason=window, cycles_in_bootstrap=20); strict promotion gate now active
+
+stderr | tests/normalization-evidence.test.ts > retired promoted nodes retain history but restored authority requires a fresh receipt without duplicating the entity
+[2026-10-01T16:16:04.740Z] [INFO]  Normalization cycle #21 starting (threshold: 0.62)
+[2026-10-01T16:16:04.740Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > retired promoted nodes retain history but restored authority requires a fresh receipt without duplicating the entity
+[2026-10-01T16:16:04.838Z] [INFO]  Normalization cycle #21 complete: 1 processed (1 validated, 0 latent, 0 rejected), 0 edges promoted, 1 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > retired promoted nodes retain history but restored authority requires a fresh receipt without duplicating the entity
+[2026-10-01T16:16:04.867Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/normalization-evidence.test.ts > GE13: rejected candidates are reconsidered when real independent corroboration arrives
+[2026-10-01T16:16:04.897Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:04.897Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > GE13: rejected candidates are reconsidered when real independent corroboration arrives
+[2026-10-01T16:16:04.906Z] [INFO]  Normalization cycle #22 starting (threshold: 0.62)
+[2026-10-01T16:16:04.906Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":true,"effective_strict":true,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13: rejected candidates are reconsidered when real independent corroboration arrives
+[2026-10-01T16:16:04.924Z] [INFO]  Normalization: 1 tension-worthy rejections identified
+
+ ✓ tests/normalization-evidence.test.ts > retired promoted nodes retain history but restored authority requires a fresh receipt without duplicating the entity 536ms
+stderr | tests/normalization-evidence.test.ts > GE13: rejected candidates are reconsidered when real independent corroboration arrives
+[2026-10-01T16:16:04.976Z] [INFO]  Normalization cycle #22 complete: 1 processed (0 validated, 0 latent, 1 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13: rejected candidates are reconsidered when real independent corroboration arrives
+[2026-10-01T16:16:05.053Z] [INFO]  Normalization cycle #23 starting (threshold: 0.62)
+[2026-10-01T16:16:05.053Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13: rejected candidates are reconsidered when real independent corroboration arrives
+[2026-10-01T16:16:05.142Z] [INFO]  Normalization cycle #23 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13: rejected candidates are reconsidered when real independent corroboration arrives
+[2026-10-01T16:16:05.142Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/normalization-evidence.test.ts > GE13: witness-source debt blocks unchanged bytes and becomes usable after committed reconciliation
+[2026-10-01T16:16:05.242Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:05.242Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+ ✓ tests/normalization-evidence.test.ts > GE13: rejected candidates are reconsidered when real independent corroboration arrives 277ms
+stderr | tests/normalization-evidence.test.ts > GE13: witness-source debt blocks unchanged bytes and becomes usable after committed reconciliation
+[2026-10-01T16:16:05.253Z] [INFO]  Normalization cycle #24 starting (threshold: 0.62)
+[2026-10-01T16:16:05.253Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13: witness-source debt blocks unchanged bytes and becomes usable after committed reconciliation
+[2026-10-01T16:16:05.331Z] [INFO]  Normalization cycle #24 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13: witness-source debt blocks unchanged bytes and becomes usable after committed reconciliation
+[2026-10-01T16:16:05.454Z] [INFO]  Normalization cycle #25 starting (threshold: 0.62)
+[2026-10-01T16:16:05.454Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13: witness-source debt blocks unchanged bytes and becomes usable after committed reconciliation
+[2026-10-01T16:16:05.540Z] [INFO]  Normalization cycle #25 complete: 1 processed (0 validated, 1 latent, 0 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13: witness-source debt blocks unchanged bytes and becomes usable after committed reconciliation
+[2026-10-01T16:16:05.611Z] [INFO]  Normalization cycle #26 starting (threshold: 0.62)
+[2026-10-01T16:16:05.612Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13: witness-source debt blocks unchanged bytes and becomes usable after committed reconciliation
+[2026-10-01T16:16:05.704Z] [INFO]  Normalization cycle #26 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13: witness-source debt blocks unchanged bytes and becomes usable after committed reconciliation
+[2026-10-01T16:16:05.705Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+ ✓ tests/normalization-evidence.test.ts > GE13: witness-source debt blocks unchanged bytes and becomes usable after committed reconciliation 563ms
+stderr | tests/normalization-evidence.test.ts > XS21: full outcomes larger than receipt limits recover without clipping or duplicate effects
+[2026-10-01T16:16:05.833Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:05.833Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > XS21: full outcomes larger than receipt limits recover without clipping or duplicate effects
+[2026-10-01T16:16:05.842Z] [INFO]  Normalization cycle #27 starting (threshold: 0.62)
+[2026-10-01T16:16:05.843Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > XS21: full outcomes larger than receipt limits recover without clipping or duplicate effects
+[2026-10-01T16:16:05.995Z] [INFO]  Normalization cycle #27 complete: 50 processed (50 validated, 0 latent, 0 rejected), 50 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > XS21: full outcomes larger than receipt limits recover without clipping or duplicate effects
+[2026-10-01T16:16:06.070Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/normalization-evidence.test.ts > XS21: current source changes while awaiting semantic work reject the whole pass before publication
+[2026-10-01T16:16:06.135Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:06.135Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > XS21: current source changes while awaiting semantic work reject the whole pass before publication
+[2026-10-01T16:16:06.146Z] [INFO]  Normalization cycle #28 starting (threshold: 0.62)
+[2026-10-01T16:16:06.146Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > XS21: current source changes while awaiting semantic work reject the whole pass before publication
+[2026-10-01T16:16:06.171Z] [INFO]  Semantic validation: 0/1 edges evaluated (? tokens)
+
+ ✓ tests/normalization-evidence.test.ts > XS21: full outcomes larger than receipt limits recover without clipping or duplicate effects 364ms
+stderr | tests/normalization-evidence.test.ts > XS21: current source changes while awaiting semantic work reject the whole pass before publication
+[2026-10-01T16:16:06.201Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+ ✓ tests/normalization-evidence.test.ts > XS21: current source changes while awaiting semantic work reject the whole pass before publication 130ms
+stderr | tests/normalization-evidence.test.ts > GE13: physical witness paths expose dependency debt through a repository directory alias
+[2026-10-01T16:16:06.348Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:06.348Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > GE13: physical witness paths expose dependency debt through a repository directory alias
+[2026-10-01T16:16:06.358Z] [INFO]  Normalization cycle #29 starting (threshold: 0.62)
+[2026-10-01T16:16:06.358Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13: physical witness paths expose dependency debt through a repository directory alias
+[2026-10-01T16:16:06.446Z] [INFO]  Normalization cycle #29 complete: 1 processed (1 validated, 0 latent, 0 rejected), 1 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13: physical witness paths expose dependency debt through a repository directory alias
+[2026-10-01T16:16:06.553Z] [INFO]  Normalization cycle #30 starting (threshold: 0.62)
+[2026-10-01T16:16:06.553Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > GE13: physical witness paths expose dependency debt through a repository directory alias
+[2026-10-01T16:16:06.654Z] [INFO]  Normalization cycle #30 complete: 1 processed (0 validated, 1 latent, 0 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/normalization-evidence.test.ts > GE13: physical witness paths expose dependency debt through a repository directory alias
+[2026-10-01T16:16:06.655Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/normalization-evidence.test.ts > XS14: malformed optional claim evidence leaves unrelated canonical entities available and prevents normalizer publication
+[2026-10-01T16:16:06.709Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:06.709Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/normalization-evidence.test.ts > XS14: malformed optional claim evidence leaves unrelated canonical entities available and prevents normalizer publication
+[2026-10-01T16:16:06.714Z] [INFO]  Normalization cycle #31 starting (threshold: 0.62)
+[2026-10-01T16:16:06.714Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > XS14: malformed optional claim evidence leaves unrelated canonical entities available and prevents normalizer publication
+[2026-10-01T16:16:06.727Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/normalization-evidence.test.ts > XS21: abort reaches the actual semantic provider and prevents a successful publication
+[2026-10-01T16:16:06.756Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T16:16:06.756Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+ ✓ tests/normalization-evidence.test.ts > GE13: physical witness paths expose dependency debt through a repository directory alias 457ms
+ ✓ tests/normalization-evidence.test.ts > XS14: malformed optional claim evidence leaves unrelated canonical entities available and prevents normalizer publication 67ms
+stderr | tests/normalization-evidence.test.ts > XS21: abort reaches the actual semantic provider and prevents a successful publication
+[2026-10-01T16:16:06.766Z] [INFO]  Normalization cycle #32 starting (threshold: 0.62)
+[2026-10-01T16:16:06.766Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":false,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"applied_promotion_config":{"promotion_confidence":0.62,"promotion_plausibility":0.45,"promotion_evidence":0.4,"promotion_evidence_count":2,"retention_plausibility":0.35,"max_contradiction":0.3},"bootstrap":{"active":false,"state":"graduated","relaxed_fields":[]}}
+
+stderr | tests/normalization-evidence.test.ts > XS21: abort reaches the actual semantic provider and prevents a successful publication
+[2026-10-01T16:16:06.784Z] [WARN]  Semantic validation failed: fixture cancel
+
+stderr | tests/normalization-evidence.test.ts > XS21: abort reaches the actual semantic provider and prevents a successful publication
+[2026-10-01T16:16:06.791Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+ ✓ tests/normalization-evidence.test.ts > XS21: abort reaches the actual semantic provider and prevents a successful publication 65ms
+ ✓ tests/normalization-evidence.test.ts > GE08: cyclic, missing and wrong-claim ancestry remains reviewable without creating a source root; human assertions stay distinct 38ms
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'getElementById')
+ ❯ $ ../../../../../..//schedules/workspace.js:4:23
+ ❯ showErrors ../../../../../..//schedules/workspace.js:79:39
+ ❯ HTMLFormElement.<anonymous> ../../../../../..//schedules/workspace.js:106:16
+
+This error originated in "tests/schedule-workspace.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "actual served browser script saves disabled, preserves invalid drafts, and supports keyboard tabs/filter/edit". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  5 passed (5)
+      Tests  47 passed (47)
+     Errors  1 error
+   Start at  19:15:53
+   Duration  12.95s (transform 2.39s, setup 0ms, collect 18.33s, tests 13.50s, environment 1ms, prepare 771ms)
+

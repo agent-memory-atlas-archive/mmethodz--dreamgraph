@@ -1,0 +1,500 @@
+{
+  "schema_version": "1.0.0",
+  "session_id": "ea472546-116f-46df-a577-1946736958f7",
+  "instance_uuid": "ee9ce3b9-0313-4768-b5f1-24b9b3fffc4b",
+  "produced_at": "2026-09-30T23:12:54.893Z",
+  "plan_id": "ea472546-116f-46df-a577-1946736958f7",
+  "delta_table": {
+    "schema_version": "1.0.0",
+    "session_id": "ea472546-116f-46df-a577-1946736958f7",
+    "instance_uuid": "ee9ce3b9-0313-4768-b5f1-24b9b3fffc4b",
+    "produced_at": "2026-09-30T23:12:54.893Z",
+    "produced_in_phase": "verify",
+    "source_of_truth": {
+      "sources": [
+        {
+          "type": "source_file",
+          "identifier": "src/graph/contracts.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved current/previous schema ownership, generated 31 contracts and twelve immutable task labels; source and SDK drift checks pass. Later platform/client/release composition remains pending."
+        },
+        {
+          "type": "source_file",
+          "identifier": "src/tools/reconciliation-transaction.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved typed revision publication, CAS/read barrier, physical writer and journal fault/replay tests; managed graph currency is scope-based and never scan-age based. No live migration or cross-platform qualification."
+        },
+        {
+          "type": "source_file",
+          "identifier": "src/tools/query-resource.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved shared 31-URI whole-record resolver with signed revision cursors, MCP structured/text parity and explicit malformed/unknown/unavailable results."
+        },
+        {
+          "type": "source_file",
+          "identifier": "src/tools/enrich-parser-nodes.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved three-way entity deltas, checkpoint publication and durable source-effect reconciliation; explicit Architect API source now binds its own role. External GUI control and shared budget admission remain 31/6 work."
+        },
+        {
+          "type": "source_file",
+          "identifier": "src/cognitive/llm.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved six independent immutable policy snapshots, saved/role/session precedence, retention/billing separation and cognitive-role-preserving temperature omission without model/effort escalation."
+        },
+        {
+          "type": "source_file",
+          "identifier": "src/cognitive/graph-rag.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Implemented pure canonical 17-family bounded retrieval with required plan/slice/ADR/source evidence, structured whole fields, neighbor/record/text/metadata caps, scoped currency and assembly receipts. Real adapter delivery and paired final usefulness remain 25/27; index/evaluator is 4."
+        },
+        {
+          "type": "source_file",
+          "identifier": "src/cognitive/llm.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Implemented exact r3 generated API/tool/image/effort capability evidence, immutable role adoption, Responses/Chat/Messages request fixtures, strict original local validation, refusals/incomplete/tool errors, shared cancellation and actual per-call usage including failed outcomes. VS Code native Responses streaming and optional Claude schema output pass complete extension suite. Native CLI transport remains separate. Browser strict pass projection/image attachment wiring, execution admission/tree stop and actual CU remain 25/6/17/31 rather than falsely qualified."
+        },
+        {
+          "type": "source_file",
+          "identifier": "src/utils/engine-env.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Implemented 295-entry typed source inventory, bounded legacy/JSON engine.env codec, revision-CAS durable private backup receipts and recovery, template preview/identity/protected values/undo, requested/effective/source redaction and dashboard/Architect persistence adoption. Concurrency/fault/restart/HTTP fixtures pass; transport authentication, compact UI and platform ACL gates remain 11/23/27."
+        }
+      ],
+      "total_entries": 8
+    },
+    "entries": [
+      {
+        "id": "ASHOKA-FOUNDATION",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/graph/contracts.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved current/previous schema ownership, generated 31 contracts and twelve immutable task labels; source and SDK drift checks pass. Later platform/client/release composition remains pending."
+        },
+        "target_ref": {
+          "file_path": "src/graph/contracts.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved current/previous schema ownership, generated 31 contracts and twelve immutable task labels; source and SDK drift checks pass. Later platform/client/release composition remains pending."
+        },
+        "status": "confirmed_match",
+        "description": "Preserved current/previous schema ownership, generated 31 contracts and twelve immutable task labels; source and SDK drift checks pass. Later platform/client/release composition remains pending.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790809910615_4ep1bx",
+            "tool_name": "run_tests",
+            "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790809930047_g0r1pc",
+            "tool_name": "read_source_code",
+            "summary": "Preserved current/previous schema ownership, generated 31 contracts and twelve immutable task labels; source and SDK drift checks pass. Later platform/client/release composition remains pending.",
+            "supports": "confirms"
+          }
+        ]
+      },
+      {
+        "id": "ASHOKA-PUBLICATION",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/tools/reconciliation-transaction.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved typed revision publication, CAS/read barrier, physical writer and journal fault/replay tests; managed graph currency is scope-based and never scan-age based. No live migration or cross-platform qualification."
+        },
+        "target_ref": {
+          "file_path": "src/tools/reconciliation-transaction.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved typed revision publication, CAS/read barrier, physical writer and journal fault/replay tests; managed graph currency is scope-based and never scan-age based. No live migration or cross-platform qualification."
+        },
+        "status": "confirmed_match",
+        "description": "Preserved typed revision publication, CAS/read barrier, physical writer and journal fault/replay tests; managed graph currency is scope-based and never scan-age based. No live migration or cross-platform qualification.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790809910615_4ep1bx",
+            "tool_name": "run_tests",
+            "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790809930047_g0r1pc",
+            "tool_name": "read_source_code",
+            "summary": "Preserved typed revision publication, CAS/read barrier, physical writer and journal fault/replay tests; managed graph currency is scope-based and never scan-age based. No live migration or cross-platform qualification.",
+            "supports": "confirms"
+          }
+        ]
+      },
+      {
+        "id": "ASHOKA-RESOURCES",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/tools/query-resource.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved shared 31-URI whole-record resolver with signed revision cursors, MCP structured/text parity and explicit malformed/unknown/unavailable results."
+        },
+        "target_ref": {
+          "file_path": "src/tools/query-resource.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved shared 31-URI whole-record resolver with signed revision cursors, MCP structured/text parity and explicit malformed/unknown/unavailable results."
+        },
+        "status": "confirmed_match",
+        "description": "Preserved shared 31-URI whole-record resolver with signed revision cursors, MCP structured/text parity and explicit malformed/unknown/unavailable results.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790809910615_4ep1bx",
+            "tool_name": "run_tests",
+            "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790809930047_g0r1pc",
+            "tool_name": "read_source_code",
+            "summary": "Preserved shared 31-URI whole-record resolver with signed revision cursors, MCP structured/text parity and explicit malformed/unknown/unavailable results.",
+            "supports": "confirms"
+          }
+        ]
+      },
+      {
+        "id": "ASHOKA-ENRICHMENT",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/tools/enrich-parser-nodes.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved three-way entity deltas, checkpoint publication and durable source-effect reconciliation; explicit Architect API source now binds its own role. External GUI control and shared budget admission remain 31/6 work."
+        },
+        "target_ref": {
+          "file_path": "src/tools/enrich-parser-nodes.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved three-way entity deltas, checkpoint publication and durable source-effect reconciliation; explicit Architect API source now binds its own role. External GUI control and shared budget admission remain 31/6 work."
+        },
+        "status": "confirmed_match",
+        "description": "Preserved three-way entity deltas, checkpoint publication and durable source-effect reconciliation; explicit Architect API source now binds its own role. External GUI control and shared budget admission remain 31/6 work.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790809910615_4ep1bx",
+            "tool_name": "run_tests",
+            "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790809930047_g0r1pc",
+            "tool_name": "read_source_code",
+            "summary": "Preserved three-way entity deltas, checkpoint publication and durable source-effect reconciliation; explicit Architect API source now binds its own role. External GUI control and shared budget admission remain 31/6 work.",
+            "supports": "confirms"
+          }
+        ]
+      },
+      {
+        "id": "ASHOKA-ROLE-POLICY",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/cognitive/llm.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved six independent immutable policy snapshots, saved/role/session precedence, retention/billing separation and cognitive-role-preserving temperature omission without model/effort escalation."
+        },
+        "target_ref": {
+          "file_path": "src/cognitive/llm.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Preserved six independent immutable policy snapshots, saved/role/session precedence, retention/billing separation and cognitive-role-preserving temperature omission without model/effort escalation."
+        },
+        "status": "confirmed_match",
+        "description": "Preserved six independent immutable policy snapshots, saved/role/session precedence, retention/billing separation and cognitive-role-preserving temperature omission without model/effort escalation.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790809910615_4ep1bx",
+            "tool_name": "run_tests",
+            "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790809930047_g0r1pc",
+            "tool_name": "read_source_code",
+            "summary": "Preserved six independent immutable policy snapshots, saved/role/session precedence, retention/billing separation and cognitive-role-preserving temperature omission without model/effort escalation.",
+            "supports": "confirms"
+          }
+        ]
+      },
+      {
+        "id": "ASHOKA-RETRIEVAL",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/cognitive/graph-rag.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Implemented pure canonical 17-family bounded retrieval with required plan/slice/ADR/source evidence, structured whole fields, neighbor/record/text/metadata caps, scoped currency and assembly receipts. Real adapter delivery and paired final usefulness remain 25/27; index/evaluator is 4."
+        },
+        "target_ref": {
+          "file_path": "src/cognitive/graph-rag.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Implemented pure canonical 17-family bounded retrieval with required plan/slice/ADR/source evidence, structured whole fields, neighbor/record/text/metadata caps, scoped currency and assembly receipts. Real adapter delivery and paired final usefulness remain 25/27; index/evaluator is 4."
+        },
+        "status": "confirmed_match",
+        "description": "Implemented pure canonical 17-family bounded retrieval with required plan/slice/ADR/source evidence, structured whole fields, neighbor/record/text/metadata caps, scoped currency and assembly receipts. Real adapter delivery and paired final usefulness remain 25/27; index/evaluator is 4.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790809910615_4ep1bx",
+            "tool_name": "run_tests",
+            "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790809930047_g0r1pc",
+            "tool_name": "read_source_code",
+            "summary": "Implemented pure canonical 17-family bounded retrieval with required plan/slice/ADR/source evidence, structured whole fields, neighbor/record/text/metadata caps, scoped currency and assembly receipts. Real adapter delivery and paired final usefulness remain 25/27; index/evaluator is 4.",
+            "supports": "confirms"
+          }
+        ]
+      },
+      {
+        "id": "ASHOKA-ADAPTER-POLICY",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/cognitive/llm.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Implemented exact r3 generated API/tool/image/effort capability evidence, immutable role adoption, Responses/Chat/Messages request fixtures, strict original local validation, refusals/incomplete/tool errors, shared cancellation and actual per-call usage including failed outcomes. VS Code native Responses streaming and optional Claude schema output pass complete extension suite. Native CLI transport remains separate. Browser strict pass projection/image attachment wiring, execution admission/tree stop and actual CU remain 25/6/17/31 rather than falsely qualified."
+        },
+        "target_ref": {
+          "file_path": "src/cognitive/llm.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Implemented exact r3 generated API/tool/image/effort capability evidence, immutable role adoption, Responses/Chat/Messages request fixtures, strict original local validation, refusals/incomplete/tool errors, shared cancellation and actual per-call usage including failed outcomes. VS Code native Responses streaming and optional Claude schema output pass complete extension suite. Native CLI transport remains separate. Browser strict pass projection/image attachment wiring, execution admission/tree stop and actual CU remain 25/6/17/31 rather than falsely qualified."
+        },
+        "status": "confirmed_match",
+        "description": "Implemented exact r3 generated API/tool/image/effort capability evidence, immutable role adoption, Responses/Chat/Messages request fixtures, strict original local validation, refusals/incomplete/tool errors, shared cancellation and actual per-call usage including failed outcomes. VS Code native Responses streaming and optional Claude schema output pass complete extension suite. Native CLI transport remains separate. Browser strict pass projection/image attachment wiring, execution admission/tree stop and actual CU remain 25/6/17/31 rather than falsely qualified.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790809910615_4ep1bx",
+            "tool_name": "run_tests",
+            "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790809930047_g0r1pc",
+            "tool_name": "read_source_code",
+            "summary": "Implemented exact r3 generated API/tool/image/effort capability evidence, immutable role adoption, Responses/Chat/Messages request fixtures, strict original local validation, refusals/incomplete/tool errors, shared cancellation and actual per-call usage including failed outcomes. VS Code native Responses streaming and optional Claude schema output pass complete extension suite. Native CLI transport remains separate. Browser strict pass projection/image attachment wiring, execution admission/tree stop and actual CU remain 25/6/17/31 rather than falsely qualified.",
+            "supports": "confirms"
+          }
+        ]
+      },
+      {
+        "id": "ASHOKA-CONFIGURATION",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/utils/engine-env.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Implemented 295-entry typed source inventory, bounded legacy/JSON engine.env codec, revision-CAS durable private backup receipts and recovery, template preview/identity/protected values/undo, requested/effective/source redaction and dashboard/Architect persistence adoption. Concurrency/fault/restart/HTTP fixtures pass; transport authentication, compact UI and platform ACL gates remain 11/23/27."
+        },
+        "target_ref": {
+          "file_path": "src/utils/engine-env.ts",
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "excerpt": "Implemented 295-entry typed source inventory, bounded legacy/JSON engine.env codec, revision-CAS durable private backup receipts and recovery, template preview/identity/protected values/undo, requested/effective/source redaction and dashboard/Architect persistence adoption. Concurrency/fault/restart/HTTP fixtures pass; transport authentication, compact UI and platform ACL gates remain 11/23/27."
+        },
+        "status": "confirmed_match",
+        "description": "Implemented 295-entry typed source inventory, bounded legacy/JSON engine.env codec, revision-CAS durable private backup receipts and recovery, template preview/identity/protected values/undo, requested/effective/source redaction and dashboard/Architect persistence adoption. Concurrency/fault/restart/HTTP fixtures pass; transport authentication, compact UI and platform ACL gates remain 11/23/27.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790809910615_4ep1bx",
+            "tool_name": "run_tests",
+            "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790809930047_g0r1pc",
+            "tool_name": "read_source_code",
+            "summary": "Implemented 295-entry typed source inventory, bounded legacy/JSON engine.env codec, revision-CAS durable private backup receipts and recovery, template preview/identity/protected values/undo, requested/effective/source redaction and dashboard/Architect persistence adoption. Concurrency/fault/restart/HTTP fixtures pass; transport authentication, compact UI and platform ACL gates remain 11/23/27.",
+            "supports": "confirms"
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "confirmed_matches": 8,
+      "confirmed_gaps": 0,
+      "partial_matches": 0,
+      "not_yet_verified": 0,
+      "total": 8,
+      "parity_percentage": 100
+    }
+  },
+  "compliance": {
+    "status": "compliant",
+    "parity_percentage": 100,
+    "total_entries": 8,
+    "matched": 8,
+    "gaps_remaining": 0,
+    "regressions": 0
+  },
+  "item_results": [
+    {
+      "plan_item_id": "ashoka-s0-contracts",
+      "delta_entry_id": "ASHOKA-FOUNDATION",
+      "tool_call_id": "tc_1790809910615_4ep1bx",
+      "verified": true,
+      "verification_detail": "Preserved current/previous schema ownership, generated 31 contracts and twelve immutable task labels; source and SDK drift checks pass. Later platform/client/release composition remains pending.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790809910615_4ep1bx",
+          "tool_name": "run_tests",
+          "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "tool_name": "read_source_code",
+          "summary": "Preserved current/previous schema ownership, generated 31 contracts and twelve immutable task labels; source and SDK drift checks pass. Later platform/client/release composition remains pending.",
+          "supports": "confirms"
+        }
+      ]
+    },
+    {
+      "plan_item_id": "ashoka-s2-publication",
+      "delta_entry_id": "ASHOKA-PUBLICATION",
+      "tool_call_id": "tc_1790809910615_4ep1bx",
+      "verified": true,
+      "verification_detail": "Preserved typed revision publication, CAS/read barrier, physical writer and journal fault/replay tests; managed graph currency is scope-based and never scan-age based. No live migration or cross-platform qualification.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790809910615_4ep1bx",
+          "tool_name": "run_tests",
+          "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "tool_name": "read_source_code",
+          "summary": "Preserved typed revision publication, CAS/read barrier, physical writer and journal fault/replay tests; managed graph currency is scope-based and never scan-age based. No live migration or cross-platform qualification.",
+          "supports": "confirms"
+        }
+      ]
+    },
+    {
+      "plan_item_id": "ashoka-s1-resources",
+      "delta_entry_id": "ASHOKA-RESOURCES",
+      "tool_call_id": "tc_1790809910615_4ep1bx",
+      "verified": true,
+      "verification_detail": "Preserved shared 31-URI whole-record resolver with signed revision cursors, MCP structured/text parity and explicit malformed/unknown/unavailable results.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790809910615_4ep1bx",
+          "tool_name": "run_tests",
+          "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "tool_name": "read_source_code",
+          "summary": "Preserved shared 31-URI whole-record resolver with signed revision cursors, MCP structured/text parity and explicit malformed/unknown/unavailable results.",
+          "supports": "confirms"
+        }
+      ]
+    },
+    {
+      "plan_item_id": "ashoka-s5-enrichment",
+      "delta_entry_id": "ASHOKA-ENRICHMENT",
+      "tool_call_id": "tc_1790809910615_4ep1bx",
+      "verified": true,
+      "verification_detail": "Preserved three-way entity deltas, checkpoint publication and durable source-effect reconciliation; explicit Architect API source now binds its own role. External GUI control and shared budget admission remain 31/6 work.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790809910615_4ep1bx",
+          "tool_name": "run_tests",
+          "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "tool_name": "read_source_code",
+          "summary": "Preserved three-way entity deltas, checkpoint publication and durable source-effect reconciliation; explicit Architect API source now binds its own role. External GUI control and shared budget admission remain 31/6 work.",
+          "supports": "confirms"
+        }
+      ]
+    },
+    {
+      "plan_item_id": "ashoka-s7-role-policy",
+      "delta_entry_id": "ASHOKA-ROLE-POLICY",
+      "tool_call_id": "tc_1790809910615_4ep1bx",
+      "verified": true,
+      "verification_detail": "Preserved six independent immutable policy snapshots, saved/role/session precedence, retention/billing separation and cognitive-role-preserving temperature omission without model/effort escalation.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790809910615_4ep1bx",
+          "tool_name": "run_tests",
+          "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "tool_name": "read_source_code",
+          "summary": "Preserved six independent immutable policy snapshots, saved/role/session precedence, retention/billing separation and cognitive-role-preserving temperature omission without model/effort escalation.",
+          "supports": "confirms"
+        }
+      ]
+    },
+    {
+      "plan_item_id": "ashoka-s3-retrieval",
+      "delta_entry_id": "ASHOKA-RETRIEVAL",
+      "tool_call_id": "tc_1790809910615_4ep1bx",
+      "verified": true,
+      "verification_detail": "Implemented pure canonical 17-family bounded retrieval with required plan/slice/ADR/source evidence, structured whole fields, neighbor/record/text/metadata caps, scoped currency and assembly receipts. Real adapter delivery and paired final usefulness remain 25/27; index/evaluator is 4.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790809910615_4ep1bx",
+          "tool_name": "run_tests",
+          "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "tool_name": "read_source_code",
+          "summary": "Implemented pure canonical 17-family bounded retrieval with required plan/slice/ADR/source evidence, structured whole fields, neighbor/record/text/metadata caps, scoped currency and assembly receipts. Real adapter delivery and paired final usefulness remain 25/27; index/evaluator is 4.",
+          "supports": "confirms"
+        }
+      ]
+    },
+    {
+      "plan_item_id": "ashoka-s8-adapters",
+      "delta_entry_id": "ASHOKA-ADAPTER-POLICY",
+      "tool_call_id": "tc_1790809910615_4ep1bx",
+      "verified": true,
+      "verification_detail": "Implemented exact r3 generated API/tool/image/effort capability evidence, immutable role adoption, Responses/Chat/Messages request fixtures, strict original local validation, refusals/incomplete/tool errors, shared cancellation and actual per-call usage including failed outcomes. VS Code native Responses streaming and optional Claude schema output pass complete extension suite. Native CLI transport remains separate. Browser strict pass projection/image attachment wiring, execution admission/tree stop and actual CU remain 25/6/17/31 rather than falsely qualified.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790809910615_4ep1bx",
+          "tool_name": "run_tests",
+          "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "tool_name": "read_source_code",
+          "summary": "Implemented exact r3 generated API/tool/image/effort capability evidence, immutable role adoption, Responses/Chat/Messages request fixtures, strict original local validation, refusals/incomplete/tool errors, shared cancellation and actual per-call usage including failed outcomes. VS Code native Responses streaming and optional Claude schema output pass complete extension suite. Native CLI transport remains separate. Browser strict pass projection/image attachment wiring, execution admission/tree stop and actual CU remain 25/6/17/31 rather than falsely qualified.",
+          "supports": "confirms"
+        }
+      ]
+    },
+    {
+      "plan_item_id": "ashoka-s10-configuration",
+      "delta_entry_id": "ASHOKA-CONFIGURATION",
+      "tool_call_id": "tc_1790809910615_4ep1bx",
+      "verified": true,
+      "verification_detail": "Implemented 295-entry typed source inventory, bounded legacy/JSON engine.env codec, revision-CAS durable private backup receipts and recovery, template preview/identity/protected values/undo, requested/effective/source redaction and dashboard/Architect persistence adoption. Concurrency/fault/restart/HTTP fixtures pass; transport authentication, compact UI and platform ACL gates remain 11/23/27.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790809910615_4ep1bx",
+          "tool_name": "run_tests",
+          "summary": "Actual stable source complete offline verification: root 113 files, 1142 passed and 2 existing skips with zero failures (packet docs/ashoka/wave-3-8-10-tests.json); VS Code full build and complete 487-test extension suite passed. Server build, 31 generated contracts, reviewed baseline revision 7, provider r3 generation and 295-entry configuration inventory checks passed. No paid calls, installation, restart or live scan.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790809930047_g0r1pc",
+          "tool_name": "read_source_code",
+          "summary": "Implemented 295-entry typed source inventory, bounded legacy/JSON engine.env codec, revision-CAS durable private backup receipts and recovery, template preview/identity/protected values/undo, requested/effective/source redaction and dashboard/Architect persistence adoption. Concurrency/fault/restart/HTTP fixtures pass; transport authentication, compact UI and platform ACL gates remain 11/23/27.",
+          "supports": "confirms"
+        }
+      ]
+    }
+  ],
+  "regressions": [],
+  "recommendation": {
+    "action": "accept",
+    "justification": "All entries match. No regressions detected."
+  }
+}

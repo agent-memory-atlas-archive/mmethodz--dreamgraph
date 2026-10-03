@@ -1,0 +1,29 @@
+✔ claude-opus-5-5: preserves signed thinking and tool calls through the next request (73.9976ms)
+✔ claude-sonnet-5-5: preserves signed thinking and tool calls through the next request (21.6466ms)
+✔ claude-fable-5-1: preserves signed thinking and tool calls through the next request (17.4138ms)
+✔ claude-mythos-5-1: preserves signed thinking and tool calls through the next request (17.9525ms)
+✔ Claude reasoning drops produce diagnostics without exposing signatures (1.0983ms)
+✔ GPT-6.1 Sol uses Responses for tools and supports images (15.3513ms)
+✔ switching providers translates neutral history instead of replaying foreign raw blocks (1.1062ms)
+✔ Responses streaming preserves actual usage and validates the authoritative final response (12.0414ms)
+✔ Responses truncated/refused streams and invalid strict outputs are never accepted (12.0681ms)
+✔ explicit Chat preserves model/effort and rejects GPT-6 tool reasoning before dispatch (10.2999ms)
+✔ Claude opt-in native schemas retain effort and locally validate the original output (10.3369ms)
+✔ routes current OpenAI reasoning families to the Responses API (1.3319ms)
+✔ builds a GPT-5.5 Responses request with reasoning, verbosity, and function tools (1.3197ms)
+✔ translates Architect tool history into Responses function-call items (0.5463ms)
+✔ skips malformed raw replay items instead of emitting invalid Responses items (0.2173ms)
+✔ extracts text while safely ignoring unknown Responses output items (0.4368ms)
+✔ inserts a paragraph break between adjacent verbose-mode message items lacking surrounding whitespace (0.2689ms)
+✔ keeps streamed sub-blocks within a single message tightly joined (0.1859ms)
+✔ normalizes Responses output to the provider boundary contract (1.3743ms)
+✔ normalizes Responses tool calls as tool_use finish reason (0.3473ms)
+✔ extracts function calls and hardens malformed or unknown items (0.8788ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 421.1582

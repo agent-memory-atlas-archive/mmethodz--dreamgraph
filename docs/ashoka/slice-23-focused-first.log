@@ -1,0 +1,99 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ❯ tests/configuration-workspace.test.ts (9 tests | 9 failed) 41ms
+   × maps every consumed setting to one typed control or named read-only exception without leaking stored secrets 13ms
+     → ENOENT: no such file or directory, lstat 'C:\Users\Mika Jussila\source\repos\dreamgraph\templates\default\data'
+     → Cannot read properties of undefined (reading 'closeAllConnections')
+   × keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work 4ms
+     → ENOENT: no such file or directory, lstat 'C:\Users\Mika Jussila\source\repos\dreamgraph\templates\default\data'
+     → Cannot read properties of undefined (reading 'closeAllConnections')
+   × edits structured component settings and retains explicit zeros/default inheritance through restart parsing 3ms
+     → ENOENT: no such file or directory, lstat 'C:\Users\Mika Jussila\source\repos\dreamgraph\templates\default\data'
+     → Cannot read properties of undefined (reading 'closeAllConnections')
+   × retains a whole captured save after a committed lost reply and recovers that receipt without a second effect 3ms
+     → ENOENT: no such file or directory, lstat 'C:\Users\Mika Jussila\source\repos\dreamgraph\templates\default\data'
+     → Cannot read properties of undefined (reading 'closeAllConnections')
+   × keeps drafts on concurrent revision refusal and never overwrites the intervening file 3ms
+     → ENOENT: no such file or directory, lstat 'C:\Users\Mika Jussila\source\repos\dreamgraph\templates\default\data'
+     → Cannot read properties of undefined (reading 'closeAllConnections')
+   × previews a scoped template without writes, applies protected staging and undoes the original bytes 3ms
+     → ENOENT: no such file or directory, lstat 'C:\Users\Mika Jussila\source\repos\dreamgraph\templates\default\data'
+     → Cannot read properties of undefined (reading 'closeAllConnections')
+   × generic apply refreshes actual cached model controls and daemon role readback without touching session overrides 4ms
+     → ENOENT: no such file or directory, lstat 'C:\Users\Mika Jussila\source\repos\dreamgraph\templates\default\data'
+     → Cannot read properties of undefined (reading 'closeAllConnections')
+   × reports a staged deletion as a mismatch until restart clears the old runtime override 3ms
+     → ENOENT: no such file or directory, lstat 'C:\Users\Mika Jussila\source\repos\dreamgraph\templates\default\data'
+     → Cannot read properties of undefined (reading 'closeAllConnections')
+   × root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry 3ms
+     → ENOENT: no such file or directory, lstat 'C:\Users\Mika Jussila\source\repos\dreamgraph\templates\default\data'
+     → Cannot read properties of undefined (reading 'closeAllConnections')
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-02T11:47:01.079Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-02T11:47:01.125Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-02T11:47:01.134Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+ ✓ tests/engine-configuration.test.ts (18 tests) 686ms
+ ✓ tests/schedule-http.test.ts (2 tests) 934ms
+   ✓ shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay  710ms
+stderr | tests/configuration-http.test.ts > configuration HTTP parity > saves scheduler settings through the rendered form and reloads exactly
+[2026-10-02T11:47:02.562Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:47:02.562Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+ ✓ tests/configuration-http.test.ts (4 tests) 326ms
+ ✓ tests/schedule-workspace.test.ts (8 tests) 1882ms
+   ✓ actual served browser script saves disabled, preserves invalid drafts, and supports keyboard tabs/filter/edit  479ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+ FAIL  tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+ FAIL  tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+ FAIL  tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+ FAIL  tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+ FAIL  tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+ FAIL  tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+ FAIL  tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+ FAIL  tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+Error: ENOENT: no such file or directory, lstat 'C:\Users\Mika Jussila\source\repos\dreamgraph\templates\default\data'
+ ❯ tests/configuration-workspace.test.ts:26:27
+     24|   envBefore = { ...process.env }; oldModel = { ...getLlmConfig() }; ol…
+     25|   directory = await mkdtemp(join(tmpdir(), "dg-settings-workspace-"));…
+     26|   await mkdir(configDir); await cp(resolve("templates/default/data"), …
+       |                           ^
+     27|   for (const key of Object.keys(process.env)) if (key.startsWith("DREA…
+     28|   process.env.DREAMGRAPH_LLM_PROVIDER = "none"; process.env.DREAMGRAPH…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/18]⎯
+
+ FAIL  tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+ FAIL  tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+ FAIL  tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+ FAIL  tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+ FAIL  tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+ FAIL  tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+ FAIL  tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+ FAIL  tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+ FAIL  tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+TypeError: Cannot read properties of undefined (reading 'closeAllConnections')
+ ❯ tests/configuration-workspace.test.ts:39:48
+     37| });
+     38| afterEach(async () => {
+     39|   dom?.window.close(); dom = undefined; server.closeAllConnections(); …
+       |                                                ^
+     40|   stopScheduler(); updateSchedulerConfig({ ...oldScheduler, enabled: f…
+     41|   for (const key of Object.keys(process.env)) if (!(key in envBefore))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/18]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  9 failed | 32 passed (41)
+   Start at  14:46:55
+   Duration  7.83s (transform 2.43s, setup 0ms, collect 22.19s, tests 3.87s, environment 1ms, prepare 817ms)
+

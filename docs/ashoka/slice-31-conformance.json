@@ -1,0 +1,797 @@
+{
+  "schema": "dreamgraph.ashoka.computer_checkpoint.v1",
+  "recorded_at": "2026-10-02T17:59:29.306Z",
+  "status": "original_host_browser_foundation_qualified_slice31_in_progress",
+  "root": {
+    "passed": 1941,
+    "failed": 0,
+    "skipped": 2,
+    "files": 170,
+    "exit_code": 0
+  },
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "scope": {
+    "physical": "Actual isolated Windows Chrome/process and compiled local qualification command; exact runtime and measured subchecks below.",
+    "core": "Actual execution, grant, job, publication and journal owners. Some executor/provider/UI/registration tests are declared doubles, not OS/model qualification.",
+    "native_api": "Custom computer tools are integrated into the original Architect loop; whole real-worker/provider-HTTP and provider-native/CLI adapter joins remain open."
+  },
+  "tests": [
+    {
+      "file": "architect-managed-context.test.ts",
+      "name": "native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt",
+      "status": "passed"
+    },
+    {
+      "file": "architect-managed-context.test.ts",
+      "name": "the actual native API pass shares original-host review and reports remaining controls before revocation",
+      "status": "passed"
+    },
+    {
+      "file": "architect-managed-context.test.ts",
+      "name": "native API late completion after cancellation closes with termination uncertainty",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "single original host/job owns scoped dispatch, independent postcondition and replay",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "native custom tools preserve scoped fresh observations and keep literal arguments out of preview metadata",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "ephemeral image bytes are hash checked and atomically recorded as distinct pixel/DOM descriptors",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "an executor cannot pair arbitrary image bytes with a forged digest",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "full-access scope does not replace exact action approval; target changes remain fenced",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "grant revocation stops without a model roundtrip and prevents later physical dispatch",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "lost reply after input has one durable unknown receipt and is never replayed",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "failed independent termination retains the original worker for stop-only recovery",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "material source change stays reconciliation pending even though the GUI postcondition passed",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "wrong-session and unqualified routes cannot open even a declared worker",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "a reviewed profile cannot be replaced by the worker",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "a reviewed backend cannot be replaced by the worker",
+      "status": "passed"
+    },
+    {
+      "file": "computer-broker.test.ts",
+      "name": "observation-only operator approval cannot authorize interaction even with an exact action approval",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-registry.test.ts",
+      "name": "preflight and selection create no grant; human confirmation pins finite scope and exact lost reply",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-registry.test.ts",
+      "name": "profile or attached-project changes after preparation cannot widen a grant",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-registry.test.ts",
+      "name": "unqualified OS/source/retention/native CLI and authority-origin targets remain unavailable",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "performs real Unicode, checked, click/readback and scrolling using opaque current references",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "moved/covered controls, disabled and credential controls never receive a guessed action",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "forbidden posts, redirects, popups and frames cannot reach another origin or authority",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "explicit navigation stays inside the approved origin and segment path and verifies independent destination state",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "private worker process preserves typed observations and responsive independent termination",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "stop bypasses a pending browser navigation and never waits for its ten-second server response",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "masked frames have a verified digest and image exhaustion refuses before another input",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "a real worker closes its dedicated browser on disconnect without another model call",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "a real worker closes its dedicated browser on watchdog without another model call",
+      "status": "passed"
+    },
+    {
+      "file": "computer-browser-worker.test.ts",
+      "name": "lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input",
+      "status": "passed"
+    },
+    {
+      "file": "computer-capabilities.test.ts",
+      "name": "negotiates the intersection and does not treat declared fixtures as product qualification",
+      "status": "passed"
+    },
+    {
+      "file": "computer-capabilities.test.ts",
+      "name": "native CLI cannot silently inherit a harness or infer native input authority from model/shell support",
+      "status": "passed"
+    },
+    {
+      "file": "computer-capabilities.test.ts",
+      "name": "mandatory scope_enforced cannot be relaxed by an otherwise qualified backend",
+      "status": "passed"
+    },
+    {
+      "file": "computer-capabilities.test.ts",
+      "name": "mandatory bounded_actions cannot be relaxed by an otherwise qualified backend",
+      "status": "passed"
+    },
+    {
+      "file": "computer-capabilities.test.ts",
+      "name": "mandatory privacy_enforced cannot be relaxed by an otherwise qualified backend",
+      "status": "passed"
+    },
+    {
+      "file": "computer-capabilities.test.ts",
+      "name": "mandatory independent_stop cannot be relaxed by an otherwise qualified backend",
+      "status": "passed"
+    },
+    {
+      "file": "computer-capabilities.test.ts",
+      "name": "rejects incompatible protocols, backend pin drift, missing compound proof and unleased physical input",
+      "status": "passed"
+    },
+    {
+      "file": "computer-journal.test.ts",
+      "name": "requires delivered original authority, sealed intent and explicitly qualified route",
+      "status": "passed"
+    },
+    {
+      "file": "computer-journal.test.ts",
+      "name": "replays original intent/receipt across service recreation and never persists raw action text",
+      "status": "passed"
+    },
+    {
+      "file": "computer-journal.test.ts",
+      "name": "does not cross sessions, host epochs, target generations or grants",
+      "status": "passed"
+    },
+    {
+      "file": "computer-journal.test.ts",
+      "name": "invalidates old observations on target changes and cannot verify a model interpretation",
+      "status": "passed"
+    },
+    {
+      "file": "computer-journal.test.ts",
+      "name": "reserves finite actions/images/bytes once and refuses oversize or unsupported operations",
+      "status": "passed"
+    },
+    {
+      "file": "computer-journal.test.ts",
+      "name": "postcondition proof, terminal immutability and graph receipt owner remain separate",
+      "status": "passed"
+    },
+    {
+      "file": "computer-journal.test.ts",
+      "name": "a lost physical result stays recoverable after acknowledged stop and cannot redispatch",
+      "status": "passed"
+    },
+    {
+      "file": "computer-journal.test.ts",
+      "name": "active workers prevent completion and stopped proved work remains a state receipt, never graph truth",
+      "status": "passed"
+    },
+    {
+      "file": "computer-journal.test.ts",
+      "name": "late unknown-result bookkeeping does not pretend worker termination was acknowledged",
+      "status": "passed"
+    },
+    {
+      "file": "computer-seat.test.ts",
+      "name": "a second session/daemon cannot steal a seat; release permits the next original owner",
+      "status": "passed"
+    },
+    {
+      "file": "computer-seat.test.ts",
+      "name": "the helper owns the kernel lifetime; crash releases its own seat without stale path stealing",
+      "status": "passed"
+    },
+    {
+      "file": "computer-seat.test.ts",
+      "name": "different isolated seats do not alias; aborted acquisition is rejected",
+      "status": "passed"
+    },
+    {
+      "file": "computer-use-ui.test.ts",
+      "name": "opening/inspecting scope does not mint permission or create a pass and does not add a startup request",
+      "status": "passed"
+    },
+    {
+      "file": "computer-use-ui.test.ts",
+      "name": "exact human confirmation is separate from preparation and loss retries preserve its ID",
+      "status": "passed"
+    },
+    {
+      "file": "computer-use-ui.test.ts",
+      "name": "an unavailable native CLI keeps the requested mechanism visible and cannot prepare a harness",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-http.test.ts",
+      "name": "configuration HTTP parity returns redacted typed catalogue and rejects unsupported fields",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-http.test.ts",
+      "name": "configuration HTTP parity saves scheduler settings through the rendered form and reloads exactly",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-http.test.ts",
+      "name": "configuration HTTP parity does not show success after invalid form input or missing revision",
+      "status": "passed"
+    },
+    {
+      "file": "configuration-http.test.ts",
+      "name": "configuration HTTP parity previews, applies and restores a named template without exposing secrets or resetting unrelated data",
+      "status": "passed"
+    },
+    {
+      "file": "session-authority.test.ts",
+      "name": "private durable authority a scoped observation grant pins the exact execution, profile and backend without input permission",
+      "status": "passed"
+    },
+    {
+      "file": "session-authority.test.ts",
+      "name": "private durable authority lost scoped-grant acknowledgements preserve expiry and revocation across restart and refuse widening",
+      "status": "passed"
+    },
+    {
+      "file": "session-authority.test.ts",
+      "name": "private durable authority workers and MCP continuations cannot mint scoped grants or confirm full access",
+      "status": "passed"
+    },
+    {
+      "file": "session-authority.test.ts",
+      "name": "private durable authority persists isolated selection/settings across service recreation, never bearer secrets",
+      "status": "passed"
+    },
+    {
+      "file": "session-authority.test.ts",
+      "name": "private durable authority requires two separately scoped confirmations, exact execution and independent expiry/revocation",
+      "status": "passed"
+    },
+    {
+      "file": "session-authority.test.ts",
+      "name": "private durable authority signs continuations for one session and isolates concurrent discipline state and resume",
+      "status": "passed"
+    },
+    {
+      "file": "session-authority.test.ts",
+      "name": "private durable authority fences Computer Use controls and stops outside the model loop on stop",
+      "status": "passed"
+    },
+    {
+      "file": "session-authority.test.ts",
+      "name": "private durable authority fences Computer Use controls and stops outside the model loop on revoke",
+      "status": "passed"
+    },
+    {
+      "file": "session-authority.test.ts",
+      "name": "private durable authority fences Computer Use controls and stops outside the model loop on expire",
+      "status": "passed"
+    },
+    {
+      "file": "session-authority.test.ts",
+      "name": "private durable authority fences Computer Use controls and stops outside the model loop on unknown-stop",
+      "status": "passed"
+    }
+  ],
+  "browser": {
+    "schema": "dreamgraph.browser_runtime_qualification.v1",
+    "evidence": {
+      "schema": "dreamgraph.browser_runtime_evidence.v1",
+      "recorded_at": "2026-10-02T17:35:36.260Z",
+      "source_hash": "sha256:be5778abe96b15d0d4103d4ff244ef14df83d98ae8ec39b3eb7dcf41b8ad5873",
+      "platform": "win32",
+      "architecture": "x64",
+      "node": "25.2.1",
+      "browser_version": "153.0.8010.50",
+      "runtime_version": "1.62.1",
+      "model_requests": 0,
+      "provider_scope": "none",
+      "traces": [
+        {
+          "id": "BW01",
+          "requirements": [
+            "CU02",
+            "CU20"
+          ],
+          "evidence": {
+            "unicode_postcondition": true,
+            "filtered_structural_observation": true
+          }
+        },
+        {
+          "id": "BW02",
+          "requirements": [
+            "CU03",
+            "CU14"
+          ],
+          "evidence": {
+            "stale_reference_rejected": true
+          }
+        },
+        {
+          "id": "BW03",
+          "requirements": [
+            "CU04",
+            "CU14"
+          ],
+          "evidence": {
+            "forbidden_requests": 0,
+            "forbidden_posts": 0
+          }
+        },
+        {
+          "id": "BW04",
+          "requirements": [
+            "CU05"
+          ],
+          "evidence": {
+            "stop_release_ms": 247.64729999999963
+          }
+        },
+        {
+          "id": "BW05",
+          "requirements": [
+            "CU13",
+            "CU20"
+          ],
+          "evidence": {
+            "finite_image_reservation": true,
+            "frame_hash_verified": true
+          }
+        },
+        {
+          "id": "BW05A",
+          "requirements": [
+            "CU13"
+          ],
+          "evidence": {
+            "finite_action_limit": true
+          }
+        },
+        {
+          "id": "BW06",
+          "requirements": [
+            "CU05",
+            "CU11"
+          ],
+          "evidence": {
+            "mode": "disconnect",
+            "elapsed_ms": 261.03679999999986,
+            "local_stop": null,
+            "proof": "original_child_exited_after_local_browser_closure",
+            "browser_requests_quiescent": true
+          }
+        },
+        {
+          "id": "BW07",
+          "requirements": [
+            "CU05",
+            "CU11"
+          ],
+          "evidence": {
+            "mode": "watchdog",
+            "elapsed_ms": 2563.3258000000005,
+            "local_stop": {
+              "epoch": "e5ec5547-c5d1-452a-b2e2-5973ee189489",
+              "input_released": true,
+              "terminated": true,
+              "reason": "watchdog",
+              "heartbeat_age_ms": 2529,
+              "stop_elapsed_ms": 231
+            },
+            "proof": "original_child_exited_after_local_browser_closure",
+            "browser_requests_quiescent": true
+          }
+        },
+        {
+          "id": "BW08",
+          "requirements": [
+            "CU10",
+            "CU22",
+            "CU24"
+          ],
+          "evidence": {
+            "actual_input_deliveries": 1,
+            "durable_outcome": "unknown",
+            "exact_retry_no_input": true,
+            "route": "dreamgraph_harness"
+          }
+        },
+        {
+          "id": "BW09",
+          "requirements": [
+            "CU10",
+            "CU22"
+          ],
+          "evidence": {
+            "execution_status": "recovery_required",
+            "unknown_action_retained": true
+          }
+        }
+      ],
+      "support_scope": "This installed isolated browser/runtime only. CU IDs map to measured subchecks, not full CU acceptance, other operating systems, native desktops or CLI adapters."
+    },
+    "worker": {
+      "schema": "dreamgraph.browser_install.v1",
+      "id": "ashoka-browser",
+      "browser_executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "browser_version": "153.0.8010.50",
+      "runtime_version": "1.62.1",
+      "qualification": {
+        "schema": "dreamgraph.computer_qualification.v1",
+        "backend": "isolated_playwright",
+        "backend_version": "playwright-core@1.62.1/chromium@153.0.8010.50/node@25.2.1",
+        "platform": "win32",
+        "architecture": "x64",
+        "source_hash": "sha256:be5778abe96b15d0d4103d4ff244ef14df83d98ae8ec39b3eb7dcf41b8ad5873",
+        "protocol_hash": "sha256:ec4bb77daacf9faeb874bc313e0f3fbcc431d6aef7ce7a60ab2a90448bbbfc65",
+        "qualified_at": "2026-10-02T17:35:36.260Z",
+        "evidence_scope": "actual_runtime",
+        "scope_negative_passed": true,
+        "privacy_passed": true,
+        "bounded_actions_passed": true,
+        "stop_release_ms": 247.64729999999963,
+        "control_loss_stop_ms": 2563.3258000000005,
+        "cases": [
+          "CU04",
+          "CU05",
+          "CU10",
+          "CU20",
+          "CU24"
+        ],
+        "artifact_hash": "sha256:dbb64cf3a91f948d146abdf506bc31fe4254126acd1b1a7ffa55e15693aecdb7"
+      }
+    }
+  },
+  "joins": {
+    "XS01": "Original execution/job/finite grant/profile pins; no competing runtime or job database.",
+    "XS09": "Exact supervised action review and metadata-only traces; private image/structural descriptors are distinct.",
+    "XS17": "Intent before real input, unknown reply, identical retry without redispatch; stopped worker and unresolved external effect stay separate.",
+    "XS20": "Foundation only: actual GUI evidence is distinct from source reconciliation, graph receipt and plan verification; full task/graph loop remains open."
+  },
+  "retained_failures": [
+    "Initial source loader/Windows typings/route placement failures; invalid navigation fixture and grant identity reuse.",
+    "Root attempts one/two/three/four and focused stop failure traces remain. Fixture startup/expiry bounds were corrected while real expiry/recovery assertions stay; the fifth complete run uses two workers to bound local CPU contention.",
+    "The first generated-check run found configuration inventory drift after source additions; regeneration preserved all 308 typed entries and the final six checks pass.",
+    "Serial request disposal delayed browser stop; lost stop reply discarded recovery peer; watchdog success exit could mask closure rejection. Production fixes are covered.",
+    "The disconnect assertion incorrectly required one second; C17 specifies five seconds for severed control channels. Explicit responsive stop remains one second.",
+    "Qualification attempts one/two/three remain unqualified: missing canonical fixture repository, expected unknown-job recovery and cleanup masking an earlier failure."
+  ],
+  "remaining": [
+    "Full Slice31A–H: peer native workers and actual macOS/Linux qualification; native CLI permissions/events/stop and provider-native tool mapping.",
+    "Dedicated computer model-role execution choice; integrated setup/dashboard profiles, installed activation/uninstall and scope re-grant.",
+    "Whole real-worker/native-provider-HTTP/source-to-graph-to-next-agent joins, forced-crash unknown-effect recovery, pause/reconnect and VS Code controls.",
+    "Full CU01–CU24/XS conformance, live Slice26 reviewed cutover, paired model understanding, Slice27 and synchronized release Slice28."
+  ],
+  "artifacts": [
+    {
+      "path": "src/computer/broker.ts",
+      "bytes": 20536,
+      "sha256": "f549df1ea9226fc5f24c9e0a1666eb48c462fecb0a742dba638856715020592d"
+    },
+    {
+      "path": "src/computer/browser-driver.ts",
+      "bytes": 14221,
+      "sha256": "1d329b512742a0b2355bde2a5e3af45f4de299daba93ed33228038342eef55fa"
+    },
+    {
+      "path": "src/computer/browser-harness.ts",
+      "bytes": 11817,
+      "sha256": "1523efeb20d5cbcf2a396e4002f8ff9df09ddd938309fad7145dbec7a5f83aee"
+    },
+    {
+      "path": "src/computer/browser-profile.ts",
+      "bytes": 4688,
+      "sha256": "db3e2045db6e3cf643f7247cc6e64fc325968cd74c1e74508c1124940cdf2406"
+    },
+    {
+      "path": "src/computer/browser-worker-entry.ts",
+      "bytes": 3944,
+      "sha256": "adb5518dd719eb4743f0c020e90a0ebaa686a483673db055353e45375e14c91d"
+    },
+    {
+      "path": "src/computer/browser-registry.ts",
+      "bytes": 14110,
+      "sha256": "01aa4b26f771c80592b16c2ff5392c0f65e241efe1fc2c9dc7ffce2f909176c4"
+    },
+    {
+      "path": "src/computer/capabilities.ts",
+      "bytes": 6110,
+      "sha256": "528da4b444c02b9ab3ffb12e6ab2d33b5a998b0739642060b5555d492cb63713"
+    },
+    {
+      "path": "src/computer/digest.ts",
+      "bytes": 498,
+      "sha256": "2e8b855f9509e55839a2a93e019768be10c9453e0242a8364ef02a4412075785"
+    },
+    {
+      "path": "src/computer/http.ts",
+      "bytes": 4028,
+      "sha256": "e7d4da10b17b9cabb0d51a471809a4e65488a56906b477cd7720ab143eb1b8cd"
+    },
+    {
+      "path": "src/computer/journal.ts",
+      "bytes": 12385,
+      "sha256": "b918f909c5c4136a7ee6d3ec11a7fd9c01bac437745763b4f12175a8e5e76ef3"
+    },
+    {
+      "path": "src/computer/journal-schema.ts",
+      "bytes": 1424,
+      "sha256": "9872e227b9f2fc80627767509f3bf9986ee7284eb53ad586a4e3def51e50c577"
+    },
+    {
+      "path": "src/computer/native-tools.ts",
+      "bytes": 3383,
+      "sha256": "6d779aafed46e706885b2685875b708a64b072debe1affce737e8071b22482da"
+    },
+    {
+      "path": "src/computer/physical-seat.ts",
+      "bytes": 2209,
+      "sha256": "4474be4ac0fe9740756164ca6c2985ccc6be0d1b185b51085dfdc7d61f2dc44b"
+    },
+    {
+      "path": "src/computer/qualify-browser.ts",
+      "bytes": 18381,
+      "sha256": "4aa5fb576067ed494f5839a4705d4c36af35e6a84020df3d7ac4cdbade044bb6"
+    },
+    {
+      "path": "src/computer/worker-port.ts",
+      "bytes": 1481,
+      "sha256": "67e424b8adcb44a90396eb41bd8a7efbdb4b97dd61105214942087570b19cdd7"
+    },
+    {
+      "path": "src/server/computer-control.ts",
+      "bytes": 6295,
+      "sha256": "5596cc10829342363c71bea0562e15f05edb3e8c100d2370d3f01552d91357f7"
+    },
+    {
+      "path": "src/server/session-authority.ts",
+      "bytes": 14274,
+      "sha256": "009d897f5692ae5d6374ae5987516e91fcf4e9b46ed09c66b072d7eac9f347c7"
+    },
+    {
+      "path": "src/server/http-authority.ts",
+      "bytes": 7926,
+      "sha256": "a5e9f4ad8102f19b48ff693f4a53274217f2f3ee2e74ae7fce0de4f19539f210"
+    },
+    {
+      "path": "src/server/managed-execution.ts",
+      "bytes": 24094,
+      "sha256": "6f93add46d841c56371a268e22ea2f945f18e90c71c6d14d8853bd96bfb90014"
+    },
+    {
+      "path": "src/graph/execution-context.ts",
+      "bytes": 40118,
+      "sha256": "94ee45e77ee24979c766045ce0561cd05c5ed313c5b69ff1135d9427232ca8f6"
+    },
+    {
+      "path": "src/architect/computer-use-ui.ts",
+      "bytes": 7898,
+      "sha256": "9f02f14c2d877f4948140b7f906fd9328a8f38cf078609665223df5d417cbf2e"
+    },
+    {
+      "path": "src/architect/native-tool-loop.ts",
+      "bytes": 47251,
+      "sha256": "b225fdab6e0510ca98fdb2e8308de97e835a78b73083d275052803b5af6589d7"
+    },
+    {
+      "path": "src/architect/routes.ts",
+      "bytes": 652662,
+      "sha256": "54762140d0ee427735cb5801ea6a4b106d1d8729d3c6cd57a56794e4518d67dc"
+    },
+    {
+      "path": "src/cli/commands/computer-use.ts",
+      "bytes": 3797,
+      "sha256": "a86742935cc5bcf7b25ea651778341c65f9927169429233eb6f6ff48ee7130db"
+    },
+    {
+      "path": "src/cli/dg.ts",
+      "bytes": 10072,
+      "sha256": "a1ffcdb76c09542b4728b894a09fbf2d16adbb839c3ad5006b438fefe4a8086f"
+    },
+    {
+      "path": "src/graph/contracts.ts",
+      "bytes": 28760,
+      "sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+    },
+    {
+      "path": "src/cognitive/jobs.ts",
+      "bytes": 25670,
+      "sha256": "c9c5305e037219f991e7e2aff9bf1f30212906fc612a926d8857d2eeb7d5d5fe"
+    },
+    {
+      "path": "src/cognitive/provider-images.ts",
+      "bytes": 1754,
+      "sha256": "e0eb4de365e55f4b0b7feab6c222c4032437b589351b38fd8344c04def15a229"
+    },
+    {
+      "path": "package.json",
+      "bytes": 4149,
+      "sha256": "6acc1e573150165cfc8a77109e0409e992bb8f34bf9700eaf4eeac69a61011a8"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 208219,
+      "sha256": "a27b2d8891dd20c838e27b26a9a1cdf2ef67a48fe97d02e3819589ccc174fd91"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "tests/computer-broker.test.ts",
+      "bytes": 15654,
+      "sha256": "c71ed6532cba997f423e5bd83958ab53ea499a67496747bc51a918242c0c7ef5"
+    },
+    {
+      "path": "tests/computer-browser-worker.test.ts",
+      "bytes": 16481,
+      "sha256": "e5b3f7fc766fecea23f74d0a90d6fb6d82b015fe4b029fa29963f1e273f1fc6b"
+    },
+    {
+      "path": "tests/computer-browser-registry.test.ts",
+      "bytes": 8331,
+      "sha256": "db7da4e81c45e8492efae78a8250591c098e4928d60f58bd261a828dc321643a"
+    },
+    {
+      "path": "tests/computer-capabilities.test.ts",
+      "bytes": 4251,
+      "sha256": "ebd9a9cddf30df60bcac39dc0d86ba57fc51f436ac486379a003f5ee5b94f30b"
+    },
+    {
+      "path": "tests/computer-journal.test.ts",
+      "bytes": 12417,
+      "sha256": "c61c277b4744cd1b0ebb8615e304659398e1d26bd4bc21c37f7b08f853145d38"
+    },
+    {
+      "path": "tests/computer-seat.test.ts",
+      "bytes": 2942,
+      "sha256": "ee1806b6bcf7134afb18061c673a2cc897e9757c5d47a05a84207aa6b0dd0d9c"
+    },
+    {
+      "path": "tests/computer-use-ui.test.ts",
+      "bytes": 3998,
+      "sha256": "00eaa1dea013a83d81a05079928699ca980deb9d537148393b38b9dc99653f3b"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 176388,
+      "sha256": "cb2aad6bf3a67bcaf53274b0a18d15c02275f56667b88536e56c8c5010d524be"
+    },
+    {
+      "path": "docs/ashoka/computer-use.md",
+      "bytes": 7234,
+      "sha256": "0256487529ef6d4b050c15296be595878c02769b7b6b36894fe6e2c3a35a3fa5"
+    },
+    {
+      "path": "docs/ashoka/slice-31-foundation-root-tests-fifth.json",
+      "bytes": 657898,
+      "sha256": "805250d99a9b6fbbb0a9d54a333765b4eed5f7f5d016941cebe54a31a7e19f31"
+    },
+    {
+      "path": "docs/ashoka/slice-31-foundation-root-tests-fifth.log",
+      "bytes": 362732,
+      "sha256": "275ef6a97b2b6f9d2b7f9d76326c7fd745f5a819428606c7955633739ef6a636"
+    },
+    {
+      "path": "docs/ashoka/slice-31-foundation-root-tests-fifth-exit.json",
+      "bytes": 75,
+      "sha256": "3d2a082b726455dd93bc3fa6c18e80cd493a81cc3677cf0118c04d0d4fc8e9bd"
+    },
+    {
+      "path": "docs/ashoka/slice-31-installed-browser-qualification-fourth.json",
+      "bytes": 4622,
+      "sha256": "f578fa4b1cc3eb0c58da844d027dcfa0b562b6a37e6830ffdd3e197b5c962cfd"
+    },
+    {
+      "path": "docs/ashoka/slice-31-installed-browser-qualification-fourth.log",
+      "bytes": 639,
+      "sha256": "dfb45bfd0b72f65e47928769a6456c77214752507b7689ace6c8f54a0e8f469c"
+    },
+    {
+      "path": "docs/ashoka/slice-31-build-twenty-second.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-31-generated-checks.log",
+      "bytes": 2857,
+      "sha256": "9d6c8a1aaba76c484932955c45f991533d7cfce2a9caea4916b3b45608411ed2"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-build.log",
+      "bytes": 1628,
+      "sha256": "b1011e56b82bc06f5413f32910a76f79808677a9f6ee0ebe6022febecf699d9e"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-tests.log",
+      "bytes": 46231,
+      "sha256": "710e9c5ed8ec462a6282190bb01002616fc607f7fdbf5be5bf759ebde5b6f539"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-tests-exit.json",
+      "bytes": 75,
+      "sha256": "aef8ced6c3a8ff46bad65641a5851f928e94e4e23e8c4d7a8843cbd3d61c4847"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/host-managed-execution.test.ts > SDK native worker performs one actual governed source effect and retains durable source debt rather than graph completion
+[2026-10-02T02:08:01.418Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T02:08:01.419Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T02:08:01.420Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+ ❯ tests/host-managed-execution.test.ts (71 tests | 1 failed | 70 skipped) 384ms
+   ↓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass
+   ↓ parallel host passes share their authenticated owner while another client cannot read or close them
+   ↓ a worker credential cannot issue a new grant, close another host pass or change its chosen identity
+   ↓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable
+   ↓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block
+   ↓ editor initialization cancellation stops only its caller and preserves another caller on the shared handshake
+   ↓ sdk initialization cancellation stops only its caller and preserves another caller on the shared handshake
+   ↓ editor freezes nested exact approvals before the shared session wait
+   ↓ sdk freezes nested exact approvals before the shared session wait
+   ↓ editor disposal prevents a delayed noncooperative handshake from dispatching or restoring authority
+   ↓ sdk disposal prevents a delayed noncooperative handshake from dispatching or restoring authority
+   ↓ editor session readiness cannot redirect a queued authority call to a replacement endpoint
+   ↓ editor changed endpoints reject late handshake replies rather than adopting a new owner
+   ↓ SDK constructor options cannot be mutated into a different transport after construction
+   ↓ SDK native lifecycle captures request/port identities, refreshes each continuation and preserves whole literal results
+   ↓ SDK handoff rejects a clipped exact checkpoint before worker dispatch and never acknowledges it
+   × SDK native worker performs one actual governed source effect and retains durable source debt rather than graph completion 382ms
+     → {"_meta":{"dreamgraph":{"schema":"dreamgraph.tool_result_metadata.v1","contract_version":1,"tool":"edit_file","outcome":"failed","effect":"source_write"}},"content":[{"type":"text","text":"{\"success\":false,\"error\":{\"code\":\"INVALID_INPUT\",\"message\":\"Arguments do not match the registered owner schema.\"}}"}],"structuredContent":{"success":false,"error":{"code":"INVALID_INPUT","message":"Arguments do not match the registered owner schema."}},"isError":true}: expected true not to be true // Object.is equality
+   ↓ SDK wait cancellation keeps a noncooperative callback and late successful reply termination-unconfirmed
+   ↓ SDK native termination requires explicit harness evidence and never derives it from settled successful prose
+   ↓ SDK lost admission retains its original ID, inspects only that owner and can close without repeating admission
+   ↓ SDK lost closure retries only its captured disposition after actual owner closure, without repeating native work
+   ↓ SDK refresh rejects a foreign execution receipt before handoff or new worker dispatch
+   ↓ SDK worker reads canonical plugin graph evidence through the actual manager/resource transport without inheriting host authority
+   ↓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts
+   ↓ editor CLI byte admission refuses the whole over-budget request before acknowledging or launching it
+   ↓ editor CLI cancellation preserves unconfirmed descendant termination instead of proving a no-change pass
+   ↓ editor CLI pre-launch failure settles without model work; cancellation during acknowledgement cannot yield a launchable prompt
+   ↓ the actual editor host records exact review before activation; replay cannot replenish consumed effects
+   ↓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads
+   ↓ an authenticated owner fences in-flight review; queued HTTP review cannot bypass the changed checkpoint
+   ↓ review cannot exceed the original effect ceiling or approve a changed named source
+   ↓ the actual portable SDK recovers a lost approval reply without reissuing a grant or extending expiry
+   ↓ a published review alone grants no effect; the unchanged live host can recover activation exactly once
+   ↓ a saved review cannot reactivate after the actual lease expires
+   ↓ the actual editor rendezvous waits before the graph writer, then publishes approval before one unchanged source effect
+   ↓ the actual SDK operator decline settles the pending tool without granting or executing an effect
+   ↓ request cancellation removes an enabled review wait without invoking the effect owner
+   ↓ the editor review controller retains literal exact proposals and retries lost acknowledgement without repeating effects
+   ↓ the editor controller declines the captured daemon action without dispatch or approval publication
+   ↓ editor review decisions cannot redirect through a changed endpoint
+   ↓ native editor admission delivers whole replacement evidence, uses the actual worker MCP fence and closes unchanged source with durable review
+   ↓ native editor source changes retain reconciliation debt rather than reporting a graph commit
+   ↓ native editor commands execute at the actual daemon owner with exact review and complete source observation
+   ↓ native editor cancelled waiting closes promptly with underlying callback termination unconfirmed
+   ↓ native editor Unicode request byte refusal happens before delivery and dispatch
+   ↓ native editor captured instance mismatch refuses before delivery and revokes the owned lease
+   ↓ an independently cancelled native round blocks fresh dispatch until its unknown outcome closes
+   ↓ the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+   ↓ the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+   ↓ compiled editor Undo restores exact Unicode/BOM/mixed newline bytes through actual HTTP/MCP source owners and retains graph debt
+   ↓ compiled editor Undo for a created file uses the actual source owner and exact absent/hash precondition
+   ↓ compiled editor Undo for a deleted file uses the actual source owner and exact absent/hash precondition
+   ↓ Undo refuses a file changed after its review without dispatching authority or overwriting user bytes
+   ↓ a changed editor authority refuses Undo before admission and retains a retryable original review
+   ↓ a lost operator closure acknowledgement retains recovery and duplicate Undo/Keep cannot repeat or erase it
+   ↓ captured review copies cannot mutate the baseline/authority and stale IDs cannot clear or undo a later edit
+   ↓ lost operator admission can close the same original lease without dispatching any tool or minting a replacement
+   ↓ operator recovery cannot turn actual unknown termination into a successful closure or redirect to a different instance
+   ↓ Stop invalidates queued review clicks before their second owner dispatch
+   ↓ operator message-action errors retain the complete actual owner payload and a failed trace, with no local alias fallback
+   ↓ an explicit operator message action records changed-file review under its original daemon and retains the actual source closure
+   ↓ a returned message action persists its original instance outcome and never labels pending source debt as completed after selection changes
+   ↓ expired lost-ack review recovers only by reading the original settled closure, without renewing approval or repeating its effect
+   ↓ review inspection retains actual unknown termination and disables historical approval after revocation
+   ↓ inspection of a pending review fences continuation when its original authority was revoked with unknown termination
+   ↓ Stop during a noncooperative inspection cannot resurrect a retired pending review from a late original-host reply
+   ↓ a compiled palette command uses the original daemon owner, records actual source change and keeps reconciliation separate from exit zero
+   ↓ a compiled palette capture refuses a later instance selection before any execution admission or local shell fallback
+   ↓ palette invocation without an original daemon refuses before dispatch and leaves source unchanged
+   ↓ the actual palette captures before prompting and shows complete owner evidence with a pending warning despite exit zero
+   ↓ the actual build palette preserves literal root ext-prefixed script identity and refuses unsafe script names without dispatch
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/host-managed-execution.test.ts > SDK native worker performs one actual governed source effect and retains durable source debt rather than graph completion
+AssertionError: {"_meta":{"dreamgraph":{"schema":"dreamgraph.tool_result_metadata.v1","contract_version":1,"tool":"edit_file","outcome":"failed","effect":"source_write"}},"content":[{"type":"text","text":"{\"success\":false,\"error\":{\"code\":\"INVALID_INPUT\",\"message\":\"Arguments do not match the registered owner schema.\"}}"}],"structuredContent":{"success":false,"error":{"code":"INVALID_INPUT","message":"Arguments do not match the registered owner schema."}},"isError":true}: expected true not to be true // Object.is equality
+ ❯ tests/host-managed-execution.test.ts:287:54
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 70 skipped (71)
+   Start at  05:07:52
+   Duration  8.99s (transform 2.81s, setup 0ms, collect 8.22s, tests 384ms, environment 0ms, prepare 134ms)
+

@@ -1,0 +1,11 @@
+{
+  "output": "C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\docs\\ashoka\\slice-31-wsl-current",
+  "version": "13.4.0",
+  "node": "20.20.2",
+  "browser": "151.0.7922.34",
+  "measured_checks": 11,
+  "stop_release_ms": 186.94063600000027,
+  "control_loss_stop_ms": 2525.792173,
+  "model_requests": 0,
+  "scope": "Actual WSL Linux test-bed installer and isolated headless browser only. No native desktop, CLI computer adapter, macOS, Linux Mint GUI or VS Code activation qualification."
+}

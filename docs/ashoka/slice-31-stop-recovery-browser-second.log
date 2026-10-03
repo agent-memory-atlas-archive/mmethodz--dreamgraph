@@ -1,0 +1,33 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ❯ tests/computer-browser-worker.test.ts (11 tests | 1 failed) 27678ms
+   ✓ performs real Unicode, checked, click/readback and scrolling using opaque current references  2773ms
+   ✓ moved/covered controls, disabled and credential controls never receive a guessed action  1410ms
+   ✓ forbidden posts, redirects, popups and frames cannot reach another origin or authority  2959ms
+   ✓ exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime  444ms
+   ✓ explicit navigation stays inside the approved origin and segment path and verifies independent destination state  2392ms
+   ✓ private worker process preserves typed observations and responsive independent termination  2245ms
+   ✓ stop bypasses a pending browser navigation and never waits for its ten-second server response  1348ms
+   ✓ masked frames have a verified digest and image exhaustion refuses before another input  2145ms
+   ✓ a real worker closes its dedicated browser on disconnect without another model call  2467ms
+   × a real worker closes its dedicated browser on watchdog without another model call 6936ms
+     → expected 5138.5264000000025 to be less than 5000
+   ✓ lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input  2557ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on watchdog without another model call
+AssertionError: expected 5138.5264000000025 to be less than 5000
+ ❯ tests/computer-browser-worker.test.ts:110:35
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+   Start at  20:17:12
+   Duration  28.36s (transform 147ms, setup 0ms, collect 308ms, tests 27.68s, environment 0ms, prepare 138ms)
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/slice-31-stop-recovery-browser-second.json

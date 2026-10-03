@@ -1,0 +1,1202 @@
+
+> dreamgraph-vscode@13.4.0 build
+> npm run lint:isolation && npm run build:webview && tsc -p ./tsconfig.json && npm run build:extension && npm run build:bridge && npm run build:vendor
+
+
+> dreamgraph-vscode@13.4.0 lint:isolation
+> node scripts/lint-isolation.mjs
+
+lint:isolation OK — architect-v2 quarantined; 0 violations.
+
+> dreamgraph-vscode@13.4.0 build:webview
+> node scripts/build-webview.cjs
+
+
+  dist\webview.js  27.2kb
+
+Done in 8ms
+src/chat-panel.ts(888,9): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(893,9): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(893,36): error TS1005: ';' expected.
+src/chat-panel.ts(904,9): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(904,40): error TS1005: ';' expected.
+src/chat-panel.ts(911,9): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(911,33): error TS1005: ';' expected.
+src/chat-panel.ts(916,5): error TS1005: ',' expected.
+src/chat-panel.ts(916,6): error TS1068: Unexpected token. A constructor, method, accessor, or property was expected.
+src/chat-panel.ts(916,8): error TS1068: Unexpected token. A constructor, method, accessor, or property was expected.
+src/chat-panel.ts(916,30): error TS1005: ';' expected.
+src/chat-panel.ts(919,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(921,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(921,10): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(921,31): error TS1005: ';' expected.
+src/chat-panel.ts(921,45): error TS1109: Expression expected.
+src/chat-panel.ts(922,9): error TS1005: ':' expected.
+src/chat-panel.ts(922,50): error TS1005: ',' expected.
+src/chat-panel.ts(923,11): error TS1005: ',' expected.
+src/chat-panel.ts(923,15): error TS1005: ':' expected.
+src/chat-panel.ts(923,33): error TS1005: ',' expected.
+src/chat-panel.ts(924,11): error TS1005: ',' expected.
+src/chat-panel.ts(924,15): error TS1005: ':' expected.
+src/chat-panel.ts(924,27): error TS1005: ',' expected.
+src/chat-panel.ts(927,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(927,19): error TS1005: ';' expected.
+src/chat-panel.ts(928,9): error TS1005: ':' expected.
+src/chat-panel.ts(928,27): error TS1005: ',' expected.
+src/chat-panel.ts(929,9): error TS1005: ':' expected.
+src/chat-panel.ts(929,33): error TS1005: ',' expected.
+src/chat-panel.ts(930,16): error TS1005: ',' expected.
+src/chat-panel.ts(930,39): error TS1005: ',' expected.
+src/chat-panel.ts(930,45): error TS1005: ':' expected.
+src/chat-panel.ts(930,74): error TS1005: ',' expected.
+src/chat-panel.ts(933,3): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(933,31): error TS1005: ',' expected.
+src/chat-panel.ts(933,40): error TS1005: ';' expected.
+src/chat-panel.ts(933,54): error TS1109: Expression expected.
+src/chat-panel.ts(934,10): error TS1005: ',' expected.
+src/chat-panel.ts(934,38): error TS1005: ',' expected.
+src/chat-panel.ts(934,39): error TS1136: Property assignment expected.
+src/chat-panel.ts(1471,1): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(1473,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(1473,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(1474,7): error TS1005: ',' expected.
+src/chat-panel.ts(1475,11): error TS1005: ',' expected.
+src/chat-panel.ts(1476,14): error TS1109: Expression expected.
+src/chat-panel.ts(1477,17): error TS1109: Expression expected.
+src/chat-panel.ts(1478,2): error TS1005: ';' expected.
+src/chat-panel.ts(1478,38): error TS1005: ',' expected.
+src/chat-panel.ts(1479,7): error TS1003: Identifier expected.
+src/chat-panel.ts(1479,12): error TS1005: ',' expected.
+src/chat-panel.ts(1479,27): error TS1005: ',' expected.
+src/chat-panel.ts(1479,29): error TS1136: Property assignment expected.
+src/chat-panel.ts(1507,1): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(1518,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(1518,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(1518,43): error TS1005: ',' expected.
+src/chat-panel.ts(1518,70): error TS1109: Expression expected.
+src/chat-panel.ts(1518,79): error TS1005: ';' expected.
+src/chat-panel.ts(1519,9): error TS1003: Identifier expected.
+src/chat-panel.ts(1519,14): error TS1005: ',' expected.
+src/chat-panel.ts(1519,102): error TS1005: ',' expected.
+src/chat-panel.ts(1520,13): error TS1005: ':' expected.
+src/chat-panel.ts(1520,103): error TS1005: ',' expected.
+src/chat-panel.ts(1521,11): error TS1005: ':' expected.
+src/chat-panel.ts(1521,41): error TS1005: ',' expected.
+src/chat-panel.ts(1522,11): error TS1005: ':' expected.
+src/chat-panel.ts(1528,37): error TS1005: ',' expected.
+src/chat-panel.ts(1530,9): error TS1005: ':' expected.
+src/chat-panel.ts(1531,13): error TS1005: ':' expected.
+src/chat-panel.ts(1531,109): error TS1005: ',' expected.
+src/chat-panel.ts(1532,28): error TS1005: ',' expected.
+src/chat-panel.ts(1532,106): error TS1005: ',' expected.
+src/chat-panel.ts(1533,15): error TS1005: ':' expected.
+src/chat-panel.ts(1533,59): error TS1005: ',' expected.
+src/chat-panel.ts(1534,13): error TS1005: ',' expected.
+src/chat-panel.ts(1534,17): error TS1005: ':' expected.
+src/chat-panel.ts(1534,107): error TS1005: ',' expected.
+src/chat-panel.ts(1535,7): error TS1005: ';' expected.
+src/chat-panel.ts(1541,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(1543,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(1543,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(1543,42): error TS1005: ',' expected.
+src/chat-panel.ts(1543,59): error TS1005: ';' expected.
+src/chat-panel.ts(1544,9): error TS1005: ':' expected.
+src/chat-panel.ts(1545,13): error TS1005: ':' expected.
+src/chat-panel.ts(1545,86): error TS1005: ',' expected.
+src/chat-panel.ts(1546,11): error TS1005: ':' expected.
+src/chat-panel.ts(1546,39): error TS1005: ',' expected.
+src/chat-panel.ts(1547,13): error TS1005: ',' expected.
+src/chat-panel.ts(1547,17): error TS1005: ':' expected.
+src/chat-panel.ts(1548,227): error TS1005: ',' expected.
+src/chat-panel.ts(1549,14): error TS1005: ':' expected.
+src/chat-panel.ts(1549,134): error TS1005: ',' expected.
+src/chat-panel.ts(1550,7): error TS1005: ',' expected.
+src/chat-panel.ts(1557,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(1557,55): error TS1109: Expression expected.
+src/chat-panel.ts(1557,72): error TS1005: ';' expected.
+src/chat-panel.ts(1557,74): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(1728,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(1728,53): error TS1109: Expression expected.
+src/chat-panel.ts(1728,70): error TS1005: ';' expected.
+src/chat-panel.ts(1728,72): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(1869,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(1870,13): error TS1005: ',' expected.
+src/chat-panel.ts(1871,9): error TS1005: ',' expected.
+src/chat-panel.ts(1872,18): error TS1005: ',' expected.
+src/chat-panel.ts(1872,46): error TS1005: ',' expected.
+src/chat-panel.ts(1873,17): error TS1005: ',' expected.
+src/chat-panel.ts(1873,36): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(1874,31): error TS1005: ',' expected.
+src/chat-panel.ts(1874,50): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(1875,12): error TS1005: ',' expected.
+src/chat-panel.ts(1876,44): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(1876,57): error TS1005: ',' expected.
+src/chat-panel.ts(1877,40): error TS1005: ',' expected.
+src/chat-panel.ts(1877,46): error TS1005: ',' expected.
+src/chat-panel.ts(1877,47): error TS1109: Expression expected.
+src/chat-panel.ts(1877,48): error TS1005: ':' expected.
+src/chat-panel.ts(1878,32): error TS1005: ',' expected.
+src/chat-panel.ts(1879,43): error TS1005: ',' expected.
+src/chat-panel.ts(1880,31): error TS1005: ',' expected.
+src/chat-panel.ts(1881,38): error TS1005: ',' expected.
+src/chat-panel.ts(1883,4): error TS1005: ';' expected.
+src/chat-panel.ts(1883,6): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2073,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2073,39): error TS1005: ',' expected.
+src/chat-panel.ts(2073,48): error TS1005: ';' expected.
+src/chat-panel.ts(2073,72): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(2073,74): error TS1005: ';' expected.
+src/chat-panel.ts(2099,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2099,45): error TS1005: ';' expected.
+src/chat-panel.ts(2099,47): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2105,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2105,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2105,35): error TS1005: ';' expected.
+src/chat-panel.ts(2105,49): error TS1109: Expression expected.
+src/chat-panel.ts(2106,11): error TS1005: ':' expected.
+src/chat-panel.ts(2112,7): error TS1005: ',' expected.
+src/chat-panel.ts(2113,9): error TS1003: Identifier expected.
+src/chat-panel.ts(2113,16): error TS1005: ',' expected.
+src/chat-panel.ts(2113,37): error TS1005: ';' expected.
+src/chat-panel.ts(2186,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2188,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2188,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2188,35): error TS1005: ';' expected.
+src/chat-panel.ts(2188,49): error TS1109: Expression expected.
+src/chat-panel.ts(2189,11): error TS1005: ',' expected.
+src/chat-panel.ts(2189,15): error TS1005: ':' expected.
+src/chat-panel.ts(2192,7): error TS1005: ',' expected.
+src/chat-panel.ts(2195,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2195,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2195,43): error TS1005: ',' expected.
+src/chat-panel.ts(2195,56): error TS1005: ';' expected.
+src/chat-panel.ts(2195,70): error TS1109: Expression expected.
+src/chat-panel.ts(2196,11): error TS1005: ':' expected.
+src/chat-panel.ts(2196,38): error TS1005: ',' expected.
+src/chat-panel.ts(2197,9): error TS1005: ',' expected.
+src/chat-panel.ts(2197,44): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(2197,50): error TS1005: ',' expected.
+src/chat-panel.ts(2198,9): error TS1005: ':' expected.
+src/chat-panel.ts(2199,65): error TS1005: ',' expected.
+src/chat-panel.ts(2200,7): error TS1005: ',' expected.
+src/chat-panel.ts(2200,13): error TS1005: ':' expected.
+src/chat-panel.ts(2201,13): error TS1005: ':' expected.
+src/chat-panel.ts(2203,5): error TS1005: ',' expected.
+src/chat-panel.ts(2203,11): error TS1005: ':' expected.
+src/chat-panel.ts(2203,27): error TS1005: ',' expected.
+src/chat-panel.ts(2204,11): error TS1005: ',' expected.
+src/chat-panel.ts(2204,18): error TS1005: ',' expected.
+src/chat-panel.ts(2220,8): error TS1005: ',' expected.
+src/chat-panel.ts(2223,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2223,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2223,46): error TS1005: ',' expected.
+src/chat-panel.ts(2223,64): error TS1005: ',' expected.
+src/chat-panel.ts(2223,73): error TS1005: ';' expected.
+src/chat-panel.ts(2223,87): error TS1109: Expression expected.
+src/chat-panel.ts(2224,11): error TS1005: ':' expected.
+src/chat-panel.ts(2224,122): error TS1005: ',' expected.
+src/chat-panel.ts(2225,9): error TS1003: Identifier expected.
+src/chat-panel.ts(2225,22): error TS1005: ',' expected.
+src/chat-panel.ts(2225,39): error TS1005: ',' expected.
+src/chat-panel.ts(2225,41): error TS1136: Property assignment expected.
+src/chat-panel.ts(2252,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2254,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2254,28): error TS1005: ';' expected.
+src/chat-panel.ts(2254,41): error TS1005: ':' expected.
+src/chat-panel.ts(2254,66): error TS1005: ',' expected.
+src/chat-panel.ts(2254,72): error TS1005: ':' expected.
+src/chat-panel.ts(2254,101): error TS1005: ',' expected.
+src/chat-panel.ts(2254,107): error TS1005: ':' expected.
+src/chat-panel.ts(2254,133): error TS1005: ',' expected.
+src/chat-panel.ts(2261,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2261,73): error TS1005: ';' expected.
+src/chat-panel.ts(2261,118): error TS1109: Expression expected.
+src/chat-panel.ts(2265,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2265,35): error TS1005: ',' expected.
+src/chat-panel.ts(2265,62): error TS1005: ',' expected.
+src/chat-panel.ts(2265,82): error TS1005: ',' expected.
+src/chat-panel.ts(2265,111): error TS1005: ';' expected.
+src/chat-panel.ts(2265,113): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2291,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2291,30): error TS1005: ',' expected.
+src/chat-panel.ts(2291,40): error TS1005: ';' expected.
+src/chat-panel.ts(2291,42): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2295,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2295,51): error TS1005: ',' expected.
+src/chat-panel.ts(2295,60): error TS1005: ';' expected.
+src/chat-panel.ts(2295,62): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2299,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2299,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2300,8): error TS1005: ',' expected.
+src/chat-panel.ts(2301,17): error TS1005: ',' expected.
+src/chat-panel.ts(2302,13): error TS1005: ',' expected.
+src/chat-panel.ts(2303,4): error TS1005: ';' expected.
+src/chat-panel.ts(2304,9): error TS1003: Identifier expected.
+src/chat-panel.ts(2304,14): error TS1005: ',' expected.
+src/chat-panel.ts(2304,57): error TS1005: ',' expected.
+src/chat-panel.ts(2304,66): error TS1005: ':' expected.
+src/chat-panel.ts(2304,71): error TS1005: ',' expected.
+src/chat-panel.ts(2306,11): error TS1005: ':' expected.
+src/chat-panel.ts(2306,61): error TS1005: ',' expected.
+src/chat-panel.ts(2307,11): error TS1005: ':' expected.
+src/chat-panel.ts(2307,57): error TS1005: ',' expected.
+src/chat-panel.ts(2308,11): error TS1005: ':' expected.
+src/chat-panel.ts(2308,94): error TS1005: ',' expected.
+src/chat-panel.ts(2309,11): error TS1005: ':' expected.
+src/chat-panel.ts(2309,147): error TS1005: ',' expected.
+src/chat-panel.ts(2310,9): error TS1005: ':' expected.
+src/chat-panel.ts(2310,36): error TS1005: ',' expected.
+src/chat-panel.ts(2311,11): error TS1005: ',' expected.
+src/chat-panel.ts(2311,15): error TS1005: ':' expected.
+src/chat-panel.ts(2311,68): error TS1005: ',' expected.
+src/chat-panel.ts(2313,11): error TS1005: ':' expected.
+src/chat-panel.ts(2313,74): error TS1005: ',' expected.
+src/chat-panel.ts(2314,11): error TS1005: ':' expected.
+src/chat-panel.ts(2314,69): error TS1005: ',' expected.
+src/chat-panel.ts(2315,11): error TS1005: ':' expected.
+src/chat-panel.ts(2315,30): error TS1005: ',' expected.
+src/chat-panel.ts(2315,57): error TS1005: ',' expected.
+src/chat-panel.ts(2315,69): error TS1005: ';' expected.
+src/chat-panel.ts(2394,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2400,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2400,29): error TS1005: ';' expected.
+src/chat-panel.ts(2401,9): error TS1005: ':' expected.
+src/chat-panel.ts(2401,27): error TS1005: ',' expected.
+src/chat-panel.ts(2402,9): error TS1005: ':' expected.
+src/chat-panel.ts(2402,31): error TS1005: ',' expected.
+src/chat-panel.ts(2403,9): error TS1005: ':' expected.
+src/chat-panel.ts(2403,28): error TS1005: ',' expected.
+src/chat-panel.ts(2404,9): error TS1005: ':' expected.
+src/chat-panel.ts(2404,32): error TS1005: ',' expected.
+src/chat-panel.ts(2405,10): error TS1005: ':' expected.
+src/chat-panel.ts(2405,70): error TS1005: ',' expected.
+src/chat-panel.ts(2406,13): error TS1005: ',' expected.
+src/chat-panel.ts(2406,26): error TS1005: ',' expected.
+src/chat-panel.ts(2406,28): error TS1136: Property assignment expected.
+src/chat-panel.ts(2411,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2413,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2413,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2413,35): error TS1005: ';' expected.
+src/chat-panel.ts(2413,49): error TS1109: Expression expected.
+src/chat-panel.ts(2414,11): error TS1005: ',' expected.
+src/chat-panel.ts(2414,15): error TS1005: ':' expected.
+src/chat-panel.ts(2414,90): error TS1005: ',' expected.
+src/chat-panel.ts(2415,11): error TS1005: ',' expected.
+src/chat-panel.ts(2415,15): error TS1005: ':' expected.
+src/chat-panel.ts(2415,27): error TS1005: ',' expected.
+src/chat-panel.ts(2416,13): error TS1005: ',' expected.
+src/chat-panel.ts(2416,23): error TS1005: ',' expected.
+src/chat-panel.ts(2416,31): error TS1005: ',' expected.
+src/chat-panel.ts(2416,35): error TS1005: ':' expected.
+src/chat-panel.ts(2416,95): error TS1005: ',' expected.
+src/chat-panel.ts(2417,11): error TS1005: ',' expected.
+src/chat-panel.ts(2417,15): error TS1005: ':' expected.
+src/chat-panel.ts(2417,34): error TS1005: ',' expected.
+src/chat-panel.ts(2418,11): error TS1005: ',' expected.
+src/chat-panel.ts(2418,15): error TS1005: ':' expected.
+src/chat-panel.ts(2418,37): error TS1005: ',' expected.
+src/chat-panel.ts(2421,9): error TS1005: ':' expected.
+src/chat-panel.ts(2421,36): error TS1005: ',' expected.
+src/chat-panel.ts(2424,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2424,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2424,28): error TS1005: ';' expected.
+src/chat-panel.ts(2424,42): error TS1109: Expression expected.
+src/chat-panel.ts(2425,11): error TS1005: ',' expected.
+src/chat-panel.ts(2425,15): error TS1005: ':' expected.
+src/chat-panel.ts(2425,82): error TS1005: ',' expected.
+src/chat-panel.ts(2426,11): error TS1005: ',' expected.
+src/chat-panel.ts(2426,15): error TS1005: ':' expected.
+src/chat-panel.ts(2426,37): error TS1005: ',' expected.
+src/chat-panel.ts(2429,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2429,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2429,38): error TS1005: ';' expected.
+src/chat-panel.ts(2429,52): error TS1109: Expression expected.
+src/chat-panel.ts(2430,11): error TS1005: ':' expected.
+src/chat-panel.ts(2430,135): error TS1005: ',' expected.
+src/chat-panel.ts(2431,16): error TS1005: ',' expected.
+src/chat-panel.ts(2431,29): error TS1005: ',' expected.
+src/chat-panel.ts(2431,31): error TS1136: Property assignment expected.
+src/chat-panel.ts(2436,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2438,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2438,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2438,49): error TS1005: ',' expected.
+src/chat-panel.ts(2438,71): error TS1005: ';' expected.
+src/chat-panel.ts(2439,11): error TS1005: ':' expected.
+src/chat-panel.ts(2439,64): error TS1005: ',' expected.
+src/chat-panel.ts(2440,12): error TS1005: ':' expected.
+src/chat-panel.ts(2453,6): error TS1005: ',' expected.
+src/chat-panel.ts(2456,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2456,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2456,51): error TS1005: ',' expected.
+src/chat-panel.ts(2456,73): error TS1005: ';' expected.
+src/chat-panel.ts(2456,103): error TS1005: ',' expected.
+src/chat-panel.ts(2456,125): error TS1005: ',' expected.
+src/chat-panel.ts(2456,172): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(2457,11): error TS1005: ':' expected.
+src/chat-panel.ts(2457,45): error TS1005: ',' expected.
+src/chat-panel.ts(2458,11): error TS1005: ':' expected.
+src/chat-panel.ts(2458,88): error TS1005: ',' expected.
+src/chat-panel.ts(2459,9): error TS1005: ',' expected.
+src/chat-panel.ts(2459,19): error TS1005: ',' expected.
+src/chat-panel.ts(2460,15): error TS1005: ',' expected.
+src/chat-panel.ts(2460,41): error TS1005: ',' expected.
+src/chat-panel.ts(2460,43): error TS1136: Property assignment expected.
+src/chat-panel.ts(2468,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2470,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2470,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2470,48): error TS1005: ',' expected.
+src/chat-panel.ts(2470,57): error TS1005: ';' expected.
+src/chat-panel.ts(2470,71): error TS1109: Expression expected.
+src/chat-panel.ts(2471,11): error TS1005: ':' expected.
+src/chat-panel.ts(2471,66): error TS1005: ',' expected.
+src/chat-panel.ts(2472,11): error TS1005: ':' expected.
+src/chat-panel.ts(2472,46): error TS1005: ',' expected.
+src/chat-panel.ts(2473,9): error TS1003: Identifier expected.
+src/chat-panel.ts(2478,5): error TS1005: ',' expected.
+src/chat-panel.ts(2478,11): error TS1005: ':' expected.
+src/chat-panel.ts(2478,72): error TS1005: ',' expected.
+src/chat-panel.ts(2479,11): error TS1005: ':' expected.
+src/chat-panel.ts(2479,45): error TS1005: ',' expected.
+src/chat-panel.ts(2480,11): error TS1005: ':' expected.
+src/chat-panel.ts(2480,108): error TS1005: ',' expected.
+src/chat-panel.ts(2481,11): error TS1005: ':' expected.
+src/chat-panel.ts(2481,106): error TS1005: ',' expected.
+src/chat-panel.ts(2482,11): error TS1005: ',' expected.
+src/chat-panel.ts(2482,17): error TS1005: ',' expected.
+src/chat-panel.ts(2482,57): error TS1005: ',' expected.
+src/chat-panel.ts(2483,11): error TS1005: ':' expected.
+src/chat-panel.ts(2483,52): error TS1005: ',' expected.
+src/chat-panel.ts(2484,17): error TS1005: ',' expected.
+src/chat-panel.ts(2484,78): error TS1005: ',' expected.
+src/chat-panel.ts(2485,11): error TS1005: ',' expected.
+src/chat-panel.ts(2485,17): error TS1005: ',' expected.
+src/chat-panel.ts(2485,51): error TS1005: ',' expected.
+src/chat-panel.ts(2486,11): error TS1005: ',' expected.
+src/chat-panel.ts(2486,17): error TS1005: ',' expected.
+src/chat-panel.ts(2486,142): error TS1005: ',' expected.
+src/chat-panel.ts(2487,20): error TS1005: ',' expected.
+src/chat-panel.ts(2487,69): error TS1005: ',' expected.
+src/chat-panel.ts(2487,71): error TS1136: Property assignment expected.
+src/chat-panel.ts(2490,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2492,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2492,31): error TS1005: ';' expected.
+src/chat-panel.ts(2492,55): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(2492,57): error TS1005: ';' expected.
+src/chat-panel.ts(2496,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2496,29): error TS1005: ';' expected.
+src/chat-panel.ts(2496,31): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2500,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2500,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2501,11): error TS1005: ',' expected.
+src/chat-panel.ts(2502,9): error TS1005: ',' expected.
+src/chat-panel.ts(2503,2): error TS1005: ';' expected.
+src/chat-panel.ts(2503,16): error TS1109: Expression expected.
+src/chat-panel.ts(2504,7): error TS1003: Identifier expected.
+src/chat-panel.ts(2504,17): error TS1005: ',' expected.
+src/chat-panel.ts(2504,42): error TS1005: ';' expected.
+src/chat-panel.ts(2517,1): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2519,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2519,39): error TS1005: ',' expected.
+src/chat-panel.ts(2520,21): error TS1005: ',' expected.
+src/chat-panel.ts(2521,19): error TS1005: ',' expected.
+src/chat-panel.ts(2522,28): error TS1005: ',' expected.
+src/chat-panel.ts(2523,22): error TS1005: ',' expected.
+src/chat-panel.ts(2524,31): error TS1005: ',' expected.
+src/chat-panel.ts(2525,23): error TS1005: ',' expected.
+src/chat-panel.ts(2526,23): error TS1005: ',' expected.
+src/chat-panel.ts(2527,33): error TS1005: ',' expected.
+src/chat-panel.ts(2528,25): error TS1005: ',' expected.
+src/chat-panel.ts(2529,5): error TS1005: ';' expected.
+src/chat-panel.ts(2530,9): error TS1005: ':' expected.
+src/chat-panel.ts(2531,11): error TS1005: ':' expected.
+src/chat-panel.ts(2531,58): error TS1005: ',' expected.
+src/chat-panel.ts(2532,7): error TS1005: ',' expected.
+src/chat-panel.ts(2532,13): error TS1005: ':' expected.
+src/chat-panel.ts(2537,5): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2537,33): error TS1005: ',' expected.
+src/chat-panel.ts(2537,47): error TS1005: ';' expected.
+src/chat-panel.ts(2537,75): error TS1109: Expression expected.
+src/chat-panel.ts(2547,5): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2547,45): error TS1005: ',' expected.
+src/chat-panel.ts(2547,83): error TS1005: ';' expected.
+src/chat-panel.ts(2547,85): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2551,5): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2551,38): error TS1005: ',' expected.
+src/chat-panel.ts(2551,52): error TS1005: ';' expected.
+src/chat-panel.ts(2551,54): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2566,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2566,37): error TS1005: ',' expected.
+src/chat-panel.ts(2566,46): error TS1005: ';' expected.
+src/chat-panel.ts(2586,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2586,35): error TS1005: ',' expected.
+src/chat-panel.ts(2586,63): error TS1005: ',' expected.
+src/chat-panel.ts(2586,72): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(2586,74): error TS1005: ';' expected.
+src/chat-panel.ts(2587,9): error TS1003: Identifier expected.
+src/chat-panel.ts(2587,16): error TS1005: '{' expected.
+src/chat-panel.ts(2587,22): error TS1005: ':' expected.
+src/chat-panel.ts(2588,11): error TS1005: ':' expected.
+src/chat-panel.ts(2588,53): error TS1005: ',' expected.
+src/chat-panel.ts(2591,9): error TS1005: ':' expected.
+src/chat-panel.ts(2592,13): error TS1005: ':' expected.
+src/chat-panel.ts(2592,59): error TS1005: ',' expected.
+src/chat-panel.ts(2593,19): error TS1005: ',' expected.
+src/chat-panel.ts(2593,40): error TS1005: ',' expected.
+src/chat-panel.ts(2593,42): error TS1136: Property assignment expected.
+src/chat-panel.ts(2604,5): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2604,7): error TS1005: 'try' expected.
+src/chat-panel.ts(2622,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2624,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2624,39): error TS1005: ',' expected.
+src/chat-panel.ts(2624,53): error TS1005: ';' expected.
+src/chat-panel.ts(2624,69): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(2624,71): error TS1005: ';' expected.
+src/chat-panel.ts(2643,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2643,42): error TS1005: ',' expected.
+src/chat-panel.ts(2643,51): error TS1005: ';' expected.
+src/chat-panel.ts(2643,53): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2647,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2647,45): error TS1005: ',' expected.
+src/chat-panel.ts(2647,77): error TS1005: ';' expected.
+src/chat-panel.ts(2647,79): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2651,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2651,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2651,39): error TS1005: ',' expected.
+src/chat-panel.ts(2651,48): error TS1005: ';' expected.
+src/chat-panel.ts(2651,62): error TS1109: Expression expected.
+src/chat-panel.ts(2652,11): error TS1005: ':' expected.
+src/chat-panel.ts(2652,74): error TS1005: ',' expected.
+src/chat-panel.ts(2653,9): error TS1003: Identifier expected.
+src/chat-panel.ts(2656,5): error TS1005: ',' expected.
+src/chat-panel.ts(2656,11): error TS1005: ',' expected.
+src/chat-panel.ts(2656,17): error TS1005: ',' expected.
+src/chat-panel.ts(2656,81): error TS1005: ',' expected.
+src/chat-panel.ts(2657,9): error TS1005: ':' expected.
+src/chat-panel.ts(2660,7): error TS1005: ',' expected.
+src/chat-panel.ts(2663,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2663,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2663,38): error TS1005: ',' expected.
+src/chat-panel.ts(2663,47): error TS1005: ';' expected.
+src/chat-panel.ts(2663,61): error TS1109: Expression expected.
+src/chat-panel.ts(2664,11): error TS1005: ':' expected.
+src/chat-panel.ts(2664,74): error TS1005: ',' expected.
+src/chat-panel.ts(2665,9): error TS1003: Identifier expected.
+src/chat-panel.ts(2668,5): error TS1005: ',' expected.
+src/chat-panel.ts(2668,12): error TS1005: ',' expected.
+src/chat-panel.ts(2668,37): error TS1005: ',' expected.
+src/chat-panel.ts(2669,9): error TS1005: ':' expected.
+src/chat-panel.ts(2672,7): error TS1005: ',' expected.
+src/chat-panel.ts(2673,11): error TS1005: ',' expected.
+src/chat-panel.ts(2673,15): error TS1005: ':' expected.
+src/chat-panel.ts(2673,33): error TS1005: ',' expected.
+src/chat-panel.ts(2674,11): error TS1005: ',' expected.
+src/chat-panel.ts(2674,15): error TS1005: ':' expected.
+src/chat-panel.ts(2674,27): error TS1005: ',' expected.
+src/chat-panel.ts(2677,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2677,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2677,44): error TS1005: ',' expected.
+src/chat-panel.ts(2677,62): error TS1005: ',' expected.
+src/chat-panel.ts(2677,71): error TS1005: ';' expected.
+src/chat-panel.ts(2677,85): error TS1109: Expression expected.
+src/chat-panel.ts(2678,11): error TS1005: ':' expected.
+src/chat-panel.ts(2678,66): error TS1005: ',' expected.
+src/chat-panel.ts(2679,11): error TS1005: ':' expected.
+src/chat-panel.ts(2679,107): error TS1005: ',' expected.
+src/chat-panel.ts(2680,9): error TS1003: Identifier expected.
+src/chat-panel.ts(2680,18): error TS1005: ',' expected.
+src/chat-panel.ts(2680,82): error TS1005: ';' expected.
+src/chat-panel.ts(2810,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2817,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2817,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2817,36): error TS1005: ',' expected.
+src/chat-panel.ts(2817,64): error TS1005: ';' expected.
+src/chat-panel.ts(2817,78): error TS1109: Expression expected.
+src/chat-panel.ts(2818,13): error TS1005: ',' expected.
+src/chat-panel.ts(2818,27): error TS1005: ',' expected.
+src/chat-panel.ts(2818,29): error TS1136: Property assignment expected.
+src/chat-panel.ts(2827,7): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2836,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2838,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2838,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2838,34): error TS1005: ';' expected.
+src/chat-panel.ts(2838,48): error TS1109: Expression expected.
+src/chat-panel.ts(2839,9): error TS1003: Identifier expected.
+src/chat-panel.ts(2839,14): error TS1005: ',' expected.
+src/chat-panel.ts(2839,21): error TS1005: ',' expected.
+src/chat-panel.ts(2839,29): error TS1005: ':' expected.
+src/chat-panel.ts(2840,11): error TS1005: ',' expected.
+src/chat-panel.ts(2840,15): error TS1005: ':' expected.
+src/chat-panel.ts(2840,88): error TS1005: ',' expected.
+src/chat-panel.ts(2843,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2843,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2844,13): error TS1005: ',' expected.
+src/chat-panel.ts(2845,4): error TS1005: ';' expected.
+src/chat-panel.ts(2845,18): error TS1109: Expression expected.
+src/chat-panel.ts(2846,9): error TS1003: Identifier expected.
+src/chat-panel.ts(2846,14): error TS1005: ',' expected.
+src/chat-panel.ts(2846,21): error TS1005: ',' expected.
+src/chat-panel.ts(2846,29): error TS1005: ':' expected.
+src/chat-panel.ts(2848,11): error TS1005: ':' expected.
+src/chat-panel.ts(2848,106): error TS1005: ',' expected.
+src/chat-panel.ts(2849,24): error TS1005: ',' expected.
+src/chat-panel.ts(2871,5): error TS1005: ',' expected.
+src/chat-panel.ts(2871,11): error TS1005: ',' expected.
+src/chat-panel.ts(2871,15): error TS1005: ':' expected.
+src/chat-panel.ts(2871,33): error TS1005: ',' expected.
+src/chat-panel.ts(2874,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2874,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2874,34): error TS1005: ';' expected.
+src/chat-panel.ts(2874,48): error TS1109: Expression expected.
+src/chat-panel.ts(2875,9): error TS1003: Identifier expected.
+src/chat-panel.ts(2875,14): error TS1005: ',' expected.
+src/chat-panel.ts(2875,21): error TS1005: ',' expected.
+src/chat-panel.ts(2875,29): error TS1005: ':' expected.
+src/chat-panel.ts(2876,11): error TS1005: ':' expected.
+src/chat-panel.ts(2876,65): error TS1005: ',' expected.
+src/chat-panel.ts(2877,9): error TS1005: ',' expected.
+src/chat-panel.ts(2877,132): error TS1005: ',' expected.
+src/chat-panel.ts(2879,13): error TS1005: ',' expected.
+src/chat-panel.ts(2879,55): error TS1005: ',' expected.
+src/chat-panel.ts(2879,57): error TS1136: Property assignment expected.
+src/chat-panel.ts(2942,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2944,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2944,29): error TS1005: ';' expected.
+src/chat-panel.ts(2945,11): error TS1005: ':' expected.
+src/chat-panel.ts(2945,70): error TS1005: ',' expected.
+src/chat-panel.ts(2946,11): error TS1005: ':' expected.
+src/chat-panel.ts(2946,64): error TS1005: ',' expected.
+src/chat-panel.ts(2947,11): error TS1005: ':' expected.
+src/chat-panel.ts(2951,11): error TS1005: ',' expected.
+src/chat-panel.ts(2952,11): error TS1005: ':' expected.
+src/chat-panel.ts(2952,158): error TS1005: ',' expected.
+src/chat-panel.ts(2953,10): error TS1005: ':' expected.
+src/chat-panel.ts(2959,7): error TS1005: ',' expected.
+src/chat-panel.ts(2962,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2962,32): error TS1005: ';' expected.
+src/chat-panel.ts(2966,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2966,37): error TS1005: ';' expected.
+src/chat-panel.ts(2966,66): error TS1005: ';' expected.
+src/chat-panel.ts(2970,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2970,44): error TS1005: ',' expected.
+src/chat-panel.ts(2970,64): error TS1005: ';' expected.
+src/chat-panel.ts(2970,66): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2988,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(2988,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(2988,41): error TS1005: ',' expected.
+src/chat-panel.ts(2988,61): error TS1005: ';' expected.
+src/chat-panel.ts(2988,75): error TS1109: Expression expected.
+src/chat-panel.ts(2990,13): error TS1005: ',' expected.
+src/chat-panel.ts(2990,26): error TS1005: ',' expected.
+src/chat-panel.ts(2990,28): error TS1136: Property assignment expected.
+src/chat-panel.ts(3026,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3028,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3028,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3028,35): error TS1005: ',' expected.
+src/chat-panel.ts(3028,44): error TS1005: ';' expected.
+src/chat-panel.ts(3028,58): error TS1109: Expression expected.
+src/chat-panel.ts(3030,13): error TS1005: ',' expected.
+src/chat-panel.ts(3030,26): error TS1005: ',' expected.
+src/chat-panel.ts(3030,28): error TS1136: Property assignment expected.
+src/chat-panel.ts(3043,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3045,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3045,11): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3045,18): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3046,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3046,11): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3046,18): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3047,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3047,11): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3047,18): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3048,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3048,11): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3048,18): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3050,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3050,11): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3050,18): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3057,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3057,38): error TS1005: ';' expected.
+src/chat-panel.ts(3058,11): error TS1005: ':' expected.
+src/chat-panel.ts(3058,35): error TS1005: ',' expected.
+src/chat-panel.ts(3059,11): error TS1005: ':' expected.
+src/chat-panel.ts(3059,43): error TS1005: ',' expected.
+src/chat-panel.ts(3060,9): error TS1005: ':' expected.
+src/chat-panel.ts(3060,62): error TS1005: ',' expected.
+src/chat-panel.ts(3061,9): error TS1005: ':' expected.
+src/chat-panel.ts(3061,69): error TS1005: ',' expected.
+src/chat-panel.ts(3062,13): error TS1005: ',' expected.
+src/chat-panel.ts(3062,30): error TS1005: ',' expected.
+src/chat-panel.ts(3062,36): error TS1005: ':' expected.
+src/chat-panel.ts(3062,63): error TS1005: ',' expected.
+src/chat-panel.ts(3066,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3066,33): error TS1005: ';' expected.
+src/chat-panel.ts(3067,9): error TS1005: ':' expected.
+src/chat-panel.ts(3067,37): error TS1005: ',' expected.
+src/chat-panel.ts(3070,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3070,38): error TS1005: ',' expected.
+src/chat-panel.ts(3070,47): error TS1005: ';' expected.
+src/chat-panel.ts(3071,11): error TS1005: ':' expected.
+src/chat-panel.ts(3071,37): error TS1005: ',' expected.
+src/chat-panel.ts(3072,11): error TS1005: ':' expected.
+src/chat-panel.ts(3075,43): error TS1005: ',' expected.
+src/chat-panel.ts(3077,9): error TS1003: Identifier expected.
+src/chat-panel.ts(3077,30): error TS1005: '{' expected.
+src/chat-panel.ts(3077,36): error TS1005: ':' expected.
+src/chat-panel.ts(3079,11): error TS1005: ':' expected.
+src/chat-panel.ts(3079,67): error TS1005: ',' expected.
+src/chat-panel.ts(3083,11): error TS1005: ':' expected.
+src/chat-panel.ts(3083,48): error TS1005: ',' expected.
+src/chat-panel.ts(3084,11): error TS1005: ':' expected.
+src/chat-panel.ts(3086,34): error TS1005: ',' expected.
+src/chat-panel.ts(3087,9): error TS1005: ':' expected.
+src/chat-panel.ts(3094,6): error TS1005: ',' expected.
+src/chat-panel.ts(3095,9): error TS1005: ':' expected.
+src/chat-panel.ts(3095,33): error TS1005: ',' expected.
+src/chat-panel.ts(3096,9): error TS1005: ':' expected.
+src/chat-panel.ts(3096,36): error TS1005: ',' expected.
+src/chat-panel.ts(3099,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3099,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3099,38): error TS1005: ',' expected.
+src/chat-panel.ts(3099,47): error TS1005: ';' expected.
+src/chat-panel.ts(3099,61): error TS1109: Expression expected.
+src/chat-panel.ts(3100,11): error TS1005: ':' expected.
+src/chat-panel.ts(3100,80): error TS1005: ',' expected.
+src/chat-panel.ts(3101,11): error TS1005: ':' expected.
+src/chat-panel.ts(3101,44): error TS1005: ',' expected.
+src/chat-panel.ts(3102,9): error TS1003: Identifier expected.
+src/chat-panel.ts(3102,13): error TS1005: '{' expected.
+src/chat-panel.ts(3102,19): error TS1005: ':' expected.
+src/chat-panel.ts(3103,11): error TS1005: ':' expected.
+src/chat-panel.ts(3103,39): error TS1005: ',' expected.
+src/chat-panel.ts(3109,9): error TS1005: ':' expected.
+src/chat-panel.ts(3109,60): error TS1005: ',' expected.
+src/chat-panel.ts(3110,9): error TS1005: ':' expected.
+src/chat-panel.ts(3110,33): error TS1005: ',' expected.
+src/chat-panel.ts(3111,9): error TS1005: ':' expected.
+src/chat-panel.ts(3111,36): error TS1005: ',' expected.
+src/chat-panel.ts(3112,11): error TS1005: ',' expected.
+src/chat-panel.ts(3112,17): error TS1005: ',' expected.
+src/chat-panel.ts(3116,6): error TS1005: ',' expected.
+src/chat-panel.ts(3119,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3119,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3119,33): error TS1005: ';' expected.
+src/chat-panel.ts(3119,47): error TS1109: Expression expected.
+src/chat-panel.ts(3122,9): error TS1005: ':' expected.
+src/chat-panel.ts(3122,62): error TS1005: ',' expected.
+src/chat-panel.ts(3123,9): error TS1005: ':' expected.
+src/chat-panel.ts(3123,34): error TS1005: ',' expected.
+src/chat-panel.ts(3124,9): error TS1005: ':' expected.
+src/chat-panel.ts(3124,37): error TS1005: ',' expected.
+src/chat-panel.ts(3125,9): error TS1005: ':' expected.
+src/chat-panel.ts(3125,38): error TS1005: ',' expected.
+src/chat-panel.ts(3126,9): error TS1005: ':' expected.
+src/chat-panel.ts(3126,36): error TS1005: ',' expected.
+src/chat-panel.ts(3127,11): error TS1005: ',' expected.
+src/chat-panel.ts(3127,17): error TS1005: ',' expected.
+src/chat-panel.ts(3131,6): error TS1005: ',' expected.
+src/chat-panel.ts(3134,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3134,37): error TS1005: ';' expected.
+src/chat-panel.ts(3135,11): error TS1005: ':' expected.
+src/chat-panel.ts(3135,65): error TS1005: ',' expected.
+src/chat-panel.ts(3136,10): error TS1005: ':' expected.
+src/chat-panel.ts(3148,7): error TS1005: ',' expected.
+src/chat-panel.ts(3158,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3158,11): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3159,12): error TS1005: ',' expected.
+src/chat-panel.ts(3159,23): error TS1005: ',' expected.
+src/chat-panel.ts(3159,41): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3160,10): error TS1005: ',' expected.
+src/chat-panel.ts(3160,21): error TS1005: ',' expected.
+src/chat-panel.ts(3160,36): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3161,4): error TS1005: ';' expected.
+src/chat-panel.ts(3161,24): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3161,26): error TS1005: ';' expected.
+src/chat-panel.ts(3174,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3174,43): error TS1005: ',' expected.
+src/chat-panel.ts(3174,54): error TS1005: ',' expected.
+src/chat-panel.ts(3174,72): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3174,74): error TS1005: ';' expected.
+src/chat-panel.ts(3174,94): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3174,96): error TS1005: ';' expected.
+src/chat-panel.ts(3184,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3184,45): error TS1005: ',' expected.
+src/chat-panel.ts(3184,65): error TS1005: ';' expected.
+src/chat-panel.ts(3184,67): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3198,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3198,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3198,59): error TS1005: ',' expected.
+src/chat-panel.ts(3198,77): error TS1005: ',' expected.
+src/chat-panel.ts(3198,88): error TS1005: ',' expected.
+src/chat-panel.ts(3198,113): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3198,115): error TS1005: ';' expected.
+src/chat-panel.ts(3198,129): error TS1109: Expression expected.
+src/chat-panel.ts(3199,11): error TS1005: ':' expected.
+src/chat-panel.ts(3201,81): error TS1005: ',' expected.
+src/chat-panel.ts(3202,11): error TS1005: ':' expected.
+src/chat-panel.ts(3202,18): error TS1005: ',' expected.
+src/chat-panel.ts(3208,6): error TS1005: ',' expected.
+src/chat-panel.ts(3209,9): error TS1005: ':' expected.
+src/chat-panel.ts(3209,32): error TS1005: ',' expected.
+src/chat-panel.ts(3210,11): error TS1005: ',' expected.
+src/chat-panel.ts(3210,15): error TS1005: ':' expected.
+src/chat-panel.ts(3210,33): error TS1005: ',' expected.
+src/chat-panel.ts(3211,11): error TS1005: ',' expected.
+src/chat-panel.ts(3211,15): error TS1005: ':' expected.
+src/chat-panel.ts(3217,7): error TS1005: ',' expected.
+src/chat-panel.ts(3220,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3220,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3221,12): error TS1005: ',' expected.
+src/chat-panel.ts(3222,14): error TS1005: ',' expected.
+src/chat-panel.ts(3223,16): error TS1005: ',' expected.
+src/chat-panel.ts(3223,35): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3224,10): error TS1005: ',' expected.
+src/chat-panel.ts(3224,27): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3225,4): error TS1005: ';' expected.
+src/chat-panel.ts(3225,18): error TS1109: Expression expected.
+src/chat-panel.ts(3227,11): error TS1005: ':' expected.
+src/chat-panel.ts(3227,60): error TS1005: ',' expected.
+src/chat-panel.ts(3235,11): error TS1005: ':' expected.
+src/chat-panel.ts(3235,18): error TS1005: ',' expected.
+src/chat-panel.ts(3235,37): error TS1005: ',' expected.
+src/chat-panel.ts(3235,38): error TS1109: Expression expected.
+src/chat-panel.ts(3235,40): error TS1005: ':' expected.
+src/chat-panel.ts(3238,7): error TS1005: ',' expected.
+src/chat-panel.ts(3239,9): error TS1005: ':' expected.
+src/chat-panel.ts(3239,43): error TS1005: ',' expected.
+src/chat-panel.ts(3244,11): error TS1005: ':' expected.
+src/chat-panel.ts(3244,53): error TS1005: ',' expected.
+src/chat-panel.ts(3245,11): error TS1005: ':' expected.
+src/chat-panel.ts(3248,6): error TS1005: ',' expected.
+src/chat-panel.ts(3251,11): error TS1005: ':' expected.
+src/chat-panel.ts(3258,7): error TS1005: ',' expected.
+src/chat-panel.ts(3263,11): error TS1005: ':' expected.
+src/chat-panel.ts(3269,9): error TS1005: ',' expected.
+src/chat-panel.ts(3270,23): error TS1005: ',' expected.
+src/chat-panel.ts(3270,56): error TS1005: ';' expected.
+src/chat-panel.ts(3412,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3414,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3414,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3415,11): error TS1005: ',' expected.
+src/chat-panel.ts(3416,20): error TS1005: ',' expected.
+src/chat-panel.ts(3416,39): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3417,10): error TS1005: ',' expected.
+src/chat-panel.ts(3417,27): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3418,20): error TS1005: ',' expected.
+src/chat-panel.ts(3418,40): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3419,12): error TS1005: ',' expected.
+src/chat-panel.ts(3419,49): error TS1005: ',' expected.
+src/chat-panel.ts(3420,4): error TS1005: ';' expected.
+src/chat-panel.ts(3420,18): error TS1109: Expression expected.
+src/chat-panel.ts(3421,12): error TS1005: ',' expected.
+src/chat-panel.ts(3421,68): error TS1005: ',' expected.
+src/chat-panel.ts(3421,75): error TS1005: ':' expected.
+src/chat-panel.ts(3422,13): error TS1005: ',' expected.
+src/chat-panel.ts(3422,49): error TS1005: ',' expected.
+src/chat-panel.ts(3422,51): error TS1136: Property assignment expected.
+src/chat-panel.ts(3777,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3809,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3810,15): error TS1005: ',' expected.
+src/chat-panel.ts(3811,14): error TS1005: ',' expected.
+src/chat-panel.ts(3812,12): error TS1005: ',' expected.
+src/chat-panel.ts(3812,32): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3813,4): error TS1005: ';' expected.
+src/chat-panel.ts(3814,9): error TS1003: Identifier expected.
+src/chat-panel.ts(3814,18): error TS1005: ',' expected.
+src/chat-panel.ts(3814,41): error TS1005: ';' expected.
+src/chat-panel.ts(3818,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3820,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3820,40): error TS1005: ',' expected.
+src/chat-panel.ts(3820,59): error TS1005: ',' expected.
+src/chat-panel.ts(3820,68): error TS1005: ';' expected.
+src/chat-panel.ts(3821,9): error TS1005: ':' expected.
+src/chat-panel.ts(3835,33): error TS1005: ',' expected.
+src/chat-panel.ts(3835,42): error TS1005: ',' expected.
+src/chat-panel.ts(3835,44): error TS1136: Property assignment expected.
+src/chat-panel.ts(3867,5): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3867,7): error TS1005: 'try' expected.
+src/chat-panel.ts(3870,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3877,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3877,43): error TS1005: ',' expected.
+src/chat-panel.ts(3877,52): error TS1005: ';' expected.
+src/chat-panel.ts(3877,54): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3881,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3881,38): error TS1005: ',' expected.
+src/chat-panel.ts(3881,58): error TS1005: ',' expected.
+src/chat-panel.ts(3881,118): error TS1005: ';' expected.
+src/chat-panel.ts(3881,120): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3885,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3885,50): error TS1005: ',' expected.
+src/chat-panel.ts(3885,61): error TS1005: ',' expected.
+src/chat-panel.ts(3885,76): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3885,78): error TS1005: ';' expected.
+src/chat-panel.ts(3885,80): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3912,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3912,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3912,51): error TS1005: ',' expected.
+src/chat-panel.ts(3912,75): error TS1109: Expression expected.
+src/chat-panel.ts(3912,84): error TS1005: ';' expected.
+src/chat-panel.ts(3912,98): error TS1109: Expression expected.
+src/chat-panel.ts(3913,11): error TS1005: ':' expected.
+src/chat-panel.ts(3913,83): error TS1005: ',' expected.
+src/chat-panel.ts(3914,11): error TS1005: ':' expected.
+src/chat-panel.ts(3914,79): error TS1005: ',' expected.
+src/chat-panel.ts(3915,11): error TS1005: ':' expected.
+src/chat-panel.ts(3925,23): error TS1005: ',' expected.
+src/chat-panel.ts(3926,11): error TS1005: ':' expected.
+src/chat-panel.ts(3926,44): error TS1005: ',' expected.
+src/chat-panel.ts(3927,9): error TS1003: Identifier expected.
+src/chat-panel.ts(3927,17): error TS1005: '{' expected.
+src/chat-panel.ts(3927,23): error TS1005: ':' expected.
+src/chat-panel.ts(3928,16): error TS1005: ',' expected.
+src/chat-panel.ts(3928,55): error TS1005: ';' expected.
+src/chat-panel.ts(3940,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3942,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3942,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3942,62): error TS1109: Expression expected.
+src/chat-panel.ts(3942,71): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3942,73): error TS1005: ';' expected.
+src/chat-panel.ts(3942,87): error TS1109: Expression expected.
+src/chat-panel.ts(3943,11): error TS1005: ':' expected.
+src/chat-panel.ts(3953,56): error TS1005: ',' expected.
+src/chat-panel.ts(3954,11): error TS1005: ':' expected.
+src/chat-panel.ts(3954,79): error TS1005: ',' expected.
+src/chat-panel.ts(3955,16): error TS1005: ',' expected.
+src/chat-panel.ts(3955,27): error TS1005: ',' expected.
+src/chat-panel.ts(3955,29): error TS1136: Property assignment expected.
+src/chat-panel.ts(3972,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3974,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3974,11): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3974,18): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3978,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3978,11): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3978,18): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3981,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(3981,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(3982,16): error TS1005: ',' expected.
+src/chat-panel.ts(3982,35): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3983,10): error TS1005: ',' expected.
+src/chat-panel.ts(3983,27): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3984,17): error TS1109: Expression expected.
+src/chat-panel.ts(3984,27): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(3985,12): error TS1109: Expression expected.
+src/chat-panel.ts(3986,4): error TS1005: ';' expected.
+src/chat-panel.ts(3987,14): error TS1005: ',' expected.
+src/chat-panel.ts(3987,25): error TS1005: ',' expected.
+src/chat-panel.ts(3987,35): error TS1005: ',' expected.
+src/chat-panel.ts(3987,70): error TS1005: ';' expected.
+src/chat-panel.ts(4008,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4010,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4010,11): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4010,41): error TS1005: ',' expected.
+src/chat-panel.ts(4010,50): error TS1005: ';' expected.
+src/chat-panel.ts(4010,52): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4014,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4014,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4014,46): error TS1005: ',' expected.
+src/chat-panel.ts(4014,73): error TS1109: Expression expected.
+src/chat-panel.ts(4014,83): error TS1005: ';' expected.
+src/chat-panel.ts(4026,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4026,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4026,47): error TS1005: ',' expected.
+src/chat-panel.ts(4026,66): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(4026,74): error TS1005: ',' expected.
+src/chat-panel.ts(4026,91): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(4026,136): error TS1005: ';' expected.
+src/chat-panel.ts(4027,12): error TS1005: ',' expected.
+src/chat-panel.ts(4027,68): error TS1005: ',' expected.
+src/chat-panel.ts(4027,75): error TS1005: ':' expected.
+src/chat-panel.ts(4027,132): error TS1005: ',' expected.
+src/chat-panel.ts(4028,13): error TS1005: ',' expected.
+src/chat-panel.ts(4028,49): error TS1005: ',' expected.
+src/chat-panel.ts(4028,57): error TS1005: ':' expected.
+src/chat-panel.ts(4028,104): error TS1005: ',' expected.
+src/chat-panel.ts(4029,11): error TS1005: ':' expected.
+src/chat-panel.ts(4029,93): error TS1005: ',' expected.
+src/chat-panel.ts(4030,11): error TS1005: ':' expected.
+src/chat-panel.ts(4030,198): error TS1005: ',' expected.
+src/chat-panel.ts(4031,11): error TS1005: ':' expected.
+src/chat-panel.ts(4031,77): error TS1005: ',' expected.
+src/chat-panel.ts(4032,9): error TS1005: ',' expected.
+src/chat-panel.ts(4032,57): error TS1005: ',' expected.
+src/chat-panel.ts(4033,9): error TS1005: ':' expected.
+src/chat-panel.ts(4034,13): error TS1005: ',' expected.
+src/chat-panel.ts(4034,17): error TS1005: ':' expected.
+src/chat-panel.ts(4034,91): error TS1005: ',' expected.
+src/chat-panel.ts(4035,13): error TS1005: ':' expected.
+src/chat-panel.ts(4035,105): error TS1005: ',' expected.
+src/chat-panel.ts(4036,87): error TS1005: ',' expected.
+src/chat-panel.ts(4037,13): error TS1005: ',' expected.
+src/chat-panel.ts(4037,17): error TS1005: ':' expected.
+src/chat-panel.ts(4037,65): error TS1005: ',' expected.
+src/chat-panel.ts(4037,83): error TS1005: ',' expected.
+src/chat-panel.ts(4038,7): error TS1005: ',' expected.
+src/chat-panel.ts(4039,5): error TS1005: ',' expected.
+src/chat-panel.ts(4039,9): error TS1005: ',' expected.
+src/chat-panel.ts(4039,65): error TS1005: ',' expected.
+src/chat-panel.ts(4040,9): error TS1005: ':' expected.
+src/chat-panel.ts(4041,122): error TS1005: ',' expected.
+src/chat-panel.ts(4042,11): error TS1005: ':' expected.
+src/chat-panel.ts(4042,39): error TS1005: ',' expected.
+src/chat-panel.ts(4043,13): error TS1005: ',' expected.
+src/chat-panel.ts(4043,17): error TS1005: ':' expected.
+src/chat-panel.ts(4043,279): error TS1005: ',' expected.
+src/chat-panel.ts(4044,7): error TS1005: ',' expected.
+src/chat-panel.ts(4048,5): error TS1005: ',' expected.
+src/chat-panel.ts(4048,9): error TS1003: Identifier expected.
+src/chat-panel.ts(4048,11): error TS1181: Array element destructuring pattern expected.
+src/chat-panel.ts(4048,22): error TS1138: Parameter declaration expected.
+src/chat-panel.ts(4048,24): error TS1003: Identifier expected.
+src/chat-panel.ts(4048,41): error TS1138: Parameter declaration expected.
+src/chat-panel.ts(4048,43): error TS1003: Identifier expected.
+src/chat-panel.ts(4048,60): error TS1005: ')' expected.
+src/chat-panel.ts(4048,61): error TS1003: Identifier expected.
+src/chat-panel.ts(4048,129): error TS1005: ',' expected.
+src/chat-panel.ts(4049,13): error TS1005: ':' expected.
+src/chat-panel.ts(4049,236): error TS1005: ',' expected.
+src/chat-panel.ts(4050,9): error TS1003: Identifier expected.
+src/chat-panel.ts(4050,21): error TS1005: '{' expected.
+src/chat-panel.ts(4050,27): error TS1005: ':' expected.
+src/chat-panel.ts(4050,34): error TS1005: ',' expected.
+src/chat-panel.ts(4051,12): error TS1005: ':' expected.
+src/chat-panel.ts(4051,18): error TS1005: ',' expected.
+src/chat-panel.ts(4054,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4054,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4054,55): error TS1005: ',' expected.
+src/chat-panel.ts(4054,74): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(4054,82): error TS1005: ',' expected.
+src/chat-panel.ts(4054,99): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(4054,113): error TS1005: ',' expected.
+src/chat-panel.ts(4054,133): error TS1005: ';' expected.
+src/chat-panel.ts(4055,7): error TS1003: Identifier expected.
+src/chat-panel.ts(4055,12): error TS1005: ',' expected.
+src/chat-panel.ts(4055,25): error TS1005: ',' expected.
+src/chat-panel.ts(4055,27): error TS1136: Property assignment expected.
+src/chat-panel.ts(4425,1): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4432,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4432,32): error TS1005: ';' expected.
+src/chat-panel.ts(4434,11): error TS1005: ',' expected.
+src/chat-panel.ts(4436,5): error TS1005: ',' expected.
+src/chat-panel.ts(4436,13): error TS1005: ':' expected.
+src/chat-panel.ts(4437,11): error TS1005: ':' expected.
+src/chat-panel.ts(4437,47): error TS1005: ',' expected.
+src/chat-panel.ts(4440,11): error TS1005: ':' expected.
+src/chat-panel.ts(4440,15): error TS1005: ',' expected.
+src/chat-panel.ts(4440,23): error TS1005: '>' expected.
+src/chat-panel.ts(4440,60): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(4440,77): error TS1005: ',' expected.
+src/chat-panel.ts(4440,79): error TS1109: Expression expected.
+src/chat-panel.ts(4465,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4467,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4467,39): error TS1005: ',' expected.
+src/chat-panel.ts(4467,56): error TS1005: ';' expected.
+src/chat-panel.ts(4467,58): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4479,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4479,33): error TS1005: ',' expected.
+src/chat-panel.ts(4479,42): error TS1005: ';' expected.
+src/chat-panel.ts(4479,44): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4493,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4493,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4493,36): error TS1005: ';' expected.
+src/chat-panel.ts(4493,66): error TS1005: ',' expected.
+src/chat-panel.ts(4493,88): error TS1005: ',' expected.
+src/chat-panel.ts(4494,9): error TS1003: Identifier expected.
+src/chat-panel.ts(4494,14): error TS1005: ',' expected.
+src/chat-panel.ts(4494,24): error TS1005: ',' expected.
+src/chat-panel.ts(4494,33): error TS1005: ':' expected.
+src/chat-panel.ts(4494,35): error TS1005: ',' expected.
+src/chat-panel.ts(4495,9): error TS1003: Identifier expected.
+src/chat-panel.ts(4495,14): error TS1005: ',' expected.
+src/chat-panel.ts(4495,36): error TS1005: ',' expected.
+src/chat-panel.ts(4495,38): error TS1136: Property assignment expected.
+src/chat-panel.ts(4515,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4522,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4522,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4522,49): error TS1005: ',' expected.
+src/chat-panel.ts(4522,63): error TS1005: ',' expected.
+src/chat-panel.ts(4522,97): error TS1109: Expression expected.
+src/chat-panel.ts(4522,111): error TS1005: ';' expected.
+src/chat-panel.ts(4523,11): error TS1005: ',' expected.
+src/chat-panel.ts(4524,5): error TS1005: ',' expected.
+src/chat-panel.ts(4524,9): error TS1003: Identifier expected.
+src/chat-panel.ts(4524,14): error TS1005: ',' expected.
+src/chat-panel.ts(4524,24): error TS1005: ',' expected.
+src/chat-panel.ts(4524,26): error TS1136: Property assignment expected.
+src/chat-panel.ts(4532,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4534,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4534,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4534,51): error TS1005: ',' expected.
+src/chat-panel.ts(4534,66): error TS1005: ',' expected.
+src/chat-panel.ts(4534,92): error TS1005: ';' expected.
+src/chat-panel.ts(4535,11): error TS1005: ':' expected.
+src/chat-panel.ts(4535,33): error TS1005: ',' expected.
+src/chat-panel.ts(4536,9): error TS1005: ',' expected.
+src/chat-panel.ts(4536,40): error TS1005: ',' expected.
+src/chat-panel.ts(4536,53): error TS1005: ':' expected.
+src/chat-panel.ts(4537,11): error TS1005: ':' expected.
+src/chat-panel.ts(4537,44): error TS1005: ',' expected.
+src/chat-panel.ts(4538,9): error TS1005: ',' expected.
+src/chat-panel.ts(4538,100): error TS1005: ',' expected.
+src/chat-panel.ts(4539,9): error TS1005: ',' expected.
+src/chat-panel.ts(4539,33): error TS1005: ',' expected.
+src/chat-panel.ts(4539,68): error TS1005: ',' expected.
+src/chat-panel.ts(4539,99): error TS1005: ',' expected.
+src/chat-panel.ts(4540,9): error TS1005: ':' expected.
+src/chat-panel.ts(4541,25): error TS1005: ',' expected.
+src/chat-panel.ts(4541,61): error TS1005: ',' expected.
+src/chat-panel.ts(4541,132): error TS1005: ',' expected.
+src/chat-panel.ts(4542,13): error TS1005: ':' expected.
+src/chat-panel.ts(4542,77): error TS1005: ',' expected.
+src/chat-panel.ts(4542,93): error TS1005: ',' expected.
+src/chat-panel.ts(4543,14): error TS1005: ',' expected.
+src/chat-panel.ts(4543,48): error TS1005: ',' expected.
+src/chat-panel.ts(4543,64): error TS1005: ',' expected.
+src/chat-panel.ts(4544,14): error TS1005: ':' expected.
+src/chat-panel.ts(4544,20): error TS1005: ',' expected.
+src/chat-panel.ts(4545,7): error TS1005: ';' expected.
+src/chat-panel.ts(4561,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4563,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4563,29): error TS1005: ';' expected.
+src/chat-panel.ts(4563,59): error TS1005: ';' expected.
+src/chat-panel.ts(4566,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4566,38): error TS1005: ';' expected.
+src/chat-panel.ts(4566,39): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4569,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4569,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4569,38): error TS1005: ';' expected.
+src/chat-panel.ts(4576,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4576,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4576,54): error TS1005: ',' expected.
+src/chat-panel.ts(4576,72): error TS1109: Expression expected.
+src/chat-panel.ts(4576,89): error TS1005: ';' expected.
+src/chat-panel.ts(4577,11): error TS1005: ':' expected.
+src/chat-panel.ts(4577,42): error TS1005: ',' expected.
+src/chat-panel.ts(4578,12): error TS1005: ',' expected.
+src/chat-panel.ts(4578,48): error TS1005: ',' expected.
+src/chat-panel.ts(4578,55): error TS1005: ':' expected.
+src/chat-panel.ts(4578,91): error TS1005: ',' expected.
+src/chat-panel.ts(4579,11): error TS1005: ':' expected.
+src/chat-panel.ts(4579,49): error TS1005: ',' expected.
+src/chat-panel.ts(4580,8): error TS1003: Identifier expected.
+src/chat-panel.ts(4580,17): error TS1005: ',' expected.
+src/chat-panel.ts(4581,54): error TS1005: ';' expected.
+src/chat-panel.ts(4603,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4604,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4604,36): error TS1005: ',' expected.
+src/chat-panel.ts(4604,45): error TS1005: ';' expected.
+src/chat-panel.ts(4604,46): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4612,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4612,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4612,42): error TS1005: ',' expected.
+src/chat-panel.ts(4612,62): error TS1005: ';' expected.
+src/chat-panel.ts(4619,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4619,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4619,46): error TS1005: ',' expected.
+src/chat-panel.ts(4619,59): error TS1005: ',' expected.
+src/chat-panel.ts(4619,93): error TS1109: Expression expected.
+src/chat-panel.ts(4619,111): error TS1005: ';' expected.
+src/chat-panel.ts(4661,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4661,38): error TS1005: ',' expected.
+src/chat-panel.ts(4661,48): error TS1005: ';' expected.
+src/chat-panel.ts(4661,50): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4676,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4676,44): error TS1005: ';' expected.
+src/chat-panel.ts(4676,46): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4691,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4691,39): error TS1005: ';' expected.
+src/chat-panel.ts(4692,11): error TS1005: ':' expected.
+src/chat-panel.ts(4692,49): error TS1005: ',' expected.
+src/chat-panel.ts(4693,9): error TS1003: Identifier expected.
+src/chat-panel.ts(4693,17): error TS1005: '{' expected.
+src/chat-panel.ts(4693,23): error TS1005: ':' expected.
+src/chat-panel.ts(4694,9): error TS1005: ':' expected.
+src/chat-panel.ts(4694,42): error TS1005: ',' expected.
+src/chat-panel.ts(4695,9): error TS1005: ':' expected.
+src/chat-panel.ts(4696,13): error TS1005: ':' expected.
+src/chat-panel.ts(4696,44): error TS1005: ',' expected.
+src/chat-panel.ts(4697,11): error TS1005: ':' expected.
+src/chat-panel.ts(4697,42): error TS1005: ',' expected.
+src/chat-panel.ts(4700,15): error TS1005: ',' expected.
+src/chat-panel.ts(4700,22): error TS1005: ',' expected.
+src/chat-panel.ts(4700,24): error TS1136: Property assignment expected.
+src/chat-panel.ts(4739,5): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4739,7): error TS1005: 'try' expected.
+src/chat-panel.ts(4742,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4745,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4745,39): error TS1005: ';' expected.
+src/chat-panel.ts(4745,66): error TS1005: ';' expected.
+src/chat-panel.ts(4749,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4749,35): error TS1005: ',' expected.
+src/chat-panel.ts(4749,45): error TS1005: ';' expected.
+src/chat-panel.ts(4749,47): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4753,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4753,33): error TS1005: ',' expected.
+src/chat-panel.ts(4753,48): error TS1005: ',' expected.
+src/chat-panel.ts(4753,65): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(4753,67): error TS1005: ';' expected.
+src/chat-panel.ts(4753,69): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4757,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4757,48): error TS1005: ',' expected.
+src/chat-panel.ts(4757,73): error TS1109: Expression expected.
+src/chat-panel.ts(4757,96): error TS1109: Expression expected.
+src/chat-panel.ts(4757,105): error TS1005: ';' expected.
+src/chat-panel.ts(4757,114): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(4757,116): error TS1005: ';' expected.
+src/chat-panel.ts(4775,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4775,52): error TS1005: ',' expected.
+src/chat-panel.ts(4775,99): error TS1005: ';' expected.
+src/chat-panel.ts(4775,101): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4797,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4798,10): error TS1005: ',' expected.
+src/chat-panel.ts(4799,20): error TS1005: ',' expected.
+src/chat-panel.ts(4799,78): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(4800,4): error TS1005: ';' expected.
+src/chat-panel.ts(4801,10): error TS1359: Identifier expected. 'const' is a reserved word that cannot be used here.
+src/chat-panel.ts(4801,16): error TS1005: ',' expected.
+src/chat-panel.ts(4801,27): error TS1005: ',' expected.
+src/chat-panel.ts(4801,30): error TS1005: ',' expected.
+src/chat-panel.ts(4815,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4816,10): error TS1005: ',' expected.
+src/chat-panel.ts(4817,14): error TS1005: ',' expected.
+src/chat-panel.ts(4817,25): error TS1005: ',' expected.
+src/chat-panel.ts(4817,46): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(4818,4): error TS1005: ';' expected.
+src/chat-panel.ts(4819,9): error TS1003: Identifier expected.
+src/chat-panel.ts(4819,20): error TS1005: ',' expected.
+src/chat-panel.ts(4819,45): error TS1005: ';' expected.
+src/chat-panel.ts(4832,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4834,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4834,50): error TS1005: ',' expected.
+src/chat-panel.ts(4834,73): error TS1005: ';' expected.
+src/chat-panel.ts(4834,75): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4858,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4858,42): error TS1005: ',' expected.
+src/chat-panel.ts(4858,64): error TS1005: ';' expected.
+src/chat-panel.ts(4858,66): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4885,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4885,11): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4886,10): error TS1005: ',' expected.
+src/chat-panel.ts(4887,11): error TS1005: ',' expected.
+src/chat-panel.ts(4888,9): error TS1005: ',' expected.
+src/chat-panel.ts(4889,21): error TS1005: ',' expected.
+src/chat-panel.ts(4890,4): error TS1005: ';' expected.
+src/chat-panel.ts(4890,6): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4894,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4894,11): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4894,44): error TS1005: ',' expected.
+src/chat-panel.ts(4894,61): error TS1005: ',' expected.
+src/chat-panel.ts(4894,84): error TS1005: ';' expected.
+src/chat-panel.ts(4894,86): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4905,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4905,11): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(4905,38): error TS1005: ',' expected.
+src/chat-panel.ts(4905,47): error TS1011: An element access expression should take an argument.
+src/chat-panel.ts(4905,49): error TS1005: ';' expected.
+src/chat-panel.ts(4906,9): error TS1003: Identifier expected.
+src/chat-panel.ts(4906,14): error TS1005: ',' expected.
+src/chat-panel.ts(4906,84): error TS1005: ',' expected.
+src/chat-panel.ts(4906,86): error TS1136: Property assignment expected.
+src/chat-panel.ts(4947,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4949,3): error TS1128: Declaration or statement expected.
+src/chat-panel.ts(4949,26): error TS1005: ',' expected.
+src/chat-panel.ts(4949,43): error TS1005: ';' expected.
+src/chat-panel.ts(4949,45): error TS1434: Unexpected keyword or identifier.
+src/chat-panel.ts(6352,1): error TS1128: Declaration or statement expected.

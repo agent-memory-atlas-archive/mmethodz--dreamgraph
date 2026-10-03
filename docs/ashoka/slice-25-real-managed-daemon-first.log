@@ -1,0 +1,29 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ❯ tests/daemon-transport-isolation.test.ts (3 tests | 1 failed) 8863ms
+   ✓ isolates real native MCP transports, rejects foreign browser binding and removes closed sessions  3593ms
+   ✓ carries its stdio stream owner through tools and resources  2217ms
+   × the actual daemon admits one exact managed MCP action once, retains source debt and refuses consumed replay 3052ms
+     → {"_meta":{"dreamgraph":{"schema":"dreamgraph.tool_result_metadata.v1","contract_version":1,"tool":"create_file","outcome":"failed","effect":"source_write","session_id":"3010c86e-9dde-4584-a797-535b1e9c2d70","execution":"owner_specific","receipt":"owner_specific; no generic commit attestation"}},"content":[{"type":"text","text":"{\"success\":false,\"error\":{\"code\":\"EXECUTION_POLICY_DENIED\",\"message\":\"EXECUTION_POLICY_DENIED: Error: EXECUTION_ACTION_APPROVAL_REQUIRED: effect ceiling exhausted\"}}"}],"structuredContent":{"success":false,"error":{"code":"EXECUTION_POLICY_DENIED","message":"EXECUTION_POLICY_DENIED: Error: EXECUTION_ACTION_APPROVAL_REQUIRED: effect ceiling exhausted"}},"isError":true}: expected true not to be true // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/daemon-transport-isolation.test.ts > the actual daemon admits one exact managed MCP action once, retains source debt and refuses consumed replay
+AssertionError: {"_meta":{"dreamgraph":{"schema":"dreamgraph.tool_result_metadata.v1","contract_version":1,"tool":"create_file","outcome":"failed","effect":"source_write","session_id":"3010c86e-9dde-4584-a797-535b1e9c2d70","execution":"owner_specific","receipt":"owner_specific; no generic commit attestation"}},"content":[{"type":"text","text":"{\"success\":false,\"error\":{\"code\":\"EXECUTION_POLICY_DENIED\",\"message\":\"EXECUTION_POLICY_DENIED: Error: EXECUTION_ACTION_APPROVAL_REQUIRED: effect ceiling exhausted\"}}"}],"structuredContent":{"success":false,"error":{"code":"EXECUTION_POLICY_DENIED","message":"EXECUTION_POLICY_DENIED: Error: EXECUTION_ACTION_APPROVAL_REQUIRED: effect ceiling exhausted"}},"isError":true}: expected true not to be true // Object.is equality
+ ❯ tests/daemon-transport-isolation.test.ts:118:53
+    116|   await worker.connect(new StreamableHTTPClientTransport(new URL(base+…
+    117|   const result=await worker.callTool({name:'create_file',arguments:arg…
+    118|   expect(result.isError,JSON.stringify(result)).not.toBe(true);expect(…
+       |                                                     ^
+    119|   expect(await readFile(join(root,'source.ts'),'utf8')).toBe(args.cont…
+    120|   const replay=await worker.callTool({name:'create_file',arguments:arg…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  04:39:06
+   Duration  9.71s (transform 115ms, setup 0ms, collect 468ms, tests 8.86s, environment 0ms, prepare 141ms)
+

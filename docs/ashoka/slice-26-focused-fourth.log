@@ -1,0 +1,55 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/graph-upgrade-notice.test.ts (5 tests) 699ms
+   ✓ requires a durable original review receipt, reopens a restored format and keeps notification read-only  468ms
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-02T14:24:30.258Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/plan-context-integration.test.ts (6 tests) 2067ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  923ms
+   ✓ verified implementation evidence is distinct from the next slice and recovers after a transcript-free read  425ms
+stderr | tests/onboarding-readiness.test.ts
+[2026-10-02T14:24:31.199Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/onboarding-readiness.test.ts
+[2026-10-02T14:24:31.311Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T14:24:31.464Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T14:24:31.490Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/onboarding-readiness.test.ts > daemon onboarding readiness projection > renders a plain-language Dashboard Start Here card with governed repair paths
+[2026-10-02T14:24:31.611Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/onboarding-readiness.test.ts (9 tests) 236ms
+stderr | tests/architect-plan-authority.test.ts > actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan
+[2026-10-02T14:24:36.020Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+ ✓ tests/legacy-graph-upgrade.test.ts (14 tests) 10782ms
+   ✓ reviewed offline legacy graph upgrade > previews all families without writing, preserves scoped identities and provenance, and never invents source/scan history  599ms
+   ✓ reviewed offline legacy graph upgrade > archives exact duplicates once but blocks conflicting claims until exact row-bound explicit choices  602ms
+   ✓ reviewed offline legacy graph upgrade > rejects unsupported majors, invalid UTF-8 and schema shapes, stale resolutions and changed previews  443ms
+   ✓ reviewed offline legacy graph upgrade > refuses cross-collection identity collisions even when a modified preview conceals the staged blocker  396ms
+   ✓ reviewed offline legacy graph upgrade > cancels before cutover and rejects input changes after backup; original mutation is retained  577ms
+   ✓ reviewed offline legacy graph upgrade > binds and privately backs up opaque configuration bytes while restore preserves later operating settings  781ms
+   ✓ reviewed offline legacy graph upgrade > cannot acquire a live process writer and proceeds only after that kernel owner exits  1106ms
+   ✓ reviewed offline legacy graph upgrade > validates owner stores and refuses unfinished jobs instead of cancelling or reassigning them  462ms
+   ✓ reviewed offline legacy graph upgrade > restores exact original bytes as a new publication while preserving post-cutover debt, history and source currency  684ms
+   ✓ reviewed offline legacy graph upgrade > exposes restore conflicts and backup corruption before any restore; an uncertain old result is not overwritten  528ms
+   ✓ reviewed offline legacy graph upgrade > recovers a real killed writer at after_replace:0: without replaying a second graph effect  2234ms
+   ✓ reviewed offline legacy graph upgrade > recovers a real killed writer at publication_committed without replaying a second graph effect  1871ms
+ ✓ tests/architect-plan-authority.test.ts (7 tests) 9558ms
+   ✓ reads never import legacy success; preview/import retain exact bytes and recover one lost reply  383ms
+   ✓ the frozen actual Ashoka definition and log keep completed cards muted and current work navigable before lifecycle import  3828ms
+   ✓ actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan  905ms
+   ✓ archive refuses a running/recovery lease and keeps original artifacts on failure  407ms
+   ✓ the real Architect script exposes readable running/current markers, slice filters and keyboard navigation  3735ms
+
+ Test Files  5 passed (5)
+      Tests  41 passed (41)
+   Start at  17:24:23
+   Duration  17.75s (transform 3.15s, setup 0ms, collect 25.04s, tests 23.34s, environment 1ms, prepare 783ms)
+

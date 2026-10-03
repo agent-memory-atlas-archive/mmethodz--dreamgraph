@@ -1,0 +1,5 @@
+
+> dreamgraph@13.4.0 contracts:generate
+> tsx scripts/generate-graph-contracts.mjs
+
+{"status":"generated","contracts":32,"source_sha256":"c49b5ba65792a10e664d2f0983ecc0f26f95c4f4cdc485316e5d66a4c4f84f4c"}

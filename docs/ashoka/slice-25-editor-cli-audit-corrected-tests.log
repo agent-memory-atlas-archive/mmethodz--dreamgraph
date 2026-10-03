@@ -1,0 +1,64 @@
+✔ codex provider-port: getCapabilities reports text and image attachments (2.4262ms)
+✔ codex provider-port: awaits mandatory prompt admission before spawn and propagates rejection (10.3549ms)
+✔ codex provider-port: invocation cwd is optional for multi-repo DreamGraph runs (2.1698ms)
+✔ codex provider-port: serializes conversation to stdin and projects proposal (1.7951ms)
+✔ codex provider-port: advertises DreamGraph prompt policies and diagnostics (2.1902ms)
+✔ codex provider-port: keeps bridge-local run_command visible with read-only upstream tools (1.3589ms)
+✔ codex provider-port: forwards assistant text through onStreamChunk (1.142ms)
+✔ codex provider-port: streams Codex assistant deltas live without duplicating final text (2.3485ms)
+✔ codex provider-port: streams completed assistant message when no deltas are available (1.1075ms)
+✔ codex provider-port: provider errors carry deterministic metadata (0.7035ms)
+✔ codex provider-port: streams live audit calls before final run reconciliation (1.0382ms)
+✔ codex provider-port: streams transcript MCP witnesses when audit records are absent (3.9046ms)
+✔ codex provider-port: onRunResult fires for ok and failed runs (0.8687ms)
+✔ codex provider-port: rejects missing or malformed options (0.3574ms)
+✔ createHostAuditLive: rejects empty auditDirAbsPath (1.3112ms)
+✔ subscribe with no existing file → catch-up empty, future records delivered (79.9385ms)
+✔ subscribe after records exist → catch-up replays them (16.9473ms)
+✔ partial trailing line is buffered until newline arrives (109.0844ms)
+[copilot-cli audit-live] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-live-bad-Ri6pPl\run-4.ndjson
+✔ malformed line is skipped silently (18.3651ms)
+✔ close() stops further deliveries and is idempotent (224.569ms)
+[copilot-cli audit-live] handler threw; subsequent events will still deliver: boom
+✔ handler exception does not break subsequent deliveries (14.0113ms)
+✔ resultJson larger than 4 KB is truncated for the live channel (22.7504ms)
+✔ auditFilePathFor: composes a deterministic path under the dir (1.6658ms)
+✔ auditFilePathFor: rejects empty inputs (0.4364ms)
+✔ auditFilePathFor: sanitizes unsafe runId characters (0.2249ms)
+✔ createHostAudit: rejects empty auditDirAbsPath (0.298ms)
+✔ createHostAudit: missing file â†’ empty array, no throw (13.8594ms)
+[copilot-cli audit] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-parse-VKNgkE\run-mixed.ndjson:2
+[copilot-cli audit] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-parse-VKNgkE\run-mixed.ndjson:3
+✔ createHostAudit: parses NDJSON, drops malformed lines, deletes file (15.7396ms)
+✔ createHostAudit: finishRecording without startRecording â†’ empty (2.3504ms)
+✔ createHostAudit: second finishRecording for same runId â†’ empty (14.7001ms)
+✔ bridge: forwards tools/list to the HTTP upstream (2316.2024ms)
+✔ bridge: run_command delegates to the daemon command port and does not call the upstream MCP handler (2268.4099ms)
+✔ createHostAudit: running intent is not a completed call, including an unfinished final intent (14.0817ms)
+✔ bridge: forwards tools/call and retains paired intent/terminal audit records per call (2281.7975ms)
+✔ bridge: marks JSON-RPC error responses with isError=true (2262.3869ms)
+✔ bridge: Unicode audit safety ceiling is bytes and never cuts through a UTF-8 character (2289.364ms)
+✔ bridge: only tools/call generates audit records (tools/list does not) (2291.0534ms)
+✔ bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is unset (154.5636ms)
+✔ bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is malformed (156.2156ms)
+✔ bridge: fails closed when upstream is unreachable (197.9116ms)
+✔ provider-port: getCapabilities reports text and image attachments (1.4251ms)
+✔ provider-port: awaits mandatory prompt admission before spawn and propagates rejection (4.1341ms)
+✔ provider-port: exposes hostLlm reference verbatim through `llm` (0.2558ms)
+✔ provider-port: callProvider serializes the conversation into --prompt (1.2314ms)
+✔ provider-port: advertises the live authoritative tool catalog to Copilot CLI (1.4189ms)
+✔ provider-port: keeps bridge-local run_command visible with read-only upstream tools (0.7747ms)
+✔ provider-port: callProvider forwards onStreamChunk with full assistant text (2.2005ms)
+✔ provider-port: callProvider forwards abortSignal to the spawn port (1.038ms)
+✔ provider-port: callProvider throws annotated Error when orchestrator returns ok=false (0.6697ms)
+✔ provider-port: onRunResult fires for both ok and failed runs (0.9023ms)
+✔ provider-port: onRunResult exceptions are swallowed (0.627ms)
+✔ provider-port: rejects missing or malformed options (0.4406ms)
+ℹ tests 52
+ℹ suites 0
+ℹ pass 52
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14782.2442

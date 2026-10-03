@@ -1,0 +1,21 @@
+
+> dreamgraph-vscode@13.4.0 build
+> npm run lint:isolation && npm run build:webview && tsc -p ./tsconfig.json && npm run build:extension && npm run build:bridge && npm run build:vendor
+
+
+> dreamgraph-vscode@13.4.0 lint:isolation
+> node scripts/lint-isolation.mjs
+
+lint:isolation OK — architect-v2 quarantined; 0 violations.
+
+> dreamgraph-vscode@13.4.0 build:webview
+> esbuild src/webview/index.ts --bundle --outfile=dist/webview.js --format=iife --platform=browser
+
+
+  dist\webview.js  36.6kb
+
+Done in 12ms
+src/daemon-client.ts(176,13): error TS2322: Type 'unknown' is not assignable to type '{ instance_id: string; status: "no_change" | "running" | "recovery_required" | "reconciliation_pending" | "graph_committed" | "assembled" | "state_committed" | "work_pending"; ... 9 more ...; delivery_attests: "host_transport_only"; }'.
+src/daemon-client.ts(188,5): error TS2322: Type 'unknown' is not assignable to type '{ instance_id: string; status: "no_change" | "running" | "recovery_required" | "reconciliation_pending" | "graph_committed" | "assembled" | "state_committed" | "work_pending"; ... 9 more ...; delivery_attests: "host_transport_only"; }'.
+src/daemon-client.ts(196,8): error TS18046: 'result.pack' is of type 'unknown'.
+src/daemon-client.ts(197,32): error TS2322: Type 'unknown' is not assignable to type '{ instance_id: string; id: string; revision: { publication_sequence: number; graph_revision: string | null; domains: Record<string, number>; }; schema: "dreamgraph.context_pack.v1"; ... 11 more ...; receipt: { ...; }; }'.

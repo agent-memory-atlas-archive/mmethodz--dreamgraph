@@ -1,0 +1,123 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > pgo_wave: positive output is speculative, bounded and does not mutate the snapshot
+[2026-10-01T05:47:06.830Z] [INFO]  PGO wave: 2 stochastic edges (2 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > pgo_wave: zero and tiny combined budgets never overflow
+[2026-10-01T05:47:06.832Z] [INFO]  PGO wave: 1 stochastic edges (1 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > pgo_wave: zero and tiny combined budgets never overflow
+[2026-10-01T05:47:06.832Z] [INFO]  PGO wave: 2 stochastic edges (2 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > pgo_wave: zero and tiny combined budgets never overflow
+[2026-10-01T05:47:06.833Z] [INFO]  PGO wave: 2 stochastic edges (2 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > PGO reproduces semantic output with the same random seed
+[2026-10-01T05:47:06.835Z] [INFO]  PGO wave: 2 stochastic edges (2 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > PGO reproduces semantic output with the same random seed
+[2026-10-01T05:47:06.836Z] [INFO]  PGO wave: 2 stochastic edges (2 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual causal replay with historical input fixtures > repeated precedence yields a bounded hypothesis, not causal fact or seeded reinforcement
+[2026-10-01T05:47:06.845Z] [INFO]  Causal replay: generated 1 predictive dream edges
+
+stderr | tests/strategy-registry.test.ts > actual causal replay with historical input fixtures > insufficient history and empty/zero scopes cannot produce a causal candidate
+[2026-10-01T05:47:06.847Z] [INFO]  Causal replay: generated 0 predictive dream edges
+
+ ✓ tests/strategy-registry.test.ts (38 tests) 95ms
+stderr | tests/dream-router-authority.test.ts > rejects retired/unknown focused requests before decay or cycle mutation
+[2026-10-01T05:47:07.097Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-01T05:47:07.098Z] [INFO]  dream_cycle tool called: strategy=reflective, max=100, auto_normalize=true
+
+stderr | tests/dream-router-authority.test.ts > rejects retired/unknown focused requests before decay or cycle mutation
+[2026-10-01T05:47:07.109Z] [INFO]  dream_cycle tool called: strategy=all, max=10, auto_normalize=true
+
+stderr | tests/dream-router-authority.test.ts > zero MCP budget does not decay, normalize, invoke providers or interrupt another state
+[2026-10-01T05:47:07.129Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T05:47:07.131Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-01T05:47:07.131Z] [INFO]  dream_cycle tool called: strategy=all, max=0, auto_normalize=true
+
+stderr | tests/dream-router-authority.test.ts > zero MCP budget does not decay, normalize, invoke providers or interrupt another state
+[2026-10-01T05:47:07.138Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/dream-router-authority.test.ts > zero MCP budget does not decay, normalize, invoke providers or interrupt another state
+[2026-10-01T05:47:07.139Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T05:47:07.147Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T05:47:07.154Z] [INFO]  REM dream cycle #1 starting (strategy: missing_abstraction, max: 3)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T05:47:07.212Z] [INFO]  REM dream cycle #1 complete: 1 nodes, 2 edges (0 duplicates merged — ideas become beliefs)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T05:47:07.226Z] [INFO]  REM dream cycle #2 starting (strategy: missing_abstraction, max: 3)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T05:47:07.274Z] [INFO]  Duplicate suppression: 2 merged, 0 truly new
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T05:47:07.275Z] [INFO]  REM dream cycle #2 complete: 0 nodes, 0 edges (3 duplicates merged — ideas become beliefs)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T05:47:07.280Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T05:47:07.281Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+stderr | tests/dream-router-authority.test.ts > invalid fractions and unknown scope leave the cycle unchanged; duplicate roots accept zero hops
+[2026-10-01T05:47:07.289Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/dream-router-authority.test.ts > invalid fractions and unknown scope leave the cycle unchanged; duplicate roots accept zero hops
+[2026-10-01T05:47:07.303Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/dream-router-authority.test.ts > invalid fractions and unknown scope leave the cycle unchanged; duplicate roots accept zero hops
+[2026-10-01T05:47:07.303Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+ ✓ tests/dream-router-authority.test.ts (5 tests) 251ms
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > persists bounded focused schedules and reuses the same stabilization request
+[2026-10-01T05:47:07.972Z] [INFO]  Schedule created: "targeted_graph_stabilization_orphan_bridging_4623ceb2" (dream_cycle, interval)
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > persists bounded focused schedules and reuses the same stabilization request
+[2026-10-01T05:47:07.997Z] [INFO]  Schedule created: "targeted_graph_stabilization_llm_dream_089d543d" (dream_cycle, interval)
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > persists bounded focused schedules and reuses the same stabilization request
+[2026-10-01T05:47:08.023Z] [INFO]  Targeted dream stabilization: 2 created, 0 reused, 2 focus entities
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > persists bounded focused schedules and reuses the same stabilization request
+[2026-10-01T05:47:08.031Z] [INFO]  Targeted dream stabilization: 0 created, 2 reused, 2 focus entities
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > automatically schedules stabilization after a major curated graph write
+[2026-10-01T05:47:08.063Z] [INFO]  enrich_seed_data: wrote features.json — 2 new, 0 updated, 2 total
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > automatically schedules stabilization after a major curated graph write
+[2026-10-01T05:47:08.111Z] [INFO]  enrich_seed_data: index rebuilt with 2 entries
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > automatically schedules stabilization after a major curated graph write
+[2026-10-01T05:47:08.206Z] [INFO]  Schedule created: "targeted_graph_stabilization_llm_dream_294214e5" (dream_cycle, interval)
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > automatically schedules stabilization after a major curated graph write
+[2026-10-01T05:47:08.233Z] [INFO]  Schedule created: "targeted_graph_stabilization_missing_abstraction_db1b0660" (dream_cycle, interval)
+
+stderr | tests/cognitive/targeted-dreams.test.ts > targeted graph stabilization > automatically schedules stabilization after a major curated graph write
+[2026-10-01T05:47:08.258Z] [INFO]  Targeted dream stabilization: 2 created, 0 reused, 2 focus entities
+
+ ✓ tests/cognitive/targeted-dreams.test.ts (3 tests) 329ms
+stderr | tests/cognitive-attribution-integration.test.ts > attaches selected role, exact context and response attribution to actual accepted dream output
+[2026-10-01T05:47:08.397Z] [INFO]  LLM dream grounding: read 1 source files for 2 entities
+[2026-10-01T05:47:08.398Z] [INFO]  LLM dream: sending prompt (2 entities, 0 edges) to model=gpt-5.4, temp=0, maxTokens=1000
+
+stderr | tests/cognitive-attribution-integration.test.ts > attaches selected role, exact context and response attribution to actual accepted dream output
+[2026-10-01T05:47:08.398Z] [INFO]  LLM dream: received 208 chars from reported-fixture
+[2026-10-01T05:47:08.400Z] [INFO]  LLM dream: 1 edges, 0 nodes from reported-fixture (? tokens)
+
+ ✓ tests/cognitive-attribution-integration.test.ts (1 test) 16ms
+
+ Test Files  4 passed (4)
+      Tests  47 passed (47)
+   Start at  08:47:02
+   Duration  5.82s (transform 1.77s, setup 0ms, collect 9.21s, tests 690ms, environment 1ms, prepare 557ms)
+

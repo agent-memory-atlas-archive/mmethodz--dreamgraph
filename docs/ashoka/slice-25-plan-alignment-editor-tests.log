@@ -1,0 +1,1131 @@
+✔ summary renderer disables privileged actions and suppresses mixed Do all (3.7618ms)
+✔ summary renderer trusts host capability checks (1.2814ms)
+node:fs:435
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\types.ts'
+    at Object.readFileSync (node:fs:435:20)
+    at Object.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\adaptive-future-inspector.test.js:16:39)
+    at Module._compile (node:internal/modules/cjs/loader:1760:14)
+    at Object..js (node:internal/modules/cjs/loader:1892:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module._load (node:internal/modules/cjs/loader:1299:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\types.ts'
+}
+
+Node.js v25.2.1
+✖ extensions\vscode\dist\test\adaptive-future-inspector.test.js (710.8521ms)
+✔ compiled agent dispatch preserves daemon error/metadata/commit receipts and marks its trace failed (124.7974ms)
+✔ compiled agent preserves the original owner receipt when local accounting fails after a result (39.7805ms)
+✔ compiled history elision retains an earlier MCP text receipt as whole JSON with matching call ID (93.5969ms)
+✔ a compiled provider reply delivered after operator abort cannot dispatch an MCP effect (32.4456ms)
+✔ compiled ordinary native execution refuses missing daemon authority before a model or local effect (1.1146ms)
+✖ Anthropic Fable/Mythos inventory is exposed without changing the governed default (1.3786ms)
+✖ Anthropic request helpers route Fable/Mythos through effort and adaptive thinking (0.2936ms)
+✖ Standalone and quarantined v2 Anthropic metadata include Fable/Mythos (0.2724ms)
+✖ Anthropic migration docs do not claim Mythos is generally available (0.261ms)
+✔ runPass: text-only turn calls ports in canonical order and stops on no tool calls (3.2121ms)
+✔ runPass: forwards content blocks to composer when attachments present (0.6227ms)
+✔ runPass: surfaces dropped attachments without posting them itself (0.3382ms)
+✔ runPass: clears attachments exactly once, after persistence and before provider (0.3423ms)
+✔ runPass: runs the inner agentic loop across many tool batches in service of one pass (0.5824ms)
+✔ runPass: stops at maxIterations cap when provider keeps requesting tools (0.3853ms)
+✔ runPass: surfaces provider error as 'error' stop reason without throwing (0.4433ms)
+✔ runPass: aborts mid-loop when abortSignal fires before next iteration (0.5192ms)
+✔ runPass: frames pass goal and task goal into composer additionalInstructions (0.8996ms)
+✔ runPass: propagates final iteration's providerRawAssistant unchanged to memory (0.6454ms)
+✔ detectArchitectLens — silent default for empty / trivial prompts (1.9558ms)
+✔ detectArchitectLens — performance keywords select performance lens (2.2833ms)
+✔ detectArchitectLens — security keywords select security lens (1.436ms)
+✔ detectArchitectLens — refactor keywords select refactor lens (1.5295ms)
+✔ detectArchitectLens — debug keywords select debug lens (0.4453ms)
+✔ detectArchitectLens — review keywords select review lens (0.2841ms)
+✔ detectArchitectLens — reliability keywords select reliability lens (0.2931ms)
+✔ detectArchitectLens — explanatory ask_dreamgraph downgrades weak performance hits (0.2399ms)
+✔ detectArchitectLens — security stays material under ask_dreamgraph (0.3289ms)
+✔ detectArchitectLens — command source forces lens even without keywords (0.4566ms)
+✔ lensLabel — capitalised display labels (0.2669ms)
+✔ ADR-171 + ADR-140 isolation lint reports zero violations (104.7109ms)
+✔ do all eligible only for compatible actions (1.3519ms)
+✔ eager selects strongest action under medium uncertainty when defining (0.2829ms)
+✔ capability guards block graph release records without graph-write MCP tool (1.0867ms)
+✔ capability guards allow graph release records when enrich_seed_data is exposed (0.3687ms)
+✔ capability guards block marketplace publish without VSCE_PAT (0.2954ms)
+✔ capability guards allow marketplace publish when a marketplace PAT is present (1.3321ms)
+✔ blocked actions make Do all ineligible (0.3321ms)
+✔ shouldContinueAfterPass stops with "pass budget exhausted" when remaining hits 0 (1.6716ms)
+✔ budget exhaustion stops every mode, even with otherwise-eligible signal (0.3835ms)
+✔ decrementPassBudget bottoms out at 0 — never goes negative (0.3092ms)
+✔ decrementPassBudget leaves remaining untouched when pass counting is inactive (0.1888ms)
+✔ exhausted-budget stop fires before the cautious/eager mode-specific gates (0.1862ms)
+✔ contract block includes json requirement (1.3536ms)
+✔ extracts structured json envelope blocks (1.1815ms)
+✔ returns primary structured json envelope (0.328ms)
+✔ ignores malformed json blocks (1.9495ms)
+✔ extracts envelope from a fenced block with no language hint (0.4158ms)
+✔ extracts bare top-level JSON envelope (no fence at all) (0.4142ms)
+✔ repairs envelopes containing smart quotes and trailing commas (0.5196ms)
+✔ preserves // and , ] sequences inside string values during repair (0.3842ms)
+✔ does not falsely match a non-envelope JSON object that happens to have summary (0.3389ms)
+✔ inferPassOutcomeSignal detects goal completion and stalled progress markers (3.9021ms)
+✔ inferPassOutcomeSignal detects awaiting-user prose at the message tail (0.2964ms)
+✔ analyzePass pauses for user input when the assistant asks a question, even with action chips (1.9723ms)
+✔ analyzePass selects continuation prompt when autonomous mode has a strong next step (0.5736ms)
+✔ analyzePass stops when goal is sufficiently reached (0.3639ms)
+✔ analyzePass lets partial structured envelope override broad completion prose (0.3522ms)
+✔ advanceAutonomyStateIfContinued decrements visible counters only when continuing (0.3178ms)
+✔ analyzePass marks pure-read pass as empty once patch anchor is established (0.3869ms)
+✔ analyzePass does not mark read-only pass as empty before any anchor (0.2518ms)
+✔ mode switch preserves completed and remaining pass counters (1.4462ms)
+✔ shouldContinueAfterPass re-evaluates against the new mode immediately (0.4195ms)
+✔ decrementPassBudget counts correctly across a cautious→eager→autonomous→cautious sequence (0.255ms)
+✔ switching modes after exhaustion does not revive the budget (0.3343ms)
+✔ Ashoka canonical profiles preserve legacy labels without widening approved scope (1.0027ms)
+✔ getAutonomyInstructionBlock returns instruction when enabled (1.4144ms)
+✔ getAutonomyInstructionBlock returns empty string when disabled (0.2929ms)
+✔ getAutonomyInstructionBlock returns empty when undefined (0.1498ms)
+✔ getStructuredResponseContractBlock includes json envelope requirement (1.5345ms)
+✔ parseAutonomyRequest extracts autonomous mode from text (1.2419ms)
+✔ parseAutonomyRequest extracts eager mode (0.2413ms)
+✔ parseAutonomyRequest extracts conscientious mode (0.1468ms)
+✔ parseAutonomyRequest keeps current mode when no keyword found (0.1649ms)
+✔ parseAutonomyRequest extracts budget from "for N passes" pattern (0.1863ms)
+✔ extracts actions from recommended next steps section (2.6915ms)
+✔ prefers structured json envelope when present (1.991ms)
+✔ does not infer complete from successful tool-call prose alone (0.6579ms)
+✔ ranks actions from assistant output (0.5312ms)
+✔ preserves structured action blockers and requirements (0.4239ms)
+✔ extractProseAnchorPaths picks up file path co-occurring with edit verb (4.2753ms)
+✔ extractProseAnchorPaths picks up backtick-quoted bare filename with edit verb (0.4734ms)
+✔ extractProseAnchorPaths returns [] when there is no edit verb on the line (0.1713ms)
+✔ extractProseAnchorPaths deduplicates and preserves first-occurrence order (0.2236ms)
+✔ setEqualsPaths is order-independent and treats undefined as empty (0.2991ms)
+✔ analyzePass treats prose anchor as patch anchor without tool binding (2.0248ms)
+✔ continuation prompt includes anchor preamble when patch anchor is sticky (0.4455ms)
+✔ continuation prompt omits anchor preamble before any anchor (0.2373ms)
+✔ continuation prompt authorizes one bounded read_source_code action (0.4052ms)
+✔ post-anchor re-reading does NOT trigger a two-strike token-economy STOP (0.9163ms)
+✔ decrementPassBudget increments completed and decrements remaining when budgeted (1.4868ms)
+✔ deriveAutonomyStatusView exposes visible counters when counting is active (0.415ms)
+✔ rankRecommendedActions picks the top ranked action and enables Do all for compatible actions (1.2174ms)
+✔ computeDoAllEligibility rejects mutually exclusive actions (0.2464ms)
+✔ chooseActionForMode keeps cautious mode user-driven unless near-trivial (0.3243ms)
+✔ shouldContinueAfterPass stops on goal completion regardless of mode (0.4143ms)
+✔ shouldContinueAfterPass stops on stalled progress regardless of mode (0.2434ms)
+✔ shouldContinueAfterPass keeps cautious mode asking often (0.2006ms)
+✔ shouldContinueAfterPass allows eager mode to continue on defining next steps (0.2004ms)
+✔ shouldContinueAfterPass makes autonomous mode self-directed within budget (0.2807ms)
+✔ getAutonomyInstructionBlock includes visible counters and reporting contract (0.4915ms)
+✔ autonomous completion model continues after an intermediate checkpoint with actionable slices (0.2276ms)
+✔ autonomous completion model continues after verification while target remains incomplete (0.1785ms)
+✔ checkpoint summary with remaining actionable work is not final completion (0.1434ms)
+✔ requested target completion stops autonomous execution (0.168ms)
+✔ genuine blocker requiring user input stops autonomous execution (0.2092ms)
+✔ external maintenance timeout does not terminate locally actionable implementation (0.2595ms)
+✔ fresh coordinator with no snapshot has zero debt and full target (2.927ms)
+✔ estimate creates a reservation and is replaced by actual (0.3498ms)
+✔ unreconciled estimates are discarded at finalize (0.3607ms)
+✔ debt carries forward after overspend (0.217ms)
+✔ debt repaid by underspend on next turn (0.2789ms)
+✔ pressure label crosses thresholds at 0 and 0.5 (0.2415ms)
+✔ compression records do not affect debt math (0.2395ms)
+✔ history retains components only for the most recent N turns (0.5483ms)
+✔ model switch rescales debt with clamp + decay (0.3351ms)
+✔ extreme downgrade resets debt and logs synthetic history entry (0.3785ms)
+✔ graph slice emergency trim flag persisted in history (0.2788ms)
+✔ finalize is idempotent (0.1534ms)
+✔ estimateTokensFromString uses chars/4 heuristic (0.2092ms)
+✔ Phase 2 — BudgetSnapshot is JSON round-trip identical (Plan §9 reload invariant) (1.4453ms)
+(node:46392) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ canonical graph context reaches the actual model-facing packet at high pressure, with exact receipt and Unicode evidence (19.5491ms)
+✔ a missing canonical capability is visible in the prompt and does not silently call the legacy data projection (1.4888ms)
+✔ required graph records borrow optional space within the same total bound; they never disappear when too large (2.9207ms)
+✔ repository-local ID collisions remain in the whole canonical pack without manufacturing a navigation identity (0.7604ms)
+✔ T-3.1: entity fence renders an entity card (7.368ms)
+✔ T-3.2: adr fence renders an adr card (1.3172ms)
+✔ T-3.3: tension fence renders a tension card (1.0984ms)
+✔ T-3.4: insight fence renders an insight card (1.0481ms)
+✔ T-3.5: unknown fence type falls back to regular code block (2.7661ms)
+✔ T-3.6: rendered cards are collapsible details blocks (0.9392ms)
+✔ T-3.7: incomplete streaming-style fence remains a code block until complete (1.0414ms)
+✔ Review #8: malformed card body falls back to code block, no crash (0.81ms)
+✔ ChatMemory persists messages per instance (2.1515ms)
+✔ ChatMemory clears a single instance history (1.2708ms)
+✔ ChatMemory preserves canonical anchor identity across save and restore (0.4143ms)
+✔ ChatMemory round-trip preserves canonical anchor fields written by ChatPanel refresh flow (0.2996ms)
+✔ Phase 2 � ChatMemory persists and restores BudgetSnapshot per instance (0.878ms)
+✔ Phase 2 � restored BudgetSnapshot rehydrates a coordinator with identical pressure (0.4972ms)
+node:fs:435
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+    at readFileSync (node:fs:435:20)
+    at Object.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\chat-panel-copilot-cli-diff.test.js:34:52)
+    at Module._compile (node:internal/modules/cjs/loader:1760:14)
+    at Object..js (node:internal/modules/cjs/loader:1892:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module._load (node:internal/modules/cjs/loader:1299:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+}
+
+Node.js v25.2.1
+✖ extensions\vscode\dist\test\chat-panel-copilot-cli-diff.test.js (306.5483ms)
+✔ deriveVerdict treats completed tool calls without delivered answer as partial progress (2.2106ms)
+✔ deriveVerdict keeps completed audited work partial when report says requested assessment remains incomplete (0.6071ms)
+✔ deriveVerdict requires completion signal before showing verified tool-count banner (0.2024ms)
+✔ deriveVerdict honors partial structured envelope over successful tool trace (0.2947ms)
+✔ help-probe: parses Codex root and exec surfaces (2.7222ms)
+✔ help-probe: supports Codex exec help without ask-for-approval (0.6231ms)
+✔ help-probe: missing exec help fails the support check (0.5723ms)
+✔ help-probe: empty registry reports all minimum tools as missing (0.3762ms)
+✔ allowlist: live registry with all catalog tools is ok (0.2923ms)
+✔ allowlist: bridge-local run_command is allowed even when absent upstream (0.1692ms)
+✔ allowlist: missing minimum grounding tool flips ok to false (0.2463ms)
+✔ mcp-config: builds deterministic Codex config.toml artifact (0.7652ms)
+✔ mcp-config: rejects empty inputs with explicit messages (0.9042ms)
+✔ mcp-bridge: validates live registry before building isolated config (0.7902ms)
+✔ mcp-bridge: fails closed when required DreamGraph tools are missing (0.4183ms)
+✔ argv: emits authoritative codex exec shape with stdin positional dash (0.9743ms)
+✔ argv: gives gpt-6.1-sol xhigh reasoning and respects explicit overrides (0.4901ms)
+✔ argv: gives gpt-6-astra xhigh reasoning and respects explicit overrides (0.1736ms)
+✔ argv: gives gpt-6-sol xhigh reasoning and respects explicit overrides (0.1345ms)
+✔ argv: gives gpt-6-luna xhigh reasoning and respects explicit overrides (0.1714ms)
+✔ argv: gives gpt-5.6-sol xhigh reasoning and respects explicit overrides (0.1849ms)
+✔ argv: omits ask-for-approval when Codex exec does not advertise it (0.3847ms)
+✔ argv: never emits elevated sandbox or approval from config overrides (0.3204ms)
+✔ argv: rejects missing workspace and missing required help support (0.5115ms)
+✔ classifier: dreamgraph + allowlisted tool is authoritative (0.2085ms)
+✔ classifier: dreamgraph + non-allowlisted tool is rejected (0.144ms)
+✔ classifier: third-party MCP server is generic context (0.1391ms)
+✔ classifier: inline sentinel is provider inline tool (0.1249ms)
+✔ transcript: projects Codex MCP JSON events into tool observations (5.0719ms)
+✔ transcript: strips ANSI, reports diagnostics, and detects login recovery signal (2.5584ms)
+✔ transcript: projects Codex item.completed agent messages from whitespace-separated json (0.9969ms)
+✔ codex orchestrator: success writes isolated config, spawns codex exec with stdin dash, and cleans up (11.6079ms)
+✔ codex orchestrator: empty invocation cwd uses neutral probe cwd and scratch exec cwd (2.3664ms)
+✔ codex orchestrator: missing binary fails before spawn (0.4074ms)
+✔ codex orchestrator: unsupported help surface fails before spawn (1.0465ms)
+✔ codex orchestrator: codex login status failure returns clickable login recovery metadata (1.6719ms)
+✔ codex orchestrator: login status policy noise is advisory unless it reports auth failure (3.4099ms)
+✔ codex orchestrator: codex login status exit 0 is authoritative even with misleading noise (1.82ms)
+✔ codex orchestrator: exec MCP runtime failure fails closed instead of accepting ungrounded output (2.7601ms)
+✔ codex orchestrator: transcript-only DreamGraph MCP events fail closed without audit results (1.6133ms)
+✔ codex orchestrator: cancelled DreamGraph MCP result without audit result fails closed (1.9373ms)
+✔ codex orchestrator: audited read call clears MCP probe even with transcript witness noise (1.0817ms)
+✔ codex orchestrator: rmcp transport EOF on shutdown is teardown noise, not a load failure (2.0077ms)
+✔ codex orchestrator: missing required DreamGraph tool fails closed (0.6823ms)
+✔ codex orchestrator: wall timeout and idle timeout remain distinguishable (1.4521ms)
+✔ codex orchestrator: cancellation, signal, nonzero, and not-logged-in exec failures are classified (2.0398ms)
+✔ codex orchestrator: usage limit after audited DreamGraph tools is not classified as login failure (1.5483ms)
+✔ codex orchestrator: source snippets mentioning usage limit do not override policy/tool failures (2.5606ms)
+✔ codex orchestrator: telemetry unknown terminal type is not unsupported model and failure tail stays compact (1.8934ms)
+✔ codex orchestrator: inspected source mentioning unsupported model does not poison failure classification (0.9873ms)
+✔ codex orchestrator: audited DreamGraph success suppresses false exec login classification (0.69ms)
+✔ codex orchestrator: failed read_source_code schema args are not classified as missing tool (2.1342ms)
+✔ codex orchestrator: unsupported model and native policy denial are not login failures (1.0963ms)
+✔ codex orchestrator: read-only sandbox MCP block is policy denial, not audit mismatch (0.6813ms)
+✔ codex orchestrator: thrown spawn still drains audit and cleans scratch (0.6773ms)
+✔ codex orchestrator: validates required input (0.8254ms)
+✔ codex provider-port: a permit signal reaches native spawn and mandatory settlement is awaited (11.6086ms)
+✔ codex provider-port: settlement loss is mandatory and cannot become a swallowed observer error (2.0576ms)
+✔ codex provider-port: getCapabilities reports text and image attachments (1.6446ms)
+✔ codex provider-port: awaits mandatory prompt admission before spawn and propagates rejection (1.4653ms)
+✔ codex provider-port: invocation cwd is optional for multi-repo DreamGraph runs (1.3812ms)
+✔ codex provider-port: serializes conversation to stdin and projects proposal (1.7034ms)
+✔ codex provider-port: advertises DreamGraph prompt policies and diagnostics (1.8372ms)
+✔ codex provider-port: keeps bridge-local run_command visible with read-only upstream tools (0.9632ms)
+✔ codex provider-port: forwards assistant text through onStreamChunk (0.9124ms)
+✔ codex provider-port: streams Codex assistant deltas live without duplicating final text (2.0162ms)
+✔ codex provider-port: streams completed assistant message when no deltas are available (1.0897ms)
+✔ codex provider-port: provider errors carry deterministic metadata (0.4633ms)
+✔ codex provider-port: streams live audit calls before final run reconciliation (0.9488ms)
+✔ codex provider-port: streams transcript MCP witnesses when audit records are absent (5.9781ms)
+✔ codex provider-port: onRunResult fires for ok and failed runs (1.004ms)
+✔ codex provider-port: rejects missing or malformed options (0.4386ms)
+✔ selection tests: file-aware routing selects the correct environment scopes (29.7555ms)
+✔ rendering stability and token-discipline: unchanged Layer 2 rendering remains identical, compact, and noise-controlled (25.3479ms)
+✔ evidence-order and omission contract: environment ranks below hard constraints and above notes, and optional evidence can be omitted under budget pressure (1.3458ms)
+✔ cache-churn and packet instrumentation: logically unchanged stable inputs produce stable prefix reuse and omission telemetry by kind (0.8449ms)
+✔ evaluation fixture plan: representative task packets preserve sufficiency cues for runtime, scope role, module boundary, and graph identity (0.3738ms)
+✔ fallback planning contract keeps environment evidence in optional evidence (1.0367ms)
+✔ environment evidence ranks ahead of low-priority notes and stays within a compact token budget (1.2017ms)
+✔ shimmed ContextBuilder evidence collection includes environment evidence with stable ordering and compact size (2.0514ms)
+✔ Phase 3 — 'low' pressure fetches every deep-insight regardless of required/optional (1.0905ms)
+✔ Phase 3 — 'normal' pressure fetches every deep-insight (tier-2 trim reserved for future) (0.2147ms)
+✔ Phase 3 — 'high' pressure skips optional deep-insights but keeps required ones (0.2072ms)
+✔ Phase 3 — 'high' pressure with all-optional needs drops everything (0.17ms)
+✔ Phase 3 — pressure decision is pure (same inputs → same outputs) (0.1595ms)
+[DreamGraph] deep-insights cache invalidated: tool:dream_cycle
+[DreamGraph] deep-insights cache invalidated: tool:nightmare_cycle
+[DreamGraph] deep-insights cache invalidated: tool:normalize_dreams
+[DreamGraph] deep-insights cache invalidated: tool:resolve_tension
+[DreamGraph] deep-insights cache invalidated: tool:clear_dreams
+[DreamGraph] deep-insights cache invalidated: tool:lucid_action
+[DreamGraph] deep-insights cache invalidated: tool:wake_from_lucid
+[DreamGraph] deep-insights cache invalidated: tool:enrich_seed_data
+[DreamGraph] deep-insights cache invalidated: tool:enrich_parser_nodes
+[DreamGraph] deep-insights cache invalidated: tool:solidify_cognitive_insight
+[DreamGraph] deep-insights cache invalidated: tool:init_graph
+[DreamGraph] deep-insights cache invalidated: tool:scan_project
+[DreamGraph] deep-insights cache invalidated: tool:record_architecture_decision
+[DreamGraph] deep-insights cache invalidated: tool:register_ui_element
+[DreamGraph] deep-insights cache invalidated: tool:import_dream_archetypes
+[DreamGraph] deep-insights cache invalidated: tool:dispatch_cognitive_event
+[DreamGraph] deep-insights cache invalidated: tool:metacognitive_analysis
+[DreamGraph] deep-insights cache invalidated: test-eviction
+[DreamGraph] deep-insights cache invalidated: tool:dream_cycle
+[DreamGraph] deep-insights cache invalidated: tool:normalize_dreams
+[DreamGraph] deep-insights cache invalidated: tool:record_architecture_decision
+✔ every COGNITIVE_MUTATING_TOOL triggers deep-insights invalidation (2.1425ms)
+✔ read-only tools do NOT trigger invalidation (0.2509ms)
+✔ invalidateDeepInsights drops the slot so the next get rebuilds it (0.3018ms)
+✔ clearAll drops both env-snapshot and deep-insights slots (0.2751ms)
+✔ getDeepInsightsSlot returns the same instance within the TTL window (0.2351ms)
+✔ maybeInvalidateForTool only fires for the published mutating-tool set (0.2888ms)
+[DreamGraph] Context fetch timed out: f18_record_49388_1_qh05kc (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+[DreamGraph] Context fetch timed out: f18_record_49388_1_qh05kc (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 2.
+[DreamGraph] Context fetch timed out: f18_snapshot_49388_2_4z4wmu (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+[DreamGraph] Context fetch timed out: f18_a_49388_3_dpxpst (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+[DreamGraph] Context fetch timed out: f18_a_49388_3_dpxpst (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 2.
+[DreamGraph] Context fetch timed out: f18_b_49388_4_nmcy69 (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+✔ recordTimeout increments per-tool counters (1.7242ms)
+✔ getTimeoutStats returns an independent snapshot — mutating it does not affect the cache (0.2916ms)
+✔ per-tool counters are independent (0.2611ms)
+✔ isTimeout matches the documented timeout/aborted error vocabulary (0.3708ms)
+✔ isTimeout rejects unrelated errors and falsy values (0.2309ms)
+✔ MCP_CONTEXT_FETCH_TIMEOUT_MS is a positive finite number (0.2104ms)
+node:fs:435
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+    at Object.readFileSync (node:fs:435:20)
+    at Object.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\context-output-logging.test.js:10:43)
+    at Module._compile (node:internal/modules/cjs/loader:1760:14)
+    at Object..js (node:internal/modules/cjs/loader:1892:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module._load (node:internal/modules/cjs/loader:1299:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+}
+
+Node.js v25.2.1
+✖ extensions\vscode\dist\test\context-output-logging.test.js (559.6274ms)
+✔ help-probe: parses full help surface (1.7965ms)
+✔ help-probe: minimal help is supported (only required flags) (0.3603ms)
+✔ help-probe: empty help fails the support check (0.317ms)
+✔ help-probe: missing single required flag fails the support check (0.1882ms)
+✔ help-probe: undefined help text yields zero-length surface, not throw (0.2532ms)
+✔ allowlist: live registry with all catalog tools is ok (1.1963ms)
+✔ allowlist: bridge-local run_command is allowed even when absent upstream (0.3038ms)
+✔ allowlist: missing minimum grounding tool flips ok to false (0.2466ms)
+✔ allowlist: empty registry reports all minimum tools as missing (0.2515ms)
+✔ mcp-config: builds a deterministic single-server artifact (0.9556ms)
+✔ mcp-config: caller env wins for arbitrary keys, never for token (0.3304ms)
+✔ mcp-config: serialization is stable and ends in newline (0.2738ms)
+✔ mcp-config: rejects empty inputs with explicit messages (0.6591ms)
+✔ argv: emits model, allow-all-tools, native shell allow, deny-write, allow-tool per allowlist, prompt (0.5054ms)
+✔ argv: no native command tools are advertised; shell execution is routed exclusively through dreamgraph:run_command (0.337ms)
+✔ argv: emits one --add-dir per addDirs entry, ordered, after --disallow-temp-dir and before --prompt (0.2616ms)
+✔ argv: omits --add-dir entirely when addDirs is empty or absent (0.1611ms)
+✔ argv: omits --disallow-temp-dir when help surface lacks it (0.2198ms)
+✔ argv: never emits --additional-mcp-config (data plane lives on disk) (0.2683ms)
+✔ argv: always emits --allow-all-tools (required for non-interactive mode) (0.1713ms)
+✔ argv: rejects empty prompt and empty allowlist (0.2457ms)
+✔ classifier: dreamgraph + allowlisted tool → authoritative (0.1677ms)
+✔ classifier: dreamgraph + non-allowlisted tool → rejected (0.0925ms)
+✔ classifier: third-party MCP server → generic_context_mcp (0.0953ms)
+✔ classifier: inline sentinel → provider_inline_tool (0.1012ms)
+✔ createHostAuditLive: rejects empty auditDirAbsPath (1.7888ms)
+✔ subscribe with no existing file → catch-up empty, future records delivered (93.7495ms)
+✔ subscribe after records exist → catch-up replays them (25.5152ms)
+✔ partial trailing line is buffered until newline arrives (105.2827ms)
+[copilot-cli audit-live] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-live-bad-gWfRTR\run-4.ndjson
+✔ malformed line is skipped silently (16.9535ms)
+✔ close() stops further deliveries and is idempotent (231.6125ms)
+[copilot-cli audit-live] handler threw; subsequent events will still deliver: boom
+✔ handler exception does not break subsequent deliveries (13.9536ms)
+✔ resultJson larger than 4 KB is truncated for the live channel (23.9128ms)
+✔ auditFilePathFor: composes a deterministic path under the dir (1.41ms)
+✔ auditFilePathFor: rejects empty inputs (0.3255ms)
+✔ auditFilePathFor: sanitizes unsafe runId characters (0.1754ms)
+✔ createHostAudit: rejects empty auditDirAbsPath (0.2592ms)
+✔ createHostAudit: missing file â†’ empty array, no throw (11.855ms)
+[copilot-cli audit] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-parse-8yidqk\run-mixed.ndjson:2
+[copilot-cli audit] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-parse-8yidqk\run-mixed.ndjson:3
+✔ createHostAudit: parses NDJSON, drops malformed lines, deletes file (16.4569ms)
+✔ createHostAudit: finishRecording without startRecording â†’ empty (2ms)
+✔ createHostAudit: second finishRecording for same runId â†’ empty (14.1165ms)
+✔ bridge: forwards tools/list to the HTTP upstream (2324.2269ms)
+✔ bridge: run_command delegates to the daemon command port and does not call the upstream MCP handler (2266.0497ms)
+✔ createHostAudit: unfinished intent fails honestly and retains the physical audit for recovery (14.5741ms)
+[copilot-cli audit] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-invalid-terminal-BLsGEG\invalid-terminal.ndjson:2
+✔ createHostAudit: malformed terminal acknowledgement cannot settle a running intent (13.1566ms)
+✔ bridge: forwards tools/call and retains paired intent/terminal audit records per call (2273.858ms)
+✔ bridge: marks JSON-RPC error responses with isError=true (2263.4703ms)
+✔ bridge: Unicode audit safety ceiling is bytes and never cuts through a UTF-8 character (2281.4678ms)
+✔ bridge: only tools/call generates audit records (tools/list does not) (2268.6045ms)
+✔ bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is unset (153.4061ms)
+✔ bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is malformed (155.9672ms)
+✔ bridge: fails closed when upstream is unreachable (195.6074ms)
+✔ event-stream: parses a tool.execution_start with mcpServerName/mcpToolName (1.9146ms)
+✔ event-stream: parses a CLI-native tool.execution_start without mcp fields (0.3138ms)
+✔ event-stream: pairs start+complete by toolCallId across chunks split mid-line (1.3944ms)
+✔ event-stream: accumulates assistant deltas and snapshotAssistantText concatenates them (0.3931ms)
+✔ event-stream: assistant.message replaces accumulated deltas as authoritative (0.3841ms)
+✔ event-stream: reasoning deltas are emitted but do NOT contribute to assistant text (0.2607ms)
+✔ event-stream: result event is parsed with sessionId/exitCode/usage (1.2149ms)
+✔ event-stream: unknown event types surface as `other` without losing data (0.2472ms)
+✔ event-stream: malformed JSON lines and blank lines are skipped silently (0.2773ms)
+✔ event-stream: events missing required fields are dropped (0.2962ms)
+✔ event-stream: flush() emits a buffered trailing line missing its newline (0.2719ms)
+✔ event-stream: handles \r\n line endings (0.2208ms)
+✔ event-stream: assistant.message_delta with empty deltaContent is dropped (no zero-byte events) (0.2743ms)
+✔ event-stream: tool.execution_complete defaults success=true when field missing (0.1739ms)
+✔ event-stream: feed() returns events in arrival order across multiple lines in one chunk (0.2086ms)
+✔ event-stream: assistant.message with empty content is dropped (0.3609ms)
+✔ HOST_CLOCK.nowMs returns a wall-clock millisecond reading (1.575ms)
+✔ HOST_CLOCK.nowMs is monotonic-ish across two reads (6.0553ms)
+✔ HOST_CRYPTO.randomToken is URL-safe and unique (1.0527ms)
+✔ HOST_CRYPTO.randomToken rejects invalid byte lengths (0.5875ms)
+✔ HOST_CRYPTO.randomRunId is path-safe and unique (0.5195ms)
+✔ HOST_FS round-trip: mkdtemp → mkdir → writeFile → rmRecursive (35.4966ms)
+✔ HOST_FS.rmRecursive is idempotent (force:true) (5.0242ms)
+✔ HOST_FS.joinPath delegates to node:path (0.4903ms)
+✔ HOST_PROCESS.resolveExecutable: absolute path round-trips (468.1154ms)
+✔ HOST_PROCESS.resolveExecutable: missing binary returns null (482.015ms)
+✔ HOST_PROCESS.resolveExecutable: rejects empty name (0.3691ms)
+✔ HOST_PROCESS.runHelp captures Node --help output (114.4932ms)
+✔ HOST_PROCESS.spawn captures stdout, exitCode 0, durationMs >= 0 (101.2846ms)
+✔ HOST_PROCESS.spawn surfaces nonzero exit codes verbatim (94.9568ms)
+✔ HOST_PROCESS.spawn streams chunks live via onStdoutChunk (95.5969ms)
+✔ HOST_PROCESS.spawn enforces timeoutMs and reports timedOut=true (229.5707ms)
+✔ HOST_PROCESS.spawn honors abortSignal and reports aborted=true (117.0188ms)
+✔ HOST_PROCESS.spawn rejects non-positive timeoutMs (0.737ms)
+✔ HOST_PROCESS.spawn surfaces ENOENT as a thrown error (1.5573ms)
+✔ HOST_PROCESS.spawn: aborting twice is idempotent and still settles (0.5216ms)
+✔ both native process ports refuse an already-cancelled child before it can create a source effect (193.1227ms)
+✔ HOST_PROCESS.spawn: aborted child stops emitting stdout chunks before resolve (170.355ms)
+✔ HOST_PROCESS.spawn: cooperative SIGINT child exits cleanly inside the escalation window (0.3337ms)
+✔ orchestrator: happy path runs all six steps and returns ok=true (8.5324ms)
+✔ orchestrator: missing binary → COPILOT_CLI_NOT_FOUND, no spawn (0.7188ms)
+✔ orchestrator: incomplete help surface → COPILOT_HELP_SURFACE_UNSUPPORTED (1.4106ms)
+✔ orchestrator: missing Copilot config → COPILOT_NOT_LOGGED_IN, no spawn (0.6492ms)
+✔ orchestrator: config.json with empty loggedInUsers → COPILOT_NOT_LOGGED_IN (0.4833ms)
+✔ orchestrator: COPILOT_HOME env override is honoured by the login check (0.873ms)
+✔ orchestrator: missing minimum MCP tool → DREAMGRAPH_TOOL_REGISTRY_MISMATCH (0.784ms)
+✔ orchestrator: nonzero exit → COPILOT_RUN_NONZERO_EXIT, transcript captured (1.8836ms)
+✔ orchestrator: empty-output nonzero exit includes spawn context (1.2675ms)
+✔ orchestrator: timeout → TIMEOUT (1.3749ms)
+✔ orchestrator: abort → CANCELLED (0.6656ms)
+✔ orchestrator: signal w/o abort/timeout → COPILOT_RUN_SIGNALED (0.4734ms)
+✔ orchestrator: spawn throws → scratch dir still cleaned + audit drained (1.1735ms)
+✔ orchestrator: rejects empty prompt / cwd / invalid timeout (0.5712ms)
+✔ transcript: strips ANSI, trims, surfaces stderr diagnostics (0.4311ms)
+✔ transcript: clean stderr → hasStderrErrors=false (0.1391ms)
+✔ orchestrator: classifier wired to dreamgraph authoritative server (0.1264ms)
+✔ serializeConversationForCopilotCli: rejects empty conversations (1.4022ms)
+✔ serializeConversationForCopilotCli: renders [system]/[user]/[assistant] headers in order (0.3507ms)
+✔ serializeConversationForCopilotCli: joins multiple text blocks with newlines (0.2484ms)
+✔ serializeConversationForCopilotCli: replaces image blocks with placeholder (0.3582ms)
+✔ serializeConversationForCopilotCli: honors custom role headers (0.2105ms)
+✔ serializeConversationForCopilotCli: tools manifest advertises mutation and verification routing (0.8964ms)
+✔ serializeConversationForCopilotCli: command policy names disabled routes explicitly (0.2877ms)
+✔ copilot provider-port: permit cancellation reaches the native spawn and accounting precedes observers (6.3648ms)
+✔ copilot provider-port: mandatory settlement failure fences native continuation (1.5105ms)
+✔ provider-port: getCapabilities reports text and image attachments (0.2881ms)
+✔ provider-port: awaits mandatory prompt admission before spawn and propagates rejection (1.1092ms)
+✔ provider-port: exposes hostLlm reference verbatim through `llm` (0.2582ms)
+✔ provider-port: callProvider serializes the conversation into --prompt (1.0558ms)
+✔ provider-port: advertises the live authoritative tool catalog to Copilot CLI (1.8974ms)
+✔ provider-port: keeps bridge-local run_command visible with read-only upstream tools (0.9519ms)
+✔ provider-port: callProvider forwards onStreamChunk with full assistant text (2.7146ms)
+✔ provider-port: callProvider forwards abortSignal to the spawn port (1.1591ms)
+✔ provider-port: callProvider throws annotated Error when orchestrator returns ok=false (0.5885ms)
+✔ provider-port: onRunResult fires for both ok and failed runs (0.7573ms)
+✔ provider-port: onRunResult exceptions are swallowed (0.5647ms)
+✔ provider-port: rejects missing or malformed options (0.4887ms)
+✔ T-2.1: feature:// URIs are linkified (2.3079ms)
+✔ T-2.2: all recognised schemes are linkified (0.9047ms)
+✔ T-2.3: generated anchor has correct data-type and data-uri (0.2856ms)
+✔ T-2.4: URIs inside <pre>…</pre> are NOT linkified (0.1941ms)
+✔ T-2.4b: URIs inside inline <code>…</code> are NOT linkified (1.4326ms)
+✔ T-2.5: URIs inside existing href="" are NOT double-linkified (0.3855ms)
+✔ T-S1.4: javascript: scheme is NOT linkified (0.2133ms)
+✔ T-S1.4b: data: scheme is NOT linkified (0.1758ms)
+✔ T-S1.4c: vscode: scheme is NOT linkified (0.2043ms)
+✔ T-S3.1: data-uri only contains the allowlisted URI, not injected content (0.4585ms)
+✔ T-2: multiple entity links in one paragraph (0.2273ms)
+✔ T-2: plain text outside tags is linkified (0.2318ms)
+✔ normalizes nested-summary envelope drift (autonomy + summary wrapper) (1.9734ms)
+✔ promotes singular recommended_next_step to plural array (0.3588ms)
+✔ preserves canonical envelope unchanged (0.2382ms)
+✔ environment context selects the most specific matching scope for a file (43.2372ms)
+✔ environment context rendering is stable and bounded for a given file (39.2297ms)
+✔ environment context excludes non-curated dependency noise (33.4155ms)
+✔ claude-opus-5-5: preserves signed thinking and tool calls through the next request (119.9164ms)
+✔ claude-sonnet-5-5: preserves signed thinking and tool calls through the next request (30.1567ms)
+✔ claude-fable-5-1: preserves signed thinking and tool calls through the next request (22.8401ms)
+✔ claude-mythos-5-1: preserves signed thinking and tool calls through the next request (25.443ms)
+✔ Claude reasoning drops produce diagnostics without exposing signatures (1.6564ms)
+✔ GPT-6.1 Sol uses Responses for tools and supports images (18.9258ms)
+✔ switching providers translates neutral history instead of replaying foreign raw blocks (1.4147ms)
+✔ Responses streaming preserves actual usage and validates the authoritative final response (14.1732ms)
+✔ Responses truncated/refused streams and invalid strict outputs are never accepted (12.4926ms)
+✔ explicit Chat preserves model/effort and rejects GPT-6 tool reasoning before dispatch (13.498ms)
+✔ Claude opt-in native schemas retain effort and locally validate the original output (10.6524ms)
+✔ openai: whole serialized Unicode request above the byte ceiling is refused before provider dispatch (46.2618ms)
+✔ anthropic: whole serialized Unicode request above the byte ceiling is refused before provider dispatch (44.2351ms)
+✔ routes current OpenAI reasoning families to the Responses API (1.6809ms)
+✔ builds a GPT-5.5 Responses request with reasoning, verbosity, and function tools (2.1378ms)
+✔ translates Architect tool history into Responses function-call items (1.2688ms)
+✔ skips malformed raw replay items instead of emitting invalid Responses items (0.4182ms)
+✔ extracts text while safely ignoring unknown Responses output items (0.7506ms)
+✔ inserts a paragraph break between adjacent verbose-mode message items lacking surrounding whitespace (0.5779ms)
+✔ keeps streamed sub-blocks within a single message tightly joined (0.6691ms)
+✔ normalizes Responses output to the provider boundary contract (1.8236ms)
+✔ normalizes Responses tool calls as tool_use finish reason (0.8345ms)
+✔ extracts function calls and hardens malformed or unknown items (2.0795ms)
+✔ Responses item identity cannot replace the required tool call identity (0.5203ms)
+✔ T-1.1: bold, italic, inline code (11.4825ms)
+✔ T-1.2: fenced code block with language class (1.0297ms)
+✔ T-1.3: fenced code block without language still produces pre>code (0.446ms)
+✔ T-1.4: headings h2 and h3 (1.5214ms)
+✔ T-1.5: tables produce table/th/td (1.0436ms)
+✔ T-1.6: unordered and ordered lists (0.9567ms)
+✔ T-1.7: partial markdown (incomplete bold) does not produce unclosed tag (0.784ms)
+✔ T-1.9: external links get rendered as <a href> (2.218ms)
+✔ T-1.8: raw script tag is escaped, not passed through (1.692ms)
+✔ T-1.8b: javascript: URI in link is not rendered as active href (0.7519ms)
+✔ T-1.8c: raw img tag is escaped as text when html:false is used (0.2926ms)
+✔ T-S3.4: rendered output contains no active <script> tags (0.6697ms)
+✔ T-S2.1: key-value secrets are redacted (2.5148ms)
+✔ T-S2.2: token-like prefixes are partially masked (0.4969ms)
+✔ T-S2.3: private key blocks are redacted (0.4538ms)
+✔ T-5.1/T-5.2: verdict banner renders structured verdict level and summary (1.9347ms)
+✔ T-S4.1/T-S4.2/T-S4.3: provenance label distinguishes executed-tool grounding (0.4778ms)
+✔ T-4.5: verification names are batched to max 50 (1.4184ms)
+✔ T-S7.4: verification list is capped at 100 unique names (0.3247ms)
+✔ T-4.1/T-4.2/T-4.3/T-4.4: verification semantics distinguish verified, tension, latent, and unverified (0.386ms)
+✔ T-5.3/T-5.4: tool trace renders collapsible entries from real call records (0.4392ms)
+✖ Slice 5 source includes show_full storage and action state messaging (1.3886ms)
+✖ operator actions without daemon authority refuse rather than falling back to a local file write (1.0131ms)
+✖ Slice 5 source logs action provenance with outcome and detail (0.5602ms)
+✖ Slice 5 audit: hover actions are wired for copy, retry, and pin (1.4893ms)
+✖ Slice 5 audit: action execution remains allowlisted and explicit-click only (0.4409ms)
+✖ Slice 5 audit: resource guards remain in place (0.2867ms)
+✖ Slice 5 audit: styles include context footer, action buttons, and implicit entity notice (0.3678ms)
+✖ Slice 5 audit: codex-cli is selectable and routes through native ProviderPort (0.3482ms)
+✖ Slice 6 audit: codex-cli live tool trace and final reconciliation are wired (0.5214ms)
+✖ Slice 6 audit: codex-cli host timeout and forced-report evidence preserve partial progress (0.4287ms)
+✖ Slice 5 next pass adds instance scoping to chat messages (2.1529ms)
+✖ Slice 5 next pass restoreMessages filters messages to the active instance (0.6467ms)
+✖ Slice 5 next pass adds context footer metadata (0.4689ms)
+✖ Slice 5 next pass adds implicit entity detection and capping (0.4607ms)
+✖ Slice 5 next pass adds implicit entity notice styling (0.4285ms)
+✖ slice 5 runtime renders action buttons with loading/error styles (1.7232ms)
+✖ slice 5 runtime renders implicit entity notice separately from message content (0.7281ms)
+✖ slice 5 runtime keeps explicit click requirement for actions (0.392ms)
+✖ Slice 5 TDD references action safety and limits (1.4262ms)
+✖ chat panel contains Slice 5 action and render limit scaffolding (0.3848ms)
+✖ chat panel persists header autonomy dropdown selections (0.2959ms)
+✖ styles include role header, hover actions, and action block styles (0.3369ms)
+node:fs:435
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\context-inspector.ts'
+    at Object.readFileSync (node:fs:435:20)
+    at Object.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\timeout-diagnostics.test.js:22:43)
+    at Module._compile (node:internal/modules/cjs/loader:1760:14)
+    at Object..js (node:internal/modules/cjs/loader:1892:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module._load (node:internal/modules/cjs/loader:1299:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\context-inspector.ts'
+}
+
+Node.js v25.2.1
+✖ extensions\vscode\dist\test\timeout-diagnostics.test.js (188.1214ms)
+node:internal/test_runner/harness:121
+      throw err;
+      ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+    at Object.readFileSync (node:fs:435:20)
+    at Object.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\timeout-recovery.test.js:97:43)
+    at Module._compile (node:internal/modules/cjs/loader:1760:14)
+    at Object..js (node:internal/modules/cjs/loader:1892:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module._load (node:internal/modules/cjs/loader:1299:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+}
+
+Node.js v25.2.1
+✖ extensions\vscode\dist\test\timeout-recovery.test.js (160.3344ms)
+✔ isWriteToolName recognizes host-local write tools (2.0703ms)
+✔ isWriteToolName recognizes MCP-prefixed write tools (0.2726ms)
+✔ isWriteToolName rejects pure-read tools (0.2181ms)
+✔ isVerifyToolName recognizes verification + execution tools (0.2899ms)
+✔ isVerifyToolName rejects locator/search tools (0.1714ms)
+✔ narrowToWriteAndVerify keeps writes + verifies and drops pure searches (1.5463ms)
+✔ narrowToWriteAndVerify falls back to full catalog when filter would be empty (0.2675ms)
+✔ pickPreferredWriteTool prefers multi_replace then replace then create (0.305ms)
+✔ pickPreferredWriteTool falls back to the first write-classified tool (0.2324ms)
+✔ pickPreferredWriteTool returns undefined when no write tools exist (0.3292ms)
+✔ APPLY_LABEL_PATTERN matches the canonical apply/patch verbs (0.4584ms)
+✔ APPLY_LABEL_PATTERN does NOT match pure read/locate verbs (0.1667ms)
+✔ primed tool is exposed even when next prompt is terse (1.9127ms)
+✔ priming a tool also exposes its sibling group members (0.5099ms)
+✔ primed tools that are not in availableToolNames are skipped (0.3327ms)
+✔ no primed tools behaves identically to omitting the field (1.1705ms)
+✔ envelope tool/tool_args fields survive structured extraction (1.679ms)
+✔ envelope without tool field leaves action.tool undefined (0.3605ms)
+✔ Phase 4 — pressure ≤ 0 returns content verbatim (2.0288ms)
+✔ Phase 4 — server-side envelope passthrough preserved under any pressure (0.4463ms)
+✔ Phase 4 — mild tier (0 < pressure ≤ 0.5) leaves small payloads verbatim (0.4204ms)
+✔ Phase 4 — mild tier trims when content exceeds expected slice (0.4321ms)
+✔ Phase 4 — aggressive tier (pressure > 0.5) trims hard with high-pressure marker (1.4293ms)
+✔ Phase 4 — coordinator that throws does not break the pipeline (0.2102ms)
+✔ Phase 4 — recordCompression that throws does not break the pipeline (0.3046ms)
+✔ Phase 4 — pressure-tier ordering is monotonic (verbatim ≤ mild ≤ aggressive in trim depth) (0.3457ms)
+✖ Slice 3 build migration: bundled webview runtime is emitted (2.2268ms)
+✖ Slice 3 build migration: chat panel loads bundled runtime via script src (0.5249ms)
+ℹ tests 485
+ℹ suites 0
+ℹ pass 452
+ℹ fail 33
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15999.7855
+
+✖ failing tests:
+
+test at extensions\vscode\dist\test\adaptive-future-inspector.test.js:1:1
+✖ extensions\vscode\dist\test\adaptive-future-inspector.test.js (710.8521ms)
+  'test failed'
+
+test at extensions\vscode\dist\test\anthropic-fable-mythos.test.js:13:25
+✖ Anthropic Fable/Mythos inventory is exposed without changing the governed default (1.3786ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\architect-llm.ts'
+      at readFileSync (node:fs:435:20)
+      at readRepoFile (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\anthropic-fable-mythos.test.js:11:39)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\anthropic-fable-mythos.test.js:14:26)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\architect-llm.ts'
+  }
+
+test at extensions\vscode\dist\test\anthropic-fable-mythos.test.js:21:25
+✖ Anthropic request helpers route Fable/Mythos through effort and adaptive thinking (0.2936ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\architect-llm.ts'
+      at readFileSync (node:fs:435:20)
+      at readRepoFile (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\anthropic-fable-mythos.test.js:11:39)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\anthropic-fable-mythos.test.js:22:26)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\architect-llm.ts'
+  }
+
+test at extensions\vscode\dist\test\anthropic-fable-mythos.test.js:30:25
+✖ Standalone and quarantined v2 Anthropic metadata include Fable/Mythos (0.2724ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\src\architect\routes.ts'
+      at readFileSync (node:fs:435:20)
+      at readRepoFile (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\anthropic-fable-mythos.test.js:11:39)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\anthropic-fable-mythos.test.js:31:20)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\src\\architect\\routes.ts'
+  }
+
+test at extensions\vscode\dist\test\anthropic-fable-mythos.test.js:38:25
+✖ Anthropic migration docs do not claim Mythos is generally available (0.261ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\docs\anthropic-opus-4-7.md'
+      at readFileSync (node:fs:435:20)
+      at readRepoFile (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\anthropic-fable-mythos.test.js:11:39)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\anthropic-fable-mythos.test.js:39:18)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\docs\\anthropic-opus-4-7.md'
+  }
+
+test at extensions\vscode\dist\test\chat-panel-copilot-cli-diff.test.js:1:1
+✖ extensions\vscode\dist\test\chat-panel-copilot-cli-diff.test.js (306.5483ms)
+  'test failed'
+
+test at extensions\vscode\dist\test\context-output-logging.test.js:1:1
+✖ extensions\vscode\dist\test\context-output-logging.test.js (559.6274ms)
+  'test failed'
+
+test at extensions\vscode\dist\test\slice5-actions.test.js:12:25
+✖ Slice 5 source includes show_full storage and action state messaging (1.3886ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-actions.test.js:13:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-actions.test.js:18:25
+✖ operator actions without daemon authority refuse rather than falling back to a local file write (1.0131ms)
+  Error: Cannot find module 'C:\Users\Mika Jussila\source\tests\helpers\compiled-editor.cjs'
+  Require stack:
+  - C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-actions.test.js
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1420:15)
+      at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+      at Module._load (node:internal/modules/cjs/loader:1226:37)
+      at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+      at Module.require (node:internal/modules/cjs/loader:1503:12)
+      at require (node:internal/modules/helpers:152:16)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-actions.test.js:19:27)
+      at Test.runInAsyncScope (node:async_hooks:213:14) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [ 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\extensions\\vscode\\dist\\test\\slice5-actions.test.js' ]
+  }
+
+test at extensions\vscode\dist\test\slice5-actions.test.js:32:25
+✖ Slice 5 source logs action provenance with outcome and detail (0.5602ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-actions.test.js:33:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-audit.test.js:10:25
+✖ Slice 5 audit: hover actions are wired for copy, retry, and pin (1.4893ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-audit.test.js:11:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-audit.test.js:17:25
+✖ Slice 5 audit: action execution remains allowlisted and explicit-click only (0.4409ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-audit.test.js:18:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-audit.test.js:26:25
+✖ Slice 5 audit: resource guards remain in place (0.2867ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-audit.test.js:27:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-audit.test.js:33:25
+✖ Slice 5 audit: styles include context footer, action buttons, and implicit entity notice (0.3678ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\webview\styles.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-audit.test.js:34:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\webview\\styles.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-audit.test.js:40:25
+✖ Slice 5 audit: codex-cli is selectable and routes through native ProviderPort (0.3482ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-audit.test.js:41:50)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-audit.test.js:56:25
+✖ Slice 6 audit: codex-cli live tool trace and final reconciliation are wired (0.5214ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-audit.test.js:57:50)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-audit.test.js:69:25
+✖ Slice 6 audit: codex-cli host timeout and forced-report evidence preserve partial progress (0.4287ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-audit.test.js:70:50)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-next-pass.test.js:10:25
+✖ Slice 5 next pass adds instance scoping to chat messages (2.1529ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-next-pass.test.js:11:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-next-pass.test.js:16:25
+✖ Slice 5 next pass restoreMessages filters messages to the active instance (0.6467ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-next-pass.test.js:17:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-next-pass.test.js:20:25
+✖ Slice 5 next pass adds context footer metadata (0.4689ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-next-pass.test.js:21:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-next-pass.test.js:26:25
+✖ Slice 5 next pass adds implicit entity detection and capping (0.4607ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-next-pass.test.js:27:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-next-pass.test.js:36:25
+✖ Slice 5 next pass adds implicit entity notice styling (0.4285ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\webview\styles.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-next-pass.test.js:37:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\webview\\styles.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-runtime.test.js:10:25
+✖ slice 5 runtime renders action buttons with loading/error styles (1.7232ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-runtime.test.js:11:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-runtime.test.js:18:25
+✖ slice 5 runtime renders implicit entity notice separately from message content (0.7281ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-runtime.test.js:19:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-runtime.test.js:24:25
+✖ slice 5 runtime keeps explicit click requirement for actions (0.392ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-runtime.test.js:25:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-ui.test.js:10:25
+✖ Slice 5 TDD references action safety and limits (1.4262ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\plans\TDD_COGNITIVE_OUTPUT_V2.md'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-ui.test.js:11:45)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\plans\\TDD_COGNITIVE_OUTPUT_V2.md'
+  }
+
+test at extensions\vscode\dist\test\slice5-ui.test.js:15:25
+✖ chat panel contains Slice 5 action and render limit scaffolding (0.3848ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-ui.test.js:16:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-ui.test.js:22:25
+✖ chat panel persists header autonomy dropdown selections (0.2959ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-ui.test.js:23:47)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }
+
+test at extensions\vscode\dist\test\slice5-ui.test.js:28:25
+✖ styles include role header, hover actions, and action block styles (0.3369ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\webview\styles.ts'
+      at readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-ui.test.js:29:44)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\webview\\styles.ts'
+  }
+
+test at extensions\vscode\dist\test\timeout-diagnostics.test.js:1:1
+✖ extensions\vscode\dist\test\timeout-diagnostics.test.js (188.1214ms)
+  'test failed'
+
+test at extensions\vscode\dist\test\timeout-recovery.test.js:1:1
+✖ extensions\vscode\dist\test\timeout-recovery.test.js (160.3344ms)
+  'test failed'
+
+test at extensions\vscode\dist\test\webview-bundle.test.js:10:25
+✖ Slice 3 build migration: bundled webview runtime is emitted (2.2268ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\webview-bundle.test.js:12:22)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at extensions\vscode\dist\test\webview-bundle.test.js:18:25
+✖ Slice 3 build migration: chat panel loads bundled runtime via script src (0.5249ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\Mika Jussila\source\repos\dreamgraph\src\chat-panel.ts'
+      at Object.readFileSync (node:fs:435:20)
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\webview-bundle.test.js:19:38)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\src\\chat-panel.ts'
+  }

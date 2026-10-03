@@ -1,0 +1,25 @@
+{
+  "recorded_at": "2026-09-30T22:44:08.111Z",
+  "scope": "Slice 10 core configuration authority progress; wave acceptance pending Slice 8 integration",
+  "files": 111,
+  "passed": 1136,
+  "failed": 0,
+  "skipped": 2,
+  "success": true,
+  "checks": {
+    "server_build": "passed",
+    "contracts": 31,
+    "baseline_revision": 7,
+    "providers_drift": "passed",
+    "configuration_drift": "295 typed entries; 99 literal source keys; zero unregistered documentation names"
+  },
+  "paid_provider_calls": 0,
+  "installed_runtime_changed": false,
+  "limitations": [
+    "Slice 11 transport/session authority pending",
+    "Slice 17 pinned job policy and restrictive admission integration pending",
+    "Slice 23 complete UI tabs/template controls pending",
+    "Windows ACL and power-loss qualification not claimed",
+    "Template/undo fields stage until activation; effective mismatch remains visible"
+  ]
+}

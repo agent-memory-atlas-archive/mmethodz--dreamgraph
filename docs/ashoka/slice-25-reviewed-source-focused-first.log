@@ -1,0 +1,98 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/change-obligations.test.ts > durable source change obligations > tracks real MCP create/edit/rename/delete commands through durable obligations
+[2026-10-02T00:03:43.910Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T00:03:43.911Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T00:03:43.912Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/change-obligations.test.ts > durable source change obligations > the actual MCP edit tool reports an unchanged write without requesting reconciliation
+[2026-10-02T00:03:44.267Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T00:03:44.267Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T00:03:44.268Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/change-obligations.test.ts > durable source change obligations > actual create_file refuses bytes changed after operator review without creating an obligation
+[2026-10-02T00:03:44.874Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T00:03:44.874Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T00:03:44.875Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/change-obligations.test.ts > durable source change obligations > actual delete_file refuses bytes changed after operator review without creating an obligation
+[2026-10-02T00:03:44.898Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T00:03:44.899Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T00:03:44.899Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/change-obligations.test.ts > durable source change obligations > actual reviewed create/delete restores exact Unicode/BOM/line endings and preserves independent source debt
+[2026-10-02T00:03:44.919Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T00:03:44.920Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T00:03:44.920Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/mcp-catalog-boundary.test.ts
+[2026-10-02T00:03:45.130Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-02T00:03:45.133Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T00:03:45.133Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T00:03:45.134Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-02T00:03:45.134Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-02T00:03:45.134Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-02T00:03:45.135Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-02T00:03:45.135Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-02T00:03:45.137Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-02T00:03:45.138Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-02T00:03:45.140Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-02T00:03:45.141Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-02T00:03:45.145Z] [INFO]  Registered 17 cognitive resources
+[2026-10-02T00:03:45.148Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-02T00:03:45.149Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-02T00:03:45.150Z] [INFO]  Registered 10 discipline execution tools
+
+stderr | tests/mcp-catalog-boundary.test.ts > collects the real registrars once with exact discipline parity and schemas
+[2026-10-02T00:03:45.205Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-02T00:03:45.206Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T00:03:45.206Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T00:03:45.206Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-02T00:03:45.206Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-02T00:03:45.207Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-02T00:03:45.207Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-02T00:03:45.207Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-02T00:03:45.208Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-02T00:03:45.208Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-02T00:03:45.210Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-02T00:03:45.210Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-02T00:03:45.236Z] [INFO]  Registered 17 cognitive resources
+[2026-10-02T00:03:45.238Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-02T00:03:45.240Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-02T00:03:45.241Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-02T00:03:45.260Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-02T00:03:45.261Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T00:03:45.261Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T00:03:45.261Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-02T00:03:45.261Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-02T00:03:45.261Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-02T00:03:45.262Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-02T00:03:45.262Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-02T00:03:45.262Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-02T00:03:45.263Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-02T00:03:45.265Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-02T00:03:45.265Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-02T00:03:45.291Z] [INFO]  Registered 17 cognitive resources
+[2026-10-02T00:03:45.292Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-02T00:03:45.294Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-02T00:03:45.295Z] [INFO]  Registered 10 discipline execution tools
+
+ ✓ tests/change-obligations.test.ts (21 tests) 2851ms
+   ✓ durable source change obligations > exact managed source replay preserves the implicit parent execution binding and writes once  303ms
+   ✓ durable source change obligations > tracks real MCP create/edit/rename/delete commands through durable obligations  364ms
+stderr | tests/mcp-catalog-boundary.test.ts > blocks mutations/cognition in the wrong phase and requires an applicable approved plan
+[2026-10-02T00:03:47.666Z] [INFO]  Discipline session started: 1b828bdb-5132-4b99-bbfa-aeafb60410d7 (modification: boundary)
+
+ ✓ tests/mcp-catalog-boundary.test.ts (191 tests) 2504ms
+   ✓ dream_cycle: shared result/dependency/version/cancellation boundary  410ms
+   ✓ import_dream_archetypes: shared result/dependency/version/cancellation boundary  376ms
+   ✓ metacognitive_analysis: shared result/dependency/version/cancellation boundary  368ms
+   ✓ nightmare_cycle: shared result/dependency/version/cancellation boundary  360ms
+   ✓ normalize_dreams: shared result/dependency/version/cancellation boundary  360ms
+
+ Test Files  2 passed (2)
+      Tests  212 passed (212)
+   Start at  03:03:37
+   Duration  10.41s (transform 2.83s, setup 0ms, collect 12.48s, tests 5.35s, environment 0ms, prepare 293ms)
+

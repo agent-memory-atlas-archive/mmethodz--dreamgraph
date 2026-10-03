@@ -1,0 +1,56 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/computer-browser-worker.test.ts > Stop terminates its original browser within the same deadline when graceful close is deliberately ignored
+Forced original-browser termination evidence {
+  elapsed_ms: 636.8463000000011,
+  dropped_graceful_frames: 1,
+  requests_quiescent: true
+}
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on disconnect without another model call
+Computer control-loss evidence { mode: 'disconnect', elapsed_ms: 271.4517999999989, local_stop: null }
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on watchdog without another model call
+Computer control-loss evidence {
+  mode: 'watchdog',
+  elapsed_ms: 3510.171599999998,
+  local_stop: {
+    epoch: '164f5906-70ab-4cb3-8998-29db941e590a',
+    input_released: true,
+    terminated: true,
+    reason: 'watchdog',
+    heartbeat_age_ms: 2563.196,
+    stop_elapsed_ms: 1216.0609
+  }
+}
+
+stderr | tests/computer-browser-worker.test.ts > lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input
+Original worker reply deadline {
+  operation: 'stop',
+  timeout_ms: 900,
+  elapsed_ms: 902.0930999999982,
+  cause: { phase: 'stop' }
+}
+
+ ✓ tests/computer-browser-worker.test.ts (13 tests) 34233ms
+   ✓ performs real Unicode, checked, click/readback and scrolling using opaque current references  2821ms
+   ✓ moved/covered controls, disabled and credential controls never receive a guessed action  1504ms
+   ✓ forbidden posts, redirects, popups and frames cannot reach another origin or authority  3139ms
+   ✓ exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime  451ms
+   ✓ explicit navigation stays inside the approved origin and segment path and verifies independent destination state  2483ms
+   ✓ private worker process preserves typed observations and responsive independent termination  2343ms
+   ✓ Stop terminates its original browser within the same deadline when graceful close is deliberately ignored  2737ms
+   ✓ original worker pause fences capture/input and resumes with new references before independent Stop  2820ms
+   ✓ stop bypasses a pending browser navigation and never waits for its ten-second server response  2025ms
+   ✓ masked frames have a verified digest and image exhaustion refuses before another input  2259ms
+   ✓ a real worker closes its dedicated browser on disconnect without another model call  2331ms
+   ✓ a real worker closes its dedicated browser on watchdog without another model call  5550ms
+   ✓ lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input  3769ms
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  11:38:51
+   Duration  35.05s (transform 181ms, setup 0ms, collect 407ms, tests 34.23s, environment 0ms, prepare 148ms)
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/slice-27-pause-diagnostic-first.json

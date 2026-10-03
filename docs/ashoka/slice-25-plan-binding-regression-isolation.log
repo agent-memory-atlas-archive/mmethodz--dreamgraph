@@ -1,0 +1,18 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/managed-plan-execution.test.ts (11 tests | 8 skipped) 3676ms
+   ✓ a real pending native model permit cannot be reported as confirmed plan termination  1208ms
+   ✓ the SDK native model callback uses the delivered running plan and original spend permit but cannot mark the slice implemented  944ms
+   ✓ a fresh compiled daemon process recovers the saved closure without live launch authority or another C14 event  1523ms
+stdout | tests/host-managed-execution.test.ts > compiled command Cancel propagates to native HTTP and cannot publish a successful answer or confirm remote termination
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":41892,"approxTokens":10473}
+
+ ✓ tests/host-managed-execution.test.ts (128 tests | 127 skipped) 1033ms
+   ✓ compiled command Cancel propagates to native HTTP and cannot publish a successful answer or confirm remote termination  1031ms
+
+ Test Files  2 passed (2)
+      Tests  4 passed | 135 skipped (139)
+   Start at  11:38:57
+   Duration  9.12s (transform 3.16s, setup 0ms, collect 12.34s, tests 4.71s, environment 0ms, prepare 286ms)
+

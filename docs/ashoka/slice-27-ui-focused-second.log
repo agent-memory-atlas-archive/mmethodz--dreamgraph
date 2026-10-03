@@ -1,0 +1,88 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-03T07:08:01.311Z] [ERROR] /explorer route error (/explorer/api/node/Public): { name: 'Error', message: 'EXPLORER_AMBIGUOUS_ID' }
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-03T07:08:01.322Z] [ERROR] /explorer route error (/explorer/api/node/legacy%2Ffeature%2FPublic): { name: 'Error', message: 'EXPLORER_REVISION_CONFLICT' }
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-03T07:08:01.325Z] [ERROR] /explorer route error (/explorer/api/candidates): { name: 'Error', message: 'EXPLORER_REVISION_CONFLICT' }
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-03T07:08:01.328Z] [ERROR] /explorer route error (/explorer/api/tensions): { name: 'Error', message: 'EXPLORER_REVISION_CONFLICT' }
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-03T07:08:01.332Z] [ERROR] /explorer route error (/explorer/api/stats): { name: 'Error', message: 'EXPLORER_REVISION_CONFLICT' }
+
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-03T07:08:01.497Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/explorer-canonical-navigation.test.ts (5 tests) 1280ms
+   ✓ discloses render exclusions and keeps metadata-only revisions from rebuilding the layout  341ms
+stderr | tests/architect-plan-authority.test.ts > anchors slice definitions to exact UTF-16 source positions rather than earlier title mentions
+[2026-10-03T07:08:02.423Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > anchors slice definitions to exact UTF-16 source positions rather than earlier title mentions
+[2026-10-03T07:08:02.442Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/explorer-mutations.test.ts > tension.resolve > returns 404 when the tension does not exist
+[2026-10-03T07:08:03.904Z] [WARN]  Mutation "tension.resolve" failed: Tension ghost_id is not active.
+
+ ❯ tests/explorer-mutations.test.ts (16 tests | 2 failed) 1153ms
+   ✓ Mutation auth > rejects when X-DreamGraph-Instance is missing in instance mode 15ms
+   ✓ Mutation auth > rejects when X-DreamGraph-Instance is wrong 14ms
+   ✓ Mutation auth > returns 404 for unknown intent 18ms
+   ✓ Mutation preconditions > rejects when reason is missing 31ms
+   ✓ Mutation preconditions > rejects when If-Match is missing 16ms
+   ✓ Mutation preconditions > rejects with 412 when If-Match is stale 56ms
+   ✓ Mutation preconditions > accepts an older displayed snapshot when only an unrelated entity changed 152ms
+   ✓ Mutation preconditions > refuses a changed tension or a changed referenced entity before invoking the mutation 94ms
+   × Mutation preconditions > candidate.promote rebases unrelated changes but refuses changed original claims 72ms
+     → expected 412 to be 200 // Object.is equality
+   × Mutation preconditions > candidate.reject rebases unrelated changes but refuses changed original claims 55ms
+     → expected 412 to be 200 // Object.is equality
+   ✓ Audit row contract > writes the full contract on a successful tension.resolve 144ms
+   ✓ tension.resolve > removes the tension from active signals 124ms
+   ✓ tension.resolve > dry-run does NOT mutate state but still writes an audit row 50ms
+   ✓ tension.resolve > returns 404 when the tension does not exist 48ms
+   ✓ candidate.promote > records a human assertion and preserves normalization history 126ms
+   ✓ candidate.reject > records rejection without rewriting assessment history or adding source validation 136ms
+stderr | tests/architect-plan-authority.test.ts > actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan
+[2026-10-03T07:08:07.036Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+ ✓ tests/architect-plan-authority.test.ts (8 tests) 6449ms
+   ✓ the frozen actual Ashoka definition and log keep completed cards muted and current work navigable before lifecycle import  3845ms
+   ✓ actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan  847ms
+   ✓ archive refuses a running/recovery lease and keeps original artifacts on failure  394ms
+   ✓ the real Architect script exposes readable running/current markers, slice filters and keyboard navigation  630ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/explorer-mutations.test.ts > Mutation preconditions > candidate.promote rebases unrelated changes but refuses changed original claims
+ FAIL  tests/explorer-mutations.test.ts > Mutation preconditions > candidate.reject rebases unrelated changes but refuses changed original claims
+AssertionError: expected 412 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 412
+
+ ❯ tests/explorer-mutations.test.ts:297:29
+    295|     await writeFile(dataPath("capabilities.json"),JSON.stringify({capa…
+    296|     await run(intent, {body:{dream_id:"dream_1",reason:"Review",dry_ru…
+    297|     expect(captured.status).toBe(200);
+       |                             ^
+    298|     const graph=JSON.parse(await readFile(dataPath("dream_graph.json")…
+    299|     await writeFile(dataPath("dream_graph.json"),JSON.stringify(graph)…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 27 passed (29)
+   Start at  10:07:54
+   Duration  14.54s (transform 2.88s, setup 0ms, collect 14.33s, tests 8.88s, environment 1ms, prepare 425ms)
+

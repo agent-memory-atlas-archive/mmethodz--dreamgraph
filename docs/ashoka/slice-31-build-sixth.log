@@ -1,0 +1,5 @@
+
+> dreamgraph@13.4.0 build:server
+> tsc -b
+
+src/computer/browser-driver.ts(117,53): error TS2339: Property 'scrollBy' does not exist on type 'Node'.

@@ -1,0 +1,87 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/standalone-architect-routes.test.ts
+[2026-10-02T05:45:50.694Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > resolves Windows CLI shims and wraps them before spawning
+[2026-10-02T05:45:50.998Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > serves an executable browser bootstrap script for runtime binding
+[2026-10-02T05:45:51.073Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-02T05:45:52.500Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-02T05:45:52.504Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-02T05:45:52.738Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-02T05:45:52.748Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-02T05:45:52.785Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-02T05:45:52.991Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification
+[2026-10-02T05:45:53.028Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification
+[2026-10-02T05:45:53.087Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification
+[2026-10-02T05:45:53.705Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-02T05:45:53.741Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-02T05:45:53.821Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-02T05:45:54.028Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > replaces a stale local model when codex-cli is selected
+[2026-10-02T05:45:54.066Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+[2026-10-02T05:45:54.071Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T05:45:54.170Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T05:45:54.194Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T05:45:54.219Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T05:45:54.243Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > exposes one active session runtime across config and chat payloads
+[2026-10-02T05:45:54.348Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.4, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists token economy config changes in engine.env
+[2026-10-02T05:45:54.589Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists token economy config changes in engine.env
+[2026-10-02T05:45:54.636Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+ ✓ tests/standalone-architect-routes.test.ts (55 tests) 5767ms
+   ✓ standalone Architect route hardening > executes browser bootstrap and bounds poisoned persisted chat history replay  518ms
+   ✓ standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification  739ms
+   ✓ standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports  324ms
+ ✓ tests/daemon-transport-isolation.test.ts (3 tests) 8843ms
+   ✓ isolates real native MCP transports, rejects foreign browser binding and removes closed sessions  3652ms
+   ✓ carries its stdio stream owner through tools and resources  2375ms
+   ✓ the actual daemon admits one exact managed MCP action once, retains source debt and refuses consumed replay  2814ms
+
+ Test Files  2 passed (2)
+      Tests  58 passed (58)
+   Start at  08:45:42
+   Duration  23.42s (transform 2.61s, setup 0ms, collect 7.98s, tests 14.61s, environment 0ms, prepare 256ms)
+

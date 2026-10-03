@@ -1,0 +1,55 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/agent-usefulness.test.ts (9 tests) 113ms
+ ✓ tests/plan-context-integration.test.ts (6 tests) 1890ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  904ms
+   ✓ verified implementation evidence is distinct from the next slice and recovers after a transcript-free read  368ms
+stderr | tests/managed-plan-execution.test.ts
+[2026-10-02T08:53:27.158Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/managed-plan-execution.test.ts > selection alone stays read-only, while explicit execution injects the post-admission canonical running projection
+[2026-10-02T08:53:27.393Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ✓ tests/plan-runtime.test.ts (10 tests) 2367ms
+   ✓ native termination closes only the execution lease, leaving current implementation and verification evidence unchanged  329ms
+ ❯ tests/managed-plan-execution.test.ts (13 tests | 1 failed) 12013ms
+   ✓ selection alone stays read-only, while explicit execution injects the post-admission canonical running projection  1176ms
+   ✓ refuses foreign project, selection mismatch, changed source semantics and stale approval before returning native authority  569ms
+   ✓ external plan edits block delivery and worker/model dispatch; source restoration cannot renew a closed pass  683ms
+   ✓ a real pending native model permit cannot be reported as confirmed plan termination  952ms
+   ✓ the SDK native model callback uses the delivered running plan and original spend permit but cannot mark the slice implemented  856ms
+   ✓ unconfirmed termination remains recovery on exact retry and cannot be strengthened through another public finish  753ms
+   × rejected admission can close only a durably undelivered context with no lease or effects 487ms
+     → expected [Function] to throw error including 'PLAN_VERIFICATION_NOT_CURRENT' but got 'EXECUTION_REQUEST_REJECTED: HTTP 409:…'
+   ✓ lost C14 closure acknowledgment replays the persisted original command after host revocation without another event  704ms
+   ✓ finite authority expiry leaves canonical recovery and a later claimed confirmed stop cannot erase missing live observation  1957ms
+   ✓ a fresh compiled daemon process recovers the saved closure without live launch authority or another C14 event  1342ms
+   ✓ actual compiled editor and SDK native passes preserve explicit purpose and close canonical ownership without claiming verification  1423ms
+   ✓ foreign hosts and execution workers cannot request C14 closure or another implementation lease  633ms
+   ✓ browser chat refuses forged purpose, unrelated selection, fallback and continuation before a native task can start  475ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/managed-plan-execution.test.ts > rejected admission can close only a durably undelivered context with no lease or effects
+AssertionError: expected [Function] to throw error including 'PLAN_VERIFICATION_NOT_CURRENT' but got 'EXECUTION_REQUEST_REJECTED: HTTP 409:…'
+
+Expected: "PLAN_VERIFICATION_NOT_CURRENT"
+Received: "EXECUTION_REQUEST_REJECTED: HTTP 409: {"error":"HOST_EXECUTION_REJECTED","message":"PlanRuntimeAdmissionError: PLAN_RUNTIME_ADMISSION_UNCONFIRMED: refused-before-dispatch; inspect the original plan execution"}"
+
+ ❯ tests/managed-plan-execution.test.ts:174:3
+    172| it("rejected admission can close only a durably undelivered context wi…
+    173|   const sequence = (await view())!.state.event_sequence;
+    174|   await expect(client.begin(request("refused-before-dispatch", { plan_…
+       |   ^
+    175|   const saved = await inHost(() => readManagedContext("refused-before-…
+    176|   expect(saved).toMatchObject({ status: "assembled", effects: [], pack…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 37 passed (38)
+   Start at  11:53:19
+   Duration  19.30s (transform 2.93s, setup 0ms, collect 16.74s, tests 16.38s, environment 1ms, prepare 594ms)
+

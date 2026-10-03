@@ -1,0 +1,47 @@
+[
+  {
+    "elapsed_seconds": 5.9424331,
+    "exit_code": 0,
+    "script": "build:server"
+  },
+  {
+    "elapsed_seconds": 0.6504219,
+    "exit_code": 0,
+    "script": "docs:architecture-tree"
+  },
+  {
+    "elapsed_seconds": 3.8237793,
+    "exit_code": 0,
+    "script": "config:inventory"
+  },
+  {
+    "elapsed_seconds": 1.0356625,
+    "exit_code": 0,
+    "script": "contracts:check"
+  },
+  {
+    "elapsed_seconds": 0.9723164,
+    "exit_code": 0,
+    "script": "providers:check"
+  },
+  {
+    "elapsed_seconds": 3.1926384,
+    "exit_code": 0,
+    "script": "mcp:check"
+  },
+  {
+    "elapsed_seconds": 2.2893366,
+    "exit_code": 0,
+    "script": "metrics:check"
+  },
+  {
+    "elapsed_seconds": 0.9356654,
+    "exit_code": 0,
+    "script": "ashoka:baseline:check"
+  },
+  {
+    "elapsed_seconds": 3.4782477,
+    "exit_code": 0,
+    "script": "config:check"
+  }
+]

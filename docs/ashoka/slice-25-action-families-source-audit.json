@@ -1,0 +1,40 @@
+{
+  "scope": "Full artifact byte reads and hashes; semantic review covers contextual action and captured navigation boundaries only, not complete project or UX qualification",
+  "entries": [
+    {
+      "path": "src/architect/context-actions.ts",
+      "bytes": 8961,
+      "sha256": "030d8f31cb72c795feadbcf814cb6cb09862631d003dcff80ddd096da220f4d3"
+    },
+    {
+      "path": "src/architect/routes.ts",
+      "bytes": 642246,
+      "sha256": "03b8d7483ae3db6e5b1db74e3a093fcaa5effcd162bddcf39f4606d0b5c2714a"
+    },
+    {
+      "path": "src/server/context-menu.ts",
+      "bytes": 5485,
+      "sha256": "af62c20af58b9d912770bcfac84259a6988ce927d41134bc4191a541baf437c8"
+    },
+    {
+      "path": "src/server/schedule-workspace.ts",
+      "bytes": 34602,
+      "sha256": "3a8166e5fc41bc3cb05a9d5433e11d69153f954eb6cebc1513b46f7e56be2aca"
+    },
+    {
+      "path": "tests/schedule-workspace.test.ts",
+      "bytes": 12619,
+      "sha256": "87f5f7e5473aecf02bdadb52e9c1c1ee93a52c66f23ca35b52131c7a254356ff"
+    },
+    {
+      "path": "scripts/qualify-ashoka-architect.mjs",
+      "bytes": 30355,
+      "sha256": "a6796489651ea8a6fa978e55ec99c6da6e949d8e1df40e9218711bb4c82f612b"
+    },
+    {
+      "path": "docs/ashoka/browser-25-action-families-fourth/qualification.json",
+      "bytes": 4664,
+      "sha256": "594e9eed3b4b824b4eac3c01e340b499701a6393280525137d4c3bdb8b4c4f72"
+    }
+  ]
+}

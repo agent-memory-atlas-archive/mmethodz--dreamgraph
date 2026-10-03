@@ -1,0 +1,58 @@
+{
+  "scope": "Actual compiled Windows daemon/Architect, CLI and Chrome. Read-only graph-family copy plus original receipt history for navigation scale; publication store dependencies narrowed to copied files and fresh disposable authority. No live mutation, scan, paid inference or production migration claimed.",
+  "checks": [
+    {
+      "name": "NAV08",
+      "detail": "528 real compiled daemon health probes create no sessions, cookies, grants or publication writes before actual browser navigation."
+    },
+    {
+      "name": "NAV01",
+      "detail": "Actual shell/list load at original receipt and graph-family scale; no mocked plan-index route."
+    }
+  ],
+  "errors": [],
+  "input_snapshot": {
+    "publication_sha256": "d58c7ea8d1e6648b1bc3ea6d7778927bfe09be5bbfa32380565ae846559fd37c",
+    "epoch": "26106937-91a6-4a74-adc7-594cc4cb7685",
+    "revision": {
+      "publication_sequence": 15942,
+      "graph_revision": null,
+      "domains": {
+        "authority": 523,
+        "extension_state": 10,
+        "schedules": 15409
+      }
+    },
+    "boundary": "Original publication bytes remained identical and no journal was present across the read-only family copy. This fixture is not a live cutover approval."
+  },
+  "publication_bytes": 13064663,
+  "copied_graph_files": [
+    "features.json",
+    "workflows.json",
+    "data_model.json",
+    "capabilities.json",
+    "datastores.json",
+    "auxiliary_entities.json",
+    "ui_registry.json",
+    "dream_graph.json",
+    "candidate_edges.json",
+    "validated_edges.json",
+    "tension_log.json",
+    "adr_log.json",
+    "dream_archetypes.json",
+    "system_story.json"
+  ],
+  "health_probes": {
+    "count": 528,
+    "p95_ms": 12,
+    "max_ms": 34,
+    "unchanged_authority": true,
+    "unchanged_publication": true
+  },
+  "browser": "153.0.8010.50",
+  "shell_ms": 2382,
+  "plans_visible_ms": 4790,
+  "success": false,
+  "failure": "locator.waitFor: Error: strict mode violation: locator('[data-slice-id].slice-current') resolved to 2 elements:\n    1) <li tabindex=\"0\" role=\"button\" class=\"dg-context-target slice-current\" data-slice-id=\"slice-26-refresh-the-legacy-dreamgraph-graph-safely\" aria-label=\"Slice 26 — Refresh the legacy DreamGraph graph safely, Current · in_progress (reported). Open definition\">…</li> aka getByLabel('Slice 26 — Refresh the legacy DreamGraph graph safely, Current · in_progress (')\n    2) <li tabindex=\"0\" role=\"button\" class=\"dg-context-target slice-current\" data-slice-id=\"slice-31-deliver-governed-cross-platform-computer-use\" aria-label=\"Slice 31 — Deliver governed cross-platform Computer Use, Current · in_progress (reported). Open definition\">…</li> aka getByLabel('Slice 31 — Deliver governed cross-platform Computer Use, Current · in_progress')\n\nCall log:\n\u001b[2m  - waiting for locator('[data-slice-id].slice-current')\u001b[22m\n\n    at C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\scripts\\qualify-ashoka-navigation.mjs:56:104",
+  "daemon_diagnostic": "[2026-10-02T20:27:54.521Z] [INFO]  Loaded 24 env vars from C:\\Users\\MIKAJU~1\\AppData\\Local\\Temp\\dg-navigation-browser-m69WvV\\master\\39c8e4b5-4007-4083-a700-5932a4cfae91\\config\\engine.env\n[2026-10-02T20:27:54.521Z] [INFO]  Auto-registered attached project_root as repo 'dreamgraph': C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\n[2026-10-02T20:27:54.522Z] [INFO]  Instance mode activated: InstanceScope(39c8e4b5…, project=C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph)\n[2026-10-02T20:27:54.523Z] [INFO]  Repos available: fixture, dreamgraph\n[2026-10-02T20:27:54.906Z] [INFO]  Cognitive engine hydrated: 2125 dream cycles, 1842 normalization cycles, bootstrap=graduated\n[2026-10-02T20:27:54.906Z] [INFO]  LLM provider: none (model: n/a)\n[2026-10-02T20:27:54.906Z] [WARN]  LLM provider \"none\" is NOT reachable — dreams will be structural-only (degraded)\n[2026-10-02T20:27:54.920Z] [INFO]  Plugin discovery: no plugins found in <instance>/plugins or instance.json\n[2026-10-02T20:27:54.928Z] [INFO]  Data dir watcher active on C:\\Users\\MIKAJU~1\\AppData\\Local\\Temp\\dg-navigation-browser-m69WvV\\master\\39c8e4b5-4007-4083-a700-5932a4cfae91\\data\n[2026-10-02T20:27:54.934Z] [INFO]  DreamGraph MCP Server running on 127.0.0.1:55761 — remote=false, authentication=local-machine\n[2026-10-02T20:27:57.574Z] [INFO]  LLM architect config: provider=none (general), model=n/a (provider_default), temp=0.7, maxTokens=2048\n"
+}

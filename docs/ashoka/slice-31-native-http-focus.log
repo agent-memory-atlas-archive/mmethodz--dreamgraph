@@ -1,0 +1,64 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/architect-native-tool-loop.test.ts (23 tests) 39ms
+stderr | tests/http-session-isolation.test.ts
+[2026-10-02T16:28:11.295Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > defaults to loopback, refuses unsafe remote combinations and redacts authentication
+[2026-10-02T16:28:11.381Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > rejects hostile origin/host/fetch metadata before creating session state
+[2026-10-02T16:28:11.422Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > keeps Architect selection/model/history private across overlapping clients and reload
+[2026-10-02T16:28:11.549Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > keeps Architect selection/model/history private across overlapping clients and reload
+[2026-10-02T16:28:11.858Z] [INFO]  LLM architect config: provider=none (general), model=none (general), temp=0, maxTokens=1024
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > authenticates explicit remote mode and resumes only the authenticated principal
+[2026-10-02T16:28:11.957Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > isolates overlapping execution and cancellation, and reconnects to its own running pass
+[2026-10-02T16:28:12.032Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > isolates overlapping execution and cancellation, and reconnects to its own running pass
+[2026-10-02T16:28:12.131Z] [INFO]  LLM architect config: provider=none (general), model=none (general), temp=0, maxTokens=1024
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > requires the human browser control port for full-access confirmation
+[2026-10-02T16:28:12.413Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/http-session-isolation.test.ts > actual local HTTP session boundaries > keeps scoped computer permission on the human control port and reports unavailable native routes without substitution
+[2026-10-02T16:28:12.607Z] [INFO]  LLM provider: none (model: none)
+
+ ✓ tests/http-session-isolation.test.ts (7 tests) 1537ms
+   ✓ actual local HTTP session boundaries > keeps Architect selection/model/history private across overlapping clients and reload  409ms
+   ✓ actual local HTTP session boundaries > isolates overlapping execution and cancellation, and reconnects to its own running pass  381ms
+ ✓ tests/computer-journal.test.ts (9 tests) 3477ms
+   ✓ replays original intent/receipt across service recreation and never persists raw action text  512ms
+   ✓ reserves finite actions/images/bytes once and refuses oversize or unsupported operations  426ms
+   ✓ postcondition proof, terminal immutability and graph receipt owner remain separate  439ms
+   ✓ a lost physical result stays recoverable after acknowledged stop and cannot redispatch  453ms
+   ✓ active workers prevent completion and stopped proved work remains a state receipt, never graph truth  403ms
+   ✓ late unknown-result bookkeeping does not pretend worker termination was acknowledged  412ms
+ ✓ tests/computer-broker.test.ts (13 tests) 12528ms
+   ✓ single original host/job owns scoped dispatch, independent postcondition and replay  1622ms
+   ✓ native custom tools preserve scoped fresh observations and keep literal arguments out of preview metadata  1482ms
+   ✓ ephemeral image bytes are hash checked and atomically recorded as distinct pixel/DOM descriptors  900ms
+   ✓ an executor cannot pair arbitrary image bytes with a forged digest  872ms
+   ✓ full-access scope does not replace exact action approval; target changes remain fenced  1020ms
+   ✓ grant revocation stops without a model roundtrip and prevents later physical dispatch  772ms
+   ✓ lost reply after input has one durable unknown receipt and is never replayed  1185ms
+   ✓ failed independent termination retains the original worker for stop-only recovery  857ms
+   ✓ material source change stays reconciliation pending even though the GUI postcondition passed  1316ms
+   ✓ wrong-session and unqualified routes cannot open even a declared worker  470ms
+   ✓ a reviewed profile cannot be replaced by the worker  442ms
+   ✓ a reviewed backend cannot be replaced by the worker  458ms
+   ✓ observation-only operator approval cannot authorize interaction even with an exact action approval  1130ms
+
+ Test Files  4 passed (4)
+      Tests  52 passed (52)
+   Start at  19:28:03
+   Duration  18.54s (transform 3.40s, setup 0ms, collect 21.90s, tests 17.58s, environment 1ms, prepare 827ms)
+

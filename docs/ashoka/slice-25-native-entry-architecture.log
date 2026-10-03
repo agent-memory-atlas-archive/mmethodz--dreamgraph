@@ -1,0 +1,5 @@
+
+> dreamgraph@13.4.0 docs:architecture-tree
+> node scripts/generate-architecture-tree.mjs
+
+Updated docs/architecture.md source tree section.

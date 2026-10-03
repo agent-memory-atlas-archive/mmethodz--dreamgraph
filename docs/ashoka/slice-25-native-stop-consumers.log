@@ -1,0 +1,13 @@
+[2026-10-02T09:50:32.892Z] [INFO]  Creating instance 3e2f9555-4981-4e70-b5c1-6962b583bf70 (plan-consumers) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-DUOVn7\master\3e2f9555-4981-4e70-b5c1-6962b583bf70
+[2026-10-02T09:50:32.957Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-DUOVn7\master\instances.json
+[2026-10-02T09:50:32.957Z] [INFO]  Registered new instance 3e2f9555-4981-4e70-b5c1-6962b583bf70 (plan-consumers)
+[2026-10-02T09:50:32.962Z] [INFO]  Instance 3e2f9555-4981-4e70-b5c1-6962b583bf70 created successfully
+dreamgraph:draft
+dreamgraph:implemented
+dreamgraph:verified
+dreamgraph:blocked
+web64:draft
+web64:implemented
+web64:verified
+web64:blocked
+Explorer scope

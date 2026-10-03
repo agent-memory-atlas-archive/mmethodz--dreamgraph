@@ -1,0 +1,14 @@
+(node:16268) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ canonical graph context reaches the actual model-facing packet at high pressure, with exact receipt and Unicode evidence (16.4299ms)
+✔ a missing canonical capability is visible in the prompt and does not silently call the legacy data projection (1.1091ms)
+✔ required graph records borrow optional space within the same total bound; they never disappear when too large (2.2507ms)
+✔ repository-local ID collisions remain in the whole canonical pack without manufacturing a navigation identity (0.6413ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 265.1628

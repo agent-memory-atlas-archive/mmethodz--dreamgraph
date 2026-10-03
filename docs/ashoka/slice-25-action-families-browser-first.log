@@ -1,0 +1,23 @@
+[2026-10-02T02:38:05.163Z] [INFO]  Creating instance 7d6b0b8e-f9bb-4214-8b4c-b2c51edf2ce8 (browser-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-V1TvaA\master\7d6b0b8e-f9bb-4214-8b4c-b2c51edf2ce8
+[2026-10-02T02:38:05.245Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-V1TvaA\master\instances.json
+[2026-10-02T02:38:05.245Z] [INFO]  Registered new instance 7d6b0b8e-f9bb-4214-8b4c-b2c51edf2ce8 (browser-fixture)
+[2026-10-02T02:38:05.251Z] [INFO]  Instance 7d6b0b8e-f9bb-4214-8b4c-b2c51edf2ce8 created successfully
+B25-01
+B25-02
+B25-03
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for getByRole('menu').getByRole('menuitem', { name: 'Ask Architect…', exact: true })
+
+    at C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-architect.mjs:56:143 {
+  log: [
+    "  - waiting for getByRole('menu').getByRole('menuitem', { name: 'Ask Architect…', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v25.2.1

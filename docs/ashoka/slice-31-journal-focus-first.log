@@ -1,0 +1,46 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T15:01:00.774Z] [INFO]  Discipline session started: 5c924828-b3e3-4c98-99f1-869ee2f352ff (modification: owner-0)
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T15:01:00.779Z] [INFO]  Discipline session started: 7a16fb1b-fafe-4e33-b261-167d5702bf9e (modification: owner-1)
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T15:01:00.794Z] [INFO]  Discipline session completed: 5c924828-b3e3-4c98-99f1-869ee2f352ff
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T15:01:00.800Z] [INFO]  Discipline session completed: 7a16fb1b-fafe-4e33-b261-167d5702bf9e
+
+ ✓ tests/session-authority.test.ts (7 tests) 2257ms
+   ✓ private durable authority > fences Computer Use controls and stops outside the model loop on expire  1169ms
+ ✓ tests/computer-journal.test.ts (9 tests) 3230ms
+   ✓ replays original intent/receipt across service recreation and never persists raw action text  385ms
+   ✓ does not cross sessions, host epochs, target generations or grants  327ms
+   ✓ invalidates old observations on target changes and cannot verify a model interpretation  342ms
+   ✓ reserves finite actions/images/bytes once and refuses oversize or unsupported operations  365ms
+   ✓ postcondition proof, terminal immutability and graph receipt owner remain separate  410ms
+   ✓ a lost physical result stays recoverable after acknowledged stop and cannot redispatch  451ms
+   ✓ active workers prevent completion and stopped proved work remains a state receipt, never graph truth  359ms
+   ✓ late unknown-result bookkeeping does not pretend worker termination was acknowledged  381ms
+ ✓ tests/execution-context.test.ts (22 tests) 7710ms
+   ✓ an unchanged source edit closes as no_change and returns no unnecessary reconciliation claim  374ms
+   ✓ revalidates actual named source content and affected graph constraints, while ignoring unrelated activity  320ms
+   ✓ binds actual source effects to the host execution and retains a durable reconciliation obligation at closure  320ms
+   ✓ an owner failure after a real write cannot become no-change or authorize a blind retry  312ms
+   ✓ actual shell source observation distinguishes no-source-change from process exit; external effects remain unattested  553ms
+   ✓ observes actual native additions/deletions as exact pending scopes while excluding instance metadata  513ms
+   ✓ refresh never launders a concrete untracked named-source mismatch into current graph context  424ms
+   ✓ a refreshed concrete gap admits only the canonical explicitly approved structural repair, preserving the gap until proof commits  498ms
+   ✓ a delivered known source obligation admits only an explicitly approved repair and retains the execution-bound graph receipt  621ms
+   ✓ a pending closed execution can recover its verified reconciliation without redispatching the source effect  304ms
+   ✓ unrelated execution debt does not prevent explicitly approved repair of the affected source  409ms
+   ✓ separates an execution-bound operational commit from graph publication and rejects invented closure receipts  468ms
+   ✓ per-request command cancellation stops the actual managed process and retains independently observed source debt  705ms
+
+ Test Files  3 passed (3)
+      Tests  38 passed (38)
+   Start at  18:00:58
+   Duration  13.40s (transform 2.17s, setup 0ms, collect 11.63s, tests 13.20s, environment 1ms, prepare 443ms)
+

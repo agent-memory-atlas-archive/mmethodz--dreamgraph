@@ -1,0 +1,5 @@
+[2026-10-02T12:40:16.229Z] [INFO]  Creating instance dc548a0c-d9a6-413c-94aa-f2d5b1c7773e (ashoka-bounded-source-review) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-source-review-uFReuM\master\dc548a0c-d9a6-413c-94aa-f2d5b1c7773e
+[2026-10-02T12:40:16.327Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-source-review-uFReuM\master\instances.json
+[2026-10-02T12:40:16.327Z] [INFO]  Registered new instance dc548a0c-d9a6-413c-94aa-f2d5b1c7773e (ashoka-bounded-source-review)
+[2026-10-02T12:40:16.334Z] [INFO]  Instance dc548a0c-d9a6-413c-94aa-f2d5b1c7773e created successfully
+{"sessionId":"124329c9-005c-4a4f-b969-150692a776e9","compliance":{"status":"compliant","parity_percentage":100,"total_entries":4,"matched":4,"gaps_remaining":0,"regressions":0},"recommendation":{"action":"accept","justification":"All entries match. No regressions detected."}}

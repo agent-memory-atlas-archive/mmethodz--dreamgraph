@@ -1,0 +1,814 @@
+{
+  "schema": "dreamgraph.ashoka.system_checkpoint.v1",
+  "recorded_at": "2026-10-03T04:19:23.982Z",
+  "status": "offline_system_checkpoint_slice27_in_progress",
+  "gate": {
+    "source_hash": "5781c931fd76a14806b1c0763e1484af22d7c57de6bfae592d0d9af2420fb503",
+    "platform": "win32",
+    "architecture": "x64",
+    "node": "25.2.1",
+    "steps": [
+      {
+        "name": "server",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 0.5136978
+      },
+      {
+        "name": "explorer",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 10.4453218
+      },
+      {
+        "name": "editor",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 12.0544581
+      },
+      {
+        "name": "contracts-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 0.9033963000000004
+      },
+      {
+        "name": "providers-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 0.814681700000001
+      },
+      {
+        "name": "mcp-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 2.9971714000000027
+      },
+      {
+        "name": "metrics-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 1.936487799999999
+      },
+      {
+        "name": "config-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 3.397699800000002
+      },
+      {
+        "name": "ashoka-baseline-check",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 0.8072877000000007
+      },
+      {
+        "name": "editor-tests",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 16.2012295
+      },
+      {
+        "name": "root-tests",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 326.7618128
+      },
+      {
+        "name": "browser",
+        "exit_code": 0,
+        "signal": null,
+        "child_closed": true,
+        "failure": null,
+        "elapsed_seconds": 18.610055500000016
+      }
+    ],
+    "root": {
+      "passed": 2013,
+      "failed": 0,
+      "skipped": 2,
+      "skip_names": [
+        "pushParticlesForEdge ParticleSystem removed in Slice F1 — flow now lives on the tube shader",
+        "ParticleSystem ParticleSystem removed in Slice F1"
+      ],
+      "files": 179
+    },
+    "editor": {
+      "passed": 546,
+      "failed": 0,
+      "skipped": 0
+    },
+    "browser": {
+      "platform": "win32",
+      "architecture": "x64",
+      "checks": 11,
+      "stop_release_ms": 267.52840000000015,
+      "control_loss_stop_ms": 2553.4858999999997
+    }
+  },
+  "actual_plan_computer_joins": [
+    {
+      "name": "native_core real scoped browser pass preserves original control, source/graph boundaries and closure",
+      "status": "passed"
+    },
+    {
+      "name": "native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure",
+      "status": "passed"
+    },
+    {
+      "name": "native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure",
+      "status": "passed"
+    },
+    {
+      "name": "native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure",
+      "status": "passed"
+    },
+    {
+      "name": "native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure",
+      "status": "passed"
+    },
+    {
+      "name": "native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure",
+      "status": "passed"
+    }
+  ],
+  "offline_gate_acceptance": [
+    {
+      "name": "requires every discovered root file and refuses an unreviewed skip despite green totals",
+      "status": "passed"
+    },
+    {
+      "name": "names only the two retired particle assertions rather than permitting arbitrary pending coverage",
+      "status": "passed"
+    },
+    {
+      "name": "refuses compiled-editor cancellation, skips and missing summaries, including Node decorative output",
+      "status": "passed"
+    },
+    {
+      "name": "actual browser coverage retains all subchecks and independent Stop bounds without admitting desktop/model claims",
+      "status": "passed"
+    }
+  ],
+  "assertions": {
+    "original_plan_scope": true,
+    "no_gui_implied_slice_verification": true,
+    "source_reconciliation_has_separate_receipt": true,
+    "stop_retains_unconfirmed_adapter_recovery": true,
+    "context_limit_preserves_reconciliation_debt": true,
+    "failed_role_revokes_own_health": true,
+    "no_model_escalation_or_limit_increase": true
+  },
+  "failures": {
+    "retained": true,
+    "gate_first": "Configuration inventory source-line drift; regenerated and checked.",
+    "gate_second": "Compiled editor runner used repository cwd instead of extension cwd; fixed without excluding any test.",
+    "gate_third": "One Windows fixture ENOTEMPTY cleanup failure after graph/lifecycle assertions. Added actual async-handler drain and bounded filesystem retries; no production cancellation change.",
+    "gate_fourth": "One four-worker browser qualification failed with no bounded phase diagnostics in the earlier fixture. Its cause remains unproven. Added bounded diagnostics and one unchanged-host qualification shared across six separately scoped sessions; full suite now uses two workers. Production Stop bounds remain unchanged; no stress-load qualification is inferred.",
+    "earlier_plan_joins": "Missing matching plan ID, incorrect SDK method and insufficient positive-fixture context allocation. The unchanged smaller allocation remains an actual refusal/recovery case."
+  },
+  "evidence_scope": "Actual local Windows gate; compiled editor/DOM boundaries and deterministic provider replies declared. Browser/input/source/daemon/SDK/graph joins are actual. No paid inference or remote CI execution.",
+  "real_provider_requests": 0,
+  "remote_ci_jobs_run": 0,
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "remaining": [
+    "Slice31 peer native workers, native CLI/provider built-ins, physical editor/platform and complete CU/XS qualification.",
+    "Slice26 reviewed live graph cutover; Slice27 complete owner/compound evidence and actual paired usefulness; Slice28 synchronized14.0.0 packaging/install/release."
+  ],
+  "product_version": "13.4.0",
+  "windows_global_changed": false,
+  "artifacts": [
+    {
+      "path": ".github/workflows/ashoka.yml",
+      "bytes": 1878,
+      "sha256": "30a67933ade02653d7a0ad214c8bb703eaec7fac2f4803515b0aa3aab21142d2"
+    },
+    {
+      "path": "package.json",
+      "bytes": 4220,
+      "sha256": "5a30c291cffe5869e9c666a7b4335d446165207aca6e4f10c8f6cf519da94897"
+    },
+    {
+      "path": "scripts/ashoka-ci-browser.mjs",
+      "bytes": 1122,
+      "sha256": "2431f72058052247df14472c0ee9775ed8fe7877a3bb9f7e3931b408c59a50fc"
+    },
+    {
+      "path": "scripts/run-ashoka-editor-tests.mjs",
+      "bytes": 848,
+      "sha256": "335b53832fd83dc7b2260532397ea0daa4ca493b61ef201cf0318f2af1ee50e8"
+    },
+    {
+      "path": "scripts/run-ashoka-system-checks.mjs",
+      "bytes": 11271,
+      "sha256": "d11158f6eb41445df53e68b9a1e5b8f5fdb6d03e7f8d6d56780699606da1c024"
+    },
+    {
+      "path": "src/architect/routes.ts",
+      "bytes": 655154,
+      "sha256": "dc23a7dfa9c316b9fda455a11bf48881726eec81e924903ebe79834f9fcebd3d"
+    },
+    {
+      "path": "src/cognitive/role-qualification.ts",
+      "bytes": 671,
+      "sha256": "b38160c8dec0da6d2656b6141e8a58d5cc069e1233bbe46fc07e76dfa7fc5554"
+    },
+    {
+      "path": "tests/ashoka-system-gate.test.ts",
+      "bytes": 3499,
+      "sha256": "cd6d5be12ecabc06339bd78294ce8a61d640cb6f1b928c1eb8bd51f6cf4bfd10"
+    },
+    {
+      "path": "tests/computer-native-graph-loop.test.ts",
+      "bytes": 29037,
+      "sha256": "6de3af40c725b0fa21de797cd53b0a1d0d72c5279dd868f9bd9a0cad356d6a17"
+    },
+    {
+      "path": "vitest.config.ts",
+      "bytes": 206,
+      "sha256": "c596eb614f17227b139e7cba9af95fb8b057e5d8e8b0121a25bef89c784cf280"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 817,
+      "sha256": "478d46b7cf5fa160aa6a49097214c5aea6f205f8fb3a275091aee04177f2bb63"
+    },
+    {
+      "path": "docs/ashoka/system-gate.md",
+      "bytes": 2942,
+      "sha256": "c72719aa93b281bec5c0b3e0ed80aacc419e86c2f06219d8911a8e8e81cc55b4"
+    },
+    {
+      "path": "docs/ashoka/plan-computer-integration.md",
+      "bytes": 2371,
+      "sha256": "4a786ea67ac52bd7300e6c1ad51d671306967f0b73b8580bc492fc66184c7a8a"
+    },
+    {
+      "path": "docs/ashoka/record-27-offline.mjs",
+      "bytes": 6125,
+      "sha256": "a9aafe5166fd81d5189d99fad776b36ec37bec094092b480dd6cb5c8169f10a4"
+    },
+    {
+      "path": "docs/ashoka/native-review-27.mjs",
+      "bytes": 8128,
+      "sha256": "a71985ae1f5fd02517bf41cf15afbfe69065d6a59e5259a79227ba64d2499736"
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 47041,
+      "sha256": "51c41f8de7e4384db4c88fb8bdc51804e682b41e2fdcf0d3c908aa432ab9d2d0"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/ashoka-baseline-check.log",
+      "bytes": 219,
+      "sha256": "7f0b2e76c814517bde04d07532f2058196c91530fef4e8e10b954ed00de808b5"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/browser-qualification.json",
+      "bytes": 4912,
+      "sha256": "3725dc3df109096dd50908bd44fe0e3d45232f45f0b6e73a93362df041b7834f"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/browser.log",
+      "bytes": 631,
+      "sha256": "2b8267592831e3a1d400ba317974185562592e2afa99938424eb4a96c5212ec0"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/config-check.log",
+      "bytes": 190,
+      "sha256": "0d8abdedc82ac49f3809a8f8e1eecd10e655fbeb2ac1a7992c067da162de93fb"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/contracts-check.log",
+      "bytes": 209,
+      "sha256": "c6217692983e2d57e0822d5caf0ef6c7b19b25aa7c2d521f5cd87c8956e6b77b"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/editor-tests.log",
+      "bytes": 52131,
+      "sha256": "f52fa46db4238b8101e0f5a04e0e2020c176c2d2ab7c1e94daf5089337515fba"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/editor.log",
+      "bytes": 1589,
+      "sha256": "24a047fdc6e891a2c6fc114a77b6ea52e14e56dd54e5c724e3e3072f35cfa2bb"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/explorer.log",
+      "bytes": 1860,
+      "sha256": "d63967d95fb0464bcf0aba427b7b2306380d5a2f89be32bc0dffbe03a4a0f535"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/mcp-check.log",
+      "bytes": 1971,
+      "sha256": "e60ee1d9a5ef2a5fe8ac8f5fb81bf477404b04ce8c3fb9226ad90e9a01de622c"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/metrics-check.log",
+      "bytes": 129,
+      "sha256": "54eff59fb6201c5947a34afd42019f667cbe81c62ab739ece7861cd754c01904"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/providers-check.log",
+      "bytes": 92,
+      "sha256": "89cd883323ab82f11bb5083bef408b6792d5b0a51ae4f5f580fcaee22deef328"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/result.json",
+      "bytes": 3109,
+      "sha256": "f6880ca960df56ca176a2b0206286bda073999289139c55be2ccb467b202538c"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/root-tests.json",
+      "bytes": 683002,
+      "sha256": "7f10a1f3186a9b845aecfb51049dde2005f62ede65465e6a1a6a65a294b0b30a"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/root-tests.log",
+      "bytes": 125,
+      "sha256": "ecba2fe0b5a4f5430e45b3c925f4986175b70f03c43c0f0e6de9e5e98a88a4b2"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/server.log",
+      "bytes": 44,
+      "sha256": "7afbb4529bf4fe561cf07ce6721a86eda26f781124390c93d326b236dae33c7e"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth/source-inventory.json",
+      "bytes": 156587,
+      "sha256": "1bf96477efb75e30db16b5d0f6455bb0bf51d79e6a17d10081d4bf376058bc64"
+    },
+    {
+      "path": "docs/ashoka/slice-27-editor-runner-second-exit.json",
+      "bytes": 74,
+      "sha256": "d3336e741bbb2a8b8e1df2954a0ede5d3c6e9e824f46e7e0ecd00ee6b6fcac99"
+    },
+    {
+      "path": "docs/ashoka/slice-27-editor-runner-second.log",
+      "bytes": 52726,
+      "sha256": "0fb3694de2566000237fe8431a3d777d100f184be19d11c8489e27ff652a1209"
+    },
+    {
+      "path": "docs/ashoka/slice-27-gate-configuration-check.log",
+      "bytes": 195,
+      "sha256": "399f55de75e9c35bd778ce1af8cb4601077d163ba8af794cc175223ba859ba38"
+    },
+    {
+      "path": "docs/ashoka/slice-27-gate-configuration-generation.log",
+      "bytes": 191,
+      "sha256": "c6b54fc079487c330d619f4b40fc0e94bfa9e2efaabb168e12cc4c203ea37a4f"
+    },
+    {
+      "path": "docs/ashoka/slice-27-gate-runner-focus-first-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-27-gate-runner-focus-first.json",
+      "bytes": 1969,
+      "sha256": "9a0342e0146a08199e2fe10494675723e3e8880bc9994de7e7ec86f93dd00895"
+    },
+    {
+      "path": "docs/ashoka/slice-27-gate-runner-focus-first.log",
+      "bytes": 120,
+      "sha256": "06cb4c254e4275bddbe3466b8d8338f3d8edf425adf140b7c46bb8d14bcc69e0"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth-exit.json",
+      "bytes": 74,
+      "sha256": "242996ce54392701c23adc6bee502160d05f2e997e2a6df7efb2a064e681a0d9"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fifth.log",
+      "bytes": 2798,
+      "sha256": "9afa225e7a4bd37577bb855a0b586f4b4be5c8a5b2bc7bfb026dfa2d9d9edbe1"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first-exit.json",
+      "bytes": 24,
+      "sha256": "50d7caf03dd967e4363a5bc7babbf450452b31dd1ec7fb605b2abc6465759571"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first.log",
+      "bytes": 929,
+      "sha256": "5864e35bb94c610d456657e1df092ce6b41bf1deccc2e5dd096def8c81ba96bd"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth-exit.json",
+      "bytes": 74,
+      "sha256": "0d4072123f4fe021922e7f0c9e93223fbbb8074fe5035f84e32ef78ee319cb63"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth.log",
+      "bytes": 1124,
+      "sha256": "0774c6ec0d72d1d9c6e9f4b2bcc71fb85280590b7a23bcae8cc86a39dea2ca1d"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second-exit.json",
+      "bytes": 74,
+      "sha256": "b6b1fd43ff25c13d79c13b7a8bcdbb31a0fe8c850ae3e433475e0c204ef3406d"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second.log",
+      "bytes": 1093,
+      "sha256": "713b3ecb6a4ef9ed48cd4505c5bf47b08fe5e26e52a5dbee9363d9593d92fc78"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third-exit.json",
+      "bytes": 74,
+      "sha256": "9f50c03a030259448b4274efd9c7b18cbf3e090166b60d2fc702df3866921d72"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third.log",
+      "bytes": 1123,
+      "sha256": "0bee4a1cc1507c57a88b8b9d1c76ad40e3743286e11f030ac5d55fa6bfd507d2"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first/config-check.log",
+      "bytes": 600,
+      "sha256": "7842024d01b7c8ccd2d40acbb9227c27f1130994a6606c5e31643fb58d2886e9"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first/contracts-check.log",
+      "bytes": 209,
+      "sha256": "c6217692983e2d57e0822d5caf0ef6c7b19b25aa7c2d521f5cd87c8956e6b77b"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first/editor.log",
+      "bytes": 1589,
+      "sha256": "29fa348ac7e6c57ff89881246108aa4c95dd585fdf6471c0a771ea526db78195"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first/explorer.log",
+      "bytes": 1860,
+      "sha256": "b7b8a550e84033de748501fe0c66bf40744c49be4856b7fc66d5c2931cc8455c"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first/mcp-check.log",
+      "bytes": 1971,
+      "sha256": "7fdba36e80a8fe75ce624809dc7351a3f973726f0fed90d55542c169c1220438"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first/metrics-check.log",
+      "bytes": 129,
+      "sha256": "54eff59fb6201c5947a34afd42019f667cbe81c62ab739ece7861cd754c01904"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first/providers-check.log",
+      "bytes": 92,
+      "sha256": "89cd883323ab82f11bb5083bef408b6792d5b0a51ae4f5f580fcaee22deef328"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first/result.json",
+      "bytes": 1507,
+      "sha256": "2252bc825827710709e252405a8255fae58e62df8e212481ba6cfeed2388646f"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first/server.log",
+      "bytes": 44,
+      "sha256": "7afbb4529bf4fe561cf07ce6721a86eda26f781124390c93d326b236dae33c7e"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-first/source-inventory.json",
+      "bytes": 155946,
+      "sha256": "9a21057d7e1c82935b4d0d07cf0ca401e6cc3347ce4759e51101946140e06445"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/ashoka-baseline-check.log",
+      "bytes": 219,
+      "sha256": "7f0b2e76c814517bde04d07532f2058196c91530fef4e8e10b954ed00de808b5"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/config-check.log",
+      "bytes": 190,
+      "sha256": "0d8abdedc82ac49f3809a8f8e1eecd10e655fbeb2ac1a7992c067da162de93fb"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/contracts-check.log",
+      "bytes": 209,
+      "sha256": "c6217692983e2d57e0822d5caf0ef6c7b19b25aa7c2d521f5cd87c8956e6b77b"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/editor-tests.log",
+      "bytes": 84083,
+      "sha256": "6e2cdc09dd64f1f2a612398a982913c8ed602aadf98bd513a3152122ff58fcce"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/editor.log",
+      "bytes": 1589,
+      "sha256": "2209923c6a6d98305487140f940719bd9aa39af9ee1a9329165eb8693064206c"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/explorer.log",
+      "bytes": 1860,
+      "sha256": "140ee76c4dfff80d3833ce3876699c9f4bdf849afb3083496bc47d9105b4017b"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/mcp-check.log",
+      "bytes": 1971,
+      "sha256": "4b7e2a7ab9c5582b15f62becce381f34b653a1482647a7eeb3cf314fa4fafc88"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/metrics-check.log",
+      "bytes": 129,
+      "sha256": "54eff59fb6201c5947a34afd42019f667cbe81c62ab739ece7861cd754c01904"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/providers-check.log",
+      "bytes": 92,
+      "sha256": "89cd883323ab82f11bb5083bef408b6792d5b0a51ae4f5f580fcaee22deef328"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/result.json",
+      "bytes": 2309,
+      "sha256": "842da739a3df83417f6064c064b40bf5456b74f92e4a69c46f62d5a19ebb31e2"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/server.log",
+      "bytes": 44,
+      "sha256": "7afbb4529bf4fe561cf07ce6721a86eda26f781124390c93d326b236dae33c7e"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-second/source-inventory.json",
+      "bytes": 156587,
+      "sha256": "6001f8f7b63b87fb188589820729434beddd0c75a468527fe5b74f671ec67bbf"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/ashoka-baseline-check.log",
+      "bytes": 219,
+      "sha256": "7f0b2e76c814517bde04d07532f2058196c91530fef4e8e10b954ed00de808b5"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/config-check.log",
+      "bytes": 190,
+      "sha256": "0d8abdedc82ac49f3809a8f8e1eecd10e655fbeb2ac1a7992c067da162de93fb"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/contracts-check.log",
+      "bytes": 209,
+      "sha256": "c6217692983e2d57e0822d5caf0ef6c7b19b25aa7c2d521f5cd87c8956e6b77b"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/editor-tests.log",
+      "bytes": 52122,
+      "sha256": "a1e3d7c52ab96437b9386602f7b7a6ffd91b3eab1529fe00d70e3b6787a7e7d5"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/editor.log",
+      "bytes": 1589,
+      "sha256": "ea34dc057ce37c8181c11a139f78dab0b2893f60f9f5a0621fbc533604938488"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/explorer.log",
+      "bytes": 1860,
+      "sha256": "9eeb430c2327f39fe48a68529e19c2af15cb677fb7ea755f31f8019ddf1f69dc"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/mcp-check.log",
+      "bytes": 1971,
+      "sha256": "b3892229eaac63de6e0ca8e2f6ddb67b4c6d50059ae6d48842a59efc0773cbe6"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/metrics-check.log",
+      "bytes": 129,
+      "sha256": "54eff59fb6201c5947a34afd42019f667cbe81c62ab739ece7861cd754c01904"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/providers-check.log",
+      "bytes": 92,
+      "sha256": "89cd883323ab82f11bb5083bef408b6792d5b0a51ae4f5f580fcaee22deef328"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/result.json",
+      "bytes": 2550,
+      "sha256": "bc752ad297e11305ca97b3baf19ab6d93858751ebb9e9570921d07967a78f9b5"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/root-tests.json",
+      "bytes": 683094,
+      "sha256": "499c2bea9930f9bab6c101e7cd31a0ff404a70c9ba426b5f8a106e65baf004b4"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/root-tests.log",
+      "bytes": 125,
+      "sha256": "b16e13803468e4f9bdd842627de76675409c9ab236b7421e67505b90bb292346"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/server.log",
+      "bytes": 44,
+      "sha256": "7afbb4529bf4fe561cf07ce6721a86eda26f781124390c93d326b236dae33c7e"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-third/source-inventory.json",
+      "bytes": 156587,
+      "sha256": "c2a7bfe36747b1fac52a8406808841ffcb151aac79cf44978eff5aa8bec0fc06"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/ashoka-baseline-check.log",
+      "bytes": 219,
+      "sha256": "7f0b2e76c814517bde04d07532f2058196c91530fef4e8e10b954ed00de808b5"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/config-check.log",
+      "bytes": 190,
+      "sha256": "0d8abdedc82ac49f3809a8f8e1eecd10e655fbeb2ac1a7992c067da162de93fb"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/contracts-check.log",
+      "bytes": 209,
+      "sha256": "c6217692983e2d57e0822d5caf0ef6c7b19b25aa7c2d521f5cd87c8956e6b77b"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/editor-tests.log",
+      "bytes": 52125,
+      "sha256": "3c1dbbc6737cf244d925c2f4b34c49043008a6f673c1ee4d0906a4bb061f25b2"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/editor.log",
+      "bytes": 1589,
+      "sha256": "be917a3aea7f5f91b03b7c1ccc93195f42450c99238dc01a5de8035157864af7"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/explorer.log",
+      "bytes": 1860,
+      "sha256": "71a43d0d598aa6bccb18cc3d03a0810b8aeafd91e521c0730f83d695f6711df3"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/mcp-check.log",
+      "bytes": 1971,
+      "sha256": "f98326ced26b471c79b97a1f45729cf4f7217b7ebe88d04727a3bb9565c8aba1"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/metrics-check.log",
+      "bytes": 129,
+      "sha256": "54eff59fb6201c5947a34afd42019f667cbe81c62ab739ece7861cd754c01904"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/providers-check.log",
+      "bytes": 92,
+      "sha256": "89cd883323ab82f11bb5083bef408b6792d5b0a51ae4f5f580fcaee22deef328"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/result.json",
+      "bytes": 2536,
+      "sha256": "6cbfe5b05aeb211d975c2bfa65b481bd74185f7fc00746eb5c3801dc07692888"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/root-tests.json",
+      "bytes": 683459,
+      "sha256": "0805c074b779351a0c02a084db85a84ac8d29d942e5afc2a727caf39008d3bb4"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/root-tests.log",
+      "bytes": 126,
+      "sha256": "c10c624d021b224d681a32c14a1f54863d041e310b39c595b96c8c5925aa15c6"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/server.log",
+      "bytes": 44,
+      "sha256": "7afbb4529bf4fe561cf07ce6721a86eda26f781124390c93d326b236dae33c7e"
+    },
+    {
+      "path": "docs/ashoka/slice-27-offline-gate-fourth/source-inventory.json",
+      "bytes": 156587,
+      "sha256": "b8c81e8c620384499b7804a3aaff46c36e4980cd734525c12bd34365a9f2fe06"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-fifth-exit.json",
+      "bytes": 24,
+      "sha256": "50d7caf03dd967e4363a5bc7babbf450452b31dd1ec7fb605b2abc6465759571"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-fifth.json",
+      "bytes": 3461,
+      "sha256": "08da7573efd5d2b167cd108e85522d32247c6602387d64e2d209075c13c2b733"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-fifth.log",
+      "bytes": 122,
+      "sha256": "cc1de4a325a5fdf585b79d382b1ba736fa4193f10db7f33ae14d311db40a13d4"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-first-exit.json",
+      "bytes": 24,
+      "sha256": "50d7caf03dd967e4363a5bc7babbf450452b31dd1ec7fb605b2abc6465759571"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-first.json",
+      "bytes": 3819,
+      "sha256": "21124d48903eaf34bab8c6c0398ac6c44d413bbc49ad62922d09528eeaf8f2dc"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-first.log",
+      "bytes": 122,
+      "sha256": "0da5b1cb739f25d4bf1fa570eb0d699aec0be0598d9fda41d36f3aec3e67eea0"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-fourth-exit.json",
+      "bytes": 24,
+      "sha256": "50d7caf03dd967e4363a5bc7babbf450452b31dd1ec7fb605b2abc6465759571"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-fourth.json",
+      "bytes": 4163,
+      "sha256": "12af02aecbe31ca18c94f2b84908dc81e216410652b418be3050a1b1cac175c7"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-fourth.log",
+      "bytes": 123,
+      "sha256": "6313099f8b38f2593ca1249955cd40136fcfd442d8f1e61f52d64af1534ac124"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-second-exit.json",
+      "bytes": 24,
+      "sha256": "50d7caf03dd967e4363a5bc7babbf450452b31dd1ec7fb605b2abc6465759571"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-second.json",
+      "bytes": 2907,
+      "sha256": "b5de4f17fdea1edbc8bba147bd9c20c27d3cd9e1ad040347efbd78267263393c"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-second.log",
+      "bytes": 123,
+      "sha256": "b422aba9beb231ed07b5a7b37449f16bb679649b1b119933bde273c2e14f4abb"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-seventh-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-seventh.json",
+      "bytes": 11912,
+      "sha256": "4f84e95d56d1b35587d383310ded7c4288f96e41fd51d46774d8c5897711a9f2"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-seventh.log",
+      "bytes": 124,
+      "sha256": "a4444b69202115f830be06b1444d214285273df8a86f4a05d77d4ba5129e67f2"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-sixth-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-sixth.json",
+      "bytes": 2582,
+      "sha256": "85a8732661063a8815003a716d4841871016ce67062d67e1e656a43175d0f83e"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-sixth.log",
+      "bytes": 122,
+      "sha256": "d9db4824da00ec38bbac5e7713d98cbebef882bd9ec23857446aff4b7a25b215"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-third-exit.json",
+      "bytes": 24,
+      "sha256": "50d7caf03dd967e4363a5bc7babbf450452b31dd1ec7fb605b2abc6465759571"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-third.json",
+      "bytes": 2948,
+      "sha256": "d20b8a4753179ff3afec438f96bdbf880ceae586cb75443f7c7cd9564364e43b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-plan-computer-focus-third.log",
+      "bytes": 122,
+      "sha256": "f404096a56e7752d33389073a65e36aaeaabbc0a33bcc0deb75149a9276ae521"
+    }
+  ]
+}

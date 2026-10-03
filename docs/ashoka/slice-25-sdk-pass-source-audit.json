@@ -1,0 +1,40 @@
+{
+  "scope": "Full artifact byte reads and hashes; semantic review focuses on SDK lifecycle changes and reused owner boundaries, not full project coverage",
+  "entries": [
+    {
+      "path": "packages/sdk/src/seams/graph-execution.ts",
+      "bytes": 22766,
+      "sha256": "8a986b90aaf1dad2bce00557ea078667244a41ed85adadad10c1f9903431f05a"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 108406,
+      "sha256": "ee7d007e5d660186ff6571694c6bc7f2fd4ce201a0fdf1ca5ae3653095d9e14c"
+    },
+    {
+      "path": "src/evaluation/agent-usefulness.ts",
+      "bytes": 10097,
+      "sha256": "b22829f6183d53fa62e5772e482d7b69b2235f7a037f48e4c4000e2f40a176b7"
+    },
+    {
+      "path": "tests/agent-usefulness.test.ts",
+      "bytes": 8920,
+      "sha256": "716a05f07b0149979f39c5a0175434695d32c4f77dcb7ba028e997a847732f2b"
+    },
+    {
+      "path": "src/server/server.ts",
+      "bytes": 13866,
+      "sha256": "3643555fb4cce818ec3da11041ba89ae3afcbdfc5e47a3f4e06c8246bd1f9f35"
+    },
+    {
+      "path": "src/plugins/contributions.ts",
+      "bytes": 12572,
+      "sha256": "1b2b8243456ffa74c800f57a38814b721a05af3d95c7e5c7472c39cac48642b5"
+    },
+    {
+      "path": "src/plugins/manager.ts",
+      "bytes": 42200,
+      "sha256": "b2518519af1d0f37ebe0f4d3aeb9b8cfc7b80d62600834262de3586c3a486844"
+    }
+  ]
+}

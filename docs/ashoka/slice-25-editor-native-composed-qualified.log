@@ -1,0 +1,27 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5933,"approxTokens":1484}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":6833,"approxTokens":1709}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":9390,"approxTokens":2348}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5924,"approxTokens":1481}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":9084,"approxTokens":2271}
+
+ ✓ tests/host-managed-execution.test.ts (31 tests | 29 skipped) 3636ms
+   ✓ the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation  2040ms
+   ✓ the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation  1594ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 29 skipped (31)
+   Start at  02:32:12
+   Duration  9.61s (transform 1.96s, setup 0ms, collect 5.58s, tests 3.64s, environment 0ms, prepare 132ms)
+

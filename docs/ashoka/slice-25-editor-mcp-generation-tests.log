@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/editor-mcp-result.test.ts (7 tests) 218ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  00:42:09
+   Duration  1.35s (transform 104ms, setup 0ms, collect 709ms, tests 218ms, environment 0ms, prepare 163ms)
+

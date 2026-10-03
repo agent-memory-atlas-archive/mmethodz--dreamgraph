@@ -1,0 +1,54 @@
+[2026-10-01T19:34:12.284Z] [INFO]  Creating instance 58cd2544-70f0-4378-8e27-c68e45fec68c (browser-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-pjLnwi\master\58cd2544-70f0-4378-8e27-c68e45fec68c
+[2026-10-01T19:34:12.356Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-pjLnwi\master\instances.json
+[2026-10-01T19:34:12.356Z] [INFO]  Registered new instance 58cd2544-70f0-4378-8e27-c68e45fec68c (browser-fixture)
+[2026-10-01T19:34:12.361Z] [INFO]  Instance 58cd2544-70f0-4378-8e27-c68e45fec68c created successfully
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Actual schedule projection must be available before UI doubles: {"ok":false,"error":"internal_error","message":"SCHEDULE_STORE_UNAVAILABLE: [\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"object\",\n    \"received\": \"undefined\",\n    \"path\": [\n      \"metadata\"\n    ],\n    \"message\": \"Required\"\n  },\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"array\",\n    \"received\": \"undefined\",\n    \"path\": [\n      \"executions\"\n    ],\n    \"message\": \"Required\"\n  }\n]"}; daemon: [2026-10-01T19:34:13.480Z] [INFO]  Loaded 7 env vars from C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-pjLnwi\master\58cd2544-70f0-4378-8e27-c68e45fec68c\config\engine.env
+[2026-10-01T19:34:13.482Z] [INFO]  Instance mode activated: InstanceScope(58cd2544…, project=C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-pjLnwi)
+[2026-10-01T19:34:13.482Z] [INFO]  Repos available: fixture
+[2026-10-01T19:34:13.502Z] [INFO]  LLM provider: none (model: n/a)
+[2026-10-01T19:34:13.502Z] [WARN]  LLM provider "none" is NOT reachable — dreams will be structural-only (degraded)
+[2026-10-01T19:34:13.504Z] [INFO]  Plugin discovery: no plugins found in <instance>/plugins or instance.json
+[2026-10-01T19:34:13.512Z] [INFO]  Data dir watcher active on C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-pjLnwi\master\58cd2544-70f0-4378-8e27-c68e45fec68c\data
+[2026-10-01T19:34:13.518Z] [INFO]  DreamGraph MCP Server running on 127.0.0.1:59882 — remote=false, authentication=local-machine
+[2026-10-01T19:34:14.159Z] [INFO]  LLM architect config: provider=none (general), model=n/a (provider_default), temp=0.7, maxTokens=2048
+[2026-10-01T19:34:14.244Z] [ERROR] /architect route error (/api/architect/v1/schedules): {
+  name: 'Error',
+  message: 'SCHEDULE_STORE_UNAVAILABLE: [\n' +
+    '  {\n' +
+    '    "code": "invalid_type",\n' +
+    '    "expected": "object",\n' +
+    '    "received": "undefined",\n' +
+    '    "path": [\n' +
+    '      "metadata"\n' +
+    '    ],\n' +
+    '    "message": "Required"\n' +
+    '  },\n' +
+    '  {\n' +
+    '    "code": "invalid_type",\n' +
+    '    "expected": "array",\n' +
+    '    "received": "undefined",\n' +
+    '    "path": [\n' +
+    '      "executions"\n' +
+    '    ],\n' +
+    '    "message": "Required"\n' +
+    '  }\n' +
+    ']'
+}
+
+
+500 !== 200
+
+    at <anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-architect.mjs:26:9) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 500,
+  expected: 200,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v25.2.1

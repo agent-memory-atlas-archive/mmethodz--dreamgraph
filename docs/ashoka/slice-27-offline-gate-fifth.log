@@ -1,0 +1,17 @@
+
+> dreamgraph@13.4.0 ashoka:system:check
+> node scripts/run-ashoka-system-checks.mjs --out docs/ashoka/slice-27-offline-gate-fifth
+
+Ashoka offline gate: server
+Ashoka offline gate: explorer
+Ashoka offline gate: editor
+Ashoka offline gate: contracts-check
+Ashoka offline gate: providers-check
+Ashoka offline gate: mcp-check
+Ashoka offline gate: metrics-check
+Ashoka offline gate: config-check
+Ashoka offline gate: ashoka-baseline-check
+Ashoka offline gate: editor-tests
+Ashoka offline gate: root-tests
+Ashoka offline gate: browser
+{"schema":"dreamgraph.ashoka.offline_gate.v1","status":"passed","source_hash":"5781c931fd76a14806b1c0763e1484af22d7c57de6bfae592d0d9af2420fb503","platform":"win32","architecture":"x64","node":"25.2.1","model_requests":0,"scope":"Offline builds, contracts, compiled consumers and actual isolated browser only. No release or real-model usefulness claim.","steps":[{"name":"server","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":0.5136978},{"name":"explorer","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":10.4453218},{"name":"editor","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":12.0544581},{"name":"contracts-check","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":0.9033963000000004},{"name":"providers-check","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":0.814681700000001},{"name":"mcp-check","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":2.9971714000000027},{"name":"metrics-check","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":1.936487799999999},{"name":"config-check","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":3.397699800000002},{"name":"ashoka-baseline-check","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":0.8072877000000007},{"name":"editor-tests","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":16.2012295},{"name":"root-tests","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":326.7618128},{"name":"browser","exit_code":0,"signal":null,"child_closed":true,"failure":null,"elapsed_seconds":18.610055500000016}],"editor":{"passed":546,"failed":0,"skipped":0},"root":{"passed":2013,"failed":0,"skipped":2,"skip_names":["pushParticlesForEdge ParticleSystem removed in Slice F1 — flow now lives on the tube shader","ParticleSystem ParticleSystem removed in Slice F1"],"files":179},"browser":{"platform":"win32","architecture":"x64","checks":11,"stop_release_ms":267.52840000000015,"control_loss_stop_ms":2553.4858999999997},"finished_at":"2026-10-03T04:18:15.555Z"}

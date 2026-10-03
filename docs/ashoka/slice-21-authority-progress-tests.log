@@ -1,0 +1,50 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/plan-workflow.test.ts (16 tests) 70ms
+ ✓ tests/plan-authority.test.ts (7 tests) 1283ms
+   ✓ PL04/GE14: a status receipt cannot count as implementation; an actual graph commit can, and accepted verification survives replay  338ms
+   ✓ GE14/CU22 effect contract: reconciliation must finish; optional unfunded digestion can remain pending  420ms
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-01T06:41:56.026Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-01T06:41:56.041Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-01T06:41:56.161Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ❯ tests/architect-plan-authority.test.ts (4 tests | 1 failed) 1446ms
+   × reads never import legacy success; preview/import retain exact bytes and recover one lost reply 233ms
+     → expected 409 to be 400 // Object.is equality
+   ✓ actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan  702ms
+   ✓ rejects client-forged identity/leases and stale concurrent transitions without another effect 177ms
+   ✓ archive refuses a running/recovery lease and keeps original artifacts on failure  333ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+AssertionError: expected 409 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 409
+
+ ❯ tests/architect-plan-authority.test.ts:50:108
+     48|   expect(await readFile(join(root, "data", "plan_state.json"), "utf8")…
+     49|   expect((Object.values(JSON.parse(before).records)[0] as any).backups…
+     50|   expect((await post("/lifecycle/review", { ...imported.request, revie…
+       |                                                                                                            ^
+     51| });
+     52| it("actual graph receipt and accepted review converge detail/list; imp…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 26 passed (27)
+   Start at  09:41:49
+   Duration  8.45s (transform 2.19s, setup 0ms, collect 10.17s, tests 2.80s, environment 1ms, prepare 394ms)
+

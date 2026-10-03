@@ -1,0 +1,21 @@
+{
+  "scope": "Focused Windows actual Chromium/compiled Architect shell, fake authority/executors, no inference; these composed checks are not complete normative UX/GE acceptance",
+  "checks": [
+    {
+      "name": "B25-01",
+      "detail": "Actual 1,000 variable-height rows restore selected plan by ID and center only the rail."
+    },
+    {
+      "name": "B25-02",
+      "detail": "Filtering preserves active plan; explicit reveal adds one labelled row without clearing filters or substituting first plan."
+    },
+    {
+      "name": "B25-03",
+      "detail": "Background list/detail refresh retains rail scroll instead of stealing focus."
+    }
+  ],
+  "errors": [],
+  "browser": "153.0.8010.50",
+  "success": false,
+  "failure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('menu').getByRole('menuitem', { name: 'Ask Architect…', exact: true })\u001b[22m\n\n    at C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\scripts\\qualify-ashoka-architect.mjs:56:143"
+}

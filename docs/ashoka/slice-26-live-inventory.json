@@ -1,0 +1,429 @@
+{
+  "schema": "dreamgraph.ashoka.legacy_inventory.v1",
+  "observed_at": "2026-10-02T13:07:26.720Z",
+  "instance_id": "ee9ce3b9-0313-4768-b5f1-24b9b3fffc4b",
+  "scope": "Read-only individual physical root JSON observations. Publication stability is explicitly reported; a changing publication is not a coherent cutover preview. No assertion that unmanaged files or a native worker are quiescent; no repair, scan or scan-age freshness inference.",
+  "publication_stable": false,
+  "publication_before_sha256": "5b7523256abe9b2a50c9ed06b7c075190bf18f4ba1bb751c1b5a29e34befc5a6",
+  "publication_after_sha256": "eb377c12f81179483918c60f9836f28380739f0bd2713794046e98ad8f03fd31",
+  "total_bytes": 112036518,
+  "files": [
+    {
+      "file": "adr_log.json",
+      "bytes": 756132,
+      "sha256": "fc023442d187d2166601ae0b4935797365994307b75e5971612c11dc4abebb0d",
+      "valid_json": true,
+      "schema": "1.0.0",
+      "collections": [
+        {
+          "collection": "decisions",
+          "rows": 241,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    },
+    {
+      "file": "api_surface.json",
+      "bytes": 4087066,
+      "sha256": "7cf231e2497411debab38fcccba8acbd10cbaf08b93b64f2c86568427d1c5c7c",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "architect_plugin_plan_state.json",
+      "bytes": 1703,
+      "sha256": "6903556355507e1a681943d5f719ebf57282939165d95a020d43aa19f2d1a224",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "auxiliary_entities.json",
+      "bytes": 356247,
+      "sha256": "8c48b00c4c1c859cdc8297a0774d140858637e07714ed1a8092745d0fa58637a",
+      "valid_json": true,
+      "schema": "1.0.0",
+      "collections": [
+        {
+          "collection": "entries",
+          "rows": 197,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    },
+    {
+      "file": "candidate_edges.json",
+      "bytes": 60138327,
+      "sha256": "a1172d483a7bba9840457b9e060a3e7474dcafcac1af5d7c8f24e731169d8807",
+      "valid_json": true,
+      "schema": "1.0.0",
+      "collections": [
+        {
+          "collection": "results",
+          "rows": 80752,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 59,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 59
+        }
+      ]
+    },
+    {
+      "file": "capabilities.json",
+      "bytes": 85638,
+      "sha256": "20e0d162cfd20586fbfa572f7a4d9af5cd8d56c848bef08da1f47f838e46fa68",
+      "valid_json": true,
+      "schema": null,
+      "collections": [
+        {
+          "collection": "<root>",
+          "rows": 31,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    },
+    {
+      "file": "data_model.json",
+      "bytes": 942895,
+      "sha256": "d8a8d2497fa4fb5f1eb98b08f1501abe67fca35bc6d50a91aaf2fc7e3fb0f225",
+      "valid_json": true,
+      "schema": null,
+      "collections": [
+        {
+          "collection": "<root>",
+          "rows": 202,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    },
+    {
+      "file": "datastores.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "valid_json": true,
+      "schema": null,
+      "collections": [
+        {
+          "collection": "<root>",
+          "rows": 0,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    },
+    {
+      "file": "dream_archetypes.json",
+      "bytes": 265176,
+      "sha256": "1c71cc4cbcb8abbdb6b27133edc26e397b1b89522d3e4dbe409f9c29dad2bc83",
+      "valid_json": true,
+      "schema": "1.0.0",
+      "collections": [
+        {
+          "collection": "archetypes",
+          "rows": 457,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    },
+    {
+      "file": "dream_graph.json",
+      "bytes": 151551,
+      "sha256": "d63ac620863f6ba6005288bc1583b6ffeca88859e7ff08e7781aebd209446d63",
+      "valid_json": true,
+      "schema": "1.0.0",
+      "collections": [
+        {
+          "collection": "nodes",
+          "rows": 100,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    },
+    {
+      "file": "dream_history.json",
+      "bytes": 12580430,
+      "sha256": "d0fe3a98b52b0dc3edbcbe533c704dafd6a63bee5a1125bfec2ca3b1b2780a83",
+      "valid_json": true,
+      "schema": "1.0.0"
+    },
+    {
+      "file": "event_log.json",
+      "bytes": 33280,
+      "sha256": "70c0152c8036eb0f20fae12f7e25b5b360ef8fe54450504b08501acb11f3fffa",
+      "valid_json": true,
+      "schema": "1.0.0"
+    },
+    {
+      "file": "explorer_prefs.json",
+      "bytes": 379,
+      "sha256": "61e2447c05f051d7f6d400668df5890dfb42682bf30d1d91bc778e44b1c82b0b",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "features.json",
+      "bytes": 1494501,
+      "sha256": "e86446f568d21e3224fc550b6f2813963f909728ac7eb79de2ea9fd244ab78ea",
+      "valid_json": true,
+      "schema": null,
+      "collections": [
+        {
+          "collection": "<root>",
+          "rows": 669,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    },
+    {
+      "file": "graph_maintenance.json",
+      "bytes": 964,
+      "sha256": "e5ac81f9e91ac1aa59401ea7348c3a4139f59289716a219d00b4ef6329e4ba8c",
+      "valid_json": true,
+      "schema": "1.0.0"
+    },
+    {
+      "file": "index.json",
+      "bytes": 241300,
+      "sha256": "20546dbd2dc9d6b3aa4c7e4113d4f73ea0aece5fceeaf3e1a40b337686330075",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "llm_bootstrap_log.json",
+      "bytes": 5505,
+      "sha256": "d67c16016fd344d7b021d84a99a432ecd3e2556f9a5f9f99dd5583c7701a6cb1",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "meta_log.json",
+      "bytes": 18155,
+      "sha256": "f85d1c1b21ede5751a4bedc5b5121be2fe4844438fea10e39b8959bb7f1a186f",
+      "valid_json": true,
+      "schema": "1.0.0"
+    },
+    {
+      "file": "metrics_snapshot.json",
+      "bytes": 530,
+      "sha256": "9dfa50ebb009b6033c2a3aec55f295fbf149c64bdd1b908aa14ab6cbdee72012",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "onboarding_telemetry.json",
+      "bytes": 8314,
+      "sha256": "d39add6a130cd50590019340639763fc0aee73167cb8a6ea250f2130ea5a7f3c",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "plugin_policy_proposals.json",
+      "bytes": 602,
+      "sha256": "043fbbc15f91dcccd553758d5ae07d2bd8c712d21363117156bbc13b2756e82f",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "publication_state.json",
+      "bytes": 9016092,
+      "sha256": "5b7523256abe9b2a50c9ed06b7c075190bf18f4ba1bb751c1b5a29e34befc5a6",
+      "valid_json": true,
+      "schema": "dreamgraph.publication.v1"
+    },
+    {
+      "file": "remediation_log.json",
+      "bytes": 92807,
+      "sha256": "86d6eb2752b27eb86eeaa39fb5e6537873f09dcca16a0ee562bd205d89f74b00",
+      "valid_json": true,
+      "schema": "1.0"
+    },
+    {
+      "file": "schedules.json",
+      "bytes": 309066,
+      "sha256": "f28856bec02694c4929567bc7ada6209a15b2d4931ec113c8aa02513b8180ef5",
+      "valid_json": true,
+      "schema": "2.0.0"
+    },
+    {
+      "file": "session_authority.json",
+      "bytes": 148717,
+      "sha256": "eb53ab82a1bfa4f6e30897afc3b01a4cae7473f723ea58e36fe0bb2334f83038",
+      "valid_json": true,
+      "schema": "dreamgraph.session_authority.v1"
+    },
+    {
+      "file": "source_less_fact_quarantine_2026-05-17T01-54-46-226Z.json",
+      "bytes": 9258659,
+      "sha256": "add17241f143ec162600179820bb5a108071d0844bb21c5aacbda647cf613517",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "system_overview.json",
+      "bytes": 9271,
+      "sha256": "38514fe4fec8fe7791c915b07e6be6027298575215b7df1b99cecaf1f455182e",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "system_story.json",
+      "bytes": 203168,
+      "sha256": "a87f340ea42a350727c0d0d868e046746c96734d833d2d182605be6522cfb9bd",
+      "valid_json": true,
+      "schema": "1.0.0",
+      "collections": [
+        {
+          "collection": "chapters",
+          "rows": 100,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 1,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 1
+        },
+        {
+          "collection": "digests",
+          "rows": 38,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    },
+    {
+      "file": "tension_log.json",
+      "bytes": 5130585,
+      "sha256": "694319d8967e6d755ea47547d452f576ae9d791467b1f9416b9450b92020004e",
+      "valid_json": true,
+      "schema": "2.0.0",
+      "collections": [
+        {
+          "collection": "signals",
+          "rows": 0,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        },
+        {
+          "collection": "resolved_tensions",
+          "rows": 5329,
+          "placeholders": 0,
+          "missing_ids": 5329,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    },
+    {
+      "file": "threat_log.json",
+      "bytes": 327942,
+      "sha256": "f5c64b34e3756627513d2735232ab3e42c84a8c6b3f1adeb2a49bd910b40d0f2",
+      "valid_json": true,
+      "schema": "1.0.0"
+    },
+    {
+      "file": "ui_registry.json",
+      "bytes": 352783,
+      "sha256": "1c2ad9cf7c1962a77d9785c1871296453bb89c9c5f30eea43a2a9bb67c487ac7",
+      "valid_json": true,
+      "schema": "1.2.0",
+      "collections": [
+        {
+          "collection": "elements",
+          "rows": 92,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    },
+    {
+      "file": "validated_edges.json",
+      "bytes": 5178055,
+      "sha256": "2d999986d3075c0b9a24c402d14e85302152e4786c5a0918475afc6915cd72b8",
+      "valid_json": true,
+      "schema": "1.0.0",
+      "collections": [
+        {
+          "collection": "edges",
+          "rows": 6858,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 1,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 1
+        }
+      ]
+    },
+    {
+      "file": "webhook_dead_letter.json",
+      "bytes": 360505,
+      "sha256": "c51d1d8805c099402fd096cf3197c1718bce3dfa3dbfd52a14d8c53d5266ee5a",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "webhook_subscriptions.json",
+      "bytes": 549,
+      "sha256": "7c9678374ab874cb4083e20fc49759aae44b43d276ea7ef6a6dc5966e2fed62e",
+      "valid_json": true,
+      "schema": null
+    },
+    {
+      "file": "workflows.json",
+      "bytes": 479622,
+      "sha256": "910c242e5850125dd1dbe17e9adc7f7fd05110f832b69ef4ee17694d33cf5667",
+      "valid_json": true,
+      "schema": null,
+      "collections": [
+        {
+          "collection": "<root>",
+          "rows": 197,
+          "placeholders": 0,
+          "missing_ids": 0,
+          "duplicate_groups": 0,
+          "exact_duplicate_groups": 0,
+          "conflicting_duplicate_groups": 0
+        }
+      ]
+    }
+  ]
+}

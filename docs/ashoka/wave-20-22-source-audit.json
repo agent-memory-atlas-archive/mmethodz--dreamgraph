@@ -1,0 +1,542 @@
+[
+  {
+    "path": "docs/ashoka/risk-remediation.md",
+    "sha256": "80082413b7b48c9b66bf9a266afab48982e543953f129281dc78d95c4b91b741",
+    "bytes": 3460,
+    "lines": 18
+  },
+  {
+    "path": "docs/ashoka/slice-18-coalescing-tests.json",
+    "sha256": "fc89f6645b11dc10f3b7a05682401f1ad9c8743d857a5fa180cd85d2a3ac7caa",
+    "bytes": 12280,
+    "lines": 1
+  },
+  {
+    "path": "docs/ashoka/slice-18-extension-build.log",
+    "sha256": "e65bb850339087ae29cc11884abf1d654ce760bcfdded16500215619c190b7bf",
+    "bytes": 1720,
+    "lines": 40
+  },
+  {
+    "path": "docs/ashoka/slice-18-extension-tests.log",
+    "sha256": "2ef105752d33dda3270cd9791c1d7821c664f77ed8573a5087be1bc1410a80f2",
+    "bytes": 43421,
+    "lines": 528
+  },
+  {
+    "path": "docs/ashoka/slice-18-qualified-tests.json",
+    "sha256": "a50c2f7f3272812a305c7cbb75e0d727705fa570c8ad9d2388556ebb68a0d709",
+    "bytes": 531637,
+    "lines": 1
+  },
+  {
+    "path": "docs/ashoka/temporal-federation.md",
+    "sha256": "f9f75972eb3a2157423484094fda498a21600808a3ca2bc6dfb987bfbdb4716e",
+    "bytes": 5501,
+    "lines": 26
+  },
+  {
+    "path": "docs/contracts/analytics-payload.v1.json",
+    "sha256": "11050f2f4a67e58542f8afdb9b7723dc02291a4608ca860e7201eb0a62c890c4",
+    "bytes": 19303,
+    "lines": 759
+  },
+  {
+    "path": "docs/contracts/metric-definitions.v2.json",
+    "sha256": "5c0c06526777681db24431c5deaa1538a3b0e47eb8e3114aa59a4f28a719b1e7",
+    "bytes": 2673,
+    "lines": 68
+  },
+  {
+    "path": "python/analytics/_common.py",
+    "sha256": "e4496266b19c29ad63b5efb7df36602a93f9b98859bda709dcf6e04bfd5b6919",
+    "bytes": 2678,
+    "lines": 56
+  },
+  {
+    "path": "python/analytics/cognitive_load.py",
+    "sha256": "e4d2e1c340908159b90a0f6b6f534ebc7eab3f575c13c2636f10e97f76bf6eb6",
+    "bytes": 3608,
+    "lines": 103
+  },
+  {
+    "path": "python/analytics/confidence_integrity.py",
+    "sha256": "2fff9183ec6c68a29578154a4c4abc7d472197628e8ae6dc13bbbd6e08c636f3",
+    "bytes": 4612,
+    "lines": 131
+  },
+  {
+    "path": "python/analytics/definitions.py",
+    "sha256": "38bdd759e09aa014a0bb4dae4065ac4e5dd96fa03820e72757a86d429572710f",
+    "bytes": 8413,
+    "lines": 93
+  },
+  {
+    "path": "python/analytics/domain_entropy.py",
+    "sha256": "ca63796aa1f8e3fe948f0fc83c227c0ccecf63f111f3da3b4838e0c02b7c72e9",
+    "bytes": 3637,
+    "lines": 108
+  },
+  {
+    "path": "python/analytics/domain_saturation.py",
+    "sha256": "fb0b7078ba2bfc7088f551662e477f69633c28e7ffaf3638cc863d70f5b79c18",
+    "bytes": 2874,
+    "lines": 71
+  },
+  {
+    "path": "python/analytics/hub_health.py",
+    "sha256": "c336f05cf5d1559b90131dbf7ee814ff8842b203d08a7eb5c2bdcc572c72eb37",
+    "bytes": 3701,
+    "lines": 112
+  },
+  {
+    "path": "python/analytics/loader.py",
+    "sha256": "787a2d28a20e777ea01472a6a9f52a59336eac3552cc78cc693592dd9cc85cab",
+    "bytes": 7657,
+    "lines": 164
+  },
+  {
+    "path": "python/analytics/maturity_score.py",
+    "sha256": "217a1f1154d305e801e1ea304464fdbcbdfb5c6625077f2250f436d4781b3065",
+    "bytes": 3635,
+    "lines": 108
+  },
+  {
+    "path": "python/analytics/meaningful_edges.py",
+    "sha256": "56ba6464aba3744a9762c7993a17bd8984e2ac56e356cca803087b57c4e6d7ea",
+    "bytes": 4771,
+    "lines": 134
+  },
+  {
+    "path": "python/analytics/metric-definitions.json",
+    "sha256": "5c0c06526777681db24431c5deaa1538a3b0e47eb8e3114aa59a4f28a719b1e7",
+    "bytes": 2673,
+    "lines": 68
+  },
+  {
+    "path": "python/analytics/model_impact.py",
+    "sha256": "bea236c3da23c2b190f2a50a0f512df50ad20103efa0cef13af5089d6155b651",
+    "bytes": 4802,
+    "lines": 116
+  },
+  {
+    "path": "python/analytics/orphan_pressure.py",
+    "sha256": "5d72589c4af8682d1803058e26e6a3ea097721129b9fc163126d260690f230d1",
+    "bytes": 3525,
+    "lines": 110
+  },
+  {
+    "path": "python/analytics/promotion_funnel.py",
+    "sha256": "ddea85b3701c05f6127d0ad95648eb023215e3ebf985c111fa737dbf99efdedc",
+    "bytes": 3755,
+    "lines": 98
+  },
+  {
+    "path": "python/analytics/reappearance_rate.py",
+    "sha256": "051cdb7610ded6d0ee5a96a097d76743e652ee920faa8555ac88463057a33fa4",
+    "bytes": 3858,
+    "lines": 100
+  },
+  {
+    "path": "python/analytics/schema.py",
+    "sha256": "7cbc4f405c9542dac2ad2a820c588e5d64e04085cc2cc240ad0a34345ea02b70",
+    "bytes": 2960,
+    "lines": 39
+  },
+  {
+    "path": "python/analytics/snapshot-schema.json",
+    "sha256": "11050f2f4a67e58542f8afdb9b7723dc02291a4608ca860e7201eb0a62c890c4",
+    "bytes": 19303,
+    "lines": 759
+  },
+  {
+    "path": "python/analytics/tension_flow.py",
+    "sha256": "70a407b8057a6d37bc40179aa61a6c7b79ac47fc68dd5d57403812ff2810c59c",
+    "bytes": 3106,
+    "lines": 86
+  },
+  {
+    "path": "python/analytics/tension_halflife.py",
+    "sha256": "68c3395ac586a9196600456f88514ca4da4e2de858ae14e8ed1129319fe00111",
+    "bytes": 4140,
+    "lines": 116
+  },
+  {
+    "path": "scripts/export-analytics-snapshot.mjs",
+    "sha256": "016119b3e25cf4ad6e6bf9197ac1b5bb84b42597aa4639a4c15aa7f0778f9abb",
+    "bytes": 1273,
+    "lines": 15
+  },
+  {
+    "path": "scripts/generate-metric-definitions.mjs",
+    "sha256": "9f0a93504866c16750899bc80fce92e4b670532e8c7b1dd79d83bcae1536af92",
+    "bytes": 2709,
+    "lines": 17
+  },
+  {
+    "path": "src/api/routes.ts",
+    "sha256": "d82824957edd300a287c2088d95138368d0aa6679e65d44fbf0812127e9e3fdb",
+    "bytes": 44391,
+    "lines": 1180
+  },
+  {
+    "path": "src/architect/cli-bridge.ts",
+    "sha256": "be03269857cd72aa39e77b7d19734333febd5478e19a52eeb6a93c58dc6239a4",
+    "bytes": 45148,
+    "lines": 1041
+  },
+  {
+    "path": "src/architect/plan-registry.ts",
+    "sha256": "08cbc18fc13df24739a92bd16d86769921fbcbc41572732c8ec8c8653118b692",
+    "bytes": 54840,
+    "lines": 1263
+  },
+  {
+    "path": "src/architect/routes.ts",
+    "sha256": "bbf837703a6792a6c9287a23e14fd3e8002260b7a0bb3cf6afc40a36d33ef9f1",
+    "bytes": 630637,
+    "lines": 13603
+  },
+  {
+    "path": "src/cognitive/adversarial.ts",
+    "sha256": "6becd77823adb74a236854cef6f7ea95f727ef2d8f085cd363807e22d63a1188",
+    "bytes": 24659,
+    "lines": 629
+  },
+  {
+    "path": "src/cognitive/calibration-evaluation.ts",
+    "sha256": "a3042795d3b80add0e28c9f011737b8f910b32a9659a652f70b7401c155eceeb",
+    "bytes": 8759,
+    "lines": 139
+  },
+  {
+    "path": "src/cognitive/causal.ts",
+    "sha256": "871ac30f8020ab85c4a1ea26be5835cb7b0ec6f4a621e59e63fea82832f92f70",
+    "bytes": 10967,
+    "lines": 113
+  },
+  {
+    "path": "src/cognitive/digestion.ts",
+    "sha256": "96c78943ec471466ee7ad57ca123806367927aeb6ef1e4c9a857b6b2be40a821",
+    "bytes": 14136,
+    "lines": 138
+  },
+  {
+    "path": "src/cognitive/dreamer.ts",
+    "sha256": "2a0f6b2e112c21162baa75dc9647b16fd57d7d70a437d525d3f4881eeffc1586",
+    "bytes": 10313,
+    "lines": 186
+  },
+  {
+    "path": "src/cognitive/engine.ts",
+    "sha256": "c23b42bd186feb82b3a4798e793abf9bc4c0410b724d52205069b18f02f52517",
+    "bytes": 96273,
+    "lines": 1940
+  },
+  {
+    "path": "src/cognitive/evidence-ledger.ts",
+    "sha256": "5bea372f104ec8f988fedfa08df45c58e0d9f5e4ac17444e22bf6b29e1b54bc6",
+    "bytes": 6884,
+    "lines": 220
+  },
+  {
+    "path": "src/cognitive/federation.ts",
+    "sha256": "440e69177921a3229eaac23ca3d21fb8c0c2deaa2ff9cdb3b18022abda0dd515",
+    "bytes": 14726,
+    "lines": 168
+  },
+  {
+    "path": "src/cognitive/graph-rag.ts",
+    "sha256": "9e44706bbe3157f5402c555404cd7fb3eb24b03b81ee4e0c49bc126903cc99a0",
+    "bytes": 44204,
+    "lines": 1120
+  },
+  {
+    "path": "src/cognitive/intervention.ts",
+    "sha256": "b5ac1902866ed30eae4743d086b1d4e5ead5d8f8ebcc970ae3aa5984104329c8",
+    "bytes": 78085,
+    "lines": 1901
+  },
+  {
+    "path": "src/cognitive/lifecycle-visibility.ts",
+    "sha256": "ba66abd026c15c599c424ff164de64f6bec6bdafa59c76f4083c41356c183c21",
+    "bytes": 6276,
+    "lines": 133
+  },
+  {
+    "path": "src/cognitive/llm.ts",
+    "sha256": "f2fe12b1075f983ce25ad351bea7b25d26f3fd3da65d6a75e788d38836b2b6f7",
+    "bytes": 78345,
+    "lines": 1693
+  },
+  {
+    "path": "src/cognitive/lucid.ts",
+    "sha256": "096e9eba5522a5c1beddef403791d747c49530be6b272ea7ceab534c36c0a76f",
+    "bytes": 16628,
+    "lines": 125
+  },
+  {
+    "path": "src/cognitive/metacognition.ts",
+    "sha256": "4dd5e2281fa9b2c587024d95e4f85a9cbba5979528c1efd8c4ac1e43f2241b6e",
+    "bytes": 12858,
+    "lines": 296
+  },
+  {
+    "path": "src/cognitive/narrator.ts",
+    "sha256": "2fbf52fbac469d47e04c6c7fc4113f078ce8283063624941d80e1f5290165de2",
+    "bytes": 28718,
+    "lines": 779
+  },
+  {
+    "path": "src/cognitive/normalization-evidence.ts",
+    "sha256": "43e804a9ad873f9fc4d406b29d050bbc78090f26ad79ea1557933a6d3a9b5475",
+    "bytes": 19345,
+    "lines": 258
+  },
+  {
+    "path": "src/cognitive/normalizer.ts",
+    "sha256": "c56ae0577d7c7ec624f8dd14428ea83c05904485ef31748399d6493d6c6a4242",
+    "bytes": 53823,
+    "lines": 1256
+  },
+  {
+    "path": "src/cognitive/playback.ts",
+    "sha256": "f850af6edd1e6600516a93aa1866507515b3c03d4426c9a5012b3b8146cd05c8",
+    "bytes": 7838,
+    "lines": 161
+  },
+  {
+    "path": "src/cognitive/projection-context.ts",
+    "sha256": "3cc204e2ebb3cd481fc0f58d228d5eae75f06ce4a8c957e4b126a0d4f7fbd80c",
+    "bytes": 3653,
+    "lines": 46
+  },
+  {
+    "path": "src/cognitive/register.ts",
+    "sha256": "1ce37cf497d83279a489dbca69cc60c6470ff0a9bc06898a0a60df78a10a5dbd",
+    "bytes": 114824,
+    "lines": 2920
+  },
+  {
+    "path": "src/cognitive/risk-lifecycle.ts",
+    "sha256": "e3dc79a7fa4d8927306539f59d1d1857163c934bf9f157ad469febafc4321f90",
+    "bytes": 6269,
+    "lines": 60
+  },
+  {
+    "path": "src/cognitive/scheduler.ts",
+    "sha256": "ac7d5dc29947a8458312955fd417aaee8e5e589cdaaf0fdbdb8756fad067d9cc",
+    "bytes": 38939,
+    "lines": 616
+  },
+  {
+    "path": "src/cognitive/strategies/llm-dream.ts",
+    "sha256": "1e873124e32ebd6e4747ce67b7bcf18b7cc409cd131a3ffcd4f75fbb2c4efd73",
+    "bytes": 24912,
+    "lines": 548
+  },
+  {
+    "path": "src/cognitive/temporal-evidence.ts",
+    "sha256": "058c7aec2a31b549e2fe585b054a16f7c9d3d924f38e3af704e05aaf5395474f",
+    "bytes": 6660,
+    "lines": 89
+  },
+  {
+    "path": "src/cognitive/temporal.ts",
+    "sha256": "463d42bb94983646644e8f8075d478c3a1ff98881dc115b350e835f54f213bae",
+    "bytes": 4862,
+    "lines": 56
+  },
+  {
+    "path": "src/cognitive/tension-clustering.ts",
+    "sha256": "4280f09b4fa8980433c66bf0d92857ca1f01905c782c668d1694b1166a7e6f55",
+    "bytes": 6486,
+    "lines": 123
+  },
+  {
+    "path": "src/cognitive/types.ts",
+    "sha256": "ddae1a19712284a9545363a3c5fa3e5aaeee026d72ab24d87ee05e0fdf885cff",
+    "bytes": 97352,
+    "lines": 2895
+  },
+  {
+    "path": "src/config/engine-setting-catalogue.ts",
+    "sha256": "3583d71709ca8c12aee26b4c1a161b9e82aa56a64905ad0579ffeacd3fcad51f",
+    "bytes": 15209,
+    "lines": 119
+  },
+  {
+    "path": "src/config/engine-settings.ts",
+    "sha256": "f01be8d6135ddce1e9f7573fda7cd33c12b929c270d9ad0b1a6d97e9370eba5e",
+    "bytes": 3471,
+    "lines": 45
+  },
+  {
+    "path": "src/evaluation/agent-usefulness.ts",
+    "sha256": "30b37dc52641a851436fce941bbc4e5c7176d649f9b6d708a3b50f0b9159e280",
+    "bytes": 9946,
+    "lines": 126
+  },
+  {
+    "path": "src/graph/change-obligations.ts",
+    "sha256": "a71beb8bb8c99f835a20a1ae10444043a80074d4dbacdb3575d52d5bba8cb440",
+    "bytes": 18153,
+    "lines": 244
+  },
+  {
+    "path": "src/graph/contracts.ts",
+    "sha256": "33a249a9d9604c483e667dae3db73d907917cdd1976552373a680b8dded6f2e1",
+    "bytes": 20767,
+    "lines": 347
+  },
+  {
+    "path": "src/graph/read-model.ts",
+    "sha256": "20876c3016523a72b31c0aad2f3245957d829762fb315f815910820c1a721b6f",
+    "bytes": 35304,
+    "lines": 452
+  },
+  {
+    "path": "src/graph/store-registry.ts",
+    "sha256": "2c8bf9c171894c146c56c93e4a0b6963f5f9b2c191e18b4edc7a517289c327b3",
+    "bytes": 1908,
+    "lines": 23
+  },
+  {
+    "path": "src/index.ts",
+    "sha256": "7a864362184bc325698feaaa25c5caa7e593c0a8ac189c6e42689cf77ddc47bb",
+    "bytes": 17429,
+    "lines": 399
+  },
+  {
+    "path": "src/observability/analytics-snapshot.ts",
+    "sha256": "2aa89fb8e83df57f61277474db6560b4bab378368722bf6b0205590ebfd9f58e",
+    "bytes": 14245,
+    "lines": 104
+  },
+  {
+    "path": "src/observability/runtime-metrics.ts",
+    "sha256": "9d44aa84a0a8c53c74ae6dacef008bb7478b7582a2c1a8459534341be3152419",
+    "bytes": 16289,
+    "lines": 477
+  },
+  {
+    "path": "src/server/server.ts",
+    "sha256": "eaaa8a2e857386fec251c01d9a0fb916c9d1d4e2bed11d80245c0165a0b5c6ea",
+    "bytes": 13863,
+    "lines": 245
+  },
+  {
+    "path": "src/tools/enrich-parser-nodes.ts",
+    "sha256": "a46f4e17bc0348dde43bf3d427299f9a53f2f1e16d3520f51c8b32ac9376aff3",
+    "bytes": 120416,
+    "lines": 2524
+  },
+  {
+    "path": "src/tools/graph-health.ts",
+    "sha256": "2274ac39b189e0020c9e3fb525f605d1455888904b29245b36dac8eeff868583",
+    "bytes": 33282,
+    "lines": 528
+  },
+  {
+    "path": "src/tools/query-resource.ts",
+    "sha256": "10fdd8864bd1f8db5a0dfa0241a44ec20625b7318669e1e49a7575ec57e4f794",
+    "bytes": 3245,
+    "lines": 34
+  },
+  {
+    "path": "src/tools/reconciliation-transaction.ts",
+    "sha256": "e962c857fe509ab4202f83441c17bd066ca13f66937f911083799a62ecf0ba19",
+    "bytes": 3020,
+    "lines": 59
+  },
+  {
+    "path": "src/tools/register.ts",
+    "sha256": "f6312e570086bc87e8692e007587a6a9af6112698798a4a751cbabb9b2535627",
+    "bytes": 2835,
+    "lines": 62
+  },
+  {
+    "path": "src/utils/engine-env.ts",
+    "sha256": "8ed402b232753b4e974daecf2ac9a88818cd64843eda7214d771d6fda88baa99",
+    "bytes": 16655,
+    "lines": 440
+  },
+  {
+    "path": "tests/agent-usefulness.test.ts",
+    "sha256": "b40c00b725e00b7fc5df066119062422f97ce305b1861921b1bcd8275ccd6afb",
+    "bytes": 8605,
+    "lines": 92
+  },
+  {
+    "path": "tests/analytics-observability.test.ts",
+    "sha256": "e971071bff05cc625bf9b757468f8c868bec6d17ab7aa771169d256326f66d6a",
+    "bytes": 10272,
+    "lines": 65
+  },
+  {
+    "path": "tests/cognitive-producers.test.ts",
+    "sha256": "0ee2b29b99c5f48b010b42c5865f39c3f380bc705ebce314fed4359e120b4c38",
+    "bytes": 15081,
+    "lines": 433
+  },
+  {
+    "path": "tests/context-pack.test.ts",
+    "sha256": "75778e3a46e9eb524d9ab75599548c8d57f0d44359e3dcdd33b789a3a4ae012e",
+    "bytes": 19610,
+    "lines": 239
+  },
+  {
+    "path": "tests/daemon-transport-isolation.test.ts",
+    "sha256": "875192a82ce8d39f86e52657aaacbce26e787ab699c583af25c9df623d1e6c2a",
+    "bytes": 9178,
+    "lines": 96
+  },
+  {
+    "path": "tests/graph-read-model.test.ts",
+    "sha256": "5c4ab5ffcc221755c3f0bf78fd4f54aa31a125bf43097b804c98407498dc0d87",
+    "bytes": 11103,
+    "lines": 161
+  },
+  {
+    "path": "tests/lifecycle-narrative.test.ts",
+    "sha256": "319be6240366aae4d41667ec239c88aa25dbd12bf18db5edf986eedbf8f7c028",
+    "bytes": 8964,
+    "lines": 75
+  },
+  {
+    "path": "tests/living-dreamgraph-projections.test.ts",
+    "sha256": "f4cd6453c83e7965ddff967af396f1889a03d5837b502e27e93e4f4e4aa43aa7",
+    "bytes": 12463,
+    "lines": 158
+  },
+  {
+    "path": "tests/normalization-evidence.test.ts",
+    "sha256": "6814a96e56466707638edabaf58dadfdccee7ff203627da50f91d43c78a615db",
+    "bytes": 32096,
+    "lines": 331
+  },
+  {
+    "path": "tests/risk-remediation.test.ts",
+    "sha256": "b339661c9cbc4849f8626275ff73615b9faa46acb763068267c04b0230e9151c",
+    "bytes": 12458,
+    "lines": 106
+  },
+  {
+    "path": "tests/temporal-federation.test.ts",
+    "sha256": "ef76d6baee4a5ebd852a96447974006b2ec8304b80e582cca38891aa9d67c391",
+    "bytes": 17831,
+    "lines": 168
+  },
+  {
+    "path": "tests/tension-resolution.test.ts",
+    "sha256": "60b128ba7a43cf8d5b69555f8c0dbf23497a846e217d2080e3b521d234a9e449",
+    "bytes": 9675,
+    "lines": 269
+  },
+  {
+    "path": "tests/tools/graph-health.test.ts",
+    "sha256": "f6c61f7aa1a407abe1c1dd22e4671b11c6c7dcc3dcb9763d9fdae90625805f92",
+    "bytes": 4103,
+    "lines": 100
+  }
+]

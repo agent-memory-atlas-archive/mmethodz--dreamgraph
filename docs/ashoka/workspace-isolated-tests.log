@@ -1,0 +1,26 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/schedule-workspace.test.ts > schema-derived action fields and draft preview validate without creating files/jobs or changing definitions 119ms
+ ✓ tests/schedule-workspace.test.ts > duplicate is atomic/new/disabled and original receipt replays after later source edits 140ms
+ ✓ tests/schedule-workspace.test.ts > enable and enqueue bind reviewed policy; lost replies replay originals rather than applying new ambient policy 154ms
+ × tests/schedule-workspace.test.ts > actual served browser script saves disabled, preserves invalid drafts, and supports keyboard tabs/filter/edit 3492ms
+   → fixture condition not reached
+ ✓ tests/schedule-workspace.test.ts > captured menu targets survive selection changes and stale edits fail while source history survives 263ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/schedule-workspace.test.ts > actual served browser script saves disabled, preserves invalid drafts, and supports keyboard tabs/filter/edit
+Error: fixture condition not reached
+ ❯ eventually tests/schedule-workspace.test.ts:24:160
+
+ ❯ tests/schedule-workspace.test.ts:58:146
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  19:21:46
+   Duration  10.82s (transform 1.85s, setup 0ms, collect 5.76s, tests 4.17s, environment 0ms, prepare 143ms)
+

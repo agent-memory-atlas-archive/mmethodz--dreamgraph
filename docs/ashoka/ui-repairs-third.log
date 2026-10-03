@@ -1,0 +1,7 @@
+[2026-10-03T07:14:24.259Z] [INFO]  Creating instance 7ffc3898-b144-4d9c-a3a7-f8a0ddc7cc1f (ui-repairs) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-ui-repairs-5d9AVt\master\7ffc3898-b144-4d9c-a3a7-f8a0ddc7cc1f
+[2026-10-03T07:14:24.330Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-ui-repairs-5d9AVt\master\instances.json
+[2026-10-03T07:14:24.330Z] [INFO]  Registered new instance 7ffc3898-b144-4d9c-a3a7-f8a0ddc7cc1f (ui-repairs)
+[2026-10-03T07:14:24.335Z] [INFO]  Instance 7ffc3898-b144-4d9c-a3a7-f8a0ddc7cc1f created successfully
+{"text":"### Slice 5 — Commit enrichment and checkpoints coherently\r\n\r\n- status: verified\r\n- Priority: P1\r\n- ","offset":38554,"target":{"x":310,"y":7864.15625,"width":6.453125,"height":13,"top":7864.15625,"right":316.453125,"bottom":7877.15625,"left":310},"body":{"x":301,"y":443.21875,"width":914,"height":30331.125,"top":443.21875,"right":1215,"bottom":30774.34375,"left":301},"scroll":0,"scrollHeight":30329,"details":{"x":291,"y":406.21875,"width":934,"height":583.78125,"top":406.21875,"right":1225,"bottom":990,"left":291},"panel":{"x":291,"y":289.59375,"width":938,"height":700.40625,"top":289.59375,"right":1229,"bottom":990,"left":291},"padding":"8px"}
+page.waitForFunction: Timeout 30000ms exceeded.
+    at C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-ui-repairs.mjs:61:13

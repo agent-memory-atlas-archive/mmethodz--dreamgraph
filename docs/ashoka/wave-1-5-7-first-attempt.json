@@ -1,0 +1,22 @@
+{
+  "schema": "dreamgraph.offline_test_attempt.v1",
+  "files": 105,
+  "passed": 1018,
+  "failed": 2,
+  "skipped": 2,
+  "failures": [
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/standalone-architect-routes.test.ts",
+      "cases": [
+        "standalone Architect route hardening keeps native tool-loop budget and Responses API routing behind source contracts"
+      ]
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/plugins/hello-events-e2e.test.ts",
+      "cases": [
+        "examples/hello-events full-seam smoke activates and exercises every seam declared in plugin.json"
+      ]
+    }
+  ],
+  "disposition": "Corrected source-contract assertion for explicit API selection and fixture waits for durable plugin acceptance; production plugin contribution drain/unload adoption remains Slice 12."
+}

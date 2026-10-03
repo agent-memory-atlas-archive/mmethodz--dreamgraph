@@ -1,0 +1,12 @@
+✔ compiled agent dispatch preserves daemon error/metadata/commit receipts and marks its trace failed (111.7218ms)
+✔ compiled agent preserves the original owner receipt when local accounting fails after a result (32.9846ms)
+✔ compiled history elision retains an earlier MCP text receipt as whole JSON with matching call ID (55.8323ms)
+✔ a compiled provider reply delivered after operator abort cannot dispatch an MCP effect (14.3773ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 737.8646

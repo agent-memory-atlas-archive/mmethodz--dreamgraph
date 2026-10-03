@@ -1,0 +1,302 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ❯ tests/legacy-graph-upgrade.test.ts (11 tests | 1 failed) 7999ms
+   ✓ reviewed offline legacy graph upgrade > previews all families without writing, preserves scoped identities and provenance, and never invents source/scan history  502ms
+   ✓ reviewed offline legacy graph upgrade > archives exact duplicates once but blocks conflicting claims until exact row-bound explicit choices  476ms
+   ✓ reviewed offline legacy graph upgrade > keeps immutable assessment history and chapter identities; no automatic cycle winner or evidence promotion 274ms
+   ✓ reviewed offline legacy graph upgrade > rejects unsupported majors, invalid UTF-8 and schema shapes, stale resolutions and changed previews  370ms
+   ✓ reviewed offline legacy graph upgrade > rejects stale input and unpublished changes instead of overwriting concurrent source or graph work 194ms
+   ✓ reviewed offline legacy graph upgrade > cancels before cutover and rejects input changes after backup; original mutation is retained  534ms
+   × reviewed offline legacy graph upgrade > validates owner stores and refuses unfinished jobs instead of cancelling or reassigning them 110ms
+     → [
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "requests"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "input_tokens"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "output_tokens"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "retries"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "elapsed_ms"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "concurrency"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "max_hops"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "max_neighbors"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "run_amount"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "day_amount"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "currency"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "pricing_version"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "billing_principal"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "max_input_tokens",
+      "max_output_tokens",
+      "max_provider_requests",
+      "max_cost_usd",
+      "max_retries",
+      "max_wall_time_ms"
+    ],
+    "path": [],
+    "message": "Unrecognized key(s) in object: 'max_input_tokens', 'max_output_tokens', 'max_provider_requests', 'max_cost_usd', 'max_retries', 'max_wall_time_ms'"
+  }
+]
+   ✓ reviewed offline legacy graph upgrade > restores exact original bytes as a new publication while preserving post-cutover debt, history and source currency  799ms
+   ✓ reviewed offline legacy graph upgrade > exposes restore conflicts and backup corruption before any restore; an uncertain old result is not overwritten  578ms
+   ✓ reviewed offline legacy graph upgrade > recovers a real killed writer at after_replace:0: without replaying a second graph effect  2253ms
+   ✓ reviewed offline legacy graph upgrade > recovers a real killed writer at publication_committed without replaying a second graph effect  1906ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/legacy-graph-upgrade.test.ts > reviewed offline legacy graph upgrade > validates owner stores and refuses unfinished jobs instead of cancelling or reassigning them
+ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "requests"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "input_tokens"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "output_tokens"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "retries"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "elapsed_ms"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "concurrency"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "max_hops"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "max_neighbors"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "run_amount"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "undefined",
+    "path": [
+      "day_amount"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "currency"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "pricing_version"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "billing_principal"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "max_input_tokens",
+      "max_output_tokens",
+      "max_provider_requests",
+      "max_cost_usd",
+      "max_retries",
+      "max_wall_time_ms"
+    ],
+    "path": [],
+    "message": "Unrecognized key(s) in object: 'max_input_tokens', 'max_output_tokens', 'max_provider_requests', 'max_cost_usd', 'max_retries', 'max_wall_time_ms'"
+  }
+]
+ ❯ Object.get error [as error] ../../../../Mika%20Jussila/source/repos/dreamgraph/node_modules/zod/v3/types.js:39:31
+ ❯ ZodObject.parse ../../../../Mika%20Jussila/source/repos/dreamgraph/node_modules/zod/v3/types.js:114:22
+ ❯ EngineJobs.accept src/cognitive/jobs.ts:112:33
+    110|     if (!base) throw new EngineJobError("JOB_RESOURCE_POLICY_REQUIRED"…
+    111|     // The parent is an intersection, never a fresh allowance for each…
+    112|     const budget = BudgetSchema.parse(input.budget ?? Object.fromEntri…
+       |                                 ^
+    113|       typeof value === "number" ? Math.min(...budgets.map(candidate =>…
+    114|     const timeout = Math.min(input.timeout_ms ?? budget.elapsed_ms,inp…
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+   Start at  16:38:01
+   Duration  13.73s (transform 1.96s, setup 0ms, collect 5.24s, tests 8.00s, environment 0ms, prepare 141ms)
+
+ ❯ tests/legacy-graph-upgrade.test.ts:90:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

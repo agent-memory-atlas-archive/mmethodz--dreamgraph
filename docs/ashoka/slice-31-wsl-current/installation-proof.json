@@ -1,0 +1,69 @@
+{
+  "schema": "dreamgraph.wsl_installation_proof.v1",
+  "recorded_at": "2026-10-03T00:36:57.298Z",
+  "platform": "linux",
+  "architecture": "x64",
+  "kernel": "6.6.87.2-microsoft-standard-WSL2",
+  "distribution": "PRETTY_NAME=\"Ubuntu 24.04.4 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.4 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+  "node": "20.20.2",
+  "npm": "10.8.2",
+  "master": "/home/mmethodz/.dreamgraph",
+  "source": "/tmp/dg-ashoka-wsl-b03d0c4e-cd8e-479c-82d2-f7e29ce7cfde/source",
+  "version": "13.4.0",
+  "cli_version": "DreamGraph CLI v13.4.0 (Glass Atlas)",
+  "workspaces": [
+    {
+      "name": "@dreamgraph/sdk",
+      "version": "13.4.0",
+      "files": 88
+    },
+    {
+      "name": "@dreamgraph/host",
+      "version": "13.4.0",
+      "files": 28
+    },
+    {
+      "name": "@dreamgraph/token-economy",
+      "version": "13.4.0",
+      "files": 20
+    }
+  ],
+  "files": [
+    {
+      "file": "package.json",
+      "sha256": "4774334dde888d0278e37714cac6388603f171b4145c5978cdcb582884228f71"
+    },
+    {
+      "file": "dist/cli/dg.js",
+      "sha256": "d904dff72a0c6cc925b4f1dfbbb900cab2adb944f56114e2c89848d05d223578"
+    },
+    {
+      "file": "dist/computer/browser-harness.js",
+      "sha256": "8398de70aa91ce95d8c85a598056f3c91dcad8915c5ab8600ff2e05749b5e681"
+    },
+    {
+      "file": "dist/computer/browser-worker-entry.js",
+      "sha256": "147394c444899f245f347a030ddcda8af1cbfbc860e9f5cbd21b1314ecb0bf9e"
+    }
+  ],
+  "runtime_version": "1.62.1",
+  "browser_executable": "/tmp/dg-ashoka-wsl-3e20aba0-2617-4c9e-8b89-93779607a2a6/browsers/chromium-1234/chrome-linux64/chrome",
+  "browser_version": "151.0.7922.34",
+  "model_requests": 0,
+  "support_scope": "Actual WSL Linux test-bed installer and isolated headless browser only. No native desktop, CLI computer adapter, macOS, Linux Mint GUI or VS Code activation qualification.",
+  "browser_artifact_hash": "sha256:dd1cb2e2024985d7ae61dc0c63e63ac37333d98cf548d02d140598d8d65e59d6",
+  "cli_output": {
+    "qualification_path": "/tmp/dg-ashoka-wsl-b03d0c4e-cd8e-479c-82d2-f7e29ce7cfde/browser-qualification.json",
+    "worker_id": "ashoka-wsl-ubuntu-browser",
+    "platform": "linux",
+    "architecture": "x64",
+    "browser_version": "151.0.7922.34",
+    "node": "20.20.2",
+    "model_requests": 0,
+    "measured_checks": 11,
+    "evidence_hash": "sha256:dd1cb2e2024985d7ae61dc0c63e63ac37333d98cf548d02d140598d8d65e59d6",
+    "stop_release_ms": 186.94063600000027,
+    "control_loss_stop_ms": 2525.792173,
+    "note": "Qualification only. Instance setup, target review and explicit scoped permission are separate."
+  }
+}

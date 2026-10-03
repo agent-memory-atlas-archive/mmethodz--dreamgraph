@@ -1,0 +1,16 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/plan-context-integration.test.ts (1 test) 245ms
+ ✓ tests/plan-authority.test.ts (7 tests) 1429ms
+   ✓ PL04/GE14: a status receipt cannot count as implementation; an actual graph commit can, and accepted verification survives replay  381ms
+   ✓ GE14/CU22 effect contract: reconciliation must finish; optional unfunded digestion can remain pending  465ms
+ ✓ tests/graph-read-model.test.ts (11 tests) 506ms
+ ✓ tests/context-pack.test.ts (36 tests) 2328ms
+ ✓ tests/plan-workflow.test.ts (17 tests) 90ms
+
+ Test Files  5 passed (5)
+      Tests  72 passed (72)
+   Start at  08:53:45
+   Duration  10.09s (transform 1.97s, setup 0ms, collect 12.76s, tests 4.60s, environment 1ms, prepare 733ms)
+

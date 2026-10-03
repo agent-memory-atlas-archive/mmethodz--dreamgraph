@@ -1,0 +1,17 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/role-policy.test.ts (20 tests) 231ms
+stderr | tests/architect-cli-controls.test.ts > codex-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity
+[2026-10-01T08:23:14.900Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/architect-cli-controls.test.ts (7 tests) 29436ms
+   ✓ daemon command perimeter rejects missing/excess grants and observes actual process cancellation  463ms
+   ✓ codex-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity  14365ms
+   ✓ copilot-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity  14584ms
+
+ Test Files  2 passed (2)
+      Tests  27 passed (27)
+   Start at  11:23:07
+   Duration  34.62s (transform 1.70s, setup 0ms, collect 5.07s, tests 29.67s, environment 0ms, prepare 336ms)
+

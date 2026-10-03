@@ -1,0 +1,389 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > succeeds with zero plugins when plugins dir is empty
+[2026-10-02T01:46:59.435Z] [INFO]  Plugin discovery: no plugins found in <instance>/plugins or instance.json
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > is idempotent — second call is a no-op
+[2026-10-02T01:46:59.447Z] [INFO]  Plugin discovery: no plugins found in <instance>/plugins or instance.json
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > discovers a manifest under <instance>/plugins/<id>/ and emits telemetry
+[2026-10-02T01:46:59.465Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=false
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > discovers a manifest under <instance>/plugins/<id>/ and emits telemetry
+[2026-10-02T01:46:59.466Z] [INFO]  Plugins loaded: 0; rejected: 1
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > invokes activate() and bridges ctx.events.subscribe to graphEventBus when trusted in-process
+[2026-10-02T01:46:59.501Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:46:59.501Z] [WARN]  plugin examples.activate@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > invokes activate() and bridges ctx.events.subscribe to graphEventBus when trusted in-process
+[2026-10-02T01:46:59.502Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/manager.test.ts > bootstrapPlugins > invokes activate() and bridges ctx.events.subscribe to graphEventBus when trusted in-process
+[2026-10-02T01:46:59.516Z] [INFO]  Plugin examples.activate activated (1 subscription(s))
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed MCP tool when manifest declares tools:register + emit_tool
+[2026-10-02T01:46:59.538Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:46:59.538Z] [WARN]  plugin examples.contrib-tool@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed MCP tool when manifest declares tools:register + emit_tool
+[2026-10-02T01:46:59.538Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed MCP tool when manifest declares tools:register + emit_tool
+[2026-10-02T01:46:59.556Z] [INFO]  Plugin examples.contrib-tool registered tool 'examples_contrib_tool_hello'
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed MCP tool when manifest declares tools:register + emit_tool
+[2026-10-02T01:46:59.556Z] [INFO]  Plugin examples.contrib-tool activated (0 subscription(s))
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > rejects tool registration with tool_name_unprefixed when name lacks plugin id prefix
+[2026-10-02T01:46:59.581Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:46:59.581Z] [WARN]  plugin examples.bad-name@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > rejects tool registration with tool_name_unprefixed when name lacks plugin id prefix
+[2026-10-02T01:46:59.582Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > rejects tool registration with tool_name_unprefixed when name lacks plugin id prefix
+[2026-10-02T01:46:59.603Z] [WARN]  Plugin examples.bad-name tool 'wrong_prefix.foo' rejected: tool_name_unprefixed (tool name must start with 'examples_bad_name_')
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > rejects tool registration with tool_name_unprefixed when name lacks plugin id prefix
+[2026-10-02T01:46:59.603Z] [INFO]  Plugin examples.bad-name activated (0 subscription(s))
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed resource and gates uri namespace
+[2026-10-02T01:46:59.624Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:46:59.624Z] [WARN]  plugin examples.contrib-res@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed resource and gates uri namespace
+[2026-10-02T01:46:59.624Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed resource and gates uri namespace
+[2026-10-02T01:46:59.636Z] [INFO]  Plugin examples.contrib-res registered resource 'plugin://examples.contrib-res/data'
+
+stderr | tests/plugins/manager.test.ts > plugin contributions (M4) > registers a contributed resource and gates uri namespace
+[2026-10-02T01:46:59.636Z] [INFO]  Plugin examples.contrib-res activated (0 subscription(s))
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > unloadPluginById deactivates and drops contributions
+[2026-10-02T01:46:59.652Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:46:59.653Z] [WARN]  plugin examples.unload-me@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > unloadPluginById deactivates and drops contributions
+[2026-10-02T01:46:59.653Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > unloadPluginById deactivates and drops contributions
+[2026-10-02T01:46:59.664Z] [INFO]  Plugin examples.unload-me registered tool 'examples_unload_me_ping'
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > unloadPluginById deactivates and drops contributions
+[2026-10-02T01:46:59.665Z] [INFO]  Plugin examples.unload-me activated (0 subscription(s))
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-02T01:46:59.683Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:46:59.683Z] [WARN]  plugin examples.reload-me@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-02T01:46:59.683Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-02T01:46:59.700Z] [INFO]  Plugin examples.reload-me registered tool 'examples_reload_me_ping'
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-02T01:46:59.700Z] [INFO]  Plugin examples.reload-me activated (0 subscription(s))
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-02T01:46:59.703Z] [WARN]  plugin examples.reload-me@0.1.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-02T01:46:59.705Z] [INFO]  Plugin examples.reload-me registered tool 'examples_reload_me_ping'
+
+stderr | tests/plugins/manager.test.ts > plugin hot lifecycle (M3.5) > reloadPlugin re-activates a plugin and re-registers contributions fresh
+[2026-10-02T01:46:59.705Z] [INFO]  Plugin examples.reload-me activated (0 subscription(s))
+
+ ✓ tests/plugins/manager.test.ts (10 tests) 301ms
+stderr | tests/plugins/contributions-boundary.test.ts > retains complete MCP errors/media/structured receipts and records failure rather than successful prose
+[2026-10-02T01:47:01.194Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:47:01.196Z] [WARN]  plugin fixture.boundary@1.0.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/contributions-boundary.test.ts > retains complete MCP errors/media/structured receipts and records failure rather than successful prose
+[2026-10-02T01:47:01.196Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/contributions-boundary.test.ts > retains complete MCP errors/media/structured receipts and records failure rather than successful prose
+[2026-10-02T01:47:01.219Z] [INFO]  Plugin fixture.boundary registered tool 'fixture_boundary_effect'
+[2026-10-02T01:47:01.219Z] [INFO]  Plugin fixture.boundary registered resource 'plugin://fixture.boundary/evidence'
+
+stderr | tests/plugins/contributions-boundary.test.ts > retains complete MCP errors/media/structured receipts and records failure rather than successful prose
+[2026-10-02T01:47:01.220Z] [INFO]  Plugin fixture.boundary activated (0 subscription(s))
+
+stderr | tests/plugins/contributions-boundary.test.ts > retains complete MCP errors/media/structured receipts and records failure rather than successful prose
+[2026-10-02T01:47:01.228Z] [INFO]  Plugin contributions wired into session: 1 tool(s), 1 resource(s)
+
+stderr | tests/plugins/contributions-boundary.test.ts > retains legacy failure objects and rejects invalid or unserializable MCP results without reporting success
+[2026-10-02T01:47:01.268Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:47:01.268Z] [WARN]  plugin fixture.boundary@1.0.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/contributions-boundary.test.ts > retains legacy failure objects and rejects invalid or unserializable MCP results without reporting success
+[2026-10-02T01:47:01.269Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/contributions-boundary.test.ts > retains legacy failure objects and rejects invalid or unserializable MCP results without reporting success
+[2026-10-02T01:47:01.279Z] [INFO]  Plugin fixture.boundary registered tool 'fixture_boundary_effect'
+[2026-10-02T01:47:01.279Z] [INFO]  Plugin fixture.boundary registered resource 'plugin://fixture.boundary/evidence'
+
+stderr | tests/plugins/contributions-boundary.test.ts > retains legacy failure objects and rejects invalid or unserializable MCP results without reporting success
+[2026-10-02T01:47:01.279Z] [INFO]  Plugin fixture.boundary activated (0 subscription(s))
+
+stderr | tests/plugins/contributions-boundary.test.ts > retains legacy failure objects and rejects invalid or unserializable MCP results without reporting success
+[2026-10-02T01:47:01.280Z] [INFO]  Plugin contributions wired into session: 1 tool(s), 1 resource(s)
+
+stderr | tests/plugins/contributions-boundary.test.ts > retains legacy failure objects and rejects invalid or unserializable MCP results without reporting success
+[2026-10-02T01:47:01.285Z] [WARN]  Plugin tool fixture_boundary_effect threw: PLUGIN_TOOL_RESULT_INVALID
+
+stderr | tests/plugins/contributions-boundary.test.ts > retains legacy failure objects and rejects invalid or unserializable MCP results without reporting success
+[2026-10-02T01:47:01.286Z] [WARN]  Plugin tool fixture_boundary_effect threw: PLUGIN_TOOL_RESULT_UNSERIALIZABLE
+
+stderr | tests/plugins/contributions-boundary.test.ts > propagates actual MCP cancellation to a cooperative plugin handler and keeps effect termination unconfirmed in its failure
+[2026-10-02T01:47:01.306Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:47:01.306Z] [WARN]  plugin fixture.boundary@1.0.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/contributions-boundary.test.ts > propagates actual MCP cancellation to a cooperative plugin handler and keeps effect termination unconfirmed in its failure
+[2026-10-02T01:47:01.306Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/contributions-boundary.test.ts > propagates actual MCP cancellation to a cooperative plugin handler and keeps effect termination unconfirmed in its failure
+[2026-10-02T01:47:01.316Z] [INFO]  Plugin fixture.boundary registered tool 'fixture_boundary_effect'
+[2026-10-02T01:47:01.316Z] [INFO]  Plugin fixture.boundary registered resource 'plugin://fixture.boundary/evidence'
+
+stderr | tests/plugins/contributions-boundary.test.ts > propagates actual MCP cancellation to a cooperative plugin handler and keeps effect termination unconfirmed in its failure
+[2026-10-02T01:47:01.316Z] [INFO]  Plugin fixture.boundary activated (0 subscription(s))
+
+stderr | tests/plugins/contributions-boundary.test.ts > propagates actual MCP cancellation to a cooperative plugin handler and keeps effect termination unconfirmed in its failure
+[2026-10-02T01:47:01.317Z] [INFO]  Plugin contributions wired into session: 1 tool(s), 1 resource(s)
+
+stderr | tests/plugins/contributions-boundary.test.ts > propagates actual MCP cancellation to a cooperative plugin handler and keeps effect termination unconfirmed in its failure
+[2026-10-02T01:47:01.320Z] [WARN]  Plugin tool fixture_boundary_effect threw: Error: declared caller cancellation
+
+stderr | tests/plugins/contributions-boundary.test.ts > does not claim a noncooperative plugin callback stopped when the cancelled client wait rejects
+[2026-10-02T01:47:01.341Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:47:01.341Z] [WARN]  plugin fixture.boundary@1.0.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/contributions-boundary.test.ts > does not claim a noncooperative plugin callback stopped when the cancelled client wait rejects
+[2026-10-02T01:47:01.341Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/contributions-boundary.test.ts > does not claim a noncooperative plugin callback stopped when the cancelled client wait rejects
+[2026-10-02T01:47:01.350Z] [INFO]  Plugin fixture.boundary registered tool 'fixture_boundary_effect'
+[2026-10-02T01:47:01.350Z] [INFO]  Plugin fixture.boundary registered resource 'plugin://fixture.boundary/evidence'
+
+stderr | tests/plugins/contributions-boundary.test.ts > does not claim a noncooperative plugin callback stopped when the cancelled client wait rejects
+[2026-10-02T01:47:01.351Z] [INFO]  Plugin fixture.boundary activated (0 subscription(s))
+
+stderr | tests/plugins/contributions-boundary.test.ts > does not claim a noncooperative plugin callback stopped when the cancelled client wait rejects
+[2026-10-02T01:47:01.352Z] [INFO]  Plugin contributions wired into session: 1 tool(s), 1 resource(s)
+
+stderr | tests/plugins/contributions-boundary.test.ts > unregister aborts an in-flight original contribution and rejects new calls without repeating its handler
+[2026-10-02T01:47:01.428Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:47:01.428Z] [WARN]  plugin fixture.boundary@1.0.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/contributions-boundary.test.ts > unregister aborts an in-flight original contribution and rejects new calls without repeating its handler
+[2026-10-02T01:47:01.428Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/contributions-boundary.test.ts > unregister aborts an in-flight original contribution and rejects new calls without repeating its handler
+[2026-10-02T01:47:01.437Z] [INFO]  Plugin fixture.boundary registered tool 'fixture_boundary_effect'
+[2026-10-02T01:47:01.437Z] [INFO]  Plugin fixture.boundary registered resource 'plugin://fixture.boundary/evidence'
+
+stderr | tests/plugins/contributions-boundary.test.ts > unregister aborts an in-flight original contribution and rejects new calls without repeating its handler
+[2026-10-02T01:47:01.437Z] [INFO]  Plugin fixture.boundary activated (0 subscription(s))
+
+stderr | tests/plugins/contributions-boundary.test.ts > unregister aborts an in-flight original contribution and rejects new calls without repeating its handler
+[2026-10-02T01:47:01.438Z] [INFO]  Plugin contributions wired into session: 1 tool(s), 1 resource(s)
+
+stderr | tests/plugins/contributions-boundary.test.ts > resource unload reaches the original handler and preserves whole binary/text contents and owner metadata
+[2026-10-02T01:47:01.462Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:47:01.462Z] [WARN]  plugin fixture.boundary@1.0.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/contributions-boundary.test.ts > resource unload reaches the original handler and preserves whole binary/text contents and owner metadata
+[2026-10-02T01:47:01.462Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/contributions-boundary.test.ts > resource unload reaches the original handler and preserves whole binary/text contents and owner metadata
+[2026-10-02T01:47:01.472Z] [INFO]  Plugin fixture.boundary registered tool 'fixture_boundary_effect'
+[2026-10-02T01:47:01.472Z] [INFO]  Plugin fixture.boundary registered resource 'plugin://fixture.boundary/evidence'
+
+stderr | tests/plugins/contributions-boundary.test.ts > resource unload reaches the original handler and preserves whole binary/text contents and owner metadata
+[2026-10-02T01:47:01.472Z] [INFO]  Plugin fixture.boundary activated (0 subscription(s))
+
+stderr | tests/plugins/contributions-boundary.test.ts > resource unload reaches the original handler and preserves whole binary/text contents and owner metadata
+[2026-10-02T01:47:01.474Z] [INFO]  Plugin contributions wired into session: 1 tool(s), 1 resource(s)
+
+stderr | tests/plugins/contributions-boundary.test.ts > the actual modern registration wire fence rejects original invalid arguments and consumes an exact allowance once
+[2026-10-02T01:47:01.497Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T01:47:01.497Z] [WARN]  plugin fixture.boundary@1.0.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/plugins/contributions-boundary.test.ts > the actual modern registration wire fence rejects original invalid arguments and consumes an exact allowance once
+[2026-10-02T01:47:01.497Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/plugins/contributions-boundary.test.ts > the actual modern registration wire fence rejects original invalid arguments and consumes an exact allowance once
+[2026-10-02T01:47:01.507Z] [INFO]  Plugin fixture.boundary registered tool 'fixture_boundary_effect'
+[2026-10-02T01:47:01.507Z] [INFO]  Plugin fixture.boundary registered resource 'plugin://fixture.boundary/evidence'
+
+stderr | tests/plugins/contributions-boundary.test.ts > the actual modern registration wire fence rejects original invalid arguments and consumes an exact allowance once
+[2026-10-02T01:47:01.507Z] [INFO]  Plugin fixture.boundary activated (0 subscription(s))
+
+ ✓ tests/plugins/contributions-boundary.test.ts (7 tests) 357ms
+stderr | tests/mcp-catalog-boundary.test.ts
+[2026-10-02T01:47:01.678Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-02T01:47:01.681Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:01.681Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:01.682Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-02T01:47:01.683Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-02T01:47:01.683Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-02T01:47:01.683Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-02T01:47:01.684Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-02T01:47:01.686Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-02T01:47:01.686Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-02T01:47:01.689Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-02T01:47:01.690Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-02T01:47:01.694Z] [INFO]  Registered 17 cognitive resources
+[2026-10-02T01:47:01.698Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-02T01:47:01.698Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-02T01:47:01.699Z] [INFO]  Registered 10 discipline execution tools
+
+stderr | tests/mcp-catalog-boundary.test.ts > collects the real registrars once with exact discipline parity and schemas
+[2026-10-02T01:47:01.754Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-02T01:47:01.754Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:01.754Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:01.755Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-02T01:47:01.755Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-02T01:47:01.755Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-02T01:47:01.755Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-02T01:47:01.755Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-02T01:47:01.756Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-02T01:47:01.756Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-02T01:47:01.759Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-02T01:47:01.759Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-02T01:47:01.787Z] [INFO]  Registered 17 cognitive resources
+[2026-10-02T01:47:01.789Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-02T01:47:01.790Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-02T01:47:01.790Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-02T01:47:01.813Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-02T01:47:01.814Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:01.814Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:01.814Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-02T01:47:01.814Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-02T01:47:01.814Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-02T01:47:01.814Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-02T01:47:01.814Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-02T01:47:01.815Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-02T01:47:01.815Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-02T01:47:01.817Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-02T01:47:01.818Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-02T01:47:01.846Z] [INFO]  Registered 17 cognitive resources
+[2026-10-02T01:47:01.847Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-02T01:47:01.849Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-02T01:47:01.849Z] [INFO]  Registered 10 discipline execution tools
+
+stderr | tests/mcp-catalog-boundary.test.ts > blocks mutations/cognition in the wrong phase and requires an applicable approved plan
+[2026-10-02T01:47:04.428Z] [INFO]  Discipline session started: b1204ba7-4183-4cf5-98db-b7cbe0e398b0 (modification: boundary)
+
+ ✓ tests/mcp-catalog-boundary.test.ts (191 tests) 2718ms
+   ✓ dream_cycle: shared result/dependency/version/cancellation boundary  449ms
+   ✓ import_dream_archetypes: shared result/dependency/version/cancellation boundary  411ms
+   ✓ metacognitive_analysis: shared result/dependency/version/cancellation boundary  402ms
+   ✓ nightmare_cycle: shared result/dependency/version/cancellation boundary  381ms
+   ✓ normalize_dreams: shared result/dependency/version/cancellation boundary  382ms
+ ✓ tests/daemon-transport-isolation.test.ts (3 tests) 9983ms
+   ✓ isolates real native MCP transports, rejects foreign browser binding and removes closed sessions  4186ms
+   ✓ carries its stdio stream owner through tools and resources  2542ms
+   ✓ the actual daemon admits one exact managed MCP action once, retains source debt and refuses consumed replay  3253ms
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5933,"approxTokens":1484}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":6833,"approxTokens":1709}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":9390,"approxTokens":2348}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5924,"approxTokens":1481}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":9084,"approxTokens":2271}
+
+stderr | tests/host-managed-execution.test.ts > compiled editor Undo restores exact Unicode/BOM/mixed newline bytes through actual HTTP/MCP source owners and retains graph debt
+[2026-10-02T01:47:16.378Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:16.379Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:16.380Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > compiled editor Undo for a created file uses the actual source owner and exact absent/hash precondition
+[2026-10-02T01:47:16.836Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:16.836Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:16.837Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > compiled editor Undo for a deleted file uses the actual source owner and exact absent/hash precondition
+[2026-10-02T01:47:17.286Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:17.286Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:17.286Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > a changed editor authority refuses Undo before admission and retains a retryable original review
+[2026-10-02T01:47:17.928Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:17.928Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:17.929Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > a lost operator closure acknowledgement retains recovery and duplicate Undo/Keep cannot repeat or erase it
+[2026-10-02T01:47:18.388Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:18.389Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:18.389Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > captured review copies cannot mutate the baseline/authority and stale IDs cannot clear or undo a later edit
+[2026-10-02T01:47:18.869Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:18.870Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:18.870Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > operator message-action errors retain the complete actual owner payload and a failed trace, with no local alias fallback
+[2026-10-02T01:47:20.121Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:20.121Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:20.122Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > an explicit operator message action records changed-file review under its original daemon and retains the actual source closure
+[2026-10-02T01:47:20.560Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:20.560Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:20.560Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > a returned message action persists its original instance outcome and never labels pending source debt as completed after selection changes
+[2026-10-02T01:47:20.984Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:47:20.985Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:47:20.985Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+ ✓ tests/host-managed-execution.test.ts (62 tests) 24487ms
+   ✓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass  525ms
+   ✓ parallel host passes share their authenticated owner while another client cannot read or close them  395ms
+   ✓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable  568ms
+   ✓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block  365ms
+   ✓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts  331ms
+   ✓ the actual editor host records exact review before activation; replay cannot replenish consumed effects  450ms
+   ✓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads  396ms
+   ✓ a published review alone grants no effect; the unchanged live host can recover activation exactly once  315ms
+   ✓ a saved review cannot reactivate after the actual lease expires  1652ms
+   ✓ the actual editor rendezvous waits before the graph writer, then publishes approval before one unchanged source effect  513ms
+   ✓ the editor review controller retains literal exact proposals and retries lost acknowledgement without repeating effects  468ms
+   ✓ the editor controller declines the captured daemon action without dispatch or approval publication  321ms
+   ✓ native editor admission delivers whole replacement evidence, uses the actual worker MCP fence and closes unchanged source with durable review  659ms
+   ✓ native editor source changes retain reconciliation debt rather than reporting a graph commit  301ms
+   ✓ native editor commands execute at the actual daemon owner with exact review and complete source observation  741ms
+   ✓ the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation  1869ms
+   ✓ the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation  1556ms
+   ✓ compiled editor Undo restores exact Unicode/BOM/mixed newline bytes through actual HTTP/MCP source owners and retains graph debt  470ms
+   ✓ compiled editor Undo for a created file uses the actual source owner and exact absent/hash precondition  439ms
+   ✓ compiled editor Undo for a deleted file uses the actual source owner and exact absent/hash precondition  449ms
+   ✓ a changed editor authority refuses Undo before admission and retains a retryable original review  445ms
+   ✓ a lost operator closure acknowledgement retains recovery and duplicate Undo/Keep cannot repeat or erase it  495ms
+   ✓ captured review copies cannot mutate the baseline/authority and stale IDs cannot clear or undo a later edit  437ms
+   ✓ operator recovery cannot turn actual unknown termination into a successful closure or redirect to a different instance  355ms
+   ✓ operator message-action errors retain the complete actual owner payload and a failed trace, with no local alias fallback  438ms
+   ✓ an explicit operator message action records changed-file review under its original daemon and retains the actual source closure  432ms
+   ✓ a returned message action persists its original instance outcome and never labels pending source debt as completed after selection changes  427ms
+   ✓ expired lost-ack review recovers only by reading the original settled closure, without renewing approval or repeating its effect  1351ms
+   ✓ review inspection retains actual unknown termination and disables historical approval after revocation  481ms
+   ✓ inspection of a pending review fences continuation when its original authority was revoked with unknown termination  356ms
+   ✓ a compiled palette command uses the original daemon owner, records actual source change and keeps reconciliation separate from exit zero  598ms
+
+ Test Files  5 passed (5)
+      Tests  273 passed (273)
+   Start at  04:46:54
+   Duration  30.17s (transform 3.27s, setup 0ms, collect 18.25s, tests 37.85s, environment 1ms, prepare 721ms)
+

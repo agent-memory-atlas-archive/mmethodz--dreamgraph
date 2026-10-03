@@ -1,0 +1,143 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+[2026-10-02T19:01:27.983Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+[2026-10-02T19:01:29.622Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T19:01:29.741Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T19:01:30.045Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T19:01:30.170Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T19:01:30.382Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":0,"max_auto_cycles_per_hour":10}
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T19:01:30.465Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T19:01:30.580Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T19:01:30.764Z] [INFO]  LLM provider: none (model: new-model)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T19:01:30.868Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T19:01:30.979Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T19:01:31.157Z] [INFO]  LLM provider: none (model: other-writer)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T19:01:31.204Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+[2026-10-02T19:01:31.313Z] [INFO]  LLM provider: none (model: old-model)
+
+ ✓ tests/computer-journal.test.ts (13 tests) 4195ms
+   ✓ reconnect pages existing owner descriptors without reading archived transcripts or creating authority  333ms
+   ✓ changed and foreign reconnect cursors cannot turn partial pages into a current complete session list  335ms
+   ✓ the real HTTP reconnect projection keeps declared transport identities isolated, bounded and read-only  315ms
+   ✓ replays original intent/receipt across service recreation and never persists raw action text  338ms
+   ✓ reserves finite actions/images/bytes once and refuses oversize or unsupported operations  378ms
+   ✓ postcondition proof, terminal immutability and graph receipt owner remain separate  402ms
+   ✓ a lost physical result stays recoverable after acknowledged stop and cannot redispatch  426ms
+   ✓ active workers prevent completion and stopped proved work remains a state receipt, never graph truth  349ms
+   ✓ late unknown-result bookkeeping does not pretend worker termination was acknowledged  373ms
+stderr | tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+[2026-10-02T19:01:31.917Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T19:01:32.022Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T19:01:32.053Z] [WARN]  LLM: OpenAI provider configured but no API key set (DREAMGRAPH_LLM_API_KEY)
+[2026-10-02T19:01:32.054Z] [INFO]  LLM provider: openai (model: gpt-5.4)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T19:01:32.066Z] [INFO]  LLM dreamer config: model=gpt-5.4-mini, temp=0, maxTokens=1600
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T19:01:32.092Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > structured edits remove only corresponding legacy aliases and preserve unrelated zero limits
+[2026-10-02T19:01:32.203Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > structured edits remove only corresponding legacy aliases and preserve unrelated zero limits
+[2026-10-02T19:01:32.448Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > a runtime activation failure preserves the committed save, restores prior runtime and excludes secret error text
+[2026-10-02T19:01:32.549Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > a runtime activation failure preserves the committed save, restores prior runtime and excludes secret error text
+[2026-10-02T19:01:32.578Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > a runtime activation failure preserves the committed save, restores prior runtime and excludes secret error text
+[2026-10-02T19:01:32.595Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > recent and active pagination retains session isolation and refuses cancellation of another session job
+[2026-10-02T19:01:32.692Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > recent and active pagination retains session isolation and refuses cancellation of another session job
+[2026-10-02T19:01:32.988Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > preserves fragmented UTF-8 configuration bytes and rejects invalid encoding before any file write
+[2026-10-02T19:01:33.082Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > preserves fragmented UTF-8 configuration bytes and rejects invalid encoding before any file write
+[2026-10-02T19:01:33.122Z] [INFO]  LLM provider: none (model: määrä🌿)
+
+stderr | tests/configuration-workspace.test.ts > preserves fragmented UTF-8 configuration bytes and rejects invalid encoding before any file write
+[2026-10-02T19:01:33.139Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T19:01:33.230Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T19:01:33.281Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T19:01:33.290Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T19:01:33.405Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T19:01:33.571Z] [INFO]  LLM architect config: provider=none (general), model=old-model (general), temp=0.7, maxTokens=2048
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T19:01:33.755Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ✓ tests/computer-configuration.test.ts (8 tests) 657ms
+stderr | tests/configuration-workspace.test.ts > schema-driven Computer Use profiles load only on demand and recover the exact real CAS save after lost acknowledgement
+[2026-10-02T19:01:33.862Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > schema-driven Computer Use profiles load only on demand and recover the exact real CAS save after lost acknowledgement
+[2026-10-02T19:01:34.190Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ✓ tests/configuration-workspace.test.ts (14 tests) 6326ms
+   ✓ maps every consumed setting to one typed control or named read-only exception without leaking stored secrets  1762ms
+   ✓ keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work  421ms
+   ✓ edits structured component settings and retains explicit zeros/default inheritance through restart parsing  425ms
+   ✓ retains a whole captured save after a committed lost reply and recovers that receipt without a second effect  397ms
+   ✓ keeps drafts on concurrent revision refusal and never overwrites the intervening file  336ms
+   ✓ previews a scoped template without writes, applies protected staging and undoes the original bytes  712ms
+   ✓ structured edits remove only corresponding legacy aliases and preserve unrelated zero limits  357ms
+   ✓ recent and active pagination retains session isolation and refuses cancellation of another session job  391ms
+   ✓ root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry  465ms
+   ✓ schema-driven Computer Use profiles load only on demand and recover the exact real CAS save after lost acknowledgement  437ms
+
+ Test Files  3 passed (3)
+      Tests  35 passed (35)
+   Start at  22:01:22
+   Duration  12.01s (transform 2.36s, setup 0ms, collect 11.11s, tests 11.18s, environment 1ms, prepare 418ms)
+

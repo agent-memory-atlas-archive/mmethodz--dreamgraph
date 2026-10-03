@@ -1,0 +1,171 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/daemon-transport-isolation.test.ts (2 tests) 5387ms
+   ✓ isolates real native MCP transports, rejects foreign browser binding and removes closed sessions  3164ms
+   ✓ carries its stdio stream owner through tools and resources  2221ms
+stderr | tests/discipline-current-approval.test.ts > latest complete delta and fresh approved content admit execution; restart preserves binding
+[2026-10-01T05:55:43.266Z] [INFO]  Discipline session started: fa911463-941d-4064-bbbf-70cb8a780ac4 (modification: Current approval fixture)
+
+stderr | tests/discipline-current-approval.test.ts > latest complete delta and fresh approved content admit execution; restart preserves binding
+[2026-10-01T05:55:43.289Z] [INFO]  Phase transition: ingest → audit (session fa911463-941d-4064-bbbf-70cb8a780ac4)
+
+stderr | tests/discipline-current-approval.test.ts > latest complete delta and fresh approved content admit execution; restart preserves binding
+[2026-10-01T05:55:43.298Z] [INFO]  Delta table created: 1 entries, 0% parity (session fa911463-941d-4064-bbbf-70cb8a780ac4, phase audit)
+
+stderr | tests/discipline-current-approval.test.ts > latest complete delta and fresh approved content admit execution; restart preserves binding
+[2026-10-01T05:55:43.303Z] [INFO]  Phase transition: audit → plan (session fa911463-941d-4064-bbbf-70cb8a780ac4)
+
+stderr | tests/discipline-current-approval.test.ts > latest complete delta and fresh approved content admit execution; restart preserves binding
+[2026-10-01T05:55:43.316Z] [INFO]  Implementation plan created: 1 items, 0 high-risk (session fa911463-941d-4064-bbbf-70cb8a780ac4, status: approved)
+
+stderr | tests/discipline-current-approval.test.ts > latest complete delta and fresh approved content admit execution; restart preserves binding
+[2026-10-01T05:55:43.326Z] [INFO]  Resumed discipline session: fa911463-941d-4064-bbbf-70cb8a780ac4
+
+stderr | tests/discipline-current-approval.test.ts > latest complete delta and fresh approved content admit execution; restart preserves binding
+[2026-10-01T05:55:43.333Z] [INFO]  Phase transition: plan → execute (session fa911463-941d-4064-bbbf-70cb8a780ac4)
+
+stderr | tests/discipline-current-approval.test.ts > latest complete delta and fresh approved content admit execution; restart preserves binding
+[2026-10-01T05:55:43.341Z] [INFO]  Discipline session abandoned: fa911463-941d-4064-bbbf-70cb8a780ac4
+
+stderr | tests/discipline-current-approval.test.ts > failed new submission cannot reuse a historical approval after a PLAN loopback
+[2026-10-01T05:55:43.353Z] [INFO]  Discipline session started: db537ae9-aff7-414b-9d02-939de8b64562 (modification: Current approval fixture)
+
+stderr | tests/mcp-catalog-boundary.test.ts
+[2026-10-01T05:55:43.314Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T05:55:43.318Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-01T05:55:43.318Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-01T05:55:43.319Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-01T05:55:43.319Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-01T05:55:43.320Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-01T05:55:43.320Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-01T05:55:43.320Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-01T05:55:43.323Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-01T05:55:43.323Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-01T05:55:43.325Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-01T05:55:43.326Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-01T05:55:43.330Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T05:55:43.333Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-01T05:55:43.334Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-01T05:55:43.334Z] [INFO]  Registered 10 discipline execution tools
+
+stderr | tests/discipline-current-approval.test.ts > failed new submission cannot reuse a historical approval after a PLAN loopback
+[2026-10-01T05:55:43.374Z] [INFO]  Phase transition: ingest → audit (session db537ae9-aff7-414b-9d02-939de8b64562)
+
+stderr | tests/discipline-current-approval.test.ts > failed new submission cannot reuse a historical approval after a PLAN loopback
+[2026-10-01T05:55:43.379Z] [INFO]  Delta table created: 1 entries, 0% parity (session db537ae9-aff7-414b-9d02-939de8b64562, phase audit)
+
+stderr | tests/discipline-current-approval.test.ts > failed new submission cannot reuse a historical approval after a PLAN loopback
+[2026-10-01T05:55:43.386Z] [INFO]  Phase transition: audit → plan (session db537ae9-aff7-414b-9d02-939de8b64562)
+
+stderr | tests/discipline-current-approval.test.ts > failed new submission cannot reuse a historical approval after a PLAN loopback
+[2026-10-01T05:55:43.393Z] [INFO]  Implementation plan created: 1 items, 0 high-risk (session db537ae9-aff7-414b-9d02-939de8b64562, status: approved)
+
+stderr | tests/discipline-current-approval.test.ts > failed new submission cannot reuse a historical approval after a PLAN loopback
+[2026-10-01T05:55:43.399Z] [INFO]  Phase transition: plan → execute (session db537ae9-aff7-414b-9d02-939de8b64562)
+
+stderr | tests/mcp-catalog-boundary.test.ts > collects the real registrars once with exact discipline parity and schemas
+[2026-10-01T05:55:43.368Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T05:55:43.368Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-01T05:55:43.369Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-01T05:55:43.369Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-01T05:55:43.369Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-01T05:55:43.369Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-01T05:55:43.369Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-01T05:55:43.369Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-01T05:55:43.370Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-01T05:55:43.370Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-01T05:55:43.371Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-01T05:55:43.371Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-01T05:55:43.375Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T05:55:43.376Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-01T05:55:43.376Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-01T05:55:43.376Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-01T05:55:43.379Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-01T05:55:43.380Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-01T05:55:43.380Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-01T05:55:43.380Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-01T05:55:43.380Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-01T05:55:43.380Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-01T05:55:43.380Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-01T05:55:43.381Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-01T05:55:43.381Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-01T05:55:43.381Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-01T05:55:43.382Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-01T05:55:43.382Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-01T05:55:43.386Z] [INFO]  Registered 17 cognitive resources
+[2026-10-01T05:55:43.387Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-01T05:55:43.387Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-01T05:55:43.387Z] [INFO]  Registered 10 discipline execution tools
+
+stderr | tests/discipline-current-approval.test.ts > failed new submission cannot reuse a historical approval after a PLAN loopback
+[2026-10-01T05:55:43.406Z] [INFO]  Phase transition: execute → verify (session db537ae9-aff7-414b-9d02-939de8b64562)
+
+stderr | tests/discipline-current-approval.test.ts > failed new submission cannot reuse a historical approval after a PLAN loopback
+[2026-10-01T05:55:43.419Z] [INFO]  Phase transition: verify → plan (session db537ae9-aff7-414b-9d02-939de8b64562)
+
+stderr | tests/discipline-current-approval.test.ts > failed new submission cannot reuse a historical approval after a PLAN loopback
+[2026-10-01T05:55:43.427Z] [INFO]  Resumed discipline session: db537ae9-aff7-414b-9d02-939de8b64562
+
+stderr | tests/discipline-current-approval.test.ts > failed new submission cannot reuse a historical approval after a PLAN loopback
+[2026-10-01T05:55:43.440Z] [INFO]  Discipline session abandoned: db537ae9-aff7-414b-9d02-939de8b64562
+
+stderr | tests/discipline-current-approval.test.ts > changed plan bytes or latest delta revoke admission; historical gaps do not contaminate a new wave
+[2026-10-01T05:55:43.450Z] [INFO]  Discipline session started: f471df60-5d9d-438c-ba5c-de62df581e36 (modification: Current approval fixture)
+
+stderr | tests/discipline-current-approval.test.ts > changed plan bytes or latest delta revoke admission; historical gaps do not contaminate a new wave
+[2026-10-01T05:55:43.468Z] [INFO]  Phase transition: ingest → audit (session f471df60-5d9d-438c-ba5c-de62df581e36)
+
+stderr | tests/mcp-catalog-boundary.test.ts > blocks mutations/cognition in the wrong phase and requires an applicable approved plan
+[2026-10-01T05:55:43.471Z] [INFO]  Discipline session started: 0f7ddd58-e5d2-43bd-879e-17a20bf54269 (modification: boundary)
+
+stderr | tests/discipline-current-approval.test.ts > changed plan bytes or latest delta revoke admission; historical gaps do not contaminate a new wave
+[2026-10-01T05:55:43.476Z] [INFO]  Delta table created: 1 entries, 0% parity (session f471df60-5d9d-438c-ba5c-de62df581e36, phase audit)
+
+stderr | tests/discipline-current-approval.test.ts > changed plan bytes or latest delta revoke admission; historical gaps do not contaminate a new wave
+[2026-10-01T05:55:43.482Z] [INFO]  Phase transition: audit → plan (session f471df60-5d9d-438c-ba5c-de62df581e36)
+
+ ✓ tests/mcp-catalog-boundary.test.ts (190 tests) 119ms
+stderr | tests/discipline-current-approval.test.ts > changed plan bytes or latest delta revoke admission; historical gaps do not contaminate a new wave
+[2026-10-01T05:55:43.489Z] [INFO]  Implementation plan created: 1 items, 0 high-risk (session f471df60-5d9d-438c-ba5c-de62df581e36, status: approved)
+
+stderr | tests/discipline-current-approval.test.ts > changed plan bytes or latest delta revoke admission; historical gaps do not contaminate a new wave
+[2026-10-01T05:55:43.499Z] [INFO]  Delta table created: 1 entries, 0% parity (session f471df60-5d9d-438c-ba5c-de62df581e36, phase audit)
+
+stderr | tests/discipline-current-approval.test.ts > changed plan bytes or latest delta revoke admission; historical gaps do not contaminate a new wave
+[2026-10-01T05:55:43.506Z] [INFO]  Implementation plan created: 1 items, 0 high-risk (session f471df60-5d9d-438c-ba5c-de62df581e36, status: approved)
+
+stderr | tests/discipline-current-approval.test.ts > changed plan bytes or latest delta revoke admission; historical gaps do not contaminate a new wave
+[2026-10-01T05:55:43.512Z] [INFO]  Delta table created: 1 entries, 0% parity (session f471df60-5d9d-438c-ba5c-de62df581e36, phase audit)
+
+stderr | tests/discipline-current-approval.test.ts > changed plan bytes or latest delta revoke admission; historical gaps do not contaminate a new wave
+[2026-10-01T05:55:43.518Z] [INFO]  Discipline session abandoned: f471df60-5d9d-438c-ba5c-de62df581e36
+
+stderr | tests/discipline-current-approval.test.ts > unresolved latest delta blocks planning and legacy unbound approvals are not silently trusted
+[2026-10-01T05:55:43.528Z] [INFO]  Discipline session started: ed46ff58-a7d8-4f81-826d-5e5ae1fda3d0 (modification: Current approval fixture)
+
+stderr | tests/discipline-current-approval.test.ts > unresolved latest delta blocks planning and legacy unbound approvals are not silently trusted
+[2026-10-01T05:55:43.546Z] [INFO]  Phase transition: ingest → audit (session ed46ff58-a7d8-4f81-826d-5e5ae1fda3d0)
+
+stderr | tests/discipline-current-approval.test.ts > unresolved latest delta blocks planning and legacy unbound approvals are not silently trusted
+[2026-10-01T05:55:43.553Z] [INFO]  Delta table created: 1 entries, 0% parity (session ed46ff58-a7d8-4f81-826d-5e5ae1fda3d0, phase audit)
+
+stderr | tests/discipline-current-approval.test.ts > unresolved latest delta blocks planning and legacy unbound approvals are not silently trusted
+[2026-10-01T05:55:43.565Z] [INFO]  Delta table created: 1 entries, 0% parity (session ed46ff58-a7d8-4f81-826d-5e5ae1fda3d0, phase audit)
+
+stderr | tests/discipline-current-approval.test.ts > unresolved latest delta blocks planning and legacy unbound approvals are not silently trusted
+[2026-10-01T05:55:43.571Z] [INFO]  Phase transition: audit → plan (session ed46ff58-a7d8-4f81-826d-5e5ae1fda3d0)
+
+stderr | tests/discipline-current-approval.test.ts > unresolved latest delta blocks planning and legacy unbound approvals are not silently trusted
+[2026-10-01T05:55:43.578Z] [INFO]  Implementation plan created: 1 items, 0 high-risk (session ed46ff58-a7d8-4f81-826d-5e5ae1fda3d0, status: approved)
+
+stderr | tests/discipline-current-approval.test.ts > unresolved latest delta blocks planning and legacy unbound approvals are not silently trusted
+[2026-10-01T05:55:43.591Z] [INFO]  Discipline session abandoned: ed46ff58-a7d8-4f81-826d-5e5ae1fda3d0
+
+ ✓ tests/discipline-current-approval.test.ts (4 tests) 347ms
+
+ Test Files  3 passed (3)
+      Tests  196 passed (196)
+   Start at  08:55:36
+   Duration  7.38s (transform 2.35s, setup 0ms, collect 7.46s, tests 5.85s, environment 1ms, prepare 432ms)
+

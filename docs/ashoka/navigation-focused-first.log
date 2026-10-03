@@ -1,0 +1,32 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-02T13:19:11.025Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/plan-context-integration.test.ts (6 tests) 1945ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  927ms
+   ✓ verified implementation evidence is distinct from the next slice and recovers after a transcript-free read  382ms
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T13:19:12.187Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T13:19:12.215Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/graph-publication.test.ts (20 tests) 1710ms
+   ✓ canonical graph publication > holds sole kernel writer ownership across processes and releases it on crash  613ms
+stderr | tests/architect-plan-authority.test.ts > actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan
+[2026-10-02T13:19:16.713Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+ ✓ tests/architect-plan-authority.test.ts (7 tests) 9493ms
+   ✓ reads never import legacy success; preview/import retain exact bytes and recover one lost reply  389ms
+   ✓ the frozen actual Ashoka definition and log keep completed cards muted and current work navigable before lifecycle import  3820ms
+   ✓ actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan  866ms
+   ✓ archive refuses a running/recovery lease and keeps original artifacts on failure  394ms
+   ✓ the real Architect script exposes readable running/current markers, slice filters and keyboard navigation  3734ms
+
+ Test Files  3 passed (3)
+      Tests  33 passed (33)
+   Start at  16:19:03
+   Duration  17.98s (transform 3.02s, setup 0ms, collect 13.80s, tests 13.15s, environment 1ms, prepare 476ms)
+

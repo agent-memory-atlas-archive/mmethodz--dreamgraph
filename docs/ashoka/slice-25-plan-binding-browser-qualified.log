@@ -1,0 +1,23 @@
+[2026-10-02T09:04:03.209Z] [INFO]  Creating instance b5d493c6-35c3-47bc-8501-a6950731ae40 (browser-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-be9MJp\master\b5d493c6-35c3-47bc-8501-a6950731ae40
+[2026-10-02T09:04:03.294Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-be9MJp\master\instances.json
+[2026-10-02T09:04:03.295Z] [INFO]  Registered new instance b5d493c6-35c3-47bc-8501-a6950731ae40 (browser-fixture)
+[2026-10-02T09:04:03.303Z] [INFO]  Instance b5d493c6-35c3-47bc-8501-a6950731ae40 created successfully
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+browserType.launch: Executable doesn't exist at C:\Users\Mika Jussila\AppData\Local\ms-playwright\chromium_headless_shell-1234\chrome-headless-shell-win64\chrome-headless-shell.exe
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     npx playwright install                                 ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+    at C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-architect.mjs:22:25 {
+  log: [],
+  name: 'Error'
+}
+
+Node.js v25.2.1

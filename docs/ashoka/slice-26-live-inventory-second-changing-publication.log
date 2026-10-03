@@ -1,0 +1,8 @@
+file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/docs/ashoka/inventory-live-26.mjs:17
+const after=await optional('publication_state.json');if(hash(before??'absent')!==hash(after??'absent'))throw Error('PUBLICATION_CHANGED_DURING_READ_ONLY_INVENTORY');
+                                                                                                             ^
+
+Error: PUBLICATION_CHANGED_DURING_READ_ONLY_INVENTORY
+    at file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/docs/ashoka/inventory-live-26.mjs:17:110
+
+Node.js v25.2.1

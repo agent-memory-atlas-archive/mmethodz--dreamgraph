@@ -1,0 +1,5 @@
+
+> dreamgraph@13.4.0 metrics:check
+> tsx scripts/generate-metric-definitions.mjs --check
+
+Qualified 13 shared metric definitions

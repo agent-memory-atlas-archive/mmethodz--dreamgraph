@@ -1,0 +1,10 @@
+
+> dreamgraph@13.4.0 docs:architecture-tree
+> node scripts/generate-architecture-tree.mjs
+
+Updated docs/architecture.md source tree section.
+
+> dreamgraph@13.4.0 config:inventory
+> tsx scripts/generate-configuration-inventory.mjs
+
+Configuration inventory: 308 typed entries, 101 literal source keys, 0 documentation-only names

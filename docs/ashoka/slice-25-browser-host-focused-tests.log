@@ -1,0 +1,69 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/architect-native-tool-loop.test.ts (23 tests) 35ms
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:25:14.516Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:25:14.526Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:25:14.532Z] [INFO]  Architect native tool loop: calling edit_file
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:25:15.002Z] [INFO]  Architect native tool loop: calling scan_project
+
+ ✓ tests/architect-cli-bridge.test.ts (4 tests) 6ms
+ ✓ tests/architect-managed-context.test.ts (3 tests) 2246ms
+   ✓ native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt  1697ms
+stderr | tests/architect-cli-controls.test.ts > codex-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity
+[2026-10-01T22:25:16.356Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ❯ tests/host-managed-execution.test.ts (16 tests | 1 failed) 6947ms
+   ✓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass  575ms
+   ✓ parallel host passes share their authenticated owner while another client cannot read or close them  430ms
+   ✓ a worker credential cannot issue a new grant, close another host pass or change its chosen identity 190ms
+   ✓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable  609ms
+   ✓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block  359ms
+   ✓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts  344ms
+   ✓ editor CLI byte admission refuses the whole over-budget request before acknowledging or launching it 176ms
+   ✓ editor CLI cancellation preserves unconfirmed descendant termination instead of proving a no-change pass 242ms
+   ✓ editor CLI pre-launch failure settles without model work; cancellation during acknowledgement cannot yield a launchable prompt 228ms
+   ✓ the actual editor host records exact review before activation; replay cannot replenish consumed effects  534ms
+   ✓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads  463ms
+   ✓ an authenticated owner fences in-flight review; queued HTTP review cannot bypass the changed checkpoint  343ms
+   ✓ review cannot exceed the original effect ceiling or approve a changed named source 252ms
+   ✓ the actual portable SDK recovers a lost approval reply without reissuing a grant or extending expiry 281ms
+   ✓ a published review alone grants no effect; the unchanged live host can recover activation exactly once  308ms
+   × a saved review cannot reactivate after the actual lease expires 1611ms
+     → expected [Function] to throw error including 'AUTHORITY_UNAVAILABLE' but got 'MANAGED_APPROVAL_UNAVAILABLE: HTTP 40…'
+ ✓ tests/architect-cli-controls.test.ts (8 tests) 34662ms
+   ✓ daemon command perimeter rejects missing/excess grants and observes actual process cancellation  570ms
+   ✓ codex-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity  17618ms
+   ✓ copilot-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity  16442ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/host-managed-execution.test.ts > a saved review cannot reactivate after the actual lease expires
+AssertionError: expected [Function] to throw error including 'AUTHORITY_UNAVAILABLE' but got 'MANAGED_APPROVAL_UNAVAILABLE: HTTP 40…'
+
+Expected: "AUTHORITY_UNAVAILABLE"
+Received: "MANAGED_APPROVAL_UNAVAILABLE: HTTP 409: {"error":"HOST_EXECUTION_REJECTED","message":"Error: EXECUTION_POLICY_EXPIRED"}"
+
+ ❯ tests/host-managed-execution.test.ts:277:2
+    275|  await host.approveExecution(review);
+    276|  await vi.waitFor(async()=>expect((await host.readExecution(checkpoint…
+    277|  await expect(host.approveExecution(review)).rejects.toThrow("AUTHORIT…
+       |  ^
+    278|  await host.finishExecution(checkpoint.execution_id,"completed","confi…
+    279| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 53 passed (54)
+   Start at  01:25:09
+   Duration  38.96s (transform 2.47s, setup 0ms, collect 16.49s, tests 43.90s, environment 1ms, prepare 738ms)
+

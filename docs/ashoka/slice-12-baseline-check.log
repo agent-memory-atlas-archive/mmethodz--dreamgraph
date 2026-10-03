@@ -1,0 +1,5 @@
+
+> dreamgraph@13.4.0 ashoka:baseline:check
+> tsx scripts/freeze-ashoka-baseline.mjs
+
+{"status":"verified","owners":29,"cases":12,"evidence":8,"sha256":"dedd54b50636e6fbcbff9c67275074cf407c4699bb133b414d79a6f9e658efaf"}

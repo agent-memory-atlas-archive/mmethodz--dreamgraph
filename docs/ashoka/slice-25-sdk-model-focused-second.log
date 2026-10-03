@@ -1,0 +1,284 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/agent-usefulness.test.ts (9 tests) 119ms
+stderr | tests/host-managed-execution.test.ts > SDK native worker performs one actual governed source effect and retains durable source debt rather than graph completion
+[2026-10-02T04:51:30.953Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T04:51:30.953Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T04:51:30.954Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > SDK worker reads canonical plugin graph evidence through the actual manager/resource transport without inheriting host authority
+[2026-10-02T04:51:34.274Z] [INFO]  Plugin discovery: 1 candidate(s); allowInProcessPlugins=true
+[2026-10-02T04:51:34.275Z] [WARN]  plugin fixture.sdk@1.0.0 loaded with FULL HOST TRUST (in-process)
+
+stderr | tests/host-managed-execution.test.ts > SDK worker reads canonical plugin graph evidence through the actual manager/resource transport without inheriting host authority
+[2026-10-02T04:51:34.275Z] [INFO]  Plugins loaded: 1; rejected: 0
+
+stderr | tests/host-managed-execution.test.ts > SDK worker reads canonical plugin graph evidence through the actual manager/resource transport without inheriting host authority
+[2026-10-02T04:51:34.287Z] [INFO]  Plugin fixture.sdk registered resource 'plugin://fixture.sdk/context'
+
+stderr | tests/host-managed-execution.test.ts > SDK worker reads canonical plugin graph evidence through the actual manager/resource transport without inheriting host authority
+[2026-10-02T04:51:34.287Z] [INFO]  Plugin fixture.sdk activated (0 subscription(s))
+
+stderr | tests/host-managed-execution.test.ts > SDK worker reads canonical plugin graph evidence through the actual manager/resource transport without inheriting host authority
+[2026-10-02T04:51:34.401Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T04:51:34.401Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T04:51:34.402Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-02T04:51:34.403Z] [INFO]  Plugin contributions wired into session: 0 tool(s), 1 resource(s)
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5933,"approxTokens":1484}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":6845,"approxTokens":1712}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":9402,"approxTokens":2351}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5924,"approxTokens":1481}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":9098,"approxTokens":2275}
+
+stderr | tests/host-managed-execution.test.ts > compiled editor Undo restores exact Unicode/BOM/mixed newline bytes through actual HTTP/MCP source owners and retains graph debt
+[2026-10-02T04:51:47.747Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T04:51:47.747Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T04:51:47.747Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > compiled editor Undo for a created file uses the actual source owner and exact absent/hash precondition
+[2026-10-02T04:51:48.245Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T04:51:48.245Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T04:51:48.246Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > compiled editor Undo for a deleted file uses the actual source owner and exact absent/hash precondition
+[2026-10-02T04:51:48.715Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T04:51:48.715Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T04:51:48.715Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > a changed editor authority refuses Undo before admission and retains a retryable original review
+[2026-10-02T04:51:49.418Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T04:51:49.418Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T04:51:49.419Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > a lost operator closure acknowledgement retains recovery and duplicate Undo/Keep cannot repeat or erase it
+[2026-10-02T04:51:49.883Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T04:51:49.883Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T04:51:49.884Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > captured review copies cannot mutate the baseline/authority and stale IDs cannot clear or undo a later edit
+[2026-10-02T04:51:50.402Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T04:51:50.402Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T04:51:50.402Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > operator message-action errors retain the complete actual owner payload and a failed trace, with no local alias fallback
+[2026-10-02T04:51:51.782Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T04:51:51.783Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T04:51:51.783Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > an explicit operator message action records changed-file review under its original daemon and retains the actual source closure
+[2026-10-02T04:51:52.250Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T04:51:52.250Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T04:51:52.251Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stderr | tests/host-managed-execution.test.ts > a returned message action persists its original instance outcome and never labels pending source debt as completed after selection changes
+[2026-10-02T04:51:52.700Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T04:51:52.700Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T04:51:52.700Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+stdout | tests/host-managed-execution.test.ts > the actual compiled native serializer reserves the whole Unicode wire before provider HTTP and reports real reply usage
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5393,"approxTokens":1349}
+
+stdout | tests/host-managed-execution.test.ts > a known zero paid allocation refuses the compiled native provider before dispatch without inventing unsettled work
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":5339,"approxTokens":1335}
+
+stdout | tests/host-managed-execution.test.ts > a lost native permit reply cannot launch or retry through the compiled adapter
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":5360,"approxTokens":1340}
+
+stdout | tests/host-managed-execution.test.ts > a lost actual native settlement report fences continuation while preserving settled usage and the original report
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":5360,"approxTokens":1340}
+
+stdout | tests/host-managed-execution.test.ts > successive native requests share the original cumulative call ceiling and a refused continuation cannot reach provider HTTP
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":5357,"approxTokens":1340}
+
+stdout | tests/host-managed-execution.test.ts > successive native requests share the original cumulative call ceiling and a refused continuation cannot reach provider HTTP
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":5397,"approxTokens":1350}
+
+stdout | tests/host-managed-execution.test.ts > native Responses streaming remains live while admission and terminal usage stay with the original host
+[DreamGraph][llm_input_budget] {"callsite":"streamOpenAIResponses","model":"gpt-4.1","inputChars":5462,"approxTokens":1366}
+
+stdout | tests/host-managed-execution.test.ts > an actual native stream ending without provider completion retains uncertainty and never authorizes another request
+[DreamGraph][llm_input_budget] {"callsite":"streamOpenAIResponses","model":"gpt-4.1","inputChars":5468,"approxTokens":1367}
+
+stdout | tests/host-managed-execution.test.ts > native local streaming handles fragmented NDJSON and reports local usage only after an explicit completion
+[DreamGraph][llm_input_budget] {"callsite":"streamOllama","model":"qwen3:8b","inputChars":2989,"approxTokens":748}
+
+stdout | tests/host-managed-execution.test.ts > native Anthropic messages retain the selected model, finite output and actual terminal usage without transporting credentials to the daemon
+[DreamGraph][llm_input_budget] {"callsite":"callAnthropic","model":"claude-haiku-4-5","inputChars":2955,"approxTokens":739}
+
+stdout | tests/host-managed-execution.test.ts > a native 429 is a known request rejection while a disallowed explicit retry remains fenced before another provider request
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5402,"approxTokens":1351}
+
+stdout | tests/host-managed-execution.test.ts > a native 429 is a known request rejection while a disallowed explicit retry remains fenced before another provider request
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5377,"approxTokens":1345}
+
+stdout | tests/host-managed-execution.test.ts > native API cancellation stops the host wait without claiming a still-running provider fixture terminated
+[DreamGraph][llm_input_budget] {"callsite":"streamOpenAIResponses","model":"gpt-4.1","inputChars":5453,"approxTokens":1364}
+
+stdout | tests/host-managed-execution.test.ts > an oversized native provider response is refused whole with unknown liability and cannot resume model dispatch
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":5369,"approxTokens":1343}
+
+stdout | tests/host-managed-execution.test.ts > the compiled read-only model helper supplies whole fresh graph context and closes its original host scope
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":5404,"approxTokens":1351}
+
+stdout | tests/host-managed-execution.test.ts > compiled Explain File and ADR Compliance use the same original host graph/model authority
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":41892,"approxTokens":10473}
+
+stdout | tests/host-managed-execution.test.ts > compiled Explain File and ADR Compliance use the same original host graph/model authority
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":43234,"approxTokens":10809}
+
+stdout | tests/host-managed-execution.test.ts > compiled command Cancel propagates to native HTTP and cannot publish a successful answer or confirm remote termination
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAI","model":"gpt-4.1","inputChars":41892,"approxTokens":10473}
+
+ ❯ tests/host-managed-execution.test.ts (120 tests | 1 failed) 50083ms
+   ✓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass  481ms
+   ✓ parallel host passes share their authenticated owner while another client cannot read or close them  351ms
+   ✓ a worker credential cannot issue a new grant, close another host pass or change its chosen identity 174ms
+   ✓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable  529ms
+   ✓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block  324ms
+   ✓ editor initialization cancellation stops only its caller and preserves another caller on the shared handshake 226ms
+   ✓ sdk initialization cancellation stops only its caller and preserves another caller on the shared handshake 227ms
+   ✓ editor freezes nested exact approvals before the shared session wait 167ms
+   ✓ sdk freezes nested exact approvals before the shared session wait 162ms
+   ✓ editor disposal prevents a delayed noncooperative handshake from dispatching or restoring authority 68ms
+   ✓ sdk disposal prevents a delayed noncooperative handshake from dispatching or restoring authority 66ms
+   ✓ editor session readiness cannot redirect a queued authority call to a replacement endpoint 154ms
+   ✓ editor changed endpoints reject late handshake replies rather than adopting a new owner 71ms
+   ✓ SDK constructor options cannot be mutated into a different transport after construction 155ms
+   ✓ SDK native lifecycle captures request/port identities, refreshes each continuation and preserves whole literal results  302ms
+   ✓ SDK handoff rejects a clipped exact checkpoint before worker dispatch and never acknowledges it 158ms
+   ✓ SDK native worker performs one actual governed source effect and retains durable source debt rather than graph completion  383ms
+   ✓ SDK wait cancellation keeps a noncooperative callback and late successful reply termination-unconfirmed  328ms
+   ✓ SDK native termination requires explicit harness evidence and never derives it from settled successful prose 254ms
+   ✓ SDK refuses missing native termination evidence instead of treating callback settlement as confirmation 224ms
+   ✓ SDK total pass deadline cancels a noncooperative native wait without claiming that underlying work stopped  1175ms
+   ✓ SDK lost admission retains its original ID, inspects only that owner and can close without repeating admission 168ms
+   ✓ SDK lost closure retries only its captured confirmed termination after actual owner closure, without repeating native work 226ms
+   ✓ SDK lost closure retries only its captured unconfirmed termination after actual owner closure, without repeating native work 277ms
+   ✓ SDK late inspection cannot replace its confirmed inactive closure with an earlier active snapshot 168ms
+   ✓ SDK refresh rejects a foreign execution receipt before handoff or new worker dispatch 233ms
+   ✓ SDK worker reads canonical plugin graph evidence through the actual manager/resource transport without inheriting host authority 243ms
+   ✓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts 290ms
+   ✓ editor CLI byte admission refuses the whole over-budget request before acknowledging or launching it 161ms
+   ✓ editor CLI cancellation preserves unconfirmed descendant termination instead of proving a no-change pass 226ms
+   ✓ editor CLI pre-launch failure settles without model work; cancellation during acknowledgement cannot yield a launchable prompt 196ms
+   ✓ the actual editor host records exact review before activation; replay cannot replenish consumed effects  402ms
+   ✓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads  387ms
+   ✓ an authenticated owner fences in-flight review; queued HTTP review cannot bypass the changed checkpoint  302ms
+   ✓ review cannot exceed the original effect ceiling or approve a changed named source 240ms
+   ✓ the actual portable SDK recovers a lost approval reply without reissuing a grant or extending expiry  301ms
+   ✓ a published review alone grants no effect; the unchanged live host can recover activation exactly once  304ms
+   ✓ a saved review cannot reactivate after the actual lease expires  1678ms
+   ✓ the actual editor rendezvous waits before the graph writer, then publishes approval before one unchanged source effect  541ms
+   ✓ the actual SDK operator decline settles the pending tool without granting or executing an effect 289ms
+   ✓ request cancellation removes an enabled review wait without invoking the effect owner 277ms
+   ✓ the editor review controller retains literal exact proposals and retries lost acknowledgement without repeating effects  487ms
+   ✓ the editor controller declines the captured daemon action without dispatch or approval publication 269ms
+   ✓ editor review decisions cannot redirect through a changed endpoint 257ms
+   ✓ native editor admission delivers whole replacement evidence, uses the actual worker MCP fence and closes unchanged source with durable review  669ms
+   ✓ native editor source changes retain reconciliation debt rather than reporting a graph commit  374ms
+   ✓ native editor commands execute at the actual daemon owner with exact review and complete source observation  674ms
+   ✓ native editor cancelled waiting closes promptly with underlying callback termination unconfirmed 220ms
+   ✓ native editor Unicode request byte refusal happens before delivery and dispatch 182ms
+   ✓ native editor captured instance mismatch refuses before delivery and revokes the owned lease 166ms
+   ✓ an independently cancelled native round blocks fresh dispatch until its unknown outcome closes 223ms
+   ✓ the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation  2079ms
+   ✓ the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation  1761ms
+   ✓ compiled editor Undo restores exact Unicode/BOM/mixed newline bytes through actual HTTP/MCP source owners and retains graph debt  521ms
+   ✓ compiled editor Undo for a created file uses the actual source owner and exact absent/hash precondition  476ms
+   ✓ compiled editor Undo for a deleted file uses the actual source owner and exact absent/hash precondition  495ms
+   ✓ Undo refuses a file changed after its review without dispatching authority or overwriting user bytes 207ms
+   ✓ a changed editor authority refuses Undo before admission and retains a retryable original review  472ms
+   ✓ a lost operator closure acknowledgement retains recovery and duplicate Undo/Keep cannot repeat or erase it  513ms
+   ✓ captured review copies cannot mutate the baseline/authority and stale IDs cannot clear or undo a later edit  466ms
+   ✓ lost operator admission can close the same original lease without dispatching any tool or minting a replacement  338ms
+   ✓ operator recovery cannot turn actual unknown termination into a successful closure or redirect to a different instance  401ms
+   ✓ Stop invalidates queued review clicks before their second owner dispatch 187ms
+   ✓ operator message-action errors retain the complete actual owner payload and a failed trace, with no local alias fallback  465ms
+   ✓ an explicit operator message action records changed-file review under its original daemon and retains the actual source closure  454ms
+   ✓ a returned message action persists its original instance outcome and never labels pending source debt as completed after selection changes  475ms
+   ✓ expired lost-ack review recovers only by reading the original settled closure, without renewing approval or repeating its effect  1399ms
+   ✓ review inspection retains actual unknown termination and disables historical approval after revocation  498ms
+   ✓ inspection of a pending review fences continuation when its original authority was revoked with unknown termination  333ms
+   ✓ Stop during a noncooperative inspection cannot resurrect a retired pending review from a late original-host reply  319ms
+   ✓ a compiled palette command uses the original daemon owner, records actual source change and keeps reconciliation separate from exit zero  652ms
+   ✓ a compiled palette capture refuses a later instance selection before any execution admission or local shell fallback 203ms
+   ✓ palette invocation without an original daemon refuses before dispatch and leaves source unchanged 67ms
+   ✓ the actual palette captures before prompting and shows complete owner evidence with a pending warning despite exit zero 67ms
+   ✓ the actual build palette preserves literal root ext-prefixed script identity and refuses unsafe script names without dispatch 71ms
+   ✓ native-host API accounting reserves the complete Unicode wire before any provider dispatch and recovers exact settlement after closure  444ms
+   ✓ native-host permits require whole delivered context, original owner and host-only transport 276ms
+   ✓ zero paid allocation or unknown exact tariff cannot issue native-host permits  470ms
+   ✓ native-host requests keep one policy and a shared cumulative run/retry ceiling across changed configuration  655ms
+   ✓ a lost native permit response retains liability, read-only recovery and unknown closure instead of authorizing retry  695ms
+   ✓ native-host deadline stops permit waiting without attesting native work stopped or dropping its liability  1467ms
+   ✓ CLI host accounting stays subscription-unmeasured and cannot borrow an API monetary allowance  580ms
+   ✓ the portable SDK admission port preserves original permit/report identities and read-only outcomes  362ms
+   ✓ native wire model/output/retention/effort and frontier temperature mismatches refuse before ledger dispatch  343ms
+   ✓ an unconfirmed native report keeps actual partial usage, blocks another permit and cannot strengthen termination on retry  450ms
+   ✓ native-host permits preserve a shorter configured model timeout independently of the longer host authority  975ms
+   ✓ the actual compiled native serializer reserves the whole Unicode wire before provider HTTP and reports real reply usage  397ms
+   ✓ a known zero paid allocation refuses the compiled native provider before dispatch without inventing unsettled work 273ms
+   ✓ a lost native permit reply cannot launch or retry through the compiled adapter  397ms
+   ✓ a lost actual native settlement report fences continuation while preserving settled usage and the original report  414ms
+   ✓ successive native requests share the original cumulative call ceiling and a refused continuation cannot reach provider HTTP  508ms
+   ✓ native Responses streaming remains live while admission and terminal usage stay with the original host  395ms
+   ✓ an actual native stream ending without provider completion retains uncertainty and never authorizes another request  416ms
+   ✓ native local streaming handles fragmented NDJSON and reports local usage only after an explicit completion  360ms
+   ✓ native Anthropic messages retain the selected model, finite output and actual terminal usage without transporting credentials to the daemon  349ms
+   ✓ a native 429 is a known request rejection while a disallowed explicit retry remains fenced before another provider request  522ms
+   ✓ native API cancellation stops the host wait without claiming a still-running provider fixture terminated  420ms
+   ✓ an oversized native provider response is refused whole with unknown liability and cannot resume model dispatch  430ms
+   ✓ the production native model guard refuses all bare API methods before provider dispatch 220ms
+   ✓ the compiled read-only model helper supplies whole fresh graph context and closes its original host scope  571ms
+   ✓ read-only native admission refuses a changed selected instance before provider dispatch  378ms
+   ✓ a read-only native admission acknowledgement loss retains the exact original identity and cannot call the provider  361ms
+   ✓ an uncertain managed timeout cannot silently spend through a fresh recovery stream 71ms
+   ✓ compiled Explain File and ADR Compliance use the same original host graph/model authority  876ms
+   ✓ compiled command authority is captured before asynchronous context reads and refuses changed selection without inference 252ms
+   ✓ compiled native commands honour an already-cancelled progress token before context or paid work starts 249ms
+   ✓ compiled command Cancel propagates to native HTTP and cannot publish a successful answer or confirm remote termination  556ms
+   ✓ native CLI prompt reserves original invocation liability with unclaimed API provenance and unmeasured usage  337ms
+   ✓ native CLI continues under the same cumulative ledger, never a fresh allocation after each prompt  457ms
+   ✓ lost native CLI permit acknowledgement cannot allocate a replacement or confirm closure  361ms
+   ✓ native CLI cancellation/report loss retains original liability and cannot strengthen descendant termination  379ms
+   ✓ native CLI enforces its shorter core permit deadline without proving native work stopped  646ms
+   ✓ native API still refuses an unresolved provider despite the CLI binding amendment 227ms
+   ✓ compiled native CLI option builders require the original pass and await its model reservation and report  694ms
+   × portable SDK model execution reserves before actual native HTTP and reports observed protocol usage under the same graph pass 347ms
+     → expected '{"narrative":"Source observed and con…' to be 'Source observed and context retained.' // Object.is equality
+   ✓ portable SDK lost model admission keeps original inspection and never invokes a replacement callback  381ms
+   ✓ portable SDK report loss permits exact report recovery without a stronger termination claim or new request  385ms
+   ✓ portable SDK model timeout rejects waiting while its declared noncooperative callback remains running  691ms
+   ✓ portable SDK rejects successful prose without explicit provider observation and preserves unknown work  380ms
+   ✓ portable SDK callback gets the captured final request despite mutation during asynchronous admission  332ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/host-managed-execution.test.ts > portable SDK model execution reserves before actual native HTTP and reports observed protocol usage under the same graph pass
+AssertionError: expected '{"narrative":"Source observed and con…' to be 'Source observed and context retained.' // Object.is equality
+
+Expected: "Source observed and context retained."
+Received: "{"narrative":"Source observed and context retained.","summary":"Source observed and context retained.","goal_status":"complete","progress_status":"advancing","uncertainty":"low","recommended_next_steps":[]}"
+
+ ❯ tests/host-managed-execution.test.ts:1602:22
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 128 passed (129)
+   Start at  07:51:18
+   Duration  59.07s (transform 2.94s, setup 0ms, collect 8.78s, tests 50.20s, environment 0ms, prepare 326ms)
+

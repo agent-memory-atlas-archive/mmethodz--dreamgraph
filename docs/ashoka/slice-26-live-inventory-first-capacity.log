@@ -1,0 +1,8 @@
+file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/docs/ashoka/inventory-live-26.mjs:9
+for(const file of files){const bytes=await readFile(join(directory,file));if(bytes.length>32*1024*1024)throw Error('Inventory capacity: '+file);const row={file,bytes:bytes.length,sha256:hash(bytes)};
+                                                                                                             ^
+
+Error: Inventory capacity: candidate_edges.json
+    at file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/docs/ashoka/inventory-live-26.mjs:9:110
+
+Node.js v25.2.1

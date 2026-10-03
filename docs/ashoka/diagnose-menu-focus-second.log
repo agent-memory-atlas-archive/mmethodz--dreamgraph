@@ -1,0 +1,31 @@
+{
+  "trace": [
+    {
+      "connected": true,
+      "same": true,
+      "visibility": "visible",
+      "rect": {
+        "x": 342,
+        "y": 18,
+        "width": 360,
+        "height": 57.59375,
+        "top": 18,
+        "right": 702,
+        "bottom": 75.59375,
+        "left": 342
+      },
+      "active": "Action 0"
+    }
+  ],
+  "active": "Action 0",
+  "rect": {
+    "x": 332,
+    "y": 8,
+    "width": 380,
+    "height": 244,
+    "top": 8,
+    "right": 712,
+    "bottom": 252,
+    "left": 332
+  }
+}

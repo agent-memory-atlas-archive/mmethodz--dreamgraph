@@ -1,0 +1,212 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+[2026-10-02T11:48:11.029Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+[2026-10-02T11:48:12.335Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T11:48:12.461Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T11:48:12.640Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:48:12.641Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T11:48:12.686Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T11:48:12.847Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T11:48:12.990Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":0,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:48:12.991Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T11:48:13.036Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T11:48:13.188Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T11:48:13.308Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T11:48:13.407Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T11:48:13.556Z] [INFO]  LLM provider: none (model: other-writer)
+[2026-10-02T11:48:13.557Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:48:13.557Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T11:48:13.593Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+[2026-10-02T11:48:13.695Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+[2026-10-02T11:48:14.084Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:48:14.199Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:48:14.238Z] [WARN]  LLM: OpenAI provider configured but no API key set (DREAMGRAPH_LLM_API_KEY)
+[2026-10-02T11:48:14.238Z] [INFO]  LLM provider: openai (model: gpt-5.4)
+[2026-10-02T11:48:14.239Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:48:14.239Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:48:14.248Z] [INFO]  LLM dreamer config: model=gpt-5.4-mini, temp=0, maxTokens=1600
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:48:14.313Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:48:14.348Z] [ERROR] Scheduler tick: Error: GRAPH_REVISION_CONFLICT: read publication changed; retry the whole snapshot
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T11:48:14.433Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T11:48:14.481Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T11:48:14.489Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T11:48:14.586Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T11:48:14.749Z] [INFO]  LLM architect config: provider=none (general), model=old-model (general), temp=0.7, maxTokens=2048
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T11:48:14.927Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ❯ tests/configuration-workspace.test.ts (9 tests | 4 failed) 4002ms
+   ✓ maps every consumed setting to one typed control or named read-only exception without leaking stored secrets  1437ms
+   × keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work 380ms
+     → ENOTEMPTY: directory not empty, rmdir 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-vBOoKv'
+   × edits structured component settings and retains explicit zeros/default inheritance through restart parsing 339ms
+     → ENOTEMPTY: directory not empty, rmdir 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-1HEuEP'
+   × retains a whole captured save after a committed lost reply and recovers that receipt without a second effect 228ms
+     → expected 'Saving the captured configuration req…' to contain 'uncertain'
+   × keeps drafts on concurrent revision refusal and never overwrites the intervening file 286ms
+     → ENOTEMPTY: directory not empty, rmdir 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-ozF6Y7'
+   ✓ previews a scoped template without writes, applies protected staging and undoes the original bytes  507ms
+   ✓ generic apply refreshes actual cached model controls and daemon role readback without touching session overrides 234ms
+   ✓ reports a staged deletion as a mismatch until restart clears the old runtime override 153ms
+   ✓ root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry  436ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+Error: ENOTEMPTY: directory not empty, rmdir 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-vBOoKv'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+Error: ENOTEMPTY: directory not empty, rmdir 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-1HEuEP'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+AssertionError: expected 'Saving the captured configuration req…' to contain 'uncertain'
+
+Expected: "uncertain"
+Received: "Saving the captured configuration request…"
+
+ ❯ tests/configuration-workspace.test.ts:105:62
+    103|   edit(document, "DREAMGRAPH_LLM_MODEL", "new-model"); (document.query…
+    104|   await eventually(() => !(document.querySelector("#cw-retry") as HTML…
+    105|   expect(document.querySelector("#cw-message")!.textContent).toContain…
+       |                                                              ^
+    106|   (document.querySelector("#cw-retry") as HTMLButtonElement).click(); …
+    107|   expect(payloads).toHaveLength(2); expect(payloads[1]).toBe(payloads[…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+Error: ENOTEMPTY: directory not empty, rmdir 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-settings-workspace-ozF6Y7'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 6 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'getElementById')
+ ❯ $ ../../../../../..//config/workspace.js:3:28
+ ❯ message ../../../../../..//config/workspace.js:8:29
+ ❯ load ../../../../../..//config/workspace.js:143:19
+
+This error originated in "tests/configuration-workspace.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "maps every consumed setting to one typed control or named read-only exception without leaking stored secrets". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'getElementById')
+ ❯ $ ../../../../../..//config/workspace.js:3:28
+ ❯ controls ../../../../../..//config/workspace.js:19:125
+ ❯ perform ../../../../../..//config/workspace.js:149:24
+
+This error originated in "tests/configuration-workspace.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'getElementById')
+ ❯ $ ../../../../../..//config/workspace.js:3:28
+ ❯ controls ../../../../../..//config/workspace.js:19:125
+ ❯ perform ../../../../../..//config/workspace.js:149:24
+
+This error originated in "tests/configuration-workspace.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "edits structured component settings and retains explicit zeros/default inheritance through restart parsing". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'getElementById')
+ ❯ $ ../../../../../..//config/workspace.js:3:28
+ ❯ message ../../../../../..//config/workspace.js:8:29
+ ❯ load ../../../../../..//config/workspace.js:143:19
+
+This error originated in "tests/configuration-workspace.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "retains a whole captured save after a committed lost reply and recovers that receipt without a second effect". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'getElementById')
+ ❯ $ ../../../../../..//config/workspace.js:3:28
+ ❯ controls ../../../../../..//config/workspace.js:19:125
+ ❯ perform ../../../../../..//config/workspace.js:149:24
+
+This error originated in "tests/configuration-workspace.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "retains a whole captured save after a committed lost reply and recovers that receipt without a second effect". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'getElementById')
+ ❯ $ ../../../../../..//config/workspace.js:3:28
+ ❯ controls ../../../../../..//config/workspace.js:19:125
+ ❯ perform ../../../../../..//config/workspace.js:149:24
+
+This error originated in "tests/configuration-workspace.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "previews a scoped template without writes, applies protected staging and undoes the original bytes". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 5 passed (9)
+     Errors  6 errors
+   Start at  14:48:04
+   Duration  10.66s (transform 2.04s, setup 0ms, collect 6.23s, tests 4.00s, environment 0ms, prepare 138ms)
+

@@ -1,0 +1,30 @@
+
+> dreamgraph-vscode@13.4.0 build
+> npm run lint:isolation && npm run build:webview && tsc -p ./tsconfig.json && npm run build:extension && npm run build:bridge && npm run build:vendor
+
+
+> dreamgraph-vscode@13.4.0 lint:isolation
+> node scripts/lint-isolation.mjs
+
+lint:isolation OK — architect-v2 quarantined; 0 violations.
+
+> dreamgraph-vscode@13.4.0 build:webview
+> esbuild src/webview/index.ts --bundle --outfile=dist/webview.js --format=iife --platform=browser
+
+
+  dist\webview.js  36.6kb
+
+Done in 64ms
+src/daemon-client.ts(174,15): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(174,82): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(175,60): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(175,89): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(175,117): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(187,49): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(192,15): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(192,56): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(193,40): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(193,72): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(194,19): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(198,55): error TS18046: 'body' is of type 'unknown'.
+src/daemon-client.ts(198,85): error TS18046: 'body' is of type 'unknown'.

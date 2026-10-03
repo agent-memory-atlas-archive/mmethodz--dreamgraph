@@ -1,0 +1,87 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5933,"approxTokens":1484}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":6833,"approxTokens":1709}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5924,"approxTokens":1481}
+
+ ❯ tests/host-managed-execution.test.ts (31 tests | 2 failed) 19101ms
+   ✓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass  457ms
+   ✓ parallel host passes share their authenticated owner while another client cannot read or close them  348ms
+   ✓ a worker credential cannot issue a new grant, close another host pass or change its chosen identity 171ms
+   ✓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable  484ms
+   ✓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block  300ms
+   ✓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts  350ms
+   ✓ editor CLI byte admission refuses the whole over-budget request before acknowledging or launching it 175ms
+   ✓ editor CLI cancellation preserves unconfirmed descendant termination instead of proving a no-change pass 224ms
+   ✓ editor CLI pre-launch failure settles without model work; cancellation during acknowledgement cannot yield a launchable prompt 187ms
+   ✓ the actual editor host records exact review before activation; replay cannot replenish consumed effects  412ms
+   ✓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads  360ms
+   ✓ an authenticated owner fences in-flight review; queued HTTP review cannot bypass the changed checkpoint 281ms
+   ✓ review cannot exceed the original effect ceiling or approve a changed named source 248ms
+   ✓ the actual portable SDK recovers a lost approval reply without reissuing a grant or extending expiry 269ms
+   ✓ a published review alone grants no effect; the unchanged live host can recover activation exactly once  321ms
+   ✓ a saved review cannot reactivate after the actual lease expires  1648ms
+   ✓ the actual editor rendezvous waits before the graph writer, then publishes approval before one unchanged source effect  511ms
+   ✓ the actual SDK operator decline settles the pending tool without granting or executing an effect 280ms
+   ✓ request cancellation removes an enabled review wait without invoking the effect owner 285ms
+   ✓ the editor review controller retains literal exact proposals and retries lost acknowledgement without repeating effects  491ms
+   ✓ the editor controller declines the captured daemon action without dispatch or approval publication 269ms
+   ✓ editor review decisions cannot redirect through a changed endpoint 244ms
+   ✓ native editor admission delivers whole replacement evidence, uses the actual worker MCP fence and closes unchanged source with durable review  674ms
+   ✓ native editor source changes retain reconciliation debt rather than reporting a graph commit  317ms
+   ✓ native editor commands execute at the actual daemon owner with exact review and complete source observation  677ms
+   ✓ native editor cancelled waiting closes promptly with underlying callback termination unconfirmed 200ms
+   ✓ native editor Unicode request byte refusal happens before delivery and dispatch 179ms
+   ✓ native editor captured instance mismatch refuses before delivery and revokes the owned lease 153ms
+   ✓ an independently cancelled native round blocks fresh dispatch until its unknown outcome closes 203ms
+   × the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation 4303ms
+     → expected 'idle' to be 'pending' // Object.is equality
+   × the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation 4079ms
+     → expected 'idle' to be 'pending' // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+AssertionError: expected 'idle' to be 'pending' // Object.is equality
+
+Expected: "pending"
+Received: "idle"
+
+ ❯ vi.waitFor.timeout tests/host-managed-execution.test.ts:548:67
+    546|  const running=panel.runAgenticLoop([{role:'user',content:'Inspect Hos…
+    547|  try{
+    548|   await vi.waitFor(()=>expect(panel._executionReview.view.status).toBe…
+       |                                                                   ^
+    549|   expect(modelRequests).toHaveLength(2);const checkpoint=await host.re…
+    550|   expect(checkpoint.pack.receipt.delivery).toBe('delivered');expect(JS…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+AssertionError: expected 'idle' to be 'pending' // Object.is equality
+
+Expected: "pending"
+Received: "idle"
+
+ ❯ vi.waitFor.timeout tests/host-managed-execution.test.ts:567:67
+    565|  const running=panel.runAgenticLoop([{role:'user',content:'Change sour…
+    566|  try{
+    567|   await vi.waitFor(()=>expect(panel._executionReview.view.status).toBe…
+       |                                                                   ^
+    568|   await panel._executionReview.decide(request.execution_id,request.app…
+    569|   expect(String(await running)).toContain('MANAGED_NATIVE_RECONCILIATI…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 29 passed (31)
+   Start at  02:28:13
+   Duration  25.18s (transform 1.99s, setup 0ms, collect 5.66s, tests 19.10s, environment 0ms, prepare 140ms)
+

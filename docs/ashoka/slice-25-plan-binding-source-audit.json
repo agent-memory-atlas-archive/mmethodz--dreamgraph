@@ -1,0 +1,230 @@
+{
+  "checkpoint": "slice-25-explicit-native-plan-task-binding",
+  "created_at": "2026-10-02T09:13:18.1282544Z",
+  "source_read": "complete physical bytes",
+  "root_passed": 1838,
+  "root_skipped": 2,
+  "files": 157,
+  "focused_passed": 38,
+  "new_cases": 13,
+  "editor_passed": 509,
+  "browser_checks": 29,
+  "consumer_checks": 9,
+  "baseline": 17,
+  "contracts": 42,
+  "baseline_16_preserved": true,
+  "native_audit": 106,
+  "limitations": "Original-host task purpose/source/closure integration with declared offline model/native callback fixtures. User-facing task preparation and independent stop recovery/full GE/UX/eight-surface/C17 remain open. No paid-model/native-GUI/other-platform or whole Slice25/release acceptance.",
+  "artifacts": [
+    {
+      "path": "src/evaluation/agent-usefulness.ts",
+      "bytes": 10097,
+      "sha256": "b22829f6183d53fa62e5772e482d7b69b2235f7a037f48e4c4000e2f40a176b7"
+    },
+    {
+      "path": "tests/agent-usefulness.test.ts",
+      "bytes": 8920,
+      "sha256": "716a05f07b0149979f39c5a0175434695d32c4f77dcb7ba028e997a847732f2b"
+    },
+    {
+      "path": "src/graph/contracts.ts",
+      "bytes": 28760,
+      "sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+    },
+    {
+      "path": "src/graph/execution-context.ts",
+      "bytes": 33254,
+      "sha256": "b8662907815ba441e4ae9a3d124e637a96c85c9beca99269b863814479de2647"
+    },
+    {
+      "path": "src/discipline/plan-runtime.ts",
+      "bytes": 15386,
+      "sha256": "efe2e00b227e8de8eedb9119fa22afce61d2f3f14e25d1ba4c4cd2fbec5469de"
+    },
+    {
+      "path": "src/discipline/plan-workflow.ts",
+      "bytes": 28760,
+      "sha256": "94492f73e2af80239cafd1385bf256f59f670d0c14eddf40a4c606e57e9fa373"
+    },
+    {
+      "path": "src/server/managed-execution.ts",
+      "bytes": 21629,
+      "sha256": "c00aabdda5c7707a98f14f1cd912d6f2e9048267c29a94ac30ac93ecadd0953a"
+    },
+    {
+      "path": "src/server/host-model-admission.ts",
+      "bytes": 13050,
+      "sha256": "c463ffd17bc6b83a17a55e4db2839f530f42f9cf117e06f7a3c8c5c4034e308d"
+    },
+    {
+      "path": "src/architect/plan-registry.ts",
+      "bytes": 56795,
+      "sha256": "41fde61070c4fbe17032aae7008d3bc21ccb1e84dd96708e3c79b21db4edff45"
+    },
+    {
+      "path": "src/architect/routes.ts",
+      "bytes": 646413,
+      "sha256": "4ddb9917581d5965a2193a8bb65a86095b92c69a67931951e2f352c69adb31d8"
+    },
+    {
+      "path": "src/architect/native-tool-loop.ts",
+      "bytes": 43876,
+      "sha256": "f74731fb92a96b2a3e3d71d4d27f7bf39cb6f43836b71ef7ecf84a7a616acf3e"
+    },
+    {
+      "path": "src/architect/cli-bridge.ts",
+      "bytes": 47315,
+      "sha256": "a671bab59191683b26a61fe7da6c93ef073285ec794615b165ffe800d3391fa3"
+    },
+    {
+      "path": "packages/sdk/src/seams/graph-execution.ts",
+      "bytes": 31131,
+      "sha256": "cc11d55b937a9686460863881a7f5628d079038d9be59d183ce2d0daaca0f006"
+    },
+    {
+      "path": "packages/sdk/src/graph-contracts.ts",
+      "bytes": 28837,
+      "sha256": "a2b53b30a4313b4be282c63baa9db89ee50113c48ba196cbe34b5ea637fe95a8"
+    },
+    {
+      "path": "extensions/vscode/src/daemon-client.ts",
+      "bytes": 20907,
+      "sha256": "f587ddf4bfd59022f469d4dedb5da2e9c3c5bdc26506dc64e9b066f0fbd9f623"
+    },
+    {
+      "path": "extensions/vscode/src/generated/graph-contracts.ts",
+      "bytes": 28840,
+      "sha256": "ff3eeb996272832fbddcea955502ba049269b451c840772f714dbd81d11e8fe3"
+    },
+    {
+      "path": "tests/managed-plan-execution.test.ts",
+      "bytes": 23911,
+      "sha256": "f7553747de94cc00f2216a1549ffa701d5787f99a7d46fb6cc9ac602a5797a82"
+    },
+    {
+      "path": "tests/helpers/compiled-editor.cjs",
+      "bytes": 3035,
+      "sha256": "9cba69f24a063f05acaecf30eb903ab81a8b4ce1933d7e52fc8aeba97ab1e5e9"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 82798,
+      "sha256": "b79c8a1020973cccc7e3a6f94b85dc064c8649b67e86ff0caa802fd5ffed438e"
+    },
+    {
+      "path": "docs/contracts/graph-contracts.v1.json",
+      "bytes": 228133,
+      "sha256": "4a3f97353da9013cca9f8ce8699d15ab18ef378912b0d053336b3fa167850999"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-qualified-root-tests-second.json",
+      "bytes": 621839,
+      "sha256": "22419441826ea5757c4b5101b24ffbd982a0d70b7603d05afe675497899d34ff"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-qualified-root-tests-second.log",
+      "bytes": 346686,
+      "sha256": "3661eb08a4df76568297c26afcb513130153acc95bd223fc5d1ea15162a657d7"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-focused-sixth.log",
+      "bytes": 2935,
+      "sha256": "bbf393ac7a2057d96570aa313682bd74488b3d8d56fe6a7805b2a739fa77c899"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-focused-fourth.log",
+      "bytes": 10707,
+      "sha256": "0aab66c78a9e1a963b87e1e92738f462864bd5191a8db17475b151f2ca402210"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-regression-isolation.log",
+      "bytes": 1208,
+      "sha256": "1ba6073f434d3ec91df7f28d2058b6339e1d56e617dccc4ce899652efd9db145"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-editor-tests-qualified-second.log",
+      "bytes": 46238,
+      "sha256": "4f24a1dc210e0232d9ecdeea7d9704a48d032826d0b2cb765893a93ee6c9a2e3"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-editor-build-third.log",
+      "bytes": 1628,
+      "sha256": "e69fd098f4e123d82f999ecd8d0910344214ced9dd64bf073dd6a695d4f49d2e"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-server-build-seventh.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-contracts-check.log",
+      "bytes": 214,
+      "sha256": "f07539ed26e1c65d0b64ae44313eb4d70d70c328f98dddfdd6f5bbe3718970c8"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-providers-check.log",
+      "bytes": 96,
+      "sha256": "06118bee7b5506c11123a1c0d2590c5c3ec5bda449dd82ceeac8696b8fe1d237"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-mcp-check.log",
+      "bytes": 1992,
+      "sha256": "82adff16eccaa0bc0ca3ec6beaf6e91c6141dfec9b3efb620fe61febaa56797b"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-config-check.log",
+      "bytes": 195,
+      "sha256": "7b377a5109972e6191e752f5c826bca9d56f21da5c6f5d147e4b35dc536f5677"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-metrics-check.log",
+      "bytes": 134,
+      "sha256": "80323cae2b6b39df4f20ff8e1171eb2436d2e059eb4cc426f377181baa2b471a"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-binding-ashoka-baseline-check.log",
+      "bytes": 224,
+      "sha256": "820a68479b9066ee23019438734f9c24f2b13be68b54abf63f045bba2d0dcb19"
+    },
+    {
+      "path": "docs/ashoka/browser-25-plan-binding-qualified-second/qualification.json",
+      "bytes": 6340,
+      "sha256": "79aa73654cb7b08a99a0e3ffe67e5acb788d24b46a79fea09a515559f2fe6fcc"
+    },
+    {
+      "path": "docs/ashoka/plan-consumers-native-binding-qualified/qualification.json",
+      "bytes": 10676,
+      "sha256": "123798a00049d526f08fdf2fa00a1602f41118a2d027e5afc070641cc24743cb"
+    },
+    {
+      "path": "docs/ashoka/client-integration.md",
+      "bytes": 48568,
+      "sha256": "8c417cfd24d34d650a6af408102ae9b3393a929a6fb783e4add776ce3643811d"
+    },
+    {
+      "path": "docs/ashoka/plan-authority.md",
+      "bytes": 12088,
+      "sha256": "382c7b120923b0d1c3d19525f29981a4e755ba9dca99c036b4c781f6b8795624"
+    },
+    {
+      "path": "docs/data-model.md",
+      "bytes": 44864,
+      "sha256": "9a3a1c3f332ff3e2a9cf7bc61725ffb907fce758c28ba92e21eb94d774edbe31"
+    },
+    {
+      "path": "docs/workflows.md",
+      "bytes": 46925,
+      "sha256": "c27b4380db8b7e8d43350800e5f77de215e21f54ca7477f01fff03c0410825a4"
+    },
+    {
+      "path": "plans/graph-trust-and-agent-effectiveness.md",
+      "bytes": 146847,
+      "sha256": "861d820a730703ea8b7e59f5d2b33fea775a65f762b43a2407b583ab49411b06"
+    },
+    {
+      "path": "plans/graph-trust-and-agent-effectiveness.implementation-log.md",
+      "bytes": 134872,
+      "sha256": "9e7d958a84788630b1971ecfff8ef84656821ecce47fc8bba03a671da6875099"
+    }
+  ]
+}

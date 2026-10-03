@@ -1,0 +1,45 @@
+{
+  "scope": "Complete source bytes read after frozen qualification; offline provider and VSCode boundary fixtures only",
+  "files": [
+    {
+      "path": "extensions/vscode/src/architect-llm.ts",
+      "bytes": 69790,
+      "sha256": "74d7fa74673f9f5f838695649efecd561c80506ac6978024f4695c184f92156d"
+    },
+    {
+      "path": "extensions/vscode/src/extension.ts",
+      "bytes": 12939,
+      "sha256": "9937b0c0b87c4cf28e768d01a56a1a32abff99a0205098f6f882fd08d34dd432"
+    },
+    {
+      "path": "extensions/vscode/src/managed-native-pass.ts",
+      "bytes": 11190,
+      "sha256": "671213fd2b972495396c8074485a51550fdbb8c2dd1972983eebd53c2172aa0a"
+    },
+    {
+      "path": "extensions/vscode/src/chat-panel.ts",
+      "bytes": 312175,
+      "sha256": "25f0d8b14254eafbc6ff066f36f595f45ef0811d44f12f77da98851fd479b71e"
+    },
+    {
+      "path": "extensions/vscode/src/commands.ts",
+      "bytes": 36322,
+      "sha256": "2910ad9e9eef7a7f4249d2d4c50debd6674075c148e4cf3ebe2c468b50dbedae"
+    },
+    {
+      "path": "tests/helpers/compiled-editor.cjs",
+      "bytes": 2604,
+      "sha256": "444c12aec1e2acda8508e89a3ea913eeb2c5dd88a3a4d0c1758a459d7bea8482"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 146469,
+      "sha256": "f305ff1ff4e579a627ff08c89e3914928befd4af82f12bdaf08cbfd650f5ddeb"
+    },
+    {
+      "path": "src/evaluation/agent-usefulness.ts",
+      "bytes": 10097,
+      "sha256": "b22829f6183d53fa62e5772e482d7b69b2235f7a037f48e4c4000e2f40a176b7"
+    }
+  ]
+}

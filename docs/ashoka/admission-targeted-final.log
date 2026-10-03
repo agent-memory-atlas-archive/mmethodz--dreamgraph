@@ -1,0 +1,711 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/agent-usefulness.test.ts (6 tests) 48ms
+ ✓ tests/model-execution.test.ts (6 tests) 864ms
+ ✓ tests/model-admission.test.ts (16 tests) 1753ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint
+[2026-10-01T00:06:04.331Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint
+[2026-10-01T00:06:04.442Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint
+[2026-10-01T00:06:04.444Z] [WARN]  Batch (openrct2::core, 1 nodes): ADMISSION_REQUEST_LIMIT: run fixture; checkpointed as retryable.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint
+[2026-10-01T00:06:04.476Z] [INFO]  Semantic enrichment batch 2: 0/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint
+[2026-10-01T00:06:04.503Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=3 batches=2 anchors=0 errors=2 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects an overlapping enrichment before another provider call or graph write
+[2026-10-01T00:06:04.521Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects an overlapping enrichment before another provider call or graph write
+[2026-10-01T00:06:04.607Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects an overlapping enrichment before another provider call or graph write
+[2026-10-01T00:06:04.632Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > restricts structured output to the complete input batch and the supplied typed target IDs
+[2026-10-01T00:06:04.641Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=2)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > restricts structured output to the complete input batch and the supplied typed target IDs
+[2026-10-01T00:06:04.687Z] [WARN]  Batch (openrct2::core, 2 nodes): validation_failed: 1 node(s) used deterministic fallback; missing enrichment for node contract-b
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > restricts structured output to the complete input batch and the supplied typed target IDs
+[2026-10-01T00:06:04.728Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 1 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > restricts structured output to the complete input batch and the supplied typed target IDs
+[2026-10-01T00:06:04.756Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced data_model link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:04.765Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced data_model link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:04.811Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 0 relation target type(s) from graph IDs; omitted 0 self link(s); converted 1 non-feature anchor(s) to typed relations.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced data_model link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:04.850Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced data_model link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:04.878Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced workflow link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:04.888Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced workflow link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:04.934Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 0 relation target type(s) from graph IDs; omitted 0 self link(s); converted 1 non-feature anchor(s) to typed relations.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced workflow link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:04.972Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced workflow link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:04.999Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced capability link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:05.010Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced capability link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:05.054Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 0 relation target type(s) from graph IDs; omitted 0 self link(s); converted 1 non-feature anchor(s) to typed relations.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced capability link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:05.094Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced capability link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:05.120Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced datastore link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:05.131Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced datastore link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:05.172Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 0 relation target type(s) from graph IDs; omitted 0 self link(s); converted 1 non-feature anchor(s) to typed relations.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced datastore link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:05.213Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > converts an evidenced datastore link misplaced in feature_anchors into its canonical typed relation
+[2026-10-01T00:06:05.241Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("")
+[2026-10-01T00:06:05.250Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/standalone-architect-routes.test.ts
+[2026-10-01T00:06:05.281Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("")
+[2026-10-01T00:06:05.293Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; contract: unknown feature anchor neighbor; contract: missing feature anchor evidence excerpt for neighbor
+
+stderr | tests/standalone-architect-routes.test.ts
+[2026-10-01T00:06:05.286Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("")
+[2026-10-01T00:06:05.335Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:05.335Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("   ")
+[2026-10-01T00:06:05.343Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("   ")
+[2026-10-01T00:06:05.388Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; contract: unknown feature anchor neighbor; contract: missing feature anchor evidence excerpt for neighbor
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > serves an executable browser bootstrap script for runtime binding
+[2026-10-01T00:06:05.420Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("   ")
+[2026-10-01T00:06:05.490Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:05.490Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 0 in traversal, prompts and persisted metadata
+[2026-10-01T00:06:05.500Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=0, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 0 in traversal, prompts and persisted metadata
+[2026-10-01T00:06:05.580Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 0 in traversal, prompts and persisted metadata
+[2026-10-01T00:06:05.606Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 1 in traversal, prompts and persisted metadata
+[2026-10-01T00:06:05.614Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=1, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 1 in traversal, prompts and persisted metadata
+[2026-10-01T00:06:05.697Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > honors a maximum context depth of 1 in traversal, prompts and persisted metadata
+[2026-10-01T00:06:05.722Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses canonical graph types for known relation IDs instead of discarding rich node knowledge
+[2026-10-01T00:06:05.732Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses canonical graph types for known relation IDs instead of discarding rich node knowledge
+[2026-10-01T00:06:05.774Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 3 relation target type(s) from graph IDs; omitted 0 self link(s); converted 0 non-feature anchor(s) to typed relations.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses canonical graph types for known relation IDs instead of discarding rich node knowledge
+[2026-10-01T00:06:05.810Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses canonical graph types for known relation IDs instead of discarding rich node knowledge
+[2026-10-01T00:06:05.835Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=1 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > omits redundant self links without losing otherwise valid semantic enrichment
+[2026-10-01T00:06:05.845Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > omits redundant self links without losing otherwise valid semantic enrichment
+[2026-10-01T00:06:05.888Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 0 relation target type(s) from graph IDs; omitted 2 self link(s); converted 0 non-feature anchor(s) to typed relations.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > omits redundant self links without losing otherwise valid semantic enrichment
+[2026-10-01T00:06:05.926Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > omits redundant self links without losing otherwise valid semantic enrichment
+[2026-10-01T00:06:05.953Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'unknown relation IDs' after canonical relation normalization
+[2026-10-01T00:06:05.962Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'unknown relation IDs' after canonical relation normalization
+[2026-10-01T00:06:06.008Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; guarded-contract: unknown relation target missing
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'unknown relation IDs' after canonical relation normalization
+[2026-10-01T00:06:06.045Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:06.045Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'known relations without evidence' after canonical relation normalization
+[2026-10-01T00:06:06.053Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'known relations without evidence' after canonical relation normalization
+[2026-10-01T00:06:06.098Z] [INFO]  Batch (openrct2::core, 1 nodes): canonicalized 1 relation target type(s) from graph IDs; omitted 0 self link(s); converted 0 non-feature anchor(s) to typed relations.
+[2026-10-01T00:06:06.098Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; guarded-contract: incomplete relation evidence for neighbor
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > still rejects 'known relations without evidence' after canonical relation normalization
+[2026-10-01T00:06:06.144Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:06.144Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:06:06.153Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:06:06.198Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; retry-fallback: semantic description or intent is too shallow
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:06:06.236Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:06.236Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:06:06.240Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:06:06.308Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-01T00:06:06.325Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-01T00:06:06.329Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false)
+[2026-10-01T00:06:06.339Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:06:06.348Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:06:06.391Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; retry-fallback: semantic description or intent is too shallow
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:06:06.426Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:06.426Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:06:06.453Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:06:06.560Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-01T00:06:06.584Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true)
+[2026-10-01T00:06:06.586Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-01T00:06:06.588Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-01T00:06:06.592Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:06:06.595Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:06:06.647Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; exhausted-fallback: semantic description or intent is too shallow
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:06:06.690Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:06.690Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:06:06.691Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:06:06.734Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; exhausted-fallback: semantic description or intent is too shallow
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:06:06.773Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:06.773Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:06:06.773Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-01T00:06:06.810Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:06:06.816Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; exhausted-fallback: semantic description or intent is too shallow
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists and returns refreshed plan cursors for completed standalone Architect passes
+[2026-10-01T00:06:06.816Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists and returns refreshed plan cursors for completed standalone Architect passes
+[2026-10-01T00:06:06.833Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:06:06.849Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:06.850Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:06:06.850Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again
+[2026-10-01T00:06:06.898Z] [INFO]  enrich_parser_nodes: enriched=0 eligible=0 batches=0 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reuses a fresh enriched neighborhood as semantic cache without rereading covered source
+[2026-10-01T00:06:06.909Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reuses a fresh enriched neighborhood as semantic cache without rereading covered source
+[2026-10-01T00:06:07.001Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > reuses a fresh enriched neighborhood as semantic cache without rereading covered source
+[2026-10-01T00:06:07.034Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > deduplicates shared source excerpts across nodes in one batch
+[2026-10-01T00:06:07.046Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=2)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > deduplicates shared source excerpts across nodes in one batch
+[2026-10-01T00:06:07.132Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > deduplicates shared source excerpts across nodes in one batch
+[2026-10-01T00:06:07.160Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > makes an enriched node available to later batches in the same run
+[2026-10-01T00:06:07.170Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > makes an enriched node available to later batches in the same run
+[2026-10-01T00:06:07.258Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > makes an enriched node available to later batches in the same run
+[2026-10-01T00:06:07.300Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > makes an enriched node available to later batches in the same run
+[2026-10-01T00:06:07.328Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=2 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses deterministic structural fallback when no provider is available
+[2026-10-01T00:06:07.345Z] [INFO]  enrich_parser_nodes: starting (model=none, provider=none, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > uses deterministic structural fallback when no provider is available
+[2026-10-01T00:06:07.427Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:07.427Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > enriches every non-enriched graph node regardless of scanner origin
+[2026-10-01T00:06:07.436Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > enriches every non-enriched graph node regardless of scanner origin
+[2026-10-01T00:06:07.531Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists and returns refreshed plan cursors for completed standalone Architect passes
+[2026-10-01T00:06:07.548Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-01T00:06:07.559Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > enriches every non-enriched graph node regardless of scanner origin
+[2026-10-01T00:06:07.560Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > re-enriches when force=true
+[2026-10-01T00:06:07.570Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-01T00:06:07.575Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > re-enriches when force=true
+[2026-10-01T00:06:07.674Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > re-enriches when force=true
+[2026-10-01T00:06:07.702Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects batch_size — multiple LLM calls for larger inputs
+[2026-10-01T00:06:07.710Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=2)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-01T00:06:07.792Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > replaces a stale local model when codex-cli is selected
+[2026-10-01T00:06:07.803Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+[2026-10-01T00:06:07.804Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-01T00:06:07.816Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-01T00:06:07.819Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects batch_size — multiple LLM calls for larger inputs
+[2026-10-01T00:06:07.822Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-01T00:06:07.822Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-01T00:06:07.825Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > exposes one active session runtime across config and chat payloads
+[2026-10-01T00:06:07.852Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.4, temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects batch_size — multiple LLM calls for larger inputs
+[2026-10-01T00:06:07.866Z] [INFO]  Semantic enrichment batch 2: 2/2 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists token economy config changes in engine.env
+[2026-10-01T00:06:07.910Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects batch_size — multiple LLM calls for larger inputs
+[2026-10-01T00:06:07.916Z] [INFO]  Semantic enrichment batch 3: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists token economy config changes in engine.env
+[2026-10-01T00:06:07.941Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects batch_size — multiple LLM calls for larger inputs
+[2026-10-01T00:06:07.944Z] [INFO]  enrich_parser_nodes: enriched=5 eligible=5 batches=3 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects max_nodes cap
+[2026-10-01T00:06:07.953Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=5)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects max_nodes cap
+[2026-10-01T00:06:08.044Z] [INFO]  Semantic enrichment batch 1: 3/3 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > respects max_nodes cap
+[2026-10-01T00:06:08.071Z] [INFO]  enrich_parser_nodes: enriched=3 eligible=10 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > dry_run does not persist changes but still calls the LLM
+[2026-10-01T00:06:08.080Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > dry_run does not persist changes but still calls the LLM
+[2026-10-01T00:06:08.108Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+[2026-10-01T00:06:08.108Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=true
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > writes feature anchors as weak GraphLinks
+[2026-10-01T00:06:08.114Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > writes feature anchors as weak GraphLinks
+[2026-10-01T00:06:08.225Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > writes feature anchors as weak GraphLinks
+[2026-10-01T00:06:08.262Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=1 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects unknown feature anchors before persistence and uses structural fallback
+[2026-10-01T00:06:08.272Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects unknown feature anchors before persistence and uses structural fallback
+[2026-10-01T00:06:08.327Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; n-invalid: unknown feature anchor missing-feature
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects unknown feature anchors before persistence and uses structural fallback
+[2026-10-01T00:06:08.372Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:08.373Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid node ids before persistence and uses structural fallback
+[2026-10-01T00:06:08.383Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid node ids before persistence and uses structural fallback
+[2026-10-01T00:06:08.428Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; unknown node id other-node; missing enrichment for node n-invalid
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid node ids before persistence and uses structural fallback
+[2026-10-01T00:06:08.469Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:08.470Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid relationship vocabulary before persistence and uses structural fallback
+[2026-10-01T00:06:08.478Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid relationship vocabulary before persistence and uses structural fallback
+[2026-10-01T00:06:08.526Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; n-invalid: invalid feature anchor relationship not_allowed
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects invalid relationship vocabulary before persistence and uses structural fallback
+[2026-10-01T00:06:08.563Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:08.563Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects excessive anchor counts before persistence and uses structural fallback
+[2026-10-01T00:06:08.571Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+ ✓ tests/standalone-architect-routes.test.ts (55 tests) 3268ms
+   ✓ standalone Architect route hardening > executes browser bootstrap and bounds poisoned persisted chat history replay  416ms
+   ✓ standalone Architect route hardening > persists and returns refreshed plan cursors for completed standalone Architect passes  743ms
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects excessive anchor counts before persistence and uses structural fallback
+[2026-10-01T00:06:08.622Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; n-invalid: excessive feature anchors (6 > 5)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects excessive anchor counts before persistence and uses structural fallback
+[2026-10-01T00:06:08.668Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:08.668Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects missing evidence excerpts before persistence and uses structural fallback
+[2026-10-01T00:06:08.677Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects missing evidence excerpts before persistence and uses structural fallback
+[2026-10-01T00:06:08.724Z] [WARN]  Batch (openrct2::core, 1 nodes): validation_failed: 1 node(s) used deterministic fallback; n-invalid: missing feature anchor evidence excerpt for f1
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > rejects missing evidence excerpts before persistence and uses structural fallback
+[2026-10-01T00:06:08.764Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+[2026-10-01T00:06:08.764Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > salvages valid nodes when another result in the same batch fails validation
+[2026-10-01T00:06:08.772Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=2)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > salvages valid nodes when another result in the same batch fails validation
+[2026-10-01T00:06:08.819Z] [WARN]  Batch (openrct2::core, 2 nodes): validation_failed: 1 node(s) used deterministic fallback; invalid-node: semantic description or intent is too shallow
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > salvages valid nodes when another result in the same batch fails validation
+[2026-10-01T00:06:08.858Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 1 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > salvages valid nodes when another result in the same batch fails validation
+[2026-10-01T00:06:08.886Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > malformed LLM response for a batch is recorded and run continues
+[2026-10-01T00:06:08.894Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > malformed LLM response for a batch is recorded and run continues
+[2026-10-01T00:06:08.935Z] [WARN]  Batch (openrct2::core, 1 nodes): invalid_output: LLM did not return parseable JSON; deterministic fallback used.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > malformed LLM response for a batch is recorded and run continues
+[2026-10-01T00:06:08.971Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 1 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > malformed LLM response for a batch is recorded and run continues
+[2026-10-01T00:06:09.013Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > malformed LLM response for a batch is recorded and run continues
+[2026-10-01T00:06:09.038Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=2 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists after each batch (crash-safety check)
+[2026-10-01T00:06:09.045Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists after each batch (crash-safety check)
+[2026-10-01T00:06:09.121Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists after each batch (crash-safety check)
+[2026-10-01T00:06:09.121Z] [WARN]  Batch (openrct2::core, 1 nodes): provider_failed: simulated LLM failure; deterministic fallback used.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists after each batch (crash-safety check)
+[2026-10-01T00:06:09.160Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 1 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists after each batch (crash-safety check)
+[2026-10-01T00:06:09.186Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=2 anchors=0 errors=1 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target=both processes features too
+[2026-10-01T00:06:09.195Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target=both processes features too
+[2026-10-01T00:06:09.272Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target=both processes features too
+[2026-10-01T00:06:09.308Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target=both processes features too
+[2026-10-01T00:06:09.333Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=2 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="both" emits a deprecation note
+[2026-10-01T00:06:09.341Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="both" emits a deprecation note
+[2026-10-01T00:06:09.418Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="both" emits a deprecation note
+[2026-10-01T00:06:09.450Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" enriches scanner-origin UI elements with source_repo
+[2026-10-01T00:06:09.459Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" enriches scanner-origin UI elements with source_repo
+[2026-10-01T00:06:09.542Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" enriches scanner-origin UI elements with source_repo
+[2026-10-01T00:06:09.567Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > keeps rich UI enrichment and unions scanner facts when the model adds no relation
+[2026-10-01T00:06:09.578Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > keeps rich UI enrichment and unions scanner facts when the model adds no relation
+[2026-10-01T00:06:09.659Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > keeps rich UI enrichment and unions scanner facts when the model adds no relation
+[2026-10-01T00:06:09.683Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" skips UI elements without source_repo (manual entries)
+[2026-10-01T00:06:09.694Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" skips UI elements without source_repo (manual entries)
+[2026-10-01T00:06:09.773Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" skips UI elements without source_repo (manual entries)
+[2026-10-01T00:06:09.797Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" skips already-enriched elements unless force=true
+[2026-10-01T00:06:09.806Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="ui" skips already-enriched elements unless force=true
+[2026-10-01T00:06:09.849Z] [INFO]  enrich_parser_nodes: enriched=0 eligible=0 batches=0 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:06:09.857Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=10)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:06:09.935Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:06:09.972Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:06:10.009Z] [INFO]  Semantic enrichment batch 3: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:06:10.049Z] [INFO]  Semantic enrichment batch 4: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store
+[2026-10-01T00:06:10.075Z] [INFO]  enrich_parser_nodes: enriched=4 eligible=4 batches=4 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:06:10.084Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:06:10.164Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:06:10.167Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:06:10.234Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:06:10.273Z] [INFO]  Semantic enrichment batch 2: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:06:10.300Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=2 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:06:10.300Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free
+[2026-10-01T00:06:10.340Z] [INFO]  enrich_parser_nodes: enriched=0 eligible=0 batches=0 anchors=0 errors=0 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:06:10.347Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:06:10.387Z] [WARN]  Batch (openrct2::core, 1 nodes): provider_failed: simulated transient timeout; checkpointed as retryable.
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:06:10.418Z] [INFO]  Semantic enrichment batch 1: 0/1 committed, 0 uncommitted, 0 fallback
+[2026-10-01T00:06:10.418Z] [INFO]  enrich_parser_nodes: enriched=0 eligible=1 batches=1 anchors=0 errors=2 dry_run=false
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:06:10.422Z] [INFO]  enrich_parser_nodes: starting (model=mock-model, provider=mock, context_hops=2, batch_size=1)
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:06:10.486Z] [INFO]  Semantic enrichment batch 1: 1/1 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint
+[2026-10-01T00:06:10.511Z] [INFO]  enrich_parser_nodes: enriched=1 eligible=1 batches=1 anchors=0 errors=0 dry_run=false
+
+ ❯ tests/tools/enrich-parser-nodes.test.ts (66 tests | 1 failed) 6244ms
+   ✓ enrichment structured output provider limits > retains server grounding without exceeding the enum count limit 6ms
+   ✓ enrichment structured output provider limits > retains server grounding without exceeding the enum string length limit 2ms
+   ✓ enrichment structured output provider limits > requires empty link arrays at zero graph hops 2ms
+   ✓ isParserOrigin / isAlreadyEnriched / bucketKey / chunk > isParserOrigin only matches native scanner provenance 2ms
+   ✓ isParserOrigin / isAlreadyEnriched / bucketKey / chunk > isAlreadyEnriched only true when enrichment.enriched is true 2ms
+   ✓ isParserOrigin / isAlreadyEnriched / bucketKey / chunk > bucketKey is repo::domain with fallbacks 2ms
+   ✓ isParserOrigin / isAlreadyEnriched / bucketKey / chunk > chunk slices into batches of N 3ms
+   ✓ isParserOrigin / isAlreadyEnriched / bucketKey / chunk > builds relation context beyond one hop 4ms
+   ✓ buildSemanticCachePlan > uses a confident enriched neighbor to cover shared source evidence 3ms
+   ✓ buildSemanticCachePlan > rejects low-confidence neighbor semantics and reads the source 2ms
+   ✓ buildSemanticCachePlan > does not let high stated confidence turn hollow knowledge into cache evidence 2ms
+   ✓ buildSemanticCachePlan > treats source newer than enrichment as a cache conflict 2ms
+   ✓ parseLlmEnrichment > parses a well-formed JSON payload 3ms
+   ✓ parseLlmEnrichment > recovers from ```json fenced output 2ms
+   ✓ parseLlmEnrichment > clamps invalid confidence to 0.5 2ms
+   ✓ parseLlmEnrichment > filters anchors with empty target_id 2ms
+   ✓ parseLlmEnrichment > throws on completely unparseable input 2ms
+   ✓ mergeEnrichment > preserves original description in description_raw 2ms
+   ✓ mergeEnrichment > only writes feature anchors whose target_id is in the valid set 2ms
+   ✓ mergeEnrichment > does not duplicate links to already-linked targets 2ms
+   ✓ mergeEnrichment > does not overwrite an existing description_raw on re-enrichment 2ms
+   × enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint 195ms
+     → expected undefined to be defined
+   ✓ enrichParserNodesProgrammatic — integration > rejects an overlapping enrichment before another provider call or graph write 119ms
+   ✓ enrichParserNodesProgrammatic — integration > restricts structured output to the complete input batch and the supplied typed target IDs 125ms
+   ✓ enrichParserNodesProgrammatic — integration > converts an evidenced data_model link misplaced in feature_anchors into its canonical typed relation 122ms
+   ✓ enrichParserNodesProgrammatic — integration > converts an evidenced workflow link misplaced in feature_anchors into its canonical typed relation 121ms
+   ✓ enrichParserNodesProgrammatic — integration > converts an evidenced capability link misplaced in feature_anchors into its canonical typed relation 121ms
+   ✓ enrichParserNodesProgrammatic — integration > converts an evidenced datastore link misplaced in feature_anchors into its canonical typed relation 121ms
+   ✓ enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("") 93ms
+   ✓ enrichParserNodesProgrammatic — integration > still rejects a misplaced known anchor without evidence ("   ") 156ms
+   ✓ enrichParserNodesProgrammatic — integration > honors a maximum context depth of 0 in traversal, prompts and persisted metadata 115ms
+   ✓ enrichParserNodesProgrammatic — integration > honors a maximum context depth of 1 in traversal, prompts and persisted metadata 116ms
+   ✓ enrichParserNodesProgrammatic — integration > uses canonical graph types for known relation IDs instead of discarding rich node knowledge 115ms
+   ✓ enrichParserNodesProgrammatic — integration > omits redundant self links without losing otherwise valid semantic enrichment 116ms
+   ✓ enrichParserNodesProgrammatic — integration > still rejects 'unknown relation IDs' after canonical relation normalization 91ms
+   ✓ enrichParserNodesProgrammatic — integration > still rejects 'known relations without evidence' after canonical relation normalization 100ms
+   ✓ enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=false) 195ms
+   ✓ enrichParserNodesProgrammatic — integration > resumes fallback nodes without treating them as checkpoint success (legacy=true) 246ms
+   ✓ enrichParserNodesProgrammatic — integration > reports unresolved fallback work after the retry budget is exhausted without calling the provider again  311ms
+   ✓ enrichParserNodesProgrammatic — integration > reuses a fresh enriched neighborhood as semantic cache without rereading covered source 138ms
+   ✓ enrichParserNodesProgrammatic — integration > deduplicates shared source excerpts across nodes in one batch 125ms
+   ✓ enrichParserNodesProgrammatic — integration > makes an enriched node available to later batches in the same run 169ms
+   ✓ enrichParserNodesProgrammatic — integration > uses deterministic structural fallback when no provider is available 99ms
+   ✓ enrichParserNodesProgrammatic — integration > enriches every non-enriched graph node regardless of scanner origin 134ms
+   ✓ enrichParserNodesProgrammatic — integration > re-enriches when force=true 140ms
+   ✓ enrichParserNodesProgrammatic — integration > respects batch_size — multiple LLM calls for larger inputs 243ms
+   ✓ enrichParserNodesProgrammatic — integration > respects max_nodes cap 127ms
+   ✓ enrichParserNodesProgrammatic — integration > dry_run does not persist changes but still calls the LLM 35ms
+   ✓ enrichParserNodesProgrammatic — integration > writes feature anchors as weak GraphLinks 157ms
+   ✓ enrichParserNodesProgrammatic — integration > rejects unknown feature anchors before persistence and uses structural fallback 111ms
+   ✓ enrichParserNodesProgrammatic — integration > rejects invalid node ids before persistence and uses structural fallback 96ms
+   ✓ enrichParserNodesProgrammatic — integration > rejects invalid relationship vocabulary before persistence and uses structural fallback 92ms
+   ✓ enrichParserNodesProgrammatic — integration > rejects excessive anchor counts before persistence and uses structural fallback 106ms
+   ✓ enrichParserNodesProgrammatic — integration > rejects missing evidence excerpts before persistence and uses structural fallback 96ms
+   ✓ enrichParserNodesProgrammatic — integration > salvages valid nodes when another result in the same batch fails validation 122ms
+   ✓ enrichParserNodesProgrammatic — integration > malformed LLM response for a batch is recorded and run continues 152ms
+   ✓ enrichParserNodesProgrammatic — integration > persists after each batch (crash-safety check) 149ms
+   ✓ enrichParserNodesProgrammatic — integration > target=both processes features too 146ms
+   ✓ enrichParserNodesProgrammatic — integration > target="both" emits a deprecation note 116ms
+   ✓ enrichParserNodesProgrammatic — integration > target="ui" enriches scanner-origin UI elements with source_repo 119ms
+   ✓ enrichParserNodesProgrammatic — integration > keeps rich UI enrichment and unions scanner facts when the model adds no relation 116ms
+   ✓ enrichParserNodesProgrammatic — integration > target="ui" skips UI elements without source_repo (manual entries) 113ms
+   ✓ enrichParserNodesProgrammatic — integration > target="ui" skips already-enriched elements unless force=true 50ms
+   ✓ enrichParserNodesProgrammatic — integration > target="all" processes every populated canonical graph store 228ms
+   ✓ enrichParserNodesProgrammatic — integration > persists a production checkpoint, resumes only remaining nodes, and makes the unchanged completed run provider-free 265ms
+   ✓ enrichParserNodesProgrammatic — integration > retries a production transient provider failure from its durable checkpoint 170ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/tools/enrich-parser-nodes.test.ts > enrichParserNodesProgrammatic — integration > stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint
+AssertionError: expected undefined to be defined
+ ❯ tests/tools/enrich-parser-nodes.test.ts:534:68
+    532|     expect(mockState.calls).toHaveLength(2);
+    533|     const stored = await readData<ParserNodeRecord[]>("data_model.json…
+    534|     expect(stored.find(node => node.id === "paid-a")?.enriched_at).toB…
+       |                                                                    ^
+    535|     expect(stored.find(node => node.id === "paid-b")?.enriched_at).toB…
+    536|     const checkpoint = await readData<any>("enrichment_state.json");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 148 passed (149)
+   Start at  03:05:59
+   Duration  11.02s (transform 3.12s, setup 0ms, collect 10.91s, tests 12.18s, environment 1ms, prepare 989ms)
+

@@ -1,0 +1,14 @@
+{
+  "qualification_path": "C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\docs\\ashoka\\slice-31-installed-browser-qualification-fourth.json",
+  "worker_id": "ashoka-browser",
+  "platform": "win32",
+  "architecture": "x64",
+  "browser_version": "153.0.8010.50",
+  "node": "25.2.1",
+  "model_requests": 0,
+  "measured_checks": 10,
+  "evidence_hash": "sha256:dbb64cf3a91f948d146abdf506bc31fe4254126acd1b1a7ffa55e15693aecdb7",
+  "stop_release_ms": 247.64729999999963,
+  "control_loss_stop_ms": 2563.3258000000005,
+  "note": "Qualification only. Instance setup, target review and explicit scoped permission are separate."
+}

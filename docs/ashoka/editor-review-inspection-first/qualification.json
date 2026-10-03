@@ -1,0 +1,20 @@
+{
+  "scope": "Compiled editor review component, actual Windows Chrome; host messages are doubles, no native VSCode or paid model claim",
+  "checks": [
+    {
+      "name": "E25-01",
+      "detail": "Actual compiled component keeps complete literal Unicode/source JSON, bounded detail height, draft and native keyboard disclosure at narrow width; decision contains only captured IDs."
+    },
+    {
+      "name": "E25-02",
+      "detail": "Unconfirmed review survives unrelated selection state, enables only exact-ID retry, declines only captured target, and hides after owner confirmation; draft remains unchanged."
+    },
+    {
+      "name": "E25-06",
+      "detail": "Actual component sends only original inspection IDs, retains whole literal readback and unknown closure, disables revoked approval, and projects a distinct closed read-only disposition."
+    }
+  ],
+  "browser": "153.0.8010.50",
+  "pageErrors": [],
+  "success": true
+}

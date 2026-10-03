@@ -1,0 +1,180 @@
+{
+  "checkpoint": "slice-25-v1-plan-consumer-alignment",
+  "created_at": "2026-10-02T07:27:04.2012181Z",
+  "source_read": "complete physical file bytes",
+  "baseline": 16,
+  "schemas": 41,
+  "root_passed": 1815,
+  "root_skipped": 2,
+  "editor_passed": 509,
+  "browser_checks": 29,
+  "consumer_checks": 9,
+  "scope": "Offline native/local authority qualification; actual Windows Chrome and disposable daemon; no paid inference/native editor GUI/other-platform/full Slice25/release acceptance",
+  "artifacts": [
+    {
+      "path": "src/discipline/plan-authority.ts",
+      "bytes": 18851,
+      "sha256": "0260727e92b91e60c2274efe60956b4e166a05edac9dec479d0373b204fb47d3"
+    },
+    {
+      "path": "src/graph/read-model.ts",
+      "bytes": 36981,
+      "sha256": "285223da0ed714e84c222d3b708d3de60b821206e7c2e0ebc5754eee7fd0cc53"
+    },
+    {
+      "path": "src/graph/context-pack.ts",
+      "bytes": 19760,
+      "sha256": "d47d4d87b97feb248ebc67a1b611107e37ca4325c8164681da1909cdb9c3cff7"
+    },
+    {
+      "path": "src/cli/commands/architect.ts",
+      "bytes": 37022,
+      "sha256": "c9e2296597474c1fec8119e25347cc66f01336b3c29444081160576512f948c4"
+    },
+    {
+      "path": "src/instance/types.ts",
+      "bytes": 9853,
+      "sha256": "b2ca51fe9e01b0a389f71c2fc0e18e922fd8c18c4669809e40d7bd2a7e78ba7b"
+    },
+    {
+      "path": "templates/default/dream_history.json",
+      "bytes": 23,
+      "sha256": "6b736bc2e1e390227625891dd59cbb83a629c0031d2b7fdb406f20ed2f363a5d"
+    },
+    {
+      "path": "templates/default/tension_log.json",
+      "bytes": 49,
+      "sha256": "cdf04753f09bd2023e073d583b6fc87cda63789af2821a3812dcda42531f8f90"
+    },
+    {
+      "path": "templates/default/candidate_edges.json",
+      "bytes": 20,
+      "sha256": "cd5cb418e5abc7fd3080c737062bba266f1af7ec61b19076a24f26fdaddb416a"
+    },
+    {
+      "path": "templates/default/validated_edges.json",
+      "bytes": 18,
+      "sha256": "432a840a570e233d4c528accce60f5c609cd1c2fb99744037c002ef251b7bf7f"
+    },
+    {
+      "path": "src/architect/routes.ts",
+      "bytes": 645375,
+      "sha256": "57333641c19b53c4b895ec725148877ee2c3c09b9baf519da61a837beaa40f16"
+    },
+    {
+      "path": "src/architect/context-actions.ts",
+      "bytes": 9041,
+      "sha256": "de3118ded3a04425bd343444e2005e2a85de683bf1f04a2e8f1122b04fb0d3e7"
+    },
+    {
+      "path": "src/server/context-menu.ts",
+      "bytes": 7578,
+      "sha256": "d282b47364b29b943e24e1539e211cca1c9670ded6a37c26cc320503ace35ae8"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/adapters/v1.ts",
+      "bytes": 14043,
+      "sha256": "e3a63c8c9b11b70fdb65b2f267abe13af9ced14e0f1190c28137b80d7dc0a4c4"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/adapters/host.ts",
+      "bytes": 4616,
+      "sha256": "5a9cab355100dfcb3a6de30f0b9c53e8d4f6fd4d2bd402f068b6cc81a92f46a0"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/runner.ts",
+      "bytes": 10125,
+      "sha256": "8c50c98bc0c3e003ab6632a9379a623b0259bb3ef753a376e1e2bcd7a053200e"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/pass.ts",
+      "bytes": 13348,
+      "sha256": "497b3aef9cbce68c596066283917f423c9d780dd683b75514908e23039c2d4a1"
+    },
+    {
+      "path": "extensions/vscode/src/architect-core/ports.ts",
+      "bytes": 10634,
+      "sha256": "a77fedf6dfda74b5904d7553acf8ab817de846b51ee288ec598db471d72a488a"
+    },
+    {
+      "path": "extensions/vscode/src/chat-panel.ts",
+      "bytes": 313760,
+      "sha256": "ef2ce86376e882de7cdc17678e18391df729c7aa0a9f0f95b4847910e4119e77"
+    },
+    {
+      "path": "tests/helpers/compiled-editor.cjs",
+      "bytes": 2886,
+      "sha256": "88dc4af33da8eacdc59f3bd54b7a3c3ca3a036cc53c1f812e89c42329bbb1db2"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 175932,
+      "sha256": "ad3fa8287208897ee4b5b4c86b76efeda3096617b05d2540cca93883cb437309"
+    },
+    {
+      "path": "tests/standalone-architect-routes.test.ts",
+      "bytes": 148630,
+      "sha256": "d5469021957232d80bb42167111148d860bbfaa463729b8385ea73a1d90314b2"
+    },
+    {
+      "path": "tests/daemon-transport-isolation.test.ts",
+      "bytes": 12807,
+      "sha256": "150954a3a5a309943c9869ec64ae9094c5e426621ae85bac5684d8538009178c"
+    },
+    {
+      "path": "tests/plan-context-integration.test.ts",
+      "bytes": 11666,
+      "sha256": "d1589b8631ba67deddf8f573503c98cae85dae025cd08bd4d38d19530f2f1122"
+    },
+    {
+      "path": "tests/instance-cognitive-bootstrap.test.ts",
+      "bytes": 2922,
+      "sha256": "80f46b88179bcde84e06490a0e9e0c12014b4dcb3b0b1dbb0daab622b4d35113"
+    },
+    {
+      "path": "tests/schedule-workspace.test.ts",
+      "bytes": 12642,
+      "sha256": "69f3223ab1ab2a006caada311e014580418f4b74d2ce03f96665555843720ba0"
+    },
+    {
+      "path": "scripts/qualify-ashoka-architect.mjs",
+      "bytes": 36169,
+      "sha256": "349cef4717598e4a51b990cac5bd75bf1e29362b35ab9f8f7a815b1820a88ec9"
+    },
+    {
+      "path": "scripts/qualify-ashoka-plan-consumers.mjs",
+      "bytes": 15246,
+      "sha256": "c5ac5795206c6f340b0c728c846897eee3e8d56f0b5a4a50d0f0adb6102a9b60"
+    },
+    {
+      "path": "src/evaluation/agent-usefulness.ts",
+      "bytes": 10097,
+      "sha256": "b22829f6183d53fa62e5772e482d7b69b2235f7a037f48e4c4000e2f40a176b7"
+    },
+    {
+      "path": "tests/agent-usefulness.test.ts",
+      "bytes": 8920,
+      "sha256": "716a05f07b0149979f39c5a0175434695d32c4f77dcb7ba028e997a847732f2b"
+    },
+    {
+      "path": "docs/ashoka/browser-25-aligned-qualified/qualification.json",
+      "bytes": 6340,
+      "sha256": "79aa73654cb7b08a99a0e3ffe67e5acb788d24b46a79fea09a515559f2fe6fcc"
+    },
+    {
+      "path": "docs/ashoka/plan-consumers-qualified/qualification.json",
+      "bytes": 10676,
+      "sha256": "56a52a46f3b2f9c5ab031aa2f3f1f571815937497e2b6ad007daecac54dbcf9d"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-alignment-qualified-root-tests-second.json",
+      "bytes": 613575,
+      "sha256": "3b7130de37475e0309f9b117c0697f894205a32f4521cc3382d41ccc8529b818"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 82786,
+      "sha256": "386d82ee2db8882312e2686cf087f39f16a0a60a1d18fda539f489d403c55f9d"
+    }
+  ]
+}

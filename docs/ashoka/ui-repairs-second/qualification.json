@@ -1,0 +1,9 @@
+{
+  "scope": "Compiled local daemon and actual Windows Chromium on disposable 1201-node graph and frozen Ashoka plan. Harness IPC writes/publishes through real graph services; dream completion event is injected, not a paid dream cycle. No installed daemon changes.",
+  "model_requests": 0,
+  "checks": [],
+  "errors": [],
+  "browser": "153.0.8010.50",
+  "success": false,
+  "failure": "page.waitForFunction: Timeout 30000ms exceeded.\n    at C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\scripts\\qualify-ashoka-ui-repairs.mjs:58:13"
+}

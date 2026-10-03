@@ -1,0 +1,13 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/explorer-mutations.test.ts > tension.resolve > returns 404 when the tension does not exist
+[2026-10-03T07:09:34.656Z] [WARN]  Mutation "tension.resolve" failed: Tension ghost_id is not active.
+
+ ✓ tests/explorer-mutations.test.ts (16 tests) 1196ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  10:09:27
+   Duration  7.14s (transform 2.02s, setup 0ms, collect 5.55s, tests 1.20s, environment 0ms, prepare 143ms)
+

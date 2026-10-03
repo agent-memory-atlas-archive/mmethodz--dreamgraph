@@ -1,0 +1,35 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ❯ tests/computer-broker.test.ts (7 tests | 1 failed) 6905ms
+   ✓ single original host/job owns scoped dispatch, independent postcondition and replay  1210ms
+   ✓ full-access scope does not replace exact action approval; target changes remain fenced  1093ms
+   ✓ grant revocation stops without a model roundtrip and prevents later physical dispatch  898ms
+   ✓ lost reply after input has one durable unknown receipt and is never replayed  1111ms
+   ✓ failed independent termination retains the original worker for stop-only recovery  821ms
+   × material source change stays reconciliation pending even though the GUI postcondition passed 1331ms
+     → EXECUTION_CONTEXT_REFRESH_REQUIRED: affected evidence changed or is unresolved; retrieve and deliver current context before an effect
+   ✓ wrong-session and unqualified routes cannot open even a declared worker  440ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-broker.test.ts > material source change stays reconciliation pending even though the GUI postcondition passed
+Error: EXECUTION_CONTEXT_REFRESH_REQUIRED: affected evidence changed or is unresolved; retrieve and deliver current context before an effect
+ ❯ assertManagedContext src/graph/execution-context.ts:401:11
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  18:18:54
+   Duration  12.78s (transform 1.98s, setup 0ms, collect 5.40s, tests 6.90s, environment 0ms, prepare 170ms)
+ ❯ ComputerExecutionBroker.admit src/computer/broker.ts:91:86
+
+ ❯ src/computer/broker.ts:127:7
+ ❯ ComputerExecutionBroker.exclusive src/computer/broker.ts:94:16
+ ❯ run.profile tests/computer-broker.test.ts:89:135
+ ❯ src/computer/broker.ts:165:18
+ ❯ src/cognitive/jobs.ts:287:50
+ ❯ tests/computer-broker.test.ts:89:2
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

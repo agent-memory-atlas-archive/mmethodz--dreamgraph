@@ -1,0 +1,108 @@
+{
+  "scope": "Full SHA-256 reads of operator source/test artifacts; code review was focused on changed owners, not whole-project coverage",
+  "generated_at": "2026-10-02T00:53:20.6887882Z",
+  "files": [
+    {
+      "path": "src/graph/change-obligations.ts",
+      "bytes": 23574,
+      "lines": 294,
+      "sha256": "ea6630023de2b9fa72f4794ed236ea6b128b12a7748e7e161c76d0fca6dc24d2"
+    },
+    {
+      "path": "src/tools/code-senses.ts",
+      "bytes": 85632,
+      "lines": 2092,
+      "sha256": "e621d46f99ea33ced5d9f884eca0e2c1b3fe00cac1fcfcbf2d29e74efaf279da"
+    },
+    {
+      "path": "extensions/vscode/src/change-review-service.ts",
+      "bytes": 15771,
+      "lines": 338,
+      "sha256": "e01c29a76466a1919c2ccd8a5df063c727c1f1ce9e5ff58e3ad15936371439b7"
+    },
+    {
+      "path": "extensions/vscode/src/chat-panel.ts",
+      "bytes": 309437,
+      "lines": 6348,
+      "sha256": "796aca3fc25fff27540d9ca9516c8aeda241c20146a8950ca4aa1cd3eec958bd"
+    },
+    {
+      "path": "extensions/vscode/src/managed-native-pass.ts",
+      "bytes": 7932,
+      "lines": 110,
+      "sha256": "d687e63a4d9f75e5292a34c5e9990e90b109dea119b467d467d3ce0b16416060"
+    },
+    {
+      "path": "extensions/vscode/src/managed-cli-pass.ts",
+      "bytes": 4762,
+      "lines": 72,
+      "sha256": "d93561d0202c4978b5b44a85c41ee23c08aafd879f387b24838d19c027b16d30"
+    },
+    {
+      "path": "extensions/vscode/src/webview/index.ts",
+      "bytes": 499,
+      "lines": 14,
+      "sha256": "3ef9733540f2b9778613a323e66be497b597792c3fb35be3698294b8066c6931"
+    },
+    {
+      "path": "extensions/vscode/scripts/build-webview.cjs",
+      "bytes": 835,
+      "lines": 12,
+      "sha256": "e545d30dc13948dad1812371306cba1574487be96043f1e8628fedaf30f6510a"
+    },
+    {
+      "path": "extensions/vscode/package.json",
+      "bytes": 18308,
+      "lines": 466,
+      "sha256": "1ef1e7da638628007841160a187be9ec054c7eb3573e7d955bb8fd5923bedd7a"
+    },
+    {
+      "path": "packages/sdk/src/mcp-catalog.ts",
+      "bytes": 274233,
+      "lines": 6853,
+      "sha256": "1e1390bf0c5d1950a5c7e86311068293d52b8437802435279818bfbc0f309b22"
+    },
+    {
+      "path": "tests/change-obligations.test.ts",
+      "bytes": 22764,
+      "lines": 249,
+      "sha256": "2a11e336571a52bd89f2e1d86d4ef4f45c5ac195bdb300be05789ae7a869ab77"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 77070,
+      "lines": 844,
+      "sha256": "e0199720fea34a4bc602e35ae98c95caaa989bf046cc07a0332d8b88f903c6df"
+    },
+    {
+      "path": "tests/helpers/compiled-editor.ts",
+      "bytes": 260,
+      "lines": 5,
+      "sha256": "f959509f8eff31327953af639d597d0ae6c3fd50c37e33967fb114b753aa368c"
+    },
+    {
+      "path": "tests/helpers/compiled-editor.cjs",
+      "bytes": 2211,
+      "lines": 26,
+      "sha256": "71bb27bb1d0d8ad310262725189a7c50ac6ce3cd8f707195d6733dbcae19ea27"
+    },
+    {
+      "path": "extensions/vscode/src/test/slice5-actions.test.ts",
+      "bytes": 1772,
+      "lines": 34,
+      "sha256": "6d94a235a06892ab53d628c80f7741bbe2e723dd4b56e559684e3e0d7e5c14f1"
+    },
+    {
+      "path": "extensions/vscode/src/test/chat-panel-copilot-cli-diff.test.ts",
+      "bytes": 4401,
+      "lines": 86,
+      "sha256": "1961058aa0848c051830f795db6999b4986a85009e8f1bd518f7607ee30b30cf"
+    },
+    {
+      "path": "scripts/qualify-ashoka-editor-operator.mjs",
+      "bytes": 7226,
+      "lines": 59,
+      "sha256": "f0cc1c761475e6091a4d6c409a4d3e490d66bb16908c27f0d260a06c50e0352e"
+    }
+  ]
+}

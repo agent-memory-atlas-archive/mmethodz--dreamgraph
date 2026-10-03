@@ -1,0 +1,39 @@
+
+> dreamgraph-vscode@13.4.0 build
+> npm run lint:isolation && npm run build:webview && tsc -p ./tsconfig.json && npm run build:extension && npm run build:bridge && npm run build:vendor
+
+
+> dreamgraph-vscode@13.4.0 lint:isolation
+> node scripts/lint-isolation.mjs
+
+lint:isolation OK — architect-v2 quarantined; 0 violations.
+
+> dreamgraph-vscode@13.4.0 build:webview
+> node scripts/build-webview.cjs
+
+
+  dist\webview.js  27.2kb
+
+Done in 7ms
+
+> dreamgraph-vscode@13.4.0 build:extension
+> esbuild src/extension.ts --bundle --outfile=dist/extension.js --format=cjs --platform=node --target=node18 --external:vscode --minify
+
+
+  dist\extension.js  1.0mb
+
+Done in 110ms
+
+> dreamgraph-vscode@13.4.0 build:bridge
+> esbuild ../../src/architect/cli-mcp-bridge.ts --bundle --outfile=dist/copilot-cli-bridge.js --format=cjs --platform=node --target=node18
+
+
+  dist\copilot-cli-bridge.js  582.6kb
+
+Done in 74ms
+
+> dreamgraph-vscode@13.4.0 build:vendor
+> node -e "const fs=require('fs'),path=require('path');const out=path.join('dist','vendor');fs.mkdirSync(out,{recursive:true});for(const [src,dst] of [['node_modules/markdown-it/dist/markdown-it.min.js','markdown-it.min.js'],['node_modules/dompurify/dist/purify.min.js','purify.min.js']]){let s=fs.readFileSync(src,'utf8');s=s.replace(/[\n\r]*\/\/[#@]\s*sourceMappingURL=.*$/m,'');fs.writeFileSync(path.join(out,dst),s);console.log('vendored',src,'->',path.join(out,dst));}"
+
+vendored node_modules/markdown-it/dist/markdown-it.min.js -> dist\vendor\markdown-it.min.js
+vendored node_modules/dompurify/dist/purify.min.js -> dist\vendor\purify.min.js

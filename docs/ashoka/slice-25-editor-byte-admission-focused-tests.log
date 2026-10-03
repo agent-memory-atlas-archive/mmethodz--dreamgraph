@@ -1,0 +1,25 @@
+✔ compiled agent dispatch preserves daemon error/metadata/commit receipts and marks its trace failed (105.521ms)
+✔ compiled agent preserves the original owner receipt when local accounting fails after a result (30.9169ms)
+✔ compiled history elision retains an earlier MCP text receipt as whole JSON with matching call ID (56.6221ms)
+✔ a compiled provider reply delivered after operator abort cannot dispatch an MCP effect (18.4416ms)
+✔ claude-opus-5-5: preserves signed thinking and tool calls through the next request (73.9963ms)
+✔ claude-sonnet-5-5: preserves signed thinking and tool calls through the next request (22.021ms)
+✔ claude-fable-5-1: preserves signed thinking and tool calls through the next request (18.8179ms)
+✔ claude-mythos-5-1: preserves signed thinking and tool calls through the next request (18.5374ms)
+✔ Claude reasoning drops produce diagnostics without exposing signatures (1.1351ms)
+✔ GPT-6.1 Sol uses Responses for tools and supports images (14.8702ms)
+✔ switching providers translates neutral history instead of replaying foreign raw blocks (1.396ms)
+✔ Responses streaming preserves actual usage and validates the authoritative final response (12.1032ms)
+✔ Responses truncated/refused streams and invalid strict outputs are never accepted (13.1089ms)
+✔ explicit Chat preserves model/effort and rejects GPT-6 tool reasoning before dispatch (10.3162ms)
+✔ Claude opt-in native schemas retain effort and locally validate the original output (11.9453ms)
+✔ openai: whole serialized Unicode request above the byte ceiling is refused before provider dispatch (44.8105ms)
+✔ anthropic: whole serialized Unicode request above the byte ceiling is refused before provider dispatch (43.7532ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 679.5423

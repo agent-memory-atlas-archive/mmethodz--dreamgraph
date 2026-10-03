@@ -1,0 +1,9 @@
+{
+  "distribution": "Ubuntu",
+  "linux_root": "/tmp/dg-ashoka-wsl-c0d9212a-e336-4a39-8130-2c3f6891a72d",
+  "npm_cache": "/tmp/dg-ashoka-wsl-3e20aba0-2617-4c9e-8b89-93779607a2a6/npm-cache",
+  "browser_cache": "/tmp/dg-ashoka-wsl-3e20aba0-2617-4c9e-8b89-93779607a2a6/browsers",
+  "operation": "install.sh --force against the authorized old Linux test bed; fresh Linux source/dependencies, then installed CLI browser qualification",
+  "Windows_installation": "untouched",
+  "source_files": 476
+}

@@ -1,0 +1,84 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/agent-usefulness.test.ts (9 tests) 132ms
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > pgo_wave: positive output is speculative, bounded and does not mutate the snapshot
+[2026-10-01T09:11:29.027Z] [INFO]  PGO wave: 2 stochastic edges (2 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > pgo_wave: zero and tiny combined budgets never overflow
+[2026-10-01T09:11:29.029Z] [INFO]  PGO wave: 1 stochastic edges (1 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > pgo_wave: zero and tiny combined budgets never overflow
+[2026-10-01T09:11:29.030Z] [INFO]  PGO wave: 2 stochastic edges (2 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > pgo_wave: zero and tiny combined budgets never overflow
+[2026-10-01T09:11:29.030Z] [INFO]  PGO wave: 2 stochastic edges (2 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > PGO reproduces semantic output with the same random seed
+[2026-10-01T09:11:29.032Z] [INFO]  PGO wave: 2 stochastic edges (2 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual active structural executors (not paid/model usefulness) > PGO reproduces semantic output with the same random seed
+[2026-10-01T09:11:29.033Z] [INFO]  PGO wave: 2 stochastic edges (2 cross-domain, burst=2)
+
+stderr | tests/strategy-registry.test.ts > actual causal replay with historical input fixtures > repeated precedence yields a bounded hypothesis, not causal fact or seeded reinforcement
+[2026-10-01T09:11:29.045Z] [INFO]  Causal replay: generated 1 predictive dream edges
+
+stderr | tests/strategy-registry.test.ts > actual causal replay with historical input fixtures > insufficient history and empty/zero scopes cannot produce a causal candidate
+[2026-10-01T09:11:29.050Z] [INFO]  Causal replay: generated 0 predictive dream edges
+
+ ✓ tests/strategy-registry.test.ts (38 tests) 100ms
+stderr | tests/dream-router-authority.test.ts > rejects retired/unknown focused requests before decay or cycle mutation
+[2026-10-01T09:11:29.297Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-01T09:11:29.298Z] [INFO]  dream_cycle tool called: strategy=reflective, max=100, auto_normalize=true
+
+stderr | tests/dream-router-authority.test.ts > rejects retired/unknown focused requests before decay or cycle mutation
+[2026-10-01T09:11:29.308Z] [INFO]  dream_cycle tool called: strategy=all, max=10, auto_normalize=true
+
+stderr | tests/dream-router-authority.test.ts > zero MCP budget does not decay, normalize, invoke providers or interrupt another state
+[2026-10-01T09:11:29.326Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+[2026-10-01T09:11:29.327Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-01T09:11:29.328Z] [INFO]  dream_cycle tool called: strategy=all, max=0, auto_normalize=true
+
+stderr | tests/dream-router-authority.test.ts > zero MCP budget does not decay, normalize, invoke providers or interrupt another state
+[2026-10-01T09:11:29.334Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/dream-router-authority.test.ts > zero MCP budget does not decay, normalize, invoke providers or interrupt another state
+[2026-10-01T09:11:29.335Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T09:11:29.343Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T09:11:29.363Z] [INFO]  REM dream cycle #1 starting (strategy: missing_abstraction, max: 3)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T09:11:29.397Z] [INFO]  REM dream cycle #1 complete: 1 nodes, 2 edges (0 duplicates suppressed; speculative output remains untrusted)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T09:11:29.414Z] [INFO]  REM dream cycle #2 starting (strategy: missing_abstraction, max: 3)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T09:11:29.442Z] [INFO]  REM dream cycle #2 complete: 0 nodes, 0 edges (3 duplicates suppressed; speculative output remains untrusted)
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T09:11:29.450Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/dream-router-authority.test.ts > actual two-cycle deduplication remaps generated hub edges to the persisted node identity
+[2026-10-01T09:11:29.451Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+stderr | tests/dream-router-authority.test.ts > invalid fractions and unknown scope leave the cycle unchanged; duplicate roots accept zero hops
+[2026-10-01T09:11:29.460Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/dream-router-authority.test.ts > invalid fractions and unknown scope leave the cycle unchanged; duplicate roots accept zero hops
+[2026-10-01T09:11:29.473Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/dream-router-authority.test.ts > invalid fractions and unknown scope leave the cycle unchanged; duplicate roots accept zero hops
+[2026-10-01T09:11:29.474Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+ ✓ tests/dream-router-authority.test.ts (5 tests) 223ms
+
+ Test Files  3 passed (3)
+      Tests  52 passed (52)
+   Start at  12:11:23
+   Duration  5.88s (transform 2.02s, setup 0ms, collect 9.33s, tests 454ms, environment 1ms, prepare 560ms)
+

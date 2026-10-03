@@ -1,0 +1,330 @@
+{
+  "scope": "Actual compiled daemon/CLI/MCP/editor HTTP client and Windows Chromium, disposable reviewed lifecycle fixtures for both AT01/AT05 project families; plugin core read port and SDK generated validation. No paid-model understanding, native editor GUI, cross-platform runtime or full task acceptance claim.",
+  "checks": [
+    {
+      "name": "Ashoka reported progress",
+      "detail": "Real frozen 32-slice plan/log, compiled daemon, CLI and Chrome preserve 26 completed cards, current Slice25 and next gated candidate without importing, approving or claiming running/verified authority."
+    },
+    {
+      "name": "dreamgraph:draft",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "dreamgraph:implemented",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "dreamgraph:verified",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "dreamgraph:blocked",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "web64:draft",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "web64:implemented",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "web64:verified",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "web64:blocked",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "Explorer scope",
+      "detail": "Explorer honestly reports plan/slice as non-rendered families; the canonical context endpoint still provides them. No plan-node rendering claim."
+    }
+  ],
+  "errors": [],
+  "snapshots": [
+    {
+      "project": "dreamgraph",
+      "stage": "draft",
+      "semantic": {
+        "lifecycle": "draft",
+        "revision": 0,
+        "definition_hash": "sha256:349180cf9c8798d711da8d3f565cef4863fa2f80e7ea9a4ea307d825ed36fb66",
+        "current": [],
+        "running": [],
+        "next": "done",
+        "can_start": false,
+        "last": null,
+        "resume": "review_plan"
+      },
+      "context_revision": {
+        "publication_sequence": 6,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 4,
+          "plans": 1
+        }
+      },
+      "analytics_revision": {
+        "publication_sequence": 8,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 6,
+          "plans": 1
+        }
+      },
+      "context_receipt": "context-receipt:155d78bb99dcf1c4028a8d1b04fae5358069bdbdbce3a170d224dd3232fdc02f"
+    },
+    {
+      "project": "dreamgraph",
+      "stage": "implemented",
+      "semantic": {
+        "lifecycle": "implementing",
+        "revision": 4,
+        "definition_hash": "sha256:349180cf9c8798d711da8d3f565cef4863fa2f80e7ea9a4ea307d825ed36fb66",
+        "current": [
+          "done"
+        ],
+        "running": [],
+        "next": null,
+        "can_start": null,
+        "last": null,
+        "resume": "verify_implementation"
+      },
+      "context_revision": {
+        "publication_sequence": 13,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 7,
+          "plans": 5
+        }
+      },
+      "analytics_revision": {
+        "publication_sequence": 14,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 8,
+          "plans": 5
+        }
+      },
+      "context_receipt": "context-receipt:899427f5dfa9ae26576e49b7c81ba530109d442301fb47313c9a956fb56e4742"
+    },
+    {
+      "project": "dreamgraph",
+      "stage": "verified",
+      "semantic": {
+        "lifecycle": "implementing",
+        "revision": 6,
+        "definition_hash": "sha256:349180cf9c8798d711da8d3f565cef4863fa2f80e7ea9a4ea307d825ed36fb66",
+        "current": [],
+        "running": [],
+        "next": "blocked",
+        "can_start": true,
+        "last": "done",
+        "resume": "start_eligible_slice"
+      },
+      "context_revision": {
+        "publication_sequence": 16,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 8,
+          "plans": 7
+        }
+      },
+      "analytics_revision": {
+        "publication_sequence": 17,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 9,
+          "plans": 7
+        }
+      },
+      "context_receipt": "context-receipt:f849751054eeccf0ab0fe2bc6e87b004e967b4d27c563c15a81a073905eae38d"
+    },
+    {
+      "project": "dreamgraph",
+      "stage": "blocked",
+      "semantic": {
+        "lifecycle": "implementing",
+        "revision": 8,
+        "definition_hash": "sha256:349180cf9c8798d711da8d3f565cef4863fa2f80e7ea9a4ea307d825ed36fb66",
+        "current": [
+          "blocked"
+        ],
+        "running": [],
+        "next": "independent",
+        "can_start": true,
+        "last": "done",
+        "resume": "resume_current"
+      },
+      "context_revision": {
+        "publication_sequence": 19,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 9,
+          "plans": 9
+        }
+      },
+      "analytics_revision": {
+        "publication_sequence": 20,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 10,
+          "plans": 9
+        }
+      },
+      "context_receipt": "context-receipt:b08cd5ce0959df9aa5732ec89cea19394dcd70db284075c351003c48cc8475e3"
+    },
+    {
+      "project": "web64",
+      "stage": "draft",
+      "semantic": {
+        "lifecycle": "draft",
+        "revision": 0,
+        "definition_hash": "sha256:a3a96df54d73880ee5916c8c707795f14ecc15b08445fa6074d57508635b6d09",
+        "current": [],
+        "running": [],
+        "next": "done",
+        "can_start": false,
+        "last": null,
+        "resume": "review_plan"
+      },
+      "context_revision": {
+        "publication_sequence": 22,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 11,
+          "plans": 10
+        }
+      },
+      "analytics_revision": {
+        "publication_sequence": 23,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 12,
+          "plans": 10
+        }
+      },
+      "context_receipt": "context-receipt:6ead1edcb0d4e4128779cfacdc205121c2b1f0f6f8c1e1f6510e25f457f0a655"
+    },
+    {
+      "project": "web64",
+      "stage": "implemented",
+      "semantic": {
+        "lifecycle": "implementing",
+        "revision": 4,
+        "definition_hash": "sha256:a3a96df54d73880ee5916c8c707795f14ecc15b08445fa6074d57508635b6d09",
+        "current": [
+          "done"
+        ],
+        "running": [],
+        "next": null,
+        "can_start": null,
+        "last": null,
+        "resume": "verify_implementation"
+      },
+      "context_revision": {
+        "publication_sequence": 28,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 13,
+          "plans": 14
+        }
+      },
+      "analytics_revision": {
+        "publication_sequence": 29,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 14,
+          "plans": 14
+        }
+      },
+      "context_receipt": "context-receipt:9769332137faa0f99abd9b14d5ffdb196d6c82ac7681ec9469ca48b67a599b01"
+    },
+    {
+      "project": "web64",
+      "stage": "verified",
+      "semantic": {
+        "lifecycle": "implementing",
+        "revision": 6,
+        "definition_hash": "sha256:a3a96df54d73880ee5916c8c707795f14ecc15b08445fa6074d57508635b6d09",
+        "current": [],
+        "running": [],
+        "next": "blocked",
+        "can_start": true,
+        "last": "done",
+        "resume": "start_eligible_slice"
+      },
+      "context_revision": {
+        "publication_sequence": 31,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 14,
+          "plans": 16
+        }
+      },
+      "analytics_revision": {
+        "publication_sequence": 32,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 15,
+          "plans": 16
+        }
+      },
+      "context_receipt": "context-receipt:fce3f6d08c6d078b56aa502de9a727f2e0487c1b24d2852a26363c37b6064bbc"
+    },
+    {
+      "project": "web64",
+      "stage": "blocked",
+      "semantic": {
+        "lifecycle": "implementing",
+        "revision": 8,
+        "definition_hash": "sha256:a3a96df54d73880ee5916c8c707795f14ecc15b08445fa6074d57508635b6d09",
+        "current": [
+          "blocked"
+        ],
+        "running": [],
+        "next": "independent",
+        "can_start": true,
+        "last": "done",
+        "resume": "resume_current"
+      },
+      "context_revision": {
+        "publication_sequence": 34,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 15,
+          "plans": 18
+        }
+      },
+      "analytics_revision": {
+        "publication_sequence": 35,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 16,
+          "plans": 18
+        }
+      },
+      "context_receipt": "context-receipt:f939790285f88e9ce75b8c95224ecd7a6562957b55d5094d1ac1a4a90759ff6b"
+    }
+  ],
+  "browser": "153.0.8010.50",
+  "success": true
+}

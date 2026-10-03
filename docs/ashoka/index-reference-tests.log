@@ -1,0 +1,13 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/agent-usefulness.test.ts (4 tests) 12ms
+ ✓ tests/retrieval-index.test.ts (4 tests) 392ms
+   ✓ content-bound retrieval index > matches rebuilt reference selection and mandatory insufficiency over frozen project tasks and budget sweeps  337ms
+ ✓ tests/context-pack.test.ts (35 tests) 1822ms
+
+ Test Files  3 passed (3)
+      Tests  43 passed (43)
+   Start at  02:23:29
+   Duration  6.58s (transform 1.59s, setup 0ms, collect 7.90s, tests 2.23s, environment 1ms, prepare 521ms)
+

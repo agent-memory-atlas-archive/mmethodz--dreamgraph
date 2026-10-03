@@ -1,0 +1,55 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/managed-plan-execution.test.ts
+[2026-10-02T21:19:00.722Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/managed-plan-execution.test.ts > selection alone stays read-only, while explicit execution injects the post-admission canonical running projection
+[2026-10-02T21:19:00.976Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ✓ tests/computer-broker.test.ts (19 tests) 23453ms
+   ✓ single original host/job owns scoped dispatch, independent postcondition and replay  1518ms
+   ✓ pause fences input and model continuation; resume preserves finite original authority and requires fresh graph/target evidence  2163ms
+   ✓ pause drains an already delivered atomic operation to its observed receipt while independent Stop remains separate  1361ms
+   ✓ Stop breaks a paused model wait without renewing a grant or turning unresolved work into a completed task  937ms
+   ✓ pause and resume require the original human owner; lost acknowledgement retries cannot pause or capture twice  1156ms
+   ✓ an unresponsive pause acknowledgement times out, records uncertainty and uses independent Stop  1796ms
+   ✓ the original deadline expires during pause; waiting cannot renew authority or leave a running worker  3571ms
+   ✓ native custom tools preserve scoped fresh observations and keep literal arguments out of preview metadata  1246ms
+   ✓ ephemeral image bytes are hash checked and atomically recorded as distinct pixel/DOM descriptors  908ms
+   ✓ an executor cannot pair arbitrary image bytes with a forged digest  855ms
+   ✓ full-access scope does not replace exact action approval; target changes remain fenced  1019ms
+   ✓ grant revocation stops without a model roundtrip and prevents later physical dispatch  828ms
+   ✓ lost reply after input has one durable unknown receipt and is never replayed  1617ms
+   ✓ failed independent termination retains the original worker for stop-only recovery  857ms
+   ✓ material source change stays reconciliation pending even though the GUI postcondition passed  1172ms
+   ✓ wrong-session and unqualified routes cannot open even a declared worker  456ms
+   ✓ a reviewed profile cannot be replaced by the worker  464ms
+   ✓ a reviewed backend cannot be replaced by the worker  471ms
+   ✓ observation-only operator approval cannot authorize interaction even with an exact action approval  1054ms
+ ✓ tests/managed-plan-execution.test.ts (19 tests) 26459ms
+   ✓ selection alone stays read-only, while explicit execution injects the post-admission canonical running projection  1317ms
+   ✓ refuses foreign project, selection mismatch, changed source semantics and stale approval before returning native authority  666ms
+   ✓ external plan edits block delivery and worker/model dispatch; source restoration cannot renew a closed pass  865ms
+   ✓ a real pending native model permit cannot be reported as confirmed plan termination  1285ms
+   ✓ the SDK native model callback uses the delivered running plan and original spend permit but cannot mark the slice implemented  1168ms
+   ✓ unconfirmed termination remains recovery on exact retry and cannot be strengthened through another public finish  892ms
+   ✓ independent original-native stop observations release only stopped ownership, preserve first closure, and require every outstanding model attempt  1671ms
+   ✓ native stop recovery refuses live authority, unconfirmed and forged attempts, foreign hosts and workers  1400ms
+   ✓ a committed independent stop with a lost reply replays its saved command without changing the first outcome or issuing more work  1412ms
+   ✓ the original SDK native worker can report a separately observed stop after its cancelled wait without renewing the pass  1297ms
+   ✓ native stop recovery also closes the original context-only SDK pass without manufacturing plan ownership  1139ms
+   ✓ the actual compiled editor model session retains the original stop identity after its first immutable settlement  1763ms
+   ✓ rejected admission can close only a durably undelivered context with no lease or effects  605ms
+   ✓ lost C14 closure acknowledgment replays the persisted original command after host revocation without another event  1187ms
+   ✓ finite authority expiry leaves canonical recovery and a later claimed confirmed stop cannot erase missing live observation  5870ms
+   ✓ a fresh compiled daemon process recovers the saved closure without live launch authority or another C14 event  1450ms
+   ✓ actual compiled editor and SDK native passes preserve explicit purpose and close canonical ownership without claiming verification  1237ms
+   ✓ foreign hosts and execution workers cannot request C14 closure or another implementation lease  710ms
+   ✓ browser chat refuses forged purpose, unrelated selection, fallback and continuation before a native task can start  522ms
+
+ Test Files  2 passed (2)
+      Tests  38 passed (38)
+   Start at  00:18:50
+   Duration  36.94s (transform 3.10s, setup 0ms, collect 17.95s, tests 49.91s, environment 0ms, prepare 278ms)
+

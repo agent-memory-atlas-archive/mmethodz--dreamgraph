@@ -1,0 +1,11 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/computer-browser-worker.test.ts (10 tests | 9 skipped) 7195ms
+   ✓ a real worker closes its dedicated browser on watchdog without another model call  7193ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 9 skipped (10)
+   Start at  19:51:06
+   Duration  8.42s (transform 145ms, setup 0ms, collect 312ms, tests 7.19s, environment 0ms, prepare 185ms)
+

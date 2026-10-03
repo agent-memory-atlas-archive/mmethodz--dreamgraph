@@ -1,0 +1,143 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:33.864Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:33.873Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:37.406Z] [INFO]  Architect native tool loop: calling scan_project
+
+stderr | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:39.226Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:39.230Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:44.531Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-4.1 (architect), temp=0.7, maxTokens=1000
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:44.583Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:44.619Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-4.1 (architect), temp=0.7, maxTokens=1000
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:46.963Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:46.980Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:50.168Z] [INFO]  Architect native tool loop: calling scan_project
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:51.734Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:51.738Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:55.016Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:55.034Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:20:57.701Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:00.172Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:00.190Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:07.098Z] [INFO]  Architect native tool loop: calling scan_project
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:08.229Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:08.804Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:08.807Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:10.081Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:12.497Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:12.513Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:15.248Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:17.744Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T08:21:17.760Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+ ✓ tests/computer-native-graph-loop.test.ts (6 tests) 75629ms
+   ✓ native_core real scoped browser pass preserves original control, source/graph boundaries and closure  11249ms
+   ✓ native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure  12473ms
+   ✓ native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure  4770ms
+   ✓ native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure  12399ms
+   ✓ native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure  5174ms
+   ✓ native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure  7230ms
+stdout | tests/computer-browser-worker.test.ts > Stop terminates its original browser within the same deadline when graceful close is deliberately ignored
+Forced original-browser termination evidence {
+  elapsed_ms: 617.9608999999982,
+  dropped_graceful_frames: 1,
+  requests_quiescent: true
+}
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on disconnect without another model call
+Computer control-loss evidence {
+  mode: 'disconnect',
+  elapsed_ms: 252.42649999999776,
+  local_stop: null
+}
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on watchdog without another model call
+Computer control-loss evidence {
+  mode: 'watchdog',
+  elapsed_ms: 2512.1764000000003,
+  local_stop: {
+    epoch: '292163d1-a973-4f25-9327-378209eb93c6',
+    input_released: true,
+    terminated: true,
+    reason: 'watchdog',
+    heartbeat_age_ms: 2535.1749,
+    stop_elapsed_ms: 237.58639999999968
+  }
+}
+
+ ✓ tests/computer-browser-worker.test.ts (13 tests) 34282ms
+   ✓ performs real Unicode, checked, click/readback and scrolling using opaque current references  2752ms
+   ✓ moved/covered controls, disabled and credential controls never receive a guessed action  1564ms
+   ✓ forbidden posts, redirects, popups and frames cannot reach another origin or authority  3106ms
+   ✓ exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime  446ms
+   ✓ explicit navigation stays inside the approved origin and segment path and verifies independent destination state  4395ms
+   ✓ private worker process preserves typed observations and responsive independent termination  2583ms
+   ✓ Stop terminates its original browser within the same deadline when graceful close is deliberately ignored  2800ms
+   ✓ original worker pause fences capture/input and resumes with new references before independent Stop  2750ms
+   ✓ stop bypasses a pending browser navigation and never waits for its ten-second server response  2009ms
+   ✓ masked frames have a verified digest and image exhaustion refuses before another input  2492ms
+   ✓ a real worker closes its dedicated browser on disconnect without another model call  2278ms
+   ✓ a real worker closes its dedicated browser on watchdog without another model call  4539ms
+   ✓ lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input  2568ms
+
+ Test Files  2 passed (2)
+      Tests  19 passed (19)
+   Start at  11:19:56
+   Duration  120.31s (transform 5.14s, setup 0ms, collect 9.64s, tests 109.91s, environment 0ms, prepare 274ms)
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/slice-27-stop-escalation-second.json

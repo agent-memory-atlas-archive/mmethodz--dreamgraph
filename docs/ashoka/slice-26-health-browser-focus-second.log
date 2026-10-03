@@ -1,0 +1,57 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on disconnect without another model call
+Computer control-loss evidence { mode: 'disconnect', elapsed_ms: 263.5730000000003, local_stop: null }
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on watchdog without another model call
+Computer control-loss evidence {
+  mode: 'watchdog',
+  elapsed_ms: 2381.9778000000006,
+  local_stop: {
+    epoch: '0df9f7bf-362b-47e1-8d6f-c2ad7fe1713b',
+    input_released: true,
+    terminated: true,
+    reason: 'watchdog',
+    heartbeat_age_ms: 2550,
+    stop_elapsed_ms: 252
+  }
+}
+
+ ✓ tests/computer-browser-worker.test.ts (12 tests) 29844ms
+   ✓ performs real Unicode, checked, click/readback and scrolling using opaque current references  3084ms
+   ✓ moved/covered controls, disabled and credential controls never receive a guessed action  1654ms
+   ✓ forbidden posts, redirects, popups and frames cannot reach another origin or authority  3229ms
+   ✓ exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime  468ms
+   ✓ explicit navigation stays inside the approved origin and segment path and verifies independent destination state  2652ms
+   ✓ private worker process preserves typed observations and responsive independent termination  2470ms
+   ✓ original worker pause fences capture/input and resumes with new references before independent Stop  2627ms
+   ✓ stop bypasses a pending browser navigation and never waits for its ten-second server response  1436ms
+   ✓ masked frames have a verified digest and image exhaustion refuses before another input  2316ms
+   ✓ a real worker closes its dedicated browser on disconnect without another model call  2441ms
+   ✓ a real worker closes its dedicated browser on watchdog without another model call  4580ms
+   ✓ lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input  2885ms
+stderr | tests/computer-native-graph-loop.test.ts > real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass
+[2026-10-02T20:24:21.099Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass
+[2026-10-02T20:24:21.108Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+ ✓ tests/http-health-authority.test.ts (4 tests) 361ms
+stderr | tests/computer-native-graph-loop.test.ts > real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass
+[2026-10-02T20:24:23.715Z] [INFO]  Architect native tool loop: calling scan_project
+
+stderr | tests/computer-native-graph-loop.test.ts > real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass
+[2026-10-02T20:24:25.110Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass
+[2026-10-02T20:24:25.115Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+ ✓ tests/computer-native-graph-loop.test.ts (1 test) 28803ms
+   ✓ real native GUI pause/resume preserves source debt, separate graph commit and current evidence in the next pass  28801ms
+
+ Test Files  3 passed (3)
+      Tests  17 passed (17)
+   Start at  23:23:49
+   Duration  35.73s (transform 2.38s, setup 0ms, collect 7.17s, tests 59.01s, environment 1ms, prepare 491ms)
+

@@ -1,0 +1,53 @@
+{
+  "scope": "Actual compiled Windows daemon/Architect, CLI and Chrome. Read-only graph-family copy plus original receipt history for navigation scale; publication store dependencies narrowed to copied files and fresh disposable authority. No live mutation, scan, paid inference or production migration claimed.",
+  "checks": [
+    {
+      "name": "NAV01",
+      "detail": "Actual shell/list load at original receipt and graph-family scale; no mocked plan-index route."
+    },
+    {
+      "name": "NAV02",
+      "detail": "Actual source plan/log progress appears with completed cards dimmed and current ownership visible; no running lease invented."
+    },
+    {
+      "name": "NAV03",
+      "detail": "Bounded format notice offers the exact instance preview command without a full migration analysis or automatic migration."
+    },
+    {
+      "name": "NAV04",
+      "detail": "Actual compiled CLI previews without writes, applies a reviewed backup/publication and replays one lost acknowledgement identity."
+    },
+    {
+      "name": "NAV05",
+      "detail": "Actual compiled CLI restore uses a separately reviewed current snapshot and returns original bytes through a new publication."
+    },
+    {
+      "name": "NAV06",
+      "detail": "Preview output cannot write inside instance storage; existing files and private authority remain protected."
+    }
+  ],
+  "errors": [],
+  "publication_bytes": 7852827,
+  "copied_graph_files": [
+    "features.json",
+    "workflows.json",
+    "data_model.json",
+    "capabilities.json",
+    "datastores.json",
+    "auxiliary_entities.json",
+    "ui_registry.json",
+    "dream_graph.json",
+    "candidate_edges.json",
+    "validated_edges.json",
+    "tension_log.json",
+    "adr_log.json",
+    "dream_archetypes.json",
+    "system_story.json"
+  ],
+  "browser": "153.0.8010.50",
+  "shell_ms": 4805,
+  "plans_visible_ms": 8782,
+  "selected_plan_data_ms": 877,
+  "selected_plan_visible_ms": 964,
+  "success": true
+}

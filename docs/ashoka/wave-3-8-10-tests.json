@@ -1,0 +1,699 @@
+{
+  "schema": "dreamgraph.offline_verification.v1",
+  "wave": "slices-3-8-10",
+  "success": true,
+  "started_at": 1790809819080,
+  "contract_sha256": "ab290876adc7d9b6e14cab7904c9841e2f726d0d2fdfcbfc029a7f9296a90850",
+  "baseline_revision": 7,
+  "baseline_sha256": "d8acba015369963165acef92ad8933a02608efeb8fbde036a10d32857fec3521",
+  "suites": {
+    "total": 113,
+    "passed": 113,
+    "failed": 0
+  },
+  "tests": {
+    "passed": 1142,
+    "failed": 0,
+    "pending": 2
+  },
+  "files": [
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/adaptive-future-scaffold.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/architect-cli-bridge.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/architect-cli.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/architect-continuation.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/architect-native-tool-loop.test.ts",
+      "status": "passed",
+      "tests": 23,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/architect-provider-usage.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/architect-pulse.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/architect-root-route.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/architect-timeout-streaming.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/auxiliary-entities.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/change-obligations.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/cli-enrichment-hops.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/cli-mcp-call.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/cli-status.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/cognitive-producers.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/configuration-http.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/context-pack.test.ts",
+      "status": "passed",
+      "tests": 35,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/engine-configuration.test.ts",
+      "status": "passed",
+      "tests": 18,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-3d-flow.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-3d-minimap.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-3d-polish.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-3d-radial.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-3d-systems.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-3d-wavefront.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-events.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-heatmap.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-inspector.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-label-layout.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-mutations.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-prefs.test.ts",
+      "status": "passed",
+      "tests": 22,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-root-route.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/explorer-snapshot.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/graph-contracts.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/graph-operation.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/graph-publication.test.ts",
+      "status": "passed",
+      "tests": 20,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/graph-read-model.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/instance-isolation.test.ts",
+      "status": "passed",
+      "tests": 44,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/latest-model-support.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/living-dreamgraph-projections.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/llm.json-fallback.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/llm.lmstudio.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/llm.routing.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/model-temperature.test.ts",
+      "status": "passed",
+      "tests": 27,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/onboarding-readiness.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/parser-bootstrap.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/project-plans-scaffold.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/provider-images.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/provider-outcome.test.ts",
+      "status": "passed",
+      "tests": 31,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/provider-usage.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/release-version.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/remediation-drafting-validation.test.ts",
+      "status": "passed",
+      "tests": 24,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/resource-query.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/role-policy.test.ts",
+      "status": "passed",
+      "tests": 17,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/role-provider.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/shell-integration-slice5-slice6.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/standalone-architect-routes.test.ts",
+      "status": "passed",
+      "tests": 55,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/standalone-token-economy-store.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/task-preamble-compiler.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tension-resolution.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/cognitive/provenance-regression.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/cognitive/quarantine-source-less-facts.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/cognitive/targeted-dreams.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/plugins/archetypes-seam.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/plugins/hello-events-e2e.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/plugins/manager.test.ts",
+      "status": "passed",
+      "tests": 10,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/plugins/markdown-fences-seam.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/plugins/policies-seam.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/plugins/ui-seam.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/sdk/action-checklist-example.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/sdk/architect-contract.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/sdk/architect-contributions.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/sdk/architect-plan-state.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/sdk/architect-routes.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/sdk/event-import-boundaries.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/sdk/host-gates.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/sdk/host-loader.test.ts",
+      "status": "passed",
+      "tests": 4,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/sdk/manifest-schema.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/c-extractor.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/cpp-extractor.test.ts",
+      "status": "passed",
+      "tests": 12,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/cpp-methods.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/cpp-shapes.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/cpp-templates.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/csharp-extractor.test.ts",
+      "status": "passed",
+      "tests": 26,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/go-extractor.test.ts",
+      "status": "passed",
+      "tests": 19,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/gradle-extractor.test.ts",
+      "status": "passed",
+      "tests": 14,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/java-extractor.test.ts",
+      "status": "passed",
+      "tests": 15,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/kotlin-extractor.test.ts",
+      "status": "passed",
+      "tests": 22,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/orchestrator.test.ts",
+      "status": "passed",
+      "tests": 13,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/python-extractor.test.ts",
+      "status": "passed",
+      "tests": 25,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/rust-extractor.test.ts",
+      "status": "passed",
+      "tests": 13,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/scanner/swift-extractor.test.ts",
+      "status": "passed",
+      "tests": 18,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/utils/atomic-write.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/utils/ui-index.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/coverage-ledger.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/enrich-parser-nodes.test.ts",
+      "status": "passed",
+      "tests": 65,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/enrichment-publication.test.ts",
+      "status": "passed",
+      "tests": 18,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/enrichment-state.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/graph-health.test.ts",
+      "status": "passed",
+      "tests": 2,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/incremental-reconciliation.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/native-data-model.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/native-ui-scanner.test.ts",
+      "status": "passed",
+      "tests": 11,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/reconciliation-transaction.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/scan-enrichment-hops.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/scan-project-gitignore.test.ts",
+      "status": "passed",
+      "tests": 1,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/scan-project-incremental-e2e.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/scan-state.test.ts",
+      "status": "passed",
+      "tests": 5,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/solidify-insight.test.ts",
+      "status": "passed",
+      "tests": 7,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/ui-migration-plan.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/ui-registry-scanner-merge.test.ts",
+      "status": "passed",
+      "tests": 8,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/tools/wire-links.test.ts",
+      "status": "passed",
+      "tests": 6,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/webhooks/sign.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/webhooks/store.test.ts",
+      "status": "passed",
+      "tests": 9,
+      "failed": []
+    },
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/webhooks/worker.test.ts",
+      "status": "passed",
+      "tests": 3,
+      "failed": []
+    }
+  ]
+}

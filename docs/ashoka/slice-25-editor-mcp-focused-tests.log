@@ -1,0 +1,18 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/agent-usefulness.test.ts (9 tests) 127ms
+ ✓ tests/editor-mcp-result.test.ts (6 tests) 196ms
+ ✓ tests/client-context-integration.test.ts (5 tests) 788ms
+   ✓ timeout of a streaming response cannot cancel another request; disposal cancels all outstanding bodies  486ms
+ ✓ tests/host-managed-execution.test.ts (9 tests) 2813ms
+   ✓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass  497ms
+   ✓ parallel host passes share their authenticated owner while another client cannot read or close them  409ms
+   ✓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable  540ms
+   ✓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts  313ms
+
+ Test Files  4 passed (4)
+      Tests  29 passed (29)
+   Start at  00:35:31
+   Duration  8.76s (transform 2.18s, setup 0ms, collect 11.75s, tests 3.92s, environment 1ms, prepare 603ms)
+

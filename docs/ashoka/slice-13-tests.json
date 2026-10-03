@@ -1,0 +1,19 @@
+{
+  "schema": "dreamgraph.verification_packet.v1",
+  "slice": 13,
+  "files": 127,
+  "passed": 1435,
+  "failed": 0,
+  "skipped": 2,
+  "success": true,
+  "provider_calls": 0,
+  "server_build": "passed",
+  "checks": {
+    "configuration": 308,
+    "provider_capabilities": "r3 passed",
+    "graph_contracts": 31,
+    "baseline": 8,
+    "mcp_catalog": "passed"
+  },
+  "scope": "Strategy dependency handoff before Slice 21 changes. Native wave review pending. Fixture providers do not qualify model usefulness; job and promotion composition remain 14/15/17/27."
+}

@@ -1,0 +1,9 @@
+{
+  "scope": "Actual compiled daemon/CLI/MCP/editor HTTP client and Windows Chromium, disposable reviewed lifecycle fixtures for both AT01/AT05 project families; plugin core read port and SDK generated validation. No paid-model understanding, native editor GUI, cross-platform runtime or full task acceptance claim.",
+  "checks": [],
+  "errors": [],
+  "snapshots": [],
+  "browser": "153.0.8010.50",
+  "success": false,
+  "failure": "AssertionError [ERR_ASSERTION]: {\"ok\":false,\"code\":\"ANALYTICS_SNAPSHOT_UNAVAILABLE\",\"message\":\"Error: ANALYTICS_INVALID_INPUT:dream_history.json\"}\n\n503 !== 200\n\n    at get (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-plan-consumers.mjs:46:81)\n    at async compare (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-plan-consumers.mjs:65:18)\n    at async file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-plan-consumers.mjs:76:3"
+}

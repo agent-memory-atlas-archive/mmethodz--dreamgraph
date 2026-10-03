@@ -1,0 +1,72 @@
+{
+  "schema": "dreamgraph.ashoka.codex_native_metadata.v1",
+  "at": "2026-10-02T23:25:11.651Z",
+  "platform": "win32",
+  "node": "25.2.1",
+  "version": "0.159.0",
+  "detected": {
+    "adapter": "codex-cli",
+    "version": "0.159.0",
+    "features": {
+      "browser_use": {
+        "stage": "stable",
+        "enabled": true
+      },
+      "browser_use_external": {
+        "stage": "stable",
+        "enabled": true
+      },
+      "browser_use_full_cdp_access": {
+        "stage": "stable",
+        "enabled": true
+      },
+      "computer_use": {
+        "stage": "stable",
+        "enabled": true
+      },
+      "in_app_browser": {
+        "stage": "stable",
+        "enabled": true
+      }
+    },
+    "checked_at": "2026-10-02T23:25:11.068Z",
+    "native_feature_detected": true,
+    "qualified": false,
+    "qualification_missing": [
+      "scoped_target_grant",
+      "bounded_native_actions",
+      "privacy_and_disclosure",
+      "independent_physical_stop",
+      "durable_normalized_receipts"
+    ]
+  },
+  "isolated_features": {
+    "browser_use": {
+      "stage": "stable",
+      "enabled": false
+    },
+    "browser_use_external": {
+      "stage": "stable",
+      "enabled": false
+    },
+    "browser_use_full_cdp_access": {
+      "stage": "stable",
+      "enabled": false
+    },
+    "computer_use": {
+      "stage": "stable",
+      "enabled": false
+    },
+    "in_app_browser": {
+      "stage": "stable",
+      "enabled": false
+    }
+  },
+  "default_app_access": "deny",
+  "config_sha256": "43fd94215a65091efd00ef830dd1266e53a4c7bc2c34e845cf3bae8baf8a978d",
+  "model_requests": 0,
+  "threads": 0,
+  "native_input": 0,
+  "qualified": false,
+  "scope": "Actual CLI version/features and app-server config/read only. Native scope, action budgets, privacy, independent physical Stop and normalized receipts remain unqualified. No personal config/auth artifacts copied."
+}

@@ -1,0 +1,82 @@
+{
+  "scope": "Actual compiled Windows daemon/Architect, CLI and Chrome. Read-only graph-family copy plus original receipt history for navigation scale; publication store dependencies narrowed to copied files and fresh disposable authority. No live mutation, scan, paid inference or production migration claimed.",
+  "checks": [
+    {
+      "name": "NAV08",
+      "detail": "528 real compiled daemon health probes create no sessions, cookies, grants or publication writes before actual browser navigation."
+    },
+    {
+      "name": "NAV01",
+      "detail": "Actual shell/list load at original receipt and graph-family scale; no mocked plan-index route."
+    },
+    {
+      "name": "NAV02",
+      "detail": "Actual source plan/log progress appears with completed cards dimmed and current ownership visible; no running lease invented."
+    },
+    {
+      "name": "NAV03",
+      "detail": "Bounded format notice offers the exact instance preview command without a full migration analysis or automatic migration."
+    },
+    {
+      "name": "NAV07",
+      "detail": "Actual daemon preserves a deliberately old map timestamp without an age-only stale verdict. Scope currency remains separately owned."
+    },
+    {
+      "name": "NAV04",
+      "detail": "Actual compiled CLI previews without writes, applies a reviewed backup/publication and replays one lost acknowledgement identity."
+    },
+    {
+      "name": "NAV05",
+      "detail": "Actual compiled CLI restore uses a separately reviewed current snapshot and returns original bytes through a new publication."
+    },
+    {
+      "name": "NAV06",
+      "detail": "Preview output cannot write inside instance storage; existing files and private authority remain protected."
+    }
+  ],
+  "errors": [],
+  "input_snapshot": {
+    "publication_sha256": "20a82d4b67683f44a5952f57fa1b27a9fc053bfdb44691858ed9fcece0855105",
+    "epoch": "26106937-91a6-4a74-adc7-594cc4cb7685",
+    "revision": {
+      "publication_sequence": 15959,
+      "graph_revision": null,
+      "domains": {
+        "authority": 523,
+        "extension_state": 10,
+        "schedules": 15426
+      }
+    },
+    "boundary": "Original publication bytes remained identical and no journal was present across the read-only family copy. This fixture is not a live cutover approval."
+  },
+  "publication_bytes": 13078620,
+  "copied_graph_files": [
+    "features.json",
+    "workflows.json",
+    "data_model.json",
+    "capabilities.json",
+    "datastores.json",
+    "auxiliary_entities.json",
+    "ui_registry.json",
+    "dream_graph.json",
+    "candidate_edges.json",
+    "validated_edges.json",
+    "tension_log.json",
+    "adr_log.json",
+    "dream_archetypes.json",
+    "system_story.json"
+  ],
+  "health_probes": {
+    "count": 528,
+    "p95_ms": 16,
+    "max_ms": 34,
+    "unchanged_authority": true,
+    "unchanged_publication": true
+  },
+  "browser": "153.0.8010.50",
+  "shell_ms": 1797,
+  "plans_visible_ms": 4233,
+  "selected_plan_data_ms": 870,
+  "selected_plan_visible_ms": 950,
+  "success": true
+}

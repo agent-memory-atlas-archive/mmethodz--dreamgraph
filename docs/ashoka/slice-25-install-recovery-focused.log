@@ -1,0 +1,42 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/cli-start-health.test.ts (3 tests) 14ms
+ ❯ tests/workspace-installation.test.ts (1 test | 1 failed) 5663ms
+   × refreshes changed workspace bytes at the same release and rejects a stale installed daemon dependency 5662ms
+     → expected [Function] to throw error including 'does not provide an export named \'bo…' but got 'Command failed: C:\nvm4w\nodejs\node.…'
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/workspace-installation.test.ts > refreshes changed workspace bytes at the same release and rejects a stale installed daemon dependency
+AssertionError: expected [Function] to throw error including 'does not provide an export named \'bo…' but got 'Command failed: C:\nvm4w\nodejs\node.…'
+
+- Expected
++ Received
+
+- does not provide an export named 'boundMachineResult'
++ Command failed: C:\nvm4w\nodejs\node.exe scripts/workspace-artifacts.mjs verify C:\Users\MIKAJU~1\AppData\Local\Temp\dg-workspace-install-Yo4dxo\source C:\Users\MIKAJU~1\AppData\Local\Temp\dg-workspace-install-Yo4dxo\bin
++ Named export 'boundMachineResult' not found. The requested module '@dreamgraph/token-economy' is a CommonJS module, which may not support all module.exports as named exports.
++ CommonJS modules can always be imported via the default export, for example using:
++
++ import pkg from '@dreamgraph/token-economy';
++ const { boundMachineResult } = pkg;
++
++
+
+ ❯ tests/workspace-installation.test.ts:45:3
+     43|   const verify = () => run(process.execPath, ["scripts/workspace-artif…
+     44|   await install();
+     45|   await expect(verify()).rejects.toThrow("does not provide an export n…
+       |   ^
+     46|   const prior = dependencies["@dreamgraph/token-economy"];
+     47|   await cp("packages/token-economy/dist/index.js", join(source, "packa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 3 passed (4)
+   Start at  12:30:06
+   Duration  6.21s (transform 137ms, setup 0ms, collect 243ms, tests 5.68s, environment 0ms, prepare 331ms)
+

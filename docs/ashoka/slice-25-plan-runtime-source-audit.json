@@ -1,0 +1,34 @@
+{
+  "checkpoint": "slice-25-plan-runtime-internal-foundation",
+  "created_at": "2026-10-02T08:03:06.0412637Z",
+  "source_read": "complete physical bytes",
+  "root_passed": 1825,
+  "root_skipped": 2,
+  "files": 156,
+  "focused_passed": 40,
+  "baseline": 16,
+  "contracts": 41,
+  "limitations": "Internal port only; ordinary native API/CLI/editor/SDK producer adoption is not yet qualified. No paid/native GUI/other-platform or whole Slice25 acceptance.",
+  "artifacts": [
+    {
+      "path": "src/discipline/plan-runtime.ts",
+      "bytes": 10523,
+      "sha256": "764d7a7d89b0a346275c9437462509e0e93a5eb2d7bcc81371b109803ef579c6"
+    },
+    {
+      "path": "tests/plan-runtime.test.ts",
+      "bytes": 12521,
+      "sha256": "05f3a1283b1a66d91ce7353bc98e4d179cdf3e5f0fa44d90d45863833c2e37fc"
+    },
+    {
+      "path": "docs/ashoka/slice-25-plan-runtime-qualified-root-tests.json",
+      "bytes": 617124,
+      "sha256": "07cadb652a0822bc0717c7cb126ebe721a8e07caf97e4716e1c528d3e6d3e2b0"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 82786,
+      "sha256": "386d82ee2db8882312e2686cf087f39f16a0a60a1d18fda539f489d403c55f9d"
+    }
+  ]
+}

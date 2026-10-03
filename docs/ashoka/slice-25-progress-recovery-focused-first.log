@@ -1,0 +1,48 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/managed-plan-execution.test.ts
+[2026-10-02T10:08:29.567Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-02T10:08:29.566Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/managed-plan-execution.test.ts > selection alone stays read-only, while explicit execution injects the post-admission canonical running projection
+[2026-10-02T10:08:29.802Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T10:08:30.765Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T10:08:30.792Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/architect-plan-authority.test.ts (7 tests) 9622ms
+   ✓ reads never import legacy success; preview/import retain exact bytes and recover one lost reply  353ms
+   ✓ the frozen actual Ashoka definition and log keep completed cards muted and current work navigable before lifecycle import  3842ms
+   ✓ actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan  1129ms
+   ✓ archive refuses a running/recovery lease and keeps original artifacts on failure  376ms
+   ✓ the real Architect script exposes readable running/current markers, slice filters and keyboard navigation  3639ms
+ ✓ tests/managed-plan-execution.test.ts (17 tests) 18991ms
+   ✓ selection alone stays read-only, while explicit execution injects the post-admission canonical running projection  1319ms
+   ✓ refuses foreign project, selection mismatch, changed source semantics and stale approval before returning native authority  879ms
+   ✓ external plan edits block delivery and worker/model dispatch; source restoration cannot renew a closed pass  750ms
+   ✓ a real pending native model permit cannot be reported as confirmed plan termination  1029ms
+   ✓ the SDK native model callback uses the delivered running plan and original spend permit but cannot mark the slice implemented  892ms
+   ✓ unconfirmed termination remains recovery on exact retry and cannot be strengthened through another public finish  866ms
+   ✓ independent original-native stop observations release only stopped ownership, preserve first closure, and require every outstanding model attempt  2041ms
+   ✓ native stop recovery refuses live authority, unconfirmed and forged attempts, foreign hosts and workers  1294ms
+   ✓ a committed independent stop with a lost reply replays its saved command without changing the first outcome or issuing more work  1176ms
+   ✓ the original SDK native worker can report a separately observed stop after its cancelled wait without renewing the pass  1154ms
+   ✓ rejected admission can close only a durably undelivered context with no lease or effects  587ms
+   ✓ lost C14 closure acknowledgment replays the persisted original command after host revocation without another event  753ms
+   ✓ finite authority expiry leaves canonical recovery and a later claimed confirmed stop cannot erase missing live observation  2027ms
+   ✓ a fresh compiled daemon process recovers the saved closure without live launch authority or another C14 event  1448ms
+   ✓ actual compiled editor and SDK native passes preserve explicit purpose and close canonical ownership without claiming verification  1571ms
+   ✓ foreign hosts and execution workers cannot request C14 closure or another implementation lease  687ms
+   ✓ browser chat refuses forged purpose, unrelated selection, fallback and continuation before a native task can start  518ms
+
+ Test Files  2 passed (2)
+      Tests  24 passed (24)
+   Start at  13:08:22
+   Duration  25.78s (transform 2.81s, setup 0ms, collect 13.74s, tests 28.61s, environment 0ms, prepare 287ms)
+

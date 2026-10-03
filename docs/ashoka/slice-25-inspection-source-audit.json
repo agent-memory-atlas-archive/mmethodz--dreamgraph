@@ -1,0 +1,56 @@
+{
+  "scope": "Full artifact SHA-256 reads; focused inspection/accounting review, not a full project review",
+  "generated_at": "2026-10-02T01:24:12.3164476Z",
+  "files": [
+    {
+      "path": "extensions/vscode/src/execution-review.ts",
+      "bytes": 10576,
+      "sha256": "315e800790cd28398a7d7c0ae3b6e53751cc6579d4a6dc140365b2f42f887a2f"
+    },
+    {
+      "path": "extensions/vscode/src/webview/execution-review.ts",
+      "bytes": 4880,
+      "sha256": "59e0d904643b3100de9ae953c0c74e58b6d67eb8ae8c6bf0b465fe0c6849b76f"
+    },
+    {
+      "path": "extensions/vscode/src/chat-panel.ts",
+      "bytes": 309743,
+      "sha256": "f4c50434bbd1972b3b9407b7d952252dc6987344377f7063efee4aa7ab3968c8"
+    },
+    {
+      "path": "src/architect/execution-review-ui.ts",
+      "bytes": 13745,
+      "sha256": "6279406c71aad5d8315d8aa76d4272bfd265c9b36700a5b7130aa510899d704e"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 85400,
+      "sha256": "64d77094e19beb352d8b57278fe0026b5f689ecc4ba621403b2f5e4be388d61d"
+    },
+    {
+      "path": "src/evaluation/agent-usefulness.ts",
+      "bytes": 10097,
+      "sha256": "b22829f6183d53fa62e5772e482d7b69b2235f7a037f48e4c4000e2f40a176b7"
+    },
+    {
+      "path": "tests/agent-usefulness.test.ts",
+      "bytes": 8920,
+      "sha256": "716a05f07b0149979f39c5a0175434695d32c4f77dcb7ba028e997a847732f2b"
+    },
+    {
+      "path": "scripts/qualify-ashoka-editor-review.mjs",
+      "bytes": 8402,
+      "sha256": "54c3c964eba2a06825477c02c8feea83989823b43db4c894840e0d4f9b8c2cee"
+    },
+    {
+      "path": "scripts/qualify-ashoka-architect.mjs",
+      "bytes": 24174,
+      "sha256": "470e7308c98afcbed0177f3d0fef0726c1d892512d303eb24686e1e42f50c85e"
+    },
+    {
+      "path": "scripts/qualify-ashoka-editor-operator.mjs",
+      "bytes": 7226,
+      "sha256": "f0cc1c761475e6091a4d6c409a4d3e490d66bb16908c27f0d260a06c50e0352e"
+    }
+  ]
+}

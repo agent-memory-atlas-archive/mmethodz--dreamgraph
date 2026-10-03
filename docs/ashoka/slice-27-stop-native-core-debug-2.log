@@ -1,0 +1,50 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+2026-10-03T08:08:25.728Z pw:browser <launching> C:\Program Files\Google\Chrome\Application\chrome.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --force-webrtc-ip-handling-policy=disable_non_proxied_udp --disable-features=WebTransport,DirectSockets,WebBluetooth,WebUSB --user-data-dir=C:\Users\MIKAJU~1\AppData\Local\Temp\playwright_chromiumdev_profile-e71NTB --remote-debugging-pipe --no-startup-window
+2026-10-03T08:08:25.740Z pw:browser <launched> pid=52736
+2026-10-03T08:08:29.129Z pw:browser [pid=52736] <gracefully close start>
+2026-10-03T08:08:29.303Z pw:browser [pid=52736] <process did exit: exitCode=0, signal=null>
+2026-10-03T08:08:29.303Z pw:browser [pid=52736] starting temporary directories cleanup
+2026-10-03T08:08:29.351Z pw:browser [pid=52736] finished temporary directories cleanup
+2026-10-03T08:08:29.351Z pw:browser [pid=52736] <gracefully close end>
+2026-10-03T08:08:30.283Z pw:browser <launching> C:\Program Files\Google\Chrome\Application\chrome.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --force-webrtc-ip-handling-policy=disable_non_proxied_udp --disable-features=WebTransport,DirectSockets,WebBluetooth,WebUSB --user-data-dir=C:\Users\MIKAJU~1\AppData\Local\Temp\playwright_chromiumdev_profile-0HVntL --remote-debugging-pipe --no-startup-window
+2026-10-03T08:08:30.296Z pw:browser <launched> pid=44948
+2026-10-03T08:08:31.220Z pw:browser [pid=44948] <gracefully close start>
+stderr | tests/computer-native-graph-loop.test.ts
+Actual graph-loop browser qualification: {
+  schema: 'dreamgraph.browser_qualification_failure_details.v1',
+  completed_checks: [ 'BW01', 'BW02', 'BW03A', 'BW03', 'BW04' ],
+  worker_phase: 'stop'
+} [{"ms":4427.1183,"worker":1,"event":"stop_called"},{"ms":4652.374400000001,"worker":1,"event":"original_stop_reply","terminated":true,"input_released":true},{"ms":4681.034800000001,"worker":1,"event":"original_child_exit","code":null,"signal":"SIGKILL"},{"ms":4681.350400000001,"worker":1,"event":"stop_resolved","elapsed_ms":254.27440000000024},{"ms":6518.892,"worker":2,"event":"stop_called"},{"ms":7428.188,"worker":2,"event":"stop_rejected","elapsed_ms":909.2903000000006,"reason":"COMPUTER_WORKER_REPLY_UNKNOWN"},{"ms":7428.5242,"worker":1,"event":"stop_called"},{"ms":7428.5342,"worker":1,"event":"stop_resolved","elapsed_ms":0.01299999999901047},{"ms":7428.540000000001,"worker":2,"event":"stop_called"},{"ms":8329.2954,"worker":2,"event":"stop_rejected","elapsed_ms":900.7309000000005,"reason":"COMPUTER_WORKER_REPLY_UNKNOWN"}]
+
+ ❯ tests/computer-native-graph-loop.test.ts (6 tests | 6 skipped) 8340ms
+   ↓ native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-native-graph-loop.test.ts [ tests/computer-native-graph-loop.test.ts ]
+Error: COMPUTER_WORKER_REPLY_UNKNOWN
+ ❯ qualifyBrowserRuntime src/computer/qualify-browser.ts:153:11
+    151|     const phase=z.enum(["bootstrap","open","observe","act","pause","re…
+    152|       cause&&typeof cause==="object"&&"phase" in cause?cause.phase:und…
+    153|     throw new Error(reason,{cause:QualificationFailureDetailsSchema.pa…
+       |           ^
+    154|       completed_checks:traces.map(trace=>trace.id),worker_phase:phase.…
+    155|   }finally{
+ ❯ tests/computer-native-graph-loop.test.ts:53:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 skipped (6)
+   Start at  11:08:18
+   Duration  14.55s (transform 2.10s, setup 0ms, collect 5.82s, tests 8.34s, environment 0ms, prepare 138ms)
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/slice-27-stop-native-core-debug-2.json

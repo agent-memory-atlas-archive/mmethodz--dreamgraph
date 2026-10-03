@@ -1,0 +1,47 @@
+✖ canonical graph context reaches the actual model-facing packet at high pressure, with exact receipt and Unicode evidence (5.8059ms)
+✖ a missing canonical capability is visible in the prompt and does not silently call the legacy data projection (0.5007ms)
+✖ required graph records borrow optional space within the same total bound; they never disappear when too large (0.8514ms)
+✔ repository-local ID collisions remain in the whole canonical pack without manufacturing a navigation identity (0.5929ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 1
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 298.5884
+
+✖ failing tests:
+
+test at extensions\vscode\dist\test\canonical-context-builder.test.js:36:25
+✖ canonical graph context reaches the actual model-facing packet at high pressure, with exact receipt and Unicode evidence (5.8059ms)
+  TypeError [ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING]: A dynamic import callback was not specified.
+      at importModuleDynamicallyCallback (node:internal/modules/esm/utils:266:9)
+      at ContextBuilder.buildReasoningPacket (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\context-builder.js:792:39)
+      at async TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\canonical-context-builder.test.js:41:20)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    code: 'ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING'
+  }
+
+test at extensions\vscode\dist\test\canonical-context-builder.test.js:50:25
+✖ a missing canonical capability is visible in the prompt and does not silently call the legacy data projection (0.5007ms)
+  TypeError [ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING]: A dynamic import callback was not specified.
+      at importModuleDynamicallyCallback (node:internal/modules/esm/utils:266:9)
+      at ContextBuilder.buildReasoningPacket (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\context-builder.js:792:39)
+      at async TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\canonical-context-builder.test.js:53:20)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    code: 'ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING'
+  }
+
+test at extensions\vscode\dist\test\canonical-context-builder.test.js:59:25
+✖ required graph records borrow optional space within the same total bound; they never disappear when too large (0.8514ms)
+  TypeError [ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING]: A dynamic import callback was not specified.
+      at importModuleDynamicallyCallback (node:internal/modules/esm/utils:266:9)
+      at ContextBuilder.buildReasoningPacket (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\context-builder.js:792:39)
+      at async TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\canonical-context-builder.test.js:62:18)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    code: 'ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING'
+  }

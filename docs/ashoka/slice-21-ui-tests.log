@@ -1,0 +1,22 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-01T06:50:05.710Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-01T06:50:05.724Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-01T06:50:06.502Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/architect-plan-authority.test.ts (5 tests) 2203ms
+   ✓ actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan  735ms
+   ✓ archive refuses a running/recovery lease and keeps original artifacts on failure  343ms
+   ✓ the real Architect script exposes readable running/current markers, slice filters and keyboard navigation  753ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  09:49:59
+   Duration  8.88s (transform 2.14s, setup 0ms, collect 6.29s, tests 2.20s, environment 0ms, prepare 131ms)
+

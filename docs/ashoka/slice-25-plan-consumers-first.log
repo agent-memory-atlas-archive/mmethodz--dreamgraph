@@ -1,0 +1,10 @@
+[2026-10-02T06:12:40.773Z] [INFO]  Creating instance dddd5192-e481-470e-a00e-9eda52b8f72c (plan-consumers) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-FnRrF3\master\dddd5192-e481-470e-a00e-9eda52b8f72c
+[2026-10-02T06:12:40.849Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-FnRrF3\master\instances.json
+[2026-10-02T06:12:40.849Z] [INFO]  Registered new instance dddd5192-e481-470e-a00e-9eda52b8f72c (plan-consumers)
+[2026-10-02T06:12:40.855Z] [INFO]  Instance dddd5192-e481-470e-a00e-9eda52b8f72c created successfully
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('#slice-list [data-slice-id="done"]') to be visible
+    61 × locator resolved to hidden <li tabindex="0" role="button" data-slice-id="done" class="dg-context-target" aria-label="Slice 0 - Verified work, pending. Open definition">…</li>
+
+    at C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-plan-consumers.mjs:44:110

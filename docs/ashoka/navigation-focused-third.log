@@ -1,0 +1,34 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-02T13:50:34.669Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/plan-context-integration.test.ts (6 tests) 1885ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  877ms
+   ✓ verified implementation evidence is distinct from the next slice and recovers after a transcript-free read  406ms
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T13:50:35.670Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T13:50:35.697Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/plan-authority.test.ts (7 tests) 1403ms
+   ✓ PL04/GE14: a status receipt cannot count as implementation; an actual graph commit can, and accepted verification survives replay  372ms
+   ✓ GE14/CU22 effect contract: reconciliation must finish; optional unfunded digestion can remain pending  450ms
+ ✓ tests/publication-read-cache.test.ts (4 tests) 396ms
+stderr | tests/architect-plan-authority.test.ts > actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan
+[2026-10-02T13:50:40.204Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+ ✓ tests/architect-plan-authority.test.ts (7 tests) 6446ms
+   ✓ reads never import legacy success; preview/import retain exact bytes and recover one lost reply  383ms
+   ✓ the frozen actual Ashoka definition and log keep completed cards muted and current work navigable before lifecycle import  3831ms
+   ✓ actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan  876ms
+   ✓ archive refuses a running/recovery lease and keeps original artifacts on failure  402ms
+   ✓ the real Architect script exposes readable running/current markers, slice filters and keyboard navigation  666ms
+
+ Test Files  4 passed (4)
+      Tests  24 passed (24)
+   Start at  16:50:27
+   Duration  14.23s (transform 2.81s, setup 0ms, collect 13.64s, tests 10.13s, environment 1ms, prepare 574ms)
+

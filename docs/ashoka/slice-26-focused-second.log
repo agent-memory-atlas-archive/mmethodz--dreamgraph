@@ -1,0 +1,21 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/graph-upgrade-notice.test.ts (5 tests) 619ms
+   ✓ requires a durable original review receipt, reopens a restored format and keeps notification read-only  405ms
+ ✓ tests/legacy-graph-upgrade.test.ts (11 tests) 7867ms
+   ✓ reviewed offline legacy graph upgrade > previews all families without writing, preserves scoped identities and provenance, and never invents source/scan history  486ms
+   ✓ reviewed offline legacy graph upgrade > archives exact duplicates once but blocks conflicting claims until exact row-bound explicit choices  525ms
+   ✓ reviewed offline legacy graph upgrade > rejects unsupported majors, invalid UTF-8 and schema shapes, stale resolutions and changed previews  353ms
+   ✓ reviewed offline legacy graph upgrade > cancels before cutover and rejects input changes after backup; original mutation is retained  590ms
+   ✓ reviewed offline legacy graph upgrade > validates owner stores and refuses unfinished jobs instead of cancelling or reassigning them  445ms
+   ✓ reviewed offline legacy graph upgrade > restores exact original bytes as a new publication while preserving post-cutover debt, history and source currency  695ms
+   ✓ reviewed offline legacy graph upgrade > exposes restore conflicts and backup corruption before any restore; an uncertain old result is not overwritten  526ms
+   ✓ reviewed offline legacy graph upgrade > recovers a real killed writer at after_replace:0: without replaying a second graph effect  1985ms
+   ✓ reviewed offline legacy graph upgrade > recovers a real killed writer at publication_committed without replaying a second graph effect  1846ms
+
+ Test Files  2 passed (2)
+      Tests  16 passed (16)
+   Start at  16:41:25
+   Duration  13.61s (transform 2.01s, setup 0ms, collect 10.64s, tests 8.49s, environment 0ms, prepare 299ms)
+

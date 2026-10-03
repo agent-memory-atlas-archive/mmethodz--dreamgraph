@@ -1,0 +1,26 @@
+[2026-10-02T12:25:44.585Z] [INFO]  Creating instance 43b689ca-0a3b-47f3-b93a-fa4387adf4a9 (configuration-check) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-configuration-browser-oimxlr\master\43b689ca-0a3b-47f3-b93a-fa4387adf4a9
+[2026-10-02T12:25:44.672Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-configuration-browser-oimxlr\master\instances.json
+[2026-10-02T12:25:44.673Z] [INFO]  Registered new instance 43b689ca-0a3b-47f3-b93a-fa4387adf4a9 (configuration-check)
+[2026-10-02T12:25:44.678Z] [INFO]  Instance 43b689ca-0a3b-47f3-b93a-fa4387adf4a9 created successfully
+CW01
+CW02
+Catalogued 0/308
+Catalogued 75/308
+Catalogued 150/308
+Catalogued 225/308
+Catalogued 300/308
+CW03
+CW04
+CW05
+CW06
+CW07
+CW08
+CW09
+CW10
+CW11
+CW12
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert((await page.locator('#cw-restart-command').innerText()).includes(instance.uuid))
+
+    at file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-configuration.mjs:82:116

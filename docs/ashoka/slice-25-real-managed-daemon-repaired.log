@@ -1,0 +1,74 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/mcp-catalog-boundary.test.ts
+[2026-10-02T01:41:20.094Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-02T01:41:20.097Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:41:20.098Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:41:20.098Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-02T01:41:20.099Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-02T01:41:20.099Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-02T01:41:20.100Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-02T01:41:20.100Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-02T01:41:20.102Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-02T01:41:20.102Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-02T01:41:20.105Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-02T01:41:20.106Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-02T01:41:20.109Z] [INFO]  Registered 17 cognitive resources
+[2026-10-02T01:41:20.113Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-02T01:41:20.114Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-02T01:41:20.114Z] [INFO]  Registered 10 discipline execution tools
+
+stderr | tests/mcp-catalog-boundary.test.ts > collects the real registrars once with exact discipline parity and schemas
+[2026-10-02T01:41:20.170Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-02T01:41:20.170Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:41:20.170Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:41:20.170Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-02T01:41:20.171Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-02T01:41:20.171Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-02T01:41:20.171Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-02T01:41:20.171Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-02T01:41:20.172Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-02T01:41:20.172Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-02T01:41:20.174Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-02T01:41:20.175Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-02T01:41:20.204Z] [INFO]  Registered 17 cognitive resources
+[2026-10-02T01:41:20.205Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-02T01:41:20.207Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-02T01:41:20.207Z] [INFO]  Registered 10 discipline execution tools
+[2026-10-02T01:41:20.226Z] [INFO]  Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)
+[2026-10-02T01:41:20.227Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-10-02T01:41:20.227Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-10-02T01:41:20.227Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+[2026-10-02T01:41:20.227Z] [INFO]  Registered 1 solidify tool (solidify_cognitive_insight)
+[2026-10-02T01:41:20.227Z] [INFO]  Registered 1 web-senses tool (fetch_web_page)
+[2026-10-02T01:41:20.227Z] [INFO]  Registered 2 git-senses tools (git_log, git_blame)
+[2026-10-02T01:41:20.227Z] [INFO]  Registered 2 db-senses tools (query_db_schema, scan_database)
+[2026-10-02T01:41:20.228Z] [INFO]  Registered 1 runtime-senses tool
+[2026-10-02T01:41:20.228Z] [INFO]  Registered 2 runtime-senses tools (query_runtime_metrics, query_self_metrics)
+[2026-10-02T01:41:20.230Z] [INFO]  Registered API surface tools (3 tools, 1 resource)
+[2026-10-02T01:41:20.231Z] [INFO]  Registered core tool owners; the composed live catalogue is authoritative for counts
+[2026-10-02T01:41:20.257Z] [INFO]  Registered 17 cognitive resources
+[2026-10-02T01:41:20.258Z] [INFO]  Registered 17 cognitive tools + 6 scheduler tools + 6 knowledge backbone tools
+[2026-10-02T01:41:20.260Z] [INFO]  Registered discipline://manifest — 94 tools classified, 19 data files protected
+[2026-10-02T01:41:20.260Z] [INFO]  Registered 10 discipline execution tools
+
+ ✓ tests/daemon-transport-isolation.test.ts (3 tests) 9738ms
+   ✓ isolates real native MCP transports, rejects foreign browser binding and removes closed sessions  3939ms
+   ✓ carries its stdio stream owner through tools and resources  2499ms
+   ✓ the actual daemon admits one exact managed MCP action once, retains source debt and refuses consumed replay  3298ms
+stderr | tests/mcp-catalog-boundary.test.ts > blocks mutations/cognition in the wrong phase and requires an applicable approved plan
+[2026-10-02T01:41:22.726Z] [INFO]  Discipline session started: 9833d533-1ea5-4e68-991b-73aff9afa1f3 (modification: boundary)
+
+ ✓ tests/mcp-catalog-boundary.test.ts (191 tests) 2605ms
+   ✓ dream_cycle: shared result/dependency/version/cancellation boundary  427ms
+   ✓ import_dream_archetypes: shared result/dependency/version/cancellation boundary  398ms
+   ✓ metacognitive_analysis: shared result/dependency/version/cancellation boundary  375ms
+   ✓ nightmare_cycle: shared result/dependency/version/cancellation boundary  368ms
+   ✓ normalize_dreams: shared result/dependency/version/cancellation boundary  362ms
+
+ Test Files  2 passed (2)
+      Tests  194 passed (194)
+   Start at  04:41:12
+   Duration  10.80s (transform 2.72s, setup 0ms, collect 8.33s, tests 12.34s, environment 0ms, prepare 281ms)
+

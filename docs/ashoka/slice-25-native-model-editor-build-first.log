@@ -1,0 +1,26 @@
+
+> dreamgraph-vscode@13.4.0 build
+> npm run lint:isolation && npm run build:webview && tsc -p ./tsconfig.json && npm run build:extension && npm run build:bridge && npm run build:vendor
+
+
+> dreamgraph-vscode@13.4.0 lint:isolation
+> node scripts/lint-isolation.mjs
+
+lint:isolation OK — architect-v2 quarantined; 0 violations.
+
+> dreamgraph-vscode@13.4.0 build:webview
+> node scripts/build-webview.cjs
+
+
+  dist\webview.js  27.2kb
+
+Done in 7ms
+src/architect-llm.ts(364,33): error TS2345: Argument of type 'ReadableStream<Uint8Array<ArrayBufferLike>> | null' is not assignable to parameter of type 'BodyInit | null | undefined'.
+  Type 'ReadableStream<Uint8Array<ArrayBufferLike>>' is not assignable to type 'BodyInit | null | undefined'.
+    Type 'ReadableStream<Uint8Array<ArrayBufferLike>>' is not assignable to type 'ReadableStream<any>'.
+      Types of property 'pipeThrough' are incompatible.
+        Type '<T>(transform: ReadableWritablePair<T, Uint8Array<ArrayBufferLike>>, options?: StreamPipeOptions | undefined) => ReadableStream<...>' is not assignable to type '<T>(transform: ReadableWritablePair<T, any>, options?: StreamPipeOptions | undefined) => ReadableStream<T>'.
+          Types of parameters 'transform' and 'transform' are incompatible.
+            Type 'ReadableWritablePair<T, any>' is not assignable to type 'ReadableWritablePair<T | undefined, Uint8Array<ArrayBufferLike>>'.
+              Types of property 'readable' are incompatible.
+                Type 'ReadableStream<T>' is missing the following properties from type 'ReadableStream<T | undefined>': values, [Symbol.asyncIterator]

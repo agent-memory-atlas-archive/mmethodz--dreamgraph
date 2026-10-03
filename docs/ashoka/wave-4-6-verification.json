@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"success\": true,\n  \"compliance\": {\n    \"status\": \"compliant\",\n    \"parity_percentage\": 100,\n    \"total_entries\": 10,\n    \"matched\": 10,\n    \"gaps_remaining\": 0,\n    \"regressions\": 0\n  },\n  \"regressions\": 0,\n  \"recommendation\": {\n    \"action\": \"accept\",\n    \"justification\": \"All entries match. No regressions detected.\"\n  },\n  \"message\": \"Verification: COMPLIANT — 100% parity, 0 gaps, 0 regressions. Recommendation: accept\"\n}"
+    }
+  ]
+}

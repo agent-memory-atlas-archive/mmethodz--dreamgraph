@@ -1,0 +1,5 @@
+
+> dreamgraph@13.4.0 test
+> vitest run --reporter=json --outputFile=docs/ashoka/slice-10-progress.raw.json
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/slice-10-progress.raw.json

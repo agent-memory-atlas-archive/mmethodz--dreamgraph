@@ -1,0 +1,251 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/computer-use-ui.test.ts (9 tests) 993ms
+stderr | tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+[2026-10-02T18:55:29.257Z] [INFO]  LLM provider: none (model: old-model)
+
+ ✓ tests/engine-configuration.test.ts (18 tests) 603ms
+stderr | tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+[2026-10-02T18:55:31.018Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T18:55:31.126Z] [INFO]  LLM provider: none (model: old-model)
+
+ ❯ tests/computer-configuration.test.ts (8 tests | 8 failed) 582ms
+   × schema-driven setup uses existing C07 receipts and exact recovery without engine enablement, graph writes or grants 86ms
+     → ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-pcbMdf\config\computer-use\workers'
+   × an actual interruption after prepared recovers through C07 and never mints replacement authority 56ms
+     → ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-hsyAp1\config\computer-use\workers'
+   × an actual interruption after file_committed recovers through C07 and never mints replacement authority 55ms
+     → ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-MbBwHH\config\computer-use\workers'
+   × competing edits and reused operation IDs preserve the original file and require readback 128ms
+     → ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-cPBLXX\config\computer-use\workers'
+   × typed and semantic scope errors reject before writes, including ID mismatch and out-of-scope initial URLs 21ms
+     → ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-m7KoLo\config\computer-use\workers'
+   × physical configuration links cannot redirect profile installation outside this instance 66ms
+     → ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-v5SOsw\config\computer-use\workers'
+   × declared qualification can be stored as setup but cannot be displayed as current production support 47ms
+     → ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-hPy5c0\config\computer-use\targets'
+   × HTTP worker/model callers cannot read or change operator profiles and exact human saves remain bounded 122ms
+     → ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-uMAlo2\config\computer-use\workers'
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T18:55:31.457Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T18:55:31.577Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T18:55:31.795Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":0,"max_auto_cycles_per_hour":10}
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T18:55:31.872Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T18:55:31.969Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T18:55:32.150Z] [INFO]  LLM provider: none (model: new-model)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T18:55:32.241Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T18:55:32.343Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T18:55:32.534Z] [INFO]  LLM provider: none (model: other-writer)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T18:55:32.582Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+[2026-10-02T18:55:32.685Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+[2026-10-02T18:55:33.263Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T18:55:33.357Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T18:55:33.390Z] [WARN]  LLM: OpenAI provider configured but no API key set (DREAMGRAPH_LLM_API_KEY)
+[2026-10-02T18:55:33.391Z] [INFO]  LLM provider: openai (model: gpt-5.4)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T18:55:33.401Z] [INFO]  LLM dreamer config: model=gpt-5.4-mini, temp=0, maxTokens=1600
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T18:55:33.429Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > structured edits remove only corresponding legacy aliases and preserve unrelated zero limits
+[2026-10-02T18:55:33.528Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > structured edits remove only corresponding legacy aliases and preserve unrelated zero limits
+[2026-10-02T18:55:33.787Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > a runtime activation failure preserves the committed save, restores prior runtime and excludes secret error text
+[2026-10-02T18:55:33.883Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > a runtime activation failure preserves the committed save, restores prior runtime and excludes secret error text
+[2026-10-02T18:55:33.914Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > a runtime activation failure preserves the committed save, restores prior runtime and excludes secret error text
+[2026-10-02T18:55:33.928Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > recent and active pagination retains session isolation and refuses cancellation of another session job
+[2026-10-02T18:55:34.021Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > recent and active pagination retains session isolation and refuses cancellation of another session job
+[2026-10-02T18:55:34.300Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > preserves fragmented UTF-8 configuration bytes and rejects invalid encoding before any file write
+[2026-10-02T18:55:34.392Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > preserves fragmented UTF-8 configuration bytes and rejects invalid encoding before any file write
+[2026-10-02T18:55:34.443Z] [INFO]  LLM provider: none (model: määrä🌿)
+
+stderr | tests/configuration-workspace.test.ts > preserves fragmented UTF-8 configuration bytes and rejects invalid encoding before any file write
+[2026-10-02T18:55:34.460Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T18:55:34.556Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T18:55:34.608Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T18:55:34.617Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T18:55:34.719Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T18:55:34.960Z] [INFO]  LLM architect config: provider=none (general), model=old-model (general), temp=0.7, maxTokens=2048
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T18:55:35.123Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ✓ tests/configuration-workspace.test.ts (13 tests) 5982ms
+   ✓ maps every consumed setting to one typed control or named read-only exception without leaking stored secrets  1883ms
+   ✓ keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work  436ms
+   ✓ edits structured component settings and retains explicit zeros/default inheritance through restart parsing  413ms
+   ✓ retains a whole captured save after a committed lost reply and recovers that receipt without a second effect  369ms
+   ✓ keeps drafts on concurrent revision refusal and never overwrites the intervening file  341ms
+   ✓ previews a scoped template without writes, applies protected staging and undoes the original bytes  680ms
+   ✓ structured edits remove only corresponding legacy aliases and preserve unrelated zero limits  358ms
+   ✓ recent and active pagination retains session isolation and refuses cancellation of another session job  368ms
+   ✓ root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry  504ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-configuration.test.ts > schema-driven setup uses existing C07 receipts and exact recovery without engine enablement, graph writes or grants
+Error: ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-pcbMdf\config\computer-use\workers'
+ ❯ releaseGraphWriter src/graph/writer-lease.ts:51:20
+     49| /** Only a quiescent daemon/test may release; ordinary requests never …
+     50| export async function releaseGraphWriter(directory = getDataDir()): Pr…
+     51|   const physical = await realpath(directory);
+       |                    ^
+     52|   const key = process.platform === "win32" ? physical.toLowerCase() : …
+     53|   const lease = leases.get(key);
+ ❯ tests/computer-configuration.test.ts:20:122
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  tests/computer-configuration.test.ts > an actual interruption after prepared recovers through C07 and never mints replacement authority
+Error: ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-hsyAp1\config\computer-use\workers'
+ ❯ releaseGraphWriter src/graph/writer-lease.ts:51:20
+     49| /** Only a quiescent daemon/test may release; ordinary requests never …
+     50| export async function releaseGraphWriter(directory = getDataDir()): Pr…
+     51|   const physical = await realpath(directory);
+       |                    ^
+     52|   const key = process.platform === "win32" ? physical.toLowerCase() : …
+     53|   const lease = leases.get(key);
+ ❯ tests/computer-configuration.test.ts:20:122
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  tests/computer-configuration.test.ts > an actual interruption after file_committed recovers through C07 and never mints replacement authority
+Error: ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-MbBwHH\config\computer-use\workers'
+ ❯ releaseGraphWriter src/graph/writer-lease.ts:51:20
+     49| /** Only a quiescent daemon/test may release; ordinary requests never …
+     50| export async function releaseGraphWriter(directory = getDataDir()): Pr…
+     51|   const physical = await realpath(directory);
+       |                    ^
+     52|   const key = process.platform === "win32" ? physical.toLowerCase() : …
+     53|   const lease = leases.get(key);
+ ❯ tests/computer-configuration.test.ts:20:122
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  tests/computer-configuration.test.ts > competing edits and reused operation IDs preserve the original file and require readback
+Error: ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-cPBLXX\config\computer-use\workers'
+ ❯ releaseGraphWriter src/graph/writer-lease.ts:51:20
+     49| /** Only a quiescent daemon/test may release; ordinary requests never …
+     50| export async function releaseGraphWriter(directory = getDataDir()): Pr…
+     51|   const physical = await realpath(directory);
+       |                    ^
+     52|   const key = process.platform === "win32" ? physical.toLowerCase() : …
+     53|   const lease = leases.get(key);
+ ❯ tests/computer-configuration.test.ts:20:122
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  tests/computer-configuration.test.ts > typed and semantic scope errors reject before writes, including ID mismatch and out-of-scope initial URLs
+Error: ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-m7KoLo\config\computer-use\workers'
+ ❯ releaseGraphWriter src/graph/writer-lease.ts:51:20
+     49| /** Only a quiescent daemon/test may release; ordinary requests never …
+     50| export async function releaseGraphWriter(directory = getDataDir()): Pr…
+     51|   const physical = await realpath(directory);
+       |                    ^
+     52|   const key = process.platform === "win32" ? physical.toLowerCase() : …
+     53|   const lease = leases.get(key);
+ ❯ tests/computer-configuration.test.ts:20:122
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  tests/computer-configuration.test.ts > physical configuration links cannot redirect profile installation outside this instance
+Error: ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-v5SOsw\config\computer-use\workers'
+ ❯ releaseGraphWriter src/graph/writer-lease.ts:51:20
+     49| /** Only a quiescent daemon/test may release; ordinary requests never …
+     50| export async function releaseGraphWriter(directory = getDataDir()): Pr…
+     51|   const physical = await realpath(directory);
+       |                    ^
+     52|   const key = process.platform === "win32" ? physical.toLowerCase() : …
+     53|   const lease = leases.get(key);
+ ❯ tests/computer-configuration.test.ts:20:122
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  tests/computer-configuration.test.ts > declared qualification can be stored as setup but cannot be displayed as current production support
+Error: ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-hPy5c0\config\computer-use\targets'
+ ❯ releaseGraphWriter src/graph/writer-lease.ts:51:20
+     49| /** Only a quiescent daemon/test may release; ordinary requests never …
+     50| export async function releaseGraphWriter(directory = getDataDir()): Pr…
+     51|   const physical = await realpath(directory);
+       |                    ^
+     52|   const key = process.platform === "win32" ? physical.toLowerCase() : …
+     53|   const lease = leases.get(key);
+ ❯ tests/computer-configuration.test.ts:20:122
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  tests/computer-configuration.test.ts > HTTP worker/model callers cannot read or change operator profiles and exact human saves remain bounded
+Error: ENOENT: no such file or directory, realpath 'C:\Users\MIKAJU~1\AppData\Local\Temp\dg-cu-config-uMAlo2\config\computer-use\workers'
+ ❯ releaseGraphWriter src/graph/writer-lease.ts:51:20
+     49| /** Only a quiescent daemon/test may release; ordinary requests never …
+     50| export async function releaseGraphWriter(directory = getDataDir()): Pr…
+     51|   const physical = await realpath(directory);
+       |                    ^
+     52|   const key = process.platform === "win32" ? physical.toLowerCase() : …
+     53|   const lease = leases.get(key);
+ ❯ tests/computer-configuration.test.ts:20:122
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  8 failed | 40 passed (48)
+   Start at  21:55:22
+   Duration  13.06s (transform 2.35s, setup 0ms, collect 12.53s, tests 8.16s, environment 1ms, prepare 601ms)
+

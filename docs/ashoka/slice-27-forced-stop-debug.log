@@ -1,0 +1,39 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+2026-10-03T08:18:42.225Z pw:browser <launching> C:\Program Files\Google\Chrome\Application\chrome.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --force-webrtc-ip-handling-policy=disable_non_proxied_udp --disable-features=WebTransport,DirectSockets,WebBluetooth,WebUSB --user-data-dir=C:\Users\MIKAJU~1\AppData\Local\Temp\playwright_chromiumdev_profile-WV5kBh --remote-debugging-pipe --no-startup-window
+2026-10-03T08:18:42.238Z pw:browser <launched> pid=47292
+2026-10-03T08:18:42.968Z pw:browser [pid=47292] <gracefully close start>
+{"stop_signal":true,"listeners":1,"at":1791015523321}
+2026-10-03T08:18:43.322Z pw:browser [pid=47292] <forcefully close>
+2026-10-03T08:18:43.322Z pw:browser [pid=47292] <kill>
+2026-10-03T08:18:43.322Z pw:browser [pid=47292] <will force kill>
+2026-10-03T08:18:43.626Z pw:browser [pid=47292] taskkill stdout: SUCCESS: The process with PID 54552 (child process of PID 47292) has been terminated.
+SUCCESS: The process with PID 26992 (child process of PID 47292) has been terminated.
+SUCCESS: The process with PID 39556 (child process of PID 47292) has been terminated.
+SUCCESS: The process with PID 30012 (child process of PID 47292) has been terminated.
+SUCCESS: The process with PID 40784 (child process of PID 47292) has been terminated.
+SUCCESS: The process with PID 53680 (child process of PID 47292) has been terminated.
+SUCCESS: The process with PID 29512 (child process of PID 47292) has been terminated.
+SUCCESS: The process with PID 47292 (child process of PID 37688) has been terminated.
+
+{"stop_signal":true,"listeners":0,"at":1791015523632}
+2026-10-03T08:18:43.658Z pw:browser [pid=47292] <process did exit: exitCode=1, signal=null>
+2026-10-03T08:18:43.658Z pw:browser [pid=47292] starting temporary directories cleanup
+2026-10-03T08:18:43.705Z pw:browser [pid=47292] finished temporary directories cleanup
+2026-10-03T08:18:43.705Z pw:browser [pid=47292] <gracefully close end>
+stdout | tests/computer-browser-worker.test.ts > Stop terminates its original browser within the same deadline when graceful close is deliberately ignored
+Forced original-browser termination evidence {
+  elapsed_ms: 768.6821,
+  dropped_graceful_frames: 1,
+  requests_quiescent: true
+}
+
+ ✓ tests/computer-browser-worker.test.ts (13 tests | 12 skipped) 2838ms
+   ✓ Stop terminates its original browser within the same deadline when graceful close is deliberately ignored  2837ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 12 skipped (13)
+   Start at  11:18:40
+   Duration  3.62s (transform 212ms, setup 0ms, collect 365ms, tests 2.84s, environment 0ms, prepare 169ms)
+

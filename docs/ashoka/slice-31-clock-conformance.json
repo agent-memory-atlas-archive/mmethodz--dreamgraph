@@ -1,0 +1,532 @@
+{
+  "schema": "dreamgraph.ashoka.computer_checkpoint.v1",
+  "recorded_at": "2026-10-03T01:24:55.722Z",
+  "status": "monotonic_watchdog_qualified_slice31_in_progress",
+  "model_requests": 0,
+  "root": {
+    "passed": 2003,
+    "failed": 0,
+    "skipped": 2,
+    "files": 178,
+    "max_workers": 4,
+    "exit_code": 0,
+    "elapsed_seconds": 180.19564404296875
+  },
+  "focused": {
+    "clock_and_failure": 5,
+    "windows_browser": 15,
+    "linux_browser_evidence": 12,
+    "failed": 0
+  },
+  "editor": {
+    "passed": 529,
+    "failed": 0,
+    "temporal": true,
+    "note": "Earlier compiled editor evidence; clock/diagnostic changes do not modify companion source."
+  },
+  "watchdog": {
+    "clock": "node.performance.now",
+    "heartbeat_threshold_ms": 2500,
+    "check_interval_ms": 100,
+    "responsive_stop_ceiling_ms": 1000,
+    "control_loss_ceiling_ms": 5000,
+    "absolute_grant_expiry": "unchanged"
+  },
+  "wsl": {
+    "installation": {
+      "schema": "dreamgraph.wsl_installation_proof.v1",
+      "recorded_at": "2026-10-03T01:21:22.633Z",
+      "platform": "linux",
+      "architecture": "x64",
+      "kernel": "6.6.87.2-microsoft-standard-WSL2",
+      "distribution": "PRETTY_NAME=\"Ubuntu 24.04.4 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.4 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+      "node": "20.20.2",
+      "npm": "10.8.2",
+      "master": "/home/mmethodz/.dreamgraph",
+      "source": "/tmp/dg-ashoka-wsl-c0d9212a-e336-4a39-8130-2c3f6891a72d/source",
+      "version": "13.4.0",
+      "cli_version": "DreamGraph CLI v13.4.0 (Glass Atlas)",
+      "workspaces": [
+        {
+          "name": "@dreamgraph/sdk",
+          "version": "13.4.0",
+          "files": 88
+        },
+        {
+          "name": "@dreamgraph/host",
+          "version": "13.4.0",
+          "files": 28
+        },
+        {
+          "name": "@dreamgraph/token-economy",
+          "version": "13.4.0",
+          "files": 20
+        }
+      ],
+      "files": [
+        {
+          "file": "package.json",
+          "sha256": "4774334dde888d0278e37714cac6388603f171b4145c5978cdcb582884228f71"
+        },
+        {
+          "file": "dist/cli/dg.js",
+          "sha256": "d904dff72a0c6cc925b4f1dfbbb900cab2adb944f56114e2c89848d05d223578"
+        },
+        {
+          "file": "dist/computer/browser-harness.js",
+          "sha256": "8398de70aa91ce95d8c85a598056f3c91dcad8915c5ab8600ff2e05749b5e681"
+        },
+        {
+          "file": "dist/computer/browser-worker-entry.js",
+          "sha256": "c4b63f0a5345bee097ea33bb1683bbc1ae01f11119ac6c503b71a606d7fdded0"
+        }
+      ],
+      "runtime_version": "1.62.1",
+      "browser_executable": "/tmp/dg-ashoka-wsl-3e20aba0-2617-4c9e-8b89-93779607a2a6/browsers/chromium-1234/chrome-linux64/chrome",
+      "browser_version": "151.0.7922.34",
+      "model_requests": 0,
+      "support_scope": "Actual WSL Linux test-bed installer and isolated headless browser only. No native desktop, CLI computer adapter, macOS, Linux Mint GUI or VS Code activation qualification.",
+      "browser_artifact_hash": "sha256:28a4b06375b6bcc970acf0d1cabfcdc57f6024b01a5f1bf90f1c01d86e5e3a6b",
+      "cli_output": {
+        "qualification_path": "/tmp/dg-ashoka-wsl-c0d9212a-e336-4a39-8130-2c3f6891a72d/browser-qualification.json",
+        "worker_id": "ashoka-wsl-ubuntu-browser",
+        "platform": "linux",
+        "architecture": "x64",
+        "browser_version": "151.0.7922.34",
+        "node": "20.20.2",
+        "model_requests": 0,
+        "measured_checks": 11,
+        "evidence_hash": "sha256:28a4b06375b6bcc970acf0d1cabfcdc57f6024b01a5f1bf90f1c01d86e5e3a6b",
+        "stop_release_ms": 264.473755,
+        "control_loss_stop_ms": 2656.418177999998,
+        "note": "Qualification only. Instance setup, target review and explicit scoped permission are separate."
+      }
+    },
+    "qualification": {
+      "schema": "dreamgraph.computer_qualification.v1",
+      "backend": "isolated_playwright",
+      "backend_version": "playwright-core@1.62.1/chromium@151.0.7922.34/node@20.20.2",
+      "platform": "linux",
+      "architecture": "x64",
+      "source_hash": "sha256:7b0e28ad46cae9cb21f2075eaabdf7470796fe1c33e796e696821b866152b814",
+      "protocol_hash": "sha256:ec4bb77daacf9faeb874bc313e0f3fbcc431d6aef7ce7a60ab2a90448bbbfc65",
+      "qualified_at": "2026-10-03T01:21:22.341Z",
+      "evidence_scope": "actual_runtime",
+      "scope_negative_passed": true,
+      "privacy_passed": true,
+      "bounded_actions_passed": true,
+      "stop_release_ms": 264.473755,
+      "control_loss_stop_ms": 2656.418177999998,
+      "cases": [
+        "CU04",
+        "CU05",
+        "CU10",
+        "CU20",
+        "CU24"
+      ],
+      "artifact_hash": "sha256:28a4b06375b6bcc970acf0d1cabfcdc57f6024b01a5f1bf90f1c01d86e5e3a6b"
+    },
+    "source_inventory_files": 476,
+    "measured_checks": 11,
+    "note": "Authorized Linux force install only. Qualification is limited to the exact isolated browser/runtime; no Windows deployment or Mint/macOS/native desktop/editor activation."
+  },
+  "failures": {
+    "retained": true,
+    "linux_initial_graph_loop": "Original watchdog report retained; subsequent monotonic-clock focus passed. Cause of the original missed heartbeats remains unproved.",
+    "initial_full_root": "2000 passed, one CLI positive fixture admission expired at300ms. Test-only allowance now2000ms remains shorter than its five-minute host lease; production limits unchanged.",
+    "first_current_wsl": "Installation succeeded but qualification reported an unknown worker reply. Its scope, source inventory and unqualified artifact remain retained. The later qualification ran after the heavy Windows suite completed; no stress-load guarantee inferred."
+  },
+  "scope": "Actual private IPC clock cases and exact current installed WSL browser. Qualified failure details are bounded codes only. Existing source/graph/browser evidence retains its original owner and offline-provider scope.",
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "remaining": [
+    "Slice31 full editor execution, native workers/native CLI/provider integration and CU/XS joins.",
+    "Slice26 reviewed live cutover,27 actual paired usefulness,28 synchronized release. Product13.4.0; no Windows install/restart, live migration or paid inference."
+  ],
+  "artifacts": [
+    {
+      "path": "src/computer/browser-worker-entry.ts",
+      "bytes": 4224,
+      "sha256": "7ef7b11919f30415e9161141fe9a5326eedf635eb77d5151d640034d05ea4124"
+    },
+    {
+      "path": "src/computer/browser-harness.ts",
+      "bytes": 12601,
+      "sha256": "b521c521b8a1a5a7ace5ebe6fbfa2b84257a61b62b3fbef8404a614143846c27"
+    },
+    {
+      "path": "src/computer/qualify-browser.ts",
+      "bytes": 20409,
+      "sha256": "f0cfff22c6d4966eae866bca4721e06b71d3112404715ba2015bf2882f5578d1"
+    },
+    {
+      "path": "src/cli/commands/computer-use.ts",
+      "bytes": 3926,
+      "sha256": "e4847a9a781e7edef8158e4b0ba3d5a72952aa7cfef7a5f24cead33d898beda5"
+    },
+    {
+      "path": "tests/computer-worker-clock.test.ts",
+      "bytes": 3279,
+      "sha256": "f8f53584ede425bd9894460ee41164c11e4bdb4af90de735bc4b30a0b941038c"
+    },
+    {
+      "path": "tests/helpers/computer-frozen-clock-worker.mjs",
+      "bytes": 316,
+      "sha256": "b6cfe19d993a73816c6fc0ecf9c694a3770e976e8e74304834b25cb41f8adcb1"
+    },
+    {
+      "path": "tests/computer-qualification-failure.test.ts",
+      "bytes": 1861,
+      "sha256": "b1352b4d073fae625bd4cf86121ee13887bc01fbc56eaacd5fa865c08360339d"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 178124,
+      "sha256": "9353ab0313f161b8286741bf901a9a1bd0c7b7b010b7810ab04c98c136930e26"
+    },
+    {
+      "path": "scripts/qualify-ashoka-wsl-browser.mjs",
+      "bytes": 10385,
+      "sha256": "94ec61dbeaf0b615a4d951a9f85c211e7821c49b8804469099ad1aa5c51b9941"
+    },
+    {
+      "path": "scripts/qualify-ashoka-native-review.mjs",
+      "bytes": 3773,
+      "sha256": "1288b88054127f3003630aeb5017669c8ce71f69c9b0b315051df6218f9882cd"
+    },
+    {
+      "path": "scripts/record-ashoka-clock-evidence.mjs",
+      "bytes": 6431,
+      "sha256": "7e199a0355f5a16fbf0dfa491548531914a9dc5733c92931ec81c5543034f627"
+    },
+    {
+      "path": "docs/ashoka/native-review-31-clock.mjs",
+      "bytes": 8125,
+      "sha256": "d1a150726b7be91f8782fe3d753ce3c792abeb50d3f2bdc8bddbdccb42c125ce"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "docs/ashoka/computer-use.md",
+      "bytes": 19077,
+      "sha256": "56c18f8b1e42e0f14b4810d04236ba04a28ef5e7b0c2d559b548c87385cf89ef"
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 46654,
+      "sha256": "f4df360163bdd0171559058506d36f3b9d4ab064bd29396ff08a70c310a9a9d1"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-editor-first.log",
+      "bytes": 50690,
+      "sha256": "b8353192bd41b7976dd60061ca53ce9a9ed22247cfdc5394dda7adc5b5e9595c"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-editor-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-ashoka-baseline-check.log",
+      "bytes": 224,
+      "sha256": "792d472654d07394f907ad469cc61d970a3a03ea24517436a05ac9950fe8cf4b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-browser-focus-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-browser-focus.json",
+      "bytes": 5669,
+      "sha256": "39197fce9b2971911ae4192bfd72a36c115d7f16ca0de0b71203adc44e5fc81e"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-browser-focus.log",
+      "bytes": 116,
+      "sha256": "7e99d9ac470826787f5f95a9eaf962afcf75552324aff18066e54606daa4c101"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-build-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-build-first.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-build-server.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-checks.json",
+      "bytes": 671,
+      "sha256": "8852ec241317261d2b398381287dc4df630982b8373913cf0f76db5808dd0d0e"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-config-check.log",
+      "bytes": 195,
+      "sha256": "399f55de75e9c35bd778ce1af8cb4601077d163ba8af794cc175223ba859ba38"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-config-inventory.log",
+      "bytes": 191,
+      "sha256": "c6b54fc079487c330d619f4b40fc0e94bfa9e2efaabb168e12cc4c203ea37a4f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-contracts-check.log",
+      "bytes": 214,
+      "sha256": "f07539ed26e1c65d0b64ae44313eb4d70d70c328f98dddfdd6f5bbe3718970c8"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-docs-architecture-tree.log",
+      "bytes": 146,
+      "sha256": "25516603743c30853b9a0a41cb2542c35c033d72331e773efe0e3451788d3a72"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-docs-final-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-docs-final.log",
+      "bytes": 146,
+      "sha256": "25516603743c30853b9a0a41cb2542c35c033d72331e773efe0e3451788d3a72"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-focus-first-exit.json",
+      "bytes": 17,
+      "sha256": "db6a3774e8dfa924f26c0bd5919423bc43913ba73af57830fc67b90b1ae2923d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-focus-first.json",
+      "bytes": 1756,
+      "sha256": "d5355276d0e44f9fd6e30a5edddd784bb577bf8018d974cc62bf4613da12317f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-focus-first.log",
+      "bytes": 114,
+      "sha256": "7c3dbd516d59b1887af069b81014b35dafb8c0a4bae7c5881551f45b22f379a5"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-focus-second-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-focus-second.json",
+      "bytes": 1235,
+      "sha256": "ee83d214c896912a01b56182cc39e085cf0cfdb8f13b45de6c19feee7de43484"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-focus-second.log",
+      "bytes": 115,
+      "sha256": "8b6d80aa3a551ce8dcf5244c36fefe8788ff275f7c83fab0bb6b5b2b32c56ff4"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-focus-third-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-focus-third.json",
+      "bytes": 42195,
+      "sha256": "3cfb57bf54cbbad491b0bae6ae9c13df1e3cbd870f5afaaaed5512222c440a19"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-focus-third.log",
+      "bytes": 114,
+      "sha256": "e591a0fbc8d1ace027d45a922e55ac08c8548f2bc8c0e1d68683cd5fd6f8cba7"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-mcp-check.log",
+      "bytes": 1992,
+      "sha256": "6ca077a93cd4b0f52d8cc1c752aae3ce3d342ab4abdb36700d4417bafe373083"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-metrics-check.log",
+      "bytes": 134,
+      "sha256": "80323cae2b6b39df4f20ff8e1171eb2436d2e059eb4cc426f377181baa2b471a"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-providers-check.log",
+      "bytes": 96,
+      "sha256": "06118bee7b5506c11123a1c0d2590c5c3ec5bda449dd82ceeac8696b8fe1d237"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-root-first-exit.json",
+      "bytes": 74,
+      "sha256": "9042b06986e7c3214f25ecbffe70e436444a79e8f5b8e19593366ed79a0be274"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-root-first.json",
+      "bytes": 679505,
+      "sha256": "43af8c6f60ce35294d8275726fdf2842acdb49131257bb67fb92433e47189035"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-root-first.log",
+      "bytes": 113,
+      "sha256": "7dcc03ca5630ea2397e301ede1ebacd8e3917151e370fa2f8f6f92f19eb29350"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-root-second-exit.json",
+      "bytes": 74,
+      "sha256": "14b5974512050cefe9a12ce5b9c0ef086e9ac3b12c3d6bbe2f68fa938e4dcb83"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-root-second.json",
+      "bytes": 679421,
+      "sha256": "939e1c58ac460ce9c3e113d6d7580435848cdebc555c4401924bc8199a660175"
+    },
+    {
+      "path": "docs/ashoka/slice-31-clock-root-second.log",
+      "bytes": 114,
+      "sha256": "6716604597e22de9ffff91d118828b4d6eefefe1cd6e6f0c287dfecd1eb7bc30"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-diagnostic-exit.json",
+      "bytes": 17,
+      "sha256": "db6a3774e8dfa924f26c0bd5919423bc43913ba73af57830fc67b90b1ae2923d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-diagnostic.json",
+      "bytes": 1537,
+      "sha256": "d410627c2287ccceafba38046e7aafcddb9a67b009c7a5280777d097a7398cec"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-diagnostic.log",
+      "bytes": 126,
+      "sha256": "2d7b666f60da57a03d1a56ba84e74b3e9fa66a4d14e4d7375c4ec3238a85bb9e"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-diagnostic2-exit.json",
+      "bytes": 17,
+      "sha256": "db6a3774e8dfa924f26c0bd5919423bc43913ba73af57830fc67b90b1ae2923d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-diagnostic2.json",
+      "bytes": 1548,
+      "sha256": "10aa6533a9ee2fd62fe9a01b1bcb802c7d062adc25e87175ad7713292cc19ab1"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-diagnostic2.log",
+      "bytes": 127,
+      "sha256": "6aabf87cf758ef2e99b0093ac98c8c3dafc9bbeaa90ee5ea51af72e8a8ba33e6"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-focus-first-exit.json",
+      "bytes": 17,
+      "sha256": "db6a3774e8dfa924f26c0bd5919423bc43913ba73af57830fc67b90b1ae2923d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-focus-first.json",
+      "bytes": 4707,
+      "sha256": "78e17e3fe5d158eedd839c43bb373f88b57aa4cb431eae1e604d6854b9bde600"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-focus-first.log",
+      "bytes": 127,
+      "sha256": "5f54f904bb6f85598381d5ce0178b486e4e5f5b1f37268eade4ad4fa36ff09d5"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-focus-second-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-focus-second.json",
+      "bytes": 5021,
+      "sha256": "15289b6f8a44f71b7ba0d13a267d214fd9e6d5e706308295ea5d5c27a410ced4"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-focus-second.log",
+      "bytes": 128,
+      "sha256": "53ee334a76e712fb77c673c88c50ba61f1adcb0f0957d6804b8c13bc0c36d2ad"
+    },
+    {
+      "path": "docs/ashoka/slice-31-linux-evidence-worker-trace.json",
+      "bytes": 3369,
+      "sha256": "e1afa0497178598fcb557b1af192ddfa2a40c465faa81a3fdd8c912b38a72a7b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock-run-exit.json",
+      "bytes": 74,
+      "sha256": "f411aa454fe058766202a77bb3a84e208122be387a6ddc4d569a3bd926ca3dbd"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock-run.log",
+      "bytes": 3309,
+      "sha256": "77dd9d0c488292ffd4536426656aff3d65d743839a146d8f7dacf2f23563b323"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock-second-run-exit.json",
+      "bytes": 74,
+      "sha256": "8bf3dd0294000af4c01a2cebfc4a5ee8510e34d8694b76b18f630675313835dc"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock-second-run.log",
+      "bytes": 507,
+      "sha256": "764fd71a669895ae4a393933f16fd1c9d242cb8d7ab5dba2f7207acc652947be"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock/failure.json",
+      "bytes": 3613,
+      "sha256": "62fd163a9c2670e738698b7719fd0a27d85c1cc3bd8fa5435000252b3d11455e"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock/installer-browser.log",
+      "bytes": 6205,
+      "sha256": "376a5a61ba54ac44bbd536e37b91258fe7faf28e867ee540f40391f2c6400ff6"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock/retained-qualification-failure.json",
+      "bytes": 143,
+      "sha256": "306d220e7e041e4add391b1f5b0ed9d9095774bf952155403ef35411318250d1"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock/run-scope.json",
+      "bytes": 493,
+      "sha256": "a68a692a3570c46874dd3ac904f345af27833ee990740305a0afbe8e2a85d221"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock/source-inventory.json",
+      "bytes": 126374,
+      "sha256": "700a7aeda3c69d71013f1bd42926e4eb0cee7e693ceef000ec400ae5b345e85d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock-second/browser-qualification.json",
+      "bytes": 4948,
+      "sha256": "e025fee97cde9762abdb497b384a85044e5cc02171f7c95df9d53b0dcb297427"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock-second/installation-proof.json",
+      "bytes": 2912,
+      "sha256": "8c305241c2da5cf2fdaaef13d5c708194dab660acc6f9ced230366d4bfb6c6fd"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock-second/installer-browser.log",
+      "bytes": 5384,
+      "sha256": "4ca9fdf768ba1c0dae7d02fbf260a521fa60455df42b6cc50709febbb49ea4b5"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock-second/run-scope.json",
+      "bytes": 493,
+      "sha256": "8b8a01604e1e5397e5d8f451500f00ce032b0f90d27f4e47b523bd632e16e831"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-clock-second/source-inventory.json",
+      "bytes": 126374,
+      "sha256": "26573fe30ecdb002c8d991811a03c0c4f51eafff9ef4f2006eb37424e6df2923"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T15:59:30.371Z] [INFO]  Discipline session started: 5c6fa921-5eff-43f2-b580-9c3fb68aeaca (modification: owner-0)
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T15:59:30.376Z] [INFO]  Discipline session started: 4da5f7d5-b1d4-4304-8359-2525fa8dbc5b (modification: owner-1)
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T15:59:30.392Z] [INFO]  Discipline session completed: 5c6fa921-5eff-43f2-b580-9c3fb68aeaca
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T15:59:30.397Z] [INFO]  Discipline session completed: 4da5f7d5-b1d4-4304-8359-2525fa8dbc5b
+
+ ✓ tests/session-authority.test.ts (10 tests) 3081ms
+   ✓ private durable authority > fences Computer Use controls and stops outside the model loop on expire  1540ms
+ ✓ tests/computer-capabilities.test.ts (7 tests) 16ms
+ ❯ tests/computer-broker.test.ts (9 tests | 2 failed) 8324ms
+   ✓ single original host/job owns scoped dispatch, independent postcondition and replay  1284ms
+   ✓ full-access scope does not replace exact action approval; target changes remain fenced  1136ms
+   ✓ grant revocation stops without a model roundtrip and prevents later physical dispatch  856ms
+   ✓ lost reply after input has one durable unknown receipt and is never replayed  1204ms
+   ✓ failed independent termination retains the original worker for stop-only recovery  929ms
+   ✓ material source change stays reconciliation pending even though the GUI postcondition passed  1386ms
+   ✓ wrong-session and unqualified routes cannot open even a declared worker  500ms
+   × a reviewed profile cannot be replaced by the worker or by a changed backend 497ms
+     → expected [Function] to throw error including 'GRANT_SCOPE_REJECTED' but got 'JOB_OPERATION_CONFLICT: 3ae2e31f-8cb3…'
+   × observation-only operator approval cannot authorize interaction even with an exact action approval 529ms
+     → JOB_OPERATION_CONFLICT: 6a4054e9-d561-472f-90de-799352611e71
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-broker.test.ts > a reviewed profile cannot be replaced by the worker or by a changed backend
+AssertionError: expected [Function] to throw error including 'GRANT_SCOPE_REJECTED' but got 'JOB_OPERATION_CONFLICT: 3ae2e31f-8cb3…'
+
+Expected: "GRANT_SCOPE_REJECTED"
+Received: "JOB_OPERATION_CONFLICT: 3ae2e31f-8cb3-4200-a496-4620dc6cf9db"
+
+ ❯ tests/computer-broker.test.ts:100:2
+     98|  await expect(run(async()=>{})).rejects.toThrow("PROFILE_PIN_REJECTED"…
+     99|  worker.probe={...worker.probe,profile_hash:input.profile.hash};worker…
+    100|  await expect(run(async()=>{})).rejects.toThrow("GRANT_SCOPE_REJECTED"…
+       |  ^
+    101| });
+    102| it("observation-only operator approval cannot authorize interaction ev…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/computer-broker.test.ts > observation-only operator approval cannot authorize interaction even with an exact action approval
+Error: JOB_OPERATION_CONFLICT: 6a4054e9-d561-472f-90de-799352611e71
+ ❯ EngineJobs.accept src/cognitive/jobs.ts:98:53
+     96|     const replay = (await this.inspect()).records.find(record => recor…
+     97|     if (replay) {
+     98|       if (replay.intent_hash !== intent_hash) throw new EngineJobError…
+       |                                                     ^
+     99|       return structuredClone(replay);
+    100|     }
+ ❯ withEngineJob src/cognitive/jobs.ts:332:43
+ ❯ tests/computer-broker.test.ts:107:2
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 24 passed (26)
+   Start at  18:59:27
+   Duration  14.59s (transform 2.20s, setup 0ms, collect 11.74s, tests 11.42s, environment 1ms, prepare 510ms)
+

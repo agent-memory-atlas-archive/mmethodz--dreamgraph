@@ -1,0 +1,45 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/computer-use-ui.test.ts (3 tests) 454ms
+ ✓ tests/computer-browser-registry.test.ts (3 tests) 614ms
+ ❯ tests/computer-browser-worker.test.ts (10 tests | 1 failed) 25518ms
+   ✓ performs real Unicode, checked, click/readback and scrolling using opaque current references  2843ms
+   ✓ moved/covered controls, disabled and credential controls never receive a guessed action  1705ms
+   ✓ forbidden posts, redirects, popups and frames cannot reach another origin or authority  2897ms
+   ✓ exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime  461ms
+   ✓ explicit navigation stays inside the approved origin and segment path and verifies independent destination state  2464ms
+   ✓ private worker process preserves typed observations and responsive independent termination  2335ms
+   ✓ stop bypasses a pending browser navigation and never waits for its ten-second server response  1355ms
+   ✓ masked frames have a verified digest and image exhaustion refuses before another input  2172ms
+   ✓ a real worker closes its dedicated browser on disconnect without another model call  2293ms
+   × a real worker closes its dedicated browser on watchdog without another model call 6992ms
+     → expected null to be +0 // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on watchdog without another model call
+AssertionError: expected null to be +0 // Object.is equality
+
+- Expected: 
+0
+
++ Received: 
+null
+
+ ❯ vi.waitFor.timeout tests/computer-browser-worker.test.ts:109:52
+    107|  await vi.waitFor(()=>expect(ticks).toBeGreaterThan(0),{timeout:2000})…
+    108|  const before=performance.now();if(loss==="disconnect")local.child.dis…
+    109|  await vi.waitFor(()=>expect(local.child.exitCode).toBe(0),{timeout:52…
+       |                                                    ^
+    110|  expect(performance.now()-before).toBeLessThan(loss==="disconnect"?100…
+    111|  const stoppedAt=ticks;await new Promise(resolve=>setTimeout(resolve,3…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 15 passed (16)
+   Start at  19:45:15
+   Duration  27.07s (transform 761ms, setup 0ms, collect 3.56s, tests 26.59s, environment 1ms, prepare 595ms)
+

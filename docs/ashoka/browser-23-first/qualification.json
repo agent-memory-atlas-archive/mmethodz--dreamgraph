@@ -1,0 +1,8 @@
+{
+  "scope": "Actual compiled daemon/configuration authority, CLI readback and Windows Chrome. Isolated instance. Native scan job producer is an explicitly declared queued EngineJobs fixture; no scan/model/GUI backend is dispatched. All six model allocations/call counts are zero. No live data, global install/restart, paid model understanding or other-platform qualification.",
+  "checks": [],
+  "errors": [],
+  "browser": "153.0.8010.50",
+  "success": false,
+  "failure": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#rw-observed').filter({ hasText: 'Read at' }) to be visible\u001b[22m\n\n    at C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\scripts\\qualify-ashoka-configuration.mjs:52:91"
+}

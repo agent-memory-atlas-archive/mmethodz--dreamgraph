@@ -1,0 +1,9 @@
+{
+  "scope": "Actual compiled daemon/CLI/MCP/editor HTTP client and Windows Chromium, disposable reviewed lifecycle fixtures for both AT01/AT05 project families; plugin core read port and SDK generated validation. No paid-model understanding, native editor GUI, cross-platform runtime or full task acceptance claim.",
+  "checks": [],
+  "errors": [],
+  "snapshots": [],
+  "browser": "153.0.8010.50",
+  "success": false,
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n    domains: {\n+     authority: 4,\n-     authority: 2,\n      graph: 1,\n      plans: 1\n    },\n    graph_revision: 'graph:1',\n+   publication_sequence: 6\n-   publication_sequence: 4\n  }\n\n    at compare (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-plan-consumers.mjs:65:375)\n    at async file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-plan-consumers.mjs:76:3"
+}

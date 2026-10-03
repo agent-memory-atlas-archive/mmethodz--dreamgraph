@@ -1,0 +1,58 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/instance-isolation.test.ts > InstanceScope — guard functions > assertWithinBounds throws ScopeViolationError for cross-instance access
+[2026-10-02T06:19:45.951Z] [ERROR] BLOCKED: Attempted to access another instance's data. Path: C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-test-iTo5w2\bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb\data\dream_graph.json, Instance: aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa, Context: test cross-instance
+
+stderr | tests/instance-isolation.test.ts > InstanceScope — guard functions > assertWithinBounds throws for out-of-bounds paths
+[2026-10-02T06:19:45.956Z] [ERROR] BLOCKED: Path outside instance scope. Path: C:\tmp\random\file.json, Instance: aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa
+
+stderr | tests/instance-isolation.test.ts > InstanceScope — guard functions > assertOwnDataPath rejects config dir (stricter than assertWithinBounds)
+[2026-10-02T06:19:45.960Z] [ERROR] BLOCKED: Path is not within instance data directory. Path: C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-test-6rVhxa\aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa\config\policies.json, Instance: aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa
+
+stderr | tests/instance-isolation.test.ts > InstanceScope — guard functions > assertOwnDataPath rejects project paths
+[2026-10-02T06:19:45.963Z] [ERROR] BLOCKED: Path is not within instance data directory. Path: C:\Users\MIKAJU~1\AppData\Local\Temp\project\data.json, Instance: aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa
+
+stderr | tests/instance-isolation.test.ts > Cross-instance contamination prevention > scope A cannot access scope B's paths
+[2026-10-02T06:19:45.975Z] [ERROR] BLOCKED: Attempted to access another instance's data. Path: C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-test-Jg5TNt\bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb\data\dream_graph.json, Instance: aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa, Context: cross-instance test
+
+stderr | tests/instance-isolation.test.ts > Cross-instance contamination prevention > scope B cannot access scope A's config
+[2026-10-02T06:19:45.978Z] [ERROR] BLOCKED: Attempted to access another instance's data. Path: C:\Users\MIKAJU~1\AppData\Local\Temp\dreamgraph-test-eMaPh7\aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa\config\policies.json, Instance: bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb
+
+ ✓ tests/instance-isolation.test.ts (44 tests) 61ms
+ ✓ tests/architect-cli.test.ts (8 tests) 156ms
+stderr | tests/instance-cognitive-bootstrap.test.ts > a real new instance has valid empty cognitive and analytics stores before its first scan or model call
+[2026-10-02T06:19:49.157Z] [INFO]  Creating instance 7387933f-e018-47bf-8fb5-3db68f8bbacf (qualified-bootstrap) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-new-cognitive-Rr79TR\master\7387933f-e018-47bf-8fb5-3db68f8bbacf
+
+stderr | tests/instance-cognitive-bootstrap.test.ts > a real new instance has valid empty cognitive and analytics stores before its first scan or model call
+[2026-10-02T06:19:49.238Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-new-cognitive-Rr79TR\master\instances.json
+
+stderr | tests/instance-cognitive-bootstrap.test.ts > a real new instance has valid empty cognitive and analytics stores before its first scan or model call
+[2026-10-02T06:19:49.239Z] [INFO]  Registered new instance 7387933f-e018-47bf-8fb5-3db68f8bbacf (qualified-bootstrap)
+
+stderr | tests/instance-cognitive-bootstrap.test.ts > a real new instance has valid empty cognitive and analytics stores before its first scan or model call
+[2026-10-02T06:19:49.245Z] [INFO]  Instance 7387933f-e018-47bf-8fb5-3db68f8bbacf created successfully
+
+ ✓ tests/instance-cognitive-bootstrap.test.ts (2 tests) 298ms
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-02T06:19:50.373Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/plan-context-integration.test.ts (6 tests) 1826ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  857ms
+   ✓ verified implementation evidence is distinct from the next slice and recovers after a transcript-free read  345ms
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T06:19:51.337Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > reads never import legacy success; preview/import retain exact bytes and recover one lost reply
+[2026-10-02T06:19:51.360Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/architect-plan-authority.test.ts (5 tests) 5436ms
+   ✓ actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan  782ms
+   ✓ archive refuses a running/recovery lease and keeps original artifacts on failure  351ms
+   ✓ the real Architect script exposes readable running/current markers, slice filters and keyboard navigation  3846ms
+
+ Test Files  5 passed (5)
+      Tests  65 passed (65)
+   Start at  09:19:43
+   Duration  12.76s (transform 3.47s, setup 0ms, collect 17.44s, tests 7.78s, environment 1ms, prepare 710ms)
+

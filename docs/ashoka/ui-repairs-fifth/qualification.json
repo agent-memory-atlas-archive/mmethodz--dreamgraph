@@ -1,0 +1,74 @@
+{
+  "scope": "Compiled local daemon and actual Windows Chromium on disposable 1201-node graph and frozen Ashoka plan. Harness IPC writes/publishes through real graph services; dream completion event is injected, not a paid dream cycle. No installed daemon changes.",
+  "model_requests": 0,
+  "checks": [
+    {
+      "name": "Architect exact slice + full-height review",
+      "detail": {
+        "height": 536,
+        "bottom": 981,
+        "viewport": 1000,
+        "scroll": 7412,
+        "available": 556.78125
+      }
+    },
+    {
+      "name": "Architect resize after full rail scroll",
+      "detail": {
+        "before": 360,
+        "after": 441.5
+      }
+    }
+  ],
+  "errors": [],
+  "browser": "153.0.8010.50",
+  "anchor_debug": {
+    "text": "### Slice 5 — Commit enrichment and checkpoints coherently\r\n\r\n- status: verified\r\n- Priority: P1\r\n- ",
+    "offset": 38554,
+    "target": {
+      "x": 309,
+      "y": 452.15625,
+      "width": 6.453125,
+      "height": 13,
+      "top": 452.15625,
+      "right": 315.453125,
+      "bottom": 465.15625,
+      "left": 309
+    },
+    "body": {
+      "x": 300,
+      "y": 443.21875,
+      "width": 916,
+      "height": 537.78125,
+      "top": 443.21875,
+      "right": 1216,
+      "bottom": 981,
+      "left": 300
+    },
+    "scroll": 7412,
+    "scrollHeight": 30329,
+    "details": {
+      "x": 291,
+      "y": 406.21875,
+      "width": 934,
+      "height": 583.78125,
+      "top": 406.21875,
+      "right": 1225,
+      "bottom": 990,
+      "left": 291
+    },
+    "panel": {
+      "x": 291,
+      "y": 289.59375,
+      "width": 938,
+      "height": 700.40625,
+      "top": 289.59375,
+      "right": 1229,
+      "bottom": 990,
+      "left": 291
+    },
+    "padding": "8px"
+  },
+  "success": false,
+  "failure": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.canvas-wrap canvas').first() to be visible\u001b[22m\n\n    at C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\scripts\\qualify-ashoka-ui-repairs.mjs:71:87"
+}

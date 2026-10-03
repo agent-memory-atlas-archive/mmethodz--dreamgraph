@@ -1,0 +1,7 @@
+{
+  "distribution": "Ubuntu",
+  "linux_root": "/tmp/dg-ashoka-wsl-3e20aba0-2617-4c9e-8b89-93779607a2a6",
+  "operation": "install.sh --force against the authorized old Linux test bed; fresh Linux source/dependencies, then installed CLI browser qualification",
+  "Windows_installation": "untouched",
+  "source_files": 470
+}

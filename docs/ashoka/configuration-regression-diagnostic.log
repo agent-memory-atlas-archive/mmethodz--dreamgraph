@@ -1,0 +1,47 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/graph-publication.test.ts > canonical graph publication > bounds durable result size before touching a store 14ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > drains stable notification IDs without losing failures or changing graph currency 143ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > recovers notification acknowledgment at journal_prepared 64ms
+ ✓ tests/webhooks/worker.test.ts > deliver() > succeeds on first 2xx response and updates stats 80ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > recovers notification acknowledgment at publication_committed 76ms
+ ✓ tests/webhooks/worker.test.ts > deliver() > sends required signature headers 60ms
+ ✓ tests/webhooks/worker.test.ts > deliver() > flat body shape per spec §7.1 (no wrapper, no subscription_id) 63ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > requires delivery and quiescence before explicit epoch retirement; rejects archived and unqualified replay 163ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > keeps receipt retirement atomic across after_replace:0: 95ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > keeps receipt retirement atomic across publication_committed 99ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > leaves unknown legacy dates null and does not initialize disk on a read 5ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > separates graph mutations, source reconciliation and full scan history 76ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > replays a lost reply exactly once, before testing stale expected revisions 44ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > persists explicit no-change receipts without advancing graph mutation time 57ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > fences deleted or altered published stores instead of silently overwriting them 39ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > blocks reads after interrupted rollback until explicit recovery restores the complete set 57ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > rejects unsafe journal participants before attempting any restore 15ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > rejects Windows path aliases and reserved marker names on every platform 16ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > rejects nested mutations and read-to-write upgrades without deadlocking 25ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > reacquires ownership for asynchronous work that outlives its originating publication 70ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > leaves malformed recovery input untouched and reports a recovery boundary 8ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > isolates caches by physical instance even for the same file name 25ms
+ ✓ tests/graph-publication.test.ts > canonical graph publication > holds sole kernel writer ownership across processes and releases it on crash 653ms
+stderr | tests/change-obligations.test.ts > durable source change obligations > tracks real MCP create/edit/rename/delete commands through durable obligations
+[2026-09-30T22:34:52.889Z] [INFO]  Registered 3 code-senses tools (list_directory, read_source_code, create_file)
+[2026-09-30T22:34:52.890Z] [INFO]  Registered 6 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file)
+[2026-09-30T22:34:52.891Z] [INFO]  Registered 14 code-senses tools (list_directory, read_source_code, create_file, edit_file, delete_file, rename_file, edit_entity, patch_file, append_to_file, edit_markdown_section, search_source_code, list_markdown_chapters, read_markdown_chapter, patch_markdown_chapter)
+
+ ✓ tests/change-obligations.test.ts > durable source change obligations > retains C17 effect-double evidence across a lost action result without repeating input or claiming graph reconciliation 310ms
+ ✓ tests/change-obligations.test.ts > durable source change obligations > tracks real MCP create/edit/rename/delete commands through durable obligations 373ms
+ ✓ tests/change-obligations.test.ts > durable source change obligations > publishes the reconciled obligation at the same graph boundary and retains later enrichment/digestion debt 166ms
+ ✓ tests/change-obligations.test.ts > durable source change obligations > records intent before touching source, retains dirty scope and does not pretend to mutate graph time 94ms
+ ✓ tests/change-obligations.test.ts > durable source change obligations > rejects stale source input before creating an effect 14ms
+ ✓ tests/change-obligations.test.ts > durable source change obligations > recovers the exact effect after intent_committed without repeating input 96ms
+ ✓ tests/change-obligations.test.ts > durable source change obligations > recovers the exact effect after effect_applied without repeating input 134ms
+ ✓ tests/change-obligations.test.ts > durable source change obligations > recovers the exact effect after effect_recorded without repeating input 96ms
+ ✓ tests/change-obligations.test.ts > durable source change obligations > retains mixed rename effects as unknown rather than repeating or claiming reconciliation 89ms
+ ✓ tests/change-obligations.test.ts > durable source change obligations > rejects sibling-prefix path escape and changed operation identity 82ms
+
+ Test Files  3 passed (3)
+      Tests  33 passed (33)
+   Start at  01:34:47
+   Duration  6.34s (transform 1.65s, setup 0ms, collect 5.92s, tests 3.41s, environment 1ms, prepare 540ms)
+

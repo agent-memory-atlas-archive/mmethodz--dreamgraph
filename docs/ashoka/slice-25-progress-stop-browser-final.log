@@ -1,0 +1,49 @@
+[2026-10-02T10:50:52.412Z] [INFO]  Creating instance af9e7a70-e8dd-40cc-b097-1c3790f70a6c (browser-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-KxySwj\master\af9e7a70-e8dd-40cc-b097-1c3790f70a6c
+[2026-10-02T10:50:52.489Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-KxySwj\master\instances.json
+[2026-10-02T10:50:52.489Z] [INFO]  Registered new instance af9e7a70-e8dd-40cc-b097-1c3790f70a6c (browser-fixture)
+[2026-10-02T10:50:52.495Z] [INFO]  Instance af9e7a70-e8dd-40cc-b097-1c3790f70a6c created successfully
+B25-01
+B25-02
+B25-03
+B25-04
+B25-05
+B25-06
+B25-07
+B25-08
+B25-09
+B25-10
+B25-11
+B25-12
+B25-13
+B25-14
+B25-15
+B25-16
+B25-17
+B25-18
+B25-19
+B25-20
+B25-21
+B25-22
+B25-23
+B25-24
+B25-25
+B25-26
+B25-27
+B25-28
+B25-29
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for getByRole('menu').getByRole('menuitem', { name: 'Prepare native task…', exact: true })
+
+    at C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-architect.mjs:183:133 {
+  log: [
+    "  - waiting for getByRole('menu').getByRole('menuitem', { name: 'Prepare native task…', exact: true })"
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v25.2.1

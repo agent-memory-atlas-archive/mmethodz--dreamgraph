@@ -1,0 +1,13 @@
+{
+  "numTotalTestSuites": 317,
+  "numPassedTestSuites": 317,
+  "numFailedTestSuites": 0,
+  "numTotalTests": 1179,
+  "numPassedTests": 1177,
+  "numFailedTests": 0,
+  "numPendingTests": 2,
+  "startTime": 1790813561685,
+  "success": true,
+  "scope": "Slice 4/6 dependency handoff; no paid/platform/client/CU/release qualification",
+  "files": 117
+}

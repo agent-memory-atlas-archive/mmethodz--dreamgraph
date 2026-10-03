@@ -1,0 +1,230 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.1
+[2026-10-02T11:55:31.579Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > keeps normalizer and dreamer provider/model/secret/protocol independent
+[2026-10-02T11:55:31.581Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.2
+[2026-10-02T11:55:31.588Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-5.4
+[2026-10-02T11:55:31.595Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-6-sol
+[2026-10-02T11:55:31.600Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > requires explicit none before sending temperature to gpt-6-luna
+[2026-10-02T11:55:31.607Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > omits sampling for gpt-5.5 even when none is requested without sampling qualification
+[2026-10-02T11:55:31.612Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > omits sampling for gpt-5.6-sol even when none is requested without sampling qualification
+[2026-10-02T11:55:31.616Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5
+[2026-10-02T11:55:31.622Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5-mini
+[2026-10-02T11:55:31.628Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-5-nano
+[2026-10-02T11:55:31.633Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to o3
+[2026-10-02T11:55:31.637Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-6-astra
+[2026-10-02T11:55:31.643Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > never sends temperature to gpt-6.1-sol
+[2026-10-02T11:55:31.648Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves dreamer role, prompt/schema, effort and selected model in Responses
+[2026-10-02T11:55:31.878Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > binds saved configuration and request limits once despite later profile changes
+[2026-10-02T11:55:31.919Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves normalizer role, prompt/schema, effort and selected model in Responses
+[2026-10-02T11:55:32.019Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > rejects model/storage/schema-guarantee substitutions before dispatch
+[2026-10-02T11:55:32.148Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > allows exact qualified custom models but blocks unsupported effort without escalation
+[2026-10-02T11:55:32.211Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > routes enrichment through its own role rather than the dreamer model
+[2026-10-02T11:55:32.266Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/role-provider.test.ts > role policy dispatch > never treats native CLI policy as an API transport
+[2026-10-02T11:55:32.277Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-10-02T11:55:32.287Z] [INFO]  LLM provider: none (model: none)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in responses without changing the role
+[2026-10-02T11:55:32.291Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-10-02T11:55:32.301Z] [INFO]  LLM readiness: initial state=unknown (reason=completion_unqualified, fingerprint=95977fcc7d83c855, models=gpt-4.1/gpt-4.1)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > honors GPT-5.4 explicit none/high in chat-completions without changing the role
+[2026-10-02T11:55:32.542Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-10-02T11:55:32.589Z] [INFO]  LLM readiness: unknown → ready (reason=ok, fingerprint=95977fcc7d83c855, models=gpt-4.1/gpt-4.1)
+
+stderr | tests/role-provider.test.ts > qualifies independent roles from real work without recurring paid probes
+[2026-10-02T11:55:32.602Z] [INFO]  LLM readiness: ready → unknown (reason=completion_unqualified, fingerprint=c78324c55ee7f583, models=gpt-4.1/gpt-5.4)
+
+ ✓ tests/role-provider.test.ts (7 tests) 1032ms
+   ✓ role policy dispatch > keeps normalizer and dreamer provider/model/secret/protocol independent  341ms
+   ✓ qualifies independent roles from real work without recurring paid probes  322ms
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > retains GPT-4.1 sampling and conservatively omits unqualified future/custom sampling
+[2026-10-02T11:55:32.901Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-opus-4-7
+[2026-10-02T11:55:33.014Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-opus-4-8
+[2026-10-02T11:55:33.126Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-sonnet-5-5
+[2026-10-02T11:55:33.267Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-fable-5-1
+[2026-10-02T11:55:33.449Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves Anthropic normalizer instructions without deprecated sampling for claude-mythos-preview
+[2026-10-02T11:55:33.560Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > keeps requested temperature in policy/migration while exposing effective omission and role intent
+[2026-10-02T11:55:33.567Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > does not let capability evidence for another model enable temperature
+[2026-10-02T11:55:33.573Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > blocks unsupported none without a provider request or automatic effort escalation
+[2026-10-02T11:55:33.580Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves daemon role and exposes omitted temperature in route provenance
+[2026-10-02T11:55:33.584Z] [INFO]  LLM provider: openai (model: gpt-4.1)
+
+stderr | tests/model-temperature.test.ts > cognitive roles without unsupported temperature > preserves daemon role and exposes omitted temperature in route provenance
+[2026-10-02T11:55:33.592Z] [INFO]  LLM provider: none (model: n/a)
+
+ ✓ tests/model-temperature.test.ts (27 tests) 2041ms
+   ✓ cognitive roles without unsupported temperature > retains GPT-4.1 sampling and conservatively omits unqualified future/custom sampling  359ms
+stderr | tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+[2026-10-02T11:55:36.285Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-02T11:55:36.326Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-02T11:55:36.375Z] [WARN]  INTERRUPTION: Forcing wake from "rem" state
+
+stderr | tests/schedule-http.test.ts > shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay
+[2026-10-02T11:55:36.382Z] [INFO]  Cognitive state: rem → AWAKE (interrupted)
+
+ ✓ tests/engine-configuration.test.ts (18 tests) 647ms
+ ✓ tests/schedule-http.test.ts (2 tests) 882ms
+   ✓ shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay  670ms
+stderr | tests/configuration-workspace.test.ts > maps every consumed setting to one typed control or named read-only exception without leaking stored secrets
+[2026-10-02T11:55:37.904Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T11:55:38.024Z] [INFO]  LLM provider: none (model: old-model)
+
+ ✓ tests/schedule-workspace.test.ts (8 tests) 1813ms
+   ✓ actual served browser script saves disabled, preserves invalid drafts, and supports keyboard tabs/filter/edit  464ms
+stderr | tests/configuration-http.test.ts > configuration HTTP parity > saves scheduler settings through the rendered form and reloads exactly
+[2026-10-02T11:55:38.136Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":60000,"max_auto_cycles_per_hour":10}
+[2026-10-02T11:55:38.137Z] [INFO]  Narrative config updated: {"narrative_interval":10,"digest_interval":50,"max_chapters":100,"auto_narrate":true}
+
+ ✓ tests/configuration-http.test.ts (4 tests) 308ms
+stderr | tests/configuration-workspace.test.ts > keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work
+[2026-10-02T11:55:38.317Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T11:55:38.415Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T11:55:38.595Z] [INFO]  Event router config updated: {"tension_threshold":0.8,"runtime_error_threshold":0.05,"cooldown_ms":0,"max_auto_cycles_per_hour":10}
+
+stderr | tests/configuration-workspace.test.ts > edits structured component settings and retains explicit zeros/default inheritance through restart parsing
+[2026-10-02T11:55:38.656Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T11:55:38.755Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T11:55:38.910Z] [INFO]  LLM provider: none (model: new-model)
+
+stderr | tests/configuration-workspace.test.ts > retains a whole captured save after a committed lost reply and recovers that receipt without a second effect
+[2026-10-02T11:55:39.004Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T11:55:39.101Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T11:55:39.261Z] [INFO]  LLM provider: none (model: other-writer)
+
+stderr | tests/configuration-workspace.test.ts > keeps drafts on concurrent revision refusal and never overwrites the intervening file
+[2026-10-02T11:55:39.299Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+[2026-10-02T11:55:39.398Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > previews a scoped template without writes, applies protected staging and undoes the original bytes
+[2026-10-02T11:55:39.962Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:55:40.061Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:55:40.090Z] [WARN]  LLM: OpenAI provider configured but no API key set (DREAMGRAPH_LLM_API_KEY)
+[2026-10-02T11:55:40.091Z] [INFO]  LLM provider: openai (model: gpt-5.4)
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:55:40.103Z] [INFO]  LLM dreamer config: model=gpt-5.4-mini, temp=0, maxTokens=1600
+
+stderr | tests/configuration-workspace.test.ts > generic apply refreshes actual cached model controls and daemon role readback without touching session overrides
+[2026-10-02T11:55:40.129Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T11:55:40.228Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T11:55:40.277Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/configuration-workspace.test.ts > reports a staged deletion as a mismatch until restart clears the old runtime override
+[2026-10-02T11:55:40.286Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T11:55:40.391Z] [INFO]  LLM provider: none (model: old-model)
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T11:55:40.547Z] [INFO]  LLM architect config: provider=none (general), model=old-model (general), temp=0.7, maxTokens=2048
+
+stderr | tests/configuration-workspace.test.ts > root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry
+[2026-10-02T11:55:40.741Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ✓ tests/configuration-workspace.test.ts (9 tests) 4578ms
+   ✓ maps every consumed setting to one typed control or named read-only exception without leaking stored secrets  1747ms
+   ✓ keeps invalid drafts and keyboard tab state, then saves an independent zero limit without enabling work  408ms
+   ✓ edits structured component settings and retains explicit zeros/default inheritance through restart parsing  338ms
+   ✓ retains a whole captured save after a committed lost reply and recovers that receipt without a second effect  348ms
+   ✓ previews a scoped template without writes, applies protected staging and undoes the original bytes  664ms
+   ✓ root runtime uses canonical currency and shows actual scoped queued cancellation without inventing stop or retry  455ms
+
+ Test Files  7 passed (7)
+      Tests  75 passed (75)
+   Start at  14:55:29
+   Duration  10.82s (transform 2.26s, setup 0ms, collect 19.68s, tests 11.30s, environment 2ms, prepare 1.02s)
+

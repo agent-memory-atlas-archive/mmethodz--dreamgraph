@@ -1,0 +1,28 @@
+[2026-10-03T07:12:29.373Z] [INFO]  Creating instance d75ee187-2133-46ad-aa77-874926b883c7 (ui-repairs) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-ui-repairs-uTvptQ\master\d75ee187-2133-46ad-aa77-874926b883c7
+[2026-10-03T07:12:29.445Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-ui-repairs-uTvptQ\master\instances.json
+[2026-10-03T07:12:29.446Z] [INFO]  Registered new instance d75ee187-2133-46ad-aa77-874926b883c7 (ui-repairs)
+[2026-10-03T07:12:29.451Z] [INFO]  Instance d75ee187-2133-46ad-aa77-874926b883c7 created successfully
+Error: Daemon exit 1: node:internal/modules/esm/load:195
+    throw new ERR_UNSUPPORTED_ESM_URL_SCHEME(parsed, schemes);
+          ^
+
+Error [ERR_UNSUPPORTED_ESM_URL_SCHEME]: Only URLs with a scheme in: file, data, and node are supported by the default ESM loader. On Windows, absolute paths must be valid file:// URLs. Received protocol 'c:'
+    at throwIfUnsupportedURLScheme (node:internal/modules/esm/load:195:11)
+    at defaultLoadSync (node:internal/modules/esm/load:142:3)
+    at #loadAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:789:12)
+    at #loadSync (node:internal/modules/esm/loader:809:49)
+    at ModuleLoader.load (node:internal/modules/esm/loader:774:26)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:520:31)
+    at #getOrCreateModuleJobAfterResolve (node:internal/modules/esm/loader:565:36)
+    at afterResolve (node:internal/modules/esm/loader:618:52)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:624:12)
+    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:643:32) {
+  code: 'ERR_UNSUPPORTED_ESM_URL_SCHEME'
+}
+
+Node.js v25.2.1
+
+    at ChildProcess.<anonymous> (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-ui-repairs.mjs:49:297)
+    at Object.onceWrapper (node:events:623:26)
+    at ChildProcess.emit (node:events:508:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:293:12)

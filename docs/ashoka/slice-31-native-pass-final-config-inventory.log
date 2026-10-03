@@ -1,0 +1,5 @@
+
+> dreamgraph@13.4.0 config:inventory
+> tsx scripts/generate-configuration-inventory.mjs
+
+Configuration inventory: 308 typed entries, 105 literal source keys, 0 documentation-only names

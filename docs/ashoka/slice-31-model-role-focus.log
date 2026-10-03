@@ -1,0 +1,92 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/provider-outcome.test.ts (31 tests) 2581ms
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6.1-sol through Responses without sampling parameters
+[2026-10-02T18:19:19.732Z] [INFO]  LLM provider: openai (model: gpt-6.1-sol)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-astra through Responses without sampling parameters
+[2026-10-02T18:19:19.932Z] [INFO]  LLM provider: openai (model: gpt-6-astra)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-sol through Responses without sampling parameters
+[2026-10-02T18:19:20.075Z] [INFO]  LLM provider: openai (model: gpt-6-sol)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-luna through Responses without sampling parameters
+[2026-10-02T18:19:20.213Z] [INFO]  LLM provider: openai (model: gpt-6-luna)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-sol through Responses without sampling parameters
+[2026-10-02T18:19:20.355Z] [INFO]  LLM provider: openai (model: gpt-5.6-sol)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-terra through Responses without sampling parameters
+[2026-10-02T18:19:20.484Z] [INFO]  LLM provider: openai (model: gpt-5.6-terra)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-luna through Responses without sampling parameters
+[2026-10-02T18:19:20.614Z] [INFO]  LLM provider: openai (model: gpt-5.6-luna)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-opus-5-5
+[2026-10-02T18:19:20.755Z] [INFO]  LLM provider: anthropic (model: claude-opus-5-5)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-sonnet-5-5
+[2026-10-02T18:19:20.895Z] [INFO]  LLM provider: anthropic (model: claude-sonnet-5-5)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-fable-5-1
+[2026-10-02T18:19:21.036Z] [INFO]  LLM provider: anthropic (model: claude-fable-5-1)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-mythos-5-1
+[2026-10-02T18:19:21.169Z] [INFO]  LLM provider: anthropic (model: claude-mythos-5-1)
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T18:19:21.651Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T18:19:21.662Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T18:19:21.669Z] [INFO]  Architect native tool loop: calling edit_file
+
+ ✓ tests/latest-model-support.test.ts (14 tests) 2151ms
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T18:19:22.085Z] [INFO]  Architect native tool loop: calling scan_project
+
+ ✓ tests/architect-managed-context.test.ts (3 tests) 2204ms
+   ✓ native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt  1647ms
+ ❯ tests/model-execution.test.ts (7 tests | 1 failed) 1691ms
+   × physical inference admission > native computer-role tools share the actual job and role allocation instead of the Architect route 897ms
+     → ADMISSION_LEDGER_UNAVAILABLE (ADMISSION_INSTANCE_MISMATCH): run unbound
+   ✓ physical inference admission > makes no HTTP request for zero allocation, unpriced API or context/reasoning bounds 38ms
+   ✓ physical inference admission > preserves refusal usage and bounds a continued run even with another provider object 134ms
+   ✓ physical inference admission > counts schema fallback as an admitted retry and cannot dispatch it with zero retry allocation 185ms
+   ✓ physical inference admission > retains a cancelled request liability and prevents overlapping account work 166ms
+   ✓ physical inference admission > records usage before rejecting malformed output and blocks measured reservation variance 141ms
+   ✓ physical inference admission > bounds simultaneous factories through one ledger and never turns an unknown reply into zero usage 129ms
+ ✓ tests/computer-use-ui.test.ts (6 tests) 688ms
+ ✓ tests/computer-browser-registry.test.ts (6 tests) 938ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/model-execution.test.ts > physical inference admission > native computer-role tools share the actual job and role allocation instead of the Architect route
+ModelAdmissionError: ADMISSION_LEDGER_UNAVAILABLE (ADMISSION_INSTANCE_MISMATCH): run unbound
+ ❯ ModelAdmission.load src/cognitive/model-admission.ts:77:13
+     75|       if ((error as NodeJS.ErrnoException).code === "ENOENT" && !publi…
+     76|         schema: "dreamgraph.model_admission.v1", instance_id: this.ins…
+     77|       throw new ModelAdmissionError(`ADMISSION_LEDGER_UNAVAILABLE (${e…
+       |             ^
+     78|     }
+     79|   }
+ ❯ src/cognitive/model-admission.ts:116:22
+ ❯ withBarrier src/utils/graph-reconciliation-barrier.ts:83:12
+ ❯ ModelExecution.request src/cognitive/model-execution.ts:80:5
+ ❯ callOpenAiCompatibleWithTools src/cognitive/llm.ts:620:15
+ ❯ completeWithNativeToolsRaw src/cognitive/llm.ts:590:7
+ ❯ src/cognitive/model-execution.ts:57:34
+ ❯ src/cognitive/jobs.ts:287:50
+ ❯ tests/model-execution.test.ts:23:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 66 passed (67)
+   Start at  21:19:14
+   Duration  10.83s (transform 2.23s, setup 0ms, collect 8.29s, tests 10.25s, environment 1ms, prepare 820ms)
+

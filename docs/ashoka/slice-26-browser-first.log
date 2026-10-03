@@ -1,0 +1,11 @@
+[2026-10-02T13:56:24.858Z] [INFO]  Creating instance d2532825-e36f-4e16-ba2e-194f0b273cdc (navigation-replica) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-navigation-browser-r2MKwQ\master\d2532825-e36f-4e16-ba2e-194f0b273cdc
+[2026-10-02T13:56:25.000Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-navigation-browser-r2MKwQ\master\instances.json
+[2026-10-02T13:56:25.000Z] [INFO]  Registered new instance d2532825-e36f-4e16-ba2e-194f0b273cdc (navigation-replica)
+[2026-10-02T13:56:25.007Z] [INFO]  Instance d2532825-e36f-4e16-ba2e-194f0b273cdc created successfully
+NAV01
+locator.waitFor: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('[data-slice-id].slice-current') to be visible
+    28 × locator resolved to hidden <li tabindex="0" role="button" class="dg-context-target slice-current" data-slice-id="slice-26-refresh-the-legacy-dreamgraph-graph-safely" aria-label="Slice 26 — Refresh the legacy DreamGraph graph safely, Current · in_progress (reported). Open definition">…</li>
+
+    at C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-navigation.mjs:39:104

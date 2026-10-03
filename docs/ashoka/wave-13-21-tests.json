@@ -1,0 +1,67 @@
+{
+  "schema": "dreamgraph.ashoka_verification_packet.v1",
+  "slices": [
+    13,
+    21
+  ],
+  "recorded_at": "2026-10-01T06:56:28.036290+00:00",
+  "source_scope": "stable root working source; fifteen-item dependency handoff, not complete release qualification",
+  "root": {
+    "files": 131,
+    "passed": 1468,
+    "skipped": 2,
+    "failed": 0,
+    "raw_report": "docs/ashoka/wave-13-21-tests.raw.json",
+    "log": "docs/ashoka/wave-13-21-tests.log"
+  },
+  "vscode": {
+    "build": "passed",
+    "tests": 487,
+    "passed": 487,
+    "failed": 0,
+    "log": "docs/ashoka/vscode-wave-13-21-tests.log"
+  },
+  "checks": {
+    "server_build": "passed",
+    "mcp": {
+      "tools": 93,
+      "resources": 31,
+      "classifications": 94,
+      "status": "passed"
+    },
+    "contracts": {
+      "count": 31,
+      "source_sha256": "33a249a9d9604c483e667dae3db73d907917cdd1976552373a680b8dded6f2e1",
+      "status": "passed"
+    },
+    "baseline": {
+      "revision": 9,
+      "owners": 29,
+      "cases": 12,
+      "frozen_evidence": 8,
+      "sha256": "996c84d36a7132f4a2b10919dc0f5b44266d4610353514708da0f78cd936f191",
+      "preceding_revision8_sha256": "dedd54b50636e6fbcbff9c67275074cf407c4699bb133b414d79a6f9e658efaf",
+      "original_task_labels_and_excerpts": "preserved exactly",
+      "status": "passed"
+    },
+    "provider_capability": "r3 passed",
+    "configuration": {
+      "typed_settings": 308,
+      "literal_source_keys": 101,
+      "status": "passed after documentation-line inventory refresh"
+    }
+  },
+  "provider_calls": 0,
+  "qualification": {
+    "C14": "pure transitions, durable receipts/replay, actual isolated HTTP and production Architect script in DOM fixture",
+    "strategy13": "actual registered strategies/preflight/output bounds; model port fixtures are not measured provider quality"
+  },
+  "limits": [
+    "Real supervised job adoption remains Slice17",
+    "All CLI/API/MCP/VS Code/Explorer/analytics consumers remain Slice25",
+    "Native GUI capability/grants/stop across platforms remains Slice31",
+    "Source/graph effect-to-execution manifest composition remains C15 integration at17/25",
+    "Paid models/platform qualification and final task usefulness remain Slice27",
+    "No live migration/global install/restart/release bump"
+  ]
+}

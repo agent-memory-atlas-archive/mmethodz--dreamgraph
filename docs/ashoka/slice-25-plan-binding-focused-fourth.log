@@ -1,0 +1,119 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T08:43:15.515Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T08:43:15.525Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T08:43:15.530Z] [INFO]  Architect native tool loop: calling edit_file
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T08:43:15.945Z] [INFO]  Architect native tool loop: calling scan_project
+
+stderr | tests/managed-plan-execution.test.ts
+[2026-10-02T08:43:16.322Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts
+[2026-10-02T08:43:16.323Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/managed-plan-execution.test.ts > selection alone stays read-only, while explicit execution injects the post-admission canonical running projection
+[2026-10-02T08:43:16.556Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > resolves Windows CLI shims and wraps them before spawning
+[2026-10-02T08:43:16.650Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > serves an executable browser bootstrap script for runtime binding
+[2026-10-02T08:43:16.742Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/architect-managed-context.test.ts (3 tests) 2139ms
+   ✓ native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt  1567ms
+   ✓ the actual native API pass shares original-host review and reports remaining controls before revocation  305ms
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-02T08:43:18.200Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-02T08:43:18.203Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-02T08:43:18.455Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-02T08:43:18.464Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-02T08:43:18.502Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-02T08:43:18.702Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification
+[2026-10-02T08:43:18.741Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification
+[2026-10-02T08:43:18.811Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification
+[2026-10-02T08:43:19.500Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-02T08:43:19.536Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-02T08:43:19.626Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-02T08:43:19.851Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > replaces a stale local model when codex-cli is selected
+[2026-10-02T08:43:19.890Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+[2026-10-02T08:43:19.895Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T08:43:20.021Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T08:43:20.047Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T08:43:20.072Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T08:43:20.097Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > exposes one active session runtime across config and chat payloads
+[2026-10-02T08:43:20.258Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.4, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists token economy config changes in engine.env
+[2026-10-02T08:43:20.459Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists token economy config changes in engine.env
+[2026-10-02T08:43:20.509Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+ ✓ tests/standalone-architect-routes.test.ts (55 tests) 6251ms
+   ✓ standalone Architect route hardening > executes browser bootstrap and bounds poisoned persisted chat history replay  503ms
+   ✓ standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification  824ms
+   ✓ standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports  352ms
+   ✓ standalone Architect route hardening > persists selected standalone plan in engine.env and exposes it for restart restore  343ms
+   ✓ standalone Architect route hardening > separates project-scope chat from selected plan logs and honors slash overrides  324ms
+ ✓ tests/managed-plan-execution.test.ts (12 tests) 12096ms
+   ✓ selection alone stays read-only, while explicit execution injects the post-admission canonical running projection  1216ms
+   ✓ refuses foreign project, selection mismatch, changed source semantics and stale approval before returning native authority  525ms
+   ✓ external plan edits block delivery and worker/model dispatch; source restoration cannot renew a closed pass  772ms
+   ✓ a real pending native model permit cannot be reported as confirmed plan termination  1077ms
+   ✓ the SDK native model callback uses the delivered running plan and original spend permit but cannot mark the slice implemented  889ms
+   ✓ unconfirmed termination remains recovery on exact retry and cannot be strengthened through another public finish  827ms
+   ✓ lost C14 closure acknowledgment replays the persisted original command after host revocation without another event  760ms
+   ✓ finite authority expiry leaves canonical recovery and a later claimed confirmed stop cannot erase missing live observation  1980ms
+   ✓ a fresh compiled daemon process recovers the saved closure without live launch authority or another C14 event  1411ms
+   ✓ actual compiled editor and SDK native passes preserve explicit purpose and close canonical ownership without claiming verification  1484ms
+   ✓ foreign hosts and execution workers cannot request C14 closure or another implementation lease  657ms
+   ✓ browser chat refuses forged purpose, unrelated selection, fallback and continuation before a native task can start  496ms
+
+ Test Files  3 passed (3)
+      Tests  70 passed (70)
+   Start at  11:43:09
+   Duration  18.84s (transform 2.99s, setup 0ms, collect 17.03s, tests 20.49s, environment 1ms, prepare 468ms)
+

@@ -1,0 +1,20 @@
+{
+  "success": true,
+  "numPassedTests": 1200,
+  "numFailedTests": 0,
+  "numPendingTests": 2,
+  "numTotalTests": 1202,
+  "startTime": 1790829792168,
+  "files": 123,
+  "failed_files": [],
+  "command": "npx vitest run --maxWorkers=4 --reporter=json --outputFile=docs/ashoka/wave-9-11-tests.raw.json",
+  "scope": "complete offline root suite; native transport tests use disposable subprocesses; no paid requests",
+  "build": "build:server passed",
+  "contracts": "31 canonical contracts, baseline8, provider r3 and 307-setting inventory checks passed after final regeneration",
+  "extension": "prior wave487 tests retained, no extension source changed in this wave",
+  "limitations": [
+    "No model-quality improvement claimed.",
+    "Real native Computer Use workers/seats and durable restart jobs remain owning-slice gates.",
+    "Existing legacy normalizer promotion weakness preserved for Slice15."
+  ]
+}

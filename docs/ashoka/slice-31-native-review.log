@@ -1,0 +1,5 @@
+[2026-10-02T17:59:49.531Z] [INFO]  Creating instance 8aef1317-5ed4-423d-a73a-8cf190b80bdb (ashoka-bounded-source-review) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-source-review-3M4lkt\master\8aef1317-5ed4-423d-a73a-8cf190b80bdb
+[2026-10-02T17:59:49.605Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-source-review-3M4lkt\master\instances.json
+[2026-10-02T17:59:49.606Z] [INFO]  Registered new instance 8aef1317-5ed4-423d-a73a-8cf190b80bdb (ashoka-bounded-source-review)
+[2026-10-02T17:59:49.611Z] [INFO]  Instance 8aef1317-5ed4-423d-a73a-8cf190b80bdb created successfully
+{"sessionId":"d77c4e0f-cda7-42e0-b88e-c26518463d95","compliance":{"status":"compliant","parity_percentage":100,"total_entries":4,"matched":4,"gaps_remaining":0,"regressions":0},"recommendation":{"action":"accept","justification":"All entries match. No regressions detected."}}

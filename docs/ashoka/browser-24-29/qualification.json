@@ -1,0 +1,52 @@
+{
+  "scope": "Actual local Chromium on Windows with software WebGL, disposable daemon, no inference",
+  "checks": [
+    {
+      "name": "SC04",
+      "detail": "Actual open/preview/create-disabled makes no job or inference."
+    },
+    {
+      "name": "SC05",
+      "detail": "Unsupported cron keeps draft and names the invalid field; zero maximum stays zero."
+    },
+    {
+      "name": "SC11-future",
+      "detail": "Explicit enable then pause changes future dispatch only, without dispatch."
+    },
+    {
+      "name": "SC01/SC03",
+      "detail": "Actual disabled duplicate/new identity and committed lost-reply retry yields two total definitions and one exact operation."
+    },
+    {
+      "name": "SC09/SC10-history",
+      "detail": "Actual unpaid maintenance job settles with immutable role/budget/config snapshot and one occurrence."
+    },
+    {
+      "name": "SC09/SC11-cancel",
+      "detail": "Actual lucid engine-lane conflict blocks the second schedule job; browser cancellation settles that captured job without changing future pause or the other completed run."
+    },
+    {
+      "name": "SC12",
+      "detail": "Archive preserves both the actual completed occurrence and the cancelled conflict/job/history."
+    },
+    {
+      "name": "SC13",
+      "detail": "Real keyboard tabs, narrow viewport, lost connection and canonical online readback."
+    },
+    {
+      "name": "XS07/XS13-context",
+      "detail": "Dense real 2D render, typed collision selection, 50-row adjacency and identical canonical agent-context path."
+    },
+    {
+      "name": "XS13/XS21-render",
+      "detail": "Actual software WebGL glass scene, selected short label intact, bounded label population and unchanged-refresh scene stability."
+    },
+    {
+      "name": "XS13-accessibility",
+      "detail": "Real narrow Explorer retains its visible 672px canvas, both rails collapse to 24px, reduced-motion rendering remains navigable."
+    }
+  ],
+  "errors": [],
+  "browser": "153.0.8010.50",
+  "success": true
+}

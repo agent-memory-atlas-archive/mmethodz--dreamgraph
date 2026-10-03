@@ -1,0 +1,43 @@
+[2026-10-02T06:27:25.966Z] [INFO]  Creating instance 41bca4f3-9591-4181-97ce-f0c66e0d3a2e (browser-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-p3SwqV\master\41bca4f3-9591-4181-97ce-f0c66e0d3a2e
+[2026-10-02T06:27:26.058Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-p3SwqV\master\instances.json
+[2026-10-02T06:27:26.059Z] [INFO]  Registered new instance 41bca4f3-9591-4181-97ce-f0c66e0d3a2e (browser-fixture)
+[2026-10-02T06:27:26.064Z] [INFO]  Instance 41bca4f3-9591-4181-97ce-f0c66e0d3a2e created successfully
+B25-01
+B25-02
+B25-03
+B25-04
+B25-05
+B25-06
+B25-07
+B25-08
+B25-09
+B25-10
+B25-11
+B25-12
+B25-13
+B25-14
+B25-15
+B25-16
+B25-17
+B25-18
+B25-19
+B25-20
+B25-21
+B25-22
+B25-23
+B25-24
+B25-25
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.fill: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('#plan-search')
+
+    at C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-architect.mjs:158:90 {
+  log: [ "  - waiting for locator('#plan-search')" ],
+  name: 'TimeoutError'
+}
+
+Node.js v25.2.1

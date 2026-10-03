@@ -1,0 +1,306 @@
+Installing dependencies...
+Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:4 https://deb.nodesource.com/node_20.x nodistro InRelease
+Hit:5 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+libatk-bridge2.0-0t64 is already the newest version (2.52.0-1build1).
+libatk-bridge2.0-0t64 set to manually installed.
+libatk1.0-0t64 is already the newest version (2.52.0-1build1).
+libatk1.0-0t64 set to manually installed.
+libatspi2.0-0t64 is already the newest version (2.52.0-1build1).
+libatspi2.0-0t64 set to manually installed.
+libcairo2 is already the newest version (1.18.0-3build1).
+libcairo2 set to manually installed.
+libcups2t64 is already the newest version (2.4.7-1.2ubuntu7.14).
+libcups2t64 set to manually installed.
+libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+libdbus-1-3 set to manually installed.
+libdrm2 is already the newest version (2.4.125-1ubuntu0.1~24.04.2).
+libdrm2 set to manually installed.
+libglib2.0-0t64 is already the newest version (2.80.0-6ubuntu3.9).
+libglib2.0-0t64 set to manually installed.
+libpango-1.0-0 is already the newest version (1.52.1+ds-1build1).
+libpango-1.0-0 set to manually installed.
+libx11-6 is already the newest version (2:1.8.7-1build1).
+libx11-6 set to manually installed.
+libxcb1 is already the newest version (1.15-1ubuntu2).
+libxcb1 set to manually installed.
+libxcomposite1 is already the newest version (1:0.4.5-1build3).
+libxcomposite1 set to manually installed.
+libxdamage1 is already the newest version (1:1.1.6-1build1).
+libxdamage1 set to manually installed.
+libxext6 is already the newest version (2:1.3.4-1build2).
+libxext6 set to manually installed.
+libxfixes3 is already the newest version (1:6.0.0-2build1).
+libxfixes3 set to manually installed.
+libxkbcommon0 is already the newest version (1.6.0-1build1).
+libxkbcommon0 set to manually installed.
+libxrandr2 is already the newest version (2:1.5.2-2build1).
+libxrandr2 set to manually installed.
+libfontconfig1 is already the newest version (2.15.0-1.1ubuntu2).
+libfontconfig1 set to manually installed.
+libfreetype6 is already the newest version (2.13.2+dfsg-1ubuntu0.1).
+libfreetype6 set to manually installed.
+The following packages were automatically installed and are no longer required:
+  gyp handlebars libauthen-sasl-perl libcares2 libclone-perl libdata-dump-perl
+  libencode-locale-perl libfile-basedir-perl libfile-desktopentry-perl
+  libfile-listing-perl libfile-mimeinfo-perl libfont-afm-perl
+  libhtml-form-perl libhtml-format-perl libhtml-parser-perl
+  libhtml-tagset-perl libhtml-tree-perl libhttp-cookies-perl
+  libhttp-daemon-perl libhttp-date-perl libhttp-message-perl
+  libhttp-negotiate-perl libio-html-perl libio-socket-ssl-perl
+  libio-stringy-perl libipc-system-simple-perl libjs-async libjs-events
+  libjs-inherits libjs-is-typedarray libjs-prettify libjs-regenerate
+  libjs-source-map libjs-sprintf-js libjs-typedarray-to-buffer libllvm19
+  liblwp-mediatypes-perl liblwp-protocol-https-perl libmailtools-perl
+  libnet-dbus-perl libnet-http-perl libnet-smtp-ssl-perl libnet-ssleay-perl
+  libnotify-bin libnotify4 libre2-10 libssl-dev libtie-ixhash-perl
+  libtimedate-perl libtry-tiny-perl liburi-perl libuv1-dev libuv1t64
+  libwayland-server0 libwww-perl libwww-robotrules-perl libx11-protocol-perl
+  libxcb-shape0 libxml-parser-perl libxml-twig-perl libxml-xpathengine-perl
+  libxv1 libxxf86dga1 node-abbrev node-ampproject-remapping node-ansi-escapes
+  node-ansi-regex node-ansi-styles node-aproba node-are-we-there-yet
+  node-argparse node-arrify node-async node-async-each node-auto-bind
+  node-babel-plugin-add-module-exports node-babel7-runtime node-balanced-match
+  node-base64-js node-binary-extensions node-brace-expansion node-busboy
+  node-camelcase node-caniuse-lite node-chownr node-chrome-trace-event
+  node-ci-info node-cjs-module-lexer node-cli-boxes node-cli-cursor node-clone
+  node-clone-deep node-collection-visit node-color-convert node-color-name
+  node-colors node-commander node-commondir node-concat-stream
+  node-console-control-strings node-convert-source-map node-core-js
+  node-core-js-pure node-core-util-is node-data-uri-to-buffer
+  node-decompress-response node-deep-is node-defaults node-define-property
+  node-delegates node-depd node-diff node-electron-to-chromium node-encoding
+  node-end-of-stream node-err-code node-error-ex node-es-module-lexer
+  node-escape-string-regexp node-eslint-utils node-eslint-visitor-keys
+  node-esquery node-estraverse node-esutils node-events node-fancy-log
+  node-fast-deep-equal node-fast-levenshtein node-fetch node-find-up
+  node-flatted node-for-in node-for-own node-foreground-child
+  node-fs-readdir-recursive node-fs-write-stream-atomic node-fs.realpath
+  node-function-bind node-functional-red-black-tree node-get-caller-file
+  node-get-stream node-get-value node-glob node-globals node-got
+  node-graceful-fs node-growl node-has-flag node-has-unicode node-has-value
+  node-has-values node-hosted-git-info node-iconv-lite node-ieee754 node-iferr
+  node-imurmurhash node-indent-string node-inflight node-inherits node-ini
+  node-interpret node-ip node-ip-regex node-is-arrayish node-is-binary-path
+  node-is-buffer node-is-descriptor node-is-extendable node-is-extglob
+  node-is-path-cwd node-is-plain-obj node-is-plain-object node-is-stream
+  node-is-typedarray node-is-windows node-isarray node-isexe node-isobject
+  node-js-tokens node-jsesc node-json-buffer node-json-parse-better-errors
+  node-json-schema node-json-schema-traverse node-json-stable-stringify
+  node-jsonify node-jsonparse node-kind-of node-levn node-loader-runner
+  node-locate-path node-lodash-packages node-log-driver node-lowercase-keys
+  node-lru-cache node-map-visit node-memfs node-merge-stream
+  node-mimic-response node-minimatch node-minimist node-minipass
+  node-mixin-deep node-mute-stream node-n3 node-negotiator node-neo-async
+  node-npm-run-path node-object-inspect node-object-visit node-once
+  node-optimist node-optionator node-osenv node-p-cancelable node-p-limit
+  node-p-locate node-p-map node-pascalcase node-path-dirname node-path-exists
+  node-path-is-absolute node-path-is-inside node-path-type node-pify
+  node-pkg-dir node-postcss-value-parser node-prelude-ls
+  node-process-nextick-args node-promise-inflight node-promise-retry
+  node-promzard node-prr node-pump node-punycode node-quick-lru
+  node-randombytes node-read node-readable-stream node-rechoir node-regenerate
+  node-regenerate-unicode-properties node-regenerator-runtime
+  node-regenerator-transform node-regexpp node-regjsgen node-repeat-string
+  node-require-directory node-require-from-string node-resolve
+  node-resolve-cwd node-resolve-from node-restore-cursor node-resumer
+  node-retry node-run-queue node-safe-buffer node-sellside-emitter
+  node-serialize-javascript node-set-blocking node-set-immediate-shim
+  node-shebang-command node-shebang-regex node-shell-quote node-signal-exit
+  node-slash node-slice-ansi node-source-list-map node-source-map
+  node-source-map-support node-spdx-correct node-spdx-exceptions
+  node-spdx-expression-parse node-spdx-license-ids node-sprintf-js node-ssri
+  node-stack-utils node-string-decoder node-strip-bom node-strip-json-comments
+  node-supports-color node-tapable node-terser node-text-table node-through
+  node-time-stamp node-to-fast-properties node-tslib node-type-check
+  node-typedarray node-typedarray-to-buffer node-undici
+  node-unicode-canonical-property-names-ecmascript
+  node-unicode-match-property-value-ecmascript
+  node-unicode-property-aliases-ecmascript node-unique-filename
+  node-unset-value node-uri-js node-util-deprecate node-uuid node-v8flags
+  node-validate-npm-package-license node-wcwidth.js node-webpack-sources
+  node-wordwrap node-wrappy node-write-file-atomic node-xtend node-y18n
+  node-yallist node-yaml perl-openssl-defaults x11-utils x11-xserver-utils
+  xdg-utils zutty
+Use 'apt autoremove' to remove them.
+The following additional packages will be installed:
+  libasound2-data libegl-mesa0 libfontenc1 libgl1-mesa-dri libglx-mesa0
+  libxfont2 mesa-libgallium mesa-vulkan-drivers x11-xkb-utils xfonts-encodings
+  xfonts-utils xserver-common
+Suggested packages:
+  alsa-utils libasound2-plugins
+Recommended packages:
+  fonts-ipafont-mincho fonts-liberation-sans-narrow fonts-tlwg-loma
+  alsa-ucm-conf alsa-topology-conf xfonts-base
+The following NEW packages will be installed:
+  fonts-freefont-ttf fonts-ipafont-gothic fonts-liberation
+  fonts-noto-color-emoji fonts-tlwg-loma-otf fonts-unifont fonts-wqy-zenhei
+  libasound2-data libasound2t64 libfontenc1 libnspr4 libnss3 libxfont2
+  x11-xkb-utils xfonts-cyrillic xfonts-encodings xfonts-scalable xfonts-utils
+  xserver-common xvfb
+The following packages will be upgraded:
+  libegl-mesa0 libgbm1 libgl1-mesa-dri libglx-mesa0 mesa-libgallium
+  mesa-vulkan-drivers
+6 upgraded, 20 newly installed, 0 to remove and 49 not upgraded.
+Need to get 64.2 MB of archives.
+After this operation, 104 MB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu noble/universe amd64 fonts-ipafont-gothic all 00303-21ubuntu1 [3513 kB]
+Get:2 http://archive.ubuntu.com/ubuntu noble/main amd64 fonts-freefont-ttf all 20211204+svn4273-2 [5641 kB]
+Get:3 http://archive.ubuntu.com/ubuntu noble/main amd64 fonts-liberation all 1:2.1.5-3 [1603 kB]
+Get:4 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 fonts-noto-color-emoji all 2.047-0ubuntu0.24.04.1 [9764 kB]
+Get:5 http://archive.ubuntu.com/ubuntu noble/universe amd64 fonts-tlwg-loma-otf all 1:0.7.3-1 [107 kB]
+Get:6 http://archive.ubuntu.com/ubuntu noble/universe amd64 fonts-unifont all 1:15.1.01-1build1 [2993 kB]
+Get:7 http://archive.ubuntu.com/ubuntu noble/universe amd64 fonts-wqy-zenhei all 0.9.45-8 [7472 kB]
+Get:8 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libasound2-data all 1.2.11-1ubuntu0.3 [21.4 kB]
+Get:9 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libasound2t64 amd64 1.2.11-1ubuntu0.3 [398 kB]
+Get:10 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libgl1-mesa-dri amd64 25.2.8-0ubuntu0.24.04.4 [38.0 kB]
+Get:11 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libglx-mesa0 amd64 25.2.8-0ubuntu0.24.04.4 [110 kB]
+Get:12 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libegl-mesa0 amd64 25.2.8-0ubuntu0.24.04.4 [117 kB]
+Get:13 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libgbm1 amd64 25.2.8-0ubuntu0.24.04.4 [34.2 kB]
+Get:14 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 mesa-libgallium amd64 25.2.8-0ubuntu0.24.04.4 [10.8 MB]
+Get:15 http://archive.ubuntu.com/ubuntu noble/main amd64 libfontenc1 amd64 1:1.1.8-1build1 [14.0 kB]
+Get:16 http://archive.ubuntu.com/ubuntu noble/main amd64 libnspr4 amd64 2:4.35-1.1build1 [117 kB]
+Get:17 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libnss3 amd64 2:3.98-1ubuntu0.2 [1445 kB]
+Get:18 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libxfont2 amd64 1:2.0.6-1+deb13u1build0.24.04.2 [94.0 kB]
+Get:19 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 mesa-vulkan-drivers amd64 25.2.8-0ubuntu0.24.04.4 [17.5 MB]
+Get:20 http://archive.ubuntu.com/ubuntu noble/main amd64 x11-xkb-utils amd64 7.7+8build2 [170 kB]
+Get:21 http://archive.ubuntu.com/ubuntu noble/main amd64 xfonts-encodings all 1:1.0.5-0ubuntu2 [578 kB]
+Get:22 http://archive.ubuntu.com/ubuntu noble/main amd64 xfonts-utils amd64 1:7.7+6build3 [94.4 kB]
+Get:23 http://archive.ubuntu.com/ubuntu noble/universe amd64 xfonts-cyrillic all 1:1.0.5+nmu1 [384 kB]
+Get:24 http://archive.ubuntu.com/ubuntu noble/main amd64 xfonts-scalable all 1:1.0.3-1.3 [304 kB]
+Get:25 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 xserver-common all 2:21.1.12-1ubuntu1.8 [34.8 kB]
+Get:26 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 xvfb amd64 2:21.1.12-1ubuntu1.8 [877 kB]
+debconf: unable to initialize frontend: Dialog
+debconf: (Dialog frontend requires a screen at least 13 lines tall and 31 columns wide.)
+debconf: falling back to frontend: Readline
+Fetched 64.2 MB in 45s (1436 kB/s)
+Selecting previously unselected package fonts-ipafont-gothic.
+(Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 90815 files and directories currently installed.)
+Preparing to unpack .../00-fonts-ipafont-gothic_00303-21ubuntu1_all.deb ...
+Unpacking fonts-ipafont-gothic (00303-21ubuntu1) ...
+Selecting previously unselected package fonts-freefont-ttf.
+Preparing to unpack .../01-fonts-freefont-ttf_20211204+svn4273-2_all.deb ...
+Unpacking fonts-freefont-ttf (20211204+svn4273-2) ...
+Selecting previously unselected package fonts-liberation.
+Preparing to unpack .../02-fonts-liberation_1%3a2.1.5-3_all.deb ...
+Unpacking fonts-liberation (1:2.1.5-3) ...
+Selecting previously unselected package fonts-noto-color-emoji.
+Preparing to unpack .../03-fonts-noto-color-emoji_2.047-0ubuntu0.24.04.1_all.deb ...
+Unpacking fonts-noto-color-emoji (2.047-0ubuntu0.24.04.1) ...
+Selecting previously unselected package fonts-tlwg-loma-otf.
+Preparing to unpack .../04-fonts-tlwg-loma-otf_1%3a0.7.3-1_all.deb ...
+Unpacking fonts-tlwg-loma-otf (1:0.7.3-1) ...
+Selecting previously unselected package fonts-unifont.
+Preparing to unpack .../05-fonts-unifont_1%3a15.1.01-1build1_all.deb ...
+Unpacking fonts-unifont (1:15.1.01-1build1) ...
+Selecting previously unselected package fonts-wqy-zenhei.
+Preparing to unpack .../06-fonts-wqy-zenhei_0.9.45-8_all.deb ...
+Unpacking fonts-wqy-zenhei (0.9.45-8) ...
+Selecting previously unselected package libasound2-data.
+Preparing to unpack .../07-libasound2-data_1.2.11-1ubuntu0.3_all.deb ...
+Unpacking libasound2-data (1.2.11-1ubuntu0.3) ...
+Selecting previously unselected package libasound2t64:amd64.
+Preparing to unpack .../08-libasound2t64_1.2.11-1ubuntu0.3_amd64.deb ...
+Unpacking libasound2t64:amd64 (1.2.11-1ubuntu0.3) ...
+Preparing to unpack .../09-libgl1-mesa-dri_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+Unpacking libgl1-mesa-dri:amd64 (25.2.8-0ubuntu0.24.04.4) over (25.2.8-0ubuntu0.24.04.2) ...
+Preparing to unpack .../10-libglx-mesa0_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+Unpacking libglx-mesa0:amd64 (25.2.8-0ubuntu0.24.04.4) over (25.2.8-0ubuntu0.24.04.2) ...
+Preparing to unpack .../11-libegl-mesa0_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+Unpacking libegl-mesa0:amd64 (25.2.8-0ubuntu0.24.04.4) over (25.2.8-0ubuntu0.24.04.2) ...
+Preparing to unpack .../12-libgbm1_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+Unpacking libgbm1:amd64 (25.2.8-0ubuntu0.24.04.4) over (25.2.8-0ubuntu0.24.04.2) ...
+Preparing to unpack .../13-mesa-libgallium_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+Unpacking mesa-libgallium:amd64 (25.2.8-0ubuntu0.24.04.4) over (25.2.8-0ubuntu0.24.04.2) ...
+Selecting previously unselected package libfontenc1:amd64.
+Preparing to unpack .../14-libfontenc1_1%3a1.1.8-1build1_amd64.deb ...
+Unpacking libfontenc1:amd64 (1:1.1.8-1build1) ...
+Selecting previously unselected package libnspr4:amd64.
+Preparing to unpack .../15-libnspr4_2%3a4.35-1.1build1_amd64.deb ...
+Unpacking libnspr4:amd64 (2:4.35-1.1build1) ...
+Selecting previously unselected package libnss3:amd64.
+Preparing to unpack .../16-libnss3_2%3a3.98-1ubuntu0.2_amd64.deb ...
+Unpacking libnss3:amd64 (2:3.98-1ubuntu0.2) ...
+Selecting previously unselected package libxfont2:amd64.
+Preparing to unpack .../17-libxfont2_1%3a2.0.6-1+deb13u1build0.24.04.2_amd64.deb ...
+Unpacking libxfont2:amd64 (1:2.0.6-1+deb13u1build0.24.04.2) ...
+Preparing to unpack .../18-mesa-vulkan-drivers_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+Unpacking mesa-vulkan-drivers:amd64 (25.2.8-0ubuntu0.24.04.4) over (25.2.8-0ubuntu0.24.04.2) ...
+Selecting previously unselected package x11-xkb-utils.
+Preparing to unpack .../19-x11-xkb-utils_7.7+8build2_amd64.deb ...
+Unpacking x11-xkb-utils (7.7+8build2) ...
+Selecting previously unselected package xfonts-encodings.
+Preparing to unpack .../20-xfonts-encodings_1%3a1.0.5-0ubuntu2_all.deb ...
+Unpacking xfonts-encodings (1:1.0.5-0ubuntu2) ...
+Selecting previously unselected package xfonts-utils.
+Preparing to unpack .../21-xfonts-utils_1%3a7.7+6build3_amd64.deb ...
+Unpacking xfonts-utils (1:7.7+6build3) ...
+Selecting previously unselected package xfonts-cyrillic.
+Preparing to unpack .../22-xfonts-cyrillic_1%3a1.0.5+nmu1_all.deb ...
+Unpacking xfonts-cyrillic (1:1.0.5+nmu1) ...
+Selecting previously unselected package xfonts-scalable.
+Preparing to unpack .../23-xfonts-scalable_1%3a1.0.3-1.3_all.deb ...
+Unpacking xfonts-scalable (1:1.0.3-1.3) ...
+Selecting previously unselected package xserver-common.
+Preparing to unpack .../24-xserver-common_2%3a21.1.12-1ubuntu1.8_all.deb ...
+Unpacking xserver-common (2:21.1.12-1ubuntu1.8) ...
+Selecting previously unselected package xvfb.
+Preparing to unpack .../25-xvfb_2%3a21.1.12-1ubuntu1.8_amd64.deb ...
+Unpacking xvfb (2:21.1.12-1ubuntu1.8) ...
+Setting up mesa-vulkan-drivers:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+Setting up mesa-libgallium:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+Setting up libgbm1:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+Setting up fonts-noto-color-emoji (2.047-0ubuntu0.24.04.1) ...
+Setting up x11-xkb-utils (7.7+8build2) ...
+Setting up libgl1-mesa-dri:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+Setting up fonts-wqy-zenhei (0.9.45-8) ...
+Setting up fonts-freefont-ttf (20211204+svn4273-2) ...
+Setting up libasound2-data (1.2.11-1ubuntu0.3) ...
+Setting up libfontenc1:amd64 (1:1.1.8-1build1) ...
+Setting up libegl-mesa0:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+Setting up libasound2t64:amd64 (1.2.11-1ubuntu0.3) ...
+Setting up fonts-tlwg-loma-otf (1:0.7.3-1) ...
+Setting up libnspr4:amd64 (2:4.35-1.1build1) ...
+Setting up xfonts-encodings (1:1.0.5-0ubuntu2) ...
+Setting up fonts-ipafont-gothic (00303-21ubuntu1) ...
+update-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode
+Setting up fonts-liberation (1:2.1.5-3) ...
+Setting up xserver-common (2:21.1.12-1ubuntu1.8) ...
+Setting up libxfont2:amd64 (1:2.0.6-1+deb13u1build0.24.04.2) ...
+Setting up fonts-unifont (1:15.1.01-1build1) ...
+Setting up libglx-mesa0:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+Setting up xvfb (2:21.1.12-1ubuntu1.8) ...
+Setting up libnss3:amd64 (2:3.98-1ubuntu0.2) ...
+Setting up xfonts-utils (1:7.7+6build3) ...
+Setting up xfonts-cyrillic (1:1.0.5+nmu1) ...
+Setting up xfonts-scalable (1:1.0.3-1.3) ...
+Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+Processing triggers for man-db (2.12.0-4build2) ...
+Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...

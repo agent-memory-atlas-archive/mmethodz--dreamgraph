@@ -1,0 +1,12 @@
+[2026-10-03T07:18:04.168Z] [INFO]  Creating instance a486af98-c4e4-4f7a-a191-756e85f096c7 (ui-repairs) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-ui-repairs-ife3Ki\master\a486af98-c4e4-4f7a-a191-756e85f096c7
+[2026-10-03T07:18:04.238Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-ui-repairs-ife3Ki\master\instances.json
+[2026-10-03T07:18:04.239Z] [INFO]  Registered new instance a486af98-c4e4-4f7a-a191-756e85f096c7 (ui-repairs)
+[2026-10-03T07:18:04.244Z] [INFO]  Instance a486af98-c4e4-4f7a-a191-756e85f096c7 created successfully
+{"text":"### Slice 5 — Commit enrichment and checkpoints coherently\r\n\r\n- status: verified\r\n- Priority: P1\r\n- ","offset":38554,"target":{"x":309,"y":452.15625,"width":6.453125,"height":13,"top":452.15625,"right":315.453125,"bottom":465.15625,"left":309},"body":{"x":300,"y":443.21875,"width":916,"height":537.78125,"top":443.21875,"right":1216,"bottom":981,"left":300},"scroll":7412,"scrollHeight":30329,"details":{"x":291,"y":406.21875,"width":934,"height":583.78125,"top":406.21875,"right":1225,"bottom":990,"left":291},"panel":{"x":291,"y":289.59375,"width":938,"height":700.40625,"top":289.59375,"right":1229,"bottom":990,"left":291},"padding":"8px"}
+Architect exact slice + full-height review
+Architect resize after full rail scroll
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('.canvas-wrap canvas').first() to be visible
+
+    at C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-ui-repairs.mjs:71:87

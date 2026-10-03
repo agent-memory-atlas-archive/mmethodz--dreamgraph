@@ -1,0 +1,15 @@
+{
+  "files": 105,
+  "passed": 1028,
+  "failed": 1,
+  "skipped": 2,
+  "failures": [
+    {
+      "file": "C:/Users/Mika Jussila/source/repos/dreamgraph/tests/plugins/policies-seam.test.ts",
+      "cases": [
+        "plugin policy seam (M6 closure) journals a proposal when capability + effect declared"
+      ]
+    }
+  ],
+  "disposition": "Policy fixture observed persisted bytes before asynchronous accepted telemetry; now waits for both."
+}

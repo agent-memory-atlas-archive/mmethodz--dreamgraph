@@ -1,0 +1,490 @@
+{
+  "schema": "dreamgraph.ashoka.computer_checkpoint.v1",
+  "recorded_at": "2026-10-02T22:09:38.994Z",
+  "status": "wsl_installer_browser_qualified_slice31_in_progress",
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "authorization": "Owner explicitly accepted installer/browser-worker proof for WSL and authorized --force replacement of the unused Linux test bed. Windows global installation and daemon remain untouched.",
+  "install": {
+    "schema": "dreamgraph.wsl_installation_proof.v1",
+    "recorded_at": "2026-10-02T22:02:42.006Z",
+    "platform": "linux",
+    "architecture": "x64",
+    "kernel": "6.6.87.2-microsoft-standard-WSL2",
+    "distribution": "PRETTY_NAME=\"Ubuntu 24.04.4 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.4 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+    "node": "20.20.2",
+    "npm": "10.8.2",
+    "master": "/home/mmethodz/.dreamgraph",
+    "source": "/tmp/dg-ashoka-wsl-39a757ee-01db-48ec-9d29-ebbcf5603f27/source",
+    "version": "13.4.0",
+    "cli_version": "DreamGraph CLI v13.4.0 (Glass Atlas)",
+    "workspaces": [
+      {
+        "name": "@dreamgraph/sdk",
+        "version": "13.4.0",
+        "files": 88
+      },
+      {
+        "name": "@dreamgraph/host",
+        "version": "13.4.0",
+        "files": 28
+      },
+      {
+        "name": "@dreamgraph/token-economy",
+        "version": "13.4.0",
+        "files": 20
+      }
+    ],
+    "files": [
+      {
+        "file": "package.json",
+        "sha256": "ebcd7d49998c5187fc03b5ecc5f76cfb2bb03041c33e69ec5245f6f95bdc2eca"
+      },
+      {
+        "file": "dist/cli/dg.js",
+        "sha256": "d904dff72a0c6cc925b4f1dfbbb900cab2adb944f56114e2c89848d05d223578"
+      },
+      {
+        "file": "dist/computer/browser-harness.js",
+        "sha256": "8398de70aa91ce95d8c85a598056f3c91dcad8915c5ab8600ff2e05749b5e681"
+      },
+      {
+        "file": "dist/computer/browser-worker-entry.js",
+        "sha256": "147394c444899f245f347a030ddcda8af1cbfbc860e9f5cbd21b1314ecb0bf9e"
+      }
+    ],
+    "runtime_version": "1.62.1",
+    "browser_executable": "/tmp/dg-ashoka-wsl-3e20aba0-2617-4c9e-8b89-93779607a2a6/browsers/chromium-1234/chrome-linux64/chrome",
+    "browser_version": "151.0.7922.34",
+    "model_requests": 0,
+    "support_scope": "Actual WSL Linux test-bed installer and isolated headless browser only. No native desktop, CLI computer adapter, macOS, Linux Mint GUI or VS Code activation qualification.",
+    "browser_artifact_hash": "sha256:2cd14d1a8d6a9c7b5f527a955e96bbb19410246c7bdf17e5b718d715c6a5e5fe",
+    "cli_output": {
+      "qualification_path": "/tmp/dg-ashoka-wsl-39a757ee-01db-48ec-9d29-ebbcf5603f27/browser-qualification.json",
+      "worker_id": "ashoka-wsl-ubuntu-browser",
+      "platform": "linux",
+      "architecture": "x64",
+      "browser_version": "151.0.7922.34",
+      "node": "20.20.2",
+      "model_requests": 0,
+      "measured_checks": 11,
+      "evidence_hash": "sha256:2cd14d1a8d6a9c7b5f527a955e96bbb19410246c7bdf17e5b718d715c6a5e5fe",
+      "stop_release_ms": 178.83776599999965,
+      "control_loss_stop_ms": 4465.588112000001,
+      "note": "Qualification only. Instance setup, target review and explicit scoped permission are separate."
+    }
+  },
+  "browser": {
+    "schema": "dreamgraph.browser_runtime_qualification.v1",
+    "evidence": {
+      "schema": "dreamgraph.browser_runtime_evidence.v1",
+      "recorded_at": "2026-10-02T22:02:41.737Z",
+      "source_hash": "sha256:1858683e03c29345f10640d5e98d825f697cc819e03346511c4de43da197418f",
+      "platform": "linux",
+      "architecture": "x64",
+      "node": "20.20.2",
+      "browser_version": "151.0.7922.34",
+      "runtime_version": "1.62.1",
+      "model_requests": 0,
+      "provider_scope": "none",
+      "traces": [
+        {
+          "id": "BW01",
+          "requirements": [
+            "CU02",
+            "CU20"
+          ],
+          "evidence": {
+            "unicode_postcondition": true,
+            "filtered_structural_observation": true
+          }
+        },
+        {
+          "id": "BW02",
+          "requirements": [
+            "CU03",
+            "CU14"
+          ],
+          "evidence": {
+            "stale_reference_rejected": true
+          }
+        },
+        {
+          "id": "BW03A",
+          "requirements": [
+            "CU03",
+            "CU12"
+          ],
+          "evidence": {
+            "original_peer_pause": true,
+            "fresh_resume_observation": true,
+            "no_input_during_pause": true
+          }
+        },
+        {
+          "id": "BW03",
+          "requirements": [
+            "CU04",
+            "CU14"
+          ],
+          "evidence": {
+            "forbidden_requests": 0,
+            "forbidden_posts": 0
+          }
+        },
+        {
+          "id": "BW04",
+          "requirements": [
+            "CU05"
+          ],
+          "evidence": {
+            "stop_release_ms": 178.83776599999965
+          }
+        },
+        {
+          "id": "BW05",
+          "requirements": [
+            "CU13",
+            "CU20"
+          ],
+          "evidence": {
+            "finite_image_reservation": true,
+            "frame_hash_verified": true
+          }
+        },
+        {
+          "id": "BW05A",
+          "requirements": [
+            "CU13"
+          ],
+          "evidence": {
+            "finite_action_limit": true
+          }
+        },
+        {
+          "id": "BW06",
+          "requirements": [
+            "CU05",
+            "CU11"
+          ],
+          "evidence": {
+            "mode": "disconnect",
+            "elapsed_ms": 4465.588112000001,
+            "local_stop": null,
+            "proof": "original_child_exited_after_local_browser_closure",
+            "browser_requests_quiescent": true
+          }
+        },
+        {
+          "id": "BW07",
+          "requirements": [
+            "CU05",
+            "CU11"
+          ],
+          "evidence": {
+            "mode": "watchdog",
+            "elapsed_ms": 2542.089594000001,
+            "local_stop": {
+              "epoch": "d1ea7fb6-d9f9-4314-8284-16dfa1f18506",
+              "input_released": true,
+              "terminated": true,
+              "reason": "watchdog",
+              "heartbeat_age_ms": 2541,
+              "stop_elapsed_ms": 152
+            },
+            "proof": "original_child_exited_after_local_browser_closure",
+            "browser_requests_quiescent": true
+          }
+        },
+        {
+          "id": "BW08",
+          "requirements": [
+            "CU10",
+            "CU22",
+            "CU24"
+          ],
+          "evidence": {
+            "actual_input_deliveries": 1,
+            "durable_outcome": "unknown",
+            "exact_retry_no_input": true,
+            "route": "dreamgraph_harness"
+          }
+        },
+        {
+          "id": "BW09",
+          "requirements": [
+            "CU10",
+            "CU22"
+          ],
+          "evidence": {
+            "execution_status": "recovery_required",
+            "unknown_action_retained": true
+          }
+        }
+      ],
+      "support_scope": "This installed isolated browser/runtime only. CU IDs map to measured subchecks, not full CU acceptance, other operating systems, native desktops or CLI adapters."
+    },
+    "worker": {
+      "schema": "dreamgraph.browser_install.v1",
+      "id": "ashoka-wsl-ubuntu-browser",
+      "browser_executable": "/tmp/dg-ashoka-wsl-3e20aba0-2617-4c9e-8b89-93779607a2a6/browsers/chromium-1234/chrome-linux64/chrome",
+      "browser_version": "151.0.7922.34",
+      "runtime_version": "1.62.1",
+      "qualification": {
+        "schema": "dreamgraph.computer_qualification.v1",
+        "backend": "isolated_playwright",
+        "backend_version": "playwright-core@1.62.1/chromium@151.0.7922.34/node@20.20.2",
+        "platform": "linux",
+        "architecture": "x64",
+        "source_hash": "sha256:1858683e03c29345f10640d5e98d825f697cc819e03346511c4de43da197418f",
+        "protocol_hash": "sha256:ec4bb77daacf9faeb874bc313e0f3fbcc431d6aef7ce7a60ab2a90448bbbfc65",
+        "qualified_at": "2026-10-02T22:02:41.737Z",
+        "evidence_scope": "actual_runtime",
+        "scope_negative_passed": true,
+        "privacy_passed": true,
+        "bounded_actions_passed": true,
+        "stop_release_ms": 178.83776599999965,
+        "control_loss_stop_ms": 4465.588112000001,
+        "cases": [
+          "CU04",
+          "CU05",
+          "CU10",
+          "CU20",
+          "CU24"
+        ],
+        "artifact_hash": "sha256:2cd14d1a8d6a9c7b5f527a955e96bbb19410246c7bdf17e5b718d715c6a5e5fe"
+      }
+    }
+  },
+  "source": {
+    "files": 470,
+    "inventory_sha256": "706dd31e5f90599aa6c9f2ea2c2b3bbfd3fed1c2bdd5f71b10c33cf2b12dcf55",
+    "current_build_source_bytes_matched": true,
+    "post_qualification_review_helper_updates": [
+      {
+        "file": "scripts/qualify-ashoka-native-review.mjs",
+        "staged_original_sha256": "dfd40da5f5e8c6c819b1c7623119d3c96c63ccb2f8737f0d5b9fd9408d147e94",
+        "current_sha256": "e18ac792551c336d08a853e1e2bdf6b1977c51e9bb81a847a261d20d9783eac4",
+        "scope": "Review runner only; added the bounded -wsl helper after qualification. Not imported by the installed runtime or used by install.sh."
+      }
+    ],
+    "shell_line_endings": "LF"
+  },
+  "packaging_test": {
+    "passed": 1,
+    "failed": 0,
+    "exit_code": 0
+  },
+  "retained_failures": [
+    "First actual install succeeded, but the downloaded Chromium could not load missing Linux libraries (first libnspr4).",
+    "The runtime dependency helper initially refused the existing unattended-upgrade package lock; bounded retries left that updater intact and succeeded on attempt7.",
+    "An early worker attempt timed out during dependency setup, and the first sandboxed diagnostic exceeded the control-loss ceiling. Both remain unqualified evidence.",
+    "After dependencies settled, the diagnostic passed and a fresh uninstrumented --force installation independently passed all eleven measured subchecks. Deadlines and Chromium sandbox remained unchanged."
+  ],
+  "scope": "Ubuntu24.04.4/WSL2 x64/Node20.20.2/Chromium151.0.7922.34/Playwright1.62.1: real source build, same-version dependency refresh, installed workspace/daemon imports and isolated browser. No native desktop, Mint GUI, macOS, native CLI Computer Use or VS Code activation claim.",
+  "remaining": [
+    "Slice31 native workers/provider-native/CLI seams, forced-crash readback, complete editor execution and CU/XS joins.",
+    "Slice26 reviewed live cutover, Slice27 actual paired usefulness and Slice28 synchronized release. Version13.4.0; no Windows global install/restart or paid inference."
+  ],
+  "artifacts": [
+    {
+      "path": "scripts/install.sh",
+      "bytes": 25854,
+      "sha256": "e6aca0db9e960c94ce3bf46c997c067a0ebeadb6c068bd2ce7264b825c8652f7"
+    },
+    {
+      "path": "scripts/install.ps1",
+      "bytes": 22276,
+      "sha256": "d989ec579bfcce6f6dfa1e7c017700c366d8949771091f13e0c553272965bf10"
+    },
+    {
+      "path": "scripts/workspace-artifacts.mjs",
+      "bytes": 3729,
+      "sha256": "0db104f863dfa31748694b121383a1c8475ca270322947830b40bfed68351965"
+    },
+    {
+      "path": "scripts/qualify-ashoka-wsl-browser.mjs",
+      "bytes": 10385,
+      "sha256": "94ec61dbeaf0b615a4d951a9f85c211e7821c49b8804469099ad1aa5c51b9941"
+    },
+    {
+      "path": "scripts/record-ashoka-wsl-evidence.mjs",
+      "bytes": 6804,
+      "sha256": "477488ad45f18b848edd6f5450816033d9b78712caa67febeb34ef5ec381f857"
+    },
+    {
+      "path": "src/computer/browser-driver.ts",
+      "bytes": 15160,
+      "sha256": "0a8ec99054bbcd9c7806cf701f804d639c142b369df9a4efb74be68d1b2c8d0f"
+    },
+    {
+      "path": "src/computer/browser-harness.ts",
+      "bytes": 12601,
+      "sha256": "b521c521b8a1a5a7ace5ebe6fbfa2b84257a61b62b3fbef8404a614143846c27"
+    },
+    {
+      "path": "src/computer/qualify-browser.ts",
+      "bytes": 19167,
+      "sha256": "bb73aa5aca43d43a944ed1c794311730f371b634431d5298bae9c6998cadad60"
+    },
+    {
+      "path": "src/cli/commands/computer-use.ts",
+      "bytes": 3797,
+      "sha256": "a86742935cc5bcf7b25ea651778341c65f9927169429233eb6f6ff48ee7130db"
+    },
+    {
+      "path": "package.json",
+      "bytes": 4149,
+      "sha256": "6acc1e573150165cfc8a77109e0409e992bb8f34bf9700eaf4eeac69a61011a8"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "tests/workspace-installation.test.ts",
+      "bytes": 3758,
+      "sha256": "40412edfd579c82e00b4a5c3ebc295622cb9038db55e831ecfdbee52b0d197f9"
+    },
+    {
+      "path": "guide/02-installation.md",
+      "bytes": 6056,
+      "sha256": "361ab105e30a30cf9c589a939314c74eba6c398e8b3185f0da9f87c851bf0db3"
+    },
+    {
+      "path": "INSTALL.md",
+      "bytes": 6674,
+      "sha256": "12df27061a0aee446463cbc21e1cd7864773bd32b9f4a4f607baac47890cf27f"
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 46369,
+      "sha256": "073c85f704d93cf4e9cc2ea6e553509999d963fabf934ff15b4730a77a15ab1e"
+    },
+    {
+      "path": "docs/ashoka/computer-use.md",
+      "bytes": 13375,
+      "sha256": "7ca83796fe3a21af72e3e052b464112d36eaa52af47abe56bbf48fb70d1af362"
+    },
+    {
+      "path": "docs/ashoka/native-review-31-wsl.mjs",
+      "bytes": 7666,
+      "sha256": "b04e0d4f531c6ad14dbeba00bfe741fcd399d27f56e19ddcf04774b6612c2b62"
+    },
+    {
+      "path": "scripts/qualify-ashoka-native-review.mjs",
+      "bytes": 3731,
+      "sha256": "e18ac792551c336d08a853e1e2bdf6b1977c51e9bb81a847a261d20d9783eac4"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-third/run-scope.json",
+      "bytes": 493,
+      "sha256": "bf38e48d14de252d2516766b69721b7554c85e302d6507af40c447699e9318e7"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-third/source-inventory.json",
+      "bytes": 124699,
+      "sha256": "706dd31e5f90599aa6c9f2ea2c2b3bbfd3fed1c2bdd5f71b10c33cf2b12dcf55"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-third/installation-proof.json",
+      "bytes": 2920,
+      "sha256": "df45d256d30a0d76f2f17e98b0176720eeb9f6b9ddc88d221c1d73265807bf14"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-third/browser-qualification.json",
+      "bytes": 4941,
+      "sha256": "68e59424fda5a3fcf5f4ba1a66b7323d6d88b13ea6929744001efa30e9ca4a97"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-third/installer-browser.log",
+      "bytes": 5209,
+      "sha256": "2de291a7983e739e677f92bd531703d93a5d330ddb57fc130735e5f186f8c5a3"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-first/failure.json",
+      "bytes": 4242,
+      "sha256": "1774813bd050cdfb741782ca4817d0abbd281df4326b9c7bcffee5329bb8adcf"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-first/installer-browser.log",
+      "bytes": 11500,
+      "sha256": "3bf9b2b2b91045b4a9fe12a4430726703e2cfb24334738971ca8628eb09a5d6b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-second/failure.json",
+      "bytes": 3613,
+      "sha256": "71cff6825706a2fc04aae6f5e85c29c2e1152edceed90565fa3d516a14e313b6"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-second/installer-browser.log",
+      "bytes": 6205,
+      "sha256": "505a74c69125fc6909266b583aae2558c6d2480f7da2333df43ee18bae7b6433"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-browser-dependencies.log",
+      "bytes": 662,
+      "sha256": "0affc51c1593d0da161017f5439a4a90843f02de476257aad5f60e6f54838da2"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-dependencies-retry-result.json",
+      "bytes": 27,
+      "sha256": "3242266af5c8c7b0e27a9cc97902f283f5d25c84d08669dc6f04c949dcb1a654"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-workspace-test.json",
+      "bytes": 1009,
+      "sha256": "0e41072991d2c7759795f81603602a2e36c4d1ae1b662cdd3120c3149b74aa44"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-workspace-test.log",
+      "bytes": 115,
+      "sha256": "6f6e2d0471844b29e135ee5dfdaef7370d3953b20170a1fa518947db19bd4c0e"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-workspace-test-exit.json",
+      "bytes": 15,
+      "sha256": "e81bc160c0843ee56f31f12997bb3aff50528d596002d4866676cb8a1b19195a"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-diagnostic.log",
+      "bytes": 166,
+      "sha256": "3c77b488e21dec02082a7eaaa9f202d707879882299640a957766e6355b401a0"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-diagnostic-second.log",
+      "bytes": 4066,
+      "sha256": "86a3093fc0ebd51a208251f1958911efb0a5a3d8d0f3211f191ebb6fb2a6679f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-diagnostic-second-exit.json",
+      "bytes": 15,
+      "sha256": "e81bc160c0843ee56f31f12997bb3aff50528d596002d4866676cb8a1b19195a"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-architecture.log",
+      "bytes": 146,
+      "sha256": "25516603743c30853b9a0a41cb2542c35c033d72331e773efe0e3451788d3a72"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-generated-checks.log",
+      "bytes": 3040,
+      "sha256": "5bfbf3896abbd8f4bd654b8c5614efb9d230798ff1138a954f704e1ed43c2fde"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-generated-checks-second.log",
+      "bytes": 2855,
+      "sha256": "1828cc6d10d5c609322e33f601310da0cc503a038565049b84a3048bcfcb0cfd"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-config-regeneration.log",
+      "bytes": 191,
+      "sha256": "c6b54fc079487c330d619f4b40fc0e94bfa9e2efaabb168e12cc4c203ea37a4f"
+    }
+  ]
+}

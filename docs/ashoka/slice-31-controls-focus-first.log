@@ -1,0 +1,20 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/computer-seat.test.ts (3 tests) 1203ms
+   ✓ a second session/daemon cannot steal a seat; release permits the next original owner  842ms
+   ✓ the helper owns the kernel lifetime; crash releases its own seat without stale path stealing  358ms
+ ✓ tests/computer-capabilities.test.ts (7 tests) 15ms
+ ✓ tests/computer-journal.test.ts (9 tests) 2809ms
+   ✓ replays original intent/receipt across service recreation and never persists raw action text  329ms
+   ✓ reserves finite actions/images/bytes once and refuses oversize or unsupported operations  324ms
+   ✓ postcondition proof, terminal immutability and graph receipt owner remain separate  352ms
+   ✓ a lost physical result stays recoverable after acknowledged stop and cannot redispatch  381ms
+   ✓ active workers prevent completion and stopped proved work remains a state receipt, never graph truth  339ms
+   ✓ late unknown-result bookkeeping does not pretend worker termination was acknowledged  375ms
+
+ Test Files  3 passed (3)
+      Tests  19 passed (19)
+   Start at  18:08:55
+   Duration  8.39s (transform 2.10s, setup 0ms, collect 10.40s, tests 4.03s, environment 1ms, prepare 440ms)
+

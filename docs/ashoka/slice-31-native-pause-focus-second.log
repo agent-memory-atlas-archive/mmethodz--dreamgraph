@@ -1,0 +1,29 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/computer-broker.test.ts (19 tests) 26139ms
+   ✓ single original host/job owns scoped dispatch, independent postcondition and replay  5840ms
+   ✓ pause fences input and model continuation; resume preserves finite original authority and requires fresh graph/target evidence  1773ms
+   ✓ pause drains an already delivered atomic operation to its observed receipt while independent Stop remains separate  1216ms
+   ✓ Stop breaks a paused model wait without renewing a grant or turning unresolved work into a completed task  764ms
+   ✓ pause and resume require the original human owner; lost acknowledgement retries cannot pause or capture twice  983ms
+   ✓ an unresponsive pause acknowledgement times out, records uncertainty and uses independent Stop  1793ms
+   ✓ the original deadline expires during pause; waiting cannot renew authority or leave a running worker  3479ms
+   ✓ native custom tools preserve scoped fresh observations and keep literal arguments out of preview metadata  1257ms
+   ✓ ephemeral image bytes are hash checked and atomically recorded as distinct pixel/DOM descriptors  771ms
+   ✓ an executor cannot pair arbitrary image bytes with a forged digest  695ms
+   ✓ full-access scope does not replace exact action approval; target changes remain fenced  1118ms
+   ✓ grant revocation stops without a model roundtrip and prevents later physical dispatch  759ms
+   ✓ lost reply after input has one durable unknown receipt and is never replayed  1081ms
+   ✓ failed independent termination retains the original worker for stop-only recovery  808ms
+   ✓ material source change stays reconciliation pending even though the GUI postcondition passed  1230ms
+   ✓ wrong-session and unqualified routes cannot open even a declared worker  503ms
+   ✓ a reviewed profile cannot be replaced by the worker  547ms
+   ✓ a reviewed backend cannot be replaced by the worker  459ms
+   ✓ observation-only operator approval cannot authorize interaction even with an exact action approval  1062ms
+
+ Test Files  1 passed (1)
+      Tests  19 passed (19)
+   Start at  22:21:27
+   Duration  32.05s (transform 2.00s, setup 0ms, collect 5.49s, tests 26.14s, environment 0ms, prepare 151ms)
+

@@ -1,0 +1,66 @@
+{
+  "scope": "Full artifact SHA-256 reads; focused wire/plugin/palette boundary review, not full project review",
+  "generated_at": "2026-10-02T01:53:08.9822281Z",
+  "files": [
+    {
+      "path": "src/server/server.ts",
+      "bytes": 13866,
+      "sha256": "3643555fb4cce818ec3da11041ba89ae3afcbdfc5e47a3f4e06c8246bd1f9f35"
+    },
+    {
+      "path": "src/server/tool-boundary.ts",
+      "bytes": 9684,
+      "sha256": "cea07ab30afc2b870f01f20ec0e674f950c769a87cf29f57fb8e860b3fb2ae8a"
+    },
+    {
+      "path": "src/server/execution-policy.ts",
+      "bytes": 9099,
+      "sha256": "034fcb4f36b4f8ddfc9132b49c40c9ee4ef7050a2533185481187fe4ed16d87b"
+    },
+    {
+      "path": "src/plugins/manager.ts",
+      "bytes": 42200,
+      "sha256": "b2518519af1d0f37ebe0f4d3aeb9b8cfc7b80d62600834262de3586c3a486844"
+    },
+    {
+      "path": "src/plugins/contributions.ts",
+      "bytes": 12572,
+      "sha256": "1b2b8243456ffa74c800f57a38814b721a05af3d95c7e5c7472c39cac48642b5"
+    },
+    {
+      "path": "tests/daemon-transport-isolation.test.ts",
+      "bytes": 12714,
+      "sha256": "af7ae4dcfdc162558d886458f5e397378c80d2f029fa7a67b523ce491238464c"
+    },
+    {
+      "path": "tests/plugins/contributions-boundary.test.ts",
+      "bytes": 11345,
+      "sha256": "795e80e17568bf18181fe70aa1beb1bb8da093e56bb21f37ac5d3dbe5f257bc7"
+    },
+    {
+      "path": "extensions/vscode/src/local-tools.ts",
+      "bytes": 34988,
+      "sha256": "cad7b5ffcbdc4c03569c36b60a6fdf9303728ae17b32d802ed934b606f5b2aff"
+    },
+    {
+      "path": "extensions/vscode/src/extension.ts",
+      "bytes": 12900,
+      "sha256": "c99f42d14bd0fd8acd51d20c9db3f000f150c0331daf67489f8f28766f88ef58"
+    },
+    {
+      "path": "extensions/vscode/src/chat-panel.ts",
+      "bytes": 310373,
+      "sha256": "ac759d9a3a2394b9f2a9b442c6822bc5ea3db3dcf59e1d32704149791ddddfab"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 91496,
+      "sha256": "483e767208deabafd9858c16cf8c0c70822ff133ab556cec48e51fdcd5efc637"
+    },
+    {
+      "path": "tests/helpers/compiled-editor.cjs",
+      "bytes": 2304,
+      "sha256": "24643e649467a8d62c4ae086abfe6d62ee6b85258494b2f3434e44b5cbc61f33"
+    }
+  ]
+}

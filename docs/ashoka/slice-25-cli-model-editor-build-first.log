@@ -1,0 +1,19 @@
+
+> dreamgraph-vscode@13.4.0 build
+> npm run lint:isolation && npm run build:webview && tsc -p ./tsconfig.json && npm run build:extension && npm run build:bridge && npm run build:vendor
+
+
+> dreamgraph-vscode@13.4.0 lint:isolation
+> node scripts/lint-isolation.mjs
+
+lint:isolation OK — architect-v2 quarantined; 0 violations.
+
+> dreamgraph-vscode@13.4.0 build:webview
+> node scripts/build-webview.cjs
+
+
+  dist\webview.js  27.2kb
+
+Done in 7ms
+src/architect-core/adapters/copilot-cli/provider-port.ts(614,33): error TS2304: Cannot find name 'externalSignal'.
+src/architect-core/adapters/copilot-cli/provider-port.ts(615,32): error TS2304: Cannot find name 'externalSignal'.

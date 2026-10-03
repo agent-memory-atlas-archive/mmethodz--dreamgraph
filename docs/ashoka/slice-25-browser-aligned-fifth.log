@@ -1,0 +1,46 @@
+[2026-10-02T06:37:41.405Z] [INFO]  Creating instance 64a0ee97-d468-457d-a340-1e0650d93f71 (browser-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-uQRUOB\master\64a0ee97-d468-457d-a340-1e0650d93f71
+[2026-10-02T06:37:41.486Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-uQRUOB\master\instances.json
+[2026-10-02T06:37:41.486Z] [INFO]  Registered new instance 64a0ee97-d468-457d-a340-1e0650d93f71 (browser-fixture)
+[2026-10-02T06:37:41.495Z] [INFO]  Instance 64a0ee97-d468-457d-a340-1e0650d93f71 created successfully
+B25-01
+B25-02
+B25-03
+B25-04
+B25-05
+B25-06
+B25-07
+B25-08
+B25-09
+B25-10
+B25-11
+B25-12
+B25-13
+B25-14
+B25-15
+B25-16
+B25-17
+B25-18
+B25-19
+B25-20
+B25-21
+B25-22
+B25-23
+B25-24
+B25-25
+B25-26
+B25-27
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: {"x":1044,"y":110.546875,"width":380,"height":393.5625}
+    at file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-architect.mjs:168:452 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v25.2.1

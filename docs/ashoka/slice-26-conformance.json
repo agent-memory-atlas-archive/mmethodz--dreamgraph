@@ -1,0 +1,570 @@
+{
+  "schema": "dreamgraph.ashoka.migration_evidence.v1",
+  "recorded_at": "2026-10-02T14:48:14.443Z",
+  "status": "offline_migration_qualified_live_cutover_pending",
+  "scope": "Actual physical kernel/writer/crash recovery, compiled CLI, Windows Chrome, source/fixture graph-family migration and navigation. Original own-instance inventory is unfenced and changing; it is not an approved live preview.",
+  "root": {
+    "passed": 1888,
+    "failed": 0,
+    "skipped": 2,
+    "files": 163,
+    "exit_code": 0
+  },
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557",
+    "preserved_cases": 12,
+    "preserved_owners": 29,
+    "preserved_excerpts": 8
+  },
+  "tests": [
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "reads never import legacy success; preview/import retain exact bytes and recover one lost reply",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "legacy progress keeps explicit statuses, reads exact structured log events and refuses to infer completion or execution",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "the frozen actual Ashoka definition and log keep completed cards muted and current work navigable before lifecycle import",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "rejects client-forged identity/leases and stale concurrent transitions without another effect",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "archive refuses a running/recovery lease and keeps original artifacts on failure",
+      "status": "passed"
+    },
+    {
+      "file": "architect-plan-authority.test.ts",
+      "name": "the real Architect script exposes readable running/current markers, slice filters and keyboard navigation",
+      "status": "passed"
+    },
+    {
+      "file": "graph-upgrade-notice.test.ts",
+      "name": "does not call an empty instance or schema placeholders a legacy graph",
+      "status": "passed"
+    },
+    {
+      "file": "graph-upgrade-notice.test.ts",
+      "name": "identifies populated flat/wrapped legacy and previous formats without inferring freshness from scan age",
+      "status": "passed"
+    },
+    {
+      "file": "graph-upgrade-notice.test.ts",
+      "name": "bounds inspection and avoids reading/parsing the complete candidate or canonical graph during navigation",
+      "status": "passed"
+    },
+    {
+      "file": "graph-upgrade-notice.test.ts",
+      "name": "reports unsupported or corrupt format detection explicitly",
+      "status": "passed"
+    },
+    {
+      "file": "graph-upgrade-notice.test.ts",
+      "name": "requires a durable original review receipt, reopens a restored format and keeps notification read-only",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade previews all families without writing, preserves scoped identities and provenance, and never invents source/scan history",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade archives exact duplicates once but blocks conflicting claims until exact row-bound explicit choices",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade keeps immutable assessment history and chapter identities; no automatic cycle winner or evidence promotion",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade rejects unsupported majors, invalid UTF-8 and schema shapes, stale resolutions and changed previews",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade rejects stale input and unpublished changes instead of overwriting concurrent source or graph work",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade refuses cross-collection identity collisions even when a modified preview conceals the staged blocker",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade cancels before cutover and rejects input changes after backup; original mutation is retained",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade binds and privately backs up opaque configuration bytes while restore preserves later operating settings",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade cannot acquire a live process writer and proceeds only after that kernel owner exits",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade validates owner stores and refuses unfinished jobs instead of cancelling or reassigning them",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade restores exact original bytes as a new publication while preserving post-cutover debt, history and source currency",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade exposes restore conflicts and backup corruption before any restore; an uncertain old result is not overwritten",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade recovers a real killed writer at after_replace:0: without replaying a second graph effect",
+      "status": "passed"
+    },
+    {
+      "file": "legacy-graph-upgrade.test.ts",
+      "name": "reviewed offline legacy graph upgrade recovers a real killed writer at publication_committed without replaying a second graph effect",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection keeps required checks separate from optional follow-up work",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection reports a ready map and an Architect next action after required setup is complete",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection keeps an old valid map available without inferring age-only staleness",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection revalidates changed map bytes and reports unreadable maps without proposing an automatic scan",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection renders a plain-language Dashboard Start Here card with governed repair paths",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection exposes the same readiness facts through Dashboard and Architect daemon routes",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection sanitizes local onboarding telemetry without retaining sensitive payload fields",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection rejects duplicate repository paths before guided setup persistence",
+      "status": "passed"
+    },
+    {
+      "file": "onboarding-readiness.test.ts",
+      "name": "daemon onboarding readiness projection persists a validated multi-repo setup and projects it into onboarding readiness",
+      "status": "passed"
+    },
+    {
+      "file": "plan-authority.test.ts",
+      "name": "PL01/PL02/PL13: import preserves original bytes, prose is not completion, and repeated reads do not write",
+      "status": "passed"
+    },
+    {
+      "file": "plan-authority.test.ts",
+      "name": "PL10: lost replies replay one receipt; changed payload and concurrent revision lose without a second effect",
+      "status": "passed"
+    },
+    {
+      "file": "plan-authority.test.ts",
+      "name": "PL10/PL14: another project cannot read or mutate the existing authority, and an agent cannot self-approve",
+      "status": "passed"
+    },
+    {
+      "file": "plan-authority.test.ts",
+      "name": "PL11: a fault before store replacement rolls back; fault after publication retains exactly one accepted transition",
+      "status": "passed"
+    },
+    {
+      "file": "plan-authority.test.ts",
+      "name": "PL04/GE14: a status receipt cannot count as implementation; an actual graph commit can, and accepted verification survives replay",
+      "status": "passed"
+    },
+    {
+      "file": "plan-authority.test.ts",
+      "name": "GE14/CU22 effect contract: reconciliation must finish; optional unfunded digestion can remain pending",
+      "status": "passed"
+    },
+    {
+      "file": "plan-authority.test.ts",
+      "name": "PL11: restart reads expire an admitted execution into recovery; metadata transitions do not invent graph currency",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "PL16 graph consumers retrieve the actual typed plan and selected slice with the same authority revision and gates",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "local slice IDs repeating across plans remain distinct, while an unscoped request is explicitly ambiguous",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "invalid typed authority removes all its plan and slice projections while preserving an independently valid legacy slice store",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "colliding plan IDs in separate projects cannot select one authority by insertion order",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "expired typed plan leases change effective graph/context receipts without writing or reviving running work",
+      "status": "passed"
+    },
+    {
+      "file": "plan-context-integration.test.ts",
+      "name": "verified implementation evidence is distinct from the next slice and recovers after a transcript-free read",
+      "status": "passed"
+    },
+    {
+      "file": "publication-read-cache.test.ts",
+      "name": "amortizes large receipt reads across simultaneous plan-size requests while snapshots stay immutable",
+      "status": "passed"
+    },
+    {
+      "file": "publication-read-cache.test.ts",
+      "name": "revalidates rewritten bytes even when mtime and size are preserved, and never caches a parse failure",
+      "status": "passed"
+    },
+    {
+      "file": "publication-read-cache.test.ts",
+      "name": "detects atomic replacement, absence, and a journal despite a warm physical version",
+      "status": "passed"
+    },
+    {
+      "file": "publication-read-cache.test.ts",
+      "name": "isolates equal-sized physical instances and leaves mutable acknowledgement state private to its writer",
+      "status": "passed"
+    }
+  ],
+  "browser": {
+    "scope": "Actual compiled Windows daemon/Architect, CLI and Chrome. Read-only graph-family copy plus original receipt history for navigation scale; publication store dependencies narrowed to copied files and fresh disposable authority. No live mutation, scan, paid inference or production migration claimed.",
+    "checks": [
+      {
+        "name": "NAV01",
+        "detail": "Actual shell/list load at original receipt and graph-family scale; no mocked plan-index route."
+      },
+      {
+        "name": "NAV02",
+        "detail": "Actual source plan/log progress appears with completed cards dimmed and current ownership visible; no running lease invented."
+      },
+      {
+        "name": "NAV03",
+        "detail": "Bounded format notice offers the exact instance preview command without a full migration analysis or automatic migration."
+      },
+      {
+        "name": "NAV07",
+        "detail": "Actual daemon preserves a deliberately old map timestamp without an age-only stale verdict. Scope currency remains separately owned."
+      },
+      {
+        "name": "NAV04",
+        "detail": "Actual compiled CLI previews without writes, applies a reviewed backup/publication and replays one lost acknowledgement identity."
+      },
+      {
+        "name": "NAV05",
+        "detail": "Actual compiled CLI restore uses a separately reviewed current snapshot and returns original bytes through a new publication."
+      },
+      {
+        "name": "NAV06",
+        "detail": "Preview output cannot write inside instance storage; existing files and private authority remain protected."
+      }
+    ],
+    "errors": [],
+    "publication_bytes": 8332385,
+    "copied_graph_files": [
+      "features.json",
+      "workflows.json",
+      "data_model.json",
+      "capabilities.json",
+      "datastores.json",
+      "auxiliary_entities.json",
+      "ui_registry.json",
+      "dream_graph.json",
+      "candidate_edges.json",
+      "validated_edges.json",
+      "tension_log.json",
+      "adr_log.json",
+      "dream_archetypes.json",
+      "system_story.json"
+    ],
+    "browser": "153.0.8010.50",
+    "shell_ms": 1275,
+    "plans_visible_ms": 3684,
+    "selected_plan_data_ms": 346,
+    "selected_plan_visible_ms": 434,
+    "success": true
+  },
+  "benchmarks": {
+    "before": {
+      "schema": "dreamgraph.ashoka.navigation_benchmark.v1",
+      "observed_at": "2026-10-02T13:16:48.945Z",
+      "input": "read-only copy of publication and plan/catalogue stores; source plan files",
+      "publication_bytes": 9292316,
+      "metadata_12_reads_ms": 6127.52,
+      "plan_count": 92,
+      "plan_list_ms": 42768.98,
+      "selected_plan_ms": 830.83,
+      "selected_plan_id": "graph-trust-and-agent-effectiveness",
+      "scope": "source modules, no running-daemon latency or browser qualification claimed"
+    },
+    "after": {
+      "schema": "dreamgraph.ashoka.navigation_benchmark.v1",
+      "observed_at": "2026-10-02T14:20:13.611Z",
+      "input": "read-only copy of publication and plan/catalogue stores; source plan files",
+      "publication_bytes": 10985724,
+      "metadata_12_reads_ms": 324.19,
+      "plan_count": 92,
+      "plan_list_ms": 2584.27,
+      "selected_plan_ms": 229.4,
+      "selected_plan_id": "graph-trust-and-agent-effectiveness",
+      "scope": "source modules, no running-daemon latency or browser qualification claimed"
+    },
+    "same_snapshot": false
+  },
+  "joins": {
+    "XS01": "physical writer exclusion, exact snapshot/configuration preview and published read fences",
+    "XS18": "whole-family disposable conversion, original byte backup, actual child crash/restart, unknown baselines and post-cutover restore",
+    "XS21": "one publication receipt and exact operation replay; graph currency and later source debt survive restore"
+  },
+  "remaining": [
+    "Own-instance live fence/backup/cutover and exact conflict dispositions require a current source-bound reviewed preview; installed daemon is not stopped by this qualification.",
+    "No paid reconstruction, full rescan/enrichment, physical desktop input, other OS or final release claim.",
+    "Original first/second regression failures, changing-publication/capacity observations and earlier browser/fixture failures are retained; final root process exit and no-unhandled-error run are required."
+  ],
+  "artifacts": [
+    {
+      "path": "src/graph/legacy-upgrade.ts",
+      "bytes": 35379,
+      "sha256": "26492d3c215b86ea56c1dd6b5341435edb8d047b0cabf3615cb3ce34d695a929"
+    },
+    {
+      "path": "src/graph/upgrade-notice.ts",
+      "bytes": 4804,
+      "sha256": "211698d964a8688b5d06c57af3bed3b1a86dbe2084b41e1f872dc31a3ad56813"
+    },
+    {
+      "path": "src/graph/publication.ts",
+      "bytes": 25637,
+      "sha256": "05cfa85d4f3cf40d88d39243f34e879c20773fdf86143e0d7b933deedd4401cf"
+    },
+    {
+      "path": "src/graph/read-model.ts",
+      "bytes": 36988,
+      "sha256": "e23ff19417b815316f30a788c30d7d617d72594574cdfb37f948e197abee9cd0"
+    },
+    {
+      "path": "src/graph/writer-lease.ts",
+      "bytes": 3019,
+      "sha256": "9ed3e0c6edeb4b36db93997dc00f5284f52d9ee4459f5fbf6161e0078e545319"
+    },
+    {
+      "path": "src/graph/store-registry.ts",
+      "bytes": 2040,
+      "sha256": "76a9d510dae0759218ffd4dad25f866406437d69bb5dbd9e15fa04d7ed1c8181"
+    },
+    {
+      "path": "src/graph/change-obligations.ts",
+      "bytes": 23574,
+      "sha256": "ea6630023de2b9fa72f4794ed236ea6b128b12a7748e7e161c76d0fca6dc24d2"
+    },
+    {
+      "path": "src/graph/execution-context.ts",
+      "bytes": 38912,
+      "sha256": "4e530b1ab28954ded9fa1e49d8832e3b0212042f156f57ca3aa84009d5c658cb"
+    },
+    {
+      "path": "src/cognitive/jobs.ts",
+      "bytes": 25670,
+      "sha256": "c9c5305e037219f991e7e2aff9bf1f30212906fc612a926d8857d2eeb7d5d5fe"
+    },
+    {
+      "path": "src/discipline/plan-authority.ts",
+      "bytes": 20346,
+      "sha256": "e7c28a0bd62b08d83406f743007de969ff7856aabe6c62f21b22e189bbd8bf13"
+    },
+    {
+      "path": "src/architect/plan-registry.ts",
+      "bytes": 64482,
+      "sha256": "041ae29e0b2dc9e7b6fb616c3f45434fe258fd9c8a0ed73d93933856c4643ede"
+    },
+    {
+      "path": "src/architect/onboarding-readiness.ts",
+      "bytes": 8195,
+      "sha256": "e004af394dbb4fca6fcee7a8da33a3a68191a456115a9120af2057365300b09b"
+    },
+    {
+      "path": "src/architect/routes.ts",
+      "bytes": 651443,
+      "sha256": "96f7a3851d1f763d9a60801acf3a6dbc78a66a39430cd5b3545c98f5c5cc8857"
+    },
+    {
+      "path": "src/cli/dg.ts",
+      "bytes": 9804,
+      "sha256": "e2dafbddfce27e6ef41c557b7131d5ab9310375f5453d70b8e1f8f40b236d2dd"
+    },
+    {
+      "path": "src/cli/commands/graph-upgrade.ts",
+      "bytes": 5325,
+      "sha256": "7252c62b7f6ce562c186d577c2a7f8c5005663c39f2913ed46257b70b2745b95"
+    },
+    {
+      "path": "tests/legacy-graph-upgrade.test.ts",
+      "bytes": 20643,
+      "sha256": "30886d527a535fb48643dc2e64a15c24383b7602d98c136d522398117186037c"
+    },
+    {
+      "path": "tests/graph-upgrade-notice.test.ts",
+      "bytes": 4098,
+      "sha256": "88f8b1aaa26bcaf48e235567d8813f549f1266d2a54f936ae4818fcccbf9b87a"
+    },
+    {
+      "path": "tests/publication-read-cache.test.ts",
+      "bytes": 4355,
+      "sha256": "f871050a63a75bc88de8240a55166e4e6ebb81ccb6e484f79476c3991f1c5168"
+    },
+    {
+      "path": "tests/onboarding-readiness.test.ts",
+      "bytes": 12056,
+      "sha256": "e3c568fc17c09c9f0b4d57086015552e17ff7f8d68326a2ec4051cf495ee7a11"
+    },
+    {
+      "path": "tests/latest-model-support.test.ts",
+      "bytes": 5256,
+      "sha256": "a89ce2b938953fa213ea805367d9b7251072b40f03468a31c48a2ead48de5bbe"
+    },
+    {
+      "path": "tests/standalone-architect-routes.test.ts",
+      "bytes": 149693,
+      "sha256": "c1e5e0e579bb108d72b8d9fd3846ea44d28771633662bd9c146d3c7796912245"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "scripts/qualify-ashoka-navigation.mjs",
+      "bytes": 10183,
+      "sha256": "50d23850d0f6111b272c09c5ae89c1a74363cfbc7a50e2259a3a1ede40ce140d"
+    },
+    {
+      "path": "scripts/benchmark-architect-navigation.mjs",
+      "bytes": 2425,
+      "sha256": "f405f08e06714c17cf81f23201cea5efefc33f74cc813d8974c45b4e8266e1d0"
+    },
+    {
+      "path": "docs/ashoka/legacy-upgrade.md",
+      "bytes": 6572,
+      "sha256": "96a768ca0d26ca1667683837d449d2ca0ef61f92a0800d726ec8cdfceefafa80"
+    },
+    {
+      "path": "docs/ashoka/browser-26-final/qualification.json",
+      "bytes": 2140,
+      "sha256": "2e1a49885f31c99110682e6d2320a5579498fcfed4ebcd4345cafcc93c29a838"
+    },
+    {
+      "path": "docs/ashoka/browser-26-final/architect.png",
+      "bytes": 189533,
+      "sha256": "cdf598f0ded242226408282fa6cb675320f4f8fd9dca93f3b671c65d0a02c9ad"
+    },
+    {
+      "path": "docs/ashoka/slice-26-qualified-root-tests-third.json",
+      "bytes": 640563,
+      "sha256": "3cba8abed5dc9ff7e5b6b8b620ed62bd6c44bd6d357fe14d0bedac7fd155dfd9"
+    },
+    {
+      "path": "docs/ashoka/slice-26-qualified-root-tests-third.log",
+      "bytes": 363734,
+      "sha256": "7b34dabaf010c31770b661c35d38be67502ab5e71a1cb2414b09280d1efb2eed"
+    },
+    {
+      "path": "docs/ashoka/slice-26-qualified-root-tests-third-exit.json",
+      "bytes": 24,
+      "sha256": "75876e0e3f497cad271143ba85bd4f36569cd81195509043f860dab14265b716"
+    },
+    {
+      "path": "docs/ashoka/slice-26-focused-recovery.log",
+      "bytes": 11757,
+      "sha256": "62fe87b5487363283f3b8417a874ee5ba510cc70707dc66bd2a1d0b6c04316f1"
+    },
+    {
+      "path": "docs/ashoka/slice-26-focused-fourth.log",
+      "bytes": 4984,
+      "sha256": "305b60c199954f3627914d428a6786302d6e1394276455e16d42e3ce9e02c646"
+    },
+    {
+      "path": "docs/ashoka/slice-26-build-fifth.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-26-generated-checks.log",
+      "bytes": 3186,
+      "sha256": "76769f334768452ef7859014bd1fc0363ebd7316cc8254a45feb46f12010f42b"
+    },
+    {
+      "path": "docs/ashoka/slice-26-generated-repair.log",
+      "bytes": 610,
+      "sha256": "d2514ab4e18c674a4b29ddf3bd3447f993b9998ed959fadbcfa7a7c31871604a"
+    },
+    {
+      "path": "docs/ashoka/slice-26-live-inventory.json",
+      "bytes": 12442,
+      "sha256": "35d5ea047906c8c90bad244f1e79d41b90fe8a3b011ddeced898833d44b7e772"
+    },
+    {
+      "path": "docs/ashoka/navigation-before.json",
+      "bytes": 501,
+      "sha256": "7d4eb1f79d3921cd0c0f86a0b916302ae54fbc5bb8fba301b518bd7afe359223"
+    },
+    {
+      "path": "docs/ashoka/navigation-after-catalogue-prefilter.json",
+      "bytes": 487,
+      "sha256": "b8cdec0966706542b107029544fae4485d2c85234327de265d901efebf59da83"
+    }
+  ]
+}

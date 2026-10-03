@@ -1,0 +1,73 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-03T07:06:07.181Z] [ERROR] /explorer route error (/explorer/api/node/Public): { name: 'Error', message: 'EXPLORER_AMBIGUOUS_ID' }
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-03T07:06:07.192Z] [ERROR] /explorer route error (/explorer/api/node/legacy%2Ffeature%2FPublic): { name: 'Error', message: 'EXPLORER_REVISION_CONFLICT' }
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-03T07:06:07.195Z] [ERROR] /explorer route error (/explorer/api/candidates): { name: 'Error', message: 'EXPLORER_REVISION_CONFLICT' }
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-03T07:06:07.199Z] [ERROR] /explorer route error (/explorer/api/tensions): { name: 'Error', message: 'EXPLORER_REVISION_CONFLICT' }
+
+stderr | tests/explorer-canonical-navigation.test.ts > pins actual HTTP inspection/context to render etag and maps ambiguous IDs to a specific conflict
+[2026-10-03T07:06:07.201Z] [ERROR] /explorer route error (/explorer/api/stats): { name: 'Error', message: 'EXPLORER_REVISION_CONFLICT' }
+
+stderr | tests/architect-plan-authority.test.ts
+[2026-10-03T07:06:07.460Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/explorer-canonical-navigation.test.ts (5 tests) 1322ms
+   ✓ discloses render exclusions and keeps metadata-only revisions from rebuilding the layout  325ms
+stderr | tests/architect-plan-authority.test.ts > anchors slice definitions to exact UTF-16 source positions rather than earlier title mentions
+[2026-10-03T07:06:08.550Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/architect-plan-authority.test.ts > anchors slice definitions to exact UTF-16 source positions rather than earlier title mentions
+[2026-10-03T07:06:08.562Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/explorer-mutations.test.ts > tension.resolve > returns 404 when the tension does not exist
+[2026-10-03T07:06:09.350Z] [WARN]  Mutation "tension.resolve" failed: Tension ghost_id is not active.
+
+ ✓ tests/explorer-mutations.test.ts (12 tests) 733ms
+stderr | tests/architect-plan-authority.test.ts > actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan
+[2026-10-03T07:06:13.079Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+ ❯ tests/architect-plan-authority.test.ts (8 tests | 1 failed) 6335ms
+   ✓ anchors slice definitions to exact UTF-16 source positions rather than earlier title mentions 191ms
+   ✓ reads never import legacy success; preview/import retain exact bytes and recover one lost reply 224ms
+   ✓ legacy progress keeps explicit statuses, reads exact structured log events and refuses to infer completion or execution 79ms
+   ✓ the frozen actual Ashoka definition and log keep completed cards muted and current work navigable before lifecycle import  3821ms
+   ✓ actual graph receipt and accepted review converge detail/list; implemented does not advance or complete the plan  800ms
+   ✓ rejects client-forged identity/leases and stale concurrent transitions without another effect 201ms
+   ✓ archive refuses a running/recovery lease and keeps original artifacts on failure  379ms
+   × the real Architect script exposes readable running/current markers, slice filters and keyboard navigation 638ms
+     → expected '' to be 'center-plan-body' // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architect-plan-authority.test.ts > the real Architect script exposes readable running/current markers, slice filters and keyboard navigation
+AssertionError: expected '' to be 'center-plan-body' // Object.is equality
+
+- Expected
++ Received
+
+- center-plan-body
+
+ ❯ tests/architect-plan-authority.test.ts:173:40
+    171|     expect(filter.value).toBe("all"); expect((document.activeElement a…
+    172|     document.activeElement!.dispatchEvent(new dom.window.KeyboardEvent…
+    173|     expect(document.activeElement?.id).toBe("center-plan-body"); expec…
+       |                                        ^
+    174|   } finally { dom.window.close(); }
+    175| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 24 passed (25)
+   Start at  10:05:59
+   Duration  15.19s (transform 3.04s, setup 0ms, collect 15.48s, tests 8.39s, environment 1ms, prepare 466ms)
+

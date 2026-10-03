@@ -1,0 +1,9 @@
+[2026-10-02T12:17:53.247Z] [INFO]  Creating instance 20da0f6d-5e00-494f-b4d6-922c94bc9653 (configuration-check) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-configuration-browser-Z90x1P\master\20da0f6d-5e00-494f-b4d6-922c94bc9653
+[2026-10-02T12:17:53.330Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-configuration-browser-Z90x1P\master\instances.json
+[2026-10-02T12:17:53.331Z] [INFO]  Registered new instance 20da0f6d-5e00-494f-b4d6-922c94bc9653 (configuration-check)
+[2026-10-02T12:17:53.337Z] [INFO]  Instance 20da0f6d-5e00-494f-b4d6-922c94bc9653 created successfully
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('#rw-observed').filter({ hasText: 'Read at' }) to be visible
+
+    at C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-configuration.mjs:52:91

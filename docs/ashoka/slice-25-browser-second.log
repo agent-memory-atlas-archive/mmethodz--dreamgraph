@@ -1,0 +1,25 @@
+[2026-10-01T17:27:40.933Z] [INFO]  Creating instance 98246817-7e9d-41ab-8501-d7385ef6971f (browser-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-ptwmK9\master\98246817-7e9d-41ab-8501-d7385ef6971f
+[2026-10-01T17:27:41.007Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-ptwmK9\master\instances.json
+[2026-10-01T17:27:41.008Z] [INFO]  Registered new instance 98246817-7e9d-41ab-8501-d7385ef6971f (browser-fixture)
+[2026-10-01T17:27:41.013Z] [INFO]  Instance 98246817-7e9d-41ab-8501-d7385ef6971f created successfully
+UX01
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 'Plan 875 architecture and execution scope architecture and execution scope architecture and execution scope'
+- 'Plan 875 architecture and execution scope architecture and execution scope architecture and execution scope '
+
+    at <anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-architect.mjs:39:67) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'Plan 875 architecture and execution scope architecture and execution scope architecture and execution scope',
+  expected: 'Plan 875 architecture and execution scope architecture and execution scope architecture and execution scope ',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v25.2.1

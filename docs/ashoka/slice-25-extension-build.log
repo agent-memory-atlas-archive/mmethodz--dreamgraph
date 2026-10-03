@@ -1,0 +1,25 @@
+
+> dreamgraph-vscode@13.4.0 build
+> npm run lint:isolation && npm run build:webview && tsc -p ./tsconfig.json && npm run build:extension && npm run build:bridge && npm run build:vendor
+
+
+> dreamgraph-vscode@13.4.0 lint:isolation
+> node scripts/lint-isolation.mjs
+
+lint:isolation OK — architect-v2 quarantined; 0 violations.
+
+> dreamgraph-vscode@13.4.0 build:webview
+> esbuild src/webview/index.ts --bundle --outfile=dist/webview.js --format=iife --platform=browser
+
+
+  dist\webview.js  36.6kb
+
+Done in 56ms
+src/generated/graph-contracts.ts(36,14): error TS2554: Expected 2-3 arguments, but got 1.
+src/generated/graph-contracts.ts(44,58): error TS2554: Expected 2-3 arguments, but got 1.
+src/generated/graph-contracts.ts(94,13): error TS2554: Expected 2-3 arguments, but got 1.
+src/generated/graph-contracts.ts(130,13): error TS2554: Expected 2-3 arguments, but got 1.
+src/generated/graph-contracts.ts(130,45): error TS2554: Expected 2-3 arguments, but got 1.
+src/generated/graph-contracts.ts(239,20): error TS2554: Expected 2-3 arguments, but got 1.
+src/generated/graph-contracts.ts(239,56): error TS2554: Expected 2-3 arguments, but got 1.
+src/generated/graph-contracts.ts(255,72): error TS2554: Expected 2-3 arguments, but got 1.

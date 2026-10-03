@@ -1,0 +1,67 @@
+[2026-10-01T17:28:16.053Z] [INFO]  Creating instance d290333c-aea4-4650-a056-fcd82db5406e (browser-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-sfpKUw\master\d290333c-aea4-4650-a056-fcd82db5406e
+[2026-10-01T17:28:16.121Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-sfpKUw\master\instances.json
+[2026-10-01T17:28:16.121Z] [INFO]  Registered new instance d290333c-aea4-4650-a056-fcd82db5406e (browser-fixture)
+[2026-10-01T17:28:16.126Z] [INFO]  Instance d290333c-aea4-4650-a056-fcd82db5406e created successfully
+UX01
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for getByRole('button', { name: 'Reveal selected plan', exact: true })
+    - locator resolved to <button type="button" class="mini-button" id="plan-reveal-selected">Reveal selected plan</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="plan-meta">Last none | next Slice 0 — Baseline | memory revi…</div> from <div id="plan-list" class="plan-list">…</div> subtree intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="plan-meta">Last none | next Slice 0 — Baseline | memory revi…</div> from <div id="plan-list" class="plan-list">…</div> subtree intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div class="plan-meta">Last none | next Slice 0 — Baseline | memory revi…</div> from <div id="plan-list" class="plan-list">…</div> subtree intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+    at <anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-architect.mjs:39:209) {
+  log: [
+    "  - waiting for getByRole('button', { name: 'Reveal selected plan', exact: true })",
+    '    - locator resolved to <button type="button" class="mini-button" id="plan-reveal-selected">Reveal selected plan</button>',
+    '  - attempting click action',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is visible, enabled and stable',
+    '      - scrolling into view if needed',
+    '      - done scrolling',
+    '      - <div class="plan-meta">Last none | next Slice 0 — Baseline | memory revi…</div> from <div id="plan-list" class="plan-list">…</div> subtree intercepts pointer events',
+    '    - retrying click action',
+    '    - waiting 20ms',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is visible, enabled and stable',
+    '      - scrolling into view if needed',
+    '      - done scrolling',
+    '      - <div class="plan-meta">Last none | next Slice 0 — Baseline | memory revi…</div> from <div id="plan-list" class="plan-list">…</div> subtree intercepts pointer events',
+    '    - retrying click action',
+    '      - waiting 100ms',
+    '    56 × waiting for element to be visible, enabled and stable',
+    '       - element is visible, enabled and stable',
+    '       - scrolling into view if needed',
+    '       - done scrolling',
+    '       - <div class="plan-meta">Last none | next Slice 0 — Baseline | memory revi…</div> from <div id="plan-list" class="plan-list">…</div> subtree intercepts pointer events',
+    '     - retrying click action',
+    '       - waiting 500ms'
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v25.2.1

@@ -1,0 +1,182 @@
+{
+  "schema": "dreamgraph.browser_runtime_qualification.v1",
+  "evidence": {
+    "schema": "dreamgraph.browser_runtime_evidence.v1",
+    "recorded_at": "2026-10-02T19:34:45.675Z",
+    "source_hash": "sha256:be31f1a5bc9c91449ed173d4c65a9e90d08eef707525d60025ecfd914feb7cec",
+    "platform": "win32",
+    "architecture": "x64",
+    "node": "25.2.1",
+    "browser_version": "153.0.8010.50",
+    "runtime_version": "1.62.1",
+    "model_requests": 0,
+    "provider_scope": "none",
+    "traces": [
+      {
+        "id": "BW01",
+        "requirements": [
+          "CU02",
+          "CU20"
+        ],
+        "evidence": {
+          "unicode_postcondition": true,
+          "filtered_structural_observation": true
+        }
+      },
+      {
+        "id": "BW02",
+        "requirements": [
+          "CU03",
+          "CU14"
+        ],
+        "evidence": {
+          "stale_reference_rejected": true
+        }
+      },
+      {
+        "id": "BW03A",
+        "requirements": [
+          "CU03",
+          "CU12"
+        ],
+        "evidence": {
+          "original_peer_pause": true,
+          "fresh_resume_observation": true,
+          "no_input_during_pause": true
+        }
+      },
+      {
+        "id": "BW03",
+        "requirements": [
+          "CU04",
+          "CU14"
+        ],
+        "evidence": {
+          "forbidden_requests": 0,
+          "forbidden_posts": 0
+        }
+      },
+      {
+        "id": "BW04",
+        "requirements": [
+          "CU05"
+        ],
+        "evidence": {
+          "stop_release_ms": 258.21889999999985
+        }
+      },
+      {
+        "id": "BW05",
+        "requirements": [
+          "CU13",
+          "CU20"
+        ],
+        "evidence": {
+          "finite_image_reservation": true,
+          "frame_hash_verified": true
+        }
+      },
+      {
+        "id": "BW05A",
+        "requirements": [
+          "CU13"
+        ],
+        "evidence": {
+          "finite_action_limit": true
+        }
+      },
+      {
+        "id": "BW06",
+        "requirements": [
+          "CU05",
+          "CU11"
+        ],
+        "evidence": {
+          "mode": "disconnect",
+          "elapsed_ms": 258.52270000000135,
+          "local_stop": null,
+          "proof": "original_child_exited_after_local_browser_closure",
+          "browser_requests_quiescent": true
+        }
+      },
+      {
+        "id": "BW07",
+        "requirements": [
+          "CU05",
+          "CU11"
+        ],
+        "evidence": {
+          "mode": "watchdog",
+          "elapsed_ms": 2483.6962999999996,
+          "local_stop": {
+            "epoch": "2a5118d4-75ba-4e77-9709-c6668c41637c",
+            "input_released": true,
+            "terminated": true,
+            "reason": "watchdog",
+            "heartbeat_age_ms": 2574,
+            "stop_elapsed_ms": 247
+          },
+          "proof": "original_child_exited_after_local_browser_closure",
+          "browser_requests_quiescent": true
+        }
+      },
+      {
+        "id": "BW08",
+        "requirements": [
+          "CU10",
+          "CU22",
+          "CU24"
+        ],
+        "evidence": {
+          "actual_input_deliveries": 1,
+          "durable_outcome": "unknown",
+          "exact_retry_no_input": true,
+          "route": "dreamgraph_harness"
+        }
+      },
+      {
+        "id": "BW09",
+        "requirements": [
+          "CU10",
+          "CU22"
+        ],
+        "evidence": {
+          "execution_status": "recovery_required",
+          "unknown_action_retained": true
+        }
+      }
+    ],
+    "support_scope": "This installed isolated browser/runtime only. CU IDs map to measured subchecks, not full CU acceptance, other operating systems, native desktops or CLI adapters."
+  },
+  "worker": {
+    "schema": "dreamgraph.browser_install.v1",
+    "id": "ashoka-controls-browser",
+    "browser_executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "browser_version": "153.0.8010.50",
+    "runtime_version": "1.62.1",
+    "qualification": {
+      "schema": "dreamgraph.computer_qualification.v1",
+      "backend": "isolated_playwright",
+      "backend_version": "playwright-core@1.62.1/chromium@153.0.8010.50/node@25.2.1",
+      "platform": "win32",
+      "architecture": "x64",
+      "source_hash": "sha256:be31f1a5bc9c91449ed173d4c65a9e90d08eef707525d60025ecfd914feb7cec",
+      "protocol_hash": "sha256:ec4bb77daacf9faeb874bc313e0f3fbcc431d6aef7ce7a60ab2a90448bbbfc65",
+      "qualified_at": "2026-10-02T19:34:45.675Z",
+      "evidence_scope": "actual_runtime",
+      "scope_negative_passed": true,
+      "privacy_passed": true,
+      "bounded_actions_passed": true,
+      "stop_release_ms": 258.21889999999985,
+      "control_loss_stop_ms": 2483.6962999999996,
+      "cases": [
+        "CU04",
+        "CU05",
+        "CU10",
+        "CU20",
+        "CU24"
+      ],
+      "artifact_hash": "sha256:fa51a38aca46f174b055374550311df0f29536f508ffdfc76ba97ac2cf73a387"
+    }
+  }
+}

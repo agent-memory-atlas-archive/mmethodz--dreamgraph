@@ -1,0 +1,25 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on watchdog without another model call
+Computer control-loss evidence {
+  mode: 'watchdog',
+  elapsed_ms: 3521.0246999999995,
+  local_stop: {
+    epoch: '83d77dcf-cbf1-4ce3-871a-538db2e3f4ef',
+    input_released: true,
+    terminated: true,
+    reason: 'watchdog',
+    heartbeat_age_ms: 3502,
+    stop_elapsed_ms: 239
+  }
+}
+
+ ✓ tests/computer-browser-worker.test.ts (11 tests | 10 skipped) 5644ms
+   ✓ a real worker closes its dedicated browser on watchdog without another model call  5643ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 10 skipped (11)
+   Start at  20:18:39
+   Duration  6.34s (transform 144ms, setup 0ms, collect 306ms, tests 5.64s, environment 0ms, prepare 143ms)
+

@@ -1,0 +1,12 @@
+SC04
+SC05
+SC11-future
+SC01/SC03
+SC09/SC10-history
+SC12
+SC13
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('.canvas-wrap canvas').first() to be visible
+
+    at <anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-surfaces.mjs:54:140)

@@ -1,0 +1,40 @@
+{
+  "scope": "Slice25 original-host model admission foundation; ordinary adapter adoption remains open",
+  "artifacts": [
+    {
+      "path": "src/graph/contracts.ts",
+      "bytes": 27839,
+      "sha256": "4c3fcdddf943e6ce6d43d6f67f2b8bcf19f070a8036603865247a04280c7225d"
+    },
+    {
+      "path": "src/cognitive/model-execution.ts",
+      "bytes": 12474,
+      "sha256": "fcd2eae4427cf8c49a32a2d58d18fd32d2c84ba722ebadfcc82b6ab2d50a5e44"
+    },
+    {
+      "path": "src/server/host-model-admission.ts",
+      "bytes": 12631,
+      "sha256": "cd45c66afae1c928690cc96e989a0bbf68c961dd206b64fdf308788736985f05"
+    },
+    {
+      "path": "src/server/managed-execution.ts",
+      "bytes": 16951,
+      "sha256": "d515549edf121e067448f89f86ece25aa608ebf657e8adb6a948a75e39c951da"
+    },
+    {
+      "path": "extensions/vscode/src/daemon-client.ts",
+      "bytes": 20474,
+      "sha256": "0a47e15823bd142f93d2f611a3709eaaebd7d6bd078323d1b32dd4a16605ef0c"
+    },
+    {
+      "path": "packages/sdk/src/seams/graph-execution.ts",
+      "bytes": 24962,
+      "sha256": "d5e9c61838adc368ad5a2beb6f061c44c7e24c70daf3b629824a87f9a416a350"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 123919,
+      "sha256": "9053be3122d578f4db72b202d45560946c623d6f1a86260aa7f6d896bac6b261"
+    }
+  ]
+}

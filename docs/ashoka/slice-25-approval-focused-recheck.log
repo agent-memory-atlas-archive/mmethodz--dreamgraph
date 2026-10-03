@@ -1,0 +1,55 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:13:15.004Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:13:15.015Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:13:15.022Z] [INFO]  Architect native tool loop: calling edit_file
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-01T22:13:15.474Z] [INFO]  Architect native tool loop: calling scan_project
+
+ ✓ tests/architect-managed-context.test.ts (1 test) 1650ms
+   ✓ native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt  1649ms
+stderr | tests/architect-cli-controls.test.ts > codex-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity
+[2026-10-01T22:13:16.806Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/execution-context.test.ts (22 tests) 7493ms
+   ✓ an unchanged source edit closes as no_change and returns no unnecessary reconciliation claim  364ms
+   ✓ binds actual source effects to the host execution and retains a durable reconciliation obligation at closure  349ms
+   ✓ an owner failure after a real write cannot become no-change or authorize a blind retry  331ms
+   ✓ actual shell source observation distinguishes no-source-change from process exit; external effects remain unattested  453ms
+   ✓ observes actual native additions/deletions as exact pending scopes while excluding instance metadata  474ms
+   ✓ refresh never launders a concrete untracked named-source mismatch into current graph context  393ms
+   ✓ a refreshed concrete gap admits only the canonical explicitly approved structural repair, preserving the gap until proof commits  501ms
+   ✓ a delivered known source obligation admits only an explicitly approved repair and retains the execution-bound graph receipt  662ms
+   ✓ unrelated execution debt does not prevent explicitly approved repair of the affected source  417ms
+   ✓ separates an execution-bound operational commit from graph publication and rejects invented closure receipts  352ms
+   ✓ per-request command cancellation stops the actual managed process and retains independently observed source debt  816ms
+   ✓ archival retains complete settled context and idempotent readback, blocks ID reuse, and refuses unsettled or foreign records  300ms
+ ✓ tests/host-managed-execution.test.ts (16 tests) 7224ms
+   ✓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass  590ms
+   ✓ parallel host passes share their authenticated owner while another client cannot read or close them  423ms
+   ✓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable  607ms
+   ✓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block  352ms
+   ✓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts  362ms
+   ✓ the actual editor host records exact review before activation; replay cannot replenish consumed effects  513ms
+   ✓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads  449ms
+   ✓ an authenticated owner fences in-flight review; queued HTTP review cannot bypass the changed checkpoint  327ms
+   ✓ the actual portable SDK recovers a lost approval reply without reissuing a grant or extending expiry  310ms
+   ✓ a published review alone grants no effect; the unchanged live host can recover activation exactly once  352ms
+   ✓ a saved review cannot reactivate after the actual lease expires  1746ms
+ ✓ tests/architect-cli-controls.test.ts (8 tests) 35207ms
+   ✓ daemon command perimeter rejects missing/excess grants and observes actual process cancellation  514ms
+   ✓ codex-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity  17736ms
+   ✓ copilot-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity  16924ms
+
+ Test Files  4 passed (4)
+      Tests  47 passed (47)
+   Start at  01:13:09
+   Duration  39.80s (transform 2.43s, setup 0ms, collect 16.94s, tests 51.58s, environment 1ms, prepare 592ms)
+

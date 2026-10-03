@@ -1,0 +1,10 @@
+{
+  "recorded_at": "2026-10-02T20:28:37.5990100Z",
+  "scope": "Read-only installed session metadata; no tokens, identities or private preferences recorded, no session eviction or daemon restart",
+  "session_count": 512,
+  "grant_count": 0,
+  "earliest_expiry": "2026-10-02T21:46:42.665Z",
+  "latest_created_at": "2026-10-02T11:12:53.633Z",
+  "authority_bytes": 148752,
+  "authority_sha256": "f11c8d72cbe8b88291f5f8a281129b8bf513cfe35dead9263f6c5f209b52b69b"
+}

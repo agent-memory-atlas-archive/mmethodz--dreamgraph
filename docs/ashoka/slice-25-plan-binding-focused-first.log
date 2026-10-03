@@ -1,0 +1,24 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/agent-usefulness.test.ts (9 tests) 114ms
+ ✓ tests/plan-context-integration.test.ts (6 tests) 2005ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  921ms
+   ✓ verified implementation evidence is distinct from the next slice and recovers after a transcript-free read  401ms
+ ✓ tests/plan-runtime.test.ts (10 tests) 2514ms
+   ✓ native termination closes only the execution lease, leaving current implementation and verification evidence unchanged  333ms
+   ✓ a cancelled wait cannot release running ownership or upgrade an uncertain stop on retry  318ms
+ ✓ tests/managed-plan-execution.test.ts (7 tests) 5723ms
+   ✓ selection alone stays read-only, while explicit execution injects the post-admission canonical running projection  1210ms
+   ✓ refuses foreign project, selection mismatch, changed source semantics and stale approval before returning native authority  560ms
+   ✓ external plan edits block delivery and worker/model dispatch; source restoration cannot renew a closed pass  775ms
+   ✓ unconfirmed termination remains recovery on exact retry and cannot be strengthened through another public finish  840ms
+   ✓ lost C14 closure acknowledgment replays the persisted original command after host revocation without another event  796ms
+   ✓ finite authority expiry leaves canonical recovery and a later claimed confirmed stop cannot erase missing live observation  857ms
+   ✓ foreign hosts and execution workers cannot request C14 closure or another implementation lease  683ms
+
+ Test Files  4 passed (4)
+      Tests  32 passed (32)
+   Start at  11:23:57
+   Duration  11.21s (transform 2.18s, setup 0ms, collect 15.13s, tests 10.36s, environment 1ms, prepare 614ms)
+

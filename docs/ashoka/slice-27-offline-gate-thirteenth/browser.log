@@ -1,0 +1,14 @@
+{
+  "qualification_path": "C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\docs\\ashoka\\slice-27-offline-gate-thirteenth\\browser-qualification.json",
+  "worker_id": "ashoka-ci-browser",
+  "platform": "win32",
+  "architecture": "x64",
+  "browser_version": "153.0.8010.50",
+  "node": "25.2.1",
+  "model_requests": 0,
+  "measured_checks": 11,
+  "evidence_hash": "sha256:0e609b06171e71461ba37b781e49270eedf7da1a9f8bb3dcee073f7fb555542d",
+  "stop_release_ms": 260.1763000000001,
+  "control_loss_stop_ms": 4505.806500000001,
+  "note": "Qualification only. Instance setup, target review and explicit scoped permission are separate."
+}

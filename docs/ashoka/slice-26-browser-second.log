@@ -1,0 +1,13 @@
+[2026-10-02T14:00:35.167Z] [INFO]  Creating instance a09fc7a1-2b6e-4712-bdee-2cfd968517b2 (navigation-replica) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-navigation-browser-g3lcls\master\a09fc7a1-2b6e-4712-bdee-2cfd968517b2
+[2026-10-02T14:00:35.278Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-navigation-browser-g3lcls\master\instances.json
+[2026-10-02T14:00:35.279Z] [INFO]  Registered new instance a09fc7a1-2b6e-4712-bdee-2cfd968517b2 (navigation-replica)
+[2026-10-02T14:00:35.284Z] [INFO]  Instance a09fc7a1-2b6e-4712-bdee-2cfd968517b2 created successfully
+NAV01
+NAV02
+NAV03
+[2026-10-02T14:00:47.625Z] [INFO]  Creating instance 38757fbe-141f-4e88-8419-bd5cd5c16f2d (migration-cli-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-navigation-browser-g3lcls\master\38757fbe-141f-4e88-8419-bd5cd5c16f2d
+[2026-10-02T14:00:47.688Z] [INFO]  Registered new instance 38757fbe-141f-4e88-8419-bd5cd5c16f2d (migration-cli-fixture)
+[2026-10-02T14:00:47.694Z] [INFO]  Instance 38757fbe-141f-4e88-8419-bd5cd5c16f2d created successfully
+NAV04
+NAV05
+NAV06

@@ -1,0 +1,49 @@
+{
+  "scope": "Actual compiled daemon/CLI/MCP/editor HTTP client and Windows Chromium, disposable reviewed lifecycle fixtures for both AT01/AT05 project families; plugin core read port and SDK generated validation. No paid-model understanding, native editor GUI, cross-platform runtime or full task acceptance claim.",
+  "checks": [
+    {
+      "name": "dreamgraph:draft",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    }
+  ],
+  "errors": [],
+  "snapshots": [
+    {
+      "project": "dreamgraph",
+      "stage": "draft",
+      "semantic": {
+        "lifecycle": "draft",
+        "revision": 0,
+        "definition_hash": "sha256:6ad085815bac0134750068b1dff99a596fc9e878c15e131f199ec0dc86ed184f",
+        "current": [],
+        "running": [],
+        "next": "done",
+        "can_start": false,
+        "last": null,
+        "resume": "review_plan"
+      },
+      "context_revision": {
+        "publication_sequence": 4,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 2,
+          "plans": 1
+        }
+      },
+      "analytics_revision": {
+        "publication_sequence": 6,
+        "graph_revision": "graph:1",
+        "domains": {
+          "graph": 1,
+          "authority": 4,
+          "plans": 1
+        }
+      },
+      "context_receipt": "context-receipt:e360f9dfac21c6278a34f87e0090f8b7c39f945376369496824b15fd94355417"
+    }
+  ],
+  "browser": "153.0.8010.50",
+  "success": false,
+  "failure": "AssertionError [ERR_ASSERTION]: {\"ok\":false,\"error\":\"plan_lifecycle_rejected\",\"message\":\"PLAN_SLICE_OWNER_REJECTED\"}\n\n403 !== 200\n\n    at post (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-plan-consumers.mjs:47:101)\n    at async file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-plan-consumers.mjs:79:229"
+}

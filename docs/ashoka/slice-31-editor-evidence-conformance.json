@@ -1,0 +1,255 @@
+{
+  "schema": "dreamgraph.ashoka.computer_checkpoint.v1",
+  "recorded_at": "2026-10-03T00:24:41.528Z",
+  "status": "original_editor_evidence_qualified_slice31_in_progress",
+  "root": {
+    "passed": 1999,
+    "failed": 0,
+    "skipped": 2,
+    "files": 176,
+    "max_workers": 4,
+    "exit_code": 0,
+    "elapsed_seconds": 167.64241723632813
+  },
+  "focused": {
+    "passed": 10,
+    "failed": 0
+  },
+  "editor": {
+    "passed": 529,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+  "model_requests": 0,
+  "scope": "Actual Windows browser/native API graph loop produces scoped PNGs read through the real original-owner SDK HTTP port. Readback changes neither publication nor usage, and pause clears capture. Actual compiled editor transport verifies linked C17 descriptors and SHA256 bytes; controller/DOM fixtures fence foreign/late/expired evidence and keep Stop independent. No physical VS Code host activation, editor-started CU, provider understanding or desktop qualification inferred.",
+  "evidence_bounds": {
+    "raw_image_bytes": 1048576,
+    "response_bytes": 2097152,
+    "reads_capture": false,
+    "writes_graph": false,
+    "grants": false
+  },
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "remaining": [
+    "Slice31 native workers, native CLI/provider built-ins, complete editor execution and CU/XS joins.",
+    "Slice26 reviewed live cutover,27 actual paired usefulness,28 synchronized release; version13.4.0. Windows global unchanged; no live migration or paid inference."
+  ],
+  "artifacts": [
+    {
+      "path": "src/computer/http.ts",
+      "bytes": 9220,
+      "sha256": "1793870b4342291ebf7d26da33dfb9a0dc4d779817f47d6739f9a091bb986520"
+    },
+    {
+      "path": "src/computer/broker.ts",
+      "bytes": 26082,
+      "sha256": "72e28a3a4d728bfcf89fbe6282b4633192671edff0a4dc073260f3d18e7f95e4"
+    },
+    {
+      "path": "src/computer/browser-driver.ts",
+      "bytes": 15160,
+      "sha256": "0a8ec99054bbcd9c7806cf701f804d639c142b369df9a4efb74be68d1b2c8d0f"
+    },
+    {
+      "path": "src/computer/worker-port.ts",
+      "bytes": 1827,
+      "sha256": "0727ead69ac691f50c878217ab81ac89033b24a5feef13db692d8bb3a9b2ba5b"
+    },
+    {
+      "path": "src/computer/journal.ts",
+      "bytes": 14263,
+      "sha256": "4102666334d06f9977fa241e399d592e787420c7b8bb8fdd125b6b538f7898e7"
+    },
+    {
+      "path": "src/server/managed-execution.ts",
+      "bytes": 24296,
+      "sha256": "0035fbef09dd9a83466cad5b10305857c8276b2df23f7b0a86d1c9bcad42cdba"
+    },
+    {
+      "path": "packages/sdk/src/seams/computer-control.ts",
+      "bytes": 4514,
+      "sha256": "e62bcbeb079a26874ccd6be3b0eb0827a5e57a2e38b2ecd5b7db7e7fd666043a"
+    },
+    {
+      "path": "packages/sdk/src/seams/graph-execution.ts",
+      "bytes": 35523,
+      "sha256": "fddd8e2b1fd8eb69d8a69f5ab669f3df069b74b372c388d8c48203c4676e925d"
+    },
+    {
+      "path": "extensions/vscode/src/daemon-client.ts",
+      "bytes": 25911,
+      "sha256": "76f3193a185c8dfd552e275789c055b92ece7c7e43de0f3ed3a5f76c6a70fd0a"
+    },
+    {
+      "path": "extensions/vscode/src/computer-control.ts",
+      "bytes": 8920,
+      "sha256": "66e7c4dbfd60634de9cee89ba6402ae06847b6b16e73a74b39da7cbda04a4496"
+    },
+    {
+      "path": "extensions/vscode/src/webview/computer-control.ts",
+      "bytes": 8547,
+      "sha256": "f15dbf49fb55a1e436d61b67b4e481febaa9898c6e184b597a9b26bd3c6cc15b"
+    },
+    {
+      "path": "extensions/vscode/src/chat-panel.ts",
+      "bytes": 315509,
+      "sha256": "135b68424267379c7f4f1d23908996c8b3a5d93c9565c3a2c091bd5ae4afb1a0"
+    },
+    {
+      "path": "extensions/vscode/src/test/computer-control.test.ts",
+      "bytes": 10391,
+      "sha256": "47bb2f6773a73d5f39ab0bd9368db8cc0909addfde0a417704a021ef7d49d147"
+    },
+    {
+      "path": "extensions/vscode/src/test/daemon-computer-control.test.ts",
+      "bytes": 8617,
+      "sha256": "847dbcbc5125cbe61d6071cce28d5f8a706579e78aaef0353bf847761cf31ec5"
+    },
+    {
+      "path": "tests/computer-evidence.test.ts",
+      "bytes": 2829,
+      "sha256": "5e48215304ef3fe419b4f9d6e329eac975afd2ee19dc0c853b05f81214fd2d80"
+    },
+    {
+      "path": "tests/computer-native-operator.test.ts",
+      "bytes": 8459,
+      "sha256": "97f9867e418d421974ed8ce446d0cdb4f64c8b647414866f8f9d804a9b311eec"
+    },
+    {
+      "path": "tests/computer-native-graph-loop.test.ts",
+      "bytes": 17385,
+      "sha256": "5c2825ada67a14ffcdba3916fd3e0d36d5c46252ffc220f64349b53b18ac21c5"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "scripts/record-ashoka-editor-evidence.mjs",
+      "bytes": 4247,
+      "sha256": "27ede667265099820410dc5953f6f284ab3178cce539f14343183692cad30b95"
+    },
+    {
+      "path": "scripts/qualify-ashoka-native-review.mjs",
+      "bytes": 3766,
+      "sha256": "22938a9789b90bdce1bfbfa4428b11c9fa869973d911b3f310ea7148ac2ae251"
+    },
+    {
+      "path": "docs/ashoka/native-review-31-evidence.mjs",
+      "bytes": 7993,
+      "sha256": "d3ac645366da7cc325177d699de8c82a2fd6b7f38deccc930d31097924e32eb6"
+    },
+    {
+      "path": "docs/ashoka/computer-use.md",
+      "bytes": 17977,
+      "sha256": "b12c177add3c0e37f0a350e29066e96b49af5a22338735696081b8db0e7a8624"
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 46567,
+      "sha256": "33ac2e52e27bbf170da5941031923957c7edb8e61b583552f158f04b0bda38af"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-architecture.log",
+      "bytes": 146,
+      "sha256": "25516603743c30853b9a0a41cb2542c35c033d72331e773efe0e3451788d3a72"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-build-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-build-first.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-config.log",
+      "bytes": 191,
+      "sha256": "c6b54fc079487c330d619f4b40fc0e94bfa9e2efaabb168e12cc4c203ea37a4f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-editor-build-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-editor-build-first.log",
+      "bytes": 1628,
+      "sha256": "5bf6b2c2ba1ed1f2f4ccd701bc490d0ae50df42008bca9667c395ec8359b5a62"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-editor-build-second-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-editor-build-second.log",
+      "bytes": 1628,
+      "sha256": "fa6c858e849e7244d15c13b6f6675699acc97fedd7b2c4098bb81d7c41e62682"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-editor-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-editor-first.log",
+      "bytes": 50690,
+      "sha256": "b8353192bd41b7976dd60061ca53ce9a9ed22247cfdc5394dda7adc5b5e9595c"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-focus-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-focus-first.json",
+      "bytes": 3055,
+      "sha256": "9d9a9c0b515b9a354654b4c628b9127f0870ab827fac9829f9aca19421765567"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-focus-first.log",
+      "bytes": 124,
+      "sha256": "3996d27f6872be05ed7e54c1cf9f9d752b896251a0fa354e41355f429c26f0b2"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-focus-second-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-focus-second.json",
+      "bytes": 4190,
+      "sha256": "ed37e46c2955dd11c69bd3056ffb1c35e106f290381a81d193947c737cc6e8d6"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-focus-second.log",
+      "bytes": 125,
+      "sha256": "6f5231a283caf0aafac58dc53712f74c62fb0b6203a82553dff83b98d70d9d62"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-root-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-root-first.json",
+      "bytes": 678164,
+      "sha256": "47f48f3053a561ba6fc0c2693dc2932aa8f70e1d612f655cd968202e57db66f5"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-evidence-root-first.log",
+      "bytes": 123,
+      "sha256": "b67d27dcc1bb8a55be4a876ad9c3f068ba1637fc31aaa021bd1173af9f11c086"
+    }
+  ]
+}

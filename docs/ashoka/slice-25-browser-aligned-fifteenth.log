@@ -1,0 +1,51 @@
+[2026-10-02T07:02:40.536Z] [INFO]  Creating instance 63d52f2e-60e5-40fd-8690-6eb0c9d18c9f (browser-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-TnxJyP\master\63d52f2e-60e5-40fd-8690-6eb0c9d18c9f
+[2026-10-02T07:02:40.604Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-TnxJyP\master\instances.json
+[2026-10-02T07:02:40.605Z] [INFO]  Registered new instance 63d52f2e-60e5-40fd-8690-6eb0c9d18c9f (browser-fixture)
+[2026-10-02T07:02:40.611Z] [INFO]  Instance 63d52f2e-60e5-40fd-8690-6eb0c9d18c9f created successfully
+B25-01
+B25-02
+B25-03
+B25-04
+B25-05
+B25-06
+B25-07
+B25-08
+B25-09
+B25-10
+B25-11
+B25-12
+B25-13
+B25-14
+B25-15
+B25-16
+B25-17
+B25-18
+B25-19
+B25-20
+B25-21
+B25-22
+B25-23
+B25-24
+B25-25
+B25-26
+B25-27
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 'Open plan'
+- 'Archive…'
+
+    at file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-architect.mjs:168:1563 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'Open plan',
+  expected: 'Archive…',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v25.2.1

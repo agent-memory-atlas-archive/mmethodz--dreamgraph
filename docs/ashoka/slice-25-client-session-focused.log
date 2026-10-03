@@ -1,0 +1,43 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/editor-mcp-result.test.ts (7 tests) 227ms
+ ✓ tests/agent-usefulness.test.ts (9 tests) 120ms
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5933,"approxTokens":1484}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":6833,"approxTokens":1709}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":9390,"approxTokens":2348}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":5924,"approxTokens":1481}
+
+stdout | tests/host-managed-execution.test.ts > the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":9084,"approxTokens":2271}
+
+ ✓ tests/host-managed-execution.test.ts (40 tests) 15463ms
+   ✓ the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass  458ms
+   ✓ parallel host passes share their authenticated owner while another client cannot read or close them  330ms
+   ✓ host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable  517ms
+   ✓ the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block  324ms
+   ✓ editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts  304ms
+   ✓ the actual editor host records exact review before activation; replay cannot replenish consumed effects  427ms
+   ✓ exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads  346ms
+   ✓ a saved review cannot reactivate after the actual lease expires  1633ms
+   ✓ the actual editor rendezvous waits before the graph writer, then publishes approval before one unchanged source effect  513ms
+   ✓ the editor review controller retains literal exact proposals and retries lost acknowledgement without repeating effects  471ms
+   ✓ the editor controller declines the captured daemon action without dispatch or approval publication  325ms
+   ✓ native editor admission delivers whole replacement evidence, uses the actual worker MCP fence and closes unchanged source with durable review  676ms
+   ✓ native editor source changes retain reconciliation debt rather than reporting a graph commit  301ms
+   ✓ native editor commands execute at the actual daemon owner with exact review and complete source observation  691ms
+   ✓ the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation  1846ms
+   ✓ the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation  1563ms
+
+ Test Files  3 passed (3)
+      Tests  56 passed (56)
+   Start at  02:50:24
+   Duration  21.80s (transform 2.09s, setup 0ms, collect 6.76s, tests 15.81s, environment 1ms, prepare 417ms)
+

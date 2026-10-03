@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+·········································
+
+ Test Files  3 passed (3)
+      Tests  41 passed (41)
+   Start at  02:00:07
+   Duration  1.86s (transform 374ms, setup 0ms, collect 1.71s, tests 353ms, environment 1ms, prepare 549ms)
+

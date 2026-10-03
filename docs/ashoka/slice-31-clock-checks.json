@@ -1,0 +1,38 @@
+[
+  {
+    "command": "npm run build:server",
+    "exit_code": 0
+  },
+  {
+    "command": "npm run docs:architecture-tree",
+    "exit_code": 0
+  },
+  {
+    "command": "npm run config:inventory",
+    "exit_code": 0
+  },
+  {
+    "command": "npm run contracts:check",
+    "exit_code": 0
+  },
+  {
+    "command": "npm run providers:check",
+    "exit_code": 0
+  },
+  {
+    "command": "npm run mcp:check",
+    "exit_code": 0
+  },
+  {
+    "command": "npm run metrics:check",
+    "exit_code": 0
+  },
+  {
+    "command": "npm run ashoka:baseline:check",
+    "exit_code": 0
+  },
+  {
+    "command": "npm run config:check",
+    "exit_code": 0
+  }
+]

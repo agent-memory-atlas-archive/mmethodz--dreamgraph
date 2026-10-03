@@ -1,0 +1,50 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/model-execution.test.ts (7 tests) 1416ms
+   ✓ physical inference admission > native computer-role tools share the actual job and role allocation instead of the Architect route  449ms
+ ✓ tests/engine-jobs.test.ts (13 tests) 5047ms
+   ✓ durably accepts exact replay, preserves original result and rejects changed intent  904ms
+   ✓ persists conflict ownership across clients and nested phases inherit one fence  358ms
+   ✓ cancelling an undispatched blocked job confirms no work while retaining the running owner's unconfirmed termination  328ms
+   ✓ timeout rejects waiting but retains recovery ownership until noncooperative work really settles  1072ms
+   ✓ caller cancellation reaches cooperative action and fences its graph publication  419ms
+   ✓ late provider liability survives cancellation and blocks the engine lane  678ms
+   ✓ external dispatch is durable before transport and unknown sends hold the lane without replay  382ms
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T18:24:06.901Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T18:24:06.910Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T18:24:06.916Z] [INFO]  Architect native tool loop: calling edit_file
+
+stderr | tests/architect-managed-context.test.ts > native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt
+[2026-10-02T18:24:07.449Z] [INFO]  Architect native tool loop: calling scan_project
+
+ ✓ tests/architect-managed-context.test.ts (3 tests) 2395ms
+   ✓ native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt  1770ms
+   ✓ the actual native API pass shares original-host review and reports remaining controls before revocation  334ms
+ ✓ tests/computer-browser-registry.test.ts (6 tests) 1083ms
+ ✓ tests/computer-broker.test.ts (13 tests) 13771ms
+   ✓ single original host/job owns scoped dispatch, independent postcondition and replay  1641ms
+   ✓ native custom tools preserve scoped fresh observations and keep literal arguments out of preview metadata  1370ms
+   ✓ ephemeral image bytes are hash checked and atomically recorded as distinct pixel/DOM descriptors  894ms
+   ✓ an executor cannot pair arbitrary image bytes with a forged digest  763ms
+   ✓ full-access scope does not replace exact action approval; target changes remain fenced  1420ms
+   ✓ grant revocation stops without a model roundtrip and prevents later physical dispatch  943ms
+   ✓ lost reply after input has one durable unknown receipt and is never replayed  1294ms
+   ✓ failed independent termination retains the original worker for stop-only recovery  914ms
+   ✓ material source change stays reconciliation pending even though the GUI postcondition passed  1564ms
+   ✓ wrong-session and unqualified routes cannot open even a declared worker  531ms
+   ✓ a reviewed profile cannot be replaced by the worker  487ms
+   ✓ a reviewed backend cannot be replaced by the worker  555ms
+   ✓ observation-only operator approval cannot authorize interaction even with an exact action approval  1395ms
+ ✓ tests/computer-use-ui.test.ts (6 tests) 736ms
+
+ Test Files  6 passed (6)
+      Tests  48 passed (48)
+   Start at  21:23:51
+   Duration  20.62s (transform 2.32s, setup 0ms, collect 13.27s, tests 24.45s, environment 1ms, prepare 844ms)
+

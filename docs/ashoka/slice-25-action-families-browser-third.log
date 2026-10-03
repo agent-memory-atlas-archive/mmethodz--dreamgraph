@@ -1,0 +1,41 @@
+[2026-10-02T02:41:20.200Z] [INFO]  Creating instance cf9eb03e-0b34-49a2-beb9-53b0ccc1ce88 (browser-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-LuXtW0\master\cf9eb03e-0b34-49a2-beb9-53b0ccc1ce88
+[2026-10-02T02:41:20.272Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-browser-clients-LuXtW0\master\instances.json
+[2026-10-02T02:41:20.273Z] [INFO]  Registered new instance cf9eb03e-0b34-49a2-beb9-53b0ccc1ce88 (browser-fixture)
+[2026-10-02T02:41:20.278Z] [INFO]  Instance cf9eb03e-0b34-49a2-beb9-53b0ccc1ce88 created successfully
+B25-01
+B25-02
+B25-03
+B25-04
+B25-05
+B25-06
+B25-07
+B25-08
+B25-09
+B25-10
+B25-11
+B25-12
+B25-13
+B25-14
+B25-15
+B25-16
+B25-17
+B25-18
+B25-19
+B25-20
+B25-21
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('#adr-editor-status').filter({ hasText: 'Review the decision' }) to be visible
+
+    at C:\Users\Mika Jussila\source\repos\dreamgraph\scripts\qualify-ashoka-architect.mjs:139:83 {
+  log: [
+    "  - waiting for locator('#adr-editor-status').filter({ hasText: 'Review the decision' }) to be visible"
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v25.2.1

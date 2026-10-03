@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/context-pack.test.ts (35 tests) 1819ms
+
+ Test Files  1 passed (1)
+      Tests  35 passed (35)
+   Start at  02:17:34
+   Duration  6.78s (transform 1.52s, setup 0ms, collect 4.13s, tests 1.82s, environment 0ms, prepare 184ms)
+

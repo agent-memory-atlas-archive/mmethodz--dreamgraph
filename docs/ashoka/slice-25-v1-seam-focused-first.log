@@ -1,0 +1,48 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/host-managed-execution.test.ts > compiled v1 API seam refreshes whole graph context and literal raw dialogue under one ledger before settled persistence
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":8960,"approxTokens":2240}
+
+stdout | tests/host-managed-execution.test.ts > compiled v1 API seam refreshes whole graph context and literal raw dialogue under one ledger before settled persistence
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":9705,"approxTokens":2427}
+
+stdout | tests/host-managed-execution.test.ts > compiled v1 API seam records literal MCP errors without transforming them into successful tool prose
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":8902,"approxTokens":2226}
+
+stdout | tests/host-managed-execution.test.ts > compiled v1 API seam records literal MCP errors without transforming them into successful tool prose
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":9912,"approxTokens":2478}
+
+stdout | tests/host-managed-execution.test.ts > compiled v1 API seam separates a complete model loop from source reconciliation and cannot advance autonomy
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":8791,"approxTokens":2198}
+
+stdout | tests/host-managed-execution.test.ts > compiled v1 API seam separates a complete model loop from source reconciliation and cannot advance autonomy
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":11595,"approxTokens":2899}
+
+stdout | tests/host-managed-execution.test.ts > compiled v1 API seam zero allocation refuses before inference and does not record a completed autonomy pass
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":8869,"approxTokens":2218}
+
+stdout | tests/host-managed-execution.test.ts > compiled v1 API seam retains a lost original closure reply without assistant persistence, renewal or redispatch
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":8897,"approxTokens":2225}
+
+stdout | tests/host-managed-execution.test.ts > compiled v1 API seam forwards Stop to a pending original worker tool and retains unconfirmed termination
+[DreamGraph][llm_input_budget] {"callsite":"callOpenAIWithTools","model":"gpt-4.1","inputChars":8889,"approxTokens":2223}
+
+stdout | tests/host-managed-execution.test.ts > compiled v1 API streaming seam reports terminal Responses usage before closing and persisting a live answer
+[DreamGraph][llm_input_budget] {"callsite":"streamOpenAIResponses","model":"gpt-4.1","inputChars":8453,"approxTokens":2114}
+
+ ✓ tests/host-managed-execution.test.ts (128 tests | 120 skipped) 5605ms
+   ✓ compiled v1 API seam refuses an absent original managed pass before model, persistence or private tool fallback  615ms
+   ✓ compiled v1 API seam refreshes whole graph context and literal raw dialogue under one ledger before settled persistence  1002ms
+   ✓ compiled v1 API seam records literal MCP errors without transforming them into successful tool prose  855ms
+   ✓ compiled v1 API seam separates a complete model loop from source reconciliation and cannot advance autonomy  1003ms
+   ✓ compiled v1 API seam zero allocation refuses before inference and does not record a completed autonomy pass  411ms
+   ✓ compiled v1 API seam retains a lost original closure reply without assistant persistence, renewal or redispatch  514ms
+   ✓ compiled v1 API seam forwards Stop to a pending original worker tool and retains unconfirmed termination  693ms
+   ✓ compiled v1 API streaming seam reports terminal Responses usage before closing and persisting a live answer  510ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed | 120 skipped (128)
+   Start at  08:36:34
+   Duration  14.71s (transform 2.95s, setup 0ms, collect 8.67s, tests 5.61s, environment 0ms, prepare 151ms)
+

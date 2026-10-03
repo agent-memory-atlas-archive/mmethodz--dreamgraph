@@ -1,0 +1,133 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6.1-sol through Responses without sampling parameters
+[2026-10-02T14:37:54.014Z] [INFO]  LLM provider: openai (model: gpt-6.1-sol)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-astra through Responses without sampling parameters
+[2026-10-02T14:37:54.223Z] [INFO]  LLM provider: openai (model: gpt-6-astra)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-sol through Responses without sampling parameters
+[2026-10-02T14:37:54.371Z] [INFO]  LLM provider: openai (model: gpt-6-sol)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-6-luna through Responses without sampling parameters
+[2026-10-02T14:37:54.531Z] [INFO]  LLM provider: openai (model: gpt-6-luna)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-sol through Responses without sampling parameters
+[2026-10-02T14:37:54.664Z] [INFO]  LLM provider: openai (model: gpt-5.6-sol)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-terra through Responses without sampling parameters
+[2026-10-02T14:37:54.799Z] [INFO]  LLM provider: openai (model: gpt-5.6-terra)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > routes gpt-5.6-luna through Responses without sampling parameters
+[2026-10-02T14:37:54.930Z] [INFO]  LLM provider: openai (model: gpt-5.6-luna)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-opus-5-5
+[2026-10-02T14:37:55.059Z] [INFO]  LLM provider: anthropic (model: claude-opus-5-5)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-sonnet-5-5
+[2026-10-02T14:37:55.177Z] [INFO]  LLM provider: anthropic (model: claude-sonnet-5-5)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-fable-5-1
+[2026-10-02T14:37:55.288Z] [INFO]  LLM provider: anthropic (model: claude-fable-5-1)
+
+stderr | tests/latest-model-support.test.ts > September 2026 model support > omits temperature and reads text after thinking for claude-mythos-5-1
+[2026-10-02T14:37:55.404Z] [INFO]  LLM provider: anthropic (model: claude-mythos-5-1)
+
+ ✓ tests/latest-model-support.test.ts (14 tests) 2046ms
+ ✓ tests/graph-upgrade-notice.test.ts (5 tests) 624ms
+   ✓ requires a durable original review receipt, reopens a restored format and keeps notification read-only  411ms
+stderr | tests/standalone-architect-routes.test.ts
+[2026-10-02T14:37:59.927Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > resolves Windows CLI shims and wraps them before spawning
+[2026-10-02T14:38:00.064Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > serves an executable browser bootstrap script for runtime binding
+[2026-10-02T14:38:00.159Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-02T14:38:01.643Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-02T14:38:01.648Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not let a failed OpenAI models probe skip native chat execution
+[2026-10-02T14:38:01.921Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-02T14:38:01.930Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-02T14:38:01.934Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > returns structured continuation reports and ADR-152 default pass budget from native chat
+[2026-10-02T14:38:02.136Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification
+[2026-10-02T14:38:02.148Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification
+[2026-10-02T14:38:02.235Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification
+[2026-10-02T14:38:02.994Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-02T14:38:03.012Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-02T14:38:03.087Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-5.5 (architect), temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports
+[2026-10-02T14:38:03.380Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > replaces a stale local model when codex-cli is selected
+[2026-10-02T14:38:03.396Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+[2026-10-02T14:38:03.401Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T14:38:03.455Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T14:38:03.482Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T14:38:03.509Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > round-trips daemon-owned Architect verbosity modes
+[2026-10-02T14:38:03.535Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.5, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > exposes one active session runtime across config and chat payloads
+[2026-10-02T14:38:03.643Z] [INFO]  LLM architect config updated: provider=openai, model=gpt-5.4, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists token economy config changes in engine.env
+[2026-10-02T14:38:03.798Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+stderr | tests/standalone-architect-routes.test.ts > standalone Architect route hardening > persists token economy config changes in engine.env
+[2026-10-02T14:38:03.847Z] [INFO]  LLM architect config updated: provider=none, model=auto, temp=0.7, maxTokens=2048
+
+ ✓ tests/standalone-architect-routes.test.ts (55 tests) 5787ms
+   ✓ standalone Architect route hardening > executes browser bootstrap and bounds poisoned persisted chat history replay  503ms
+   ✓ standalone Architect route hardening > retains pass reports as audit evidence without manufacturing slice verification  865ms
+   ✓ standalone Architect route hardening > does not advance the selected plan cursor for malformed pass reports  382ms
+   ✓ standalone Architect route hardening > separates project-scope chat from selected plan logs and honors slash overrides  305ms
+ ✓ tests/legacy-graph-upgrade.test.ts (14 tests) 15436ms
+   ✓ reviewed offline legacy graph upgrade > previews all families without writing, preserves scoped identities and provenance, and never invents source/scan history  541ms
+   ✓ reviewed offline legacy graph upgrade > archives exact duplicates once but blocks conflicting claims until exact row-bound explicit choices  546ms
+   ✓ reviewed offline legacy graph upgrade > rejects unsupported majors, invalid UTF-8 and schema shapes, stale resolutions and changed previews  366ms
+   ✓ reviewed offline legacy graph upgrade > refuses cross-collection identity collisions even when a modified preview conceals the staged blocker  339ms
+   ✓ reviewed offline legacy graph upgrade > cancels before cutover and rejects input changes after backup; original mutation is retained  611ms
+   ✓ reviewed offline legacy graph upgrade > binds and privately backs up opaque configuration bytes while restore preserves later operating settings  814ms
+   ✓ reviewed offline legacy graph upgrade > cannot acquire a live process writer and proceeds only after that kernel owner exits  1024ms
+   ✓ reviewed offline legacy graph upgrade > validates owner stores and refuses unfinished jobs instead of cancelling or reassigning them  465ms
+   ✓ reviewed offline legacy graph upgrade > restores exact original bytes as a new publication while preserving post-cutover debt, history and source currency  801ms
+   ✓ reviewed offline legacy graph upgrade > exposes restore conflicts and backup corruption before any restore; an uncertain old result is not overwritten  558ms
+   ✓ reviewed offline legacy graph upgrade > recovers a real killed writer at after_replace:0: without replaying a second graph effect  7129ms
+   ✓ reviewed offline legacy graph upgrade > recovers a real killed writer at publication_committed without replaying a second graph effect  1794ms
+
+ Test Files  4 passed (4)
+      Tests  88 passed (88)
+   Start at  17:37:52
+   Duration  21.16s (transform 3.01s, setup 0ms, collect 18.92s, tests 23.89s, environment 1ms, prepare 586ms)
+

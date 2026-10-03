@@ -1,0 +1,22 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ❯ tests/plan-context-integration.test.ts (1 test | 1 failed) 218ms
+   × PL16 graph consumers retrieve the actual typed plan and selected slice with the same authority revision and gates 217ms
+     → {"availability":"unavailable","completeness":"partial","freshness":"unknown","reasons":[{"code":"INVALID_STORE_SHAPE","scope":["plan_state.json"],"detail":"Error: INVALID_STORE_SHAPE: plan_state.json: expected one of plans"}]}: expected undefined to be defined
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/plan-context-integration.test.ts > PL16 graph consumers retrieve the actual typed plan and selected slice with the same authority revision and gates
+AssertionError: {"availability":"unavailable","completeness":"partial","freshness":"unknown","reasons":[{"code":"INVALID_STORE_SHAPE","scope":["plan_state.json"],"detail":"Error: INVALID_STORE_SHAPE: plan_state.json: expected one of plans"}]}: expected undefined to be defined
+ ❯ tests/plan-context-integration.test.ts:34:43
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  08:50:10
+   Duration  5.65s (transform 1.84s, setup 0ms, collect 4.95s, tests 218ms, environment 0ms, prepare 143ms)
+

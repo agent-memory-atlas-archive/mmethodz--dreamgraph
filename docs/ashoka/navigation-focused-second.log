@@ -1,0 +1,14 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/graph-read-model.test.ts (11 tests) 507ms
+ ✓ tests/publication-read-cache.test.ts (4 tests) 473ms
+ ✓ tests/plan-context-integration.test.ts (6 tests) 1899ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  893ms
+   ✓ verified implementation evidence is distinct from the next slice and recovers after a transcript-free read  358ms
+
+ Test Files  3 passed (3)
+      Tests  21 passed (21)
+   Start at  16:22:44
+   Duration  7.46s (transform 1.97s, setup 0ms, collect 10.63s, tests 2.88s, environment 1ms, prepare 412ms)
+

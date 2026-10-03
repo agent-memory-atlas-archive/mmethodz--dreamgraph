@@ -1,0 +1,38 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T16:00:50.257Z] [INFO]  Discipline session started: 44015e07-32a5-492c-bf46-605a6b5ca881 (modification: owner-0)
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T16:00:50.262Z] [INFO]  Discipline session started: b6bb8fb7-7cc7-4f11-a432-54dbd550919b (modification: owner-1)
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T16:00:50.277Z] [INFO]  Discipline session completed: 44015e07-32a5-492c-bf46-605a6b5ca881
+
+stderr | tests/session-authority.test.ts > private durable authority > signs continuations for one session and isolates concurrent discipline state and resume
+[2026-10-02T16:00:50.284Z] [INFO]  Discipline session completed: b6bb8fb7-7cc7-4f11-a432-54dbd550919b
+
+ ✓ tests/session-authority.test.ts (10 tests) 3521ms
+   ✓ private durable authority > lost scoped-grant acknowledgements preserve expiry and revocation across restart and refuse widening  611ms
+   ✓ private durable authority > persists isolated selection/settings across service recreation, never bearer secrets  337ms
+   ✓ private durable authority > requires two separately scoped confirmations, exact execution and independent expiry/revocation  422ms
+   ✓ private durable authority > fences Computer Use controls and stops outside the model loop on expire  1189ms
+ ✓ tests/computer-capabilities.test.ts (7 tests) 14ms
+ ✓ tests/computer-broker.test.ts (10 tests) 10130ms
+   ✓ single original host/job owns scoped dispatch, independent postcondition and replay  2181ms
+   ✓ full-access scope does not replace exact action approval; target changes remain fenced  1122ms
+   ✓ grant revocation stops without a model roundtrip and prevents later physical dispatch  931ms
+   ✓ lost reply after input has one durable unknown receipt and is never replayed  1173ms
+   ✓ failed independent termination retains the original worker for stop-only recovery  853ms
+   ✓ material source change stays reconciliation pending even though the GUI postcondition passed  1293ms
+   ✓ wrong-session and unqualified routes cannot open even a declared worker  547ms
+   ✓ a reviewed profile cannot be replaced by the worker  461ms
+   ✓ a reviewed backend cannot be replaced by the worker  498ms
+   ✓ observation-only operator approval cannot authorize interaction even with an exact action approval  1070ms
+
+ Test Files  3 passed (3)
+      Tests  27 passed (27)
+   Start at  19:00:46
+   Duration  16.15s (transform 2.21s, setup 0ms, collect 11.37s, tests 13.66s, environment 1ms, prepare 638ms)
+

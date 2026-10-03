@@ -1,0 +1,18 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/plan-workflow.test.ts (17 tests) 92ms
+ ✓ tests/plan-authority.test.ts (7 tests) 1440ms
+   ✓ PL04/GE14: a status receipt cannot count as implementation; an actual graph commit can, and accepted verification survives replay  381ms
+   ✓ GE14/CU22 effect contract: reconciliation must finish; optional unfunded digestion can remain pending  482ms
+ ✓ tests/plan-context-integration.test.ts (6 tests) 1924ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  922ms
+   ✓ verified implementation evidence is distinct from the next slice and recovers after a transcript-free read  366ms
+ ✓ tests/plan-runtime.test.ts (7 tests) 1845ms
+   ✓ a cancelled wait cannot release running ownership or upgrade an uncertain stop on retry  301ms
+
+ Test Files  4 passed (4)
+      Tests  37 passed (37)
+   Start at  10:45:12
+   Duration  8.71s (transform 2.05s, setup 0ms, collect 16.13s, tests 5.30s, environment 1ms, prepare 588ms)
+

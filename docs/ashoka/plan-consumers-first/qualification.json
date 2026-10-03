@@ -1,0 +1,9 @@
+{
+  "scope": "Actual compiled daemon/CLI/MCP/editor HTTP client and Windows Chromium, disposable reviewed lifecycle fixtures for both AT01/AT05 project families; plugin core read port and SDK generated validation. No paid-model understanding, native editor GUI, cross-platform runtime or full task acceptance claim.",
+  "checks": [],
+  "errors": [],
+  "snapshots": [],
+  "browser": "153.0.8010.50",
+  "success": false,
+  "failure": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#slice-list [data-slice-id=\"done\"]') to be visible\u001b[22m\n\u001b[2m    61 × locator resolved to hidden <li tabindex=\"0\" role=\"button\" data-slice-id=\"done\" class=\"dg-context-target\" aria-label=\"Slice 0 - Verified work, pending. Open definition\">…</li>\u001b[22m\n\n    at C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\scripts\\qualify-ashoka-plan-consumers.mjs:44:110"
+}

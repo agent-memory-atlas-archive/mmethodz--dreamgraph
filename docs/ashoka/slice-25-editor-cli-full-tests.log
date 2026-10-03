@@ -1,0 +1,772 @@
+✔ summary renderer disables privileged actions and suppresses mixed Do all (3.8623ms)
+✔ summary renderer trusts host capability checks (0.9628ms)
+✔ ReasoningPacket carries task preamble and adaptive future diagnostics (1.2043ms)
+✔ ContextBuilder compiles bounded task preamble metadata into rendered context (0.3574ms)
+✔ ContextInspector exposes compact compiler and judgment diagnostics (0.187ms)
+✔ Anthropic Fable/Mythos inventory is exposed without changing the governed default (4.5032ms)
+✔ Anthropic request helpers route Fable/Mythos through effort and adaptive thinking (1.4052ms)
+✔ Standalone and quarantined v2 Anthropic metadata include Fable/Mythos (3.5576ms)
+✔ Anthropic migration docs do not claim Mythos is generally available (0.8712ms)
+✔ runPass: text-only turn calls ports in canonical order and stops on no tool calls (3.6921ms)
+✔ runPass: forwards content blocks to composer when attachments present (0.6238ms)
+✔ runPass: surfaces dropped attachments without posting them itself (0.3497ms)
+✔ runPass: clears attachments exactly once, after persistence and before provider (0.3691ms)
+✔ runPass: runs the inner agentic loop across many tool batches in service of one pass (0.6077ms)
+✔ runPass: stops at maxIterations cap when provider keeps requesting tools (0.4715ms)
+✔ runPass: surfaces provider error as 'error' stop reason without throwing (0.5096ms)
+✔ runPass: aborts mid-loop when abortSignal fires before next iteration (0.61ms)
+✔ runPass: frames pass goal and task goal into composer additionalInstructions (0.8885ms)
+✔ runPass: propagates final iteration's providerRawAssistant unchanged to memory (0.6252ms)
+✔ detectArchitectLens — silent default for empty / trivial prompts (1.9253ms)
+✔ detectArchitectLens — performance keywords select performance lens (2.1279ms)
+✔ detectArchitectLens — security keywords select security lens (1.4454ms)
+✔ detectArchitectLens — refactor keywords select refactor lens (1.5006ms)
+✔ detectArchitectLens — debug keywords select debug lens (0.4156ms)
+✔ detectArchitectLens — review keywords select review lens (0.2578ms)
+✔ detectArchitectLens — reliability keywords select reliability lens (0.2712ms)
+✔ detectArchitectLens — explanatory ask_dreamgraph downgrades weak performance hits (0.2264ms)
+✔ detectArchitectLens — security stays material under ask_dreamgraph (0.2814ms)
+✔ detectArchitectLens — command source forces lens even without keywords (0.481ms)
+✔ lensLabel — capitalised display labels (0.2243ms)
+✔ ADR-171 + ADR-140 isolation lint reports zero violations (103.9947ms)
+✔ do all eligible only for compatible actions (1.4147ms)
+✔ eager selects strongest action under medium uncertainty when defining (0.2433ms)
+✔ capability guards block graph release records without graph-write MCP tool (1.005ms)
+✔ capability guards allow graph release records when enrich_seed_data is exposed (0.3382ms)
+✔ capability guards block marketplace publish without VSCE_PAT (0.2991ms)
+✔ capability guards allow marketplace publish when a marketplace PAT is present (1.3753ms)
+✔ blocked actions make Do all ineligible (0.3352ms)
+✔ shouldContinueAfterPass stops with "pass budget exhausted" when remaining hits 0 (1.3759ms)
+✔ budget exhaustion stops every mode, even with otherwise-eligible signal (0.3611ms)
+✔ decrementPassBudget bottoms out at 0 — never goes negative (0.3224ms)
+✔ decrementPassBudget leaves remaining untouched when pass counting is inactive (0.1967ms)
+✔ exhausted-budget stop fires before the cautious/eager mode-specific gates (0.1882ms)
+✔ contract block includes json requirement (1.301ms)
+✔ extracts structured json envelope blocks (1.0689ms)
+✔ returns primary structured json envelope (0.2806ms)
+✔ ignores malformed json blocks (1.7365ms)
+✔ extracts envelope from a fenced block with no language hint (0.3209ms)
+✔ extracts bare top-level JSON envelope (no fence at all) (0.3998ms)
+✔ repairs envelopes containing smart quotes and trailing commas (0.4944ms)
+✔ preserves // and , ] sequences inside string values during repair (0.2735ms)
+✔ does not falsely match a non-envelope JSON object that happens to have summary (0.3198ms)
+✔ inferPassOutcomeSignal detects goal completion and stalled progress markers (4.1341ms)
+✔ inferPassOutcomeSignal detects awaiting-user prose at the message tail (0.4891ms)
+✔ analyzePass pauses for user input when the assistant asks a question, even with action chips (2.2605ms)
+✔ analyzePass selects continuation prompt when autonomous mode has a strong next step (0.5832ms)
+✔ analyzePass stops when goal is sufficiently reached (0.3528ms)
+✔ analyzePass lets partial structured envelope override broad completion prose (0.4236ms)
+✔ advanceAutonomyStateIfContinued decrements visible counters only when continuing (0.3191ms)
+✔ analyzePass marks pure-read pass as empty once patch anchor is established (0.3933ms)
+✔ analyzePass does not mark read-only pass as empty before any anchor (0.2774ms)
+✔ mode switch preserves completed and remaining pass counters (1.16ms)
+✔ shouldContinueAfterPass re-evaluates against the new mode immediately (0.3415ms)
+✔ decrementPassBudget counts correctly across a cautious→eager→autonomous→cautious sequence (0.2223ms)
+✔ switching modes after exhaustion does not revive the budget (0.3328ms)
+✔ Ashoka canonical profiles preserve legacy labels without widening approved scope (0.9688ms)
+✔ getAutonomyInstructionBlock returns instruction when enabled (1.4189ms)
+✔ getAutonomyInstructionBlock returns empty string when disabled (0.3494ms)
+✔ getAutonomyInstructionBlock returns empty when undefined (0.1762ms)
+✔ getStructuredResponseContractBlock includes json envelope requirement (1.3969ms)
+✔ parseAutonomyRequest extracts autonomous mode from text (1.4156ms)
+✔ parseAutonomyRequest extracts eager mode (0.3802ms)
+✔ parseAutonomyRequest extracts conscientious mode (0.1738ms)
+✔ parseAutonomyRequest keeps current mode when no keyword found (0.1867ms)
+✔ parseAutonomyRequest extracts budget from "for N passes" pattern (0.1755ms)
+✔ extracts actions from recommended next steps section (2.9003ms)
+✔ prefers structured json envelope when present (1.7258ms)
+✔ does not infer complete from successful tool-call prose alone (0.654ms)
+✔ ranks actions from assistant output (0.5128ms)
+✔ preserves structured action blockers and requirements (0.4291ms)
+✔ extractProseAnchorPaths picks up file path co-occurring with edit verb (4.4066ms)
+✔ extractProseAnchorPaths picks up backtick-quoted bare filename with edit verb (0.4437ms)
+✔ extractProseAnchorPaths returns [] when there is no edit verb on the line (0.1819ms)
+✔ extractProseAnchorPaths deduplicates and preserves first-occurrence order (0.1978ms)
+✔ setEqualsPaths is order-independent and treats undefined as empty (0.2635ms)
+✔ analyzePass treats prose anchor as patch anchor without tool binding (1.8194ms)
+✔ continuation prompt includes anchor preamble when patch anchor is sticky (0.4696ms)
+✔ continuation prompt omits anchor preamble before any anchor (0.2549ms)
+✔ continuation prompt authorizes one bounded read_source_code action (0.4201ms)
+✔ post-anchor re-reading does NOT trigger a two-strike token-economy STOP (1.0323ms)
+✔ decrementPassBudget increments completed and decrements remaining when budgeted (1.5372ms)
+✔ deriveAutonomyStatusView exposes visible counters when counting is active (0.4517ms)
+✔ rankRecommendedActions picks the top ranked action and enables Do all for compatible actions (1.229ms)
+✔ computeDoAllEligibility rejects mutually exclusive actions (0.2506ms)
+✔ chooseActionForMode keeps cautious mode user-driven unless near-trivial (0.3209ms)
+✔ shouldContinueAfterPass stops on goal completion regardless of mode (0.3974ms)
+✔ shouldContinueAfterPass stops on stalled progress regardless of mode (0.2225ms)
+✔ shouldContinueAfterPass keeps cautious mode asking often (0.1786ms)
+✔ shouldContinueAfterPass allows eager mode to continue on defining next steps (0.2366ms)
+✔ shouldContinueAfterPass makes autonomous mode self-directed within budget (0.275ms)
+✔ getAutonomyInstructionBlock includes visible counters and reporting contract (0.4618ms)
+✔ autonomous completion model continues after an intermediate checkpoint with actionable slices (0.2105ms)
+✔ autonomous completion model continues after verification while target remains incomplete (0.1608ms)
+✔ checkpoint summary with remaining actionable work is not final completion (0.1657ms)
+✔ requested target completion stops autonomous execution (0.1428ms)
+✔ genuine blocker requiring user input stops autonomous execution (0.3371ms)
+✔ external maintenance timeout does not terminate locally actionable implementation (0.3053ms)
+✔ fresh coordinator with no snapshot has zero debt and full target (2.6898ms)
+✔ estimate creates a reservation and is replaced by actual (0.3371ms)
+✔ unreconciled estimates are discarded at finalize (0.3692ms)
+✔ debt carries forward after overspend (0.2079ms)
+✔ debt repaid by underspend on next turn (0.246ms)
+✔ pressure label crosses thresholds at 0 and 0.5 (0.2757ms)
+✔ compression records do not affect debt math (0.2285ms)
+✔ history retains components only for the most recent N turns (0.5413ms)
+✔ model switch rescales debt with clamp + decay (0.306ms)
+✔ extreme downgrade resets debt and logs synthetic history entry (0.377ms)
+✔ graph slice emergency trim flag persisted in history (0.2425ms)
+✔ finalize is idempotent (0.1611ms)
+✔ estimateTokensFromString uses chars/4 heuristic (0.1964ms)
+✔ Phase 2 — BudgetSnapshot is JSON round-trip identical (Plan §9 reload invariant) (1.428ms)
+(node:40188) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ canonical graph context reaches the actual model-facing packet at high pressure, with exact receipt and Unicode evidence (15.5041ms)
+✔ a missing canonical capability is visible in the prompt and does not silently call the legacy data projection (0.9592ms)
+✔ required graph records borrow optional space within the same total bound; they never disappear when too large (3.3331ms)
+✔ repository-local ID collisions remain in the whole canonical pack without manufacturing a navigation identity (0.5793ms)
+✔ T-3.1: entity fence renders an entity card (5.7464ms)
+✔ T-3.2: adr fence renders an adr card (1.0095ms)
+✔ T-3.3: tension fence renders a tension card (0.8038ms)
+✔ T-3.4: insight fence renders an insight card (0.6916ms)
+✔ T-3.5: unknown fence type falls back to regular code block (1.5969ms)
+✔ T-3.6: rendered cards are collapsible details blocks (0.6195ms)
+✔ T-3.7: incomplete streaming-style fence remains a code block until complete (0.6332ms)
+✔ Review #8: malformed card body falls back to code block, no crash (0.5965ms)
+✔ ChatMemory persists messages per instance (2.2982ms)
+✔ ChatMemory clears a single instance history (1.516ms)
+✔ ChatMemory preserves canonical anchor identity across save and restore (0.4095ms)
+✔ ChatMemory round-trip preserves canonical anchor fields written by ChatPanel refresh flow (0.3077ms)
+✔ Phase 2 � ChatMemory persists and restores BudgetSnapshot per instance (0.9704ms)
+✔ Phase 2 � restored BudgetSnapshot rehydrates a coordinator with identical pressure (0.4721ms)
+✔ Plan A: copilot-cli turn captures a workspace snapshot before runPassViaCopilotCli (1.4706ms)
+✔ Plan A: copilot-cli turn reconciles via recordWorkspaceChanges in finally (0.5789ms)
+✔ Plan A: when changed paths exist the pending-review webview push fires (0.3562ms)
+✔ Plan A: review reconciliation errors are swallowed (do not break the turn) (0.4871ms)
+✔ deriveVerdict treats completed tool calls without delivered answer as partial progress (2.249ms)
+✔ deriveVerdict keeps completed audited work partial when report says requested assessment remains incomplete (0.6626ms)
+✔ deriveVerdict requires completion signal before showing verified tool-count banner (0.2058ms)
+✔ deriveVerdict honors partial structured envelope over successful tool trace (0.2878ms)
+✔ help-probe: parses Codex root and exec surfaces (2.0911ms)
+✔ help-probe: supports Codex exec help without ask-for-approval (0.4224ms)
+✔ help-probe: missing exec help fails the support check (0.4674ms)
+✔ help-probe: empty registry reports all minimum tools as missing (0.287ms)
+✔ allowlist: live registry with all catalog tools is ok (0.2502ms)
+✔ allowlist: bridge-local run_command is allowed even when absent upstream (0.1531ms)
+✔ allowlist: missing minimum grounding tool flips ok to false (0.2178ms)
+✔ mcp-config: builds deterministic Codex config.toml artifact (0.663ms)
+✔ mcp-config: rejects empty inputs with explicit messages (0.6598ms)
+✔ mcp-bridge: validates live registry before building isolated config (0.5521ms)
+✔ mcp-bridge: fails closed when required DreamGraph tools are missing (0.4448ms)
+✔ argv: emits authoritative codex exec shape with stdin positional dash (0.82ms)
+✔ argv: gives gpt-6.1-sol xhigh reasoning and respects explicit overrides (0.4879ms)
+✔ argv: gives gpt-6-astra xhigh reasoning and respects explicit overrides (0.1355ms)
+✔ argv: gives gpt-6-sol xhigh reasoning and respects explicit overrides (0.1144ms)
+✔ argv: gives gpt-6-luna xhigh reasoning and respects explicit overrides (0.1515ms)
+✔ argv: gives gpt-5.6-sol xhigh reasoning and respects explicit overrides (0.236ms)
+✔ argv: omits ask-for-approval when Codex exec does not advertise it (0.3004ms)
+✔ argv: never emits elevated sandbox or approval from config overrides (0.26ms)
+✔ argv: rejects missing workspace and missing required help support (0.4506ms)
+✔ classifier: dreamgraph + allowlisted tool is authoritative (0.178ms)
+✔ classifier: dreamgraph + non-allowlisted tool is rejected (0.1017ms)
+✔ classifier: third-party MCP server is generic context (0.1248ms)
+✔ classifier: inline sentinel is provider inline tool (0.1287ms)
+✔ transcript: projects Codex MCP JSON events into tool observations (3.2387ms)
+✔ transcript: strips ANSI, reports diagnostics, and detects login recovery signal (2.1384ms)
+✔ transcript: projects Codex item.completed agent messages from whitespace-separated json (0.702ms)
+✔ codex orchestrator: success writes isolated config, spawns codex exec with stdin dash, and cleans up (11.6884ms)
+✔ codex orchestrator: empty invocation cwd uses neutral probe cwd and scratch exec cwd (2.3689ms)
+✔ codex orchestrator: missing binary fails before spawn (0.3768ms)
+✔ codex orchestrator: unsupported help surface fails before spawn (0.8529ms)
+✔ codex orchestrator: codex login status failure returns clickable login recovery metadata (1.3936ms)
+✔ codex orchestrator: login status policy noise is advisory unless it reports auth failure (2.3843ms)
+✔ codex orchestrator: codex login status exit 0 is authoritative even with misleading noise (1.5443ms)
+✔ codex orchestrator: exec MCP runtime failure fails closed instead of accepting ungrounded output (2.8577ms)
+✔ codex orchestrator: transcript-only DreamGraph MCP events fail closed without audit results (1.3055ms)
+✔ codex orchestrator: cancelled DreamGraph MCP result without audit result fails closed (1.6469ms)
+✔ codex orchestrator: audited read call clears MCP probe even with transcript witness noise (0.8474ms)
+✔ codex orchestrator: rmcp transport EOF on shutdown is teardown noise, not a load failure (2.0307ms)
+✔ codex orchestrator: missing required DreamGraph tool fails closed (0.5931ms)
+✔ codex orchestrator: wall timeout and idle timeout remain distinguishable (1.3886ms)
+✔ codex orchestrator: cancellation, signal, nonzero, and not-logged-in exec failures are classified (2.0763ms)
+✔ codex orchestrator: usage limit after audited DreamGraph tools is not classified as login failure (1.3287ms)
+✔ codex orchestrator: source snippets mentioning usage limit do not override policy/tool failures (2.5975ms)
+✔ codex orchestrator: telemetry unknown terminal type is not unsupported model and failure tail stays compact (1.8532ms)
+✔ codex orchestrator: inspected source mentioning unsupported model does not poison failure classification (1.0115ms)
+✔ codex orchestrator: audited DreamGraph success suppresses false exec login classification (0.5412ms)
+✔ codex orchestrator: failed read_source_code schema args are not classified as missing tool (1.5208ms)
+✔ codex orchestrator: unsupported model and native policy denial are not login failures (0.7647ms)
+✔ codex orchestrator: read-only sandbox MCP block is policy denial, not audit mismatch (0.53ms)
+✔ codex orchestrator: thrown spawn still drains audit and cleans scratch (0.5701ms)
+✔ codex orchestrator: validates required input (0.6907ms)
+✔ codex provider-port: getCapabilities reports text and image attachments (2.0157ms)
+✔ codex provider-port: awaits mandatory prompt admission before spawn and propagates rejection (9.2815ms)
+✔ codex provider-port: invocation cwd is optional for multi-repo DreamGraph runs (1.8926ms)
+✔ codex provider-port: serializes conversation to stdin and projects proposal (1.294ms)
+✔ codex provider-port: advertises DreamGraph prompt policies and diagnostics (1.6115ms)
+✔ codex provider-port: keeps bridge-local run_command visible with read-only upstream tools (1.0067ms)
+✔ codex provider-port: forwards assistant text through onStreamChunk (0.8569ms)
+✔ codex provider-port: streams Codex assistant deltas live without duplicating final text (2.0224ms)
+✔ codex provider-port: streams completed assistant message when no deltas are available (1.0128ms)
+✔ codex provider-port: provider errors carry deterministic metadata (0.7956ms)
+✔ codex provider-port: streams live audit calls before final run reconciliation (1.2058ms)
+✔ codex provider-port: streams transcript MCP witnesses when audit records are absent (4.3777ms)
+✔ codex provider-port: onRunResult fires for ok and failed runs (0.9868ms)
+✔ codex provider-port: rejects missing or malformed options (0.3367ms)
+✔ selection tests: file-aware routing selects the correct environment scopes (31.6699ms)
+✔ rendering stability and token-discipline: unchanged Layer 2 rendering remains identical, compact, and noise-controlled (24.1579ms)
+✔ evidence-order and omission contract: environment ranks below hard constraints and above notes, and optional evidence can be omitted under budget pressure (1.2932ms)
+✔ cache-churn and packet instrumentation: logically unchanged stable inputs produce stable prefix reuse and omission telemetry by kind (0.7548ms)
+✔ evaluation fixture plan: representative task packets preserve sufficiency cues for runtime, scope role, module boundary, and graph identity (0.3204ms)
+✔ fallback planning contract keeps environment evidence in optional evidence (1.0847ms)
+✔ environment evidence ranks ahead of low-priority notes and stays within a compact token budget (1.2379ms)
+✔ shimmed ContextBuilder evidence collection includes environment evidence with stable ordering and compact size (2.1939ms)
+✔ Phase 3 — 'low' pressure fetches every deep-insight regardless of required/optional (1.1744ms)
+✔ Phase 3 — 'normal' pressure fetches every deep-insight (tier-2 trim reserved for future) (0.2608ms)
+✔ Phase 3 — 'high' pressure skips optional deep-insights but keeps required ones (0.2515ms)
+✔ Phase 3 — 'high' pressure with all-optional needs drops everything (0.1735ms)
+✔ Phase 3 — pressure decision is pure (same inputs → same outputs) (0.1781ms)
+[DreamGraph] deep-insights cache invalidated: tool:dream_cycle
+[DreamGraph] deep-insights cache invalidated: tool:nightmare_cycle
+[DreamGraph] deep-insights cache invalidated: tool:normalize_dreams
+[DreamGraph] deep-insights cache invalidated: tool:resolve_tension
+[DreamGraph] deep-insights cache invalidated: tool:clear_dreams
+[DreamGraph] deep-insights cache invalidated: tool:lucid_action
+[DreamGraph] deep-insights cache invalidated: tool:wake_from_lucid
+[DreamGraph] deep-insights cache invalidated: tool:enrich_seed_data
+[DreamGraph] deep-insights cache invalidated: tool:enrich_parser_nodes
+[DreamGraph] deep-insights cache invalidated: tool:solidify_cognitive_insight
+[DreamGraph] deep-insights cache invalidated: tool:init_graph
+[DreamGraph] deep-insights cache invalidated: tool:scan_project
+[DreamGraph] deep-insights cache invalidated: tool:record_architecture_decision
+[DreamGraph] deep-insights cache invalidated: tool:register_ui_element
+[DreamGraph] deep-insights cache invalidated: tool:import_dream_archetypes
+[DreamGraph] deep-insights cache invalidated: tool:dispatch_cognitive_event
+[DreamGraph] deep-insights cache invalidated: tool:metacognitive_analysis
+[DreamGraph] deep-insights cache invalidated: test-eviction
+[DreamGraph] deep-insights cache invalidated: tool:dream_cycle
+[DreamGraph] deep-insights cache invalidated: tool:normalize_dreams
+[DreamGraph] deep-insights cache invalidated: tool:record_architecture_decision
+✔ every COGNITIVE_MUTATING_TOOL triggers deep-insights invalidation (2.3082ms)
+✔ read-only tools do NOT trigger invalidation (0.2446ms)
+✔ invalidateDeepInsights drops the slot so the next get rebuilds it (0.2774ms)
+✔ clearAll drops both env-snapshot and deep-insights slots (0.2502ms)
+✔ getDeepInsightsSlot returns the same instance within the TTL window (0.232ms)
+✔ maybeInvalidateForTool only fires for the published mutating-tool set (0.279ms)
+[DreamGraph] Context fetch timed out: f18_record_54704_1_8zeg2f (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+[DreamGraph] Context fetch timed out: f18_record_54704_1_8zeg2f (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 2.
+[DreamGraph] Context fetch timed out: f18_snapshot_54704_2_1sdz4g (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+[DreamGraph] Context fetch timed out: f18_a_54704_3_9o4yry (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+[DreamGraph] Context fetch timed out: f18_a_54704_3_9o4yry (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 2.
+[DreamGraph] Context fetch timed out: f18_b_54704_4_03ccjk (>6000ms). Reasoning context for this tool was dropped. Total timeouts so far: 1.
+✔ recordTimeout increments per-tool counters (1.8017ms)
+✔ getTimeoutStats returns an independent snapshot — mutating it does not affect the cache (0.3272ms)
+✔ per-tool counters are independent (0.2887ms)
+✔ isTimeout matches the documented timeout/aborted error vocabulary (0.3942ms)
+✔ isTimeout rejects unrelated errors and falsy values (0.2443ms)
+✔ MCP_CONTEXT_FETCH_TIMEOUT_MS is a positive finite number (0.2196ms)
+✔ ChatPanel context logging uses the injected shared ContextInspector (1.7325ms)
+✔ extension activate wires the shared ContextInspector into ChatPanel (0.3386ms)
+✔ help-probe: parses full help surface (2.1296ms)
+✔ help-probe: minimal help is supported (only required flags) (0.4161ms)
+✔ help-probe: empty help fails the support check (0.4161ms)
+✔ help-probe: missing single required flag fails the support check (0.2234ms)
+✔ help-probe: undefined help text yields zero-length surface, not throw (0.3827ms)
+✔ allowlist: live registry with all catalog tools is ok (1.6187ms)
+✔ allowlist: bridge-local run_command is allowed even when absent upstream (0.3162ms)
+✔ allowlist: missing minimum grounding tool flips ok to false (0.2551ms)
+✔ allowlist: empty registry reports all minimum tools as missing (0.2424ms)
+✔ mcp-config: builds a deterministic single-server artifact (1.3773ms)
+✔ mcp-config: caller env wins for arbitrary keys, never for token (0.5885ms)
+✔ mcp-config: serialization is stable and ends in newline (0.4076ms)
+✔ mcp-config: rejects empty inputs with explicit messages (1.2732ms)
+✔ argv: emits model, allow-all-tools, native shell allow, deny-write, allow-tool per allowlist, prompt (0.8097ms)
+✔ argv: no native command tools are advertised; shell execution is routed exclusively through dreamgraph:run_command (0.5188ms)
+✔ argv: emits one --add-dir per addDirs entry, ordered, after --disallow-temp-dir and before --prompt (0.3499ms)
+✔ argv: omits --add-dir entirely when addDirs is empty or absent (0.1929ms)
+✔ argv: omits --disallow-temp-dir when help surface lacks it (0.3657ms)
+✔ argv: never emits --additional-mcp-config (data plane lives on disk) (0.3924ms)
+✔ argv: always emits --allow-all-tools (required for non-interactive mode) (0.2725ms)
+✔ argv: rejects empty prompt and empty allowlist (0.3848ms)
+✔ classifier: dreamgraph + allowlisted tool → authoritative (0.2393ms)
+✔ classifier: dreamgraph + non-allowlisted tool → rejected (0.1618ms)
+✔ classifier: third-party MCP server → generic_context_mcp (0.141ms)
+✔ classifier: inline sentinel → provider_inline_tool (0.1567ms)
+✔ createHostAuditLive: rejects empty auditDirAbsPath (2.5139ms)
+✔ subscribe with no existing file → catch-up empty, future records delivered (109.5504ms)
+✔ subscribe after records exist → catch-up replays them (14.0231ms)
+✔ partial trailing line is buffered until newline arrives (98.4081ms)
+[copilot-cli audit-live] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-live-bad-2TcMo1\run-4.ndjson
+✔ malformed line is skipped silently (20.2355ms)
+✔ close() stops further deliveries and is idempotent (229.0491ms)
+[copilot-cli audit-live] handler threw; subsequent events will still deliver: boom
+✔ handler exception does not break subsequent deliveries (8.1847ms)
+✔ resultJson larger than 4 KB is truncated for the live channel (25.0935ms)
+✔ auditFilePathFor: composes a deterministic path under the dir (2.6003ms)
+✔ auditFilePathFor: rejects empty inputs (0.6818ms)
+✔ auditFilePathFor: sanitizes unsafe runId characters (0.3618ms)
+✔ createHostAudit: rejects empty auditDirAbsPath (0.5206ms)
+✔ createHostAudit: missing file â†’ empty array, no throw (16.937ms)
+[copilot-cli audit] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-parse-3WwY3K\run-mixed.ndjson:2
+[copilot-cli audit] skipped malformed record at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-audit-parse-3WwY3K\run-mixed.ndjson:3
+✔ createHostAudit: parses NDJSON, drops malformed lines, deletes file (21.573ms)
+✔ createHostAudit: finishRecording without startRecording â†’ empty (4.7508ms)
+✔ createHostAudit: second finishRecording for same runId â†’ empty (23.4735ms)
+✔ bridge: forwards tools/list to the HTTP upstream (2343.823ms)
+✔ bridge: run_command delegates to the daemon command port and does not call the upstream MCP handler (2280.2719ms)
+✔ createHostAudit: unfinished intent fails honestly and retains the physical audit for recovery (8.1157ms)
+✔ bridge: forwards tools/call and retains paired intent/terminal audit records per call (2273.1262ms)
+✔ bridge: marks JSON-RPC error responses with isError=true (2279.3072ms)
+✔ bridge: Unicode audit safety ceiling is bytes and never cuts through a UTF-8 character (2287.4356ms)
+✔ bridge: only tools/call generates audit records (tools/list does not) (2296.9085ms)
+✔ bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is unset (155.1485ms)
+✔ bridge: fails fast (exit 2) when DREAMGRAPH_HOST_MCP_URL is malformed (153.501ms)
+✔ bridge: fails closed when upstream is unreachable (193.5092ms)
+✔ event-stream: parses a tool.execution_start with mcpServerName/mcpToolName (2.2843ms)
+✔ event-stream: parses a CLI-native tool.execution_start without mcp fields (0.5654ms)
+✔ event-stream: pairs start+complete by toolCallId across chunks split mid-line (2.3781ms)
+✔ event-stream: accumulates assistant deltas and snapshotAssistantText concatenates them (0.4616ms)
+✔ event-stream: assistant.message replaces accumulated deltas as authoritative (0.4822ms)
+✔ event-stream: reasoning deltas are emitted but do NOT contribute to assistant text (0.3841ms)
+✔ event-stream: result event is parsed with sessionId/exitCode/usage (1.5034ms)
+✔ event-stream: unknown event types surface as `other` without losing data (0.3937ms)
+✔ event-stream: malformed JSON lines and blank lines are skipped silently (0.4151ms)
+✔ event-stream: events missing required fields are dropped (0.3299ms)
+✔ event-stream: flush() emits a buffered trailing line missing its newline (0.2898ms)
+✔ event-stream: handles \r\n line endings (0.2438ms)
+✔ event-stream: assistant.message_delta with empty deltaContent is dropped (no zero-byte events) (0.1622ms)
+✔ event-stream: tool.execution_complete defaults success=true when field missing (0.1808ms)
+✔ event-stream: feed() returns events in arrival order across multiple lines in one chunk (0.1951ms)
+✔ event-stream: assistant.message with empty content is dropped (0.2311ms)
+✔ HOST_CLOCK.nowMs returns a wall-clock millisecond reading (2.1192ms)
+✔ HOST_CLOCK.nowMs is monotonic-ish across two reads (8.5205ms)
+✔ HOST_CRYPTO.randomToken is URL-safe and unique (1.34ms)
+✔ HOST_CRYPTO.randomToken rejects invalid byte lengths (0.688ms)
+✔ HOST_CRYPTO.randomRunId is path-safe and unique (0.6053ms)
+✔ HOST_FS round-trip: mkdtemp → mkdir → writeFile → rmRecursive (42.8494ms)
+✔ HOST_FS.rmRecursive is idempotent (force:true) (4.1675ms)
+✔ HOST_FS.joinPath delegates to node:path (0.4777ms)
+✔ HOST_PROCESS.resolveExecutable: absolute path round-trips (443.4478ms)
+✔ HOST_PROCESS.resolveExecutable: missing binary returns null (419.9087ms)
+✔ HOST_PROCESS.resolveExecutable: rejects empty name (0.3706ms)
+✔ HOST_PROCESS.runHelp captures Node --help output (113.2324ms)
+✔ HOST_PROCESS.spawn captures stdout, exitCode 0, durationMs >= 0 (93.3371ms)
+✔ HOST_PROCESS.spawn surfaces nonzero exit codes verbatim (131.0172ms)
+✔ HOST_PROCESS.spawn streams chunks live via onStdoutChunk (98.3814ms)
+✔ HOST_PROCESS.spawn enforces timeoutMs and reports timedOut=true (236.3672ms)
+✔ HOST_PROCESS.spawn honors abortSignal and reports aborted=true (117.3216ms)
+✔ HOST_PROCESS.spawn rejects non-positive timeoutMs (0.7563ms)
+✔ HOST_PROCESS.spawn surfaces ENOENT as a thrown error (1.5751ms)
+✔ HOST_PROCESS.spawn: aborting twice is idempotent and still settles (14.3429ms)
+✔ HOST_PROCESS.spawn: aborted child stops emitting stdout chunks before resolve (91.7899ms)
+✔ HOST_PROCESS.spawn: cooperative SIGINT child exits cleanly inside the escalation window (0.3325ms)
+✔ orchestrator: happy path runs all six steps and returns ok=true (7.6806ms)
+✔ orchestrator: missing binary → COPILOT_CLI_NOT_FOUND, no spawn (0.6201ms)
+✔ orchestrator: incomplete help surface → COPILOT_HELP_SURFACE_UNSUPPORTED (1.0261ms)
+✔ orchestrator: missing Copilot config → COPILOT_NOT_LOGGED_IN, no spawn (0.8916ms)
+✔ orchestrator: config.json with empty loggedInUsers → COPILOT_NOT_LOGGED_IN (0.4622ms)
+✔ orchestrator: COPILOT_HOME env override is honoured by the login check (0.9281ms)
+✔ orchestrator: missing minimum MCP tool → DREAMGRAPH_TOOL_REGISTRY_MISMATCH (0.7676ms)
+✔ orchestrator: nonzero exit → COPILOT_RUN_NONZERO_EXIT, transcript captured (1.6087ms)
+✔ orchestrator: empty-output nonzero exit includes spawn context (1.3282ms)
+✔ orchestrator: timeout → TIMEOUT (1.2659ms)
+✔ orchestrator: abort → CANCELLED (0.7638ms)
+✔ orchestrator: signal w/o abort/timeout → COPILOT_RUN_SIGNALED (0.5552ms)
+✔ orchestrator: spawn throws → scratch dir still cleaned + audit drained (1.2128ms)
+✔ orchestrator: rejects empty prompt / cwd / invalid timeout (0.4951ms)
+✔ transcript: strips ANSI, trims, surfaces stderr diagnostics (0.3098ms)
+✔ transcript: clean stderr → hasStderrErrors=false (0.1355ms)
+✔ orchestrator: classifier wired to dreamgraph authoritative server (0.1071ms)
+✔ serializeConversationForCopilotCli: rejects empty conversations (2.3424ms)
+✔ serializeConversationForCopilotCli: renders [system]/[user]/[assistant] headers in order (0.4029ms)
+✔ serializeConversationForCopilotCli: joins multiple text blocks with newlines (0.227ms)
+✔ serializeConversationForCopilotCli: replaces image blocks with placeholder (0.3988ms)
+✔ serializeConversationForCopilotCli: honors custom role headers (0.266ms)
+✔ serializeConversationForCopilotCli: tools manifest advertises mutation and verification routing (1.1122ms)
+✔ serializeConversationForCopilotCli: command policy names disabled routes explicitly (0.3682ms)
+✔ provider-port: getCapabilities reports text and image attachments (1.8983ms)
+✔ provider-port: awaits mandatory prompt admission before spawn and propagates rejection (8.3882ms)
+✔ provider-port: exposes hostLlm reference verbatim through `llm` (0.5497ms)
+✔ provider-port: callProvider serializes the conversation into --prompt (2.6907ms)
+✔ provider-port: advertises the live authoritative tool catalog to Copilot CLI (3.3638ms)
+✔ provider-port: keeps bridge-local run_command visible with read-only upstream tools (1.977ms)
+✔ provider-port: callProvider forwards onStreamChunk with full assistant text (3.4703ms)
+✔ provider-port: callProvider forwards abortSignal to the spawn port (1.6228ms)
+✔ provider-port: callProvider throws annotated Error when orchestrator returns ok=false (0.9786ms)
+✔ provider-port: onRunResult fires for both ok and failed runs (6.2919ms)
+✔ provider-port: onRunResult exceptions are swallowed (0.7078ms)
+✔ provider-port: rejects missing or malformed options (0.4852ms)
+✔ T-2.1: feature:// URIs are linkified (3.333ms)
+✔ T-2.2: all recognised schemes are linkified (1.2059ms)
+✔ T-2.3: generated anchor has correct data-type and data-uri (0.3887ms)
+✔ T-2.4: URIs inside <pre>…</pre> are NOT linkified (0.2801ms)
+✔ T-2.4b: URIs inside inline <code>…</code> are NOT linkified (1.9927ms)
+✔ T-2.5: URIs inside existing href="" are NOT double-linkified (0.4977ms)
+✔ T-S1.4: javascript: scheme is NOT linkified (0.2981ms)
+✔ T-S1.4b: data: scheme is NOT linkified (0.2413ms)
+✔ T-S1.4c: vscode: scheme is NOT linkified (0.2515ms)
+✔ T-S3.1: data-uri only contains the allowlisted URI, not injected content (0.5627ms)
+✔ T-2: multiple entity links in one paragraph (0.2592ms)
+✔ T-2: plain text outside tags is linkified (0.1735ms)
+✔ normalizes nested-summary envelope drift (autonomy + summary wrapper) (2.371ms)
+✔ promotes singular recommended_next_step to plural array (0.3651ms)
+✔ preserves canonical envelope unchanged (0.2983ms)
+✔ environment context selects the most specific matching scope for a file (47.0757ms)
+✔ environment context rendering is stable and bounded for a given file (40.5333ms)
+✔ environment context excludes non-curated dependency noise (42.1936ms)
+✔ claude-opus-5-5: preserves signed thinking and tool calls through the next request (133.4139ms)
+✔ claude-sonnet-5-5: preserves signed thinking and tool calls through the next request (35.9874ms)
+✔ claude-fable-5-1: preserves signed thinking and tool calls through the next request (32.3363ms)
+✔ claude-mythos-5-1: preserves signed thinking and tool calls through the next request (24.0291ms)
+✔ Claude reasoning drops produce diagnostics without exposing signatures (1.2594ms)
+✔ GPT-6.1 Sol uses Responses for tools and supports images (19.0284ms)
+✔ switching providers translates neutral history instead of replaying foreign raw blocks (1.7178ms)
+✔ Responses streaming preserves actual usage and validates the authoritative final response (14.5507ms)
+✔ Responses truncated/refused streams and invalid strict outputs are never accepted (15.1576ms)
+✔ explicit Chat preserves model/effort and rejects GPT-6 tool reasoning before dispatch (11.3075ms)
+✔ Claude opt-in native schemas retain effort and locally validate the original output (12.7401ms)
+✔ routes current OpenAI reasoning families to the Responses API (3.9127ms)
+✔ builds a GPT-5.5 Responses request with reasoning, verbosity, and function tools (2.9821ms)
+✔ translates Architect tool history into Responses function-call items (1.3028ms)
+✔ skips malformed raw replay items instead of emitting invalid Responses items (0.4758ms)
+✔ extracts text while safely ignoring unknown Responses output items (0.9213ms)
+✔ inserts a paragraph break between adjacent verbose-mode message items lacking surrounding whitespace (0.4642ms)
+✔ keeps streamed sub-blocks within a single message tightly joined (0.2629ms)
+✔ normalizes Responses output to the provider boundary contract (1.0571ms)
+✔ normalizes Responses tool calls as tool_use finish reason (0.4619ms)
+✔ extracts function calls and hardens malformed or unknown items (1.8379ms)
+✔ Responses item identity cannot replace the required tool call identity (0.6527ms)
+✔ T-1.1: bold, italic, inline code (12.5724ms)
+✔ T-1.2: fenced code block with language class (1.0306ms)
+✔ T-1.3: fenced code block without language still produces pre>code (0.452ms)
+✔ T-1.4: headings h2 and h3 (2.0978ms)
+✔ T-1.5: tables produce table/th/td (1.4144ms)
+✔ T-1.6: unordered and ordered lists (1.0887ms)
+✔ T-1.7: partial markdown (incomplete bold) does not produce unclosed tag (0.8361ms)
+✔ T-1.9: external links get rendered as <a href> (3.2567ms)
+✔ T-1.8: raw script tag is escaped, not passed through (1.6803ms)
+✔ T-1.8b: javascript: URI in link is not rendered as active href (0.9705ms)
+✔ T-1.8c: raw img tag is escaped as text when html:false is used (0.47ms)
+✔ T-S3.4: rendered output contains no active <script> tags (1.051ms)
+✔ T-S2.1: key-value secrets are redacted (2.5703ms)
+✔ T-S2.2: token-like prefixes are partially masked (0.5258ms)
+✔ T-S2.3: private key blocks are redacted (0.386ms)
+✔ T-5.1/T-5.2: verdict banner renders structured verdict level and summary (1.8798ms)
+✔ T-S4.1/T-S4.2/T-S4.3: provenance label distinguishes executed-tool grounding (0.4774ms)
+✔ T-4.5: verification names are batched to max 50 (2.6096ms)
+✔ T-S7.4: verification list is capped at 100 unique names (0.7935ms)
+✔ T-4.1/T-4.2/T-4.3/T-4.4: verification semantics distinguish verified, tension, latent, and unverified (0.6374ms)
+✔ T-5.3/T-5.4: tool trace renders collapsible entries from real call records (1.0305ms)
+✔ Slice 5 source includes show_full storage and action state messaging (5.1489ms)
+✔ Slice 5 source routes message actions through real execution helpers (3.9263ms)
+✔ Slice 5 source logs action provenance with outcome and detail (3.2484ms)
+✔ Slice 5 audit: hover actions are wired for copy, retry, and pin (4.5778ms)
+✔ Slice 5 audit: action execution remains allowlisted and explicit-click only (4.7775ms)
+✔ Slice 5 audit: resource guards remain in place (3.6763ms)
+✔ Slice 5 audit: styles include context footer, action buttons, and implicit entity notice (1.0611ms)
+✖ Slice 5 audit: codex-cli is selectable and routes through native ProviderPort (7.4854ms)
+✔ Slice 6 audit: codex-cli live tool trace and final reconciliation are wired (3.7181ms)
+✔ Slice 6 audit: codex-cli host timeout and forced-report evidence preserve partial progress (4.3629ms)
+✔ Slice 5 next pass adds instance scoping to chat messages (4.1892ms)
+✔ Slice 5 next pass restoreMessages filters messages to the active instance (5.2036ms)
+✔ Slice 5 next pass adds context footer metadata (4.8168ms)
+✔ Slice 5 next pass adds implicit entity detection and capping (3.0768ms)
+✔ Slice 5 next pass adds implicit entity notice styling (1.1007ms)
+✔ slice 5 runtime renders action buttons with loading/error styles (4.2078ms)
+✔ slice 5 runtime renders implicit entity notice separately from message content (3.9259ms)
+✔ slice 5 runtime keeps explicit click requirement for actions (4.7987ms)
+✔ Slice 5 TDD references action safety and limits (2.4828ms)
+✔ chat panel contains Slice 5 action and render limit scaffolding (2.9095ms)
+✔ chat panel persists header autonomy dropdown selections (6.5831ms)
+✔ styles include role header, hover actions, and action block styles (1.134ms)
+✔ ContextInspector exposes a logTimeoutDiagnostics method with structured fields (1.7962ms)
+✔ ContextInspector includes provider, model, tool count, and reduced-context flags (0.4849ms)
+✔ ChatPanel defines _logTimeoutDiagnostics and forwards to the inspector (0.4498ms)
+✔ ChatPanel actually invokes _logTimeoutDiagnostics from the recovery path (0.6205ms)
+✔ getLlmTimeoutMs returns Anthropic stream/tool budgets by default (2.4223ms)
+✔ getLlmTimeoutMs uses provider-specific budgets (0.2851ms)
+✔ getLlmTimeoutMs falls back to REQUEST_TIMEOUT_MS for unknown providers (0.2482ms)
+✔ getLlmTimeoutMs adds 30s when toolCount > 12 (2.1928ms)
+✔ getLlmTimeoutMs reduces budget by 30s when reducedContext=true (floor 60s) (0.5953ms)
+✔ isTimeoutError matches the canonical timeout error shapes (0.6691ms)
+✔ isTimeoutError ignores unrelated errors (0.3528ms)
+✔ buildTimeoutRecoveryPrompt prepends the original text and recovery instructions (0.5849ms)
+✔ createTimeoutAbortSignal aborts when the timer fires (63.6467ms)
+✔ createTimeoutAbortSignal aborts when the parent signal aborts (0.7093ms)
+✔ createTimeoutAbortSignal aborts immediately if parent already aborted (0.3044ms)
+✔ createTimeoutAbortSignal works without a parent controller (65.3466ms)
+✔ createTimeoutAbortSignal dispose() clears the timer (no late aborts) (50.6623ms)
+✔ chat-panel.ts imports from chat-panel/timeout.ts (0.4458ms)
+✔ chat-panel.ts still calls _getLlmTimeoutMs and _createRequestSignal at the streaming + tool sites (0.3952ms)
+✔ chat-panel.ts still invokes the recovery flow on stream timeouts (0.2475ms)
+✔ isWriteToolName recognizes host-local write tools (2.2536ms)
+✔ isWriteToolName recognizes MCP-prefixed write tools (0.3764ms)
+✔ isWriteToolName rejects pure-read tools (0.3144ms)
+✔ isVerifyToolName recognizes verification + execution tools (0.4182ms)
+✔ isVerifyToolName rejects locator/search tools (1.3695ms)
+✔ narrowToWriteAndVerify keeps writes + verifies and drops pure searches (1.7408ms)
+✔ narrowToWriteAndVerify falls back to full catalog when filter would be empty (0.3141ms)
+✔ pickPreferredWriteTool prefers multi_replace then replace then create (0.4477ms)
+✔ pickPreferredWriteTool falls back to the first write-classified tool (0.2999ms)
+✔ pickPreferredWriteTool returns undefined when no write tools exist (0.4774ms)
+✔ APPLY_LABEL_PATTERN matches the canonical apply/patch verbs (0.6218ms)
+✔ APPLY_LABEL_PATTERN does NOT match pure read/locate verbs (0.2319ms)
+✔ primed tool is exposed even when next prompt is terse (2.0147ms)
+✔ priming a tool also exposes its sibling group members (0.5584ms)
+✔ primed tools that are not in availableToolNames are skipped (0.4253ms)
+✔ no primed tools behaves identically to omitting the field (1.7152ms)
+✔ envelope tool/tool_args fields survive structured extraction (2.3909ms)
+✔ envelope without tool field leaves action.tool undefined (0.4329ms)
+✔ Phase 4 — pressure ≤ 0 returns content verbatim (1.9273ms)
+✔ Phase 4 — server-side envelope passthrough preserved under any pressure (0.6994ms)
+✔ Phase 4 — mild tier (0 < pressure ≤ 0.5) leaves small payloads verbatim (0.7453ms)
+✔ Phase 4 — mild tier trims when content exceeds expected slice (1.0495ms)
+✔ Phase 4 — aggressive tier (pressure > 0.5) trims hard with high-pressure marker (3.3336ms)
+✔ Phase 4 — coordinator that throws does not break the pipeline (0.464ms)
+✔ Phase 4 — recordCompression that throws does not break the pipeline (0.5314ms)
+✔ Phase 4 — pressure-tier ordering is monotonic (verbatim ≤ mild ≤ aggressive in trim depth) (0.6245ms)
+✔ Slice 3 build migration: bundled webview runtime is emitted (2.5007ms)
+✔ Slice 3 build migration: chat panel loads bundled runtime via script src (2.7887ms)
+ℹ tests 496
+ℹ suites 0
+ℹ pass 495
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15774.9873
+
+✖ failing tests:
+
+test at dist\test\slice5-audit.test.js:40:25
+✖ Slice 5 audit: codex-cli is selectable and routes through native ProviderPort (7.4854ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /private _buildCodexCliProviderOptions\(\): CodexCliProviderPortOptions/. Input:
+  
+  '/**\r\n' +
+    ' * DreamGraph Chat Panel — M5 WebviewPanel controller.\r\n' +
+    ' *\r\n' +
+    ' * Owns all chat state (messages, streaming, model selection).\r\n' +
+    ' * The webview is a dumb renderer — the extension host is the single source of truth.\r\n' +
+    ' *\r\n' +
+    ' * Chat history is persisted in ChatMemory and re-hydrated whenever the webview\r\n' +
+    ' * is recreated or becomes visible again, so switching to another tool tab does\r\n' +
+    ' * not erase the conversation.\r\n' +
+    ' */\r\n' +
+    '\r\n' +
+    "import * as vscode from 'vscode';\r\n" +
+    "import * as path from 'path';\r\n" +
+    "import * as fs from 'fs';\r\n" +
+    "import type { ChatMemory, PersistedMessage } from './chat-memory';\r\n" +
+    "import { getStyles } from './webview/styles.js';\r\n" +
+    "import { getRenderScript } from './webview/render-markdown.js';\r\n" +
+    "import { getEntityLinksScript } from './webview/entity-links.js';\r\n" +
+    "import { getCardRendererScript } from './webview/card-renderer.js';\r\n" +
+    "import type { GraphSignalProvider } from './graph-signal';\r\n" +
+    'import {\r\n' +
+    '  ANTHROPIC_MODELS,\r\n' +
+    '  CODEX_CLI_MODELS,\r\n' +
+    '  COPILOT_CLI_MODELS,\r\n' +
+    '  OPENAI_MODELS,\r\n' +
+    '  type ArchitectContentBlock,\r\n' +
+    '  type ArchitectLlm,\r\n' +
+    '  type ArchitectMessage,\r\n' +
+    '  type ArchitectModelCapabilities,\r\n' +
+    '  type ArchitectProvider,\r\n' +
+    '  type ToolDefinition,\r\n' +
+    "} from './architect-llm';\r\n" +
+    "import type { McpClient } from './mcp-client';\n" +
+    "import type { DaemonClient } from './daemon-client.js';\n" +
+    "import { ManagedCliPass } from './managed-cli-pass.js';\n" +
+    "import type { ContextBuilder } from './context-builder';\r\n" +
+    "import type { ChangedFilesView, ChangeType } from './changed-files-view';\r\n" +
+    "import { LOCAL_TOOL_DEFINITIONS, isLocalTool, executeLocalTool } from './local-tools.js';\r\n" +
+    "import { changeReviewService, type PendingChangeReview } from './change-review-service';\r\n" +
+    "import { assemblePrompt, inferTask } from './prompts/index.js';\r\n" +
+    "import { selectToolGroups } from './tool-groups.js';\r\n" +
+    "import { runPassViaCodexCli, runPassViaCore, runPassViaCopilotCli } from './architect-core/runner.js';\r\n" +
+    'import {\r\n' +
+    '  HOST_CLOCK,\r\n' +
+    '  HOST_CRYPTO,\r\n' +
+    '  HOST_FS,\r\n' +
+    '  HOST_PROCESS,\r\n' +
+    '  createHostAudit,\r\n' +
+    '  createHostAuditLive,\r\n' +
+    '  createHostRegistry,\r\n' +
+    '  COPILOT_AUTHORITATIVE_TOOL_CATALOG,\r\n' +
+    '  DREAMGRAPH_AUTHORITATIVE_SERVER_NAME,\r\n' +
+    '  type ClassifiedToolCall,\r\n' +
+    '  type CopilotCliProviderPortOptions,\r\n' +
+    '  type CopilotCliRunResult,\r\n' +
+    '  type PromptComposedInfo,\r\n' +
+    '  type RecordedMcpToolCall,\r\n' +
+    "} from './architect-core/adapters/copilot-cli/index.js';\r\n" +
+    'import {\r\n' +
+    '  CODEX_AUTHORITATIVE_TOOL_CATALOG,\r\n' +
+    '  DREAMGRAPH_AUTHORITATIVE_SERVER_NAME as CODEX_DREAMGRAPH_AUTHORITATIVE_SERVER_NAME,\r\n' +
+    '  HOST_CLOCK as CODEX_HOST_CLOCK,\r\n' +
+    '  HOST_CRYPTO as CODEX_HOST_CRYPTO,\r\n' +
+    '  HOST_FS as CODEX_HOST_FS,\r\n' +
+    '  HOST_PROCESS as CODEX_HOST_PROCESS,\r\n' +
+    '  type ClassifiedToolCall as CodexClassifiedToolCall,\r\n' +
+    '  type CodexCliProviderPortOptions,\r\n' +
+    '  type CodexCliRunResult,\r\n' +
+    '  type CodexToolCallWitness,\r\n' +
+    '  type PromptComposedInfo as CodexPromptComposedInfo,\r\n' +
+    "} from './architect-core/adapters/codex-cli/index.js';\r\n" +
+    "import type { ChatPanelHost } from './architect-core/adapters/host.js';\r\n" +
+    'import {\r\n' +
+    '  applyRecommendedActionCapabilityGuards,\r\n' +
+    '  computeDoAllEligibility,\r\n' +
+    '  createAutonomyState,\r\n' +
+    '  deriveAutonomyStatusView,\r\n' +
+    '  isRecommendedActionRunnable,\r\n' +
+    '  type AutonomyState,\r\n' +
+    '  type AutonomyInstructionState,\r\n' +
+    '  type RecommendedAction,\r\n' +
+    '  type RecommendedActionBlocker,\r\n' +
+    "} from './autonomy.js';\r\n" +
+    "import { analyzePass, advanceAutonomyStateIfContinued, buildContinuationPrompt, isReadOnlyTool } from './autonomy-loop.js';\r\n" +
+    "import { isWriteToolName, narrowToWriteAndVerify, pickPreferredWriteTool, APPLY_LABEL_PATTERN } from './tool-classification.js';\r\n" +
+    "import { extractStructuredPassEnvelope, type StructuredPassEnvelope } from './autonomy-structured.js';\r\n" +
+    "import { extractPrimaryEnvelope } from './envelope-utils.js';\r\n" +
+    "import { getAutonomyMode, getAutonomyPassBudget, getReportingMode, parseAutonomyRequest } from './reporting.js';\n" +
+    "import { applyModeProfileToState, canonicalAutonomyPolicy, getModeProfile, type AutonomyMode } from './autonomy.js';\n" +
+    '\r\n' +
+    '/**\r\n' +
+    " * Build the initial AutonomyState for a given mode, honouring the user's\r\n" +
+    ' * explicit `dreamgraph.architect.autoPassBudget` setting when present, but\r\n' +
+    " * always defaulting to the mode profile's PassBudget + TimeBudget so the\r\n" +
+    ' * header pills are never empty (per ADR-153 — both budgets must be visible).\r\n' +
+    ' */\r\n' +
+    'function _initialAutonomyStateFromSettings(): AutonomyState {\r\n' +
+    '  const mode = getAutonomyMode();\r\n' +
+    '  const explicitBudget = getAutonomyPassBudget();\r\n' +
+    '  const profile = getModeProfile(mode);\r\n' +
+    "  const totalPasses = (typeof explicitBudget === 'number' && explicitBudget > 0) ? explicitBudget : profile.defaultPassBudget;\r\n" +
+    '  return createAutonomyState(mode, totalPasses, profile.defaultTimeBudgetMs, Date.now());\r\n' +
+    '}\r\n' +
+    "import * as helpers from './chat-panel/helpers.js';\r\n" +
+    'import {\r\n' +
+    '  BudgetCoordinator,\r\n' +
+    '  estimateTokensFromString,\r\n' +
+    '  type BudgetSnapshot,\r\n' +
+    "} from './budget-coordinator.js';\r\n" +
+    "import { compressToolResult } from './tool-result-compression.js';\r\n" +
+    "import { RESPONSES_RAW_ITEMS_KEY } from './openai-responses-adapter.js';\r\n" +
+    'import {\r\n' +
+    '  type ImplicitEntityDetectionResult,\r\n' +
+    '  type VerdictBanner,\r\n' +
+    '  type ToolTraceEntry,\r\n' +
+    "} from './chat-panel/helpers.js';\r\n" +
+    'import {\r\n' +
+    '  REQUEST_TIMEOUT_MS as TIMEOUT_REQUEST_MS,\r\n' +
+    '  getLlmTimeoutMs as _getLlmTimeoutMsPure,\r\n' +
+    '  isTimeoutError as _isTimeoutErrorPure,\r\n' +
+    '  buildTimeoutRecoveryPrompt as _buildTimeoutRecoveryPromptPure,\r\n' +
+    '  createTimeoutAbortSignal,\r\n' +
+    "} from './chat-panel/timeout.js';\r\n" +
+    '\r\n' +
+    "type ChatRole = 'user' | 'assistant' | 'system';\r\n" +
+    '\r\n' +
+    '/* ------------------------------------------------------------------ */\r\n' +
+    '/*  Conversation-history bounding                                     */\r\n' +
+    '/* ------------------------------------------------------------------ */\r\n' +
+    '/**\r\n' +
+    ' * Per-message char caps for what we send to the LLM (display copies are kept full).\r\n' +
+    ' * Without these, a 20-message slice of structured-envelope assistant replies +\r\n' +
+    ' * code-laden user prompts can easily exceed 300KB on its own — before the system\r\n' +
+    ' * prompt and tool schemas are even added — and overflow the request-budget brake.\r\n' +
+    ' */\r\n' +
+    'const HISTORY_RECENT_KEEP = 2;        // Last N messages keep full content.\r\n' +
+    'const HISTORY_RECENT_MAX_CHARS = 16_000;\r\n' +
+    'const HISTORY_OLDER_MAX_CHARS = 4_000;\r\n' +
+    '\r\n' +
+    'function _truncateHistoryMessage(content: string, cap: number): string {\r\n' +
+    '  if (content.length <= cap) return content;\r\n' +
+    '  const head = content.slice(0, cap);\r\n' +
+    '  return `${head}\\n\\n[... ${(content.length - cap).toLocaleString()} chars omitted from history to bound LLM input ...]`;\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    'function buildBoundedConversationMessages(\r\n' +
+    '  messages: Array<{ role: ChatRole; content: string; attachments?: ReadonlyArray<ChatMessageAttachmentSnapshot> }>,\r\n' +
+    '  maxRecent: number = 20,\r\n' +
+    "): Array<{ role: 'user' | 'assistant'; content: string }> {\r\n" +
+    "  const filtered = messages.filter((m) => m.role === 'user' || m.role === 'assistant') as Array<{\r\n" +
+    "    role: 'user' | 'assistant';\r\n" +
+    '    content: string;\r\n' +
+    '    attachments?: ReadonlyArray<ChatMessageAttachmentSnapshot>;\r\n' +
+    '  }>;\r\n' +
+    '  const sliced = filtered.slice(-maxRecent);\r\n' +
+    '  const recentStart = sliced.length - HISTORY_RECENT_KEEP;\r\n' +
+    '  return sliced.map((m, i) => {\r\n' +
+    '    const cap = i >= recentStart ? HISTORY_RECENT_MAX_CHARS : HISTORY_OLDER_MAX_CHARS;\r\n' +
+    '    const text = _truncateHistoryMessage(m.content, cap);\r\n' +
+    '\r\n' +
+    '    // CRITICAL — DO NOT REPLAY ATTACHMENT BYTES IN HISTORY.\r\n' +
+    '    //\r\n' +
+    '    // An earlier iteration of this function inlined image base64 from each\r\n' +
+    "    // user message's `attachments` snapshot as canonical content blocks so\r\n" +
+    '    // the model could "see" prior pictures on follow-up turns. That created\r\n' +
+    '    // an O(turns × image_bytes) wire-cost bomb: a single 1.8 MB attached\r\n' +
+    '    // image was re-serialized on every subsequent prompt — observed live\r\n' +
+    '    // as 5.4 MB / ~1.36 M tokens per request to a chat-completions model.\r\n' +
+    '    //\r\n' +
+    '    // The attachment snapshot persists ONLY for two reasons:\r\n' +
+    '    //   (1) the user-bubble thumbnail / file-info chip in the chat panel,\r\n' +
+    '    //   (2) record-keeping so the user can see what they sent.\r\n' +
+    '    // The model received the image bytes ONCE, on the originating turn, via\r\n' +
+    '    // the live `_buildUserContentBlocks` path. Subsequent turns must NOT\r\n' +
+    '    // re-send them; if the user wants the model to look again they can\r\n' +
+    '    // re-attach (cheap, explicit, observable in token telemetry).\r\n' +
+    '    //\r\n' +
+    '    // We DO surface a tiny text marker so the model knows an image was\r\n' +
+    '    // attached at that point in the conversation — but only as a name/type\r\n' +
+    '    // mention, never bytes.\r\n' +
+    '    const markers: string[] = [];\r\n' +
+    "    if (m.role === 'user' && m.attachments && m.attachments.length > 0) {\r\n" +
+    '      for (const a of m.attachments) {\r\n' +
+    '        markers.push(`[attachment: ${a.name} · ${a.kind} · ${a.mimeType}]`);\r\n' +
+    '      }\r\n' +
+    '    }\r\n' +
+    "    const composed = markers.length > 0 ? `${text}\\n\\n${markers.join('\\n')}` : text;\r\n" +
+    '    return { role: m.role, content: composed };\r\n' +
+    '  });\r\n' +
+    '}\r\n' +
+    '\r\n' +
+    '/**\r\n' +
+    ' * Replaces the `content` of tool_result blocks in older user-role messages\r\n' +
+    ' * with a short stub. Keeps the last `keepLastPairs` assistant→tool_result\r\n' +
+    ' * pairs intact (those are still being reasoned over). Older results stay\r\n' +
+    ' * in the message array (so tool_use_id references remain valid) but no\r\n' +
+    ' * longer carry their full payload.\r\n' +
+    ' */\r\n' +
+    'function _elideStaleToolResults(rawMessages: unknown[], keepLastPairs: number): void {\r\n' +
+    '  // Find indices of user-role messages whose content looks like tool_result blocks.\r\n' +
+    '  const toolResultIdx: number[] = [];\r\n' +
+    '  for (let i = 0; i < rawMessages.length; i++) {\r\n' +
+    '    const m = rawMessages[i] as { role?: string; content?: unknown };\r\n' +
+    "    if (m?.role === 'user' && Array.isArray(m.content) && m.content.length > 0 && (m.content[0] as { type?: string })?.type === 'tool_result') {\r\n" +
+    '      toolResultIdx.push(i);\r\n' +
+    '    }\r\n' +
+    '  }\r\n' +
+    '  if (toolResultIdx.length <= keepLastPairs) return;\r\n' +
+    '  const elideUpTo = toolResultIdx.length - keepLastPairs;\r\n' +
+    '  // Threshold below which we leave the content fully intact — small tool results\r\n' +
+    '  // are cheap and stripping them removes essential reasoning context.\r\n' +
+    '  const ELIDE_MIN_CHARS = 2_000;\r\n' +
+    '  // Head/tail snippet sizes preserve enough of the result that th'... 274304 more characters
+  
+      at TestContext.<anonymous> (C:\Users\Mika Jussila\source\repos\dreamgraph\extensions\vscode\dist\test\slice5-audit.test.js:50:22)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '/**\r\n * DreamGraph Chat Panel — M5 WebviewPanel controller.\r\n *\r\n * Owns all chat state (messages, streaming, model selection).\r\n * The webview is a dumb renderer — the extension host is the single source of truth.\r\n *\r\n * Chat history is persisted in ChatMemory and re-hydrated whenever the webview\r\n * is recreated or becomes visible again, so switching to another tool tab does\r\n * not erase the conversation.\r\n */\r\n\r\nimport * as vscode from \'vscode\';\r\nimport * as path from \'path\';\r\nimport * as fs from \'fs\';\r\nimport type { ChatMemory, PersistedMessage } from \'./chat-memory\';\r\nimport { getStyles } from \'./webview/styles.js\';\r\nimport { getRenderScript } from \'./webview/render-markdown.js\';\r\nimport { getEntityLinksScript } from \'./webview/entity-links.js\';\r\nimport { getCardRendererScript } from \'./webview/card-renderer.js\';\r\nimport type { GraphSignalProvider } from \'./graph-signal\';\r\nimport {\r\n  ANTHROPIC_MODELS,\r\n  CODEX_CLI_MODELS,\r\n  COPILOT_CLI_MODELS,\r\n  OPENAI_MODELS,\r\n  type ArchitectContentBlock,\r\n  type ArchitectLlm,\r\n  type ArchitectMessage,\r\n  type ArchitectModelCapabilities,\r\n  type ArchitectProvider,\r\n  type ToolDefinition,\r\n} from \'./architect-llm\';\r\nimport type { McpClient } from \'./mcp-client\';\nimport type { DaemonClient } from \'./daemon-client.js\';\nimport { ManagedCliPass } from \'./managed-cli-pass.js\';\nimport type { ContextBuilder } from \'./context-builder\';\r\nimport type { ChangedFilesView, ChangeType } from \'./changed-files-view\';\r\nimport { LOCAL_TOOL_DEFINITIONS, isLocalTool, executeLocalTool } from \'./local-tools.js\';\r\nimport { changeReviewService, type PendingChangeReview } from \'./change-review-service\';\r\nimport { assemblePrompt, inferTask } from \'./prompts/index.js\';\r\nimport { selectToolGroups } from \'./tool-groups.js\';\r\nimport { runPassViaCodexCli, runPassViaCore, runPassViaCopilotCli } from \'./architect-core/runner.js\';\r\nimport {\r\n  HOST_CLOCK,\r\n  HOST_CRYPTO,\r\n  HOST_FS,\r\n  HOST_PROCESS,\r\n  createHostAudit,\r\n  createHostAuditLive,\r\n  createHostRegistry,\r\n  COPILOT_AUTHORITATIVE_TOOL_CATALOG,\r\n  DREAMGRAPH_AUTHORITATIVE_SERVER_NAME,\r\n  type ClassifiedToolCall,\r\n  type CopilotCliProviderPortOptions,\r\n  type CopilotCliRunResult,\r\n  type PromptComposedInfo,\r\n  type RecordedMcpToolCall,\r\n} from \'./architect-core/adapters/copilot-cli/index.js\';\r\nimport {\r\n  CODEX_AUTHORITATIVE_TOOL_CATALOG,\r\n  DREAMGRAPH_AUTHORITATIVE_SERVER_NAME as CODEX_DREAMGRAPH_AUTHORITATIVE_SERVER_NAME,\r\n  HOST_CLOCK as CODEX_HOST_CLOCK,\r\n  HOST_CRYPTO as CODEX_HOST_CRYPTO,\r\n  HOST_FS as CODEX_HOST_FS,\r\n  HOST_PROCESS as CODEX_HOST_PROCESS,\r\n  type ClassifiedToolCall as CodexClassifiedToolCall,\r\n  type CodexCliProviderPortOptions,\r\n  type CodexCliRunResult,\r\n  type CodexToolCallWitness,\r\n  type PromptComposedInfo as CodexPromptComposedInfo,\r\n} from \'./architect-core/adapters/codex-cli/index.js\';\r\nimport type { ChatPanelHost } from \'./architect-core/adapters/host.js\';\r\nimport {\r\n  applyRecommendedActionCapabilityGuards,\r\n  computeDoAllEligibility,\r\n  createAutonomyState,\r\n  deriveAutonomyStatusView,\r\n  isRecommendedActionRunnable,\r\n  type AutonomyState,\r\n  type AutonomyInstructionState,\r\n  type RecommendedAction,\r\n  type RecommendedActionBlocker,\r\n} from \'./autonomy.js\';\r\nimport { analyzePass, advanceAutonomyStateIfContinued, buildContinuationPrompt, isReadOnlyTool } from \'./autonomy-loop.js\';\r\nimport { isWriteToolName, narrowToWriteAndVerify, pickPreferredWriteTool, APPLY_LABEL_PATTERN } from \'./tool-classification.js\';\r\nimport { extractStructuredPassEnvelope, type StructuredPassEnvelope } from \'./autonomy-structured.js\';\r\nimport { extractPrimaryEnvelope } from \'./envelope-utils.js\';\r\nimport { getAutonomyMode, getAutonomyPassBudget, getReportingMode, parseAutonomyRequest } from \'./reporting.js\';\nimport { applyModeProfileToState, canonicalAutonomyPolicy, getModeProfile, type AutonomyMode } from \'./autonomy.js\';\n\r\n/**\r\n * Build the initial AutonomyState for a given mode, honouring the user\'s\r\n * explicit `dreamgraph.architect.autoPassBudget` setting when present, but\r\n * always defaulting to the mode profile\'s PassBudget + TimeBudget so the\r\n * header pills are never empty (per ADR-153 — both budgets must be visible).\r\n */\r\nfunction _initialAutonomyStateFromSettings(): AutonomyState {\r\n  const mode = getAutonomyMode();\r\n  const explicitBudget = getAutonomyPassBudget();\r\n  const profile = getModeProfile(mode);\r\n  const totalPasses = (typeof explicitBudget === \'number\' && explicitBudget > 0) ? explicitBudget : profile.defaultPassBudget;\r\n  return createAutonomyState(mode, totalPasses, profile.defaultTimeBudgetMs, Date.now());\r\n}\r\nimport * as helpers from \'./chat-panel/helpers.js\';\r\nimport {\r\n  BudgetCoordinator,\r\n  estimateTokensFromString,\r\n  type BudgetSnapshot,\r\n} from \'./budget-coordinator.js\';\r\nimport { compressToolResult } from \'./tool-result-compression.js\';\r\nimport { RESPONSES_RAW_ITEMS_KEY } from \'./openai-responses-adapter.js\';\r\nimport {\r\n  type ImplicitEntityDetectionResult,\r\n  type VerdictBanner,\r\n  type ToolTraceEntry,\r\n} from \'./chat-panel/helpers.js\';\r\nimport {\r\n  REQUEST_TIMEOUT_MS as TIMEOUT_REQUEST_MS,\r\n  getLlmTimeoutMs as _getLlmTimeoutMsPure,\r\n  isTimeoutError as _isTimeoutErrorPure,\r\n  buildTimeoutRecoveryPrompt as _buildTimeoutRecoveryPromptPure,\r\n  createTimeoutAbortSignal,\r\n} from \'./chat-panel/timeout.js\';\r\n\r\ntype ChatRole = \'user\' | \'assistant\' | \'system\';\r\n\r\n/* ------------------------------------------------------------------ */\r\n/*  Conversation-history bounding                                     */\r\n/* ------------------------------------------------------------------ */\r\n/**\r\n * Per-message char caps for what we send to the LLM (display copies are kept full).\r\n * Without these, a 20-message slice of structured-envelope assistant replies +\r\n * code-laden user prompts can easily exceed 300KB on its own — before the system\r\n * prompt and tool schemas are even added — and overflow the request-budget brake.\r\n */\r\nconst HISTORY_RECENT_KEEP = 2;        // Last N messages keep full content.\r\nconst HISTORY_RECENT_MAX_CHARS = 16_000;\r\nconst HISTORY_OLDER_MAX_CHARS = 4_000;\r\n\r\nfunction _truncateHistoryMessage(content: string, cap: number): string {\r\n  if (content.length <= cap) return content;\r\n  const head = content.slice(0, cap);\r\n  return `${head}\\n\\n[... ${(content.length - cap).toLocaleString()} chars omitted from history to bound LLM input ...]`;\r\n}\r\n\r\nfunction buildBoundedConversationMessages(\r\n  messages: Array<{ role: ChatRole; content: string; attachments?: ReadonlyArray<ChatMessageAttachmentSnapshot> }>,\r\n  maxRecent: number = 20,\r\n): Array<{ role: \'user\' | \'assistant\'; content: string }> {\r\n  const filtered = messages.filter((m) => m.role === \'user\' || m.role === \'assistant\') as Array<{\r\n    role: \'user\' | \'assistant\';\r\n    content: string;\r\n    attachments?: ReadonlyArray<ChatMessageAttachmentSnapshot>;\r\n  }>;\r\n  const sliced = filtered.slice(-maxRecent);\r\n  const recentStart = sliced.length - HISTORY_RECENT_KEEP;\r\n  return sliced.map((m, i) => {\r\n    const cap = i >= recentStart ? HISTORY_RECENT_MAX_CHARS : HISTORY_OLDER_MAX_CHARS;\r\n    const text = _truncateHistoryMessage(m.content, cap);\r\n\r\n    // CRITICAL — DO NOT REPLAY ATTACHMENT BYTES IN HISTORY.\r\n    //\r\n    // An earlier iteration of this function inlined image base64 from each\r\n    // user message\'s `attachments` snapshot as canonical content blocks so\r\n    // the model could "see" prior pictures on follow-up turns. That created\r\n    // an O(turns × image_bytes) wire-cost bomb: a single 1.8 MB attached\r\n    // image was re-serialized on every subsequent prompt — observed live\r\n    // as 5.4 MB / ~1.36 M tokens per request to a chat-completions model.\r\n    //\r\n    // The attachment snapshot persists ONLY for two reasons:\r\n    //   (1) the user-bubble thumbnail / file-info chip in the chat panel,\r\n    //   (2) record-keeping so the user can see what they sent.\r\n    // The model received the image bytes ONCE, on the originating turn, via\r\n    // the live `_buildUserContentBlocks` path. Subsequent turns must NOT\r\n    // re-send them; if the user wants the model to look again they can\r\n    // re-attach (cheap, explicit, observable in token telemetry).\r\n    //\r\n    // We DO surface a tiny text marker so the model knows an image was\r\n    // attached at that point in the conversation — but only as a name/type\r\n    // mention, never bytes.\r\n    const markers: string[] = [];\r\n    if (m.role === \'user\' && m.attachments && m.attachments.length > 0) {\r\n      for (const a of m.attachments) {\r\n        markers.push(`[attachment: ${a.name} · ${a.kind} · ${a.mimeType}]`);\r\n      }\r\n    }\r\n    const composed = markers.length > 0 ? `${text}\\n\\n${markers.join(\'\\n\')}` : text;\r\n    return { role: m.role, content: composed };\r\n  });\r\n}\r\n\r\n/**\r\n * Replaces the `content` of tool_result blocks in older user-role messages\r\n * with a short stub. Keeps the last `keepLastPairs` assistant→tool_result\r\n * pairs intact (those are still being reasoned over). Older results stay\r\n * in the message array (so tool_use_id references remain valid) but no\r\n * longer carry their full payload.\r\n */\r\nfunction _elideStaleToolResults(rawMessages: unknown[], keepLastPairs: number): void {\r\n  // Find indices of user-role messages whose content looks like tool_result blocks.\r\n  const toolResultIdx: number[] = [];\r\n  for (let i = 0; i < rawMessages.length; i++) {\r\n    const m = rawMessages[i] as { role?: string; content?: unknown };\r\n    if (m?.role === \'user\' && Array.isArray(m.content) && m.content.length > 0 && (m.content[0] as { type?: string })?.type === \'tool_result\') {\r\n      toolResultIdx.push(i);\r\n    }\r\n  }\r\n  if (toolResultIdx.length <= keepLastPairs) return;\r\n  const elideUpTo = toolResultIdx.length - keepLastPairs;\r\n  // Threshold below which we leave the content fully intact — small tool results\r\n  // are cheap and stripping them removes essential reasoning context.\r\n  const ELIDE_MIN_CHARS = 2_000;\r\n  // Head/tail snippet sizes preserve enough of the result that th'... 274304 more characters,
+    expected: /private _buildCodexCliProviderOptions\(\): CodexCliProviderPortOptions/,
+    operator: 'match',
+    diff: 'simple'
+  }

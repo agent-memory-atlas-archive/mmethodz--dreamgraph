@@ -1,0 +1,35 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/agent-usefulness.test.ts (9 tests) 117ms
+stderr | tests/managed-plan-execution.test.ts
+[2026-10-02T08:56:03.475Z] [INFO]  LLM architect config: provider=ollama (general), model=qwen3:8b (general), temp=0.7, maxTokens=2048
+
+ ✓ tests/plan-context-integration.test.ts (6 tests) 1839ms
+   ✓ expired typed plan leases change effective graph/context receipts without writing or reviving running work  876ms
+   ✓ verified implementation evidence is distinct from the next slice and recovers after a transcript-free read  354ms
+stderr | tests/managed-plan-execution.test.ts > selection alone stays read-only, while explicit execution injects the post-admission canonical running projection
+[2026-10-02T08:56:03.700Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+ ✓ tests/plan-runtime.test.ts (10 tests) 2319ms
+   ✓ native termination closes only the execution lease, leaving current implementation and verification evidence unchanged  307ms
+ ✓ tests/managed-plan-execution.test.ts (13 tests) 12167ms
+   ✓ selection alone stays read-only, while explicit execution injects the post-admission canonical running projection  1190ms
+   ✓ refuses foreign project, selection mismatch, changed source semantics and stale approval before returning native authority  559ms
+   ✓ external plan edits block delivery and worker/model dispatch; source restoration cannot renew a closed pass  709ms
+   ✓ a real pending native model permit cannot be reported as confirmed plan termination  992ms
+   ✓ the SDK native model callback uses the delivered running plan and original spend permit but cannot mark the slice implemented  864ms
+   ✓ unconfirmed termination remains recovery on exact retry and cannot be strengthened through another public finish  800ms
+   ✓ rejected admission can close only a durably undelivered context with no lease or effects  516ms
+   ✓ lost C14 closure acknowledgment replays the persisted original command after host revocation without another event  673ms
+   ✓ finite authority expiry leaves canonical recovery and a later claimed confirmed stop cannot erase missing live observation  1977ms
+   ✓ a fresh compiled daemon process recovers the saved closure without live launch authority or another C14 event  1351ms
+   ✓ actual compiled editor and SDK native passes preserve explicit purpose and close canonical ownership without claiming verification  1422ms
+   ✓ foreign hosts and execution workers cannot request C14 closure or another implementation lease  634ms
+   ✓ browser chat refuses forged purpose, unrelated selection, fallback and continuation before a native task can start  479ms
+
+ Test Files  4 passed (4)
+      Tests  38 passed (38)
+   Start at  11:55:56
+   Duration  19.08s (transform 2.89s, setup 0ms, collect 15.93s, tests 16.44s, environment 1ms, prepare 572ms)
+

@@ -1,0 +1,42 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/computer-browser-registry.test.ts (3 tests) 627ms
+   ✓ preflight and selection create no grant; human confirmation pins finite scope and exact lost reply  317ms
+ ❯ tests/computer-browser-worker.test.ts (10 tests | 1 failed) 24650ms
+   ✓ performs real Unicode, checked, click/readback and scrolling using opaque current references  2801ms
+   ✓ moved/covered controls, disabled and credential controls never receive a guessed action  1489ms
+   ✓ forbidden posts, redirects, popups and frames cannot reach another origin or authority  3170ms
+   ✓ exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime  457ms
+   × explicit navigation stays inside the approved origin and segment path and verifies independent destination state 2175ms
+     → expected [Function] to throw error including 'NAVIGATION_DENIED' but got 'COMPUTER_WORKER_OPERATION_FAILED'
+   ✓ private worker process preserves typed observations and responsive independent termination  2175ms
+   ✓ stop bypasses a pending browser navigation and never waits for its ten-second server response  1338ms
+   ✓ masked frames have a verified digest and image exhaustion refuses before another input  2210ms
+   ✓ a real worker closes its dedicated browser on disconnect without another model call  2288ms
+   ✓ a real worker closes its dedicated browser on watchdog without another model call  6546ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-browser-worker.test.ts > explicit navigation stays inside the approved origin and segment path and verifies independent destination state
+AssertionError: expected [Function] to throw error including 'NAVIGATION_DENIED' but got 'COMPUTER_WORKER_OPERATION_FAILED'
+
+Expected: "NAVIGATION_DENIED"
+Received: "COMPUTER_WORKER_OPERATION_FAILED"
+
+ ❯ tests/computer-browser-worker.test.ts:81:2
+     79|  profile={...profile,navigation:true,postconditions:[...profile.postco…
+     80|  const value=await harness();await value.open(target,signal());const o…
+     81|  await expect(value.act(action(observed,"","navigate","destination",{u…
+       |  ^
+     82|  const result=await value.act(action(observed,"","navigate","destinati…
+     83|  expect(result.postcondition_met).toBe(true);expect(result.observation…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 12 passed (13)
+   Start at  19:33:07
+   Duration  25.91s (transform 644ms, setup 0ms, collect 1.82s, tests 25.28s, environment 1ms, prepare 405ms)
+

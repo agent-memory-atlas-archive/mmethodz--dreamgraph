@@ -1,0 +1,69 @@
+file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-wsl-browser.mjs:59
+      if(code!==0||timedOut)fail(new Error(`WSL phase failed (${code}${timedOut?', timeout':''}): ${text.slice(-3000)}`));else done(text.trim());
+                                 ^
+
+Error: WSL phase failed (1): dreamgraph-sdk-13.4.0-a9a39592ceed72227afc8215c7f4e8d1239ab55c851e02a4df309a8004dc5e5f.tgz [ok]
+  Packing @dreamgraph/host...
+  Packed @dreamgraph/host -> vendor/dreamgraph-host-13.4.0-656ee8c5309004b8f2f471aeeb594a2776d9ad486afc53ec3f7446fc54677ab5.tgz [ok]
+  Packing @dreamgraph/token-economy...
+  Packed @dreamgraph/token-economy -> vendor/dreamgraph-token-economy-13.4.0-5bc55696fff8a3bd436119f5cd62e7ec52f6b78404e479abcb3aa677806a882f.tgz [ok]
+  package.json created [ok]
+  Installing dependencies...
+  Reusing existing node_modules; npm will update dependencies in place.
+  up to date, audited 300 packages in 2s
+  87 packages are looking for funding
+    run `npm fund` for details
+  12 vulnerabilities (1 low, 6 moderate, 5 high)
+  To address issues that do not require attention, run:
+    npm audit fix
+  To address all issues (including breaking changes), run:
+    npm audit fix --force
+  Run `npm audit` for details.
+  Dependencies installed [ok]
+  [{"name":"@dreamgraph/sdk","version":"13.4.0","files":88},{"name":"@dreamgraph/host","version":"13.4.0","files":28},{"name":"@dreamgraph/token-economy","version":"13.4.0","files":20}]
+  Workspace bytes and daemon imports verified [ok]
+  Templates copied [ok]
+  Extension source unavailable -- skipping extension build/install
+
+Creating command shims...
+  Shims created in /home/mmethodz/.local/bin [ok]
+
+Verifying installation...
+  DreamGraph CLI v13.4.0 (Glass Atlas) [ok]
+
+==================================================
+ DreamGraph v13.4.0 installed successfully!
+==================================================
+
+ Binary:   /home/mmethodz/.dreamgraph/bin
+ Run:      dg --help
+ Start:    dg start <instance> --http
+
+ Reminder: restart any running DreamGraph and VS Code instances to load the updated installation.
+
+Error: COMPUTER_WORKER_REPLY_UNKNOWN
+node:internal/errors:984
+  const err = new Error(message);
+              ^
+
+Error: Command failed: /home/mmethodz/.local/bin/dg computer-use qualify --browser-executable /tmp/dg-ashoka-wsl-3e20aba0-2617-4c9e-8b89-93779607a2a6/browsers/chromium-1234/chrome-linux64/chrome --browser-version 151.0.7922.34 --worker-id ashoka-wsl-ubuntu-browser --out /tmp/dg-ashoka-wsl-f282f392-9e03-49a9-8807-a738035c5026/browser-qualification.json
+Error: COMPUTER_WORKER_REPLY_UNKNOWN
+
+    at genericNodeError (node:internal/errors:984:15)
+    at wrappedFn (node:internal/errors:538:14)
+    at checkExecSyncError (node:child_process:891:11)
+    at execFileSync (node:child_process:927:15)
+    at file:///tmp/dg-ashoka-wsl-f282f392-9e03-49a9-8807-a738035c5026/linux-proof.mjs:18:17 {
+  status: 1,
+  signal: null,
+  output: [ null, '', 'Error: COMPUTER_WORKER_REPLY_UNKNOWN\n' ],
+  pid: 29005,
+  stdout: '',
+  stderr: 'Error: COMPUTER_WORKER_REPLY_UNKNOWN\n'
+}
+
+Node.js v20.20.2
+
+    at ChildProcess.<anonymous> (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/scripts/qualify-ashoka-wsl-browser.mjs:59:34)
+
+Node.js v25.2.1

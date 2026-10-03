@@ -1,0 +1,40 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/computer-native-graph-loop.test.ts
+Actual graph-loop browser qualification: {
+  schema: 'dreamgraph.browser_qualification_failure_details.v1',
+  completed_checks: [ 'BW01', 'BW02', 'BW03A', 'BW03', 'BW04' ],
+  worker_phase: 'stop'
+} [{"ms":4485.790600000001,"worker":1,"event":"stop_called"},{"ms":4730.321000000001,"worker":1,"event":"original_stop_reply","terminated":true,"input_released":true},{"ms":4760.268800000001,"worker":1,"event":"original_child_exit","code":null,"signal":"SIGKILL"},{"ms":4760.606700000001,"worker":1,"event":"stop_resolved","elapsed_ms":274.8863000000001},{"ms":7360.7079,"worker":2,"event":"stop_called"},{"ms":8264.730899999999,"worker":2,"event":"stop_rejected","elapsed_ms":904.0138000000006,"reason":"COMPUTER_WORKER_REPLY_UNKNOWN"},{"ms":8265.124800000001,"worker":1,"event":"stop_called"},{"ms":8265.1367,"worker":1,"event":"stop_resolved","elapsed_ms":0.016399999998611747},{"ms":8265.142500000002,"worker":2,"event":"stop_called"},{"ms":9064.879,"worker":2,"event":"original_stop_reply","terminated":true,"input_released":true},{"ms":9064.962200000002,"worker":2,"event":"original_stop_reply","terminated":true,"input_released":true},{"ms":9088.7369,"worker":2,"event":"original_child_exit","code":null,"signal":"SIGKILL"},{"ms":9088.887200000001,"worker":2,"event":"stop_resolved","elapsed_ms":823.7453000000005}]
+
+ ❯ tests/computer-native-graph-loop.test.ts (6 tests | 6 skipped) 9142ms
+   ↓ native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+   ↓ native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-native-graph-loop.test.ts [ tests/computer-native-graph-loop.test.ts ]
+Error: COMPUTER_WORKER_REPLY_UNKNOWN
+ ❯ qualifyBrowserRuntime src/computer/qualify-browser.ts:153:11
+    151|     const phase=z.enum(["bootstrap","open","observe","act","pause","re…
+    152|       cause&&typeof cause==="object"&&"phase" in cause?cause.phase:und…
+    153|     throw new Error(reason,{cause:QualificationFailureDetailsSchema.pa…
+       |           ^
+    154|       completed_checks:traces.map(trace=>trace.id),worker_phase:phase.…
+    155|   }finally{
+ ❯ tests/computer-native-graph-loop.test.ts:53:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 skipped (6)
+   Start at  11:03:32
+   Duration  15.94s (transform 2.18s, setup 0ms, collect 6.37s, tests 9.14s, environment 0ms, prepare 148ms)
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/slice-27-stop-traced-root.json

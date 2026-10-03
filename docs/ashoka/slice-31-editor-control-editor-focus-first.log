@@ -1,0 +1,15 @@
+✔ on-demand discovery and selection issue no grant, input, model call or control (3.7112ms)
+✔ another instance or endpoint cannot receive a captured original control (0.6922ms)
+✔ late selection cannot attach previous target state or controls (0.5503ms)
+✔ Stop bypasses a pending pause wait and retains the original execution/target (0.6977ms)
+✔ unconfirmed reply preserves the original session for inspection without a fresh pass (0.6227ms)
+✔ pages carry their exact captured snapshot and changed/foreign rows are refused (0.4097ms)
+✔ compiled drawer is quiet until opened, renders literal evidence and keeps Stop available during pause (85.1593ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1030.9922

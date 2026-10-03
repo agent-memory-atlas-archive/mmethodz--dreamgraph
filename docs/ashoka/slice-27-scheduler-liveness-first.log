@@ -1,0 +1,20 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/scheduler-session-liveness.test.ts > admits and reuses a browser session with 20,000 receipts and 39 inactive schedules while timer wake-ups continue
+Established-ledger browser admission {
+  receipts: 20000,
+  inactive_schedules: 39,
+  admit_and_reuse_ms: 3755.491400000001,
+  publications: 2
+}
+
+ ✓ tests/scheduler-session-liveness.test.ts (1 test) 4522ms
+   ✓ admits and reuses a browser session with 20,000 receipts and 39 inactive schedules while timer wake-ups continue  4521ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  12:06:02
+   Duration  10.39s (transform 2.02s, setup 0ms, collect 5.44s, tests 4.52s, environment 0ms, prepare 143ms)
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/slice-27-scheduler-liveness-first.json

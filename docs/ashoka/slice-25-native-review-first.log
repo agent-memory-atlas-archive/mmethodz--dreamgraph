@@ -1,0 +1,17 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: {"name":"discipline_start_session","error":{"code":"INVALID_INPUT","message":"Arguments do not match the registered owner schema."}}
+    at call (file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/docs/ashoka/native-review-25.mjs:16:32)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async file:///C:/Users/Mika%20Jussila/source/repos/dreamgraph/docs/ashoka/native-review-25.mjs:27:13 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v25.2.1

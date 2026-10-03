@@ -1,0 +1,621 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.0941000000002532
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_start',
+  ms: 207.55429999999978
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_return',
+  ms: 511.9544999999998,
+  status: 128
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 512.4117999999999
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 513.1215000000002
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.0747999999998683
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_start',
+  ms: 213.39109999999982
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_return',
+  ms: 520.8393000000001,
+  status: 128
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 521.2829000000002
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 522.2118999999998
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.12009999999986576
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_start',
+  ms: 200.91679999999974
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_return',
+  ms: 493.98919999999976,
+  status: 128
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 494.48919999999976
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 495.3140000000001
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.09429999999974825
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 162.98519999999962
+}
+
+stdout | tests/computer-native-graph-loop.test.ts
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 169.27679999999964
+}
+
+stderr | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:02.588Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:02.599Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:06.051Z] [INFO]  Architect native tool loop: calling scan_project
+
+stdout | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.15539999999964493
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_start',
+  ms: 210.8697999999995
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_return',
+  ms: 506.72509999999966,
+  status: 128
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 507.1406999999999
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 507.78499999999985
+}
+
+stderr | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:07.893Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_core real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:07.897Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:16.973Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-4.1 (architect), temp=0.7, maxTokens=1000
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:17.026Z] [INFO]  LLM provider: ollama (model: qwen3:8b)
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:17.078Z] [INFO]  LLM architect config: provider=openai (architect), model=gpt-4.1 (architect), temp=0.7, maxTokens=1000
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:19.544Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:19.564Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:23.011Z] [INFO]  Architect native tool loop: calling scan_project
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.191899999999805
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 180.79659999999967
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 188.0655999999999
+}
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:24.715Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:24.720Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:28.132Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:28.147Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.1491000000000895
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 184.3734000000004
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 191.0558000000001
+}
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:30.509Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:33.440Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:33.456Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:36.837Z] [INFO]  Architect native tool loop: calling scan_project
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.12839999999960128
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 167.4993999999997
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 174.0084999999999
+}
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:43.634Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:44.276Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:44.280Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:45.509Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:48.208Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:48.223Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.13720000000012078
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 166.34979999999996
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 172.5257999999999
+}
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:50.822Z] [WARN]  features.json: expected flat array, found wrapper object. Auto-extracting array property.
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:53.411Z] [INFO]  Architect native tool loop: calling query_resource
+
+stderr | tests/computer-native-graph-loop.test.ts > native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+[2026-10-03T09:30:53.428Z] [INFO]  Architect native tool loop: calling query_architecture_decisions
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.14160000000083528
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 169.82670000000144
+}
+
+stdout | tests/computer-native-graph-loop.test.ts > native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure
+Original graph-loop Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 176.45039999999972
+}
+
+ ✓ tests/computer-native-graph-loop.test.ts (6 tests) 89813ms
+   ✓ native_core real scoped browser pass preserves original control, source/graph boundaries and closure  14187ms
+   ✓ native_sdk real scoped browser pass preserves original control, source/graph boundaries and closure  10976ms
+   ✓ native_sdk_stop real scoped browser pass preserves original control, source/graph boundaries and closure  4583ms
+   ✓ native_sdk_plan real scoped browser pass preserves original control, source/graph boundaries and closure  14997ms
+   ✓ native_sdk_plan_stop real scoped browser pass preserves original control, source/graph boundaries and closure  5309ms
+   ✓ native_sdk_plan_limit real scoped browser pass preserves original control, source/graph boundaries and closure  13092ms
+stdout | tests/computer-browser-worker.test.ts > explicit navigation stays inside the approved origin and segment path and verifies independent destination state
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.12210000000004584
+}
+
+stdout | tests/computer-browser-worker.test.ts > explicit navigation stays inside the approved origin and segment path and verifies independent destination state
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 191.9429
+}
+
+stdout | tests/computer-browser-worker.test.ts > explicit navigation stays inside the approved origin and segment path and verifies independent destination state
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 198.59540000000015
+}
+
+stdout | tests/computer-browser-worker.test.ts > private worker process preserves typed observations and responsive independent termination
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.156800000000203
+}
+
+stdout | tests/computer-browser-worker.test.ts > private worker process preserves typed observations and responsive independent termination
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 185.99720000000002
+}
+
+stdout | tests/computer-browser-worker.test.ts > private worker process preserves typed observations and responsive independent termination
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 193.0485000000001
+}
+
+stdout | tests/computer-browser-worker.test.ts > Stop terminates its original browser within the same deadline when graceful close is deliberately ignored
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.060400000000072396
+}
+
+stdout | tests/computer-browser-worker.test.ts > Stop terminates its original browser within the same deadline when graceful close is deliberately ignored
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_start',
+  ms: 213.40859999999998
+}
+
+stdout | tests/computer-browser-worker.test.ts > Stop terminates its original browser within the same deadline when graceful close is deliberately ignored
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_return',
+  ms: 519.8231000000001,
+  status: 0
+}
+
+stdout | tests/computer-browser-worker.test.ts > Stop terminates its original browser within the same deadline when graceful close is deliberately ignored
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 557.1255999999998
+}
+
+stdout | tests/computer-browser-worker.test.ts > Stop terminates its original browser within the same deadline when graceful close is deliberately ignored
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 557.3407000000002
+}
+
+stdout | tests/computer-browser-worker.test.ts > Stop terminates its original browser within the same deadline when graceful close is deliberately ignored
+Forced original-browser termination evidence {
+  elapsed_ms: 631.9699,
+  dropped_graceful_frames: 1,
+  requests_quiescent: true
+}
+
+stdout | tests/computer-browser-worker.test.ts > original worker pause fences capture/input and resumes with new references before independent Stop
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.1346000000000913
+}
+
+stdout | tests/computer-browser-worker.test.ts > original worker pause fences capture/input and resumes with new references before independent Stop
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 171.2521999999999
+}
+
+stdout | tests/computer-browser-worker.test.ts > original worker pause fences capture/input and resumes with new references before independent Stop
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 177.8068000000003
+}
+
+stdout | tests/computer-browser-worker.test.ts > stop bypasses a pending browser navigation and never waits for its ten-second server response
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.0784000000001015
+}
+
+stdout | tests/computer-browser-worker.test.ts > stop bypasses a pending browser navigation and never waits for its ten-second server response
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_start',
+  ms: 202.62350000000015
+}
+
+stdout | tests/computer-browser-worker.test.ts > stop bypasses a pending browser navigation and never waits for its ten-second server response
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_return',
+  ms: 494.1141,
+  status: 128
+}
+
+stdout | tests/computer-browser-worker.test.ts > stop bypasses a pending browser navigation and never waits for its ten-second server response
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 494.6264000000001
+}
+
+stdout | tests/computer-browser-worker.test.ts > stop bypasses a pending browser navigation and never waits for its ten-second server response
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 495.35180000000014
+}
+
+stdout | tests/computer-browser-worker.test.ts > masked frames have a verified digest and image exhaustion refuses before another input
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.10419999999999163
+}
+
+stdout | tests/computer-browser-worker.test.ts > masked frames have a verified digest and image exhaustion refuses before another input
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_start',
+  ms: 204.58860000000004
+}
+
+stdout | tests/computer-browser-worker.test.ts > masked frames have a verified digest and image exhaustion refuses before another input
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'owner_force_return',
+  ms: 500.1434999999997,
+  status: 0
+}
+
+stderr | tests/computer-browser-worker.test.ts > masked frames have a verified digest and image exhaustion refuses before another input
+Original worker reply deadline {
+  operation: 'stop',
+  timeout_ms: 900,
+  elapsed_ms: 907.3656999999985,
+  cause: { phase: 'stop' }
+}
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on disconnect without another model call
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 1570.6999999999998
+}
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on disconnect without another model call
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 1570.8777999999998
+}
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on disconnect without another model call
+Computer control-loss evidence {
+  mode: 'disconnect',
+  elapsed_ms: 1071.3431999999993,
+  local_stop: null
+}
+
+stdout | tests/computer-browser-worker.test.ts > a real worker closes its dedicated browser on watchdog without another model call
+Computer control-loss evidence {
+  mode: 'watchdog',
+  elapsed_ms: 2498.899400000002,
+  local_stop: {
+    epoch: '78816f35-849a-42af-9ba3-97ca17b64785',
+    input_released: true,
+    terminated: true,
+    reason: 'watchdog',
+    heartbeat_age_ms: 2500.9597000000003,
+    stop_elapsed_ms: 241.26049999999987
+  }
+}
+
+stdout | tests/computer-browser-worker.test.ts > lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'stop_received',
+  ms: 0.05880000000001928
+}
+
+stdout | tests/computer-browser-worker.test.ts > lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_exit',
+  ms: 180.67599999999993
+}
+
+stdout | tests/computer-browser-worker.test.ts > lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input
+Original browser Stop trace {
+  test_trace: 'original_browser_stop',
+  event: 'browser_close',
+  ms: 187.22489999999993
+}
+
+stderr | tests/computer-browser-worker.test.ts > lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input
+Original worker reply deadline {
+  operation: 'stop',
+  timeout_ms: 900,
+  elapsed_ms: 911.5664000000033,
+  cause: { phase: 'stop' }
+}
+
+ ✓ tests/computer-browser-worker.test.ts (13 tests) 33597ms
+   ✓ performs real Unicode, checked, click/readback and scrolling using opaque current references  2825ms
+   ✓ moved/covered controls, disabled and credential controls never receive a guessed action  1504ms
+   ✓ forbidden posts, redirects, popups and frames cannot reach another origin or authority  3016ms
+   ✓ exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime  456ms
+   ✓ explicit navigation stays inside the approved origin and segment path and verifies independent destination state  2468ms
+   ✓ private worker process preserves typed observations and responsive independent termination  2242ms
+   ✓ Stop terminates its original browser within the same deadline when graceful close is deliberately ignored  2690ms
+   ✓ original worker pause fences capture/input and resumes with new references before independent Stop  2364ms
+   ✓ stop bypasses a pending browser navigation and never waits for its ten-second server response  2091ms
+   ✓ masked frames have a verified digest and image exhaustion refuses before another input  2866ms
+   ✓ a real worker closes its dedicated browser on disconnect without another model call  3945ms
+   ✓ a real worker closes its dedicated browser on watchdog without another model call  4472ms
+   ✓ lost stop acknowledgement keeps the original peer for stop-only recovery and cannot reopen input  2656ms
+
+ Test Files  2 passed (2)
+      Tests  19 passed (19)
+   Start at  12:29:26
+   Duration  130.62s (transform 3.19s, setup 0ms, collect 6.43s, tests 123.41s, environment 0ms, prepare 278ms)
+
+JSON report written to C:/Users/Mika Jussila/source/repos/dreamgraph/docs/ashoka/slice-27-stop-phase-trace.json

@@ -1,0 +1,17 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/computer-browser-worker.test.ts (7 tests) 15657ms
+   ✓ performs real Unicode, checked, click/readback and scrolling using opaque current references  2722ms
+   ✓ moved/covered controls, disabled and credential controls never receive a guessed action  1419ms
+   ✓ forbidden posts, redirects, popups and frames cannot reach another origin or authority  3061ms
+   ✓ exact scope cannot be widened with lookalike paths, secrets in URL or a future browser/runtime  525ms
+   ✓ private worker process preserves typed observations and responsive independent termination  2317ms
+   ✓ stop bypasses a pending browser navigation and never waits for its ten-second server response  1381ms
+   ✓ masked frames have a verified digest and image exhaustion refuses before another input  4230ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  18:46:51
+   Duration  16.47s (transform 150ms, setup 0ms, collect 315ms, tests 15.66s, environment 0ms, prepare 132ms)
+

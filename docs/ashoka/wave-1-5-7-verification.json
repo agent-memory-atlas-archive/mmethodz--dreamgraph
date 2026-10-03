@@ -1,0 +1,329 @@
+{
+  "schema_version": "1.0.0",
+  "session_id": "ea472546-116f-46df-a577-1946736958f7",
+  "instance_uuid": "ee9ce3b9-0313-4768-b5f1-24b9b3fffc4b",
+  "produced_at": "2026-09-30T19:41:12.372Z",
+  "plan_id": "ea472546-116f-46df-a577-1946736958f7",
+  "delta_table": {
+    "schema_version": "1.0.0",
+    "session_id": "ea472546-116f-46df-a577-1946736958f7",
+    "instance_uuid": "ee9ce3b9-0313-4768-b5f1-24b9b3fffc4b",
+    "produced_at": "2026-09-30T19:41:12.372Z",
+    "produced_in_phase": "verify",
+    "source_of_truth": {
+      "sources": [
+        {
+          "type": "source_file",
+          "identifier": "src/graph/contracts.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Preserved strict 29-contract generation and reviewed baseline revision 5 with twelve unchanged task labels, 29 owners and prior content-addressed archive. Receipt result extension is bounded by publication. Source hash and generated drift check pass; later client/evaluation qualification remains pending."
+        },
+        {
+          "type": "source_file",
+          "identifier": "src/tools/reconciliation-transaction.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Preserved typed read/publication/CAS/currency contracts; 20 publication fault/process tests pass. Shared journal now covers outbox acknowledgment and explicit gated epoch archive. Graph currency never advances on metadata/replay. Retirement is an unactivated maintenance port until job/client adoption; Windows fixture behavior is qualified, not Linux/macOS or power loss."
+        },
+        {
+          "type": "source_file",
+          "identifier": "src/tools/query-resource.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Shared 31-URI resolver has whole-record pages, signed instance/revision/process cursors, explicit unknown/unavailable/oversized signals, canonical family/history adapters, identical MCP/query meanings and valid JSON output. Resource/read-model fixtures and complete root regression pass. Retrieval/plugin/client consumption remains the subsequent owning slices."
+        },
+        {
+          "type": "source_file",
+          "identifier": "src/tools/enrich-parser-nodes.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Actual enrichment uses fresh typed three-way deltas with index/checkpoint publication, source-byte checks, preserved human edits/deletion, durable small batch outcomes and lost-reply recovery. Source MCP writes record intent/gap/dirty scope, recover without repeated effects, and reconciliation acknowledges graph deltas atomically. 18 batch, 65 parser, 10 source/C17-double and publication/reconciliation fixtures pass; actual targeted jobs/GUI/remaining producers are later integrations."
+        },
+        {
+          "type": "source_file",
+          "identifier": "src/cognitive/llm.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Independent six-role policies preserve arbitrary selected models and precedence, separate API/native CLI/privacy/pricing, expose requested/effective diagnostics and fingerprint, persist CAS/replay/restore and immutable snapshots. Temperature omission is model/reasoning-qualified and preserves cognitive instructions/model/effort, with no capability probe or escalation. Role/provider fixtures pass. Complete adapter/job/dashboard/candidate adoption remains 8/6/10/9."
+        }
+      ],
+      "total_entries": 5
+    },
+    "entries": [
+      {
+        "id": "ASHOKA-FOUNDATION",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/graph/contracts.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Preserved strict 29-contract generation and reviewed baseline revision 5 with twelve unchanged task labels, 29 owners and prior content-addressed archive. Receipt result extension is bounded by publication. Source hash and generated drift check pass; later client/evaluation qualification remains pending."
+        },
+        "target_ref": {
+          "file_path": "src/graph/contracts.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Preserved strict 29-contract generation and reviewed baseline revision 5 with twelve unchanged task labels, 29 owners and prior content-addressed archive. Receipt result extension is bounded by publication. Source hash and generated drift check pass; later client/evaluation qualification remains pending."
+        },
+        "status": "confirmed_match",
+        "description": "Preserved strict 29-contract generation and reviewed baseline revision 5 with twelve unchanged task labels, 29 owners and prior content-addressed archive. Receipt result extension is bounded by publication. Source hash and generated drift check pass; later client/evaluation qualification remains pending.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790797050274_qq1tc1",
+            "tool_name": "run_tests",
+            "summary": "Actual 105-file offline root run: 1029 passed, 2 existing skips, 0 failures. Server build, generated 29-contract drift and baseline revision 5 checks pass; docs/ashoka/wave-1-5-7-tests.json.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790797193798_jts71m",
+            "tool_name": "read_source_code",
+            "summary": "Post-execution source and documentation review matches foundation handoff; later provider/job/client/GUI/release limits remain explicit.",
+            "supports": "confirms"
+          }
+        ]
+      },
+      {
+        "id": "ASHOKA-PUBLICATION",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/tools/reconciliation-transaction.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Preserved typed read/publication/CAS/currency contracts; 20 publication fault/process tests pass. Shared journal now covers outbox acknowledgment and explicit gated epoch archive. Graph currency never advances on metadata/replay. Retirement is an unactivated maintenance port until job/client adoption; Windows fixture behavior is qualified, not Linux/macOS or power loss."
+        },
+        "target_ref": {
+          "file_path": "src/tools/reconciliation-transaction.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Preserved typed read/publication/CAS/currency contracts; 20 publication fault/process tests pass. Shared journal now covers outbox acknowledgment and explicit gated epoch archive. Graph currency never advances on metadata/replay. Retirement is an unactivated maintenance port until job/client adoption; Windows fixture behavior is qualified, not Linux/macOS or power loss."
+        },
+        "status": "confirmed_match",
+        "description": "Preserved typed read/publication/CAS/currency contracts; 20 publication fault/process tests pass. Shared journal now covers outbox acknowledgment and explicit gated epoch archive. Graph currency never advances on metadata/replay. Retirement is an unactivated maintenance port until job/client adoption; Windows fixture behavior is qualified, not Linux/macOS or power loss.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790797050274_qq1tc1",
+            "tool_name": "run_tests",
+            "summary": "Actual 105-file offline root run: 1029 passed, 2 existing skips, 0 failures. Server build, generated 29-contract drift and baseline revision 5 checks pass; docs/ashoka/wave-1-5-7-tests.json.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790797193798_jts71m",
+            "tool_name": "read_source_code",
+            "summary": "Post-execution source and documentation review matches foundation handoff; later provider/job/client/GUI/release limits remain explicit.",
+            "supports": "confirms"
+          }
+        ]
+      },
+      {
+        "id": "ASHOKA-RESOURCES",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/tools/query-resource.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Shared 31-URI resolver has whole-record pages, signed instance/revision/process cursors, explicit unknown/unavailable/oversized signals, canonical family/history adapters, identical MCP/query meanings and valid JSON output. Resource/read-model fixtures and complete root regression pass. Retrieval/plugin/client consumption remains the subsequent owning slices."
+        },
+        "target_ref": {
+          "file_path": "src/tools/query-resource.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Shared 31-URI resolver has whole-record pages, signed instance/revision/process cursors, explicit unknown/unavailable/oversized signals, canonical family/history adapters, identical MCP/query meanings and valid JSON output. Resource/read-model fixtures and complete root regression pass. Retrieval/plugin/client consumption remains the subsequent owning slices."
+        },
+        "status": "confirmed_match",
+        "description": "Shared 31-URI resolver has whole-record pages, signed instance/revision/process cursors, explicit unknown/unavailable/oversized signals, canonical family/history adapters, identical MCP/query meanings and valid JSON output. Resource/read-model fixtures and complete root regression pass. Retrieval/plugin/client consumption remains the subsequent owning slices.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790797050274_qq1tc1",
+            "tool_name": "run_tests",
+            "summary": "Actual 105-file offline root run: 1029 passed, 2 existing skips, 0 failures. Server build, generated 29-contract drift and baseline revision 5 checks pass; docs/ashoka/wave-1-5-7-tests.json.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790797193798_jts71m",
+            "tool_name": "read_source_code",
+            "summary": "Post-execution source and documentation review matches foundation handoff; later provider/job/client/GUI/release limits remain explicit.",
+            "supports": "confirms"
+          }
+        ]
+      },
+      {
+        "id": "ASHOKA-ENRICHMENT",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/tools/enrich-parser-nodes.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Actual enrichment uses fresh typed three-way deltas with index/checkpoint publication, source-byte checks, preserved human edits/deletion, durable small batch outcomes and lost-reply recovery. Source MCP writes record intent/gap/dirty scope, recover without repeated effects, and reconciliation acknowledges graph deltas atomically. 18 batch, 65 parser, 10 source/C17-double and publication/reconciliation fixtures pass; actual targeted jobs/GUI/remaining producers are later integrations."
+        },
+        "target_ref": {
+          "file_path": "src/tools/enrich-parser-nodes.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Actual enrichment uses fresh typed three-way deltas with index/checkpoint publication, source-byte checks, preserved human edits/deletion, durable small batch outcomes and lost-reply recovery. Source MCP writes record intent/gap/dirty scope, recover without repeated effects, and reconciliation acknowledges graph deltas atomically. 18 batch, 65 parser, 10 source/C17-double and publication/reconciliation fixtures pass; actual targeted jobs/GUI/remaining producers are later integrations."
+        },
+        "status": "confirmed_match",
+        "description": "Actual enrichment uses fresh typed three-way deltas with index/checkpoint publication, source-byte checks, preserved human edits/deletion, durable small batch outcomes and lost-reply recovery. Source MCP writes record intent/gap/dirty scope, recover without repeated effects, and reconciliation acknowledges graph deltas atomically. 18 batch, 65 parser, 10 source/C17-double and publication/reconciliation fixtures pass; actual targeted jobs/GUI/remaining producers are later integrations.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790797050274_qq1tc1",
+            "tool_name": "run_tests",
+            "summary": "Actual 105-file offline root run: 1029 passed, 2 existing skips, 0 failures. Server build, generated 29-contract drift and baseline revision 5 checks pass; docs/ashoka/wave-1-5-7-tests.json.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790797193798_jts71m",
+            "tool_name": "read_source_code",
+            "summary": "Post-execution source and documentation review matches foundation handoff; later provider/job/client/GUI/release limits remain explicit.",
+            "supports": "confirms"
+          }
+        ]
+      },
+      {
+        "id": "ASHOKA-ROLE-POLICY",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "src/cognitive/llm.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Independent six-role policies preserve arbitrary selected models and precedence, separate API/native CLI/privacy/pricing, expose requested/effective diagnostics and fingerprint, persist CAS/replay/restore and immutable snapshots. Temperature omission is model/reasoning-qualified and preserves cognitive instructions/model/effort, with no capability probe or escalation. Role/provider fixtures pass. Complete adapter/job/dashboard/candidate adoption remains 8/6/10/9."
+        },
+        "target_ref": {
+          "file_path": "src/cognitive/llm.ts",
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "excerpt": "Independent six-role policies preserve arbitrary selected models and precedence, separate API/native CLI/privacy/pricing, expose requested/effective diagnostics and fingerprint, persist CAS/replay/restore and immutable snapshots. Temperature omission is model/reasoning-qualified and preserves cognitive instructions/model/effort, with no capability probe or escalation. Role/provider fixtures pass. Complete adapter/job/dashboard/candidate adoption remains 8/6/10/9."
+        },
+        "status": "confirmed_match",
+        "description": "Independent six-role policies preserve arbitrary selected models and precedence, separate API/native CLI/privacy/pricing, expose requested/effective diagnostics and fingerprint, persist CAS/replay/restore and immutable snapshots. Temperature omission is model/reasoning-qualified and preserves cognitive instructions/model/effort, with no capability probe or escalation. Role/provider fixtures pass. Complete adapter/job/dashboard/candidate adoption remains 8/6/10/9.",
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790797050274_qq1tc1",
+            "tool_name": "run_tests",
+            "summary": "Actual 105-file offline root run: 1029 passed, 2 existing skips, 0 failures. Server build, generated 29-contract drift and baseline revision 5 checks pass; docs/ashoka/wave-1-5-7-tests.json.",
+            "supports": "confirms"
+          },
+          {
+            "tool_call_id": "tc_1790797193798_jts71m",
+            "tool_name": "read_source_code",
+            "summary": "Post-execution source and documentation review matches foundation handoff; later provider/job/client/GUI/release limits remain explicit.",
+            "supports": "confirms"
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "confirmed_matches": 5,
+      "confirmed_gaps": 0,
+      "partial_matches": 0,
+      "not_yet_verified": 0,
+      "total": 5,
+      "parity_percentage": 100
+    }
+  },
+  "compliance": {
+    "status": "compliant",
+    "parity_percentage": 100,
+    "total_entries": 5,
+    "matched": 5,
+    "gaps_remaining": 0,
+    "regressions": 0
+  },
+  "item_results": [
+    {
+      "plan_item_id": "ashoka-s0-contracts",
+      "delta_entry_id": "ASHOKA-FOUNDATION",
+      "tool_call_id": "tc_1790797050274_qq1tc1",
+      "verified": true,
+      "verification_detail": "Preserved strict 29-contract generation and reviewed baseline revision 5 with twelve unchanged task labels, 29 owners and prior content-addressed archive. Receipt result extension is bounded by publication. Source hash and generated drift check pass; later client/evaluation qualification remains pending.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790797050274_qq1tc1",
+          "tool_name": "run_tests",
+          "summary": "Actual 105-file offline root run: 1029 passed, 2 existing skips, 0 failures. Server build, generated 29-contract drift and baseline revision 5 checks pass; docs/ashoka/wave-1-5-7-tests.json.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "tool_name": "read_source_code",
+          "summary": "Post-execution source and documentation review matches foundation handoff; later provider/job/client/GUI/release limits remain explicit.",
+          "supports": "confirms"
+        }
+      ]
+    },
+    {
+      "plan_item_id": "ashoka-s2-publication",
+      "delta_entry_id": "ASHOKA-PUBLICATION",
+      "tool_call_id": "tc_1790797050274_qq1tc1",
+      "verified": true,
+      "verification_detail": "Preserved typed read/publication/CAS/currency contracts; 20 publication fault/process tests pass. Shared journal now covers outbox acknowledgment and explicit gated epoch archive. Graph currency never advances on metadata/replay. Retirement is an unactivated maintenance port until job/client adoption; Windows fixture behavior is qualified, not Linux/macOS or power loss.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790797050274_qq1tc1",
+          "tool_name": "run_tests",
+          "summary": "Actual 105-file offline root run: 1029 passed, 2 existing skips, 0 failures. Server build, generated 29-contract drift and baseline revision 5 checks pass; docs/ashoka/wave-1-5-7-tests.json.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "tool_name": "read_source_code",
+          "summary": "Post-execution source and documentation review matches foundation handoff; later provider/job/client/GUI/release limits remain explicit.",
+          "supports": "confirms"
+        }
+      ]
+    },
+    {
+      "plan_item_id": "ashoka-s1-resources",
+      "delta_entry_id": "ASHOKA-RESOURCES",
+      "tool_call_id": "tc_1790797050274_qq1tc1",
+      "verified": true,
+      "verification_detail": "Shared 31-URI resolver has whole-record pages, signed instance/revision/process cursors, explicit unknown/unavailable/oversized signals, canonical family/history adapters, identical MCP/query meanings and valid JSON output. Resource/read-model fixtures and complete root regression pass. Retrieval/plugin/client consumption remains the subsequent owning slices.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790797050274_qq1tc1",
+          "tool_name": "run_tests",
+          "summary": "Actual 105-file offline root run: 1029 passed, 2 existing skips, 0 failures. Server build, generated 29-contract drift and baseline revision 5 checks pass; docs/ashoka/wave-1-5-7-tests.json.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "tool_name": "read_source_code",
+          "summary": "Post-execution source and documentation review matches foundation handoff; later provider/job/client/GUI/release limits remain explicit.",
+          "supports": "confirms"
+        }
+      ]
+    },
+    {
+      "plan_item_id": "ashoka-s5-enrichment",
+      "delta_entry_id": "ASHOKA-ENRICHMENT",
+      "tool_call_id": "tc_1790797050274_qq1tc1",
+      "verified": true,
+      "verification_detail": "Actual enrichment uses fresh typed three-way deltas with index/checkpoint publication, source-byte checks, preserved human edits/deletion, durable small batch outcomes and lost-reply recovery. Source MCP writes record intent/gap/dirty scope, recover without repeated effects, and reconciliation acknowledges graph deltas atomically. 18 batch, 65 parser, 10 source/C17-double and publication/reconciliation fixtures pass; actual targeted jobs/GUI/remaining producers are later integrations.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790797050274_qq1tc1",
+          "tool_name": "run_tests",
+          "summary": "Actual 105-file offline root run: 1029 passed, 2 existing skips, 0 failures. Server build, generated 29-contract drift and baseline revision 5 checks pass; docs/ashoka/wave-1-5-7-tests.json.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "tool_name": "read_source_code",
+          "summary": "Post-execution source and documentation review matches foundation handoff; later provider/job/client/GUI/release limits remain explicit.",
+          "supports": "confirms"
+        }
+      ]
+    },
+    {
+      "plan_item_id": "ashoka-s7-role-policy",
+      "delta_entry_id": "ASHOKA-ROLE-POLICY",
+      "tool_call_id": "tc_1790797050274_qq1tc1",
+      "verified": true,
+      "verification_detail": "Independent six-role policies preserve arbitrary selected models and precedence, separate API/native CLI/privacy/pricing, expose requested/effective diagnostics and fingerprint, persist CAS/replay/restore and immutable snapshots. Temperature omission is model/reasoning-qualified and preserves cognitive instructions/model/effort, with no capability probe or escalation. Role/provider fixtures pass. Complete adapter/job/dashboard/candidate adoption remains 8/6/10/9.",
+      "evidence": [
+        {
+          "tool_call_id": "tc_1790797050274_qq1tc1",
+          "tool_name": "run_tests",
+          "summary": "Actual 105-file offline root run: 1029 passed, 2 existing skips, 0 failures. Server build, generated 29-contract drift and baseline revision 5 checks pass; docs/ashoka/wave-1-5-7-tests.json.",
+          "supports": "confirms"
+        },
+        {
+          "tool_call_id": "tc_1790797193798_jts71m",
+          "tool_name": "read_source_code",
+          "summary": "Post-execution source and documentation review matches foundation handoff; later provider/job/client/GUI/release limits remain explicit.",
+          "supports": "confirms"
+        }
+      ]
+    }
+  ],
+  "regressions": [],
+  "recommendation": {
+    "action": "accept",
+    "justification": "All entries match. No regressions detected."
+  }
+}

@@ -1,0 +1,258 @@
+{
+  "schema": "dreamgraph.ashoka.computer_checkpoint.v1",
+  "recorded_at": "2026-10-03T00:10:33.968Z",
+  "status": "unmapped_provider_output_qualified_slice31_in_progress",
+  "root": {
+    "passed": 1994,
+    "failed": 0,
+    "skipped": 2,
+    "files": 175,
+    "max_workers": 4,
+    "exit_code": 0,
+    "elapsed_seconds": 178.819330078125
+  },
+  "focused": {
+    "passed": 182,
+    "failed": 0
+  },
+  "editor": {
+    "passed": 522,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0
+  },
+  "model_requests": 0,
+  "native_input": 0,
+  "scope": "Core and actual compiled editor native API parsing refuse unmapped native tool/image output or incomplete calls. Real declared admission/settlement preserves known usage, acknowledges failed work and logs no raw secret. No fallback/retry/native dispatch, provider built-in qualification or real-model understanding is inferred.",
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "retained_failures": [
+    "Second focused run exposed missing compiled Anthropic native-tool validation. Correct path was rebuilt and third run passed.",
+    "First full root run passed1993 and failed one fixed-date/real-clock lease test at the UTC date boundary. Date-only deterministic time now exercises the same running-to-expired durable projection without changing production lease limits. Six focused lease cases and the second full root run pass."
+  ],
+  "remaining": [
+    "Slice31 native workers, native CLI control/provider built-in integration, complete editor execution and CU/XS joins.",
+    "Slice26 reviewed live cutover,27 actual paired usefulness,28 synchronized release; version13.4.0. Windows global unchanged, no paid inference or live migration."
+  ],
+  "artifacts": [
+    {
+      "path": "src/cognitive/provider-outcome.ts",
+      "bytes": 9576,
+      "sha256": "fb8992dc694d86d82fd3f1e02d1eb978dfe9bbd274783f5e2039c7cb33172026"
+    },
+    {
+      "path": "src/cognitive/llm.ts",
+      "bytes": 79219,
+      "sha256": "fc354939d7aae9b0022c5794bc3abab7d6338502a5ddbb00bf67c375405fb160"
+    },
+    {
+      "path": "extensions/vscode/src/architect-llm.ts",
+      "bytes": 70079,
+      "sha256": "88cd5dff02070542f0a629d664f36d25d40a308a40b5c3350a8bd6c1685d5b2a"
+    },
+    {
+      "path": "extensions/vscode/src/generated/provider-outcome.ts",
+      "bytes": 9903,
+      "sha256": "685745cabe1951cd5828ca34efc08663c7b3eb2b3cbf49269eb94ee5e7bcd800"
+    },
+    {
+      "path": "tests/provider-outcome.test.ts",
+      "bytes": 13871,
+      "sha256": "6a2e11fb77b20a2004f5c150d21491a710e41bb4717876631c5a672fe0d3a233"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 177963,
+      "sha256": "7a6364f7babdf6b9d568dd8851b21cfc9255ddca68a6ab75988ac99304889d35"
+    },
+    {
+      "path": "tests/plan-context-integration.test.ts",
+      "bytes": 11748,
+      "sha256": "7b46220f9bece58b7ead9e50bc99c3e51f5cf37718ab6d5ef62bda6edd92eeab"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "scripts/generate-provider-contracts.mjs",
+      "bytes": 2291,
+      "sha256": "d26c7c5c341fca40b5af8c00eeaa7f04f0544b3ea1bb6130aef91213f9161a5a"
+    },
+    {
+      "path": "scripts/record-ashoka-provider-output-evidence.mjs",
+      "bytes": 4123,
+      "sha256": "d5f12a58d6d8d332d797605fd197902de9b3a852377617a901d82ee9a24aca9e"
+    },
+    {
+      "path": "scripts/qualify-ashoka-native-review.mjs",
+      "bytes": 3766,
+      "sha256": "22938a9789b90bdce1bfbfa4428b11c9fa869973d911b3f310ea7148ac2ae251"
+    },
+    {
+      "path": "docs/ashoka/native-review-31-provider.mjs",
+      "bytes": 7829,
+      "sha256": "e06c312acd6421093d8af607b5455ca00e64aebf397a218d33c89ede58fc3995"
+    },
+    {
+      "path": "docs/ashoka/computer-use.md",
+      "bytes": 17100,
+      "sha256": "a0a46c7eb629027495bc0f339eb6c8267aa6b5ff8747f3efd782100955153c85"
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 46514,
+      "sha256": "c4c9b118db109211ccbd7c14e7d4ac49cea8d7acc7fedfdc2170c958bde6aa67"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-architecture.log",
+      "bytes": 146,
+      "sha256": "25516603743c30853b9a0a41cb2542c35c033d72331e773efe0e3451788d3a72"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-build-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-build-first.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-config.log",
+      "bytes": 191,
+      "sha256": "c6b54fc079487c330d619f4b40fc0e94bfa9e2efaabb168e12cc4c203ea37a4f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-editor-build-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-editor-build-first.log",
+      "bytes": 1628,
+      "sha256": "e7decbc3ccfb6da9a945f0c8096a6b8bafc5fbf75f80b139b55f115116313a86"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-editor-build-second-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-editor-build-second.log",
+      "bytes": 1628,
+      "sha256": "2a8313c415a005bb3f135eb71231865ad1eb5892386722b6e4a0c8bda6a8a688"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-editor-third-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-editor-third.log",
+      "bytes": 47494,
+      "sha256": "d7488edf293e1b6cb108b610510f22e081eddaf6cccaa712c198b22fb90d1020"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-focus-first-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-focus-first.json",
+      "bytes": 19365,
+      "sha256": "215e0506c439436e1ed3980c070ff02b28f5ee4f7ab3fa1fce9662df7775d53f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-focus-first.log",
+      "bytes": 124,
+      "sha256": "73241693e6734c77b8c8cba7f7c0665e8cbe3fc4e393c5eea93368941dad8307"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-focus-second-exit.json",
+      "bytes": 17,
+      "sha256": "db6a3774e8dfa924f26c0bd5919423bc43913ba73af57830fc67b90b1ae2923d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-focus-second.json",
+      "bytes": 61099,
+      "sha256": "a961eb201649083794367f2d739ee01e19895c54f6e67b23600792cd4b5ac469"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-focus-second.log",
+      "bytes": 125,
+      "sha256": "8925a65cb97809afe919e0fd2802a1a5be836bd774486035da8feaed83322d91"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-focus-third-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-focus-third.json",
+      "bytes": 60297,
+      "sha256": "929e60c4fc55cc40bd0e2e2f147155e7fb0380285e5ce18a1fdb81f4e6c39ad8"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-focus-third.log",
+      "bytes": 124,
+      "sha256": "6800743cd1292039c1b2bdca8582db97bc54aea610be0ed22a2f64cdf970e81d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-generation.log",
+      "bytes": 91,
+      "sha256": "aeb32ea23380e56ffe5c3443ef55ccee41dc22710740b2d18cb6cd3cd427d513"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-lease-focus-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-lease-focus.json",
+      "bytes": 2719,
+      "sha256": "739b54aceb4914cc4ab0e2cd182d05a8ee4c1c4c13a7d338f772c366991a4925"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-lease-focus.log",
+      "bytes": 124,
+      "sha256": "12f453804e9a938e2a1791eec620ab460960db8dd1ee4548124ac53d066ce890"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-root-first-exit.json",
+      "bytes": 17,
+      "sha256": "db6a3774e8dfa924f26c0bd5919423bc43913ba73af57830fc67b90b1ae2923d"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-root-first.json",
+      "bytes": 676943,
+      "sha256": "7d9eb01134145ffb5af4b6806dfb8bfa396ccc79811f07acafc4db08846a9ed2"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-root-first.log",
+      "bytes": 123,
+      "sha256": "dfc0fc8d8556e6b2dcaba603691b728cfa8208a4671d4d4d85cbbf3f9eb6b0bc"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-root-second-exit.json",
+      "bytes": 17,
+      "sha256": "1652db757db1ab44142e4354b8f05f6059a92ce5230f8b723720775c0fb42dce"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-root-second.json",
+      "bytes": 676132,
+      "sha256": "7edaf8c46558105c88f5b4f0d11e59c321cdc2a0aa5b1e11149bf5e5d02b5720"
+    },
+    {
+      "path": "docs/ashoka/slice-31-provider-output-root-second.log",
+      "bytes": 124,
+      "sha256": "3cf03b4b6b50fdcbac2c5b6ca1f202a0f4c1bf4665595a64c6d70e646c9abc58"
+    }
+  ]
+}

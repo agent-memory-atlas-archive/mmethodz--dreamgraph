@@ -1,0 +1,12 @@
+{
+  "schema": "dreamgraph.ashoka.navigation_benchmark.v1",
+  "observed_at": "2026-10-02T13:20:01.505Z",
+  "input": "read-only copy of publication and plan/catalogue stores; source plan files",
+  "publication_bytes": 9416164,
+  "metadata_12_reads_ms": 271.46,
+  "plan_count": 92,
+  "plan_list_ms": 4432.4,
+  "selected_plan_ms": 374.04,
+  "selected_plan_id": "graph-trust-and-agent-effectiveness",
+  "scope": "source modules, no running-daemon latency or browser qualification claimed"
+}

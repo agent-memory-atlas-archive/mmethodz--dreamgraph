@@ -1,0 +1,20 @@
+{
+  "scope": "Actual compiled editor HTML and webview bundle in Windows Chrome; host messages/VSCode shell are declared doubles, no native editor/model/other-platform claim",
+  "checks": [
+    {
+      "name": "E25-05",
+      "detail": "Actual packaged bundle installs its renderer under the unchanged nonce CSP, formats Markdown and keeps source HTML literal; no runtime eval."
+    },
+    {
+      "name": "E25-03",
+      "detail": "Compiled production UI sends captured file/review identity, disables competing actions while an operator owns execution, keeps Stop available and retains the composer draft."
+    },
+    {
+      "name": "E25-04",
+      "detail": "Unconfirmed Undo visibly disables Keep/Undo, offers keyboard-accessible original-ID readback, refuses a foreign binding, and retains the draft. Host outcome replies remain declared doubles."
+    }
+  ],
+  "browser": "153.0.8010.50",
+  "pageErrors": [],
+  "success": true
+}

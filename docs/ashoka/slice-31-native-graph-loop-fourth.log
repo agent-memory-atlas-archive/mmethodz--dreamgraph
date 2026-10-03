@@ -1,0 +1,22 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ❯ tests/computer-native-graph-loop.test.ts (1 test | 1 failed) 7740ms
+   × real GUI input becomes source debt, a separate graph commit, and current evidence in the next original native pass 7739ms
+     → COMPUTER_WORKER_REPLY_UNKNOWN
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/computer-native-graph-loop.test.ts > real GUI input becomes source debt, a separate graph commit, and current evidence in the next original native pass
+Error: COMPUTER_WORKER_REPLY_UNKNOWN
+ ❯ Timeout._onTimeout src/computer/browser-harness.ts:75:110
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  21:39:20
+   Duration  14.38s (transform 2.12s, setup 0ms, collect 5.70s, tests 7.74s, environment 0ms, prepare 175ms)
+

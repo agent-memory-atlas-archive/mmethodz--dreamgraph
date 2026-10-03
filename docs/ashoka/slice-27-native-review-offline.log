@@ -1,0 +1,5 @@
+[2026-10-03T04:19:24.862Z] [INFO]  Creating instance 29dd7223-126c-4c75-be96-a13dba3c7893 (ashoka-bounded-source-review) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-source-review-TE96Gq\master\29dd7223-126c-4c75-be96-a13dba3c7893
+[2026-10-03T04:19:24.935Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-source-review-TE96Gq\master\instances.json
+[2026-10-03T04:19:24.936Z] [INFO]  Registered new instance 29dd7223-126c-4c75-be96-a13dba3c7893 (ashoka-bounded-source-review)
+[2026-10-03T04:19:24.941Z] [INFO]  Instance 29dd7223-126c-4c75-be96-a13dba3c7893 created successfully
+{"sessionId":"ec4df0e4-8def-471b-ba96-010ec78fcf57","compliance":{"status":"compliant","parity_percentage":100,"total_entries":4,"matched":4,"gaps_remaining":0,"regressions":0},"recommendation":{"action":"accept","justification":"All entries match. No regressions detected."}}

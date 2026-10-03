@@ -1,0 +1,37 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > prefers an available connected caller model without probing daemon config
+[2026-10-01T08:43:18.083Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > falls through to an available daemon model when the connected model is unavailable
+[2026-10-01T08:43:18.086Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > falls through to an available daemon model when the connected model is unavailable
+[2026-10-01T08:43:18.133Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > uses normalizer daemon settings and caller max tokens when requested
+[2026-10-01T08:43:18.134Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > uses normalizer daemon settings and caller max tokens when requested
+[2026-10-01T08:43:18.177Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > returns deterministic fallback when no connected or daemon model is configured
+[2026-10-01T08:43:18.178Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > returns deterministic fallback when no connected or daemon model is configured
+[2026-10-01T08:43:18.205Z] [INFO]  LLM provider: none (model: n/a)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > returns deterministic fallback when the configured daemon provider is unavailable
+[2026-10-01T08:43:18.205Z] [INFO]  LLM provider: openai (model: gpt-4o-mini)
+
+stderr | tests/llm.routing.test.ts > selectLlmRoute > returns deterministic fallback when the configured daemon provider is unavailable
+[2026-10-01T08:43:18.229Z] [INFO]  LLM provider: none (model: n/a)
+
+ ✓ tests/llm.routing.test.ts (8 tests) 154ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  11:43:16
+   Duration  2.03s (transform 350ms, setup 0ms, collect 1.03s, tests 154ms, environment 0ms, prepare 174ms)
+

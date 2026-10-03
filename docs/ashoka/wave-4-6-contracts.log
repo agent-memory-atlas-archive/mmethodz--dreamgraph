@@ -1,0 +1,19 @@
+
+> dreamgraph@13.4.0 contracts:check
+> tsx scripts/generate-graph-contracts.mjs --check
+
+{"status":"verified","contracts":31,"source_sha256":"753af399634d5fc248b080d62c82ed1e295e6478884a7c9e7a1ef691d4d8355c"}
+
+> dreamgraph@13.4.0 ashoka:baseline:check
+> tsx scripts/freeze-ashoka-baseline.mjs
+
+{"status":"verified","owners":29,"cases":12,"evidence":8,"sha256":"dedd54b50636e6fbcbff9c67275074cf407c4699bb133b414d79a6f9e658efaf"}
+
+> dreamgraph@13.4.0 providers:check
+> tsx scripts/generate-provider-contracts.mjs --check
+
+
+> dreamgraph@13.4.0 config:check
+> tsx scripts/generate-configuration-inventory.mjs --check
+
+Configuration inventory: 302 typed entries, 100 literal source keys, 0 documentation-only names

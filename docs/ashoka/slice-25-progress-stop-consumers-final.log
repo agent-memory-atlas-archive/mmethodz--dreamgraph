@@ -1,0 +1,14 @@
+[2026-10-02T10:54:01.920Z] [INFO]  Creating instance 5b6cdd15-affe-4193-acb0-66845ea745c4 (plan-consumers) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-1h10JU\master\5b6cdd15-affe-4193-acb0-66845ea745c4
+[2026-10-02T10:54:02.003Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-plan-consumers-1h10JU\master\instances.json
+[2026-10-02T10:54:02.004Z] [INFO]  Registered new instance 5b6cdd15-affe-4193-acb0-66845ea745c4 (plan-consumers)
+[2026-10-02T10:54:02.008Z] [INFO]  Instance 5b6cdd15-affe-4193-acb0-66845ea745c4 created successfully
+Ashoka reported progress
+dreamgraph:draft
+dreamgraph:implemented
+dreamgraph:verified
+dreamgraph:blocked
+web64:draft
+web64:implemented
+web64:verified
+web64:blocked
+Explorer scope

@@ -1,0 +1,19 @@
+/** Read-only own-instance physical inventory. No daemon, model, repair or fabricated baseline. */
+import {readFile,writeFile,readdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {join} from 'node:path';
+import {CANONICAL_FAMILIES} from '../../dist/graph/read-model.js';
+const directory='C:/Users/Mika Jussila/.dreamgraph/ee9ce3b9-0313-4768-b5f1-24b9b3fffc4b/data';
+const hash=bytes=>createHash('sha256').update(bytes).digest('hex'),optional=async file=>{try{return await readFile(join(directory,file));}catch(error){if(error.code==='ENOENT')return null;throw error;}};
+const before=await optional('publication_state.json'),files=(await readdir(directory)).filter(file=>/^[A-Za-z0-9_-][A-Za-z0-9_.-]*\.json$/.test(file)).sort(),rows=[];
+for(const file of files){const bytes=await readFile(join(directory,file));if(bytes.length>128*1024*1024)throw Error('Inventory capacity: '+file);const row={file,bytes:bytes.length,sha256:hash(bytes)};
+ try{const value=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes).replace(/^\uFEFF/,''));row.valid_json=true;row.schema=value?.schema??value?.schema_version??value?.metadata?.schema_version??null;
+ const family=CANONICAL_FAMILIES.find(f=>f.file===file);if(family){const arrays=Array.isArray(value)?[['<root>',value]]:Object.entries(value).filter(([key,items])=>Array.isArray(items)&&[...family.arrays,'resolved_tensions','digests','weekly_digests'].includes(key));row.collections=[];
+  for(const [collection,items]of arrays){const buckets=new Map();let missing=0,placeholders=0;for(const item of items){if(item?._schema||item?._note){placeholders++;continue;}const identity=item?.id??item?.[family.id_field??'id']??(Number.isSafeInteger(item?.chapter_number)?'chapter:'+item.chapter_number:null);if(typeof identity!=='string'||!identity){missing++;continue;}const key=family.kind==='candidate'?JSON.stringify([identity,item.dream_type??null,item.normalization_cycle??null]):identity;const contents=buckets.get(key)??[];contents.push(hash(JSON.stringify(item)));buckets.set(key,contents);}const duplicates=[...buckets.values()].filter(items=>items.length>1);row.collections.push({collection,rows:items.length,placeholders,missing_ids:missing,duplicate_groups:duplicates.length,exact_duplicate_groups:duplicates.filter(items=>new Set(items).size===1).length,conflicting_duplicate_groups:duplicates.filter(items=>new Set(items).size>1).length});}
+ }
+ if(file==='jobs.json')row.job_states=Object.fromEntries(['queued','blocked','running','recovery_required','cancelled','failed','partial','succeeded'].map(state=>[state,(value.records??[]).filter(r=>r.job?.state===state).length]));
+ }catch(error){row.valid_json=false;row.error=error instanceof SyntaxError?'INVALID_JSON':'INVALID_ENCODING_OR_SHAPE';}rows.push(row);
+}
+const after=await optional('publication_state.json'),stable=hash(before??'absent')===hash(after??'absent');
+const report={schema:'dreamgraph.ashoka.legacy_inventory.v1',observed_at:new Date().toISOString(),instance_id:'ee9ce3b9-0313-4768-b5f1-24b9b3fffc4b',scope:'Read-only individual physical root JSON observations. Publication stability is explicitly reported; a changing publication is not a coherent cutover preview. No assertion that unmanaged files or a native worker are quiescent; no repair, scan or scan-age freshness inference.',publication_stable:stable,publication_before_sha256:before?hash(before):null,publication_after_sha256:after?hash(after):null,total_bytes:rows.reduce((n,row)=>n+row.bytes,0),files:rows};
+await writeFile('docs/ashoka/slice-26-live-inventory.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({files:rows.length,bytes:report.total_bytes,problem_families:rows.filter(row=>row.collections?.some(c=>c.missing_ids||c.duplicate_groups)).map(row=>({file:row.file,collections:row.collections})),job_states:rows.find(row=>row.file==='jobs.json')?.job_states}));

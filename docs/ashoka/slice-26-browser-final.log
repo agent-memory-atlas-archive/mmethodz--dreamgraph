@@ -1,0 +1,14 @@
+[2026-10-02T14:27:15.431Z] [INFO]  Creating instance ca83474f-1c41-4506-8b3f-48343f7f2ecb (navigation-replica) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-navigation-browser-810aWO\master\ca83474f-1c41-4506-8b3f-48343f7f2ecb
+[2026-10-02T14:27:15.503Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-navigation-browser-810aWO\master\instances.json
+[2026-10-02T14:27:15.503Z] [INFO]  Registered new instance ca83474f-1c41-4506-8b3f-48343f7f2ecb (navigation-replica)
+[2026-10-02T14:27:15.508Z] [INFO]  Instance ca83474f-1c41-4506-8b3f-48343f7f2ecb created successfully
+NAV01
+NAV02
+NAV03
+NAV07
+[2026-10-02T14:27:24.288Z] [INFO]  Creating instance 270c6218-2c03-46cd-a0de-46036db9410a (migration-cli-fixture) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-navigation-browser-810aWO\master\270c6218-2c03-46cd-a0de-46036db9410a
+[2026-10-02T14:27:24.356Z] [INFO]  Registered new instance 270c6218-2c03-46cd-a0de-46036db9410a (migration-cli-fixture)
+[2026-10-02T14:27:24.361Z] [INFO]  Instance 270c6218-2c03-46cd-a0de-46036db9410a created successfully
+NAV04
+NAV05
+NAV06

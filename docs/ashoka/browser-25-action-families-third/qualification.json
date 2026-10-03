@@ -1,0 +1,93 @@
+{
+  "scope": "Focused Windows actual Chromium/compiled Architect shell, fake authority/executors, no inference; these composed checks are not complete normative UX/GE acceptance",
+  "checks": [
+    {
+      "name": "B25-01",
+      "detail": "Actual 1,000 variable-height rows restore selected plan by ID and center only the rail."
+    },
+    {
+      "name": "B25-02",
+      "detail": "Filtering preserves active plan; explicit reveal adds one labelled row without clearing filters or substituting first plan."
+    },
+    {
+      "name": "B25-03",
+      "detail": "Background list/detail refresh retains rail scroll instead of stealing focus."
+    },
+    {
+      "name": "B25-04",
+      "detail": "Menu retains captured plan after selection changes; Ask creates an editable draft without sending or mutating."
+    },
+    {
+      "name": "B25-05",
+      "detail": "Native text-input menu/draft remains intact."
+    },
+    {
+      "name": "B25-06",
+      "detail": "Shift-F10, Home/End, type-ahead and Escape work with focus restoration."
+    },
+    {
+      "name": "B25-07",
+      "detail": "Captured CAS command rejects changed revision; it cannot silently target the newly selected plan."
+    },
+    {
+      "name": "B25-08",
+      "detail": "Out-of-order detail loads and delayed reveal ignore stale selection."
+    },
+    {
+      "name": "B25-09",
+      "detail": "Explicit disclosure chevron and per-plan open state survive lifecycle refresh."
+    },
+    {
+      "name": "B25-10",
+      "detail": "Narrow/reduced-motion menu stays inside viewport, with touch-visible overflow styling."
+    },
+    {
+      "name": "B25-11",
+      "detail": "Offline refresh retains the as-of view and exposes failure; reconnect rereads canonical state."
+    },
+    {
+      "name": "B25-12",
+      "detail": "Sibling overflow controls and slice/concern menus retain native card interactions without nested buttons."
+    },
+    {
+      "name": "B25-13",
+      "detail": "Actual delayed preference persistence keeps chat bound to its original plan; result cannot refresh the new selection, and mismatched continuation dispatch is stopped."
+    },
+    {
+      "name": "B25-14",
+      "detail": "Actual approval preview race stops before any lifecycle mutation; the newly selected plan cannot inherit another plan’s reviewed scope."
+    },
+    {
+      "name": "B25-15",
+      "detail": "Exact review retains literal Unicode/source arguments and original execution/receipt/revision when selected plan changes; no source markup is executed."
+    },
+    {
+      "name": "B25-16",
+      "detail": "Lost acknowledgement retains exact ID/payload across stop and another execution event; continuation is fenced, retry cannot switch target, and confirmed acknowledgement clears the obsolete blocking status."
+    },
+    {
+      "name": "B25-17",
+      "detail": "Decline addresses only the captured proposal and issues no approval."
+    },
+    {
+      "name": "B25-18",
+      "detail": "Narrow review is within the viewport with visible native disclosure, complete scrollable detail, and no approval after the request disappears."
+    },
+    {
+      "name": "B25-19",
+      "detail": "Streamed inspection over the independent UTF-8 byte ceiling refuses without clipping evidence, changing the captured target, or issuing another approval."
+    },
+    {
+      "name": "B25-20",
+      "detail": "Read-only original-execution recovery keeps unknown closure fenced and literal, disables revoked approval, and releases the acknowledgement fence only for a declared settled inactive closure without another effect/approval."
+    },
+    {
+      "name": "B25-21",
+      "detail": "Concern review keeps the unique canonical source anchor, original plan and existing draft, without sending or resolving status from prose."
+    }
+  ],
+  "errors": [],
+  "browser": "153.0.8010.50",
+  "success": false,
+  "failure": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#adr-editor-status').filter({ hasText: 'Review the decision' }) to be visible\u001b[22m\n\n    at C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\scripts\\qualify-ashoka-architect.mjs:139:83"
+}

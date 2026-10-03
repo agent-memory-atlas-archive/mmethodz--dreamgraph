@@ -1,0 +1,748 @@
+{
+  "schema": "dreamgraph.offline_test_report.v1",
+  "command": "npx vitest run --reporter=json",
+  "started_at": "2026-09-30T19:35:57.7580000+00:00",
+  "files": 105,
+  "passed": 1029,
+  "failed": 0,
+  "skipped": 2,
+  "suites": [
+    {
+      "file": "tests/adaptive-future-scaffold.test.ts",
+      "status": "passed",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/architect-cli-bridge.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/architect-cli.test.ts",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/architect-continuation.test.ts",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/architect-native-tool-loop.test.ts",
+      "status": "passed",
+      "passed": 23,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/architect-pulse.test.ts",
+      "status": "passed",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/architect-root-route.test.ts",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/architect-timeout-streaming.test.ts",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/auxiliary-entities.test.ts",
+      "status": "passed",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/change-obligations.test.ts",
+      "status": "passed",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/cli-enrichment-hops.test.ts",
+      "status": "passed",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/cli-mcp-call.test.ts",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/cli-status.test.ts",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/cognitive-producers.test.ts",
+      "status": "passed",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-3d-flow.test.ts",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 2
+    },
+    {
+      "file": "tests/explorer-3d-minimap.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-3d-polish.test.ts",
+      "status": "passed",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-3d-radial.test.ts",
+      "status": "passed",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-3d-systems.test.ts",
+      "status": "passed",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-3d-wavefront.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-events.test.ts",
+      "status": "passed",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-heatmap.test.ts",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-inspector.test.ts",
+      "status": "passed",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-label-layout.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-mutations.test.ts",
+      "status": "passed",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-prefs.test.ts",
+      "status": "passed",
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-root-route.test.ts",
+      "status": "passed",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/explorer-snapshot.test.ts",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/graph-contracts.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/graph-operation.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/graph-publication.test.ts",
+      "status": "passed",
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/graph-read-model.test.ts",
+      "status": "passed",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/instance-isolation.test.ts",
+      "status": "passed",
+      "passed": 44,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/latest-model-support.test.ts",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/living-dreamgraph-projections.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/llm.json-fallback.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/llm.lmstudio.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/llm.routing.test.ts",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/model-temperature.test.ts",
+      "status": "passed",
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/onboarding-readiness.test.ts",
+      "status": "passed",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/parser-bootstrap.test.ts",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/project-plans-scaffold.test.ts",
+      "status": "passed",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/release-version.test.ts",
+      "status": "passed",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/remediation-drafting-validation.test.ts",
+      "status": "passed",
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/resource-query.test.ts",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/role-policy.test.ts",
+      "status": "passed",
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/shell-integration-slice5-slice6.test.ts",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/standalone-architect-routes.test.ts",
+      "status": "passed",
+      "passed": 55,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/standalone-token-economy-store.test.ts",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/task-preamble-compiler.test.ts",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tension-resolution.test.ts",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/cognitive/provenance-regression.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/cognitive/quarantine-source-less-facts.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/cognitive/targeted-dreams.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/plugins/archetypes-seam.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/plugins/hello-events-e2e.test.ts",
+      "status": "passed",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/plugins/manager.test.ts",
+      "status": "passed",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/plugins/markdown-fences-seam.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/plugins/policies-seam.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/plugins/ui-seam.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/c-extractor.test.ts",
+      "status": "passed",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/cpp-extractor.test.ts",
+      "status": "passed",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/cpp-methods.test.ts",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/cpp-shapes.test.ts",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/cpp-templates.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/csharp-extractor.test.ts",
+      "status": "passed",
+      "passed": 26,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/go-extractor.test.ts",
+      "status": "passed",
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/gradle-extractor.test.ts",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/java-extractor.test.ts",
+      "status": "passed",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/kotlin-extractor.test.ts",
+      "status": "passed",
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/orchestrator.test.ts",
+      "status": "passed",
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/python-extractor.test.ts",
+      "status": "passed",
+      "passed": 25,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/rust-extractor.test.ts",
+      "status": "passed",
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/scanner/swift-extractor.test.ts",
+      "status": "passed",
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/sdk/action-checklist-example.test.ts",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/sdk/architect-contract.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/sdk/architect-contributions.test.ts",
+      "status": "passed",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/sdk/architect-plan-state.test.ts",
+      "status": "passed",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/sdk/architect-routes.test.ts",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/sdk/event-import-boundaries.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/sdk/host-gates.test.ts",
+      "status": "passed",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/sdk/host-loader.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/sdk/manifest-schema.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/utils/atomic-write.test.ts",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/utils/ui-index.test.ts",
+      "status": "passed",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/coverage-ledger.test.ts",
+      "status": "passed",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/enrich-parser-nodes.test.ts",
+      "status": "passed",
+      "passed": 65,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/enrichment-publication.test.ts",
+      "status": "passed",
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/enrichment-state.test.ts",
+      "status": "passed",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/graph-health.test.ts",
+      "status": "passed",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/incremental-reconciliation.test.ts",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/native-data-model.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/native-ui-scanner.test.ts",
+      "status": "passed",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/reconciliation-transaction.test.ts",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/scan-enrichment-hops.test.ts",
+      "status": "passed",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/scan-project-gitignore.test.ts",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/scan-project-incremental-e2e.test.ts",
+      "status": "passed",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/scan-state.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/solidify-insight.test.ts",
+      "status": "passed",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/ui-migration-plan.test.ts",
+      "status": "passed",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/ui-registry-scanner-merge.test.ts",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/tools/wire-links.test.ts",
+      "status": "passed",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/webhooks/sign.test.ts",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/webhooks/store.test.ts",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "file": "tests/webhooks/worker.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "paid_provider_calls": 0,
+  "qualification": "Offline root regression; no live data migration, native GUI worker or paid-provider canary."
+}

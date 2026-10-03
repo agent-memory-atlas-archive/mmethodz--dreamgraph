@@ -1,0 +1,11 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+ ✓ tests/computer-native-operator.test.ts (4 tests) 1363ms
+   ✓ native SDK reads only its original owner and publishes neither input nor a new grant  545ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  00:05:42
+   Duration  7.65s (transform 2.11s, setup 0ms, collect 5.77s, tests 1.36s, environment 0ms, prepare 164ms)
+

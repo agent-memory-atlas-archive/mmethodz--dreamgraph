@@ -1,0 +1,508 @@
+{
+  "at": "2026-10-01T16:55:57.636Z",
+  "phase": "pre_implementation",
+  "files": [
+    {
+      "path": "src/graph/contracts.ts",
+      "bytes": 20767,
+      "sha256": "33a249a9d9604c483e667dae3db73d907917cdd1976552373a680b8dded6f2e1",
+      "lines": 347
+    },
+    {
+      "path": "src/tools/reconciliation-transaction.ts",
+      "bytes": 3020,
+      "sha256": "e962c857fe509ab4202f83441c17bd066ca13f66937f911083799a62ecf0ba19",
+      "lines": 59
+    },
+    {
+      "path": "src/tools/query-resource.ts",
+      "bytes": 3245,
+      "sha256": "10fdd8864bd1f8db5a0dfa0241a44ec20625b7318669e1e49a7575ec57e4f794",
+      "lines": 34
+    },
+    {
+      "path": "src/tools/enrich-parser-nodes.ts",
+      "bytes": 120416,
+      "sha256": "a46f4e17bc0348dde43bf3d427299f9a53f2f1e16d3520f51c8b32ac9376aff3",
+      "lines": 2524
+    },
+    {
+      "path": "src/cognitive/llm.ts",
+      "bytes": 78345,
+      "sha256": "f2fe12b1075f983ce25ad351bea7b25d26f3fd3da65d6a75e788d38836b2b6f7",
+      "lines": 1693
+    },
+    {
+      "path": "src/cognitive/graph-rag.ts",
+      "bytes": 44204,
+      "sha256": "9e44706bbe3157f5402c555404cd7fb3eb24b03b81ee4e0c49bc126903cc99a0",
+      "lines": 1120
+    },
+    {
+      "path": "src/utils/engine-env.ts",
+      "bytes": 16655,
+      "sha256": "8ed402b232753b4e974daecf2ac9a88818cd64843eda7214d771d6fda88baa99",
+      "lines": 440
+    },
+    {
+      "path": "src/cognitive/strategies/llm-dream.ts",
+      "bytes": 24912,
+      "sha256": "1e873124e32ebd6e4747ce67b7bcf18b7cc409cd131a3ffcd4f75fbb2c4efd73",
+      "lines": 548
+    },
+    {
+      "path": "src/index.ts",
+      "bytes": 17429,
+      "sha256": "7a864362184bc325698feaaa25c5caa7e593c0a8ac189c6e42689cf77ddc47bb",
+      "lines": 399
+    },
+    {
+      "path": "src/server/server.ts",
+      "bytes": 13863,
+      "sha256": "eaaa8a2e857386fec251c01d9a0fb916c9d1d4e2bed11d80245c0165a0b5c6ea",
+      "lines": 245
+    },
+    {
+      "path": "src/cognitive/dreamer.ts",
+      "bytes": 10313,
+      "sha256": "2a0f6b2e112c21162baa75dc9647b16fd57d7d70a437d525d3f4881eeffc1586",
+      "lines": 186
+    },
+    {
+      "path": "src/architect/plan-registry.ts",
+      "bytes": 54840,
+      "sha256": "08cbc18fc13df24739a92bd16d86769921fbcbc41572732c8ec8c8653118b692",
+      "lines": 1263
+    },
+    {
+      "path": "src/cognitive/normalizer.ts",
+      "bytes": 53823,
+      "sha256": "c56ae0577d7c7ec624f8dd14428ea83c05904485ef31748399d6493d6c6a4242",
+      "lines": 1256
+    },
+    {
+      "path": "src/architect/cli-bridge.ts",
+      "bytes": 45148,
+      "sha256": "be03269857cd72aa39e77b7d19734333febd5478e19a52eeb6a93c58dc6239a4",
+      "lines": 1041
+    },
+    {
+      "path": "src/cognitive/engine.ts",
+      "bytes": 96273,
+      "sha256": "c23b42bd186feb82b3a4798e793abf9bc4c0410b724d52205069b18f02f52517",
+      "lines": 1940
+    },
+    {
+      "path": "src/cognitive/scheduler.ts",
+      "bytes": 43690,
+      "sha256": "9d5fa9cbb74436485a5c37b23a98d9b0c8bf482359ad374cba4a4dc909b48f63",
+      "lines": 663
+    },
+    {
+      "path": "src/cognitive/federation.ts",
+      "bytes": 14726,
+      "sha256": "440e69177921a3229eaac23ca3d21fb8c0c2deaa2ff9cdb3b18022abda0dd515",
+      "lines": 168
+    },
+    {
+      "path": "src/cognitive/intervention.ts",
+      "bytes": 78085,
+      "sha256": "b5ac1902866ed30eae4743d086b1d4e5ead5d8f8ebcc970ae3aa5984104329c8",
+      "lines": 1901
+    },
+    {
+      "path": "src/cognitive/narrator.ts",
+      "bytes": 28718,
+      "sha256": "2fbf52fbac469d47e04c6c7fc4113f078ce8283063624941d80e1f5290165de2",
+      "lines": 779
+    },
+    {
+      "path": "src/tools/graph-health.ts",
+      "bytes": 33282,
+      "sha256": "2274ac39b189e0020c9e3fb525f605d1455888904b29245b36dac8eeff868583",
+      "lines": 528
+    },
+    {
+      "path": "src/graph/snapshot.ts",
+      "bytes": 18629,
+      "sha256": "f0b699651a860d9c77b13379141669b4d0a03645dec2d6f4b48e8d8ea13af855",
+      "lines": 445
+    },
+    {
+      "path": "src/graph/read-model.ts",
+      "bytes": 35304,
+      "sha256": "20876c3016523a72b31c0aad2f3245957d829762fb315f815910820c1a721b6f",
+      "lines": 452
+    },
+    {
+      "path": "src/graph/store.ts",
+      "bytes": 4367,
+      "sha256": "abc927de84d99f91dfb31c8c5eb81a19ac14d77f8bf5754ae7e18ac44d5066a9",
+      "lines": 158
+    },
+    {
+      "path": "src/explorer/queries.ts",
+      "bytes": 19860,
+      "sha256": "d4f90c5c81ac22a250102c9ca9812262acd329cac1ed0cbafdda44827a3a06bd",
+      "lines": 513
+    },
+    {
+      "path": "src/explorer/routes.ts",
+      "bytes": 13523,
+      "sha256": "444a128c2d702064d5dfa808918b20248aca5b251fab2d39291594ba5bca1f15",
+      "lines": 387
+    },
+    {
+      "path": "src/explorer/mutations.ts",
+      "bytes": 17264,
+      "sha256": "fb35e7313c830412617a5f61f89aa8965575b1a14a0878730bab5f2cd9e1460e",
+      "lines": 468
+    },
+    {
+      "path": "explorer/src/App.tsx",
+      "bytes": 20417,
+      "sha256": "c93eb0e9ec689ab03c813214daeed4188d69709d84ce94fcd4160b9cc80269be",
+      "lines": 473
+    },
+    {
+      "path": "explorer/src/Inspector.tsx",
+      "bytes": 16570,
+      "sha256": "82270621d2f9ec4f29bdd0c308c385af0e8bf47daf7180a3581f73a3c4228a30",
+      "lines": 441
+    },
+    {
+      "path": "explorer/src/types.ts",
+      "bytes": 4555,
+      "sha256": "5d9e03d945b36844cfcd108b936bdf9d78f9eadcb43e905cb444bc640da3b9b0",
+      "lines": 166
+    },
+    {
+      "path": "explorer/src/api.ts",
+      "bytes": 10832,
+      "sha256": "5faafcb6ec8ea608c28d693ea95c138e747742c181c269b26ff0a0601f639d61",
+      "lines": 345
+    },
+    {
+      "path": "explorer/src/sse.ts",
+      "bytes": 4928,
+      "sha256": "e461697e0372b90e6e70ea3872c41da16b13c50973dc2400cfd1865d91228b20",
+      "lines": 161
+    },
+    {
+      "path": "explorer/src/GraphCanvas.tsx",
+      "bytes": 28055,
+      "sha256": "46badced7773642acbbce9316554fa28825781df4c33afea40ac1bc7f2d7579f",
+      "lines": 740
+    },
+    {
+      "path": "explorer/src/Graph3DCanvas.tsx",
+      "bytes": 67647,
+      "sha256": "fe74c2e296ee90bf7585099b10a7a59cd9b76232a0830de9058758508226c685",
+      "lines": 1516
+    },
+    {
+      "path": "explorer/src/three/LabelOverlay.ts",
+      "bytes": 5020,
+      "sha256": "c84aeab9c254cc65cc74abec5ffde5fcbbf4b58f38ce3d9cd2d69e9379876ca1",
+      "lines": 131
+    },
+    {
+      "path": "explorer/src/label-layout.ts",
+      "bytes": 1338,
+      "sha256": "654a7b8404f41a08645211c80ace3cb86c349282688f8e248828e310378db229",
+      "lines": 35
+    },
+    {
+      "path": "src/server/dashboard.ts",
+      "bytes": 98143,
+      "sha256": "184445134d1621c013f2cd237bbb750c6b6cccb75a6a54f189943f7433e19034",
+      "lines": 2057
+    },
+    {
+      "path": "src/server/schedule-api.ts",
+      "bytes": 7454,
+      "sha256": "97118e8636abd59410924da176b941db32d7a16cfb7ee277a11437e4ff9b849b",
+      "lines": 71
+    },
+    {
+      "path": "src/cognitive/schedule-definition.ts",
+      "bytes": 8828,
+      "sha256": "5e369d74f99853e099d841be44cc3adeb26e14a0b7f7dfc71e5a50dab142e471",
+      "lines": 113
+    },
+    {
+      "path": "src/cli/commands/schedule.ts",
+      "bytes": 14539,
+      "sha256": "50557a198c8ca606b86bf1da06d8fe1b4899746ee36dcea78a8e88f506dc4e9b",
+      "lines": 436
+    },
+    {
+      "path": "tests/scheduler-authority.test.ts",
+      "bytes": 8607,
+      "sha256": "c7340fb8ac6d9cab8ff848e09b2ba06e475807d52dcf085e16f7d68de4f5ba2f",
+      "lines": 88
+    },
+    {
+      "path": "tests/schedule-http.test.ts",
+      "bytes": 4066,
+      "sha256": "fb969c99aa69a20dd19bc469ee8ee79a42379b6134607086e482d3b1dd720b7a",
+      "lines": 39
+    },
+    {
+      "path": "tests/explorer-snapshot.test.ts",
+      "bytes": 8458,
+      "sha256": "4ca9ebdc84de1577b00f0004547027cb98969cb8d1c9895526a7b5f647863802",
+      "lines": 254
+    },
+    {
+      "path": "tests/explorer-mutations.test.ts",
+      "bytes": 14714,
+      "sha256": "dc9d922ac231b85fb0153a86ffc06df17dc6d89b0c5304e96268fd9d691d69bf",
+      "lines": 422
+    },
+    {
+      "path": "docs/audits/2026-09-30-coverage/execution-simulation.md",
+      "bytes": 120130,
+      "sha256": "cf57c3e4c53c02e46ffa90e75c3f6a598d5b7a63522a27514009777b3c262b6e",
+      "lines": 847
+    },
+    {
+      "path": "docs/audits/2026-09-30-coverage/plan-refinement.md",
+      "bytes": 66254,
+      "sha256": "947678ac8f491c3e221c07c7ea94a7052fa9a163c98964bbe20f9d0560d38525",
+      "lines": 284
+    },
+    {
+      "path": "plans/graph-trust-and-agent-effectiveness.md",
+      "bytes": 143947,
+      "sha256": "1e637940a7d1bf74708f60b4eba48f7570e7ea33ddc01f23085665d0295fc411",
+      "lines": 1223
+    },
+    {
+      "path": "src/server/schedule-workspace.ts",
+      "bytes": 32650,
+      "sha256": "100a0ce9b8e13c6aaf15336959b2773450356ac17bcf3beea5710f8f1981f798",
+      "lines": 152
+    },
+    {
+      "path": "src/server/schedule-workspace-contract.ts",
+      "bytes": 5245,
+      "sha256": "c1d86ebc06a39ac8586bb0bce6da92c69f9595c9e3dc13f5875be3e6922ef055",
+      "lines": 61
+    },
+    {
+      "path": "src/api/routes.ts",
+      "bytes": 44611,
+      "sha256": "8f1e6853f463d6fc8748e0bd14bfa989f8f42b18ef4027bfd86d8a3c45991674",
+      "lines": 1182
+    },
+    {
+      "path": "src/cognitive/jobs.ts",
+      "bytes": 25621,
+      "sha256": "3dc8bb02e2eec224e554ab67beb1a31f9054647da8630e25cca4cb4888978621",
+      "lines": 334
+    },
+    {
+      "path": "explorer/src/view-contract.ts",
+      "bytes": 2205,
+      "sha256": "78d2aef4d46d063cb32278eab363c2c2d9b78fa25df8960f3b8a7a070466f142",
+      "lines": 34
+    },
+    {
+      "path": "explorer/src/CandidatesPanel.tsx",
+      "bytes": 11490,
+      "sha256": "f1b18108b3390f596deda726fb4ede5b8e08a13f51e6c0b9570c2b91f7dbe80c",
+      "lines": 313
+    },
+    {
+      "path": "explorer/src/TensionsPanel.tsx",
+      "bytes": 7089,
+      "sha256": "d08a055b9eefa05add5f557aed22126e604e25cbeb05b7636eabc41e92dbda0f",
+      "lines": 204
+    },
+    {
+      "path": "explorer/src/styles.css",
+      "bytes": 39800,
+      "sha256": "c9bef254378bb26537efb0a275d79e3a1f9021c8e3a5d638ba853bebe5a8133e",
+      "lines": 1226
+    },
+    {
+      "path": "tests/schedule-workspace.test.ts",
+      "bytes": 9960,
+      "sha256": "04303289fe1de85b2b4f3fd6383c4894f221c4e3e941ecd1545ae7b42b1789bf",
+      "lines": 72
+    },
+    {
+      "path": "tests/explorer-canonical-navigation.test.ts",
+      "bytes": 7808,
+      "sha256": "b446341d2d3ab0b6c13d535946a2c13a5ae705e803e52e9e43f36563db8209b0",
+      "lines": 68
+    },
+    {
+      "path": "tests/normalization-evidence.test.ts",
+      "bytes": 32382,
+      "sha256": "6412d3e6814a3b50edc79ffbfde1a2059321ff533ec2e4c297052025ed64999b",
+      "lines": 334
+    },
+    {
+      "path": "tests/engine-jobs.test.ts",
+      "bytes": 14249,
+      "sha256": "67ff360cbb6ebdcceab18e47ddfcea99aba7e8fadcb192a9aba17f66a2cb321b",
+      "lines": 154
+    },
+    {
+      "path": "scripts/qualify-ashoka-surfaces.mjs",
+      "bytes": 15871,
+      "sha256": "48ec6bbaeefa3ec1a512fedbb6f664821251ca5661f3add2d5534d0a7d5f3124",
+      "lines": 74
+    },
+    {
+      "path": "docs/ashoka/explorer-evidence.md",
+      "bytes": 3243,
+      "sha256": "17344429d4050548e4557f9455fe3b1d91ebb933cfe912b1b5cae713332a8bc1",
+      "lines": 14
+    },
+    {
+      "path": "docs/ashoka/schedule-workspace.md",
+      "bytes": 3698,
+      "sha256": "2c874175f7c5d8fc840537ac0f445b184ff11aa50ac9bf3a99dc3db369f4c236",
+      "lines": 16
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 40447,
+      "sha256": "b8c8cbdbed55415a5dd88079881c0360c719949e11d8a6885378cd6f5a05ef77",
+      "lines": 666
+    },
+    {
+      "path": "docs/data-model.md",
+      "bytes": 40394,
+      "sha256": "32ce97b3817684944b20cb998c5c5347b159505a144c52b8ecafbb6b2604c412",
+      "lines": 613
+    },
+    {
+      "path": "docs/ashoka/configuration-inventory.json",
+      "bytes": 307420,
+      "sha256": "f67beb2419cb4f0287cbf353f214b57eaf0c39445872f60ac493d73632826471",
+      "lines": 11999
+    },
+    {
+      "path": "src/architect/routes.ts",
+      "bytes": 630637,
+      "sha256": "bbf837703a6792a6c9287a23e14fd3e8002260b7a0bb3cf6afc40a36d33ef9f1",
+      "lines": 13603
+    },
+    {
+      "path": "src/architect/native-tool-loop.ts",
+      "bytes": 42651,
+      "sha256": "8b00396defd1e03fc505bcadc95b310ecafc87709a05f1495b57b32d01c3e3b5",
+      "lines": 1007
+    },
+    {
+      "path": "src/architect/cli-mcp-bridge.ts",
+      "bytes": 13006,
+      "sha256": "366d754ac5cbde21d2ff74929ae9a8ef53859af51facc617e0a54e76c4fbcc46",
+      "lines": 345
+    },
+    {
+      "path": "src/utils/mcp-result.ts",
+      "bytes": 1728,
+      "sha256": "d2710b2de76579cc478053112144ba2f8b0402d46e61e742a37a630c56390140",
+      "lines": 21
+    },
+    {
+      "path": "src/graph/context-pack.ts",
+      "bytes": 19771,
+      "sha256": "c2d66138f56b4c0e3d11f54e077e86608bd5b51950bcf1df32cd4e79e6ce8cff",
+      "lines": 229
+    },
+    {
+      "path": "src/graph/change-obligations.ts",
+      "bytes": 18153,
+      "sha256": "a71beb8bb8c99f835a20a1ae10444043a80074d4dbacdb3575d52d5bba8cb440",
+      "lines": 244
+    },
+    {
+      "path": "src/server/tool-boundary.ts",
+      "bytes": 6269,
+      "sha256": "658bac46085166ca48df2c641e0b93207f7775cbf6479b081a3ac292a1ebdbac",
+      "lines": 70
+    },
+    {
+      "path": "src/server/execution-policy.ts",
+      "bytes": 5679,
+      "sha256": "94e34862977fa9f8ecd30a09327a702fb252c150b2d98bc3eea66e95f00a20d6",
+      "lines": 67
+    },
+    {
+      "path": "extensions/vscode/src/daemon-client.ts",
+      "bytes": 5525,
+      "sha256": "29d98cdbb3a31126781521c7072701a3f886c3770a2143180360978f933a5bba",
+      "lines": 205
+    },
+    {
+      "path": "extensions/vscode/src/request-compaction.ts",
+      "bytes": 14113,
+      "sha256": "1f37f4ae457fe066da5b6d494d6caa505c3727f2bd7941007842f303c8309661",
+      "lines": 472
+    },
+    {
+      "path": "extensions/vscode/src/context-builder.ts",
+      "bytes": 92572,
+      "sha256": "80635671b76fb35343a4cca3d5ceb4a1153ad893d22185c267d0df70a72263cc",
+      "lines": 2416
+    },
+    {
+      "path": "extensions/vscode/src/architect-panel.ts",
+      "error": "Error: ENOENT: no such file or directory, open 'C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\extensions\\vscode\\src\\architect-panel.ts'"
+    },
+    {
+      "path": "packages/token-economy/src/tool-result-compression.ts",
+      "bytes": 6753,
+      "sha256": "bbd1683b6fc4243b5cbc41e684a21de521ffe69ba9929fdd33e98e5b02ff9cc8",
+      "lines": 208
+    },
+    {
+      "path": "packages/token-economy/src/index.ts",
+      "bytes": 335,
+      "sha256": "1bc1a83253a5f73f599b21a037aa48d777148cd1496a97b1bac1f7ba03326f07",
+      "lines": 5
+    },
+    {
+      "path": "packages/sdk/src/seams/architect.ts",
+      "bytes": 1908,
+      "sha256": "f9d9cc09e86f07bce310b5a99ebf5771964243a2a5c4732141e80553114927a5",
+      "lines": 64
+    },
+    {
+      "path": "packages/host/src/context.ts",
+      "bytes": 7162,
+      "sha256": "266d9a376b291791e54167a9bad43dc3a823df0acef161722e80ec238f1d95f2",
+      "lines": 208
+    },
+    {
+      "path": "packages/host/src/loader.ts",
+      "bytes": 11116,
+      "sha256": "4ff669c593bb15c2aa3c7e59df0971cefefb11a53d15bd27d292f9c873f9e86f",
+      "lines": 362
+    },
+    {
+      "path": "packages/host/src/watchdog.ts",
+      "bytes": 3262,
+      "sha256": "a868a9d2f8f2bf76a3e905762e0a5f75f72e1360ba058092492c0f030c229a6b",
+      "lines": 101
+    },
+    {
+      "path": "docs/audits/2026-09-30-coverage/architect-context-actions.md",
+      "bytes": 18677,
+      "sha256": "098a43a430c961ec62b4ef4f3eb3e3d002a69254a90f7278bae2e6a650425be6",
+      "lines": 100
+    },
+    {
+      "path": "docs/audits/2026-09-30-coverage/graph-centered-execution.md",
+      "bytes": 38616,
+      "sha256": "5a9f286e53d69c7e69039f26d9f8f7af30d87c9c9792c6c0f6ad60e93e76e207",
+      "lines": 200
+    }
+  ]
+}

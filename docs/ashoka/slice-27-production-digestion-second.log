@@ -1,0 +1,82 @@
+
+ RUN  v3.2.4 C:/Users/Mika Jussila/source/repos/dreamgraph
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:29.475Z] [INFO]  enrich_parser_nodes: starting (model=gpt-4.1, provider=openai, context_hops=0, batch_size=10)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:29.794Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 0 fallback
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:29.834Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=0 dry_run=false
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:30.177Z] [INFO]  Cognitive state: AWAKE → REM (dreaming begins)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:30.192Z] [INFO]  REM dream cycle #1 starting (strategy: all, max: 24)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:30.458Z] [INFO]  LLM dream grounding: read 2 source files for 2 entities
+[2026-10-03T05:14:30.458Z] [INFO]  LLM dream: sending prompt (2 entities, 0 edges) to model=gpt-4.1, temp=0.7, maxTokens=2048
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:30.616Z] [INFO]  LLM dream: received 290 chars from gpt-4.1
+[2026-10-03T05:14:30.618Z] [INFO]  LLM dream: 1 edges, 0 nodes from gpt-4.1 (100 tokens)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:30.689Z] [INFO]  REM dream cycle #1 complete: 0 nodes, 3 edges (0 duplicates suppressed; speculative output remains untrusted)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:30.690Z] [INFO]  Cognitive state: REM → NORMALIZING (validation begins)
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:30.701Z] [INFO]  Cold-start bootstrap started at 2026-10-03T05:14:30.701Z (cycle 0); relaxed promotion gate active until exit (entities≥50 & validated_edges≥10, OR 20 cycles, OR 24h, whichever first)
+[2026-10-03T05:14:30.701Z] [INFO]  Normalization cycle #1 starting (threshold: 0.55)
+[2026-10-03T05:14:30.701Z] [INFO]  Normalization receipt: {"profile":"balanced","requested_strict":null,"inherited_strict":false,"override_applied":false,"effective_strict":false,"threshold_source":"policy","base_promotion_config":{"promotion_confidence":0.55,"promotion_plausibility":0.4,"promotion_evidence":0.35,"promotion_evidence_count":1,"retention_plausibility":0.3,"max_contradiction":0.35},"applied_promotion_config":{"promotion_confidence":0.55,"promotion_plausibility":0.4,"promotion_evidence":0.35,"promotion_evidence_count":1,"retention_plausibility":0.2,"max_contradiction":0.35},"bootstrap":{"active":true,"state":"cold_start","relaxed_fields":["retention_plausibility"]}}
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:30.803Z] [INFO]  Normalization cycle #1 complete: 3 processed (0 validated, 3 latent, 0 rejected), 0 edges promoted, 0 entities promoted, 0 blocked by gate
+
+stderr | tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+[2026-10-03T05:14:30.816Z] [INFO]  Cognitive state: NORMALIZING → AWAKE (natural wake cycle complete)
+
+stderr | tests/system-digestion-integration.test.ts > a real production enrichment refusal preserves measured spend, explicit optional partial debt and current reconciled source without automatic retry
+[2026-10-03T05:14:31.336Z] [INFO]  enrich_parser_nodes: starting (model=gpt-4.1, provider=openai, context_hops=0, batch_size=10)
+
+stderr | tests/system-digestion-integration.test.ts > a real production enrichment refusal preserves measured spend, explicit optional partial debt and current reconciled source without automatic retry
+[2026-10-03T05:14:31.527Z] [WARN]  Batch (fixture::widgets, 2 nodes): provider_failed: PROVIDER_REFUSAL: openai/gpt-4.1 (completed); deterministic fallback used.
+
+stderr | tests/system-digestion-integration.test.ts > a real production enrichment refusal preserves measured spend, explicit optional partial debt and current reconciled source without automatic retry
+[2026-10-03T05:14:31.574Z] [INFO]  Semantic enrichment batch 1: 2/2 committed, 0 uncommitted, 2 fallback
+[2026-10-03T05:14:31.574Z] [INFO]  enrich_parser_nodes: enriched=2 eligible=2 batches=1 anchors=0 errors=1 dry_run=false
+
+ ❯ tests/system-digestion-integration.test.ts (2 tests | 1 failed) 2681ms
+   × production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan 1935ms
+     → expected 'DreamGraph evidence (untrusted; asser…' to contain 'bounded source responsibility'
+   ✓ a real production enrichment refusal preserves measured spend, explicit optional partial debt and current reconciled source without automatic retry  745ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/system-digestion-integration.test.ts > production stages share original bounded jobs, preserve source truth and supply current next-agent context after one old full scan
+AssertionError: expected 'DreamGraph evidence (untrusted; asser…' to contain 'bounded source responsibility'
+
+- Expected
++ Received
+
+- bounded source responsibility
++ DreamGraph evidence (untrusted; assertions retain their class) {"revision":"graph:25","publication":27,"freshness":"current","completeness":"complete","mandatory_satisfied":true,"warnings":[]}
++ {"entity":"directory%3Ad8b92b7704a11b5a7133783130ddb272585601224344da08e53fb52ea7ae2315/feature/fixture/a","label":"Apply Widget","assertion":"source_assertion","confidence":null,"source_files":["source.ts"],"knowledge":"Apply Widget coordinates the evidenced widget responsibility through the supplied function and preserves the explicitly observed source flow and return value.","evidence":[{"id":"source:fixture:source.ts","origin":"source","ancestry":[],"revision":null,"observed_at":null,"source_repo":"fixture","source_path":"source.ts","validation":"unreviewed"},{"id":"model:directory%3Ad8b92b7704a11b5a7133783130ddb272585601224344da08e53fb52ea7ae2315/feature/fixture/a","origin":"model","ancestry":[],"revision":"graph:25","observed_at":"2026-10-03T05:14:29.744Z","validation":"hypothesis"}]}
++ {"entity":"directory%3Ad8b92b7704a11b5a7133783130ddb272585601224344da08e53fb52ea7ae2315/feature/fixture/b","label":"Save Widget","assertion":"source_assertion","confidence":null,"source_files":["source.ts"],"knowledge":"Save Widget coordinates the evidenced widget responsibility through the supplied function and preserves the explicitly observed source flow and return value.","evidence":[{"id":"source:fixture:source.ts","origin":"source","ancestry":[],"revision":null,"observed_at":null,"source_repo":"fixture","source_path":"source.ts","validation":"unreviewed"},{"id":"model:directory%3Ad8b92b7704a11b5a7133783130ddb272585601224344da08e53fb52ea7ae2315/feature/fixture/b","origin":"model","ancestry":[],"revision":"graph:25","observed_at":"2026-10-03T05:14:29.744Z","validation":"hypothesis"}]}
+
+ ❯ tests/system-digestion-integration.test.ts:74:111
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  08:14:23
+   Duration  8.48s (transform 2.00s, setup 0ms, collect 5.41s, tests 2.68s, environment 0ms, prepare 137ms)
+

@@ -1,0 +1,20 @@
+✔ on-demand discovery and selection issue no grant, input, model call or control (3.1452ms)
+✔ another instance or endpoint cannot receive a captured original control (0.6553ms)
+✔ late selection cannot attach previous target state or controls (0.604ms)
+✔ Stop bypasses a pending pause wait and retains the original execution/target (0.7345ms)
+✔ unconfirmed reply preserves the original session for inspection without a fresh pass (0.6945ms)
+✔ pages carry their exact captured snapshot and changed/foreign rows are refused (0.4242ms)
+✔ compiled drawer is quiet until opened, renders literal evidence and keeps Stop available during pause (87.0125ms)
+✔ compiled native inspection and controls keep the private original owner without browser metadata (146.2927ms)
+✔ endpoint switch during asynchronous schema loading refuses before a new authority request (20.0759ms)
+✔ Stop does not wait for an inspection body, and cancellation preserves an unknown read (16.3561ms)
+✔ oversize operator responses refuse during bounded body consumption (19.2551ms)
+✔ wrong original execution identity cannot become an acknowledged control (9.4096ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1137.7989

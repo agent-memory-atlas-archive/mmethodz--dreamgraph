@@ -1,0 +1,5 @@
+[2026-10-02T20:37:24.996Z] [INFO]  Creating instance fd0b2f68-187a-4865-abb3-5f123e112493 (ashoka-bounded-source-review) at C:\Users\MIKAJU~1\AppData\Local\Temp\dg-source-review-Ms1bfh\master\fd0b2f68-187a-4865-abb3-5f123e112493
+[2026-10-02T20:37:25.075Z] [INFO]  Initialized empty master registry: C:\Users\MIKAJU~1\AppData\Local\Temp\dg-source-review-Ms1bfh\master\instances.json
+[2026-10-02T20:37:25.076Z] [INFO]  Registered new instance fd0b2f68-187a-4865-abb3-5f123e112493 (ashoka-bounded-source-review)
+[2026-10-02T20:37:25.081Z] [INFO]  Instance fd0b2f68-187a-4865-abb3-5f123e112493 created successfully
+{"sessionId":"64fd9142-d64a-4750-8be3-b02a3cd95a47","compliance":{"status":"compliant","parity_percentage":100,"total_entries":5,"matched":5,"gaps_remaining":0,"regressions":0},"recommendation":{"action":"accept","justification":"All entries match. No regressions detected."}}

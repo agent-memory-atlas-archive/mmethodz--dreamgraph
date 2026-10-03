@@ -1,0 +1,19 @@
+
+> dreamgraph-vscode@13.4.0 build
+> npm run lint:isolation && npm run build:webview && tsc -p ./tsconfig.json && npm run build:extension && npm run build:bridge && npm run build:vendor
+
+
+> dreamgraph-vscode@13.4.0 lint:isolation
+> node scripts/lint-isolation.mjs
+
+lint:isolation OK — architect-v2 quarantined; 0 violations.
+
+> dreamgraph-vscode@13.4.0 build:webview
+> esbuild src/webview/index.ts --bundle --outfile=dist/webview.js --format=iife --platform=browser
+
+
+  dist\webview.js  36.6kb
+
+Done in 12ms
+src/test/codex-cli-provider-port.test.ts(253,33): error TS2339: Property 'port' does not exist on type '{ readonly process: CodexCliProcessPort; readonly log: FakeProcessLog; }'.
+src/test/codex-cli-provider-port.test.ts(257,143): error TS2339: Property 'port' does not exist on type '{ readonly process: CodexCliProcessPort; readonly log: FakeProcessLog; }'.
