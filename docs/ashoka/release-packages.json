@@ -1,6 +1,6 @@
 {
   "schema": "dreamgraph.release_packages.v1",
-  "recorded_at": "2026-10-03T12:18:45.715Z",
+  "recorded_at": "2026-10-03T13:36:56.414Z",
   "scope": "Exact 13.4.0 and 14.0.0 tarball payloads; disposable shared-bin install/restart and retained legacy data. Excludes PATH/VS Code activation, real instances and paid requests.",
   "checks": [
     {
@@ -14,7 +14,7 @@
       "name": "Daemon health 13.4.0",
       "value": {
         "http": 200,
-        "start_ms": 8451
+        "start_ms": 8939
       }
     },
     {
@@ -59,7 +59,7 @@
       "name": "Daemon health 14.0.0",
       "value": {
         "http": 200,
-        "start_ms": 5117
+        "start_ms": 9297
       }
     },
     {
@@ -85,7 +85,7 @@
       "name": "Daemon health 14.0.0",
       "value": {
         "http": 200,
-        "start_ms": 2422
+        "start_ms": 2481
       }
     },
     {
@@ -120,7 +120,7 @@
     },
     {
       "file": "dreamgraph-14.0.0.tgz",
-      "sha256": "59d7981f02696aa8a01dbdbee8add4fe1c52f6b19813b5b7c4420e955ac555c5"
+      "sha256": "2138b30045e585eb1ca2329771d696b466ab9bea0c1fe4ce9f0927d5e414f3a0"
     },
     {
       "file": "dreamgraph-sdk-14.0.0.tgz",

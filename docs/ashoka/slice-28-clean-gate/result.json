@@ -1,0 +1,132 @@
+{
+  "schema": "dreamgraph.ashoka.offline_gate.v1",
+  "status": "passed",
+  "source_hash": "448b2f1c285743ae685583f235bf45a406d3b3e175de1eab7eb7f7380ee192f4",
+  "platform": "win32",
+  "architecture": "x64",
+  "node": "25.2.1",
+  "model_requests": 0,
+  "scope": "Offline builds, contracts, compiled consumers and actual isolated browser only. No release or real-model usefulness claim.",
+  "steps": [
+    {
+      "name": "server",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 3.8384471000000002
+    },
+    {
+      "name": "explorer",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 10.7636259
+    },
+    {
+      "name": "editor",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 11.938136
+    },
+    {
+      "name": "contracts-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 0.8953248999999996
+    },
+    {
+      "name": "providers-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 0.983768
+    },
+    {
+      "name": "mcp-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 3.9483724000000002
+    },
+    {
+      "name": "metrics-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 2.8483550000000033
+    },
+    {
+      "name": "config-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 3.7731999
+    },
+    {
+      "name": "ashoka-baseline-check",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 1.040654699999999
+    },
+    {
+      "name": "editor-tests",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 16.185905400000003
+    },
+    {
+      "name": "root-tests",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 676.9973843
+    },
+    {
+      "name": "browser",
+      "exit_code": 0,
+      "signal": null,
+      "child_closed": true,
+      "failure": null,
+      "elapsed_seconds": 19.329910199999926
+    }
+  ],
+  "editor": {
+    "passed": 546,
+    "failed": 0,
+    "skipped": 0
+  },
+  "root": {
+    "passed": 2047,
+    "failed": 0,
+    "skipped": 2,
+    "skip_names": [
+      "pushParticlesForEdge ParticleSystem removed in Slice F1 — flow now lives on the tube shader",
+      "ParticleSystem ParticleSystem removed in Slice F1"
+    ],
+    "files": 185
+  },
+  "browser": {
+    "platform": "win32",
+    "architecture": "x64",
+    "checks": 11,
+    "stop_release_ms": 12.147899999999936,
+    "termination_ms": 393.6111000000001,
+    "control_loss_stop_ms": 2767.1841999999997
+  },
+  "finished_at": "2026-10-03T13:28:40.648Z"
+}

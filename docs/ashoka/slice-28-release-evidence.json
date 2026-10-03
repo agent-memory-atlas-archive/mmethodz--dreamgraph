@@ -1,0 +1,108 @@
+{
+  "schema": "dreamgraph.ashoka.release_evidence.v1",
+  "version": "14.0.0",
+  "release_name": "Ashoka",
+  "status": "qualified_for_publication",
+  "recorded_at": "2026-10-03T13:40:14.662Z",
+  "source_qualification": {
+    "commit": "c761b90fc7e91fd3ea27ba7daf56fe36aaa44264",
+    "git_archive_clean_checkout": true,
+    "source_hash": "448b2f1c285743ae685583f235bf45a406d3b3e175de1eab7eb7f7380ee192f4",
+    "result": "slice-28-clean-gate/result.json",
+    "platform": "win32",
+    "node": "25.2.1",
+    "steps": 12,
+    "root": {
+      "passed": 2047,
+      "failed": 0,
+      "skipped": 2,
+      "skip_names": [
+        "pushParticlesForEdge ParticleSystem removed in Slice F1 — flow now lives on the tube shader",
+        "ParticleSystem ParticleSystem removed in Slice F1"
+      ],
+      "files": 185
+    },
+    "editor": {
+      "passed": 546,
+      "failed": 0,
+      "skipped": 0
+    },
+    "browser": {
+      "platform": "win32",
+      "architecture": "x64",
+      "checks": 11,
+      "stop_release_ms": 12.147899999999936,
+      "termination_ms": 393.6111000000001,
+      "control_loss_stop_ms": 2767.1841999999997
+    },
+    "model_requests": 0
+  },
+  "package_qualification": {
+    "result": "release-packages.json",
+    "success": true,
+    "root_package_sha256": "2138b30045e585eb1ca2329771d696b466ab9bea0c1fe4ce9f0927d5e414f3a0",
+    "original_release_source": "563d10c8109cbe3388cde71168bdcff149c96e0f",
+    "checks": [
+      "Installed CLI 13.4.0",
+      "Daemon health 13.4.0",
+      "Actual 13.4 CLI MCP client",
+      "Installed CLI 14.0.0",
+      "Installed workspace bytes and daemon import",
+      "Install leaves graph, instance configuration and extension history untouched",
+      "Daemon health 14.0.0",
+      "13.4 client reconnects to 14.0 MCP authority",
+      "Packaged web surfaces and sibling template config readback",
+      "Installed CLI reviewed migration and lost-reply replay",
+      "Daemon health 14.0.0",
+      "Post-migration restart and legacy lookup",
+      "Reviewed exact-byte restore preserves later configuration and unrelated history",
+      "Unknown/future schema refuses migration"
+    ],
+    "scope": "Exact 13.4.0 and 14.0.0 tarball payloads; disposable shared-bin install/restart and retained legacy data. Excludes PATH/VS Code activation, real instances and paid requests.",
+    "model_requests": 0
+  },
+  "accepted_dependencies": {
+    "slice_26": "slice-26-closure.json",
+    "slice_27": "slice-27-closure.json",
+    "slice_31": "slice-31-release-scope-conformance.json",
+    "linux": "Previously accepted WSL2 Ubuntu 24.04 / Node 20 installer and isolated-browser-worker evidence. No new qualification environment."
+  },
+  "ui": {
+    "qualification": "operational-tabs-ui/qualification.json",
+    "retained_architect_tabs": [
+      "Config",
+      "Schedules",
+      "Status/Health"
+    ],
+    "explorer": "Separate light-blue link opens another tab; Explorer source unchanged in this release-fix pass."
+  },
+  "compatibility": {
+    "product_version": "14.0.0",
+    "independent_schema_majors": true,
+    "upgrade": "release-14.0.0.md",
+    "installer": "Maintainer retained shared-bin replacement with operator restart and actual health confirmation. No immutable running-asset staging claim.",
+    "migration": "Installation does not consent to or perform graph conversion. Exact reviewed preview, backup, offline apply and recovery remain separate.",
+    "original_instance": "Not installed, restarted or migrated by the release pass."
+  },
+  "remote_ci": {
+    "status": "unavailable_not_started",
+    "reason": "GitHub account billing lock prevented all job steps.",
+    "observed_run": "https://github.com/mmethodz/dreamgraph/actions/runs/37122778800",
+    "codeql_run": "https://github.com/mmethodz/dreamgraph/actions/runs/37122778806",
+    "disposition": "Accepted local Windows and existing WSL2 evidence; no remote CI success claim, billing change or purchase."
+  },
+  "benchmark": {
+    "report": "benchmarks/2026-10-03-gpt-4.1/README.md",
+    "new_paid_calls": 0,
+    "limitation": "Published 14-pair pilot retains quality failures. Improved agent understanding, superiority and cost savings are not established."
+  },
+  "publication": {
+    "tag": "v14.0.0",
+    "github": "https://github.com/mmethodz/dreamgraph/releases/tag/v14.0.0",
+    "checksums": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.0/SHA256SUMS.txt",
+    "website": "https://dreamgraph.nofs.ai/",
+    "website_commit": "0a094e28a21cd573891fb780babce17ead1ee9d6",
+    "website_source_sha256": "96fa5ab8473dd5a5fa68b70442ee1cb941da83c7ebf974f949b1a733e600a61d",
+    "confirmed": false
+  }
+}
