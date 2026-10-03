@@ -21,6 +21,7 @@ import { logger } from "../utils/logger.js";
 import { getArchitectProjectRoot } from "./plan-registry.js";
 import type { PlanExecutionIntent } from "../graph/contracts.js";
 import { randomUUID } from "node:crypto";
+import { architectPassTimeoutMs } from "../config/request-bounds.js";
 import { getSessionContext } from "../server/session-context.js";
 import { executionPolicyProjection, type ExecutionApproval } from "../server/execution-policy.js";
 import { beginHostExecution, endHostExecution, withHostExecution } from "../server/managed-execution.js";
@@ -162,7 +163,7 @@ export async function runArchitectNativeToolLoop(input: RunArchitectNativeToolLo
   const lease = await beginHostExecution({ id, query: input.userMessage, adapter: "native_api_tool_loop", plan_id: input.planId, slice_id: input.sliceId,
     plan_execution: input.planExecution,
     autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced", approved_actions: input.approvedActions,
-    timeout_ms: Math.min(300000, Math.max(1, input.config.timeoutMs)) }, input.signal, input.operatorReviewEnabled === true);
+    timeout_ms: architectPassTimeoutMs() }, input.signal, input.operatorReviewEnabled === true);
   let dispatched = false, finished = false;
   try {
     const block = lease.execution.block;
@@ -308,6 +309,8 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
   for (let iteration = 1; iteration <= MAX_ARCHITECT_TOOL_ITERATIONS; iteration += 1) {
     iterations = iteration;
     input.signal?.throwIfAborted();
+    // Each loop iteration is liveness evidence for the rolling execution lease.
+    getSessionContext()?.execution_policy?.renew();
     await refreshForCompletion();
     const response = await measuredCall(() => completeWithNativeTools(input.config, rawMessages, advertisedTools, input.signal));
     completionModel = response.model || completionModel;

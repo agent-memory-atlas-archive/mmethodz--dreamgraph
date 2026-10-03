@@ -8,7 +8,7 @@ import { delimiter, isAbsolute, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { createRequire } from "node:module";
 import { nativeCliModelExecution } from "../cognitive/model-execution.js";
-import { NATIVE_CLI_PROMPT_MAX_BYTES } from "../config/request-bounds.js";
+import { NATIVE_CLI_PROMPT_MAX_BYTES, ARCHITECT_PASS_MAX_MS, ARCHITECT_PASS_DEFAULT_MS } from "../config/request-bounds.js";
 import { getArchitectLlmConfig } from "../cognitive/llm.js";
 import { providerUsage } from "../cognitive/provider-outcome.js";
 import type { LlmMessage, TokenUsage } from "../cognitive/llm.js";
@@ -77,6 +77,8 @@ export interface ArchitectCliBridgeResult {
   usage?: TokenUsage;
   usage_provenance: "native_reported" | "unavailable";
   graph_execution?: ManagedExecutionContext;
+  /** The executor asked for Computer Use (policy "ask"); the operator must answer before a re-run. */
+  computer_use_request?: { reason: string };
 }
 
 export interface RunArchitectCliBridgeInput {
@@ -98,6 +100,10 @@ export interface RunArchitectCliBridgeInput {
   planId?: string;
   sliceId?: string;
   planExecution?: PlanExecutionIntent;
+  /** Local operator allowed native Computer Use for this pass (codex-cli only). */
+  computerUse?: boolean;
+  /** Policy is "ask" and no grant exists: expose request_computer_use to the executor. */
+  computerUseRequestable?: boolean;
 }
 
 interface ProcessResult {
@@ -121,7 +127,7 @@ interface AuditRecord {
 }
 
 const OUTPUT_LIMIT = 512 * 1024;
-const CLI_DEFAULT_TIMEOUT_MS = 300_000;
+const CLI_DEFAULT_TIMEOUT_MS = ARCHITECT_PASS_DEFAULT_MS;
 const CODEX_HOME_AUTH_ARTIFACTS = Object.freeze(["auth.json", "version.json", "installation_id"] as const);
 const BRIDGE_LOCAL_DREAMGRAPH_TOOLS = Object.freeze(["run_command"] as const);
 const BRIDGE_MCP_CONFIG_ENV_KEYS = Object.freeze([
@@ -134,6 +140,7 @@ const BRIDGE_MCP_CONFIG_ENV_KEYS = Object.freeze([
   "DREAMGRAPH_ARCHITECT_VERBOSITY_MODE",
   "DREAMGRAPH_ARCHITECT_STORY_VISIBILITY",
   "DREAMGRAPH_ARCHITECT_PROMPT_PROFILE",
+  "DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE",
   "ELECTRON_RUN_AS_NODE",
 ] as const);
 const REQUIRED_DREAMGRAPH_TOOLS = Object.freeze(["query_resource", "query_architecture_decisions", "read_source_code", "search_source_code", "run_command"] as const);
@@ -175,16 +182,17 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
   // Logical execution IDs are opaque; a browser session ID may contain Windows-invalid colons.
   const auditPath = join(auditDir, `${createHash("sha256").update(runId).digest("hex")}.ndjson`);
   const bridgeSpawn = resolveBridgeSpawn();
-  let prompt = serializeCliPrompt(input.messages, input.userMessage, input.adapter, toolRequirements.requirements, { autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced" });
+  let prompt = serializeCliPrompt(input.messages, input.userMessage, input.adapter, toolRequirements.requirements, { autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced", computerUse: input.adapter !== "codex-cli" ? "off" : input.computerUse === true ? "granted" : input.computerUseRequestable === true ? "requestable" : "off" });
   const model = input.model && input.model !== "auto" ? input.model : undefined;
   const timeoutMs = Number.isFinite(input.timeoutMs) && input.timeoutMs > 0
-    ? Math.max(30_000, Math.min(input.timeoutMs, 300000))
-    : Math.min(CLI_DEFAULT_TIMEOUT_MS, 300000);
+    ? Math.max(30_000, Math.min(input.timeoutMs, ARCHITECT_PASS_MAX_MS))
+    : CLI_DEFAULT_TIMEOUT_MS;
   const startedAt = Date.now();
   const context = getSessionContext();
   if (!context) { await rm(scratchDir, { recursive: true, force: true }); throw new Error("CLI_EXECUTION_SESSION_REQUIRED"); }
   let lease: Awaited<ReturnType<typeof beginHostExecution>> | undefined;
   let executionSignal: AbortSignal;
+  let renewExecution: () => boolean = () => false;
   let dispatched = false, finished = false;
   try {
     lease = await beginHostExecution({ id: runId, query: input.userMessage, adapter: input.adapter,
@@ -193,7 +201,8 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       approved_actions: input.approvedActions, timeout_ms: Math.trunc(timeoutMs) }, input.signal, input.operatorReviewEnabled === true);
     prompt += "\n\n" + lease.execution.block;
     if (Buffer.byteLength(prompt) > NATIVE_CLI_PROMPT_MAX_BYTES) throw new Error("CLI_REQUIRED_PROMPT_BYTE_BOUND: narrow the task without clipping required evidence");
-    executionSignal = await withHostExecution(runId, async () => getSessionContext()!.execution_policy!.signal);
+    const executionPolicy = await withHostExecution(runId, async () => getSessionContext()!.execution_policy!);
+    executionSignal = executionPolicy.signal; renewExecution = executionPolicy.renew;
     executionSignal.throwIfAborted();
   }
   catch (error) {
@@ -213,9 +222,10 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       workspaceRoot: getArchitectProjectRoot(),
       verbosityMode: input.verbosityMode,
       sessionBearer: lease.worker_bearer,
+      computerUseRequestable: input.adapter === "codex-cli" && input.computerUse !== true && input.computerUseRequestable === true,
     });
     const invocation = input.adapter === "codex-cli"
-      ? await prepareCodexInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames, verbosityMode: input.verbosityMode, reasoningEffort: input.reasoningEffort })
+      ? await prepareCodexInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames, verbosityMode: input.verbosityMode, reasoningEffort: input.reasoningEffort, computerUse: input.computerUse === true })
       : await prepareCopilotInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames });
 
     await deliverManagedContext(runId, prompt);
@@ -229,7 +239,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         output_tokens: baseConfig.maxTokens, signal: executionSignal }, async signal => {
         signal.throwIfAborted(); dispatched = true;
         const result = await runProcess({ command: invocation.command, args: invocation.args, cwd: invocation.cwd,
-          env: invocation.env, stdin: invocation.stdin, timeoutMs, signal });
+          env: invocation.env, stdin: invocation.stdin, timeoutMs, signal, onActivity: () => { renewExecution(); } });
         return { result, usage: input.adapter === "codex-cli" ? extractArchitectCodexUsage(result.stdout) : undefined,
           acknowledged: result.exitCode !== null && !result.timedOut && !signal.aborted };
       });
@@ -238,12 +248,18 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     }
     const audit = await readAuditTrace(auditPath);
     const toolTrace = auditRecordsToToolTrace(audit);
+    const computerUseRequestRecord = audit.find((record) => record.tool === "request_computer_use");
+    let computerUseRequest: { reason: string } | undefined;
+    if (computerUseRequestRecord) { let reason = ""; try { reason = String((JSON.parse(computerUseRequestRecord.inputJson ?? "{}") as { reason?: unknown }).reason ?? ""); } catch { /* bounded audit body */ }
+      computerUseRequest = { reason: reason.slice(0, 500) }; }
     auditTail.emitEntries(toolTrace);
 
     const content = await extractAssistantContent(input.adapter, processResult, invocation.outputPath);
     const usage = input.adapter === "codex-cli" ? extractArchitectCodexUsage(processResult.stdout) : undefined;
     const completedTools = toolTrace.filter((entry) => entry.status === "completed").length;
-    const failureReason = executionSignal.aborted ? "ARCHITECT_CLI_CANCELLED" : processResult.timedOut
+    const abortReason = executionSignal.aborted ? String((executionSignal.reason as Error | undefined)?.message ?? "") : "";
+    const failureReason = /^EXECUTION_(STALE|CEILING_REACHED)/.test(abortReason) ? abortReason
+      : executionSignal.aborted ? "ARCHITECT_CLI_CANCELLED" : processResult.timedOut
       ? `${input.adapter.toUpperCase()}_BRIDGE_TIMEOUT: timeout after ${timeoutMs}ms; completed tools ${completedTools}/${toolTrace.length}`
       : processResult.exitCode !== 0
         ? `${input.adapter.toUpperCase()}_BRIDGE_NONZERO_EXIT: exit=${processResult.exitCode}; stderr=${compact(processResult.stderr)}`
@@ -251,11 +267,13 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
           ? `${input.adapter.toUpperCase()}_BRIDGE_EMPTY_RESPONSE: CLI completed without assistant text`
           : null;
 
-    const cancelled = executionSignal.aborted;
-    const effectiveControls = cancelled ? lease.controls : await withHostExecution(runId, async () => executionPolicyProjection(getSessionContext()!.execution_policy!));
+    const expired = /^EXECUTION_(STALE|CEILING_REACHED)/.test(abortReason);
+    const cancelled = executionSignal.aborted && !expired;
+    const effectiveControls = executionSignal.aborted ? lease.controls : await withHostExecution(runId, async () => executionPolicyProjection(getSessionContext()!.execution_policy!));
     await endHostExecution({ execution_id: runId, outcome: cancelled ? "cancelled" : failureReason ? "failed" : "completed",
       work_termination: !failureReason && !processResult.signal ? "confirmed" : "unconfirmed" }); finished = true;
     return {
+      ...(computerUseRequest ? { computer_use_request: computerUseRequest } : {}),
       graph_execution: await readManagedContext(runId),
       content: failureReason || cancelled ? "" : content.trim(),
       ...(usage ? { usage } : {}),
@@ -271,7 +289,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         required_tools: toolRequirements.requirements?.required_tools ?? [],
         unavailable_required_tools: toolRequirements.unavailable_required_tools,
         iterations: 1,
-        stop_reason: cancelled ? "cli_cancelled" : processResult.timedOut ? "cli_timed_out" : processResult.exitCode !== 0 ? "cli_failed" : failureReason ? "cli_empty_response" : "cli_completed",
+        stop_reason: expired ? (abortReason.startsWith("EXECUTION_STALE") ? "execution_stale" : "execution_ceiling_reached") : cancelled ? "cli_cancelled" : processResult.timedOut ? "cli_timed_out" : processResult.exitCode !== 0 ? "cli_failed" : failureReason ? "cli_empty_response" : "cli_completed",
         fallback_reason: failureReason,
         run_id: runId,
         executable: invocation.command,
@@ -341,6 +359,7 @@ function buildBridgeEnv(input: {
   verbosityMode?: ArchitectVerbosityMode;
   reasoningEffort?: string;
   sessionBearer?: string;
+  computerUseRequestable?: boolean;
 }): Record<string, string> {
   const env = stringEnv(process.env);
   const density = resolveArchitectNarrativeDensity(input.verbosityMode);
@@ -355,6 +374,7 @@ function buildBridgeEnv(input: {
     DREAMGRAPH_ARCHITECT_VERBOSITY_MODE: density.verbosity_mode,
     DREAMGRAPH_ARCHITECT_STORY_VISIBILITY: density.story_visibility,
     DREAMGRAPH_ARCHITECT_PROMPT_PROFILE: density.prompt_profile,
+    DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE: input.computerUseRequestable ? "1" : "0",
     ELECTRON_RUN_AS_NODE: "1",
   };
 }
@@ -501,6 +521,7 @@ async function prepareCodexInvocation(input: {
   availableToolNames: string[];
   verbosityMode?: ArchitectVerbosityMode;
   reasoningEffort?: string;
+  computerUse?: boolean;
 }): Promise<{ command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string; outputPath: string | null }> {
   const command = await resolveArchitectCliExecutable("codex-cli");
   const codexHome = join(input.scratchDir, "codex-home");
@@ -514,6 +535,7 @@ async function prepareCodexInvocation(input: {
     env: bridgeMcpConfigEnv(input.envBase),
     tools: input.availableToolNames,
     modelVerbosity: resolveArchitectNarrativeDensity(input.verbosityMode).provider_text_verbosity,
+    computerUse: input.computerUse === true,
   }), { mode: 0o600 });
 
   const outputPath = join(artifactsDir, "last-message.txt");
@@ -601,21 +623,25 @@ export function createArchitectCodexConfigToml(input: {
   env: Record<string, string>;
   tools: string[];
   modelVerbosity?: "low" | "medium" | "high";
+  /** Set only from the local operator's Computer Use policy/answer for this pass. */
+  computerUse?: boolean;
 }): string {
+  const allow = input.computerUse === true;
+  const flag = allow ? "true" : "false";
   const lines = [
     "# Generated by DreamGraph for an isolated standalone Architect Codex CLI run.",
     ...(input.modelVerbosity ? [`model_verbosity = ${tomlString(input.modelVerbosity)}`, ""] : []),
-    // A native CLI feature flag is not a C17 grant. Ordinary passes cannot
-    // acquire computer/browser authority through the CLI's default features.
+    // Codex owns its native Computer Use. It is enabled only when the local
+    // operator's policy (allow) or explicit per-request answer (ask) permits it.
     "[computer_use]",
-    'default_app_access = "deny"',
+    `default_app_access = ${tomlString(allow ? "allow" : "deny")}`,
     "",
     "[features]",
-    "computer_use = false",
-    "browser_use = false",
-    "browser_use_external = false",
+    `computer_use = ${flag}`,
+    `browser_use = ${flag}`,
+    `browser_use_external = ${flag}`,
     "browser_use_full_cdp_access = false",
-    "in_app_browser = false",
+    `in_app_browser = ${flag}`,
     "",
     "[mcp_servers.dreamgraph]",
     `command = ${tomlString(input.bridgeCommand)}`,
@@ -665,7 +691,7 @@ export function serializeCliPrompt(
   userMessage: string,
   adapter: ArchitectCliAdapter,
   toolRequirements?: ArchitectCliToolRequirements | null,
-  controls?: { autonomy: "manual" | "supervised" | "autonomous"; verbosity: ArchitectVerbosityMode },
+  controls?: { autonomy: "manual" | "supervised" | "autonomous"; verbosity: ArchitectVerbosityMode; computerUse?: ComputerUseMode },
 ): string {
   const contextMessages = messages.filter((message) => message.role !== "user");
   return [
@@ -679,7 +705,7 @@ export function serializeCliPrompt(
     "Do not use provider-native shell/read/write routes; use dreamgraph:run_command, read_source_code, patch_file, query_resource, query_architecture_decisions, and related DreamGraph MCP tools.",
     "The user request appears only in CURRENT USER REQUEST. Do not reconstruct it from prior sections.",
     createArchitectCliToolRequirementsSection(toolRequirements),
-    createCliControlInstructions(controls?.autonomy ?? "manual", controls?.verbosity ?? "balanced"),
+    createCliControlInstructions(controls?.autonomy ?? "manual", controls?.verbosity ?? "balanced", controls?.computerUse ?? "off"),
     "",
     ...contextMessages.map((message) => `## ${message.role.toUpperCase()}\n${message.content}`),
     "",
@@ -687,14 +713,19 @@ export function serializeCliPrompt(
     userMessage,
   ].join("\n\n");
 }
-export function createCliControlInstructions(autonomy: "manual" | "supervised" | "autonomous", verbosity: ArchitectVerbosityMode): string {
+export type ComputerUseMode = "granted" | "requestable" | "off";
+export function createCliControlInstructions(autonomy: "manual" | "supervised" | "autonomous", verbosity: ArchitectVerbosityMode, computerUse: ComputerUseMode = "off"): string {
   const action = autonomy === "manual" ? "Inspect/propose. Execute at most one specifically approved bounded effect, then return control. Do not continue to another slice."
     : autonomy === "supervised" ? "Execute only the approved checkpoint scope. Stop at its review checkpoint, unresolved question, scope change or governance gate."
     : "Continue eligible work within the approved task scope until task completion, a governance gate, resource limit, contradiction or user stop. Completing an intermediate slice does not complete the task.";
   const density = verbosity === "concise" ? "Give a brief outcome and essential evidence. Keep supporting diagnostics compact."
     : verbosity === "detailed" ? "Explain the outcome, relevant rationale, alternatives and uncertainty, with evidence links and diagnostic summary."
     : "Give the outcome with focused evidence and useful reasoning summary.";
-  return `Effective controls: autonomy=${autonomy}; verbosity=${verbosity}. ${action} ${density} All modes preserve graph/ADR anchors, provenance, failures, scoped currency/completeness warnings and reconciliation obligations. Output density is guidance, never permission or guaranteed word count. The daemon enforces approved effect arguments and finite limits; no native Computer Use permission is implied.`;
+  return `Effective controls: autonomy=${autonomy}; verbosity=${verbosity}. ${action} ${density} All modes preserve graph/ADR anchors, provenance, failures, scoped currency/completeness warnings and reconciliation obligations. Output density is guidance, never permission or guaranteed word count. The daemon enforces approved effect arguments and finite limits; ${computerUse === "granted"
+    ? "the local operator has ALLOWED native Computer Use for this pass: you may use your own computer/browser tools to operate applications and web pages on this machine to fulfil the request. Report what you did and observed."
+    : computerUse === "requestable"
+      ? "Computer Use is NOT granted for this pass. If the request genuinely requires operating this computer (browser, apps, screen), call the DreamGraph tool request_computer_use with a one-sentence reason, then end your turn; the operator will be asked and the request re-run with Computer Use if allowed. Otherwise do not ask."
+      : "no native Computer Use permission is implied."}`;
 }
 
 export function createArchitectCliToolRequirementsSection(toolRequirements?: ArchitectCliToolRequirements | null): string {
@@ -838,6 +869,8 @@ function runProcess(input: {
   stdin: string;
   timeoutMs: number;
   signal?: AbortSignal;
+  /** Called on any process output; used as execution liveness evidence. */
+  onActivity?: () => void;
 }): Promise<ProcessResult> {
   return new Promise((resolvePromise, reject) => {
     const startedAt = Date.now();
@@ -874,9 +907,11 @@ function runProcess(input: {
 
     child.stdout.on("data", (chunk) => {
       stdout = appendLimited(stdout, String(chunk));
+      input.onActivity?.();
     });
     child.stderr.on("data", (chunk) => {
       stderr = appendLimited(stderr, String(chunk));
+      input.onActivity?.();
     });
     child.on("error", (error) => {
       clearTimeout(timer);

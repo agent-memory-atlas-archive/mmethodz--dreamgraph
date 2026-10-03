@@ -6,7 +6,8 @@ import { ManagedExecutionRequestSchema, ManagedExecutionSnapshotSchema, ManagedE
 import { beginManagedContext, readManagedContext, finishManagedContext, recordManagedEffect, recordManagedApproval, assertManagedContext, managedContextPrompt,
   reassembleManagedPlanContext, recordManagedPlanClosure, recordManagedNativeStop, recordManagedNativeStopRecovery, recordManagedPlanStopRecovery, assertManagedPlanBinding, type ManagedExecutionContext } from "../graph/execution-context.js";
 import { getSessionContext, withSessionContext, type SessionContext } from "./session-context.js";
-import { issueExecutionPolicy, prepareExecutionApproval, executionPolicyProjection } from "./execution-policy.js";
+import { issueExecutionPolicy, prepareExecutionApproval, executionPolicyProjection, assertExecutionLive } from "./execution-policy.js";
+import { architectPassIdleMs } from "../config/request-bounds.js";
 import { withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
 import { approvalHash } from "../discipline/approval.js";
 import { HostModelAdmission, readRecoveredHostModel, originalHostStopLedger } from "./host-model-admission.js";
@@ -73,8 +74,7 @@ export async function readHostExecutionReviews(id:string) {
 export async function enableHostExecutionReviews(id:string) {
   const context=owner();await readManagedContext(id);
   const live=leases.get(key(context,id));if(!live)throw new Error("HOST_EXECUTION_AUTHORITY_UNAVAILABLE");
-  live.lease.policy.signal.throwIfAborted();
-  if(Date.parse(live.lease.policy.expires_at)<=Date.now())throw new Error("EXECUTION_POLICY_EXPIRED");
+  assertExecutionLive(live.lease.policy);
   live.lease.policy.request_review=(tool,args,signal)=>requestHostReview(context,id,tool,args,signal);
   return readHostExecutionReviews(id);
 }
@@ -95,7 +95,7 @@ export async function beginHostExecution(input:unknown,signal?:AbortSignal,opera
   if(intent){request.plan_id=intent.scope.id;if(intent.slice_id!==null)request.slice_id=intent.slice_id;}
   // Validate approval/controls before persisting assembly. A lost reply cannot reissue this ID.
   const lease=issueExecutionPolicy(context,{id:request.id,context_id:request.id,autonomy:request.autonomy,verbosity:request.verbosity,
-    timeout_ms:request.timeout_ms,approvals:request.approved_actions,signal:signal??new AbortController().signal});
+    timeout_ms:request.timeout_ms,idle_ms:Math.min(request.timeout_ms,architectPassIdleMs()),approvals:request.approved_actions,signal:signal??new AbortController().signal});
   try {
     const entry=await withGraphReconciliation(async()=>{
       const source=intent?await captureArchitectPlanRuntimeSource(intent,lease.policy.signal):undefined;
@@ -103,12 +103,14 @@ export async function beginHostExecution(input:unknown,signal?:AbortSignal,opera
       if(!intent)return assembled;
       if(!assembled.pack.mandatory_satisfied || assembled.pack.state.availability==="unavailable")throw new Error("PLAN_EXECUTION_CONTEXT_INSUFFICIENT");
       if(intent.scope.instance_id!==assembled.instance_id)throw new Error("PLAN_RUNTIME_INSTANCE_SCOPE_REJECTED");
-      await PlanRuntimeLease.admit({...intent,execution_id:request.id,timeout_ms:Math.max(1,Date.parse(lease.policy.expires_at)-Date.now())},
+      await PlanRuntimeLease.admit({...intent,execution_id:request.id,timeout_ms:Math.max(1,Date.parse(lease.policy.ceiling_at)-Date.now())},
         {signal:lease.policy.signal,check_sources:checkSignal=>checkPlanRuntimeSource(source!,checkSignal)});
       lease.policy.signal.throwIfAborted();
       return reassembleManagedPlanContext(request.id);
     });
-    const timer=setTimeout(()=>close(context,request.id),Math.max(1,Date.parse(lease.policy.expires_at)-Date.now()));timer.unref();
+    // Rolling lease: staleness aborts the policy signal (revoking worker authority) while the owner
+    // still settles it through endHostExecution. The hard ceiling remains a final cleanup bound.
+    const timer=setTimeout(()=>close(context,request.id),Math.max(1,Date.parse(lease.policy.ceiling_at)-Date.now()));timer.unref();
     leases.set(key(context,request.id),{owner:context,lease,timer,activeApprovals:new Set(),pendingReviews:new Map(),reviewCount:0});
     if(operatorReviewEnabled)lease.policy.request_review=(tool,args,signal)=>requestHostReview(context,request.id,tool,args,signal);
     return {execution:await snapshot(entry,context),worker_bearer:lease.bearer,controls:lease.projection};
@@ -128,7 +130,7 @@ export async function admitHostModel(input:unknown) {
   const block=managedContextPrompt(entry);
   if(!request.payload.includes(block)&&!request.payload.includes(JSON.stringify(block).slice(1,-1)))throw new Error("HOST_MODEL_REQUIRED_CONTEXT_MISSING");
   if(leases.get(key(context,request.execution_id))!==live)throw new Error("HOST_EXECUTION_AUTHORITY_UNAVAILABLE");
-  live.model??=new HostModelAdmission(request.execution_id,live.lease.policy.expires_at,live.lease.policy.signal);
+  live.model??=new HostModelAdmission(request.execution_id,live.lease.policy.ceiling_at,live.lease.policy.signal);
   return live.model.admit(request);
 }
 export async function settleHostModel(input:unknown) {
@@ -177,7 +179,7 @@ export async function approveHostExecution(input: unknown) {
   const live = leases.get(key(context, request.execution_id));
   if (!live) throw new Error("HOST_EXECUTION_AUTHORITY_UNAVAILABLE");
   live.lease.policy.signal.throwIfAborted();
-  if (Date.parse(live.lease.policy.expires_at) <= Date.now()) throw new Error("EXECUTION_POLICY_EXPIRED");
+  assertExecutionLive(live.lease.policy);
   if (live.lease.policy.effects_inflight) throw new Error("EXECUTION_APPROVAL_EFFECT_INFLIGHT");
   const pending=live.pendingReviews.get(request.approval_id);
   if(pending&&approvalHash(pending.request)!==approvalHash(request))throw new Error("EXECUTION_REVIEW_REQUEST_CHANGED");

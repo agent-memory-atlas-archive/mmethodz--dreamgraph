@@ -38,6 +38,8 @@ const AUDIT_BODY_LIMIT = 16 * 1024;
 const AUDIT_QUEUE_LIMIT = 256;
 const AUDIT_SHUTDOWN_BUDGET_MS = 2_000;
 const MANAGED_CONTEXT = process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER?.startsWith("dgexec.") === true;
+/** Set only when the instance policy is "ask" and this pass has no grant: the executor may request it. */
+const COMPUTER_USE_REQUESTABLE = process.env.DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE === "1";
 type ContextDelivery = { receipt_id: string; block: string; delivery: "unattested" };
 const deliveries = new Map<string | number, ContextDelivery>();
 const transportReleases = new Map<string | number, () => void>();
@@ -156,7 +158,7 @@ async function main(): Promise<void> {
     }
     // A local extension appears once, on the final page, never on every page.
     if (result.nextCursor || result.tools.some((tool) => tool.name === RUN_COMMAND_TOOL.name)) return result;
-    return { ...result, tools: [...result.tools, RUN_COMMAND_TOOL] };
+    return { ...result, tools: [...result.tools, RUN_COMMAND_TOOL, ...(COMPUTER_USE_REQUESTABLE ? [REQUEST_COMPUTER_USE_TOOL] : [])] };
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (req, extra) => {
@@ -185,7 +187,9 @@ async function main(): Promise<void> {
     try {
       let result = req.params.name === RUN_COMMAND_TOOL.name
         ? await runLocalCommand(req.params.arguments ?? {}, extra.signal)
-        : await upstream.callTool(req.params, undefined, { signal: extra.signal });
+        : req.params.name === REQUEST_COMPUTER_USE_TOOL.name
+          ? requestComputerUse(req.params.arguments ?? {})
+          : await upstream.callTool(req.params, undefined, { signal: extra.signal });
       if (MANAGED_CONTEXT) {
         try {
           const delivery = await contextTransport("refresh", {}, extra.signal) as ContextDelivery;
@@ -318,6 +322,29 @@ const RUN_COMMAND_TOOL: Tool = Object.freeze({
     required: ["command"],
   },
 });
+
+/**
+ * Capability request, not a grant. The call is recorded in the audit trace; DreamGraph ends the pass
+ * as "computer use requested", asks the local operator and, if allowed, re-runs the request with
+ * Codex's native Computer Use enabled. Nothing is operated by this tool.
+ */
+const REQUEST_COMPUTER_USE_TOOL: Tool = Object.freeze({
+  name: "request_computer_use",
+  description:
+    "[DreamGraph] Ask the local operator for permission to use Computer Use (operate this computer's browser/apps). " +
+    "Call this ONLY when the task truly requires operating the computer, then stop and end your turn with one short sentence saying what you need it for. " +
+    "If the operator allows it, the same request is run again with Computer Use enabled.",
+  inputSchema: {
+    type: "object" as const,
+    properties: { reason: { type: "string", description: "One sentence: what you need to do on the computer and why." } },
+    required: ["reason"],
+  },
+});
+function requestComputerUse(args: unknown): LocalToolResult {
+  const reason = typeof (args as { reason?: unknown })?.reason === "string" ? String((args as { reason: string }).reason).slice(0, 500) : "";
+  return localTextResult({ status: "requested", reason,
+    instruction: "Permission requested from the local operator. Do not attempt Computer Use now. End your turn with one short sentence describing what you need to do on the computer." }, false);
+}
 
 const RUN_COMMAND_DEFAULT_TIMEOUT_MS = 60_000;
 const RUN_COMMAND_MAX_TIMEOUT_MS = 300_000;

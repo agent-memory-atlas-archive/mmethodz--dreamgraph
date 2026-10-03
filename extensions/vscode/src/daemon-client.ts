@@ -144,6 +144,21 @@ export class DaemonClient {
     }
   }
 
+  /**
+   * Canonical instance Computer Use policy (engine.env DREAMGRAPH_COMPUTER_USE_POLICY).
+   * VS Code never keeps its own copy; unreadable means "deny" for this pass.
+   */
+  async getComputerUsePolicy(): Promise<"allow" | "ask" | "deny"> {
+    try {
+      const res = await this._fetch("/api/computer-use/v1/policy");
+      if (!res.ok) return "deny";
+      const value = (await res.json()) as { policy?: unknown };
+      return value.policy === "allow" || value.policy === "ask" ? value.policy : "deny";
+    } catch {
+      return "deny";
+    }
+  }
+
   /* ---- Graph Context ---- */
 
   /** Canonical bounded context. Errors remain errors; this cannot attest model consumption. */

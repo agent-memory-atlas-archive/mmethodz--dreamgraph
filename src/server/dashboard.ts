@@ -57,7 +57,7 @@ import { loadCanonicalGraph } from "../graph/read-model.js";
 import { readDirtyPartitions } from "../graph/change-obligations.js";
 import { renderRuntimeWorkspace, RUNTIME_WORKSPACE_SCRIPT } from "./runtime-workspace.js";
 import { applyEngineConfiguration, inspectEngineConfiguration, previewEngineTemplate, applyEngineTemplate, undoEngineConfiguration } from "../config/engine-configuration.js";
-import { engineSettingCatalogue, engineSetting, resolveComponentSettings, componentSettingAlias } from "../config/engine-setting-catalogue.js";
+import { engineSettingCatalogue, engineSetting, resolveComponentSettings, componentSettingAlias, computerUsePolicy } from "../config/engine-setting-catalogue.js";
 import type { EventRouterConfig, SchedulerConfig, NarrativeConfig } from "../cognitive/types.js";
 import { logger } from "../utils/logger.js";
 import { embedArchitectWorkspace } from "./architect-workspace-shell.js";
@@ -1332,6 +1332,10 @@ export async function handleDashboardRoute(
         dirty_total:dirty.partitions.length,dirty_regions:dirty.partitions.slice(0,100)};});json(res,200,result); }
     catch{json(res,503,{ok:false,error:"DASHBOARD_CANONICAL_READ_UNAVAILABLE"});}return true;
   }
+  if(req.method==="GET"&&pathname==="/api/computer-use/v1/policy"){
+    // Canonical instance policy for every Architect surface (browser, VS Code). Never a per-client copy.
+    json(res,200,{ok:true,schema:"dreamgraph.computer_use_policy.v1",policy:computerUsePolicy(),setting:"DREAMGRAPH_COMPUTER_USE_POLICY",
+      routes:{"codex-cli":"Codex native Computer Use","native_api_tool_loop":"DreamGraph browser harness, prepared explicitly per pass"}});return true;}
   if(await handleScheduleApi(req,res,pathname))return true;
   if (pathname.startsWith("/api/config/v1")) { await handleConfigurationApi(req, res, pathname); return true; }
 

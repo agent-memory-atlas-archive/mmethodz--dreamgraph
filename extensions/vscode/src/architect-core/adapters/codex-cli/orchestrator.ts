@@ -46,6 +46,8 @@ export interface CodexCliRunInput {
   readonly onRunIdAssigned?: (runId: string) => void;
   readonly onStdoutChunk?: (chunk: string) => void;
   readonly onStderrChunk?: (chunk: string) => void;
+  /** Instance Computer Use policy grant for this run. */
+  readonly computerUse?: boolean;
 }
 
 export interface CodexCliDeps {
@@ -266,6 +268,7 @@ export async function runCodexCli(
         dreamgraphArgs: bridgeSpawn.args,
         dreamgraphEnv: bridgeSpawn.env,
         liveToolNames: liveTools,
+        ...(input.computerUse === true ? { computerUse: true } : {}),
       });
     } catch (err) {
       return fail({

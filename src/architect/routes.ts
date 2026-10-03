@@ -31,6 +31,8 @@ import {
   type ArchitectPlanActionKind,
 } from "./plan-registry.js";
 import { runArchitectCliBridge } from "./cli-bridge.js";
+import { architectPassTimeoutMs } from "../config/request-bounds.js";
+import { computerUsePolicy } from "../config/engine-setting-catalogue.js";
 import { ExecutionApprovalSchema } from "../server/execution-policy.js";
 import {handleComputerHttp,isNativeComputerOperator} from "../computer/http.js";
 import {claimConfiguredComputer,preparedComputerModelBinding,assertNativeComputerPreparation,type PreparedComputer} from "../computer/browser-registry.js";
@@ -4682,6 +4684,7 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
   let completionModel = architectConfig.model;
   let toolTrace: ArchitectToolTraceEntry[] = [];
   let provenance: unknown = null;
+  let computerUseRequest: { reason: string } | null = null;
   let toolLoopRoute: unknown = null;
   let planUpdate: ArchitectPlanChatUpdateResult | null = null;
   let tokenEconomy: unknown = getArchitectTokenEconomyConfig();
@@ -4793,7 +4796,11 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
         messages,
         userMessage: passMessage,
         model: architectConfig.model,
-        timeoutMs: architectConfig.timeoutMs,
+        timeoutMs: architectPassTimeoutMs(),
+        // Loopback-only daemon: the local operator's policy decides. "ask" needs
+        // the explicit per-request answer from the Architect composer.
+        computerUse: adapter === "codex-cli" && !continuationToken && (computerUsePolicy() === "allow" || computerUsePolicy() === "ask" && body.computer_use === true),
+        computerUseRequestable: adapter === "codex-cli" && computerUsePolicy() === "ask",
         verbosityMode,
         autonomyMode: mode,
         approvedActions: approvedActions.data,
@@ -4840,6 +4847,7 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
         },
       });
       providerAvailable = true;
+      computerUseRequest = completion.computer_use_request ?? null;
       if (adapter === "codex-cli" || adapter === "copilot-cli") usageCalls.push(completion.usage);
       assistantText = completion.content.trim();
       completionModel = completion.model || architectConfig.model;
@@ -5156,6 +5164,8 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
     project_scope: buildProjectScopePayload(),
     story_visibility: runtime.narrative_density.story_visibility,
     story_source: adapter === "deterministic_fallback" ? "deterministic" : adapter === "native_api_tool_loop" ? "native_api" : adapter,
+    /** Executor asked for Computer Use under policy "ask"; the client asks the operator and may re-run with computer_use: true. */
+    computer_use_request: computerUseRequest,
   };
 
   publishEvent("architect.pass_report", {
@@ -11944,6 +11954,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       const persistedPayload = await persistArchitectControls();
       const requestRuntime = updateActiveArchitectRuntime(persistedPayload);
       const dispatchComputerPreparation=takeComputerPreparation(continuation);
+      const dispatchComputerUse=await decideComputerUse(outboundMessage,continuation);
       appendChatMessage('user', outboundMessage);
       const assistantMessage = appendChatMessage('assistant', 'I am starting on that now. I will check the governed project context first, use DreamGraph tools where needed, and report the result when the pass is complete.');
       autonomyPassCount += 1;
@@ -11956,6 +11967,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
             message: outboundMessage,
             operator_review: true,
             ...(dispatchComputerPreparation?{computer_preparation_id:dispatchComputerPreparation}:{}),
+            ...(dispatchComputerUse?{computer_use:true}:{}),
             scope: dispatchScope,
             chat_scope: dispatchScope,
             planId: dispatchPlanId,
@@ -12000,6 +12012,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
           appendEventLine('[provenance] ' + summarizeProvenance(result.provenance));
         }
         refreshArchitectContinuationPills();
+        if (result.computer_use_request) offerComputerUseGrant(renderedAssistantMessage || assistantMessage, result.computer_use_request, message);
         if (dispatchPlanId) {
           appendEventLine(result.plan_update && result.plan_update.changed ? '[plan-action] updated ' + dispatchPlanId + ' via chat' : '[plan-action] returned ' + dispatchPlanId + ' projection');
           if (activePlanId === dispatchPlanId && activePlanLoadToken === dispatchLoadToken) await loadPlans(dispatchPlanId, { activatePlanScope: true, revealSelected: false });
@@ -12007,7 +12020,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         const continuationStatus = result.continuation ? ' | continuation ' + result.continuation.status + ':' + result.continuation.reason : '';
         chatStatusEl.textContent = 'Using ' + architectRuntimeLabel(runtime) + ' | scope ' + (result.chat_scope || dispatchScope) + ' | model source ' + (runtime.model_source || route.model_source || 'unknown') + ' | session ' + (runtime.session_id || 'unknown') + ' | tools ' + (toolLoop.advertised_tool_count || 0) + '/' + (toolLoop.available_tool_count || 0) + ' | trace ' + trace.length + continuationStatus + (route.fallback_reason ? ' | ' + route.fallback_reason : '');
         const nextContinuation = result.continuation || {};
-        if (!reviewAcknowledgementUnconfirmed && nextContinuation.status === 'continue' && nextContinuation.token && nextContinuation.selected_action) {
+        if (!result.computer_use_request && !reviewAcknowledgementUnconfirmed && nextContinuation.status === 'continue' && nextContinuation.token && nextContinuation.selected_action) {
           const selected = nextContinuation.selected_action;
           window.setTimeout(function() {
             sendChatMessage(selected.prompt || selected.label || selected.id || 'Continue', {

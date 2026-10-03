@@ -36,6 +36,8 @@ add(["DREAMGRAPH_DEBUG", "DREAMGRAPH_METRICS_ENABLED", "DREAMGRAPH_ENABLE_RUNTIM
 add(["DG_ALLOW_INPROCESS_PLUGINS", "DREAMGRAPH_AUTO_APPLY_RESOLUTION_PLANS"], boolean, { protected: true });
 add(["DREAMGRAPH_ARCHITECT_SELECTED_PLAN_ID", "DREAMGRAPH_ARCHITECT_CODEX_CLI_BINARY", "DREAMGRAPH_ARCHITECT_COPILOT_CLI_BINARY", "DREAMGRAPH_ARCHITECT_PROMPT_PROFILE", "DREAMGRAPH_ARCHITECT_STORY_VISIBILITY", "DREAMGRAPH_ARCHITECT_VERBOSITY_MODE"], string, { owner: "architect", apply: "next_execution" });
 add(["DREAMGRAPH_ARCHITECT_AUTONOMY_MODE"], string, { owner: "architect", protected: true, apply: "next_execution", description: "Architect reasoning policy; never a Computer Use grant." });
+add(["DREAMGRAPH_ARCHITECT_PASS_TIMEOUT_MS"], ms.min(60_000), { owner: "architect", unit: "milliseconds", apply: "next_execution", description: "Finite maximum for one whole Architect pass (all tool calls), separate from the per-request model timeout. Never extended by activity. Default 30 minutes." });
+add(["DREAMGRAPH_ARCHITECT_PASS_IDLE_MS"], ms.min(60_000), { owner: "architect", unit: "milliseconds", apply: "next_execution", description: "A pass with no activity (worker tool calls or CLI output) for this long is treated as stale and stopped. Default 15 minutes." });
 add(["DREAMGRAPH_ARCHITECT_TOKEN_ECONOMY_SOFT_TARGET", "DREAMGRAPH_ARCHITECT_TOKEN_ECONOMY_TRANSPORT_CEILING"], positive, { unit: "tokens", apply: "next_execution" });
 add(["DREAMGRAPH_ARCHITECT_TOKEN_ECONOMY_DEBT_CARRY_FRACTION"], fraction, { unit: "fraction", apply: "next_execution" });
 add(["DREAMGRAPH_SEMANTIC_CACHE_MIN_CONFIDENCE", "DREAMGRAPH_SEMANTIC_CACHE_MIN_COVERAGE", "DG_PROMOTION_CONFIDENCE", "DG_PROMOTION_PLAUSIBILITY", "DG_PROMOTION_EVIDENCE", "DG_RETENTION_PLAUSIBILITY", "DG_MAX_CONTRADICTION", "DG_DECAY_RATE", "DG_TENSION_URGENCY_DECAY", "DG_TENSION_MIN_URGENCY", "DG_LLM_BUDGET", "DG_PGO_BUDGET", "DG_NORMALIZER_LLM_THRESHOLD", "DG_BOOTSTRAP_RELAXED_CONFIDENCE"], fraction, { unit: "fraction" });
@@ -47,6 +49,8 @@ add(["DREAMGRAPH_EVENTS"], EventSettingsSchema.partial(), { decode: JSON.parse, 
 add(["DREAMGRAPH_SCHEDULER"], SchedulerSettingsSchema.partial(), { decode: JSON.parse, owner: "scheduler", apply: "live" });
 // Cross-field validation is applied after defaults are merged below.
 add(["DREAMGRAPH_NARRATIVE"], z.object({ narrative_interval: positive, digest_interval: positive, max_chapters: positive, auto_narrate: boolean }).strict().partial(), { decode: JSON.parse, owner: "narrative", apply: "live" });
+add(["DREAMGRAPH_COMPUTER_USE_POLICY"], z.enum(["allow", "ask", "deny"]), { owner: "computer use", apply: "next_execution",
+  description: "Whether the local Architect may operate this computer (browser/apps): allow, ask every time, or deny. The daemon is loopback-only, so this is the local operator's decision." });
 add(["DREAMGRAPH_COMPUTER_USE"], ComputerUseSettingsSchema, { decode: JSON.parse, owner: "computer use", protected: true, apply: "next_execution" });
 const componentAliases = {
   DG_SCHEDULER_ENABLED: ["scheduler", "enabled"], DG_SCHEDULER_TICK: ["scheduler", "tick_interval_ms"], DG_SCHEDULER_MAX_RUNS_HR: ["scheduler", "max_runs_per_hour"], DG_SCHEDULER_COOLDOWN: ["scheduler", "global_cooldown_ms"], DG_SCHEDULER_NIGHTMARE_COOLDOWN: ["scheduler", "nightmare_cooldown_ms"], DG_SCHEDULER_MAX_HISTORY: ["scheduler", "max_history"], DG_SCHEDULER_MAX_ERROR_STREAK: ["scheduler", "max_error_streak"], DG_SCHEDULER_EXEC_TIMEOUT: ["scheduler", "execution_timeout_ms"],
@@ -112,6 +116,12 @@ export function validateEngineEnvValues(values: Record<string, string>, changedK
     if (capability) { const record = JSON.parse(capability); if (record.model !== model || record.provider !== provider) throw new Error(`CONFIG_CAPABILITY_SCOPE_MISMATCH: ${role}`); }
   }
   return diagnostics;
+}
+export type ComputerUsePolicy = "allow" | "ask" | "deny";
+/** Local operator policy. Unset or invalid values fall back to asking. */
+export function computerUsePolicy(values: Record<string, string | undefined> = process.env): ComputerUsePolicy {
+  const value = values.DREAMGRAPH_COMPUTER_USE_POLICY?.trim().toLowerCase();
+  return value === "allow" || value === "deny" ? value : "ask";
 }
 export function computerUseSettings(values: Record<string, string | undefined>) { return values.DREAMGRAPH_COMPUTER_USE ? ComputerUseSettingsSchema.parse(JSON.parse(values.DREAMGRAPH_COMPUTER_USE)) : DEFAULT_COMPUTER_USE_SETTINGS; }
 export function engineEnvNumber(key: string, fallback: number): number {

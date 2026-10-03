@@ -1352,7 +1352,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
                   host,
                   text: trimmed,
                   tools: [],
-                  providerOptions: this._buildCodexCliProviderOptions(managedCliPass),
+                  providerOptions: this._buildCodexCliProviderOptions(managedCliPass, await this._resolveCodexComputerUse()),
                   onStreamChunk: streamNativeCliChunk,
                   abortSignal: req.signal,
                 })
@@ -1682,6 +1682,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     const model = llm.currentConfig?.model;
     return {
       hostLlm: llm,
+      computerUse,
       preparePrompt: (prompt, signal) => managedPass.admitPrompt(prompt, { provider: 'none', model: model || 'auto', adapter: 'copilot-cli',
         api: 'native_cli', base_url: '', effort: null, retention: 'provider_default', strict_schema: false, output_tokens: 8192 }, signal),
       admissionSignal: () => managedPass.admissionSignal,
@@ -1787,7 +1788,17 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     };
   }
 
-  private _buildCodexCliProviderOptions(managedPass?: ManagedCliPass): CodexCliProviderPortOptions {
+  /**
+   * Instance-canonical Computer Use policy, read from the daemon for every pass.
+   * "allow" grants Codex's native Computer Use; "deny" and "ask" do not (the VS Code
+   * executor-request flow for "ask" is handled by the browser Architect for now).
+   */
+  private async _resolveCodexComputerUse(): Promise<boolean> {
+    const policy = this.daemonClient ? await this.daemonClient.getComputerUsePolicy() : 'deny';
+    return policy === 'allow';
+  }
+
+  private _buildCodexCliProviderOptions(managedPass?: ManagedCliPass, computerUse = false): CodexCliProviderPortOptions {
     if (!managedPass) throw new Error('MANAGED_CLI_PASS_REQUIRED');
     if (!this.architectLlm) {
       throw new Error('Cannot build Codex CLI provider options: architectLlm is not initialized.');
@@ -3715,7 +3726,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
                   host,
                   text: prompt,
                   tools: [],
-                  providerOptions: this._buildCodexCliProviderOptions(managedCliPass),
+                  providerOptions: this._buildCodexCliProviderOptions(managedCliPass, await this._resolveCodexComputerUse()),
                   onStreamChunk: streamNativeCliChunk,
                   abortSignal: req.signal,
                 })

@@ -1,5 +1,6 @@
 /** Internal native-host/job port. A plan context selection never admits implementation. */
 import { z } from "zod";
+import { ARCHITECT_PASS_MAX_MS } from "../config/request-bounds.js";
 import { approvalHash } from "./approval.js";
 import { applyPlanCommand, readPlanAuthority } from "./plan-authority.js";
 import { getSessionContext, withSessionContext, type SessionContext } from "../server/session-context.js";
@@ -12,7 +13,7 @@ import { bytesHash } from "./plan-authority.js";
 const id = z.string().min(1).max(1000);
 const RequestSchema = PlanExecutionIntentSchema.extend({
   execution_id: id,
-  timeout_ms: z.number().int().min(1).max(300000),
+  timeout_ms: z.number().int().min(1).max(ARCHITECT_PASS_MAX_MS),
 }).strict();
 export const PlanRuntimeFinishSchema = z.object({
   outcome: z.enum(["paused", "cancelled", "failed", "timed_out", "completed"]), reason: id,

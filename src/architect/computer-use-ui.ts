@@ -3,10 +3,13 @@ export const COMPUTER_USE_CSS=String.raw`
  .computer-row{display:flex;align-items:center;gap:6px;margin:0 10px 5px;font-size:11px;color:#b5c6bf}.computer-row button{padding:3px 7px}
  .computer-drawer{margin:0 10px 6px;padding:6px 8px;border:1px solid #384c44;border-radius:4px;background:#1e2421;font-size:11px}
  .computer-drawer[hidden]{display:none}.computer-drawer summary{cursor:pointer;font-weight:600}.computer-drawer pre{max-height:180px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:5px 0}
+ .computer-policy{padding:2px 7px;border:1px solid #3d5148;border-radius:10px;color:#cfe3d8}.computer-policy[data-policy=allow]{border-color:#4f8a6a;color:#9fe0b8}.computer-policy[data-policy=deny]{border-color:#7a4b4b;color:#e3a8a8}.computer-policy[data-policy=ask]{border-color:#7d6a3e;color:#ecd39a}
+ .computer-request{margin:8px 0 2px;padding:8px 10px;border:1px solid #7d6a3e;border-left:3px solid #e2c07a;border-radius:4px;background:#2a261d}.computer-request p{margin:4px 0 6px}.computer-request span{margin-left:8px;color:#cfc4a6}
+ #computer-use-arm[aria-pressed=true]{background:#2f5a43;border-color:#5fa37e;color:#eafff2}
  .computer-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.computer-drawer img{max-width:100%;max-height:260px;border:1px solid #46584f}.computer-actions button{padding:3px 7px}
 `;
 export const COMPUTER_USE_MARKUP=String.raw`
- <div class="computer-row"><button id="computer-use-open" type="button" aria-expanded="false" aria-controls="computer-use-drawer">Computer Use</button><span id="computer-use-state" role="status" aria-live="polite">Inactive · no target grant</span><button id="computer-use-pause" type="button" hidden>Pause</button><button id="computer-use-stop" type="button" hidden>Stop</button></div>
+ <div class="computer-row"><span id="computer-use-policy" class="computer-policy" title="Set in Config → Computer Use">Computer Use: …</span><button id="computer-use-arm" type="button" aria-pressed="false" hidden>Allow for next message</button><button id="computer-use-open" type="button" aria-expanded="false" aria-controls="computer-use-drawer" title="Browser harness for native API adapters">Harness…</button><span id="computer-use-state" role="status" aria-live="polite"></span><button id="computer-use-pause" type="button" hidden>Pause</button><button id="computer-use-stop" type="button" hidden>Stop</button></div>
  <section id="computer-use-drawer" class="computer-drawer" aria-label="Computer Use scope and evidence" hidden><details open><summary>Scope, limits and evidence</summary>
  <div class="computer-actions"><label id="computer-use-sessions-label" hidden>Session <select id="computer-use-sessions" aria-label="Existing Computer Use sessions"></select></label><button id="computer-use-refresh" type="button">Refresh sessions</button><button id="computer-use-more" type="button" hidden>More sessions</button><button id="computer-use-recover" type="button" hidden>Recheck original stop</button></div>
  <pre id="computer-use-setup" tabindex="0"></pre><div class="computer-actions"><label>Model <select id="computer-use-model-role"><option value="architect">Selected Architect model</option><option value="computer_use">Configured Computer Use role</option></select></label><label><input id="computer-use-interact" type="checkbox"> Allow interaction</label><button id="computer-use-prepare" type="button" disabled>Prepare next pass</button><button id="computer-use-confirm" type="button" hidden>Confirm scope</button><button id="computer-use-inspect" type="button" hidden>Inspect observation</button><a href="/config">Configure</a></div>
@@ -96,4 +99,38 @@ export const COMPUTER_USE_SCRIPT=String.raw`
         computerImageEl.hidden=!value?.image;if(value?.image)computerImageEl.src='data:'+value.image.mime_type+';base64,'+value.image.data_base64;else computerImageEl.removeAttribute('src');}
       catch(error){if(generation===computerGeneration)computerStateEl.textContent=error.message;}});
     window.addEventListener('pagehide',()=>{computerGeneration++;invalidateComputerPreparation();clearTimeout(computerTimer);computerImageEl.removeAttribute('src');});
+
+    /* Local operator policy for Codex native Computer Use: allow | ask | deny. */
+    const computerPolicyEl=document.getElementById('computer-use-policy'),computerArmEl=document.getElementById('computer-use-arm');
+    let computerPolicy='ask',computerPolicyReadAt=0,computerArmed=false;
+    const COMPUTER_POLICY_LABEL={allow:'Computer Use: allowed',ask:'Computer Use: ask every time',deny:'Computer Use: denied'};
+    function renderComputerPolicy(){computerPolicyEl.textContent=COMPUTER_POLICY_LABEL[computerPolicy]||COMPUTER_POLICY_LABEL.ask;computerPolicyEl.dataset.policy=computerPolicy;
+      const codex=computerAdapter()==='codex-cli';computerArmEl.hidden=!(codex&&computerPolicy==='ask');computerArmEl.setAttribute('aria-pressed',String(computerArmed));
+      computerArmEl.textContent=computerArmed?'Allowed for next message ✓':'Allow for next message';
+      if(!codex&&computerPolicy!=='deny')computerPolicyEl.title='Codex CLI uses its own Computer Use. Native API adapters use the Harness button.';else computerPolicyEl.title='Change in Config → Computer Use';}
+    async function loadComputerPolicy(force){if(!force&&Date.now()-computerPolicyReadAt<10000)return computerPolicy;
+      try{const result=await fetch('/api/computer-use/v1/policy',{cache:'no-store'}).then(r=>r.json());if(['allow','ask','deny'].includes(result.policy))computerPolicy=result.policy;computerPolicyReadAt=Date.now();}catch(error){/* keep last known */}
+      renderComputerPolicy();return computerPolicy;}
+    computerArmEl.addEventListener('click',()=>{computerArmed=!computerArmed;renderComputerPolicy();});
+    document.getElementById('architect-adapter-select').addEventListener('change',renderComputerPolicy);
+    /** Grant for one outgoing message. The daemon re-checks the instance policy; this only carries the operator's answer. */
+    async function decideComputerUse(message,continuation){if(continuation||computerAdapter()!=='codex-cli')return false;const policy=await loadComputerPolicy(false);
+      if(policy==='allow')return true;if(policy==='deny')return false;
+      if(computerArmed){computerArmed=false;renderComputerPolicy();return true;}
+      return false;}
+    /** Policy "ask": the executor requested Computer Use. Ask here, then re-run the same request with the grant. */
+    function offerComputerUseGrant(messageEl,request,originalMessage){
+      const box=document.createElement('div');box.className='computer-request';box.setAttribute('role','group');box.setAttribute('aria-label','Computer Use request');
+      const title=document.createElement('strong');title.textContent='Architect asks to use this computer';
+      const why=document.createElement('p');why.textContent=request&&request.reason?request.reason:'No reason given.';
+      const allow=document.createElement('button');allow.type='button';allow.textContent='Allow once and run again';
+      const deny=document.createElement('button');deny.type='button';deny.textContent='Not now';
+      const done=text=>{allow.disabled=true;deny.disabled=true;const note=document.createElement('span');note.textContent=text;box.append(note);};
+      allow.addEventListener('click',()=>{computerArmed=true;renderComputerPolicy();done('Allowed for this request.');
+        sendChatMessage(originalMessage).catch(error=>{computerStateEl.textContent=String(error&&error.message||error);});});
+      deny.addEventListener('click',()=>done('Not allowed. The request was not re-run.'));
+      const actions=document.createElement('div');actions.className='computer-actions';actions.append(allow,deny);
+      box.append(title,why,actions);(messageEl&&messageEl.appendChild?messageEl:document.getElementById('chat-messages')||document.body).appendChild(box);
+      box.scrollIntoView({block:'nearest'});allow.focus();}
+    void loadComputerPolicy(true);setInterval(()=>{if(!document.hidden)void loadComputerPolicy(true);},30000);
 `;

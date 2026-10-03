@@ -50,7 +50,7 @@ export class ComputerExecutionBroker {
     await authority.assertGrant(context,input.grant_id,input.execution_id,target.id,`computer_backend:${worker.qualification.source_hash}`);
     if(input.requested.some(operation=>operation!=="observe"))await authority.assertGrant(context,input.grant_id,input.execution_id,target.id,"computer_interact");
     if(authority.instance_id!==entry.instance_id||target.instance_id!==entry.instance_id||target.session_id!==context.session_id||target.host_id!==worker.probe.host_id
-      ||Date.parse(limits.expires_at)>Date.parse(grant.expires_at)||Date.parse(limits.expires_at)>Date.parse(context.execution_policy.expires_at)
+      ||Date.parse(limits.expires_at)>Date.parse(grant.expires_at)||Date.parse(limits.expires_at)>Date.parse(context.execution_policy.ceiling_at)
       ||Date.parse(limits.expires_at)>Date.now()+job.parent_admission.budget.elapsed_ms)throw new Error("COMPUTER_SESSION_SCOPE_DEADLINE_REJECTED");
     const capability=negotiateComputerCapability({...input.settings,selected_route:input.settings.route,adapter_kind:input.adapter_kind,
       adapter:input.adapter,adapter_version:input.adapter_version,requested:input.requested,probe:worker.probe,qualification:worker.qualification,allow_declared_fixture:allowDeclaredFixture});
@@ -232,7 +232,7 @@ export async function withComputerSession<T>(input:ComputerSessionInput,worker:C
     scope:[`execution:${input.execution_id}`,input.target.id],session_id:context.session_id,execution_id:input.execution_id,lifetime:"session_bound",
     lanes:[`computer:${input.target.host_id}:${worker.probe.isolated?input.id:"physical-seat"}`],parameters:{computer_id:input.id,target_id:input.target.id,profile_hash:input.profile.hash,model_policy_fingerprint:input.model_policy?.fingerprint??null},
     role_policies:input.model_policy?{[input.model_policy.policy.role]:input.model_policy}:{},budget:input.budget,timeout_ms:Math.max(1,Math.min(input.budget.elapsed_ms,Date.parse(input.limits.expires_at)-Date.now())),
-    authority:{id:context.execution_policy.id,revision:context.execution_policy.revision,scope:[input.target.id],expires_at:context.execution_policy.expires_at,autonomy:context.execution_policy.autonomy}},async()=>{
+    authority:{id:context.execution_policy.id,revision:context.execution_policy.revision,scope:[input.target.id],expires_at:context.execution_policy.ceiling_at,autonomy:context.execution_policy.autonomy}},async()=>{
       const broker=await ComputerExecutionBroker.open(input,worker,authority,options.allow_declared_fixture);
       try{return await work(broker);}finally{await broker.stop("COMPUTER_TASK_BOUNDARY_STOP");}
     },options.signal);

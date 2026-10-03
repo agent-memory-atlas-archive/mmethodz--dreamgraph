@@ -58,6 +58,8 @@ export interface CodexCliProviderPortOptions {
   readonly admissionSignal?: () => AbortSignal | undefined;
   /** Mandatory accounting failures propagate and fence continuation; not a UI observer. */
   readonly settleRun?: (result: CodexCliRunResult) => Promise<void>;
+  /** Instance Computer Use policy grant (DREAMGRAPH_COMPUTER_USE_POLICY), resolved through the daemon. */
+  readonly computerUse?: boolean;
 }
 
 export interface PromptComposedInfo {
@@ -310,6 +312,7 @@ export function createCodexCliProviderPort(
             ...(options.profile ? { profile: options.profile } : {}),
             ...(options.configOverrides ? { configOverrides: options.configOverrides } : {}),
             ...(options.binaryName ? { binaryName: options.binaryName } : {}),
+            ...(options.computerUse === true ? { computerUse: true } : {}),
             ...(executionSignal ? { abortSignal: executionSignal } : {}),
             ...(onRunIdAssigned ? { onRunIdAssigned } : {}),
             ...(onStdoutChunk ? { onStdoutChunk } : {}),

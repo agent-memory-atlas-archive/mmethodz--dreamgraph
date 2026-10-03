@@ -167,6 +167,8 @@ export interface CodexMcpConfigInput {
   readonly dreamgraphArgs: readonly string[];
   readonly dreamgraphEnv?: Readonly<Record<string, string>>;
   readonly allowlist: readonly string[];
+  /** Granted by the instance's canonical DREAMGRAPH_COMPUTER_USE_POLICY (read from the daemon). */
+  readonly computerUse?: boolean;
 }
 
 export interface CodexMcpConfigArtifact {
@@ -186,6 +188,7 @@ export interface CodexMcpBridgePlanInput {
   readonly dreamgraphArgs: readonly string[];
   readonly dreamgraphEnv?: Readonly<Record<string, string>>;
   readonly liveToolNames: readonly string[];
+  readonly computerUse?: boolean;
 }
 
 export interface CodexMcpBridgePlan {
