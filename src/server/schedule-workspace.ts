@@ -1,207 +1,450 @@
-/** Compact surface only. Definitions, timing, policy, admission and history stay in the daemon. */
-import { CONTEXT_MENU_CSS, CONTEXT_MENU_SCRIPT } from "./context-menu.js";
-export function renderScheduleWorkspace():string{return `
-<section id="schedule-workspace" aria-label="Schedule workspace">
-  <header class="sw-toolbar"><h1>Schedules</h1><span id="sw-runtime">Connecting to authority…</span><button id="sw-refresh" type="button">Refresh</button><button id="sw-new" type="button" class="btn btn-primary">New schedule</button></header>
-  <nav id="sw-tabs" role="tablist" aria-label="Schedule views"><button role="tab" aria-selected="true" aria-controls="sw-schedules" id="sw-tab-schedules" data-tab="schedules">Schedules</button><button role="tab" aria-selected="false" tabindex="-1" aria-controls="sw-upcoming" id="sw-tab-upcoming" data-tab="upcoming">Upcoming</button><button role="tab" aria-selected="false" tabindex="-1" aria-controls="sw-runs" id="sw-tab-runs" data-tab="runs">Runs</button></nav>
-  <div id="sw-status" role="status" aria-live="polite"></div><button id="sw-retry" type="button" hidden>Retry the same captured request</button>
-  <div class="sw-layout"><div class="sw-main">
-    <section id="sw-schedules" role="tabpanel" aria-labelledby="sw-tab-schedules"><div class="sw-filter"><label>Find <input id="sw-search" type="search" placeholder="Name, action or scope"></label><label>State <select id="sw-filter"><option value="all">All</option><option value="enabled">Enabled</option><option value="paused">Paused</option><option value="blocked">Blocked</option><option value="error">Error</option></select></label></div><p id="sw-count"></p><div id="sw-list" aria-label="Schedule list"></div></section>
-    <section id="sw-upcoming" role="tabpanel" aria-labelledby="sw-tab-upcoming" hidden><p>Read-only forecasts from the same evaluator used for dispatch. Paused schedules are shown as intent, without dispatch.</p><div id="sw-forecast"></div></section>
-    <section id="sw-runs" role="tabpanel" aria-labelledby="sw-tab-runs" hidden><p id="sw-run-count"></p><div id="sw-run-list"></div></section>
-  </div><aside class="sw-inspector" aria-label="Schedule details"><div id="sw-detail"><p>Select a schedule to inspect its definition, policy and history.</p></div>
-    <form id="sw-editor" hidden><h2 id="sw-edit-title">New schedule</h2><p>Save disabled. Enable separately after reviewing the preview.</p>
-      <label>Name <input name="name" required maxlength="256"></label><label>Action <select name="action"></select></label>
-      <label>Trigger <select name="trigger_type"><option value="interval">Elapsed interval</option><option value="cron_like">Calendar / cron</option><option value="after_cycles">Engine cycles</option><option value="on_idle">User inactivity</option></select></label>
-      <label data-trigger="interval on_idle">Duration <span class="sw-duration"><input name="duration" type="number" min="0.001" step="any" value="1"><select name="unit"><option value="3600000">hours</option><option value="60000">minutes</option><option value="1000">seconds</option><option value="1">milliseconds</option></select></span></label>
-      <label data-trigger="cron_like">Cron <input name="cron" placeholder="0 6 * * *"><small>Five fields: minute hour day month weekday; *, values, ranges, lists and steps. No seconds or names.</small></label>
-      <label data-trigger="after_cycles">Every N cycles <input name="cycle_interval" type="number" min="1" value="10"></label>
-      <label>Timezone <input name="timezone" value="UTC" required list="sw-zones"><datalist id="sw-zones"><option value="UTC"><option value="Europe/Helsinki"><option value="America/New_York"><option value="Asia/Tokyo"></datalist></label>
-      <label>Repeated local time <select name="fold_policy"><option value="once">Once (default)</option><option value="both">Both occurrences</option></select></label>
-      <label>Missed occurrence <select name="missed_policy"><option value="skip">Skip with reason</option><option value="catch_up_once">Catch up once</option></select></label>
-      <label>Maximum runs <input name="max_runs" type="number" min="0" placeholder="Blank = unlimited; 0 = no runs"></label>
-      <div id="sw-parameter-fields"></div><div id="sw-field-errors" role="alert"></div>
-      <div class="sw-actions"><button id="sw-preview" type="button">Preview and validate</button><button id="sw-save" type="submit" class="btn btn-primary">Save disabled</button><button id="sw-close-editor" type="button">Close editor</button></div>
-      <div id="sw-preview-result"></div>
-    </form>
-    <details class="sw-debt"><summary>Graph currency and pending knowledge</summary><div id="sw-debt"></div></details>
-  </aside></div>
+/**
+ * Schedules workspace (v14.0.1).
+ *
+ * Compact, readable list with one-click Run now (▶), Pause/Resume and Remove (✕),
+ * plus an editor whose fields follow the chosen action/strategy and timing method.
+ * The daemon scheduler stays authoritative: definitions, validation, previews,
+ * policy digests and admission all go through /api/schedules/v2.
+ */
+export function renderScheduleWorkspace(): string {
+  return `<section id="schedule-workspace" class="sch" aria-label="Schedules" data-loading="true">
+  <header class="sch-head">
+    <div><h1>Schedules</h1><p id="sw-runtime">Connecting…</p></div>
+    <div class="sch-head-actions"><a href="/config?tab=automation">Scheduler settings →</a><button id="sw-refresh" type="button">Refresh</button><button id="sw-new" type="button" class="sch-primary">+ New schedule</button></div>
+  </header>
+  <div id="sw-status" class="sch-message" role="status" aria-live="polite"></div>
+  <div class="sch-scroll">
+    <section id="sw-editor-host" hidden></section>
+    <section aria-labelledby="sw-list-title"><h2 id="sw-list-title" class="sch-h2">Your schedules <span id="sw-count"></span></h2><div id="sw-list" class="sch-list"></div></section>
+    <section aria-labelledby="sw-runs-title"><h2 id="sw-runs-title" class="sch-h2">Recent runs</h2><div id="sw-runs"></div></section>
+  </div>
 </section>
-<style>${SCHEDULE_WORKSPACE_CSS}${SCHEDULE_WORKSPACE_LAYOUT_CSS}${CONTEXT_MENU_CSS}</style><script src="/schedules/workspace.js" defer></script>`;}
+<style>${SCHEDULE_WORKSPACE_CSS}</style><script src="/schedules/workspace.js" defer></script>`;
+}
 
-export const SCHEDULE_WORKSPACE_CSS=`
-#schedule-workspace{--sw-line:#383838;--sw-muted:#aaa;color:#e0e0e0;font:12px/1.45 system-ui,sans-serif}#schedule-workspace h1{font-size:18px;margin:0}#schedule-workspace h2{font-size:14px;margin:8px 0}#schedule-workspace h3{font-size:12px;margin:8px 0 4px}#schedule-workspace p{margin:5px 0;color:var(--sw-muted)}.sw-toolbar,.sw-filter,.sw-actions,#sw-tabs{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sw-toolbar{padding:6px 0}.sw-toolbar #sw-runtime{margin-right:auto}.sw-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,390px);border-top:1px solid var(--sw-line);min-height:60vh}.sw-main{padding:8px 10px 8px 0;min-width:0}.sw-inspector{border-left:1px solid var(--sw-line);padding:8px 10px;min-width:0}#sw-tabs{gap:2px;margin-top:4px}#sw-tabs button{border-bottom:2px solid transparent}#sw-tabs [aria-selected=true]{border-bottom-color:#82aaff;background:#303030}#schedule-workspace button{padding:4px 8px;border:1px solid #444;background:#282828;color:inherit;border-radius:3px;cursor:pointer;font:inherit}#schedule-workspace button:hover{background:#363636}#schedule-workspace button:focus-visible,#schedule-workspace input:focus-visible,#schedule-workspace select:focus-visible,#schedule-workspace textarea:focus-visible{outline:2px solid #9db8dc;outline-offset:2px}#schedule-workspace button:disabled{opacity:.45;cursor:default}#schedule-workspace input,#schedule-workspace select,#schedule-workspace textarea{background:#151515;border:1px solid #444;color:inherit;border-radius:2px;padding:4px 6px;font:inherit;max-width:100%;min-width:0;box-sizing:border-box}.sw-filter input{width:220px}.sw-filter label{display:flex;align-items:center;gap:5px}.sw-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;padding:7px 8px;border-bottom:1px solid var(--sw-line)}.sw-row.is-selected{background:#30343a;border-left:2px solid #92a9c8}.sw-row .sw-select{text-align:left;border:0!important;padding:0!important;background:transparent!important;overflow-wrap:anywhere}.sw-row small,.sw-run small{display:block;color:var(--sw-muted)}.sw-run{padding:7px 8px;border-bottom:1px solid var(--sw-line);overflow-wrap:anywhere}.sw-run.is-running{border-left:2px solid #75b69c}.sw-row-status{font-size:11px;align-self:center;color:#aec1d4}.sw-row-status.is-blocked{color:#d9af72}#sw-editor>label,#sw-parameter-fields>label{display:grid;grid-template-columns:130px minmax(0,1fr);gap:6px;margin:6px 0;align-items:start}#sw-editor small{grid-column:2;color:var(--sw-muted)}.sw-duration{display:flex;gap:4px}.sw-duration input{width:90px}.sw-duration select{flex:1}#sw-editor textarea{min-height:50px;resize:vertical}.sw-actions{margin-top:8px}#sw-status{min-height:20px;padding:4px 0}#sw-status.is-error,#sw-field-errors{color:#eeb7a0}#sw-preview-result, #sw-detail{overflow-wrap:anywhere}#schedule-workspace pre{white-space:pre-wrap;font:11px/1.4 ui-monospace,monospace;background:#171717;padding:6px;max-height:250px;overflow:auto}#schedule-workspace details{border-top:1px solid var(--sw-line);padding:6px 0}#schedule-workspace summary{cursor:pointer}.sw-debt{margin-top:8px}.sw-state{font-weight:600;color:#8fbf9f}#schedule-workspace [hidden]{display:none!important}#schedule-workspace [aria-invalid=true]{border-color:#d89c80}#schedule-workspace .sw-confirm{border-left:2px solid #d0a565;padding:6px;margin:6px 0}#schedule-workspace .sw-menu{position:fixed;z-index:80;background:#242424;border:1px solid #555;padding:4px;box-shadow:0 6px 20px #0008;display:grid;gap:2px;min-width:145px}#schedule-workspace .sw-menu button{text-align:left;border:0}@media(max-width:850px){.sw-layout{grid-template-columns:1fr}.sw-inspector{border-left:0;border-top:1px solid var(--sw-line);padding:8px 0}.sw-main{padding-right:0}.sw-toolbar #sw-runtime{flex-basis:100%;order:2}}`;
-
-/** Correct the three-cell list rows and let the workspace fill its host pane. */
-export const SCHEDULE_WORKSPACE_LAYOUT_CSS=`
-#schedule-workspace{display:flex;flex-direction:column;height:100%;min-height:min(680px,calc(100dvh - 88px));min-width:0;overflow:hidden;--sw-line:#344257;--sw-muted:#9eafc4;color:#e4ecf8}
-#schedule-workspace .sw-toolbar{min-height:32px;padding:4px 8px;gap:7px}
-#schedule-workspace #sw-tabs{margin:0;padding:0 8px}
-#schedule-workspace #sw-status{min-height:0;padding:3px 8px}
-#schedule-workspace .sw-layout{flex:1;min-height:0;min-width:0;grid-template-columns:minmax(0,1fr) clamp(260px,32%,390px);overflow:hidden}
-#schedule-workspace .sw-main,#schedule-workspace .sw-inspector{min-height:0;overflow:auto;overscroll-behavior:contain}
-#schedule-workspace .sw-main{padding:8px}
-#schedule-workspace .sw-row{grid-template-columns:minmax(0,1fr) minmax(70px,max-content) 27px;align-items:center;column-gap:8px;padding:5px 7px;min-width:0}
-#schedule-workspace .sw-row .sw-select{display:block;min-width:0;width:100%;max-width:100%;overflow:hidden;overflow-wrap:normal;white-space:nowrap;text-overflow:ellipsis}
-#schedule-workspace .sw-row .sw-select small{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-#schedule-workspace .sw-row-status{min-width:0;max-width:126px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:right}
-#schedule-workspace .sw-row>button:last-child{width:27px;min-width:27px;height:27px;padding:0;text-align:center}
-#schedule-workspace .sw-invalid{margin:8px 0;padding:8px 10px;border:1px solid #826339;border-left:3px solid #d9ab63;background:#2b251f}
-#schedule-workspace .sw-invalid strong{color:#f0c582}
-#schedule-workspace .sw-invalid pre{max-height:160px;word-break:break-word}
-@media(max-width:850px){#schedule-workspace{height:100%;min-height:0;overflow:hidden}#schedule-workspace .sw-layout{display:block;overflow:auto}#schedule-workspace .sw-main,#schedule-workspace .sw-inspector{overflow:visible}#schedule-workspace .sw-inspector{padding:8px}}
-@media(max-width:460px){#schedule-workspace .sw-row{grid-template-columns:minmax(0,1fr) 27px;row-gap:1px}#schedule-workspace .sw-row-status{grid-column:1;grid-row:2;text-align:left;max-width:100%}#schedule-workspace .sw-row>button:last-child{grid-column:2;grid-row:1 / span 2}}
+export const SCHEDULE_WORKSPACE_CSS = String.raw`
+#schedule-workspace{--s-line:#363b42;--s-dim:#9aa4b1;--s-card:#1a1d21;--s-card2:#20242a;--s-acc:#7fb0e0;--s-ok:#86c79a;--s-warn:#e2c07a;--s-bad:#e59a9a;
+  display:flex;flex-direction:column;min-height:0;height:100%;color:#dde3ea;font:13px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+#schedule-workspace [hidden]{display:none!important}
+.sch-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex:none;padding-bottom:8px;border-bottom:1px solid var(--s-line)}
+.sch-head h1{margin:0;font-size:19px}.sch-head p{margin:2px 0 0;color:var(--s-dim);font-size:12px}
+.sch-head-actions{display:flex;gap:8px;align-items:center}.sch-head-actions a{color:var(--s-acc);text-decoration:none;margin-right:4px}
+.sch-message{flex:none;font-size:12px}.sch-message:not(:empty){margin-top:6px;padding:6px 9px;border-radius:4px;background:#1f2a35;border:1px solid #2f4a63}
+.sch-message.is-error{background:#35201f;border-color:#6b3434;color:#f1c3c3}.sch-message.is-ok{background:#1d2d22;border-color:#355c41}
+.sch-scroll{flex:1;min-height:0;overflow:auto;padding:10px 2px 16px}
+.sch-h2{font-size:13px;margin:14px 0 8px;color:#cfd7e0}.sch-h2 span{color:var(--s-dim);font-weight:400}
+#schedule-workspace button{font:inherit;color:#e3e8ee;background:#262b31;border:1px solid #434b55;border-radius:4px;padding:5px 11px;cursor:pointer}
+#schedule-workspace button:hover:not(:disabled){background:#2f353d}#schedule-workspace button:disabled{opacity:.45;cursor:default}
+#schedule-workspace .sch-primary{background:#2e5b86;border-color:#4f86ba;color:#fff;font-weight:600}
+#schedule-workspace input,#schedule-workspace select,#schedule-workspace textarea{font:inherit;color:#e7ecf2;background:#111418;border:1px solid #3a414a;border-radius:4px;padding:6px 8px;box-sizing:border-box;min-width:0;width:100%}
+#schedule-workspace input[type=checkbox],#schedule-workspace input[type=radio]{width:auto;padding:0;accent-color:var(--s-acc)}
+#schedule-workspace :focus-visible{outline:2px solid #4b77a3;outline-offset:1px}
+.sch-list{display:flex;flex-direction:column;gap:6px}
+.sch-row{display:grid;grid-template-columns:44px minmax(0,1.6fr) minmax(0,1.3fr) minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 12px;background:var(--s-card);border:1px solid var(--s-line);border-radius:7px}
+.sch-row.is-off{opacity:.72}.sch-row.has-problem{border-left:3px solid var(--s-warn)}
+.sch-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sch-what{color:var(--s-dim);font-size:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:2px}
+.sch-when{font-size:12.5px}.sch-when small,.sch-last small{display:block;color:var(--s-dim);font-size:11.5px}
+.sch-last{font-size:12px}
+.chip{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;border:1px solid var(--s-line);color:#cdd5de;white-space:nowrap}
+.chip.ok{color:var(--s-ok);border-color:#3c6b4b}.chip.warn{color:var(--s-warn);border-color:#6d5a30}.chip.bad{color:var(--s-bad);border-color:#6b3a3a}.chip.acc{color:var(--s-acc);border-color:#3d5c7d}
+.sch-actions{display:flex;gap:4px}
+#schedule-workspace .sch-icon{width:32px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+#schedule-workspace .sch-icon.play{color:#9fe0b8;border-color:#3c6b4b}#schedule-workspace .sch-icon.del{color:#f0b4b4;border-color:#6b3a3a}
+.sch-switch{position:relative;width:38px;height:22px;display:inline-block}.sch-switch input{opacity:0;width:0;height:0;position:absolute}
+.sch-switch span{position:absolute;inset:0;background:#3a414a;border-radius:11px;transition:.15s;cursor:pointer}
+.sch-switch span::before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#dfe5ec;border-radius:50%;transition:.15s}
+.sch-switch input:checked+span{background:#2f7a52}.sch-switch input:checked+span::before{transform:translateX(16px)}
+.sch-switch input:focus-visible+span{outline:2px solid #4b77a3;outline-offset:2px}
+.sch-problem{grid-column:2/-1;font-size:11.5px;color:var(--s-warn);margin-top:-4px}
+.sch-confirm{grid-column:1/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 10px;border-radius:5px;background:var(--s-card2);border:1px solid var(--s-line);font-size:12.5px}
+.sch-confirm .grow{flex:1;min-width:200px}
+.sch-empty{padding:18px;text-align:center;color:var(--s-dim);border:1px dashed var(--s-line);border-radius:7px}
+.sch-editor{background:var(--s-card);border:1px solid #3d5c7d;border-radius:8px;padding:14px 16px;margin-bottom:6px}
+.sch-editor h2{margin:0 0 10px;font-size:15px}
+.sch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px 16px}
+.sch-field{display:flex;flex-direction:column;gap:4px;min-width:0}.sch-field.wide{grid-column:1/-1}
+.sch-field>label,.sch-field>.lbl{font-weight:600;font-size:12px}.sch-field .help{color:var(--s-dim);font-size:11.5px}
+.sch-field .err{color:var(--s-bad);font-size:11.5px}
+.sch-seg{display:flex;flex-wrap:wrap;gap:6px}.sch-seg label{display:flex;gap:7px;align-items:center;padding:7px 11px;border:1px solid var(--s-line);border-radius:6px;background:var(--s-card2);cursor:pointer;font-weight:400}
+.sch-seg label:has(input:checked){border-color:#4f86ba;background:#1d2b39}
+.sch-inline{display:flex;gap:6px;align-items:center}.sch-inline>*{flex:1}.sch-inline>.fix{flex:none}
+.sch-sub{margin:14px 0 6px;font-size:12.5px;color:#cfd7e0;border-top:1px solid var(--s-line);padding-top:10px}
+.sch-preview{margin-top:12px;padding:9px 11px;background:#15191d;border:1px solid var(--s-line);border-radius:6px;font-size:12.5px}
+.sch-preview ol{margin:4px 0 0;padding-left:20px}.sch-preview .note{color:var(--s-dim);font-size:11.5px;margin-top:4px}
+.sch-editor-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:12px;flex-wrap:wrap}
+.sch-editor-actions label{margin-right:auto;display:flex;gap:6px;align-items:center}
+details.sch-more{margin-top:10px}details.sch-more>summary{cursor:pointer;color:var(--s-acc);font-size:12px}details.sch-more>.sch-grid{margin-top:10px}
+.sch-runs{width:100%;border-collapse:collapse;font-size:12.5px}.sch-runs th{text-align:left;color:var(--s-dim);font-weight:600;font-size:11.5px;padding:4px 8px;border-bottom:1px solid var(--s-line)}
+.sch-runs td{padding:6px 8px;border-bottom:1px solid #2a2f35;vertical-align:top}.sch-runs td.sum{color:#c4ccd5;max-width:420px}
+@media(max-width:820px){.sch-row{grid-template-columns:44px minmax(0,1fr) auto}.sch-when,.sch-last{grid-column:2/3}.sch-actions{grid-column:3;grid-row:1/span 3;flex-direction:column}.sch-head{flex-wrap:wrap}}
 `;
+/** Kept for compatibility with older imports. */
+export const SCHEDULE_WORKSPACE_LAYOUT_CSS = "";
 
-/** Served as JavaScript: executable browser tests exercise this exact source. */
-export const SCHEDULE_WORKSPACE_SCRIPT=CONTEXT_MENU_SCRIPT+String.raw`(() => {
- 'use strict';
- const root=document.getElementById('schedule-workspace'); if(!root)return;
- const $=id=>document.getElementById(id), form=$('sw-editor');
- let snapshot=null,selected=null,tab='schedules',editTarget=null,dirty=false,busy=false,pending=null,refreshing=null,preview=null,menu=null;
- const navigation=new URLSearchParams(window.location.search),requestedSchedule=navigation.get('schedule'),requestedRevision=navigation.get('revision'),requestedView=navigation.get('view')||'inspect';let navigationHandled=false;
- const controls=()=>Array.from(root.querySelectorAll('button')).filter(b=>b.dataset.mutation==='true');
- const message=(text,error=false)=>{$('sw-status').textContent=text;$('sw-status').classList.toggle('is-error',error);};
- const element=(tag,text,attrs={})=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;for(const [key,value]of Object.entries(attrs))node.setAttribute(key,String(value));return node;};
- const button=(text,click,mutation=false)=>{const node=element('button',text,{type:'button'});node.dataset.mutation=String(mutation);node.disabled=mutation&&(busy||!!pending);node.addEventListener('click',click);return node;};
- const stamp=(value,zone)=>{if(!value)return 'Unknown / activity-dependent';const date=new Date(value);if(!Number.isFinite(date.getTime()))return 'Unknown time';return date.toLocaleString(undefined,{timeZone:zone||undefined})+(zone?' '+zone:' local');};
- const field=name=>form.elements.namedItem(name);
- const setField=(name,value)=>{const node=field(name);if(node)node.value=value===null||value===undefined?'':String(value);};
- async function json(path,body){const reply=await fetch(path,{credentials:'same-origin',headers:{Accept:'application/json',...(body?{'Content-Type':'application/json'}:{})},...(body?{method:'POST',body:JSON.stringify(body)}:{})});const value=await reply.json();if(!reply.ok){const err=new Error(value.error||value.message||('HTTP '+reply.status));err.fields=value.fields||[];err.status=reply.status;throw err;}return value;}
- async function refresh(force){if(refreshing){const result=await refreshing;return force===true?refresh(true):result;}const work=(async()=>{try{const value=await json('/api/schedules/v2?workspace=1');if(value.schema!=='dreamgraph.schedule_snapshot.v2')throw new Error('Schedule schema unavailable');snapshot=value;
-   $('sw-runtime').textContent=(value.config.enabled?'Scheduler enabled':'Scheduler paused')+' · revision '+value.revision+' · max '+value.config.max_runs_per_hour+'/hour';
-   if(selected&&!value.schedules.some(s=>s.id===selected))selected=null;
-   render();const navigationMessage=await applyNavigation();if(!busy&&!pending)message(navigationMessage||('Authority readback · '+stamp(new Date().toISOString())),!!navigationMessage&&navigationMessage.startsWith('Captured'));return true;
-  }catch(error){message('Authority unavailable. Last view retained; commands require fresh admission. '+error.message,true);return false;}})();refreshing=work;try{return await work;}finally{if(refreshing===work)refreshing=null;}}
- function render(){renderList();renderRuns();renderDebt();if(form.hidden)renderDetail();if(tab==='upcoming')void forecast();}
- async function applyNavigation(){
-  if(navigationHandled||!requestedSchedule)return null;navigationHandled=true;
-  const target=snapshot.schedules.find(schedule=>schedule.id===requestedSchedule);
-  if(!target)return 'Captured schedule is unavailable: '+requestedSchedule+'. No replacement selected.';
-  selected=target.id;
-  if(requestedRevision!==null&&(!/^\d+$/.test(requestedRevision)||!Number.isSafeInteger(Number(requestedRevision))||Number(requestedRevision)!==target.definition_revision)){
-   render();return 'Captured schedule revision changed. Current definition is shown for inspection; reopen its actions before changing or running it.';
+/** Served as /schedules/workspace.js. No backticks or template placeholders inside. */
+export const SCHEDULE_WORKSPACE_SCRIPT = String.raw`(() => {
+'use strict';
+const root = document.getElementById('schedule-workspace'); if (!root) return;
+const $ = id => document.getElementById(id);
+let snap = null, descriptors = {}, busy = false, nextRuns = {}, editor = null, confirmFor = null, previewTimer = 0, previewSeq = 0;
+
+/* ---------- vocabulary ---------- */
+const ACTIONS = {
+  dream_cycle: ['Dream cycle', 'Look for new connections and hypotheses in the graph.'],
+  nightmare_cycle: ['Security scan (nightmare)', 'Probe the graph for security weaknesses.'],
+  metacognitive_analysis: ['Self-review', 'Review how well recent dreaming worked and tune strategies.'],
+  dispatch_cognitive_event: ['Cognitive event', 'Inject an event (e.g. from CI) that DreamGraph reacts to.'],
+  narrative_chapter: ['Story chapter', 'Write the next chapter of the system story from recent changes.'],
+  federation_export: ['Export dream archetypes', 'Write shareable dream patterns to a file.'],
+  graph_maintenance: ['Graph maintenance', 'Decay stale dreams and tensions.'],
+};
+const STRATEGY = { all: 'All strategies (adaptive)', gap_detection: 'Gap detection', weak_reinforcement: 'Strengthen weak links', cross_domain: 'Cross-domain links',
+  missing_abstraction: 'Missing abstractions', symmetry_completion: 'Symmetry completion', tension_directed: 'Follow open tensions', causal_replay: 'Causal replay',
+  pgo_wave: 'PGO wave (random walk)', llm_dream: 'Model-driven dreaming', orphan_bridging: 'Connect orphans', schema_grounding: 'Schema grounding',
+  all_threats: 'All threat types', privilege_escalation: 'Privilege escalation', data_leak_path: 'Data leak paths', injection_surface: 'Injection surfaces',
+  missing_validation: 'Missing validation', broken_access_control: 'Broken access control' };
+const FIELD = {
+  strategy: ['Strategy', null], max_dreams: ['Dreams per run', 'Upper bound on proposals in one cycle.'], focus_entities: ['Focus on', 'Optional. Comma-separated graph entity ids to concentrate on.'],
+  focus_hops: ['Focus radius', 'How many relationship steps around the focus to include.'], focus_reason: ['Why this focus', null],
+  window_size: ['Look back over', 'Number of recent cycles to review.'], auto_apply: ['Apply recommendations automatically', null],
+  source: ['Event source', null], severity: ['Severity', null], description: ['Description', null], affected_entities: ['Affected entities', 'Comma-separated ids.'],
+  payload: ['Extra data (JSON)', 'Optional key/value data passed with the event.'], export_path: ['Export file', 'Blank = the instance default file.'] };
+const RETIRED = { strategy: ['reflective'] };
+const DIAG = { paused: 'Paused', archived: 'Removed', max_runs: 'Reached its run limit', error_streak: 'Stopped after repeated failures — fix and resume', rate_limit: 'Waiting: hourly run limit reached',
+  global_cooldown: 'Waiting: cooldown between runs', nightmare_cooldown: 'Waiting: security-scan cooldown' };
+const UNITS = [['60000', 'minutes'], ['3600000', 'hours'], ['86400000', 'days']];
+const ZONES = (() => { try { return Intl.supportedValuesOf('timeZone'); } catch (e) { return ['UTC', 'Europe/Helsinki', 'Europe/London', 'America/New_York', 'Asia/Tokyo']; } })();
+const LOCAL_ZONE = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch (e) { return 'UTC'; } })();
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+/* ---------- helpers ---------- */
+function h(tag, attrs, ...kids) { const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) { if (v === undefined || v === null || v === false) continue; if (k === 'class') n.className = v; else if (k === 'text') n.textContent = v; else if (k.startsWith('on')) n.addEventListener(k.slice(2), v); else n.setAttribute(k, v === true ? '' : String(v)); }
+  for (const kid of kids.flat()) if (kid !== null && kid !== undefined && kid !== false) n.append(kid.nodeType ? kid : document.createTextNode(String(kid))); return n; }
+const say = (text, kind) => { const m = $('sw-status'); m.textContent = text || ''; m.className = 'sch-message' + (kind ? ' is-' + kind : ''); };
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+async function api(path, body) {
+  const r = await fetch(path, { method: body ? 'POST' : 'GET', cache: 'no-store', credentials: 'same-origin', headers: { Accept: 'application/json', ...(body ? { 'Content-Type': 'application/json' } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) });
+  let v = {}; try { v = await r.json(); } catch (e) { /* empty */ }
+  if (!r.ok || v.ok === false) { const e = new Error(humanError(v.error || ('HTTP ' + r.status), v.fields)); e.fields = v.fields || []; throw e; }
+  return v;
+}
+function humanError(code, fields) {
+  code = String(code || '');
+  if (/REVISION_CONFLICT/.test(code)) return 'This schedule was changed elsewhere. Refresh and try again.';
+  if (/POLICY_PREVIEW_CONFLICT/.test(code)) return 'Model settings changed while you were reviewing. Try again.';
+  if (/SCHEDULE_NOT_CLAIMED/.test(code)) return 'The scheduler did not start it (limit, cooldown or invalid definition).';
+  if (/RETIRED_STRATEGY/.test(code)) return 'That strategy has been retired. Choose another.';
+  if (fields && fields.length) return fields.map(f => (FIELD[String(f.field).split('.').pop()] || [String(f.field)])[0] + ': ' + f.message).join(' · ');
+  if (/invalid_definition/.test(code)) return 'The definition is not valid.';
+  return code.replace(/_/g, ' ').toLowerCase().replace(/^./, c => c.toUpperCase());
+}
+function dur(ms) { if (!Number.isFinite(ms)) return ''; const m = Math.round(ms / 60000);
+  if (ms < 60000) return Math.round(ms / 1000) + ' s'; if (m < 60) return m + ' min'; const hrs = ms / 3600000; if (hrs < 48) return (Math.round(hrs * 10) / 10) + ' h'; return (Math.round(hrs / 24 * 10) / 10) + ' days'; }
+function when(iso) { if (!iso) return ''; const t = Date.parse(iso); if (!Number.isFinite(t)) return ''; const d = t - Date.now(), a = Math.abs(d);
+  const rel = a < 60000 ? 'now' : a < 3600000 ? Math.round(a / 60000) + ' min' : a < 86400000 ? Math.round(a / 3600000) + ' h' : Math.round(a / 86400000) + ' d';
+  return rel === 'now' ? 'just now' : d > 0 ? 'in ' + rel : rel + ' ago'; }
+function stamp(iso, zone) { try { return new Date(iso).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', ...(zone ? { timeZone: zone } : {}) }); } catch (e) { return new Date(iso).toLocaleString(); } }
+function cronText(cron) {
+  const p = String(cron || '').trim().split(/\s+/); if (p.length !== 5) return 'Cron ' + cron;
+  const [mi, hr, dom, mon, dow] = p, at = /^\d+$/.test(mi) && /^\d+$/.test(hr) ? String(hr).padStart(2, '0') + ':' + String(mi).padStart(2, '0') : null;
+  if (/^\d+$/.test(mi) && hr === '*' && dom === '*' && mon === '*' && dow === '*') return 'Every hour at :' + String(mi).padStart(2, '0');
+  if (at && dom === '*' && mon === '*' && dow === '*') return 'Daily at ' + at;
+  if (at && dom === '*' && mon === '*' && dow === '1-5') return 'Weekdays at ' + at;
+  if (at && dom === '*' && mon === '*' && /^\d$/.test(dow)) return DAYS[Number(dow) % 7] + 's at ' + at;
+  if (at && /^\d+$/.test(dom) && mon === '*' && dow === '*') return 'Monthly on day ' + dom + ' at ' + at;
+  if (/^\*\/\d+$/.test(mi) && hr === '*') return 'Every ' + mi.slice(2) + ' minutes';
+  if (mi === '0' && /^\*\/\d+$/.test(hr)) return 'Every ' + hr.slice(2) + ' hours';
+  return 'Cron ' + cron;
+}
+function triggerText(s) {
+  if (s.trigger_type === 'interval') return 'Every ' + dur(s.interval_ms);
+  if (s.trigger_type === 'cron_like') return cronText(s.cron) + (s.timezone && s.timezone !== LOCAL_ZONE ? ' (' + s.timezone + ')' : '');
+  if (s.trigger_type === 'after_cycles') return 'Every ' + s.cycle_interval + ' dream cycle' + (s.cycle_interval === 1 ? '' : 's');
+  if (s.trigger_type === 'on_idle') return 'After ' + dur(s.idle_ms) + ' without activity';
+  return s.trigger_type;
+}
+function detailText(s) {
+  const p = s.parameters || {}, out = [];
+  if (p.strategy) out.push(STRATEGY[p.strategy] || p.strategy);
+  if (s.action === 'dream_cycle' && p.max_dreams !== undefined) out.push(p.max_dreams + ' dreams');
+  if (Array.isArray(p.focus_entities) && p.focus_entities.length) out.push('focus: ' + p.focus_entities.slice(0, 3).join(', ') + (p.focus_entities.length > 3 ? '…' : ''));
+  if (s.action === 'metacognitive_analysis') { out.push('last ' + (p.window_size || 50) + ' cycles'); if (p.auto_apply) out.push('auto-apply'); }
+  if (s.action === 'dispatch_cognitive_event') out.push((p.severity || 'info') + ' from ' + String(p.source || 'manual').replace(/_/g, ' '));
+  return out;
+}
+function problem(s) {
+  const d = (s.diagnostics || []).filter(x => x !== 'paused');
+  if (!d.length) return s.last_error ? 'Last run failed: ' + s.last_error : null;
+  const r = d[0]; if (r.startsWith('invalid_definition')) return 'The saved definition is no longer valid — edit it to choose supported values.';
+  return DIAG[r] || r.replace(/_/g, ' ');
+}
+
+/* ---------- loading ---------- */
+async function load() {
+  try {
+    const [v, actions] = await Promise.all([api('/api/schedules/v2?workspace=1'), Object.keys(descriptors).length ? null : api('/api/schedules/v2/actions')]);
+    snap = v; if (actions) for (const d of actions.actions) descriptors[d.action] = d.fields; else if (v.action_descriptors) for (const d of v.action_descriptors) descriptors[d.action] = d.fields;
+    const c = v.config || {};
+    $('sw-runtime').textContent = (c.enabled ? 'Scheduler running' : 'Scheduler paused — no schedule runs automatically') + ' · at most ' + c.max_runs_per_hour + ' runs per hour';
+    root.dataset.loading = 'false';
+    renderList(); renderRuns(); loadNextRuns();
+  } catch (e) { say('Could not load schedules: ' + e.message, 'error'); }
+}
+async function loadNextRuns() {
+  const list = (snap.schedules || []).filter(s => s.enabled && !problem(s) && s.trigger_type !== 'on_idle');
+  await Promise.all(list.slice(0, 40).map(async s => {
+    try { const r = await api('/api/schedules/v2/preview?id=' + encodeURIComponent(s.id)); const o = (r.occurrences || []).find(x => x.planned_at); nextRuns[s.id] = o ? o.planned_at : null; }
+    catch (e) { nextRuns[s.id] = undefined; }
+  }));
+  renderList();
+}
+
+/* ---------- list ---------- */
+function renderList() {
+  const list = $('sw-list'); list.replaceChildren();
+  const rows = (snap && snap.schedules || []).slice().sort((a, b) => Number(b.enabled) - Number(a.enabled) || a.name.localeCompare(b.name));
+  $('sw-count').textContent = rows.length ? '(' + rows.length + ')' : '';
+  if (!rows.length) { list.append(h('div', { class: 'sch-empty' }, 'No schedules yet. ', h('button', { type: 'button', onclick: () => openEditor(null) }, 'Create the first one'))); return; }
+  for (const s of rows) {
+    const label = (ACTIONS[s.action] || [s.action])[0], issue = problem(s), running = (s.jobs || []).some(j => ['queued', 'running', 'blocked'].includes(j.state));
+    const sw = h('input', { type: 'checkbox', 'aria-label': (s.enabled ? 'Pause ' : 'Resume ') + s.name }); sw.checked = !!s.enabled;
+    sw.addEventListener('change', () => { sw.checked = !!s.enabled; s.enabled ? command(s, 'update', { enabled: false }, null, 'Paused ' + s.name + '.') : enable(s); });
+    const next = s.enabled ? (s.trigger_type === 'on_idle' ? 'when you are idle' : nextRuns[s.id] ? 'next ' + when(nextRuns[s.id]) : nextRuns[s.id] === null ? 'no upcoming run' : '') : 'paused';
+    const last = s.last_run_at ? when(s.last_run_at) : 'never run';
+    const row = h('div', { class: 'sch-row' + (s.enabled ? '' : ' is-off') + (issue ? ' has-problem' : ''), 'data-id': s.id },
+      h('label', { class: 'sch-switch', title: s.enabled ? 'On — click to pause' : 'Off — click to turn on' }, sw, h('span', {})),
+      h('div', {}, h('div', { class: 'sch-name', title: s.name }, s.name), h('div', { class: 'sch-what' }, h('span', { class: 'chip acc' }, label), ...detailText(s).map(t => h('span', { class: 'chip' }, t)))),
+      h('div', { class: 'sch-when' }, triggerText(s), h('small', {}, next + (nextRuns[s.id] && s.enabled ? ' · ' + stamp(nextRuns[s.id], s.trigger_type === 'cron_like' ? s.timezone : undefined) : ''))),
+      h('div', { class: 'sch-last' }, running ? h('span', { class: 'chip ok' }, 'running now') : h('span', {}, 'Last: ' + last),
+        h('small', {}, s.run_count + (s.max_runs !== null && s.max_runs !== undefined ? ' of ' + s.max_runs : '') + ' run' + (s.run_count === 1 ? '' : 's') + (s.error_count ? ' · ' + s.error_count + ' failed' : ''))),
+      h('div', { class: 'sch-actions' },
+        h('button', { type: 'button', class: 'sch-icon play', title: 'Run now', 'aria-label': 'Run ' + s.name + ' now', disabled: busy || running || !!(issue && /no longer valid/.test(issue)), onclick: () => runNow(s) }, '▶'),
+        h('button', { type: 'button', class: 'sch-icon', title: 'Edit', 'aria-label': 'Edit ' + s.name, onclick: () => openEditor(s) }, '✎'),
+        h('button', { type: 'button', class: 'sch-icon del', title: 'Remove', 'aria-label': 'Remove ' + s.name, disabled: busy, onclick: () => askRemove(s) }, '✕')));
+    if (issue) row.append(h('div', { class: 'sch-problem' }, '⚠ ' + issue));
+    if (confirmFor && confirmFor.id === s.id) row.append(confirmFor.node);
+    list.append(row);
   }
-  render();
-  if(requestedView==='edit')openEditor(structuredClone(target));
-  else if(requestedView==='history')selectTab('runs');
-  else if(requestedView==='preview'){if(!await showPreview(structuredClone(target)))return 'Captured schedule preview refused: '+$('sw-status').textContent;}
-  else if(requestedView==='run'){if(!await confirmRun(structuredClone(target)))return 'Captured schedule run preview refused: '+$('sw-status').textContent;}
-  else if(requestedView==='enable'){if(!await enable(structuredClone(target)))return 'Captured schedule enable preview refused: '+$('sw-status').textContent;}
-  else if(requestedView!=='inspect')return 'Captured schedule view is unavailable. Inspect the current definition and choose an action.';
-  return 'Opened captured schedule '+target.name+' at definition r'+target.definition_revision+'. Navigation did not change the definition or enqueue work.';
- }
- function filtered(){const needle=$('sw-search').value.toLowerCase(),filter=$('sw-filter').value;return snapshot.schedules.filter(s=>{
-  const blocked=s.diagnostics.some(reason=>reason!=='paused');return JSON.stringify([s.name,s.action,s.parameters]).toLowerCase().includes(needle)&&(filter==='all'||filter==='enabled'&&s.enabled||filter==='paused'&&!s.enabled||filter==='error'&&s.status==='error'||filter==='blocked'&&blocked);});}
- function invalidDefinition(schedule){return schedule.diagnostics.find(reason=>reason.startsWith('invalid_definition:'));}
- function invalidDetail(reason){const raw=reason.slice('invalid_definition:'.length);try{const issues=JSON.parse(raw);if(Array.isArray(issues))return issues.map(issue=>{
-   const path=Array.isArray(issue.path)&&issue.path.length?issue.path.join('.'):'Definition';
-   return issue.code==='invalid_enum_value'?path+': unsupported value '+JSON.stringify(issue.received)+'. Choose one of: '+(issue.options||[]).join(', '):path+': '+(issue.message||issue.code||'Invalid value');
-  }).join('\n');}catch{}return raw;}
- function renderList(){const list=$('sw-list');list.replaceChildren();if(!snapshot)return;const rows=filtered();$('sw-count').textContent=rows.length+' / '+snapshot.schedules.length+' definitions. Selection does not start work.';
-  for(const schedule of rows.slice(0,500)){const captured=structuredClone(schedule),row=element('div',undefined,{class:'sw-row'+(selected===schedule.id?' is-selected':'')});
-   const pick=button(schedule.name,()=>{selected=captured.id;render();});pick.className='sw-select';pick.append(element('small',schedule.action+' · '+schedule.trigger_type+' · r'+schedule.definition_revision));row.append(pick);
-   const blocked=schedule.diagnostics.filter(reason=>reason!=='paused'),invalid=invalidDefinition(schedule),state=invalid?'Invalid definition':blocked.length?blocked[0]:schedule.enabled?'Enabled':'Paused';
-   const status=element('span',state,{class:'sw-row-status'+(blocked.length?' is-blocked':'')});status.title=invalid?'Select to inspect and repair the definition':blocked.join('\n')||state;row.append(status);
-   const more=button('⋯',event=>openMenu(event,captured));more.setAttribute('aria-label','Actions for '+schedule.name);row.append(more);row.addEventListener('contextmenu',event=>{event.preventDefault();openMenu(event,captured);});
-   row.addEventListener('keydown',event=>{if(event.key==='ContextMenu'||event.key==='F10'&&event.shiftKey){event.preventDefault();openMenu(event,captured);}});list.append(row);
-  }if(rows.length>500)list.append(element('p',(rows.length-500)+' definitions outside this list. Narrow the search.'));
- }
- function openMenu(event,target){const mutation=!busy&&!pending,invalid=invalidDefinition(target),reason=invalid?'Fix the invalid definition in Edit before dispatch': 'Another request or unconfirmed outcome is pending';window.DreamGraphContextMenu.open(event,[
-  {label:'Edit',run:()=>openEditor(target)}, {label:'Preview',available:!invalid,reason,run:()=>showPreview(target)},
-  {label:'Run now',available:mutation&&!invalid,reason,run:()=>confirmRun(target)},
-  {label:target.enabled?'Pause future dispatch':'Preview and enable',available:mutation&&!invalid,reason,run:()=>target.enabled?command(target,'update',{enabled:false}):enable(target)},
-  {label:'History',run:()=>{selected=target.id;selectTab('runs');}},
-  {label:'Copy target',run:()=>navigator.clipboard.writeText(JSON.stringify({kind:'schedule',id:target.id,expected_revision:target.definition_revision},null,2))}
- ],event.currentTarget,'Schedule actions');}
- function closeMenu(){window.DreamGraphContextMenu.close(false);}
- window.addEventListener('dreamgraph.action.error',event=>message(event.detail,true));
- function renderDetail(){const detail=$('sw-detail'),retained=Array.from(detail.querySelectorAll('.sw-confirm,.sw-preview'));detail.replaceChildren();if(!snapshot)return;const schedule=snapshot.schedules.find(s=>s.id===selected);if(!schedule){detail.append(element('p','Select a definition, or create a disabled schedule.'));return;}
-  const target=structuredClone(schedule),invalid=invalidDefinition(schedule);detail.append(element('h2',schedule.name),element('p',schedule.id+' · definition r'+schedule.definition_revision),element('p','Timezone '+schedule.timezone+' · missed '+schedule.missed_policy+' · overlap '+schedule.overlap_policy));
-  const actions=element('div',undefined,{class:'sw-actions'}),duplicate=button('Duplicate disabled',()=>command(target,'duplicate'),true),inspectPreview=button('Preview',()=>showPreview(target)),dispatch=button(target.enabled?'Pause':'Preview and enable',()=>target.enabled?command(target,'update',{enabled:false}):enable(target),true),run=button('Run now',()=>confirmRun(target),true);
-  if(invalid)for(const control of [duplicate,inspectPreview,dispatch,run]){control.disabled=true;control.title='Edit and fix the invalid definition first';}
-  actions.append(button('Edit',()=>openEditor(target)),duplicate,inspectPreview,dispatch,run,button('Archive',()=>confirmArchive(target),true));detail.append(actions);
-  if(invalid){const notice=element('div',undefined,{class:'sw-invalid',role:'alert'});
-   notice.append(element('strong','Invalid legacy definition · dispatch blocked'),element('p','Edit this schedule and explicitly choose a supported value, then preview before saving.'),element('pre',invalidDetail(invalid)));
-   detail.append(notice);
-  }for(const reason of schedule.diagnostics.filter(reason=>reason!==invalid))detail.append(element('p','Dispatch: '+reason));
-  detail.append(element('h3','Definition'),element('pre',JSON.stringify(schedule.parameters,null,2)));
-  const jobs=snapshot.job_records.filter(r=>r.job.scope.includes('schedule:'+schedule.id));for(const record of jobs.filter(r=>!['succeeded','failed','cancelled','partial'].includes(r.job.state)))detail.append(jobRow(record));
-  const history=element('details');history.append(element('summary','Original run snapshots ('+jobs.length+')'));for(const record of jobs.slice(-20).reverse())history.append(jobRow(record));detail.append(history);
-  for(const box of retained)if(box.dataset.scheduleId===schedule.id&&Number(box.dataset.definitionRevision)===schedule.definition_revision)detail.append(box);
- }
- function jobRow(record){const job=record.job,row=element('article',undefined,{class:'sw-run'+(job.state==='running'?' is-running':'')});row.append(element('strong',job.state+' · '+record.action),element('small',job.id+' · '+stamp(job.created_at)+' · config '+job.config_revision));
-  if(job.terminal_cause||record.error)row.append(element('p',job.terminal_cause||record.error));
-  if(job.unknown_effects.length)row.append(element('p','Recovery required: '+job.unknown_effects.join(', ')));
-  const detail=element('details');detail.append(element('summary','Admitted scope, policy, budget and result'),element('pre',JSON.stringify({scope:job.scope,input_revision:job.input_revision,budget:record.snapshot.budget,role_policies:record.snapshot.role_policies,parameters:record.parameters,receipts:job.receipt_ids,result:record.result,work_settled:record.work_settled},null,2)));row.append(detail);
-  if(!['succeeded','failed','cancelled','partial'].includes(job.state))row.append(button('Cancel this run',()=>mutation('/api/schedules/v2/commands',{action:'cancel_job',target_id:job.id,expected_revision:job.fence,operation_id:crypto.randomUUID()}),true));return row;
- }
- function renderRuns(){const list=$('sw-run-list');list.replaceChildren();if(!snapshot)return;const records=snapshot.job_records.filter(r=>!selected||r.job.scope.includes('schedule:'+selected));$('sw-run-count').textContent='Showing '+records.length+' captured jobs; '+snapshot.job_total+' retained in authority. Archived definitions retain history.';
-  for(const record of records.slice().reverse())list.append(jobRow(record));
-  const legacy=snapshot.history.filter(row=>!row.job_id);if(legacy.length){list.append(element('h3','Legacy history — original policy unknown'));for(const row of legacy.slice(-30).reverse())list.append(element('pre',JSON.stringify(row,null,2)));}
- }
- function renderDebt(){const node=$('sw-debt');node.replaceChildren();if(!snapshot)return;const graph=snapshot.graph;node.append(element('p',graph.state.freshness+' · '+graph.state.completeness+' · r'+graph.revision.publication_sequence),element('p','Graph updated '+stamp(graph.currency.last_graph_mutation_at)),element('p','Inclusive scan '+stamp(graph.currency.last_full_scan_at)+' — historical, not a staleness test'));
-  for(const reason of graph.state.reasons.slice(0,15))node.append(element('p',reason.code+': '+reason.detail));
-  const dirtyRows=snapshot.dirty_regions.filter(p=>p.state!=='settled');node.append(element('p',dirtyRows.length+' pending affected scopes. Optional cognition is distinct from required reconciliation.'));
-  for(const partition of dirtyRows.slice(0,30))node.append(element('pre',JSON.stringify({id:partition.id,generation:partition.generation,state:partition.state,scope:partition.scope,pending:partition.pending_stages,reason:partition.reason},null,2)));
- }
- async function previewFor(target,draft){return json('/api/schedules/v2/validate',{draft:draft||{},...(target?{target_id:target.id,expected_revision:target.definition_revision}:{})});}
- function renderPreview(parent,value){parent.replaceChildren();parent.append(element('h3','Preview — no job or model call'),element('p','Definition '+(value.definition_revision===null?'new':value.definition_revision)+' · '+(value.model_calls_possible?'Model calls possible within admitted caps':'No model calls in this action')));
-  for(const occurrence of value.occurrences)parent.append(element('p',stamp(occurrence.planned_at,value.definition.timezone)+' / '+stamp(occurrence.planned_at)+' · UTC '+(occurrence.planned_at||'future activity')+' · '+occurrence.trigger_cursor));
-  if(value.context_required.length)parent.append(element('p','Timing depends on '+value.context_required.join(', ')));if(!value.complete)parent.append(element('p','Bounded 32-day forecast; absence is not a promise of no future occurrence.'));
-  for(const policy of value.effective_policies){const group=element('details');group.append(element('summary',policy.role+': '+policy.requested.model+' → '+policy.effective.model+' / '+policy.effective.adapter+' · '+policy.status),element('pre',JSON.stringify({requested:policy.requested,effective:policy.effective,budget:policy.budget,retention:policy.retention,billing:policy.billing,diagnostics:policy.diagnostics},null,2)));parent.append(group);}
-  parent.append(element('h3',value.definition.name||'New definition'),element('pre',JSON.stringify(value.definition.parameters,null,2)),element('p',value.cost_note),element('a','Configure role models and limits',{href:'/config'}));
- }
- const capturedBox=(target,kind)=>element('div',undefined,{class:kind,'data-schedule-id':target.id,'data-definition-revision':target.definition_revision});
- async function showPreview(target){try{const value=await previewFor(target);const box=capturedBox(target,'sw-preview');renderPreview(box,value);$('sw-detail').append(box);return true;}catch(error){message(error.message,true);return false;}}
- async function enable(target){try{const value=await previewFor(target);const box=capturedBox(target,'sw-confirm');renderPreview(box,value);box.append(button('Enable this definition',()=>command(target,'update',{enabled:true},value.preview_digest),true),button('Keep paused',()=>box.remove()));$('sw-detail').append(box);box.scrollIntoView({block:'nearest'});return true;}catch(error){message(error.message,true);return false;}}
- async function confirmRun(target){try{const value=await previewFor(target);const box=capturedBox(target,'sw-confirm');renderPreview(box,value);box.append(element('p','Run now enqueues this captured definition through normal authority, readiness and budget admission.'),button('Enqueue this run',()=>command(target,'enqueue',undefined,value.preview_digest),true),button('Close',()=>box.remove()));$('sw-detail').append(box);box.scrollIntoView({block:'nearest'});return true;}catch(error){message(error.message,true);return false;}}
- function confirmArchive(target){const box=capturedBox(target,'sw-confirm');box.append(element('p','Archive '+target.name+'? Original history stays. Active jobs are not cancelled.'),button('Archive this definition',()=>command(target,'archive'),true),button('Keep definition',()=>box.remove()));$('sw-detail').append(box);}
- async function mutation(path,body){if(busy)return;if(pending&&JSON.stringify(pending.body)!==JSON.stringify(body)){message('Resolve the previous unknown request before starting another mutation.',true);return;}
-  pending={path,body};busy=true;$('sw-retry').hidden=true;controls().forEach(node=>node.disabled=true);
-  try{const result=await json(path,body);pending=null;message('Authority accepted the operation; reading its canonical result.');if(result.schedule)selected=result.schedule.id;if(body.action==='duplicate'&&result.result)selected=result.result.id;
-   if(path.endsWith('/create')||body.action==='update'&&form.hidden===false){form.hidden=true;dirty=false;}if(await refresh(true))message('Authority readback · '+stamp(new Date().toISOString()));else message('Operation accepted; canonical readback unavailable. Refresh to recover current state.',true);
-  }catch(error){if(error.status){pending=null;showErrors(error);message('Command rejected: '+error.message+'. Refresh and review the captured definition; the draft is retained.',true);}else{message('Reply unavailable; outcome is unknown. Retry reuses the exact request and operation ID.',true);$('sw-retry').hidden=false;}}
-  finally{busy=false;controls().forEach(node=>node.disabled=!!pending);if(!pending&&snapshot)render();}
- }
- function command(target,action,updates,preview_digest){return mutation('/api/schedules/v2/commands',{target_id:target.id,expected_revision:target.definition_revision,operation_id:crypto.randomUUID(),action,...(updates?{updates}:{}),...(preview_digest?{preview_digest}:{})});}
- function showErrors(error){const box=$('sw-field-errors');box.replaceChildren();for(const node of form.querySelectorAll('[aria-invalid]'))node.removeAttribute('aria-invalid');const fields=error.fields||[];
-  for(const issue of fields){box.append(element('p',issue.field+': '+issue.message));const name=issue.field.replace(/^parameters\./,'param:');const node=field(name==='interval_ms'||name==='idle_ms'?'duration':name);if(node)node.setAttribute('aria-invalid','true');}if(!fields.length)box.append(element('p',error.message));}
- function parameterFields(values={}){const box=$('sw-parameter-fields');box.replaceChildren();const action=field('action').value,descriptor=snapshot.action_descriptors.find(d=>d.action===action);if(!descriptor)return;
-  for(const [name,definition]of Object.entries(descriptor.fields)){if(definition.internal)continue;const label=element('label',name.replaceAll('_',' ')),value=values[name]===undefined?definition.default:values[name];let input;
-   if(definition.type==='enum'){input=element('select');for(const option of definition.options)input.append(element('option',option,{value:option}));
-    if(value!==undefined&&!definition.options.includes(value)){const legacy=element('option','Unsupported legacy value: '+String(value)+' — choose a replacement',{value});legacy.disabled=true;input.prepend(legacy);}}
-   else if(definition.type==='string_array'||definition.type==='json')input=element('textarea');else input=element('input',undefined,{type:definition.type==='number'?'number':definition.type==='boolean'?'checkbox':'text'});
-   input.name='param:'+name;if(definition.type==='boolean')input.checked=!!value;else input.value=definition.type==='string_array'?(value||[]).join('\n'):definition.type==='json'?JSON.stringify(value||{},null,2):value===undefined?'':String(value);
-   if(definition.minimum!==undefined)input.min=definition.minimum;if(definition.maximum!==undefined)input.max=definition.maximum;if(definition.required)input.required=true;label.append(input);if(definition.type==='string_array')label.append(element('small','One entity ID per line. Empty means the documented action scope.'));box.append(label);
+}
+function askRemove(s) {
+  confirmFor = { id: s.id, node: h('div', { class: 'sch-confirm', role: 'alert' }, h('span', { class: 'grow' }, 'Remove "' + s.name + '"? Its run history is kept.'),
+    h('button', { type: 'button', class: 'sch-icon del', style: 'width:auto;padding:0 12px', onclick: () => { confirmFor = null; command(s, 'archive', null, null, 'Removed ' + s.name + '.'); } }, 'Remove'),
+    h('button', { type: 'button', onclick: () => { confirmFor = null; renderList(); } }, 'Cancel')) };
+  renderList();
+}
+async function command(s, action, updates, digest, done) {
+  if (busy) return; busy = true; renderList();
+  try { await api('/api/schedules/v2/commands', { action, target_id: s.id, expected_revision: s.definition_revision, operation_id: uuid(), ...(updates ? { updates } : {}), ...(digest ? { preview_digest: digest } : {}) });
+    say(done || 'Done.', 'ok'); }
+  catch (e) { say(e.message, 'error'); }
+  finally { busy = false; await load(); }
+}
+async function reviewed(s) { return api('/api/schedules/v2/validate', { draft: {}, target_id: s.id, expected_revision: s.definition_revision }); }
+async function enable(s) {
+  try { const p = await reviewed(s); await command(s, 'update', { enabled: true }, p.preview_digest, 'Turned on ' + s.name + '.' + (p.occurrences && p.occurrences[0] && p.occurrences[0].planned_at ? ' Next run ' + when(p.occurrences[0].planned_at) + '.' : '')); }
+  catch (e) { say(e.message, 'error'); }
+}
+async function runNow(s) {
+  if (busy) return; busy = true; renderList(); say('Starting ' + s.name + '…');
+  try { const p = await reviewed(s);
+    await api('/api/schedules/v2/commands', { action: 'enqueue', target_id: s.id, expected_revision: s.definition_revision, operation_id: uuid(), preview_digest: p.preview_digest });
+    say('Started ' + s.name + '. It appears under Recent runs when finished.', 'ok'); }
+  catch (e) { say('Could not start ' + s.name + ': ' + e.message, 'error'); }
+  finally { busy = false; await load(); setTimeout(load, 4000); }
+}
+
+/* ---------- recent runs ---------- */
+function renderRuns() {
+  const box = $('sw-runs'); box.replaceChildren();
+  const live = (snap.job_records || []).filter(r => ['queued', 'running', 'blocked'].includes(r.job.state));
+  const hist = (snap.history || []).slice(-25).reverse();
+  if (!live.length && !hist.length) { box.append(h('div', { class: 'sch-empty' }, 'Nothing has run yet.')); return; }
+  const name = id => { const s = (snap.schedules || []).find(x => x.id === id); return s ? s.name : null; };
+  const t = h('table', { class: 'sch-runs' }, h('tr', {}, h('th', {}, 'Schedule'), h('th', {}, 'What'), h('th', {}, 'Started'), h('th', {}, 'Took'), h('th', {}, 'Result'), h('th', {}, 'Summary'), h('th', {})));
+  for (const r of live) {
+    const sid = (r.job.scope || []).map(x => String(x)).find(x => x.startsWith('schedule:'));
+    t.append(h('tr', {}, h('td', {}, name(sid ? sid.slice(9) : '') || '—'), h('td', {}, (ACTIONS[r.action] || [r.action])[0]), h('td', {}, when(r.job.created_at)), h('td', {}, '…'),
+      h('td', {}, h('span', { class: 'chip ok' }, r.job.state === 'queued' ? 'waiting' : r.job.state === 'blocked' ? 'blocked' : 'running')), h('td', { class: 'sum' }, r.job.state === 'blocked' && r.job.terminal_cause ? humanError(r.job.terminal_cause) : ''),
+      h('td', {}, h('button', { type: 'button', title: 'Stop this run', onclick: () => cancelJob(r) }, 'Stop'))));
   }
- }
- function triggerFields(){const trigger=field('trigger_type').value;for(const node of form.querySelectorAll('[data-trigger]'))node.hidden=!node.dataset.trigger.split(' ').includes(trigger);}
- function openEditor(target){if(dirty){message('Close or save the existing draft before replacing it.',true);return;}editTarget=target?structuredClone(target):null;preview=null;form.reset();form.hidden=false;$('sw-edit-title').textContent=target?'Edit '+target.name:'New disabled schedule';$('sw-save').textContent=target?'Save definition':'Save disabled';$('sw-preview-result').replaceChildren();$('sw-field-errors').replaceChildren();
-  const action=field('action');action.replaceChildren();for(const descriptor of snapshot.action_descriptors)action.append(element('option',descriptor.action,{value:descriptor.action}));setField('action',target?target.action:'graph_maintenance');
-  if(target){for(const key of ['name','trigger_type','cron','timezone','fold_policy','missed_policy','cycle_interval','max_runs'])setField(key,target[key]);const duration=target.trigger_type==='on_idle'?target.idle_ms:target.interval_ms;if(duration){const unit=[3600000,60000,1000,1].find(n=>duration%n===0);setField('unit',unit);setField('duration',duration/unit);}}
-  parameterFields(target?target.parameters:{});triggerFields();form.dataset.operation=crypto.randomUUID();dirty=false;field('name').focus();
- }
- function draft(){const action=field('action').value,descriptor=snapshot.action_descriptors.find(d=>d.action===action),parameters={};for(const [name,definition]of Object.entries(descriptor.fields)){
-   const input=field('param:'+name);if(!input){if(editTarget&&editTarget.parameters[name]!==undefined)parameters[name]=editTarget.parameters[name];continue;}
-   if(definition.type==='boolean')parameters[name]=input.checked;else if(input.value!=='')parameters[name]=definition.type==='number'?Number(input.value):definition.type==='string_array'?input.value.split(/\r?\n/).map(v=>v.trim()).filter(Boolean):definition.type==='json'?JSON.parse(input.value):input.value;
+  for (const e of hist) {
+    t.append(h('tr', {}, h('td', {}, e.schedule_name || name(e.schedule_id) || '—'), h('td', {}, (ACTIONS[e.action] || [e.action])[0]), h('td', { title: e.triggered_at }, when(e.triggered_at)), h('td', {}, dur(e.duration_ms)),
+      h('td', {}, h('span', { class: 'chip ' + (e.success ? 'ok' : 'bad') }, e.success ? 'ok' : 'failed')), h('td', { class: 'sum' }, readable(e.result_summary || e.error || '')), h('td', {})));
   }
-  const trigger=field('trigger_type').value,value={name:field('name').value,action,parameters,trigger_type:trigger,timezone:field('timezone').value,fold_policy:field('fold_policy').value,missed_policy:field('missed_policy').value,max_runs:field('max_runs').value===''?null:Number(field('max_runs').value)};
-  if(trigger==='interval')value.interval_ms=Number(field('duration').value)*Number(field('unit').value);if(trigger==='on_idle')value.idle_ms=Number(field('duration').value)*Number(field('unit').value);if(trigger==='cron_like')value.cron=field('cron').value;if(trigger==='after_cycles')value.cycle_interval=Number(field('cycle_interval').value);return value;
- }
- form.addEventListener('input',()=>{dirty=true;preview=null;});field('action').addEventListener('change',()=>{parameterFields();dirty=true;preview=null;});field('trigger_type').addEventListener('change',triggerFields);
- $('sw-preview').addEventListener('click',async()=>{try{preview=await previewFor(editTarget,draft());renderPreview($('sw-preview-result'),preview);$('sw-field-errors').replaceChildren();}catch(error){showErrors(error);message('Invalid draft; nothing was written. '+error.message,true);}});
- form.addEventListener('submit',async event=>{event.preventDefault();if(busy||pending)return;try{const value=draft();const reviewed=await previewFor(editTarget,value);
-  if(editTarget)await mutation('/api/schedules/v2/commands',{target_id:editTarget.id,expected_revision:editTarget.definition_revision,operation_id:form.dataset.operation,action:'update',updates:value,preview_digest:reviewed.preview_digest});else await mutation('/api/schedules/v2/create',{...value,operation_id:form.dataset.operation,enabled:false});
- }catch(error){showErrors(error);message(error.message,true);}});
- $('sw-close-editor').addEventListener('click',()=>{if(dirty){const box=$('sw-field-errors');box.replaceChildren(element('p','Discard the unsaved draft?'));box.append(button('Discard draft',()=>{dirty=false;form.hidden=true;renderDetail();}));return;}form.hidden=true;renderDetail();});
- $('sw-new').addEventListener('click',()=>{if(snapshot)openEditor(null);});$('sw-refresh').addEventListener('click',refresh);$('sw-search').addEventListener('input',renderList);$('sw-filter').addEventListener('change',renderList);
- $('sw-retry').addEventListener('click',()=>{if(pending)void mutation(pending.path,pending.body);});
- function selectTab(name){tab=name;for(const node of $('sw-tabs').querySelectorAll('[role=tab]')){const active=node.dataset.tab===name;node.setAttribute('aria-selected',String(active));node.tabIndex=active?0:-1;$('sw-'+node.dataset.tab).hidden=!active;}if(name==='upcoming')void forecast();if(name==='runs')renderRuns();}
- $('sw-tabs').addEventListener('click',event=>{const node=event.target.closest('[data-tab]');if(node)selectTab(node.dataset.tab);});$('sw-tabs').addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const nodes=Array.from($('sw-tabs').querySelectorAll('[role=tab]')),index=nodes.indexOf(document.activeElement);const next=event.key==='Home'?0:event.key==='End'?nodes.length-1:(index+(event.key==='ArrowRight'?1:-1)+nodes.length)%nodes.length;selectTab(nodes[next].dataset.tab);nodes[next].focus();});
- let forecastGeneration=0;async function forecast(){if(!snapshot)return;const generation=++forecastGeneration,rows=filtered().slice(0,12),box=$('sw-forecast');box.replaceChildren(element('p','Forecasting '+rows.length+' / '+filtered().length+' filtered definitions. Narrow search for the rest.'));
-  for(const schedule of rows){try{const value=await previewFor(schedule);if(generation!==forecastGeneration)return;const group=element('details');group.append(element('summary',schedule.name+' · '+(schedule.enabled?'enabled':'paused intent')));const content=element('div');renderPreview(content,value);group.append(content);box.append(group);}catch(error){if(generation===forecastGeneration)box.append(element('p',schedule.name+': '+error.message));}}
- }
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refresh();});window.addEventListener('online',refresh);window.addEventListener('beforeunload',event=>{if(dirty||pending){event.preventDefault();event.returnValue='';}});
- setInterval(()=>{if(!document.hidden)void refresh();},15000);void refresh();
+  box.append(t);
+}
+const CODES = { ADMISSION_ZERO_PAID_ALLOCATION: 'Blocked: this paid model has no spend limit. Set one in Config → Budgets & limits.',
+  ADMISSION_EXACT_PRICING_REQUIRED: 'Blocked: the model has no price set. Add it in Config → Budgets & limits.',
+  ADMISSION_RUN_AMOUNT_LIMIT: 'Stopped at the per-run spend limit.', ADMISSION_DAY_AMOUNT_LIMIT: 'Stopped at the daily spend limit.',
+  ADMISSION_ROLE_POLICY_BLOCKED: 'Blocked: the model for this job is not configured. Check Config → Models.', ADMISSION_RUN_DEADLINE: 'Stopped: the run took longer than its time budget.' };
+function readable(text) { text = String(text || ''); for (const [code, msg] of Object.entries(CODES)) if (text.includes(code)) return msg; if (/^\s*[{[]/.test(text)) { try { const v = JSON.parse(text); return Object.entries(v).filter(([, x]) => typeof x !== 'object').slice(0, 5).map(([k, x]) => k.replace(/_/g, ' ') + ': ' + x).join(' · '); } catch (e) { /* plain */ } } return text.length > 220 ? text.slice(0, 217) + '…' : text; }
+async function cancelJob(r) {
+  try { await api('/api/schedules/v2/commands', { action: 'cancel_job', target_id: r.job.id, expected_revision: r.job.fence, operation_id: uuid() }); say('Stopping the run.', 'ok'); }
+  catch (e) { say(e.message, 'error'); } finally { load(); }
+}
+
+/* ---------- editor ---------- */
+function draftFrom(s) {
+  const unit = s && s.interval_ms ? (s.interval_ms % 86400000 === 0 ? '86400000' : s.interval_ms % 3600000 === 0 ? '3600000' : '60000') : '3600000';
+  return { id: s ? s.id : null, revision: s ? s.definition_revision : null, enabled: s ? !!s.enabled : true,
+    name: s ? s.name : '', action: s ? s.action : 'dream_cycle', parameters: s ? JSON.parse(JSON.stringify(s.parameters || {})) : {},
+    trigger_type: s ? s.trigger_type : 'interval', every: s && s.interval_ms ? s.interval_ms / Number(unit) : 6, unit,
+    cron: s && s.cron ? s.cron : '0 3 * * *', timezone: s && s.timezone ? s.timezone : LOCAL_ZONE,
+    cycle_interval: s && s.cycle_interval ? s.cycle_interval : 10, idle_min: s && s.idle_ms ? s.idle_ms / 60000 : 15,
+    max_runs: s && s.max_runs !== null && s.max_runs !== undefined ? s.max_runs : '', missed_policy: s && s.missed_policy || 'skip', fold_policy: s && s.fold_policy || 'once' };
+}
+function openEditor(s) { editor = draftFrom(s); drawEditor(); $('sw-editor-host').hidden = false; $('sw-editor-host').scrollIntoView({ block: 'start' }); const n = $('se-name'); if (n) n.focus(); }
+function closeEditor() { editor = null; $('sw-editor-host').hidden = true; $('sw-editor-host').replaceChildren(); }
+function fld(title, control, help, wide) { return h('div', { class: 'sch-field' + (wide ? ' wide' : '') }, typeof title === 'string' ? h('div', { class: 'lbl' }, title) : title, control, help ? h('div', { class: 'help' }, help) : null); }
+function bindInput(input, apply) { input.addEventListener('input', () => { apply(input.value); schedulePreview(); }); input.addEventListener('change', () => { apply(input.value); schedulePreview(); }); return input; }
+function paramControls() {
+  const fields = descriptors[editor.action] || {}, out = [];
+  for (const [name, f] of Object.entries(fields)) {
+    if (f.internal) continue;
+    const [title, help] = FIELD[name] || [name.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase()), null];
+    const v = editor.parameters[name] !== undefined ? editor.parameters[name] : f.default;
+    let c;
+    if (f.type === 'enum') {
+      c = h('select', {}, ...(f.options || []).filter(o => !(RETIRED[name] || []).includes(o)).map(o => h('option', { value: o }, STRATEGY[o] || o.replace(/_/g, ' ').replace(/^./, x => x.toUpperCase()))));
+      if (v !== undefined) c.value = v; bindInput(c, x => { editor.parameters[name] = x; });
+    } else if (f.type === 'number') {
+      c = h('input', { type: 'number', min: f.minimum, max: f.maximum, step: 1, value: v !== undefined ? v : '' });
+      bindInput(c, x => { if (x === '') delete editor.parameters[name]; else editor.parameters[name] = Number(x); });
+    } else if (f.type === 'boolean') {
+      c = h('select', {}, h('option', { value: 'false' }, 'No'), h('option', { value: 'true' }, 'Yes')); c.value = String(v === true);
+      bindInput(c, x => { editor.parameters[name] = x === 'true'; });
+    } else if (f.type === 'string_array') {
+      c = h('input', { type: 'text', value: Array.isArray(v) ? v.join(', ') : '', placeholder: 'id-one, id-two' });
+      bindInput(c, x => { editor.parameters[name] = x.split(',').map(y => y.trim()).filter(Boolean); });
+    } else if (f.type === 'json') {
+      c = h('textarea', { rows: 3, placeholder: '{"reason": "…"}' }, v && Object.keys(v).length ? JSON.stringify(v, null, 2) : '');
+      bindInput(c, x => { try { editor.parameters[name] = x.trim() ? JSON.parse(x) : {}; c.removeAttribute('aria-invalid'); } catch (e) { c.setAttribute('aria-invalid', 'true'); } });
+    } else {
+      c = h('input', { type: 'text', value: v !== undefined ? v : '' }); bindInput(c, x => { if (x.trim() === '') delete editor.parameters[name]; else editor.parameters[name] = x; });
+    }
+    out.push(fld(title + (f.required && f.default === undefined ? ' *' : ''), c, help, f.type === 'json'));
+  }
+  if (!out.length) out.push(h('div', { class: 'help' }, 'No options — this action uses sensible defaults.'));
+  return out;
+}
+function cronPresets() {
+  const p = String(editor.cron).trim().split(/\s+/), time = /^\d+$/.test(p[0]) && /^\d+$/.test(p[1]) ? String(p[1]).padStart(2, '0') + ':' + String(p[0]).padStart(2, '0') : '03:00';
+  const kind = /^\d+$/.test(p[0]) && p[1] === '*' && p[2] === '*' && p[4] === '*' ? 'hourly' : p[2] === '*' && p[3] === '*' && p[4] === '*' && /^\d+$/.test(p[1]) ? 'daily'
+    : p[2] === '*' && p[4] === '1-5' ? 'weekdays' : p[2] === '*' && /^\d$/.test(p[4] || '') ? 'weekly' : 'custom';
+  const kindSel = h('select', {}, h('option', { value: 'hourly' }, 'Every hour'), h('option', { value: 'daily' }, 'Every day'), h('option', { value: 'weekdays' }, 'Weekdays (Mon–Fri)'), h('option', { value: 'weekly' }, 'Once a week'), h('option', { value: 'custom' }, 'Custom (cron expression)'));
+  kindSel.value = kind;
+  const timeIn = h('input', { type: 'time', value: time }), daySel = h('select', {}, ...DAYS.map((d, i) => h('option', { value: String(i) }, d))); daySel.value = /^\d$/.test(p[4] || '') ? p[4] : '1';
+  const minuteIn = h('input', { type: 'number', min: 0, max: 59, value: /^\d+$/.test(p[0]) ? p[0] : '0' });
+  const cronIn = h('input', { type: 'text', value: editor.cron, spellcheck: 'false', placeholder: 'minute hour day month weekday' });
+  const rebuild = () => { const [hh, mm] = (timeIn.value || '03:00').split(':').map(Number), k = kindSel.value;
+    if (k === 'hourly') editor.cron = Number(minuteIn.value || 0) + ' * * * *'; else if (k === 'daily') editor.cron = mm + ' ' + hh + ' * * *';
+    else if (k === 'weekdays') editor.cron = mm + ' ' + hh + ' * * 1-5'; else if (k === 'weekly') editor.cron = mm + ' ' + hh + ' * * ' + daySel.value; else editor.cron = cronIn.value.trim();
+    cronIn.value = editor.cron; show(); schedulePreview(); };
+  const show = () => { const k = kindSel.value; timeWrap.hidden = k === 'hourly' || k === 'custom'; minuteWrap.hidden = k !== 'hourly'; dayWrap.hidden = k !== 'weekly'; cronWrap.hidden = k !== 'custom'; };
+  kindSel.addEventListener('change', rebuild); timeIn.addEventListener('change', rebuild); daySel.addEventListener('change', rebuild); minuteIn.addEventListener('input', rebuild);
+  cronIn.addEventListener('input', () => { editor.cron = cronIn.value.trim(); schedulePreview(); });
+  const zone = h('select', {}, ...ZONES.map(z => h('option', { value: z }, z))); zone.value = editor.timezone; bindInput(zone, x => { editor.timezone = x; });
+  const timeWrap = fld('At', timeIn), minuteWrap = fld('At minute', minuteIn, 'Minutes past each hour.'), dayWrap = fld('On', daySel), cronWrap = fld('Cron expression', cronIn, 'Five fields: minute hour day-of-month month weekday. Example: 30 6 * * 1-5', true);
+  setTimeout(show, 0);
+  return [fld('Repeat', kindSel), timeWrap, minuteWrap, dayWrap, fld('Time zone', zone), cronWrap];
+}
+function timingControls() {
+  const t = editor.trigger_type;
+  if (t === 'interval') { const n = h('input', { type: 'number', min: 1, step: 'any', value: editor.every }), u = h('select', {}, ...UNITS.map(([v, l]) => h('option', { value: v }, l))); u.value = editor.unit;
+    bindInput(n, x => { editor.every = Number(x); }); bindInput(u, x => { editor.unit = x; });
+    return [fld('Run every', h('div', { class: 'sch-inline' }, n, u), 'Counted from the previous run.')]; }
+  if (t === 'cron_like') return cronPresets();
+  if (t === 'after_cycles') { const n = h('input', { type: 'number', min: 1, step: 1, value: editor.cycle_interval }); bindInput(n, x => { editor.cycle_interval = Number(x); });
+    return [fld('Run after every', h('div', { class: 'sch-inline' }, n, h('span', { class: 'fix help' }, 'dream cycles')), 'Follows how much DreamGraph has been dreaming, not the clock.')]; }
+  const n = h('input', { type: 'number', min: 1, step: 1, value: editor.idle_min }); bindInput(n, x => { editor.idle_min = Number(x); });
+  return [fld('When idle for', h('div', { class: 'sch-inline' }, n, h('span', { class: 'fix help' }, 'minutes')), 'Runs once you have not used DreamGraph for this long.')];
+}
+function drawEditor() {
+  const host = $('sw-editor-host'); host.replaceChildren();
+  const name = h('input', { id: 'se-name', type: 'text', value: editor.name, maxlength: 256, placeholder: 'e.g. Nightly dream cycle' }); bindInput(name, x => { editor.name = x; });
+  const act = h('select', {}, ...Object.entries(ACTIONS).map(([v, [l]]) => h('option', { value: v }, l))); act.value = editor.action;
+  act.addEventListener('change', () => { editor.action = act.value; editor.parameters = {}; drawEditor(); schedulePreview(); });
+  const methods = [['interval', 'Repeating interval'], ['cron_like', 'Calendar time'], ['after_cycles', 'After dream cycles'], ['on_idle', 'When I\'m idle']];
+  const seg = h('div', { class: 'sch-seg', role: 'radiogroup', 'aria-label': 'Timing method' }, ...methods.map(([v, l]) => { const r = h('input', { type: 'radio', name: 'se-trigger', value: v }); r.checked = editor.trigger_type === v;
+    r.addEventListener('change', () => { editor.trigger_type = v; drawEditor(); schedulePreview(); }); return h('label', {}, r, l); }));
+  const maxRuns = h('input', { type: 'number', min: 1, step: 1, value: editor.max_runs, placeholder: 'No limit' }); bindInput(maxRuns, x => { editor.max_runs = x; });
+  const missed = h('select', {}, h('option', { value: 'skip' }, 'Skip it'), h('option', { value: 'catch_up_once' }, 'Run once when DreamGraph is back')); missed.value = editor.missed_policy; bindInput(missed, x => { editor.missed_policy = x; });
+  const fold = h('select', {}, h('option', { value: 'once' }, 'Run once'), h('option', { value: 'both' }, 'Run both times')); fold.value = editor.fold_policy; bindInput(fold, x => { editor.fold_policy = x; });
+  const enabled = h('input', { type: 'checkbox', id: 'se-enabled' }); enabled.checked = editor.enabled; enabled.addEventListener('change', () => { editor.enabled = enabled.checked; });
+  const save = h('button', { type: 'button', class: 'sch-primary', id: 'se-save', onclick: saveEditor }, editor.id ? 'Save changes' : 'Create schedule');
+  host.append(h('div', { class: 'sch-editor' }, h('h2', {}, editor.id ? 'Edit schedule' : 'New schedule'),
+    h('div', { class: 'sch-grid' }, fld('Name', name), fld('What to run', act, (ACTIONS[editor.action] || [, ''])[1])),
+    h('div', { class: 'sch-sub' }, 'Options'), h('div', { class: 'sch-grid' }, ...paramControls()),
+    h('div', { class: 'sch-sub' }, 'When'), seg, h('div', { class: 'sch-grid', style: 'margin-top:10px' }, ...timingControls()),
+    h('details', { class: 'sch-more' }, h('summary', {}, 'More timing options'), h('div', { class: 'sch-grid' },
+      fld('Stop after', h('div', { class: 'sch-inline' }, maxRuns, h('span', { class: 'fix help' }, 'runs'))),
+      fld('If a run was missed', missed, 'For example while the computer was off.'),
+      editor.trigger_type === 'cron_like' ? fld('When clocks go back', fold, 'An hour that happens twice on DST change.') : null)),
+    h('div', { class: 'sch-preview', id: 'se-preview', 'aria-live': 'polite' }, 'Checking…'),
+    h('div', { class: 'err', id: 'se-error', role: 'alert', style: 'color:var(--s-bad);margin-top:6px' }),
+    h('div', { class: 'sch-editor-actions' }, h('label', { for: 'se-enabled' }, enabled, editor.id ? 'On' : 'Turn on after creating'),
+      h('button', { type: 'button', onclick: closeEditor }, 'Cancel'), save)));
+  schedulePreview();
+}
+function definition() {
+  const d = { name: editor.name.trim(), action: editor.action, parameters: editor.parameters, trigger_type: editor.trigger_type, timezone: editor.timezone, missed_policy: editor.missed_policy, fold_policy: editor.fold_policy,
+    max_runs: editor.max_runs === '' || editor.max_runs === null ? null : Number(editor.max_runs) };
+  if (editor.trigger_type === 'interval') d.interval_ms = Math.round(Number(editor.every) * Number(editor.unit));
+  if (editor.trigger_type === 'cron_like') d.cron = editor.cron;
+  if (editor.trigger_type === 'after_cycles') d.cycle_interval = Math.round(Number(editor.cycle_interval));
+  if (editor.trigger_type === 'on_idle') d.idle_ms = Math.round(Number(editor.idle_min) * 60000);
+  return d;
+}
+function schedulePreview() { clearTimeout(previewTimer); previewTimer = setTimeout(runPreview, 350); }
+async function runPreview() {
+  if (!editor) return; const seq = ++previewSeq, box = $('se-preview'), err = $('se-error'); if (!box) return;
+  const d = definition(); if (!d.name) d.name = 'Preview';
+  try { const p = await api('/api/schedules/v2/validate', { draft: d }); if (seq !== previewSeq || !editor) return;
+    err.textContent = ''; box.replaceChildren();
+    const occ = (p.occurrences || []).filter(o => o.planned_at);
+    if (editor.trigger_type === 'after_cycles') box.append('Runs after every ' + d.cycle_interval + ' dream cycles, so timing follows activity.');
+    else if (editor.trigger_type === 'on_idle') box.append('Runs after ' + dur(d.idle_ms) + ' without activity.');
+    else if (occ.length) box.append(h('strong', {}, 'Next runs'), h('ol', {}, ...occ.slice(0, 5).map(o => h('li', {}, stamp(o.planned_at, editor.trigger_type === 'cron_like' ? editor.timezone : undefined) + ' (' + when(o.planned_at) + ')'))));
+    else box.append('No run in the next 32 days with these settings.');
+    const roles = (p.effective_policies || []).map(r => r.role + ': ' + (r.effective && r.effective.model || '?'));
+    box.append(h('div', { class: 'note' }, (p.model_calls_possible ? 'Uses models (' + roles.join(', ') + ') within your budget limits.' : 'Does not call any model.') + (p.scheduler_enabled === false ? ' Note: the scheduler itself is paused.' : '')));
+  } catch (e) { if (seq !== previewSeq) return; box.textContent = 'Fix the highlighted settings to see when it will run.'; err.textContent = e.message; }
+}
+async function saveEditor() {
+  const d = definition(), err = $('se-error');
+  if (!d.name) { err.textContent = 'Give the schedule a name.'; $('se-name').focus(); return; }
+  $('se-save').disabled = true; err.textContent = '';
+  try {
+    if (!editor.id) {
+      const r = await api('/api/schedules/v2/create', { operation_id: uuid(), ...d });
+      if (editor.enabled && r.schedule) { const p = await reviewed(r.schedule);
+        await api('/api/schedules/v2/commands', { action: 'update', target_id: r.schedule.id, expected_revision: r.schedule.definition_revision, operation_id: uuid(), updates: { enabled: true }, preview_digest: p.preview_digest }); }
+      say('Created ' + d.name + (editor.enabled ? ' and turned it on.' : ' (off).'), 'ok');
+    } else {
+      const s = snap.schedules.find(x => x.id === editor.id); if (!s) throw new Error('This schedule no longer exists.');
+      const updates = { ...d }; const turnOn = editor.enabled && !s.enabled, turnOff = !editor.enabled && s.enabled;
+      if (turnOff) updates.enabled = false;
+      const r = await api('/api/schedules/v2/commands', { action: 'update', target_id: s.id, expected_revision: s.definition_revision, operation_id: uuid(), updates });
+      if (turnOn) { const fresh = r.result || { ...s, definition_revision: s.definition_revision + 1 }; const p = await reviewed(fresh);
+        await api('/api/schedules/v2/commands', { action: 'update', target_id: s.id, expected_revision: fresh.definition_revision, operation_id: uuid(), updates: { enabled: true }, preview_digest: p.preview_digest }); }
+      say('Saved ' + d.name + '.', 'ok');
+    }
+    closeEditor(); await load();
+  } catch (e) { err.textContent = e.message; const b = $('se-save'); if (b) b.disabled = false; }
+}
+
+/* ---------- wiring ---------- */
+$('sw-new').addEventListener('click', () => openEditor(null));
+$('sw-refresh').addEventListener('click', () => { say(''); load(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !editor && !busy) load(); });
+setInterval(() => { if (!document.hidden && !editor && !busy) load(); }, 30000);
+const nav = new URLSearchParams(location.search);
+load().then(() => {
+  const id = nav.get('schedule'), view = nav.get('view'), s = id && snap && snap.schedules.find(x => x.id === id);
+  if (!s) { if (nav.get('new') === '1') openEditor(null); return; }
+  if (view === 'edit') openEditor(s); else if (view === 'run') runNow(s); else if (view === 'enable') enable(s);
+  const row = root.querySelector('[data-id="' + CSS.escape(s.id) + '"]'); if (row) { row.scrollIntoView({ block: 'center' }); row.style.outline = '2px solid #4f86ba'; }
+});
 })();`;

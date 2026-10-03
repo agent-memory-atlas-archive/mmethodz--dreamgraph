@@ -63,6 +63,7 @@ export function renderConfigurationWorkspace(revision: string, restartCommand: s
 const CONFIGURATION_WORKSPACE_CSS = String.raw`
 #configuration-workspace{--c-line:#363b42;--c-dim:#9aa4b1;--c-card:#1a1d21;--c-card2:#20242a;--c-acc:#7fb0e0;--c-ok:#86c79a;--c-warn:#e2c07a;--c-bad:#e59a9a;
   display:flex;flex-direction:column;min-height:0;height:100%;color:#dde3ea;font:13px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+#configuration-workspace [hidden]{display:none!important}
 .cfg-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex:none;padding-bottom:6px}
 .cfg-head h1{margin:0;font-size:19px}.cfg-head p{margin:2px 0 0;color:var(--c-dim);font-size:12px}
 .cfg-head-actions{display:flex;gap:10px;align-items:center}.cfg-head-actions a{color:var(--c-acc);text-decoration:none}
@@ -607,6 +608,10 @@ async function load(keepDrafts) {
     const inFile = Object.values(snap.settings).filter(s => s.source === 'instance').length, deployedCount = Object.values(snap.settings).filter(s => s.source === 'deployment').length;
     $('cfg-source').textContent = 'engine.env · ' + inFile + ' value' + (inFile === 1 ? '' : 's') + ' set' + (deployedCount ? ' · ' + deployedCount + ' set by the launch environment' : '') + ' · read ' + new Date().toLocaleTimeString();
     $('cw-revision').value = snap.revision; root.dataset.loading = 'false';
+    const sync = r.engine_env_sync;
+    if (sync && sync.error) say('engine.env was edited but could not be applied: ' + humanError(sync.error), 'error');
+    else if (sync && sync.restart_required && sync.restart_required.length) say('engine.env changes are saved, but these only take effect after restarting DreamGraph: ' + sync.restart_required.map(label).join(', ') + ' (' + $('cw-restart-command').value + ').');
+    else if (!keepDrafts && sync && sync.changed && sync.changed.length && Date.now() - Date.parse(sync.at) < 15000) say('Picked up ' + sync.changed.length + ' change' + (sync.changed.length > 1 ? 's' : '') + ' made to engine.env outside this page and applied them.', 'ok');
     if (snap.diagnostics.length) say('engine.env has problems: ' + snap.diagnostics.slice(0, 3).map(humanError).join(' · '), 'error');
   } catch (e) { say('Could not read the configuration: ' + e.message, 'error'); }
   finally { busy = false; render(); }

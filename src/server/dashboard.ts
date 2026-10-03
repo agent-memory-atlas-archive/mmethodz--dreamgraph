@@ -20,6 +20,7 @@
 
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { readFile, readdir } from "node:fs/promises";
+import { readFileSync, watchFile, unwatchFile, existsSync } from "node:fs";
 import { resolve, basename, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
@@ -57,7 +58,7 @@ import { loadCanonicalGraph } from "../graph/read-model.js";
 import { readDirtyPartitions } from "../graph/change-obligations.js";
 import { renderRuntimeWorkspace, RUNTIME_WORKSPACE_SCRIPT } from "./runtime-workspace.js";
 import { applyEngineConfiguration, inspectEngineConfiguration, previewEngineTemplate, applyEngineTemplate, undoEngineConfiguration } from "../config/engine-configuration.js";
-import { engineSettingCatalogue, engineSetting, resolveComponentSettings, componentSettingAlias, computerUsePolicy } from "../config/engine-setting-catalogue.js";
+import { engineSettingCatalogue, engineSetting, resolveComponentSettings, componentSettingAlias, computerUsePolicy, validateEngineEnvValues } from "../config/engine-setting-catalogue.js";
 import type { EventRouterConfig, SchedulerConfig, NarrativeConfig } from "../cognitive/types.js";
 import { logger } from "../utils/logger.js";
 import { embedArchitectWorkspace } from "./architect-workspace-shell.js";
@@ -131,12 +132,71 @@ async function activateConfiguration(updates: Record<string, string | null>) {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/*  engine.env → running daemon                                        */
+/* ------------------------------------------------------------------ */
+/**
+ * Keep the running daemon in step with the instance's engine.env, including edits made
+ * outside DreamGraph (a text editor, another tool). Live and next-execution settings are
+ * activated through the same path as a dashboard save; restart-only settings are reported.
+ * Deployment (launch environment) overrides keep precedence.
+ */
+let engineEnvBaseline: Record<string, string> | null = null;
+let engineEnvWatched: string | null = null;
+let engineEnvSync: Promise<EngineEnvSyncResult> | null = null;
+export interface EngineEnvSyncResult { changed: string[]; restart_required: string[]; error: string | null; at: string }
+let lastEngineEnvSync: EngineEnvSyncResult = { changed: [], restart_required: [], error: null, at: new Date(0).toISOString() };
+export function syncEngineEnvFromDisk(reason: string): Promise<EngineEnvSyncResult> {
+  engineEnvSync ??= (async () => {
+    const path = getActiveScope()?.engineEnvPath, at = new Date().toISOString();
+    if (!path) return { changed: [], restart_required: [], error: null, at };
+    if (engineEnvWatched !== path) {
+      if (engineEnvWatched) unwatchFile(engineEnvWatched);
+      engineEnvWatched = path;
+      // Polling works on Windows network/WSL paths and survives editors that replace the file.
+      watchFile(path, { interval: 2000, persistent: false }, (current, previous) => {
+        if (current.mtimeMs !== previous.mtimeMs || current.size !== previous.size) void syncEngineEnvFromDisk("file changed");
+      });
+    }
+    let values: Record<string, string>;
+    try { values = existsSync(path) ? parseEngineEnvDocument(readFileSync(path, "utf8")) : {}; validateEngineEnvValues(values); }
+    catch (error) {
+      const message = error instanceof Error ? error.message : "CONFIG_INVALID_PERSISTED_SETTINGS";
+      logger.warn(`engine.env not applied (${reason}): ${message}`);
+      return { changed: [], restart_required: [], error: message, at };
+    }
+    const previous = engineEnvBaseline, updates: Record<string, string | null> = {};
+    for (const [key, value] of Object.entries(values)) {
+      if (ENGINE_DEPLOYMENT_OVERRIDES[key] !== undefined || !engineSetting(key)) continue;
+      const restartOnly = engineSetting(key)!.apply === "restart" || engineSetting(key)!.apply === "read_only";
+      if (restartOnly ? previous !== null && previous[key] !== value : process.env[key] !== value) updates[key] = value;
+    }
+    // A key removed from the file is cleared only when its live value came from the file.
+    if (previous) for (const [key, value] of Object.entries(previous))
+      if (!(key in values) && ENGINE_DEPLOYMENT_OVERRIDES[key] === undefined && engineSetting(key) && process.env[key] === value) updates[key] = null;
+    engineEnvBaseline = values;
+    const changed = Object.keys(updates);
+    if (!changed.length) return { changed, restart_required: [], error: null, at };
+    const restart_required = changed.filter(key => ["restart", "read_only"].includes(engineSetting(key)?.apply ?? ""));
+    const live = Object.fromEntries(Object.entries(updates).filter(([key]) => !restart_required.includes(key)));
+    if (Object.keys(live).length) {
+      const activation = await activateConfiguration(live);
+      if (activation.status !== "activated") return { changed, restart_required: changed, error: activation.message, at };
+    }
+    logger.info(`engine.env re-read (${reason}): applied ${Object.keys(live).length} setting(s)` + (restart_required.length ? `; restart needed for ${restart_required.join(", ")}` : ""));
+    return { changed, restart_required, error: null, at };
+  })().then(result => { lastEngineEnvSync = result; return result; }).finally(() => { engineEnvSync = null; });
+  return engineEnvSync;
+}
+
 /**
  * Provide runtime context that only index.ts knows (sessions, port).
  * Call once from startHTTP().
  */
 export function setDashboardContext(ctx: DashboardContext): void {
   _ctx = ctx;
+  // Establish the baseline and start watching the instance's engine.env.
+  setTimeout(() => { void syncEngineEnvFromDisk("startup"); }, 0).unref?.();
 }
 
 /* ------------------------------------------------------------------ */
@@ -735,7 +795,11 @@ async function readConfigurationRequest(req: IncomingMessage): Promise<unknown> 
 }
 async function handleConfigurationApi(req: IncomingMessage, res: ServerResponse, path: string): Promise<void> {
   try {
-    if (req.method === "GET" && path === "/api/config/v1") { json(res, 200, { ok: true, result: await configurationView() }); return; }
+    if (req.method === "GET" && path === "/api/config/v1") {
+      // Opening configuration (dashboard, Architect tab, VS Code) always re-reads engine.env first.
+      const sync = await syncEngineEnvFromDisk("configuration opened");
+      json(res, 200, { ok: true, result: { ...await configurationView(), engine_env_sync: sync.changed.length || sync.error ? sync : lastEngineEnvSync } }); return;
+    }
     if (req.method === "GET" && path === "/api/config/v1/catalogue") {
       const defaults = parseEngineEnvDocument(await readEngineTemplateSource("default", PACKAGE_ROOT, templateMasterDir()));
       json(res, 200, { ok: true, result: engineSettingCatalogue().map(({ schema, decode, ...field }) => ({ ...field, category: configurationTab(field),
