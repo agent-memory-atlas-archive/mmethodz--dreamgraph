@@ -35,7 +35,32 @@ import { initLlmProvider } from "../src/cognitive/llm.js";
 import { ARCHITECT_CONTINUATION_SCHEMA } from "../src/architect/continuation.js";
 import { normalizeArchitectVerbosityMode, resolveArchitectNarrativeDensity } from "../src/architect/verbosity.js";
 
-async function withArchitectServer<T>(run: (baseUrl: string) => Promise<T>): Promise<T> {
+// These are deliberately small, public test inputs. Historical plans under the
+// developer's ignored plans/ directory are not part of a clean checkout.
+const HISTORICAL_PLAN_FIXTURES: Record<string, string> = {
+  "STANDALONE_ARCHITECT_MIGRATION_PLAN.md": "# Standalone Architect migration\n\nStatus: Draft\n\n### Slice 1. Governed plan navigation\n\n- status: pending\n",
+  "STANDALONE_ARCHITECT_MIGRATION_PLAN.implementation-log.md": "# Standalone Architect migration log\n",
+  "ARCHITECT_REWRITE_FOUNDATION_PLAN.md": "# Architect rewrite foundation\n\nStatus: Draft\n\n### Slice 1. Establish the foundation\n\n- status: pending\n",
+  "browser-architect-ui-level-2.md": "# Browser Architect UI Level 2\n\nStatus: Draft\n\n### Slice 6. Integration hardening + plan update pass\n\n- id: slice-6-integration-hardening-plan-update-pass\n\n### Slice 7. Review next pass\n\n- status: pending\n",
+  "browser-architect-ui-level-2.implementation-log.md": "# Browser Architect UI Level 2 log\n\n### 2026-05-29T01:49:00.000+03:00 — slice: slice-6-integration-hardening-plan-update-pass — status: completed\n\n- Result: integration reviewed.\n",
+  "living-dreamgraph.md": "# Living DreamGraph\n\nStatus: Draft\n\n## Candidate Slices\n\n### Slice A: Architect Pulse + Cognitive Weather\n\n- Validates with: visible evidence.\n\n### Slice E: Tension Studio\n\n- ADR-218 preserves lifecycle and execution separation.\n\n## Open Questions\n\n- What should the next review prove?\n\n## Nervous Points\n\n- Keep speculative output separate from validated evidence.\n",
+  "living-dreamgraph.implementation-log.md": "# Living DreamGraph log\n\n### 2026-05-30 - slice: plan-created - status: created\n\n### 2026-05-31 - slice: Slice E: Tension Studio - status: implemented\n\n- Result: Slice E implementation recorded for review.\n",
+};
+
+async function withHistoricalPlanFixtures<T>(run: () => Promise<T>): Promise<T> {
+  const projectRoot = await mkdtemp(join(tmpdir(), "dreamgraph-architect-history-fixtures-"));
+  const plansRoot = join(projectRoot, "plans");
+  await mkdir(plansRoot);
+  for (const [name, content] of Object.entries(HISTORICAL_PLAN_FIXTURES)) await writeFile(join(plansRoot, name), content, "utf8");
+  const scopeSpy = vi.spyOn(lifecycle, "getActiveScope").mockReturnValue({
+    uuid: "architect-history-fixture", projectRoot, dataDir: join(projectRoot, "data"),
+  } as never);
+  try { return await run(); }
+  finally { scopeSpy.mockRestore(); await rm(projectRoot, { recursive: true, force: true }); }
+}
+
+async function withArchitectServer<T>(run: (baseUrl: string) => Promise<T>, options?: { historicalPlanFixtures?: boolean }): Promise<T> {
+  if (options?.historicalPlanFixtures) return withHistoricalPlanFixtures(() => withArchitectServer(run));
   let server: Server | undefined;
   server = createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", "http://127.0.0.1");
@@ -865,7 +890,7 @@ describe("standalone Architect route hardening", () => {
       expect(links.plan_markdown).toContain("STANDALONE_ARCHITECT_MIGRATION_PLAN.md");
       expect(links.implementation_log).toMatch(/^vscode:\/\/file\//);
       expect(links.implementation_log).toContain("STANDALONE_ARCHITECT_MIGRATION_PLAN.implementation-log.md");
-    });
+    }, { historicalPlanFixtures: true });
   });
 
   it("serves daemon-governed ADR previews without browser filesystem authority", async () => {
@@ -1030,7 +1055,7 @@ describe("standalone Architect route hardening", () => {
       expect(otherReview.selected_candidate_id).not.toBe(review.selected_candidate_id);
       expect(String(otherSelectedCandidate.id)).toContain("architect_rewrite_foundation_plan");
       expect(otherSelectedCandidate.label).not.toBe(selectedCandidate.label);
-    });
+    }, { historicalPlanFixtures: true });
   });
 
   it("mirrors task-first Architect recipes into the beginner guide", async () => {
@@ -2092,7 +2117,7 @@ describe("standalone Architect route hardening", () => {
       expect(text).toContain("event: architect.chat.status");
       expect(text).toContain("event: architect.chat.result");
       expect(text).toContain("\"transport\":\"sse\"");
-    });
+    }, { historicalPlanFixtures: true });
   });
 
   it("keeps unimported implementation-log claims separate from lifecycle authority", async () => {
@@ -2114,7 +2139,7 @@ describe("standalone Architect route hardening", () => {
       expect(operational.progress).toMatchObject({ verified: 0 });
       expect(nextSlice).toMatchObject({ status: "pending" });
       expect(String(operational.current_slice_id ?? "")).not.toContain("standalone-architect-chat-plan-update");
-    });
+    }, { historicalPlanFixtures: true });
   });
 
   it("projects living plan state from markdown and implementation-log evidence", async () => {
@@ -2139,7 +2164,7 @@ describe("standalone Architect route hardening", () => {
       expect(anchors.some((anchor) => anchor.id === "ADR-218")).toBe(true);
       expect(String(living.last_changed_because ?? "")).toContain("Slice E");
       expect(String(living.pulse ?? "")).toContain("questions=");
-    });
+    }, { historicalPlanFixtures: true });
   });
 
   it("omits resolved nervous points from the living plan projection", async () => {

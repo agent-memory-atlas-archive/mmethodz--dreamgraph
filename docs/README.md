@@ -8,6 +8,8 @@
 
 Version: **14.0.0 — Ashoka**. See the [release notes](../RELEASE_NOTES_v14.0.0.md) and [upgrade guide](ashoka/release-14.0.0.md).
 
+Easy Start is available as [Markdown](easy-start.md), [HTML](easy-start.html) and a [six-page PDF](easy-start.pdf), including the integrated Architect operational tabs.
+
 Ashoka's [Computer Use implementation](ashoka/computer-use.md) is verified for the maintainer's [Windows and accepted WSL installer/browser release scope](ashoka/v14-release-scope.md). Additional native platforms/backends are deferred, and unqualified routes remain disabled. Installation and legacy graph migration remain separate operations.
 
 Ashoka's [admitted matched answer collector](ashoka/admitted-agent-evaluation.md) uses exact reviewed contexts, model/retention/prices and the original job/spend ledger. The [published GPT-4.1 pilot](ashoka/benchmarks/2026-10-03-gpt-4.1/README.md) records quality failures and makes no understanding-gain or cost-saving claim.

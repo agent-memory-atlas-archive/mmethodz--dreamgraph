@@ -29,6 +29,8 @@ cd dreamgraph
 
 ### Linux / macOS (Bash)
 
+For v14.0.0, Linux qualification is the accepted WSL2 Ubuntu 24.04 / Node 20 installer and isolated-browser-worker pass. The Bash script also retains macOS paths, but macOS and additional native desktop environments are not qualified by this release. See the [release scope](docs/ashoka/v14-release-scope.md).
+
 ```bash
 git clone https://github.com/mmethodz/dreamgraph.git
 cd dreamgraph
@@ -89,7 +91,7 @@ $path = ($path -split ';' | Where-Object { $_ -notlike '*\.dreamgraph\bin*' }) -
 [Environment]::SetEnvironmentVariable("Path", $path, "User")
 
 # Remove VS Code extension
-code --uninstall-extension siteledger.dreamgraph-vscode
+code --uninstall-extension siteledger-solutions.dreamgraph-vscode
 ```
 
 ### Linux / macOS
@@ -175,19 +177,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 ### Extension activation error (missing modules)
 
-If the extension fails with "Cannot find module '@modelcontextprotocol/sdk'":
-
-```powershell
-# Windows
-cd "$env:USERPROFILE\.vscode\extensions\siteledger-solutions.dreamgraph-vscode-14.0.0"
-npm install --omit=dev
-
-# Linux / macOS
-cd ~/.vscode/extensions/siteledger-solutions.dreamgraph-vscode-14.0.0
-npm install --omit=dev
-```
-
-Then reload VS Code.
+The v14.0.0 VSIX bundles its runtime and vendors its webview libraries. Reinstall the v14.0.0 VSIX and reload VS Code rather than installing npm dependencies inside the installed extension. If activation still fails, retain the exact missing-module message and report it with the extension and VS Code versions. Physical VS Code activation is not implied by the compiled-suite/package checks.
 
 ### PowerShell execution policy error
 
