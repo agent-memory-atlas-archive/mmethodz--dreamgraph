@@ -5,10 +5,12 @@ import argparse
 from collections import Counter
 from pathlib import Path
 
+from .definitions import qualified
 from . import loader
 from ._common import add_common_args, emit, fmt_table, resolve_data_dir_from_args
 
 
+@qualified("orphan_pressure")
 def analyze(data_dir: Path) -> dict:
     fact = loader.all_fact_entities(data_dir)
     by_id = {e.get("id"): e for e in fact if e.get("id")}

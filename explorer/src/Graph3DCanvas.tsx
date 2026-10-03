@@ -580,7 +580,8 @@ export default function Graph3DCanvas({
         const result = await fetchHeatmap(HEATMAP_WINDOW_S);
         if (disposed || !heatmapOn) return;
         lastHeatmap = result;
-        const map = new Map<string, number>(result.nodes);
+        const map = new Map<string,number>();
+        for(const [id,count]of result.nodes){const matches=snap.nodes.filter(node=>node.id===id||node.identity?.id===id);if(matches.length===1)map.set(matches[0].id,count);}
         tubeSystem.applyHeatmap(map, result.max_count);
         renderStatus();
       };
@@ -1454,12 +1455,10 @@ export default function Graph3DCanvas({
       if (raf) cancelAnimationFrame(raf);
       cleanup?.();
     };
-    // Intentionally only depend on mount — prefs and snapshot are read via
-    // refs so toggling grid/quality at runtime won't tear the scene down.
-    // Slice E will add a snapshot-delta path that re-runs the layout in
-    // place and updates the existing systems.
+    // Rebuild only for an actual canonical revision/content change. Preference
+    // and unchanged polling replies keep the scene; worker cleanup fences old layouts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [snapshot.render_key??snapshot.etag]);
 
   return (
     <div className="canvas-wrap canvas-3d">

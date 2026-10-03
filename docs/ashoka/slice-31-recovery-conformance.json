@@ -1,0 +1,288 @@
+{
+  "schema": "dreamgraph.ashoka.computer_checkpoint.v1",
+  "recorded_at": "2026-10-02T23:07:13.026Z",
+  "status": "peer_death_recovery_qualified_slice31_in_progress",
+  "root": {
+    "passed": 1982,
+    "failed": 0,
+    "skipped": 2,
+    "files": 175,
+    "exit_code": 0,
+    "max_workers": 4,
+    "elapsed_seconds": 165.571330078125
+  },
+  "focused": {
+    "passed": 17,
+    "failed": 0,
+    "exit_code": 0
+  },
+  "linux": {
+    "passed": 1,
+    "failed": 0,
+    "exit_code": 0,
+    "platform": "Ubuntu24.04.4/WSL2 x64/Node20.20.2/Chromium151.0.7922.34/Playwright1.62.1"
+  },
+  "windows": {
+    "platform": "Windows x64/Node25.2.1/Chrome153.0.8010.50/Playwright1.62.1",
+    "real_source_write_and_peer_death": true
+  },
+  "frozen": {
+    "revision": 18,
+    "contracts": 42,
+    "baseline_sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1",
+    "contract_source_sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+  },
+  "previous_qualification": {
+    "wsl_artifact": "sha256:2cd14d1a8d6a9c7b5f527a955e96bbb19410246c7bdf17e5b718d715c6a5e5fe",
+    "unchanged_worker_files": [
+      "src/computer/browser-driver.ts",
+      "src/computer/browser-harness.ts",
+      "src/computer/qualify-browser.ts"
+    ],
+    "editor_passes": 521,
+    "scope": "Historical installed worker and compiled editor evidence; no new editor activation, native desktop or provider qualification."
+  },
+  "scope": "Actual isolated browser performs one disposable source write; the original IPC peer is forcibly killed before its action acknowledgement. Actual C17/C05/C15 stores retain unknown action and Stop, pending source debt and recovery-required execution. Original retries deliver no further input. Known original process identities end, but their absence is neither action verification nor an authenticated Stop receipt. Admission/provider pricing are declared offline fixtures; no model calls.",
+  "retained_failures": [
+    "Initial mechanical admission and ledger assertions failed and were corrected to the real contracts.",
+    "First WSL test failed during worker opening before entering the broker body; its cause remains unqualified. The unchanged production runtime subsequently passed.",
+    "Default-concurrency root run failed four cases: one finite ten-second model fixture deadline and three worker unknown replies. Phase/cause of the latter is not proven. Final bounded four-worker regression passed.",
+    "Only the multi-step test deadline became30 seconds. Pending-navigation Stop now waits for the actual target request instead of a700ms delay. Production Stop, control-loss, action and grant limits are unchanged."
+  ],
+  "remaining": [
+    "Fresh daemon restart/readback, native worker backends, native CLI/provider seams, complete editor execution and full CU/XS joins remain Slice31 work.",
+    "Live migration, paid usefulness and synchronized release remain Slices26/27/28. Version13.4.0; no Windows global installation/restart."
+  ],
+  "artifacts": [
+    {
+      "path": "scripts/record-ashoka-recovery-evidence.mjs",
+      "bytes": 6296,
+      "sha256": "065d8cd266d0c29edaf235a6833b961d6b85a4fd8bc385eeee78df8439647ea4"
+    },
+    {
+      "path": "scripts/qualify-ashoka-native-review.mjs",
+      "bytes": 3741,
+      "sha256": "c658d0c2295ce229b3a7445ea1335fb806c4c61f4b4b7db60613a77d8f4f503c"
+    },
+    {
+      "path": "docs/ashoka/native-review-31-recovery.mjs",
+      "bytes": 7861,
+      "sha256": "f0a1fb47e75621fcc5097db79ba2bad2b7a780257d89f8d51e57317990d394ab"
+    },
+    {
+      "path": "tests/computer-peer-crash.test.ts",
+      "bytes": 11874,
+      "sha256": "d3a81a018634136069c5fcd632211418cdb236e9772cf1e2f61db1b00961bdf2"
+    },
+    {
+      "path": "tests/helpers/browser-process-tree.ts",
+      "bytes": 2753,
+      "sha256": "d058c466cf00848040591b353576322762673cf2f15204bf838225225b00c32c"
+    },
+    {
+      "path": "tests/computer-browser-worker.test.ts",
+      "bytes": 18164,
+      "sha256": "c86e81bca21abba802ef58f5a3c92972fd732156b42a09e183370af7f6d72f6d"
+    },
+    {
+      "path": "tests/architect-managed-context.test.ts",
+      "bytes": 12822,
+      "sha256": "09952131124ce49d20a84ea4f7b7cf019543162935d00c28d8f0a48f29f17ddd"
+    },
+    {
+      "path": "src/computer/browser-harness.ts",
+      "bytes": 12601,
+      "sha256": "b521c521b8a1a5a7ace5ebe6fbfa2b84257a61b62b3fbef8404a614143846c27"
+    },
+    {
+      "path": "src/computer/browser-driver.ts",
+      "bytes": 15160,
+      "sha256": "0a8ec99054bbcd9c7806cf701f804d639c142b369df9a4efb74be68d1b2c8d0f"
+    },
+    {
+      "path": "src/computer/broker.ts",
+      "bytes": 26082,
+      "sha256": "72e28a3a4d728bfcf89fbe6282b4633192671edff0a4dc073260f3d18e7f95e4"
+    },
+    {
+      "path": "src/computer/journal.ts",
+      "bytes": 14263,
+      "sha256": "4102666334d06f9977fa241e399d592e787420c7b8bb8fdd125b6b538f7898e7"
+    },
+    {
+      "path": "src/graph/change-obligations.ts",
+      "bytes": 23574,
+      "sha256": "ea6630023de2b9fa72f4794ed236ea6b128b12a7748e7e161c76d0fca6dc24d2"
+    },
+    {
+      "path": "src/graph/execution-context.ts",
+      "bytes": 42134,
+      "sha256": "391ce141b2888f645848828127e236c1177340b5fb1568122a6b761e3526ce56"
+    },
+    {
+      "path": "src/server/managed-execution.ts",
+      "bytes": 24234,
+      "sha256": "c8b721457a061e0b2b5a9355b6eb4746331fb14b5684ffece5b126e42ab4de71"
+    },
+    {
+      "path": "src/cognitive/jobs.ts",
+      "bytes": 25731,
+      "sha256": "c4b74d9aca4196168efcbe008d50093960bbdac5b3b559b83f422d210c1b4fac"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 83221,
+      "sha256": "94a430f28cd7a602d49dbef1e5375ca286470776131a8814829c9b9bb22639c1"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-conformance.json",
+      "bytes": 17896,
+      "sha256": "908146606049e96490491ee50b979c22d8ca4275638a4cc9fc81124bf8cf605b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-editor-control-conformance.json",
+      "bytes": 72560,
+      "sha256": "68591f96a0feae27e55ef34a16ea7768e6e175a365aa68bc93267dcc03487aab"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-third/installation-proof.json",
+      "bytes": 2920,
+      "sha256": "df45d256d30a0d76f2f17e98b0176720eeb9f6b9ddc88d221c1d73265807bf14"
+    },
+    {
+      "path": "docs/ashoka/slice-31-wsl-third/browser-qualification.json",
+      "bytes": 4941,
+      "sha256": "68e59424fda5a3fcf5f4ba1a66b7323d6d88b13ea6929744001efa30e9ca4a97"
+    },
+    {
+      "path": "docs/ashoka/computer-use.md",
+      "bytes": 14511,
+      "sha256": "ade890c8d0fea78319b04d942be610a523cee9bc3df60f145ae418794896538b"
+    },
+    {
+      "path": "docs/architecture.md",
+      "bytes": 46415,
+      "sha256": "27c3ea732a4148b81fd776edae85b0f00b55aaa229da3fdf3cb6f9e0e04ddd2f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-first-exit.json",
+      "bytes": 15,
+      "sha256": "b728541de9166f7843e04cee774bf205b8d10fbb33ea0a9af99f592890360082"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-first.json",
+      "bytes": 1512,
+      "sha256": "5fb65093f2443ee7768352a538b9fcd869471c96a11f1f6486d0487416e461b5"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-first.log",
+      "bytes": 119,
+      "sha256": "614dca646695a192ae392c305dce0970cf5dcee66d4674d26e29c9f2045350b5"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-fourth-exit.json",
+      "bytes": 15,
+      "sha256": "e81bc160c0843ee56f31f12997bb3aff50528d596002d4866676cb8a1b19195a"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-fourth.json",
+      "bytes": 6714,
+      "sha256": "eb297adb89b70b00b9d58422f239dee140ea95a9be2fdba97eea359c68231049"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-fourth.log",
+      "bytes": 120,
+      "sha256": "2e867ebcc67f20b80658cfe6569c8a4017a288e182e8537eecec18bb9cf32046"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-second-exit.json",
+      "bytes": 15,
+      "sha256": "b728541de9166f7843e04cee774bf205b8d10fbb33ea0a9af99f592890360082"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-second.json",
+      "bytes": 1328,
+      "sha256": "7e42e9daf583f30321aaa6a8fbbfbc6f278ae0f7583c647539c56221e8a22980"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-second.log",
+      "bytes": 120,
+      "sha256": "3a800b3b7215a491f474124349c2e7c437ce481199afa3d498d08ef3acd0b0e9"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-third-exit.json",
+      "bytes": 15,
+      "sha256": "e81bc160c0843ee56f31f12997bb3aff50528d596002d4866676cb8a1b19195a"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-third.json",
+      "bytes": 1034,
+      "sha256": "e0bebc18c4ca059946c9b7d7769fa7ad08b9edbdcef080f74f5da6be02ed179e"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-focus-third.log",
+      "bytes": 119,
+      "sha256": "0143eec39c61f03293b27a713c01719fda355bb43fa4218d9a0c969243e4b395"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-linux-test-exit.json",
+      "bytes": 15,
+      "sha256": "b728541de9166f7843e04cee774bf205b8d10fbb33ea0a9af99f592890360082"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-linux-test-second-exit.json",
+      "bytes": 15,
+      "sha256": "e81bc160c0843ee56f31f12997bb3aff50528d596002d4866676cb8a1b19195a"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-linux-test-second.json",
+      "bytes": 1058,
+      "sha256": "a6d1f9455facd378c812f1663818d2f09b928402a3fcafafa8f3a5bebb564ee0"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-linux-test-second.log",
+      "bytes": 108,
+      "sha256": "52c228cdebc54a2c55e458ddc187ae80a052422d20e0bd8a70206a7433a9d6b9"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-linux-test.json",
+      "bytes": 1382,
+      "sha256": "2d21713cc942e236f73296e64988ae46fa5bacb4a76ad6988d0b19c954607c89"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-linux-test.log",
+      "bytes": 101,
+      "sha256": "55a74118be7adc7906ec9fc484e26ceb2262f30b9a4aeddd6077add9dc465c54"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-root-tests-exit.json",
+      "bytes": 15,
+      "sha256": "b728541de9166f7843e04cee774bf205b8d10fbb33ea0a9af99f592890360082"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-root-tests-second-exit.json",
+      "bytes": 15,
+      "sha256": "e81bc160c0843ee56f31f12997bb3aff50528d596002d4866676cb8a1b19195a"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-root-tests-second.json",
+      "bytes": 671878,
+      "sha256": "54917d88c119b8e50afee4afed6243ffed426d64d95bb84e587387e0b3093b8f"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-root-tests-second.log",
+      "bytes": 125,
+      "sha256": "fd924738189c5aa1b8dba920af8465fd457d192592175519901fcbd5f46e753b"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-root-tests.json",
+      "bytes": 673249,
+      "sha256": "e36fab9af16773491c05c86d26b5e4438a97358e58a05ec87567e3964401a243"
+    },
+    {
+      "path": "docs/ashoka/slice-31-peer-crash-root-tests.log",
+      "bytes": 118,
+      "sha256": "aaf336ab00613cf217e1c04c4f3105b77aaeb6143326beaf35004ea10c0dc004"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import type { ArchitectMessage, ToolDefinition } from "./architect-llm";
+import { hasRequiredEvidence } from "@dreamgraph/token-economy";
 
 const TOOL_RESULT_MAX_CHARS = 12_000;
 const TOOL_RESULT_STRUCTURED_ITEMS = 5;
@@ -182,6 +183,7 @@ export function compactRawMessagesForProvider(
 }
 
 export function compactSystemPrompt(system: string, level: 0 | 1 | 2 | 3 = 1): string {
+  if (hasRequiredEvidence(system)) return system;
   const normalized = normalizeWhitespace(system);
   const maxChars = budgetCharsForLevel(SYSTEM_PROMPT_MAX_CHARS, SYSTEM_BUDGET_FRACTION, level);
   if (normalized.length <= maxChars) {
@@ -208,6 +210,7 @@ export function compactSystemPrompt(system: string, level: 0 | 1 | 2 | 3 = 1): s
 }
 
 export function compactAssistantText(text: string, level: 0 | 1 | 2 | 3 = 1): string {
+  if (hasRequiredEvidence(text)) return text;
   const normalized = normalizeWhitespace(text);
   const maxChars = budgetCharsForLevel(TOOL_RESULT_MAX_CHARS, ASSISTANT_BUDGET_FRACTION, level);
   if (normalized.length <= maxChars) {
@@ -231,7 +234,7 @@ export function compactToolResultContent(content: unknown, _level: 0 | 1 | 2 | 3
   // tool returned. Compaction may still tighten system prompts, assistant
   // text, and older history (handled elsewhere), but a fresh tool_result is
   // the ground truth the model is reasoning over and is passed through verbatim.
-  return normalizeWhitespace(typeof content === "string" ? content : safeJsonStringify(content));
+  return typeof content === "string" ? content : safeJsonStringify(content);
 }
 
 function minifyToolSchema(schema: unknown): unknown {

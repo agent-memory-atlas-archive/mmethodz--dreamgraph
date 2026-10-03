@@ -1,3 +1,9 @@
+import { NarrativeSettingsSchema, mergeEngineSettings } from "../config/engine-settings.js";
+import { captureCognitiveProjection, projectionCurrentness, compareProjectionContext } from "./projection-context.js";
+import { readCognitiveStore } from "./cognitive-store.js";
+import { commitGraphWrites } from "../graph/publication.js";
+import { withGraphRead, withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
+import { riskDigest } from "./risk-lifecycle.js";
 /**
  * DreamGraph Dream Narratives — System Autobiography
  *
@@ -87,8 +93,8 @@ function divideIntoEpochs(
 
     // Find tensions active during this epoch
     const active = allTensions.filter((t) => {
-      // Approximate: tension is active if its TTL places it in this range
-      return true; // Include all for context
+      const start=Date.parse(t.first_seen),end=Date.parse(t.last_seen);
+      return Number.isFinite(start)&&Number.isFinite(end)&&start<=Date.parse(chunk.at(-1)!.timestamp)&&end>=Date.parse(chunk[0].timestamp);
     });
 
     // Find resolutions during this epoch
@@ -131,7 +137,7 @@ function narrateEpoch(epoch: EpochData, epochIndex: number, depth: NarrativeDept
   // Key discoveries
   const discoveries: string[] = [];
   if (totalPromoted > 0) {
-    discoveries.push(`${totalPromoted} connections were validated and promoted to the knowledge graph`);
+    discoveries.push(`${totalPromoted} historical promotions were recorded; present applicability requires current proof`);
   }
   if (epoch.resolvedTensions.length > 0) {
     const byType = new Map<string, number>();
@@ -143,10 +149,10 @@ function narrateEpoch(epoch: EpochData, epochIndex: number, depth: NarrativeDept
     }
   }
   if (totalMerged > 0) {
-    discoveries.push(`${totalMerged} ideas were rediscovered, strengthening existing hypotheses`);
+    discoveries.push(`${totalMerged} ideas were rediscovered; repetition adds no independent evidence`);
   }
   if (totalDecayed > 0) {
-    discoveries.push(`${totalDecayed} stale items decayed — the system is forgetting what doesn't matter`);
+    discoveries.push(`${totalDecayed} speculative items decayed; decay is a retention policy, not a finding about correctness or usefulness`);
   }
 
   // Tensions addressed
@@ -165,12 +171,12 @@ function narrateEpoch(epoch: EpochData, epochIndex: number, depth: NarrativeDept
 
   parts.push(
     `It generated ${totalEdges} speculative edges and ${totalNodes} hypothetical nodes, ` +
-    `of which ${totalValidated} were validated as genuine connections and ${totalRejected} were rejected as noise.`
+    `with ${totalValidated} historical validation outcomes and ${totalRejected} historical rejections. These counts are not current claim verification.`
   );
 
   if (totalPromoted > 0) {
     parts.push(
-      `${totalPromoted} edge(s) were strong enough to be promoted into the knowledge graph, representing confirmed discoveries about the system's architecture.`
+      `${totalPromoted} historical promotions were recorded. Inspect current source evidence before using them as architectural conclusions.`
     );
   }
 
@@ -183,7 +189,7 @@ function narrateEpoch(epoch: EpochData, epochIndex: number, depth: NarrativeDept
 
   if (epoch.resolvedTensions.length > 0) {
     const fixes = epoch.resolvedTensions.filter(
-      (r) => r.resolution_type === "confirmed_fixed"
+      (r) => r.resolution_state === "verified"
     );
     const fps = epoch.resolvedTensions.filter(
       (r) => r.resolution_type === "false_positive"
@@ -191,19 +197,19 @@ function narrateEpoch(epoch: EpochData, epochIndex: number, depth: NarrativeDept
 
     if (fixes.length > 0) {
       parts.push(
-        `${fixes.length} tension(s) were confirmed fixed — issues the system identified and verified as resolved.`
+        `${fixes.length} tension(s) were independently verified at the recorded resolution time; later evidence can reopen review.`
       );
     }
     if (fps.length > 0) {
       parts.push(
-        `${fps.length} tension(s) turned out to be false positives — the Truth Filter correctly identified that these were not real problems.`
+        `${fps.length} tension(s) were disposed as false positives by their recorded authority; inspect the retained rationale.`
       );
     }
   }
 
   if (totalDecayed > totalEdges * 0.3) {
     parts.push(
-      "A significant portion of speculative ideas decayed during this phase, indicating the system is tightening its focus on what matters."
+      "A significant portion of speculative ideas decayed under the configured retention policy."
     );
   }
 
@@ -218,7 +224,7 @@ function narrateEpoch(epoch: EpochData, epochIndex: number, depth: NarrativeDept
   } else if (totalDecayed > totalEdges * 0.5) {
     title = "Selective Forgetting";
   } else if (totalMerged > totalEdges * 0.3) {
-    title = "Reinforcing Beliefs";
+    title = "Recurring Observations";
   } else {
     title = `Cycle ${epoch.cycleRange[0]}–${epoch.cycleRange[1]}`;
   }
@@ -243,33 +249,33 @@ function generateEpilogue(
 ): string {
   const parts: string[] = [];
 
-  parts.push(`After ${totalCycles} dream cycle(s), the system has developed a structured understanding.`);
+  parts.push(`The record covers ${totalCycles} dream cycle(s); activity alone does not measure understanding.`);
 
   if (validatedEdges.length > 0) {
     parts.push(`${validatedEdges.length} connection(s) have been validated and promoted to the knowledge graph.`);
   }
 
   if (resolvedTensions.length > 0) {
-    const fixed = resolvedTensions.filter((r) => r.resolution_type === "confirmed_fixed").length;
+    const fixed = resolvedTensions.filter((r) => r.resolution_state === "verified").length;
     const fps = resolvedTensions.filter((r) => r.resolution_type === "false_positive").length;
     parts.push(
-      `${resolvedTensions.length} tension(s) have been resolved: ${fixed} confirmed fixed, ${fps} false positives.`
+      `${resolvedTensions.length} historical closures: ${fixed} independently verified at the recorded time, ${fps} disposed as false positives. Current applicability can change.`
     );
   }
 
   const unresolvedCount = activeTensions.filter((t) => !t.resolved).length;
   if (unresolvedCount === 0) {
     parts.push(
-      "No unresolved tensions remain. The system has reached a healthy, stable state."
+      "No active tensions are recorded. This alone does not establish graph integrity, currentness or project health."
     );
   } else if (unresolvedCount <= 5) {
     parts.push(
-      `${unresolvedCount} low-priority tension(s) remain. These will likely decay naturally or be resolved in future cycles.`
+      `${unresolvedCount} tension(s) remain; inspect their actual urgency and evidence before choosing an action.`
     );
   } else {
     const topUrgency = Math.max(...activeTensions.filter((t) => !t.resolved).map((t) => t.urgency));
     parts.push(
-      `${unresolvedCount} tension(s) remain active, with top urgency ${topUrgency.toFixed(2)}. Continued dream cycles are recommended.`
+      `${unresolvedCount} tension(s) remain active, with top urgency ${topUrgency.toFixed(2)}. Inspect their evidence and disposition before allocating further work.`
     );
   }
 
@@ -288,8 +294,8 @@ function assessHealth(
     ? Math.max(...unresolved.map((t) => t.urgency))
     : 0;
 
-  if (unresolved.length === 0) return "healthy — no open tensions";
-  if (maxUrgency > 0.8) return "critical — like super-mega cereal tensions require attention";
+  if (unresolved.length === 0) return "no active tensions — overall health requires the canonical health report";
+  if (maxUrgency > 0.8) return "high urgency — inspect recorded tensions";
   if (maxUrgency > 0.5) return "attention needed — moderate tensions remain";
   if (unresolved.length > 20) return "overloaded — too many open tensions";
   return "stable — only low-priority tensions remain";
@@ -307,6 +313,7 @@ function assessHealth(
 export async function generateNarrative(
   depth: NarrativeDepth = "technical"
 ): Promise<SystemNarrative> {
+  return withGraphRead(async()=>{
   logger.info(`Generating system narrative (depth: ${depth})`);
 
   const [history, tensionFile, validatedFile] = await Promise.all([
@@ -318,7 +325,9 @@ export async function generateNarrative(
   const sessions = history.sessions;
   const activeTensions = tensionFile.signals;
   const resolvedTensions = tensionFile.resolved_tensions ?? [];
-  const validatedEdges = validatedFile.edges;
+  const snapshot=await captureCognitiveProjection();
+  const current=new Set(snapshot.graph.entities.filter(e=>e.identity.kind==="validated"&&e.assertion_class==="validated_insight").map(e=>e.identity.id));
+  const validatedEdges = validatedFile.edges.filter(e=>current.has(e.id));
 
   // Divide into epochs
   const epochs = divideIntoEpochs(
@@ -343,6 +352,7 @@ export async function generateNarrative(
   const overall_health = assessHealth(activeTensions, validatedEdges);
 
   const narrative: SystemNarrative = {
+    projection:snapshot.context,
     title: sessions.length === 0
       ? "A System Awaiting Its First Dream"
       : `The Story of Understanding — ${sessions.length} Dream Cycles`,
@@ -359,6 +369,7 @@ export async function generateNarrative(
   );
 
   return narrative;
+  });
 }
 
 // ===========================================================================
@@ -392,25 +403,15 @@ function emptyStory(): SystemStoryFile {
 }
 
 async function loadStory(): Promise<SystemStoryFile> {
-  try {
-    if (!existsSync(storyPath())) return emptyStory();
-    const raw = await readFile(storyPath(), "utf-8");
-    const p = JSON.parse(raw);
-    const e = emptyStory();
-    return {
-      metadata: { ...e.metadata, ...(p.metadata && typeof p.metadata === "object" ? p.metadata : {}) },
-      chapters: Array.isArray(p.chapters) ? p.chapters : [],
-      digests: Array.isArray(p.digests) ? p.digests : [],
-    };
-  } catch {
-    return emptyStory();
-  }
+  return readCognitiveStore("system_story.json",emptyStory(),["chapters","digests"],["archived_chapters","archived_digests"]);
 }
 
 async function saveStory(story: SystemStoryFile): Promise<void> {
-  story.metadata.total_chapters = story.chapters.length;
+  story.metadata.total_chapters = story.chapters.length+(story.archived_chapters?.length??0);
   story.metadata.last_updated = new Date().toISOString();
-  await atomicWriteFile(storyPath(), JSON.stringify(story, null, 2));
+  const body=JSON.stringify(story,null,2);
+  if(Buffer.byteLength(body)>16*1024*1024)throw new Error("NARRATIVE_CAPACITY_REQUIRES_ARCHIVE");
+  await commitGraphWrites({actor:"narrator",scope:["system_story.json"],writes:[{file:"system_story.json",content:body}]});
 }
 
 // ---------------------------------------------------------------------------
@@ -421,6 +422,7 @@ async function saveStory(story: SystemStoryFile): Promise<void> {
  * Generate a diff chapter capturing what changed since the last chapter.
  */
 export async function generateDiffChapter(): Promise<StoryChapter> {
+  return withGraphRead(async()=>{
   const [history, tensionFile, validatedFile] = await Promise.all([
     engine.loadDreamHistory(),
     engine.loadTensions(),
@@ -435,7 +437,9 @@ export async function generateDiffChapter(): Promise<StoryChapter> {
   const sessions = history.sessions.filter(
     (s) => s.cycle_number > lastCycleCovered
   );
-  const validatedEdges = validatedFile.edges;
+  const snapshot=await captureCognitiveProjection();
+  const current=new Set(snapshot.graph.entities.filter(e=>e.identity.kind==="validated"&&e.assertion_class==="validated_insight").map(e=>e.identity.id));
+  const validatedEdges = validatedFile.edges.filter(e=>current.has(e.id));
   const resolvedTensions = tensionFile.resolved_tensions ?? [];
 
   // Compute diff window
@@ -504,7 +508,7 @@ export async function generateDiffChapter(): Promise<StoryChapter> {
     if (unresolvedCount > 0) {
       parts.push(`${unresolvedCount} tension(s) remain active.`);
     } else {
-      parts.push("No unresolved tensions remain — the system is in a healthy state.");
+      parts.push("No active tensions are recorded; consult the canonical health report for integrity/currentness.");
     }
   }
 
@@ -523,6 +527,7 @@ export async function generateDiffChapter(): Promise<StoryChapter> {
   }
 
   const chapter: StoryChapter = {
+    projection:snapshot.context,
     // NarrativeChapter base fields
     title,
     cycle_range: cycleRange,
@@ -541,7 +546,7 @@ export async function generateDiffChapter(): Promise<StoryChapter> {
       .map((r) => `${r.tension_id} (${r.resolution_type})`),
     narrative_text: parts.join(" "),
     // StoryChapter extensions
-    chapter_number: story.chapters.length + 1,
+    chapter_number: story.metadata.total_chapters + 1,
     generated_at: new Date().toISOString(),
     diff: {
       new_validated_edges: newValidated.length,
@@ -553,28 +558,35 @@ export async function generateDiffChapter(): Promise<StoryChapter> {
   };
 
   return chapter;
+  });
 }
 
 /**
  * Append a chapter to the persistent story and save.
  */
 export async function appendToStory(chapter: StoryChapter): Promise<SystemStoryFile> {
+  const committed=await withGraphReconciliation(async()=>{
   const story = await loadStory();
-  story.chapters.push(chapter);
+  const id=chapter.id??riskDigest([chapter.projection?.dependencies??null,chapter.cycle_range,chapter.narrative_text]);
+  if([...story.chapters,...story.archived_chapters??[]].some(c=>c.id===id))return {story,appended:false};
+  if(chapter.projection&&await projectionCurrentness(chapter.projection)!=="current")throw new Error("NARRATIVE_SOURCE_REVISION_CONFLICT");
+  chapter={...chapter,id,chapter_number:story.metadata.total_chapters+1};story.chapters.push(chapter);
 
   // Update total cycles covered
-  story.metadata.total_cycles_covered = chapter.cycle_range[1];
+  story.metadata.total_cycles_covered = Math.max(story.metadata.total_cycles_covered,chapter.cycle_range[1]);
 
   // Prune to max chapters
   if (story.chapters.length > narrativeConfig.max_chapters) {
-    story.chapters = story.chapters.slice(-narrativeConfig.max_chapters);
+    (story.archived_chapters??=[]).push(...story.chapters.splice(0,story.chapters.length-narrativeConfig.max_chapters));
   }
 
   await saveStory(story);
+  return {story,appended:true};
+  });
   logger.info(
     `Story updated: chapter ${chapter.chapter_number} — "${chapter.title}"`
   );
-  graphEventBus.emit("narrative.chapter.appended", {
+  if(committed.appended)graphEventBus.emit("narrative.chapter.appended", {
     affected_ids: [],
     payload: {
       chapter_number: chapter.chapter_number,
@@ -583,13 +595,14 @@ export async function appendToStory(chapter: StoryChapter): Promise<SystemStoryF
       generated_at: chapter.generated_at,
     },
   });
-  return story;
+  return committed.story;
 }
 
 /**
  * Generate a weekly digest summarizing multiple chapters.
  */
 export async function generateWeeklyDigest(): Promise<WeeklyDigest | null> {
+  return withGraphReconciliation(async()=>{
   const story = await loadStory();
   if (story.chapters.length === 0) return null;
 
@@ -663,11 +676,12 @@ export async function generateWeeklyDigest(): Promise<WeeklyDigest | null> {
   const summary =
     `Weekly digest covering cycles ${cycleRange[0]}–${cycleRange[1]} ` +
     `(${newChapters.length} chapters). ` +
-    `The system ${healthTrend === "improving" ? "showed improving health" : healthTrend === "degrading" ? "showed signs of degradation" : "remained stable"}. ` +
+    `Historical promotion activity ${healthTrend === "improving" ? "increased" : healthTrend === "degrading" ? "decreased" : "remained stable"}; this is not a health or usefulness measurement. ` +
     `${totalNewEdges} connection(s) validated, ${totalTensionsResolved} tension(s) resolved, ` +
     `${totalTensionsCreated} new tension(s) created.`;
 
   const digest: WeeklyDigest = {
+    projection:(await captureCognitiveProjection()).context,interpretation:"historical_activity",
     id: `digest_${randomUUID()}`,
     generated_at: new Date().toISOString(),
     cycle_range: cycleRange,
@@ -681,12 +695,13 @@ export async function generateWeeklyDigest(): Promise<WeeklyDigest | null> {
   // Persist
   story.digests.push(digest);
   if (story.digests.length > 52) {
-    story.digests = story.digests.slice(-52); // Keep ~1 year of digests
+    (story.archived_digests??=[]).push(...story.digests.splice(0,story.digests.length-52));
   }
   await saveStory(story);
 
   logger.info(`Weekly digest generated: cycles ${cycleRange[0]}–${cycleRange[1]}`);
   return digest;
+  });
 }
 
 /**
@@ -696,7 +711,9 @@ export async function generateWeeklyDigest(): Promise<WeeklyDigest | null> {
 export async function maybeAutoNarrate(): Promise<StoryChapter | null> {
   if (!narrativeConfig.auto_narrate) return null;
 
-  cyclesSinceLastChapter++;
+  const [history,priorStory]=await withGraphRead(()=>Promise.all([engine.loadDreamHistory(),loadStory()]));
+  const latestCycle=Math.max(0,...history.sessions.map(s=>s.cycle_number));
+  cyclesSinceLastChapter=Math.max(0,latestCycle-priorStory.metadata.total_cycles_covered);
 
   if (cyclesSinceLastChapter < narrativeConfig.narrative_interval) {
     logger.debug(
@@ -735,7 +752,7 @@ export async function maybeAutoNarrate(): Promise<StoryChapter | null> {
 export function updateNarrativeConfig(
   newConfig: Partial<NarrativeConfig>
 ): void {
-  narrativeConfig = { ...narrativeConfig, ...newConfig };
+  narrativeConfig = mergeEngineSettings(NarrativeSettingsSchema, narrativeConfig, newConfig);
   logger.info(`Narrative config updated: ${JSON.stringify(narrativeConfig)}`);
 }
 
@@ -750,5 +767,12 @@ export function getNarrativeConfig(): NarrativeConfig {
  * Load the persistent system story for resource serving.
  */
 export async function getSystemStory(): Promise<SystemStoryFile> {
-  return loadStory();
+  return withGraphRead(async()=>{
+    const story=await loadStory();
+    const chapters=[...story.chapters,...story.archived_chapters??[]];
+    const dependencies=[...new Set(chapters.flatMap(chapter=>Object.keys(chapter.projection?.dependencies??{})))];
+    const fresh=(await captureCognitiveProjection(dependencies)).context;
+    for(const chapter of chapters)chapter.currentness=compareProjectionContext(chapter.projection,fresh);
+    return story;
+  });
 }

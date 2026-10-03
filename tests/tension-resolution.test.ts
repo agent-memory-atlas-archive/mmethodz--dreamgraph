@@ -14,10 +14,12 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { setDataDirOverride } from "../src/utils/paths.js";
+import { getDataDir,setDataDirOverride } from "../src/utils/paths.js";
 import { engine } from "../src/cognitive/engine.js";
 import type { ValidatedEdgesFile } from "../src/cognitive/types.js";
 
+import { releaseGraphWriter } from "../src/graph/writer-lease.js";
+let previousDir:string;
 let tempDir: string;
 
 async function seedValidatedEdges(file: ValidatedEdgesFile): Promise<void> {
@@ -26,11 +28,13 @@ async function seedValidatedEdges(file: ValidatedEdgesFile): Promise<void> {
 }
 
 beforeEach(async () => {
+  previousDir=getDataDir();
   tempDir = await mkdtemp(join(tmpdir(), "dg-resolver-"));
   setDataDirOverride(tempDir);
 });
 
 afterEach(async () => {
+  await releaseGraphWriter(tempDir);setDataDirOverride(previousDir);
   await rm(tempDir, { recursive: true, force: true });
 });
 
@@ -130,7 +134,7 @@ describe("Phase 4 #8 — tension resolution lifecycle", () => {
     expect(stamped?.resolution_candidate?.source).toBe("llm");
   });
 
-  it("validateResolutionCandidates confirms when a bridging edge exists in validated_edges", async () => {
+  it("historical bridging labels without independent current proof cannot resolve a risk", async () => {
     const sig = await engine.recordTension({
       type: "missing_link",
       entities: ["alpha", "beta"],
@@ -177,14 +181,14 @@ describe("Phase 4 #8 — tension resolution lifecycle", () => {
     });
 
     const result = await engine.validateResolutionCandidates();
-    expect(result.confirmed).toBe(1);
-    expect(result.escalated).toBe(0);
+    expect(result.confirmed).toBe(0);
+    expect(result.escalated).toBe(1);
 
     const resolvedList = await engine.getResolvedTensions();
-    expect(resolvedList.find((r) => r.tension_id === sig.id)?.resolution_type).toBe("confirmed_fixed");
+    expect(resolvedList.find((r) => r.tension_id === sig.id)).toBeUndefined();
   });
 
-  it("validateResolutionCandidates accepts wont_fix candidates without bridging evidence", async () => {
+  it("wont_fix proposals require explicit human disposition rather than timeout acceptance", async () => {
     const sig = await engine.recordTension({
       type: "ungrounded_dream",
       entities: ["g"],
@@ -200,12 +204,12 @@ describe("Phase 4 #8 — tension resolution lifecycle", () => {
     });
 
     const result = await engine.validateResolutionCandidates();
-    expect(result.accepted_wont_fix).toBe(1);
+    expect(result.accepted_wont_fix).toBe(0);
     expect(result.confirmed).toBe(0);
-    expect(result.escalated).toBe(0);
-
-    const resolvedList = await engine.getResolvedTensions();
-    expect(resolvedList.find((r) => r.tension_id === sig.id)?.resolution_type).toBe("wont_fix");
+    expect(result.escalated).toBe(1);
+    const risks=await engine.loadTensions();expect(risks.signals.find(s=>s.id===sig.id)?.lifecycle).toBe("review_required");
+    await engine.resolveTension(sig.id,"human","wont_fix","Reviewer accepts this scoped speculative risk");
+    const resolvedList=await engine.getResolvedTensions();expect(resolvedList.find(r=>r.tension_id===sig.id)).toMatchObject({resolution_type:"wont_fix",resolution_state:"human_disposition"});
   });
 
   it("validateResolutionCandidates escalates when window expires without bridging evidence", async () => {
@@ -232,7 +236,9 @@ describe("Phase 4 #8 — tension resolution lifecycle", () => {
     expect(escalated?.attempted).toBe(true);
     expect(escalated?.resolution_candidate).toBeUndefined();
     // urgency bumped by 0.05 (capped at 1).
-    expect(escalated?.urgency).toBeGreaterThan(0.5);
+    expect(escalated?.urgency).toBe(0.5);
+    expect(escalated?.lifecycle).toBe("review_required");
+    expect(escalated?.proposal_history).toHaveLength(1);
   });
 
   it("validateResolutionCandidates leaves candidates with non-zero window untouched", async () => {

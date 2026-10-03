@@ -1,11 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { atomicWriteFile } from "../utils/atomic-write.js";
+import { z } from "zod";
+import { stripBom } from "../utils/read-json.js";
 import type { SemanticState } from "./coverage-ledger.js";
 
 export const ENRICHMENT_RUN_SCHEMA = "dreamgraph.enrichment_run.v1" as const;
 
 export type EnrichmentFailureKind =
+  | "admission_limit"
   | "provider_unavailable"
   | "context_overflow"
   | "unsupported_evidence"
@@ -29,6 +32,13 @@ export interface EnrichmentRunState {
   updated_at: string;
   nodes: Record<string, EnrichmentAttempt>;
 }
+
+export const EnrichmentRunSchema = z.object({
+  schema: z.literal(ENRICHMENT_RUN_SCHEMA), run_id: z.string().min(1), scan_revision: z.string().min(1),
+  provider_fingerprint: z.string().min(1), created_at: z.string().datetime({ offset: true }), updated_at: z.string().datetime({ offset: true }),
+  nodes: z.record(z.object({ state: z.enum(["not_eligible", "pending", "enriched", "skipped", "failed_retryable", "failed_terminal"]),
+    attempts: z.number().int().nonnegative(), updated_at: z.string().datetime({ offset: true }), reason: z.string().optional() }).strict()),
+}).strict();
 
 export function createEnrichmentRun(scanRevision: string, providerFingerprint: string, eligibleIds: string[]): EnrichmentRunState {
   const now = new Date().toISOString();
@@ -66,6 +76,7 @@ export function unfinishedEnrichmentNodeIds(state: EnrichmentRunState): string[]
 
 export function classifyEnrichmentFailure(error: unknown): { state: "failed_retryable" | "failed_terminal"; reason: EnrichmentFailureKind } {
   const message = String(error instanceof Error ? error.message : error).toLowerCase();
+  if (/admission_/.test(message)) return { state: "failed_retryable", reason: "admission_limit" };
   if (/abort|cancel/.test(message)) return { state: "failed_retryable", reason: "cancelled" };
   if (/timeout|timed out|econnreset|temporar/.test(message)) return { state: "failed_retryable", reason: "transient_timeout" };
   if (/unavailable|econnrefused|no provider|model.*not.*loaded/.test(message)) return { state: "failed_retryable", reason: "provider_unavailable" };
@@ -94,15 +105,15 @@ export function recordEnrichmentOutcome(
 }
 
 export async function persistEnrichmentRun(filePath: string, state: EnrichmentRunState): Promise<void> {
+  EnrichmentRunSchema.parse(state);
   await atomicWriteFile(filePath, JSON.stringify(state, null, 2));
 }
 
 export async function loadEnrichmentRun(filePath: string): Promise<EnrichmentRunState | null> {
   try {
-    const parsed = JSON.parse(await readFile(filePath, "utf-8")) as Partial<EnrichmentRunState>;
-    return parsed.schema === ENRICHMENT_RUN_SCHEMA && parsed.nodes && parsed.scan_revision && parsed.provider_fingerprint
-      ? parsed as EnrichmentRunState : null;
-  } catch {
-    return null;
+    return EnrichmentRunSchema.parse(JSON.parse(stripBom(await readFile(filePath, "utf-8"))));
+  } catch (failure) {
+    if ((failure as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw new Error(`ENRICHMENT_CHECKPOINT_UNAVAILABLE: ${String(failure)}`);
   }
 }

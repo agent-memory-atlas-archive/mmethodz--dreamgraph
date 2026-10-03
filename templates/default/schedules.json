@@ -1,4 +1,15 @@
 {
+  "metadata": {
+    "description": "Durable schedule definitions, occurrences and original history",
+    "schema_version": "2.0.0",
+    "total_schedules": 0,
+    "total_executions": 0,
+    "last_tick": null,
+    "revision": 0
+  },
   "schedules": [],
-  "execution_history": []
+  "executions": [],
+  "occurrences": [],
+  "definition_history": [],
+  "operation_receipts": {}
 }

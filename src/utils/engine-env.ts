@@ -8,22 +8,24 @@
  *   - Empty lines are ignored
  *   - Inline comments are NOT supported (values may contain `#`)
  *
- * Values are injected into `process.env` with "instance wins" semantics:
- * if a key is already set in the environment, the engine.env value takes
- * precedence (per-instance config > global env).
+ * Explicit deployment overrides captured at module load outrank persisted instance
+ * intent. Versioned documents use JSON quoted strings; v0 quotes remain literal.
  */
 
 import { readFileSync, existsSync, writeFileSync, mkdirSync, renameSync, unlinkSync, openSync, fdatasyncSync, closeSync, statSync } from "node:fs";
 import { dirname } from "node:path";
+import { randomUUID } from "node:crypto";
+import { parseEngineEnvDocument, renderEngineEnvUpdates, formatEngineEnvAssignment } from "../config/engine-env-document.js";
+import { validateEngineEnvValues } from "../config/engine-setting-catalogue.js";
 import { logger } from "./logger.js";
+import { ROLE_ENV_FIELDS } from "../config/role-env-fields.js";
 
-const ENGINE_ENV_MAX_BYTES = 1024 * 1024;
-const ENGINE_ENV_MAX_LINE_CHARS = 16 * 1024;
+
 
 /**
  * Write a set of KEY=VALUE pairs to an engine.env file.
  *
- * Overwrites the entire file.  Adds a header comment and groups
+ * Creates a documented scaffold, or merges into an existing file. Groups
  * values by purpose (base LLM, dreamer, normalizer).
  *
  * @param envPath  Absolute path to the engine.env file.
@@ -35,6 +37,8 @@ export function writeEngineEnv(
   vars: Record<string, string>,
 ): void {
   try {
+    if (existsSync(envPath)) { updateEngineEnvValues(envPath, vars); return; }
+    validateEngineEnvValues(vars);
     mkdirSync(dirname(envPath), { recursive: true });
 
     const template: Array<{ key: string; defaultValue: string; description: string; section: string }> = [
@@ -316,10 +320,16 @@ export function writeEngineEnv(
       },
     ];
 
+    // Add independently configurable roles without activating defaults or paid limits.
+    for (const field of ROLE_ENV_FIELDS) if (!template.some(entry => entry.key === field.key)) {
+      template.push({ key: field.key, defaultValue: "", description: field.description, section: `Role Policy — ${field.role}` });
+    }
+
     const lines: string[] = [
       "# DreamGraph Engine Configuration",
       "# Per-instance environment settings. Uncomment and edit as needed.",
-      "# Values here override global environment variables.",
+      "# Explicit deployment overrides take precedence over these persisted settings.",
+      "# dreamgraph.engine_env.v1 — JSON quoted strings",
       "",
     ];
 
@@ -352,11 +362,10 @@ export function writeEngineEnv(
 
       lines.push(`# ${entry.description}`);
       const value = vars[entry.key] ?? "";
-      if (value === "" || value == null) {
+      if (!(entry.key in vars)) {
         lines.push(`# ${entry.key}=${entry.defaultValue}`);
       } else {
-        const needsQuotes = /[\s#"']/.test(value);
-        lines.push(`${entry.key}=${needsQuotes ? `"${value}"` : value}`);
+        lines.push(formatEngineEnvAssignment(entry.key, value));
       }
     }
 
@@ -371,8 +380,7 @@ export function writeEngineEnv(
         if (value === "" || value == null) {
           lines.push(`# ${key}=`);
         } else {
-          const needsQuotes = /[\s#"']/.test(value);
-          lines.push(`${key}=${needsQuotes ? `"${value}"` : value}`);
+          lines.push(formatEngineEnvAssignment(key, value));
         }
       }
     }
@@ -380,10 +388,10 @@ export function writeEngineEnv(
     lines.push("");
     // Atomic write: temp file + fdatasync + rename. Mirrors atomicWriteFile()
     // for the sync path so a crash mid-write cannot truncate engine.env.
-    const tmp = envPath + ".tmp";
+    const tmp = envPath + `.${randomUUID()}.tmp`;
     let fd: number | undefined;
     try {
-      fd = openSync(tmp, "w");
+      fd = openSync(tmp, "wx", 0o600);
       writeFileSync(fd, lines.join("\n"), "utf-8");
       fdatasyncSync(fd);
       closeSync(fd);
@@ -400,135 +408,32 @@ export function writeEngineEnv(
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     logger.error(`engine.env: failed to write ${envPath}: ${msg}`);
-  }
-}
-
-function formatEngineEnvAssignment(key: string, value: string): string {
-  if (value === "") return `# ${key}=`;
-  const needsQuotes = /[\s#"']/.test(value);
-  const escaped = value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-  return `${key}=${needsQuotes ? `"${escaped}"` : value}`;
-}
-
-/**
- * Update a small set of engine.env values without rewriting unrelated settings.
- * Replaces active or commented KEY= lines in place and appends missing keys.
- */
-export function updateEngineEnvValues(envPath: string, updates: Record<string, string>): void {
-  try {
-    mkdirSync(dirname(envPath), { recursive: true });
-    const existing = existsSync(envPath) ? readFileSync(envPath, "utf-8") : "";
-    const lines = existing.length > 0 ? existing.split(/\r?\n/) : [
-      "# DreamGraph Engine Configuration",
-      "# Per-instance environment settings. Uncomment and edit as needed.",
-      "",
-    ];
-    const pending = new Set(Object.keys(updates));
-    const assignment = /^\s*#?\s*([A-Z_][A-Z0-9_]*)=/i;
-
-    for (let i = 0; i < lines.length; i += 1) {
-      const match = lines[i].match(assignment);
-      const key = match?.[1];
-      if (key && pending.has(key)) {
-        lines[i] = formatEngineEnvAssignment(key, updates[key] ?? "");
-        pending.delete(key);
-      }
-    }
-
-    if (pending.size > 0) {
-      if (lines.length > 0 && lines[lines.length - 1].trim() !== "") lines.push("");
-      lines.push("# architect selections");
-      for (const key of pending) {
-        lines.push(formatEngineEnvAssignment(key, updates[key] ?? ""));
-      }
-    }
-
-    const tmp = envPath + ".tmp";
-    let fd: number | undefined;
-    try {
-      fd = openSync(tmp, "w");
-      writeFileSync(fd, lines.join("\n"), "utf-8");
-      fdatasyncSync(fd);
-      closeSync(fd);
-      fd = undefined;
-      renameSync(tmp, envPath);
-    } catch (writeErr) {
-      if (fd !== undefined) {
-        try { closeSync(fd); } catch { /* ignore */ }
-      }
-      try { unlinkSync(tmp); } catch { /* ignore */ }
-      throw writeErr;
-    }
-    logger.info(`engine.env: updated ${Object.keys(updates).length} keys in ${envPath}`);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    logger.error(`engine.env: failed to update ${envPath}: ${msg}`);
     throw err;
   }
 }
 
-/**
- * Load an engine.env file and inject its values into process.env.
- *
- * @param envPath  Absolute path to the engine.env file.
- * @returns        Number of env vars loaded.
- */
-export function loadEngineEnv(envPath: string): number {
-  if (!existsSync(envPath)) {
-    return 0;
-  }
-
-  let loaded = 0;
-
+/** Compatibility writer; daemon endpoints use revision-checked configuration authority. */
+export function updateEngineEnvValues(envPath: string, updates: Record<string, string>): void {
+  mkdirSync(dirname(envPath), { recursive: true });
+  const existing = existsSync(envPath) ? readFileSync(envPath, "utf8") : "";
+  const next = renderEngineEnvUpdates(existing, updates);
+  validateEngineEnvValues(parseEngineEnvDocument(next), Object.keys(updates));
+  const tmp = envPath + `.${randomUUID()}.tmp`;
+  let fd: number | undefined;
   try {
-    const stats = statSync(envPath);
-    if (stats.size > ENGINE_ENV_MAX_BYTES) {
-      logger.warn(`engine.env: refusing to load ${envPath}; file is ${stats.size} bytes, above ${ENGINE_ENV_MAX_BYTES}. Move pasted prompt/history content out of engine.env and restart.`);
-      return 0;
-    }
-
-    const content = readFileSync(envPath, "utf-8");
-    const lines = content.split(/\r?\n/);
-
-    for (const raw of lines) {
-      if (raw.length > ENGINE_ENV_MAX_LINE_CHARS) {
-        logger.warn(`engine.env: skipping oversized line (${raw.length} chars) in ${envPath}`);
-        continue;
-      }
-      const line = raw.trim();
-
-      // Skip empty lines and comments
-      if (!line || line.startsWith("#")) continue;
-
-      // Find the first `=`
-      const eqIdx = line.indexOf("=");
-      if (eqIdx <= 0) continue;
-
-      const key = line.slice(0, eqIdx).trim();
-      let value = line.slice(eqIdx + 1).trim();
-
-      // Strip surrounding quotes
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
-
-      // Validate key — must look like an env var name
-      if (!/^[A-Z_][A-Z0-9_]*$/i.test(key)) {
-        logger.warn(`engine.env: skipping invalid key "${key}"`);
-        continue;
-      }
-
-      // Instance config OVERRIDES global env (per-instance wins)
-      process.env[key] = value;
-      loaded++;
-    }
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    logger.warn(`engine.env: failed to load ${envPath}: ${msg}`);
+    fd = openSync(tmp, "wx", 0o600); writeFileSync(fd, next, "utf8"); fdatasyncSync(fd); closeSync(fd); fd = undefined;
+    renameSync(tmp, envPath);
+  } finally {
+    if (fd !== undefined) closeSync(fd);
+    try { unlinkSync(tmp); } catch { /* renamed or never created */ }
   }
-
-  return loaded;
+}
+/** Captured before an instance file is loaded; runtime changes are not deployment overrides. */
+export const ENGINE_DEPLOYMENT_OVERRIDES: Readonly<Record<string, string | undefined>> = Object.freeze({ ...process.env });
+export function loadEngineEnv(envPath: string): number {
+  if (!existsSync(envPath)) return 0;
+  const values = parseEngineEnvDocument(readFileSync(envPath, "utf8"));
+  validateEngineEnvValues(values);
+  for (const [key, value] of Object.entries(values)) process.env[key] = ENGINE_DEPLOYMENT_OVERRIDES[key] ?? value;
+  return Object.keys(values).length;
 }

@@ -199,6 +199,12 @@ export interface CopilotCliProviderPortOptions {
    * Handler exceptions are swallowed.
    */
   readonly onPromptComposed?: (info: PromptComposedInfo) => void;
+  /** Awaited admission after serialization, before any CLI launch; failures must propagate. */
+  readonly preparePrompt?: (prompt: string, signal?: AbortSignal) => Promise<string>;
+  /** Captured after admission and propagated independently of the input's signal. */
+  readonly admissionSignal?: () => AbortSignal | undefined;
+  /** Awaited original-host accounting; failures must never be swallowed as observers. */
+  readonly settleRun?: (result: CopilotCliRunResult) => Promise<void>;
   /**
    * Optional observer invoked with one-line human-readable
    * diagnostics extracted from the CLI's stdout JSON stream. Used
@@ -317,13 +323,17 @@ export function createCopilotCliProviderPort(
       const cliToolsManifest = options.cliToolsManifest
         ? await resolveLiveToolsManifest(options)
         : undefined;
-      const promptText = serializeConversationForCopilotCli(input.prompt.conversation, {
+      let promptText = serializeConversationForCopilotCli(input.prompt.conversation, {
         ...(options.historyKeepLast !== undefined
           ? { historyKeepLast: options.historyKeepLast }
           : {}),
         markCurrentTurn: options.markCurrentTurn ?? true,
         ...(cliToolsManifest ? { cliToolsManifest } : {}),
       });
+      if (options.preparePrompt) promptText = await options.preparePrompt(promptText, input.abortSignal);
+      const permitSignal = options.admissionSignal?.();
+      const executionSignal = permitSignal && input.abortSignal ? AbortSignal.any([permitSignal, input.abortSignal]) : permitSignal ?? input.abortSignal;
+      executionSignal?.throwIfAborted();
       if (options.onPromptComposed) {
         try {
           options.onPromptComposed({
@@ -405,11 +415,7 @@ export function createCopilotCliProviderPort(
       // surface.
       let mcpFailureReason: string | null = null;
       const internalAbort = new AbortController();
-      const externalSignal = input.abortSignal;
-      if (externalSignal) {
-        if (externalSignal.aborted) internalAbort.abort();
-        else externalSignal.addEventListener("abort", () => internalAbort.abort(), { once: true });
-      }
+      const runSignal = executionSignal ? AbortSignal.any([executionSignal, internalAbort.signal]) : internalAbort.signal;
       const composedOnRunIdAssigned = (runId: string): void => {
         activeRunId = runId;
         if (onRunIdAssigned) onRunIdAssigned(runId);
@@ -421,7 +427,7 @@ export function createCopilotCliProviderPort(
         // not be surfaced to the chat panel (would render as a
         // ghost reply after the user pressed stop) or to the tool
         // trace (would record activity past the cancellation point).
-        if (internalAbort.signal.aborted) return;
+        if (runSignal.aborted) return;
         if (event.type === "tool.execution_start") {
           startsByCallId.set(event.toolCallId, event);
           return;
@@ -545,7 +551,7 @@ export function createCopilotCliProviderPort(
             ...(typeof options.idleTimeoutMs === "number" && options.idleTimeoutMs > 0
               ? { idleTimeoutMs: options.idleTimeoutMs }
               : {}),
-            abortSignal: internalAbort.signal,
+            abortSignal: runSignal,
             baseEnv: options.baseEnv,
             binaryName: options.binaryName,
             onRunIdAssigned: composedOnRunIdAssigned,
@@ -568,6 +574,7 @@ export function createCopilotCliProviderPort(
         }
       }
 
+      await options.settleRun?.(result);
       if (options.onRunResult) {
         try {
           options.onRunResult(result);
@@ -603,9 +610,9 @@ export function createCopilotCliProviderPort(
       // watchdog timing out). The internal `result.failure?.code ===
       // "CANCELLED"` path covers spawn-side aborts that never carried
       // an external reason (rare; mostly host-driven teardown).
-      if (internalAbort.signal.aborted || (!result.ok && result.failure?.code === "CANCELLED")) {
-        const externalAborted = externalSignal?.aborted === true;
-        const externalReason = externalSignal?.reason;
+      if (runSignal.aborted || (!result.ok && result.failure?.code === "CANCELLED")) {
+        const externalAborted = executionSignal?.aborted === true;
+        const externalReason = executionSignal?.reason;
         let humanMessage: string;
         let code: string;
         if (externalAborted) {
@@ -615,8 +622,8 @@ export function createCopilotCliProviderPort(
               : typeof externalReason === "string"
                 ? externalReason
                 : "";
-          if (/timed out|timeout/i.test(reasonText)) {
-            humanMessage = `Copilot CLI run aborted by the chat-panel watchdog (${reasonText}). The model did not finish before the wrapper's wall-clock budget expired.`;
+          if (/timed out|timeout|deadline|expired/i.test(reasonText)) {
+            humanMessage = `Copilot CLI execution deadline expired (${reasonText}); native work termination remains subject to the original host report.`;
             code = "CHAT_WRAPPER_TIMEOUT";
           } else {
             humanMessage = "Copilot CLI run cancelled by user.";
@@ -650,7 +657,7 @@ export function createCopilotCliProviderPort(
       // emitting again would duplicate it in the chat bubble.
       if (
         !deltasStreamed &&
-        !internalAbort.signal.aborted &&
+        !runSignal.aborted &&
         input.onStreamChunk &&
         proposal.response.content.length > 0
       ) {

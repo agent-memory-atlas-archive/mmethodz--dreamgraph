@@ -27,6 +27,8 @@ export interface DreamPlaybackFrame {
 }
 
 export interface DreamPlayback {
+  projection?: import("./projection-context.js").CognitiveProjectionContext;
+  interpretation:"historical_projection";
   source: "existing_cognitive_store_projection";
   cycle_id: string | null;
   cycle_number: number | null;
@@ -71,6 +73,8 @@ export function buildDreamPlayback(input: {
   validated: ValidatedEdgesFile;
   tensions: TensionFile;
   cycleNumber?: number;
+  currentGraph?: import("../graph/read-model.js").CanonicalGraphRead;
+  projection?: import("./projection-context.js").CognitiveProjectionContext;
 }): DreamPlayback {
   const sessions = [...input.history.sessions].sort((left, right) => right.cycle_number - left.cycle_number || right.timestamp.localeCompare(left.timestamp));
   const session: DreamHistoryEntry | undefined = input.cycleNumber == null
@@ -80,6 +84,7 @@ export function buildDreamPlayback(input: {
   if (!session) {
     return {
       source: "existing_cognitive_store_projection",
+      interpretation:"historical_projection",projection:input.projection,
       cycle_id: null,
       cycle_number: null,
       timestamp: null,
@@ -100,18 +105,20 @@ export function buildDreamPlayback(input: {
   for (const result of rejected) rejectedByReason[rejectionReason(result)] += 1;
 
   const hypothesisTrust = candidates.map((result) => {
-    const trust = describeCognitiveTrustState(trustStateFromDreamStatus(result.status));
+    const current=input.currentGraph?.entities.find(e=>e.identity.kind==="candidate"&&e.payload.dream_id===result.dream_id&&e.payload.dream_type===result.dream_type);
+    const trust = describeCognitiveTrustState(current?.assertion_class==="validated_insight"?"validated_insight":result.status==="validated"?"advisory_candidate":trustStateFromDreamStatus(result.status));
     return {
       id: result.dream_id,
       status: result.status,
       trust,
-      evidence_ledger: buildCandidateEvidenceLedger({ result, trust }),
+      evidence_ledger: buildCandidateEvidenceLedger({ result:{...result,...(current?{evidence_assessment:current.payload.current_evidence_assessment as ValidationResult["evidence_assessment"]}: {})}, trust }),
     };
   });
   const promotedEdges = input.validated.edges
     .filter((edge) => edge.normalization_cycle === session.cycle_number)
     .map((edge) => {
-      const trust = describeCognitiveTrustState("validated_insight");
+      const current=input.currentGraph?.entities.find(e=>e.identity.kind==="validated"&&e.identity.id===edge.id);
+      const trust = describeCognitiveTrustState(current?.assertion_class==="validated_insight"?"validated_insight":current?.assertion_class==="human_assertion"?"human_assertion":"advisory_candidate");
       return {
         id: edge.id,
         from: edge.from,
@@ -119,7 +126,7 @@ export function buildDreamPlayback(input: {
         relation: edge.relation,
         confidence: edge.confidence,
         trust,
-        evidence_ledger: buildValidatedEdgeEvidenceLedger({ edge, trust }),
+        evidence_ledger: buildValidatedEdgeEvidenceLedger({ edge:{...edge,...(current?{evidence_assessment:current.payload.current_evidence_assessment as typeof edge.evidence_assessment}: {})}, trust }),
       };
     });
   const tensionIds = input.tensions.signals
@@ -131,13 +138,14 @@ export function buildDreamPlayback(input: {
 
   return {
     source: "existing_cognitive_store_projection",
+    interpretation:"historical_projection",projection:input.projection,
     cycle_id: session.session_id,
     cycle_number: session.cycle_number,
     timestamp: session.timestamp,
     strategy: session.strategy,
     frames: [
       { stage: "seed", label: "Seed", summary: `Strategy ${session.strategy} started from the existing cognitive store.`, count: 1 },
-      { stage: "hypotheses", label: "Hypotheses", summary: `${generated} artifacts generated; ${session.duplicates_merged} duplicate edges reinforced.`, count: generated },
+      { stage: "hypotheses", label: "Hypotheses", summary: `${generated} artifacts generated; ${session.duplicates_merged} duplicate observations (not independent support).`, count: generated },
       { stage: "validation", label: "Validation", summary: `${normalization?.validated ?? 0} validated, ${normalization?.latent ?? 0} latent, ${normalization?.rejected ?? 0} rejected.`, count: candidates.length },
       { stage: "promotions_rejections", label: "Promotions and rejections", summary: `${promotedEdges.length} promoted edges and ${rejected.length} grouped rejections.`, count: promotedEdges.length + rejected.length },
       { stage: "tensions_story_delta", label: "Tensions and story delta", summary: `${session.tension_signals_created} tensions created; ${session.tension_signals_resolved} resolved; ${session.tensions_expired} expired.`, count: session.tension_signals_created + session.tension_signals_resolved + session.tensions_expired },
@@ -146,7 +154,7 @@ export function buildDreamPlayback(input: {
     hypothesis_trust: hypothesisTrust,
     promoted_edges: promotedEdges,
     tension_ids: tensionIds,
-    before_understanding: `Before cycle ${session.cycle_number}, the graph contained ${Math.max(0, input.dreamGraph.edges.length - session.generated_edges)} projected dream edges.`,
+    before_understanding: `The exact pre-cycle graph is unavailable without its immutable snapshot; current counts cannot reconstruct it.`,
     after_understanding: `After cycle ${session.cycle_number}, ${promotedEdges.length} edges were promoted and ${rejected.length} hypotheses were rejected.`,
   };
 }

@@ -74,7 +74,12 @@ afterEach(async () => {
 });
 
 async function flush(): Promise<void> {
-  await new Promise((r) => setTimeout(r, 80));
+  await vi.waitFor(async () => {
+    const ui = JSON.parse(await readFile(join(dataDir, "ui_registry.json"), "utf8"));
+    expect(ui.elements.some((element: { id: string }) => element.id === "examples.hello-events.greeting")).toBe(true);
+    const policies = JSON.parse(await readFile(join(dataDir, "plugin_policy_proposals.json"), "utf8"));
+    expect(policies.proposals.length).toBeGreaterThan(0);
+  }, { timeout: 5000, interval: 20 });
 }
 
 describe("examples/hello-events full-seam smoke", () => {
@@ -88,7 +93,11 @@ describe("examples/hello-events full-seam smoke", () => {
     });
     try {
       await bootstrapPlugins();
-      await flush();
+      // Registry publication is asynchronous and journaled. Await durable acceptance rather than a fixed disk timing.
+      await vi.waitFor(() => {
+        for (const seam of ["tool", "resource", "ui", "policy", "archetype", "markdown_fence"]) expect(accepted.some(event => event.payload?.seam === seam)).toBe(true);
+        expect(existsSync(join(dataDir, "plugin_policy_proposals.json"))).toBe(true);
+      }, { timeout: 5000, interval: 20 });
 
       // No contribution should have been rejected.
       expect(rejected.map((e) => (e.payload as { reason?: string }).reason)).toEqual([]);

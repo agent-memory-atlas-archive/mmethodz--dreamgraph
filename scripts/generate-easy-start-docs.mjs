@@ -28,7 +28,7 @@ const html = `<!doctype html>
     th, td { border: 1px solid #d9dfeb; padding: 0.55rem; text-align: left; vertical-align: top; }
     th { background: #f3f6fb; }
     a { color: #5546d8; }
-    @media print { body { max-width: none; padding: 20px; } a { color: inherit; text-decoration: none; } }
+    @media print { body { max-width: none; padding: 20px; } a { color: inherit; text-decoration: none; } pre { white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid; } blockquote, table { break-inside: avoid; } }
   </style>
 </head>
 <body>

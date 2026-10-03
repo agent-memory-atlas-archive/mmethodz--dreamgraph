@@ -1,0 +1,851 @@
+{
+  "schema": "dreamgraph.audit_evidence.v1",
+  "date": "2026-09-30",
+  "baseline_commit": "563d10c8109cbe3388cde71168bdcff149c96e0f",
+  "version": "13.4.0",
+  "scope": {
+    "live": "Initial web64-react read-only probes; later own DreamGraph MCP discovery/read-only checks and explicit audit/draft-plan governance writes",
+    "offline": "Historical DreamGraph own-instance stores before the user started its daemon later in the audit",
+    "paid_provider_calls": 0,
+    "product_fixes": false
+  },
+  "checks": {
+    "root_coverage": {
+      "files": 97,
+      "passed": 911,
+      "skipped": 2,
+      "metrics": {
+        "lines": {
+          "total": 78235,
+          "covered": 32157,
+          "skipped": 0,
+          "pct": 41.1
+        },
+        "statements": {
+          "total": 78235,
+          "covered": 32157,
+          "skipped": 0,
+          "pct": 41.1
+        },
+        "functions": {
+          "total": 2313,
+          "covered": 1545,
+          "skipped": 0,
+          "pct": 66.79
+        },
+        "branches": {
+          "total": 10477,
+          "covered": 7070,
+          "skipped": 0,
+          "pct": 67.48
+        },
+        "branchesTrue": {
+          "total": 0,
+          "covered": 0,
+          "skipped": 0,
+          "pct": 100
+        }
+      }
+    },
+    "root_locked_dependencies": {
+      "files": 97,
+      "passed": 911,
+      "skipped": 2
+    },
+    "extension_tests": {
+      "passed": 482,
+      "failed": 0,
+      "skipped": 0,
+      "rebuilt_before_final_run": true
+    },
+    "root_build": "passed",
+    "extension_build": "passed"
+  },
+  "live_probes": [
+    {
+      "kind": "resource",
+      "name": "system://capabilities",
+      "ms": 8,
+      "chars": 7759,
+      "valid_json": true,
+      "clipped": false,
+      "isError": false
+    },
+    {
+      "kind": "tool",
+      "name": "query_resource",
+      "args": {
+        "uri": "system://capabilities"
+      },
+      "ms": 17,
+      "chars": 9309,
+      "valid_json": false,
+      "clipped": true,
+      "isError": false
+    },
+    {
+      "kind": "resource",
+      "name": "system://features",
+      "ms": 13,
+      "chars": 9315,
+      "valid_json": false,
+      "clipped": true,
+      "isError": false
+    },
+    {
+      "kind": "tool",
+      "name": "query_resource",
+      "args": {
+        "uri": "system://features"
+      },
+      "ms": 12,
+      "chars": 9315,
+      "valid_json": false,
+      "clipped": true,
+      "isError": false
+    },
+    {
+      "kind": "tool",
+      "name": "query_resource",
+      "args": {
+        "uri": "dream://status"
+      },
+      "ms": 3,
+      "chars": 547,
+      "valid_json": true,
+      "clipped": false,
+      "isError": false
+    },
+    {
+      "kind": "tool",
+      "name": "query_resource",
+      "args": {
+        "uri": "system://features",
+        "filter": {
+          "id": "___audit_missing___"
+        }
+      },
+      "ms": 40,
+      "chars": 179,
+      "valid_json": true,
+      "clipped": false,
+      "isError": false
+    },
+    {
+      "kind": "tool",
+      "name": "cognitive_status",
+      "args": {},
+      "ms": 998,
+      "chars": 6200,
+      "valid_json": true,
+      "clipped": false,
+      "isError": false
+    },
+    {
+      "kind": "tool",
+      "name": "graph_health_report",
+      "args": {},
+      "ms": 337,
+      "chars": 9142,
+      "valid_json": true,
+      "clipped": false,
+      "isError": false
+    },
+    {
+      "kind": "tool",
+      "name": "get_dream_insights",
+      "args": {
+        "top_n": 3
+      },
+      "ms": 942,
+      "chars": 14039,
+      "valid_json": true,
+      "clipped": false,
+      "isError": false
+    },
+    {
+      "kind": "tool",
+      "name": "graph_rag_retrieve",
+      "args": {
+        "query": "compiler optimization",
+        "mode": "comprehensive",
+        "token_budget": 100,
+        "depth": 2
+      },
+      "ms": 3101,
+      "chars": 2335,
+      "valid_json": true,
+      "clipped": false,
+      "isError": false
+    },
+    {
+      "kind": "tool",
+      "name": "graph_rag_retrieve",
+      "args": {
+        "query": "compiler optimization",
+        "mode": "comprehensive",
+        "token_budget": 500,
+        "depth": 2
+      },
+      "ms": 2896,
+      "chars": 4015,
+      "valid_json": true,
+      "clipped": false,
+      "isError": false
+    },
+    {
+      "kind": "tool",
+      "name": "graph_rag_retrieve",
+      "args": {
+        "query": "compiler optimization",
+        "mode": "comprehensive",
+        "token_budget": 2000,
+        "depth": 2
+      },
+      "ms": 2944,
+      "chars": 10385,
+      "valid_json": true,
+      "clipped": false,
+      "isError": false
+    }
+  ],
+  "offline_retrieval": {
+    "scope": "DreamGraph instance stored graph, read-only",
+    "results": [
+      {
+        "type": "feature",
+        "target": "dreamgraph_extensions_vscode_scripts",
+        "target_included": true,
+        "ms": 2852,
+        "token_count": 2016,
+        "entities_included": [
+          "dreamgraph_extensions_vscode_scripts",
+          "dreamgraph_extensions_vscode_src",
+          "dreamgraph_extensions_vscode_src_context_fetchers",
+          "dreamgraph_extensions_vscode_src_prompts",
+          "dreamgraph_extensions_vscode_src_test",
+          "dreamgraph_extensions_vscode_src_webview",
+          "dreamgraph_scripts",
+          "dreamgraph_src_api",
+          "dreamgraph_src_cli",
+          "dreamgraph_src_cognitive",
+          "dreamgraph_src_cognitive_strategies",
+          "dreamgraph_src_config",
+          "dreamgraph_src_discipline",
+          "dreamgraph_src",
+          "dreamgraph_src_instance",
+          "dreamgraph_src_resources",
+          "dreamgraph_src_server",
+          "dreamgraph_src_tools",
+          "dreamgraph_src_utils"
+        ],
+        "edges_included": 1
+      },
+      {
+        "type": "capability",
+        "target": "capability_codebase_architecture_memory",
+        "target_included": false,
+        "ms": 2383,
+        "token_count": 169,
+        "entities_included": [],
+        "edges_included": 0
+      },
+      {
+        "type": "ui_element",
+        "target": "dashboard_view",
+        "target_included": false,
+        "ms": 2425,
+        "token_count": 169,
+        "entities_included": [],
+        "edges_included": 0
+      }
+    ]
+  },
+  "invalid_configuration": {
+    "scope": "isolated child process; no instance and no external model calls",
+    "status": 303,
+    "location": "/config?saved=events",
+    "before": {
+      "tension_threshold": 0.8,
+      "runtime_error_threshold": 0.05,
+      "cooldown_ms": 60000,
+      "max_auto_cycles_per_hour": 10
+    },
+    "after": {
+      "tension_threshold": null,
+      "runtime_error_threshold": -1,
+      "cooldown_ms": -42,
+      "max_auto_cycles_per_hour": -7
+    },
+    "accepted_nonfinite_threshold": true
+  },
+  "strategy_probes": [
+    {
+      "strategy": "gap-detection",
+      "fixture": "empty",
+      "edges": 0,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "gap-detection",
+      "fixture": "populated",
+      "edges": 4,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "weak-reinforcement",
+      "fixture": "empty",
+      "edges": 0,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "weak-reinforcement",
+      "fixture": "populated",
+      "edges": 1,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "cross-domain-bridging",
+      "fixture": "empty",
+      "edges": 0,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "cross-domain-bridging",
+      "fixture": "populated",
+      "edges": 4,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "missing-abstraction",
+      "fixture": "empty",
+      "edges": 0,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "missing-abstraction",
+      "fixture": "populated",
+      "edges": 0,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "symmetry-completion",
+      "fixture": "empty",
+      "edges": 0,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "symmetry-completion",
+      "fixture": "populated",
+      "edges": 3,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "tension-directed",
+      "fixture": "empty",
+      "edges": 0,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "tension-directed",
+      "fixture": "populated",
+      "edges": 4,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "pgo-wave",
+      "fixture": "empty",
+      "edges": 0,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "pgo-wave",
+      "fixture": "populated",
+      "edges": 3,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "orphan-bridging",
+      "fixture": "empty",
+      "edges": 0,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "orphan-bridging",
+      "fixture": "populated",
+      "edges": 4,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "schema-grounding",
+      "fixture": "empty",
+      "edges": 0,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    },
+    {
+      "strategy": "schema-grounding",
+      "fixture": "populated",
+      "edges": 1,
+      "nodes": 0,
+      "within_per_kind_limit": true,
+      "self_links": 0,
+      "dangling": 0,
+      "input_unchanged": true
+    }
+  ],
+  "analytics_smoke": [
+    {
+      "module": "tension_flow",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "tension_halflife",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "reappearance_rate",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "domain_saturation",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "hub_health",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "confidence_integrity",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "promotion_funnel",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "orphan_pressure",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "model_impact",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "maturity_score",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "meaningful_edges",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "domain_entropy",
+      "exit_code": 0,
+      "valid_json": true
+    },
+    {
+      "module": "cognitive_load",
+      "exit_code": 0,
+      "valid_json": true
+    }
+  ],
+  "findings": [
+    {
+      "id": "F01",
+      "priority": "P1",
+      "evidence_level": "Reproduced",
+      "title": "Large graph resources cease to be JSON",
+      "source_anchors": [
+        "src/utils/tool-output.ts",
+        "src/resources/register.ts",
+        "src/tools/query-resource.ts"
+      ]
+    },
+    {
+      "id": "F02",
+      "priority": "P1",
+      "evidence_level": "Reproduced",
+      "title": "The same resource URI has two meanings",
+      "source_anchors": [
+        "src/resources/register.ts",
+        "src/tools/query-resource.ts"
+      ]
+    },
+    {
+      "id": "F03",
+      "priority": "P1",
+      "evidence_level": "Reproduced + source",
+      "title": "Agent retrieval sees only part of the graph",
+      "source_anchors": [
+        "src/cognitive/graph-rag.ts",
+        "src/cognitive/strategies/_shared.ts",
+        "src/explorer"
+      ]
+    },
+    {
+      "id": "F04",
+      "priority": "P1",
+      "evidence_level": "Reproduced + source",
+      "title": "Retrieval exceeds its stated budget",
+      "source_anchors": [
+        "src/cognitive/graph-rag.ts"
+      ]
+    },
+    {
+      "id": "F05",
+      "priority": "P2",
+      "evidence_level": "Measured + source",
+      "title": "Retrieval needs an index and a quality oracle",
+      "source_anchors": [
+        "src/cognitive/graph-rag.ts"
+      ]
+    },
+    {
+      "id": "F06",
+      "priority": "P1",
+      "evidence_level": "Source-confirmed ordering; concurrency risk untested",
+      "title": "Enrichment completion is ahead of durable graph success",
+      "source_anchors": [
+        "src/tools/enrich-parser-nodes.ts",
+        "src/tools/enrichment-state.ts",
+        "src/utils/atomic-write.ts",
+        "src/graph"
+      ]
+    },
+    {
+      "id": "F07",
+      "priority": "P1",
+      "evidence_level": "Gap; existing protections acknowledged",
+      "title": "Enrichment cost is not an end-to-end job contract",
+      "source_anchors": [
+        "src/tools/enrich-parser-nodes.ts",
+        "src/tools/enrichment-state.ts",
+        "src/tools/scan-project.ts",
+        "src/cognitive/llm.ts"
+      ]
+    },
+    {
+      "id": "F08",
+      "priority": "P1",
+      "evidence_level": "Source-confirmed",
+      "title": "reflective is accepted but has no dream execution branch",
+      "source_anchors": [
+        "src/cognitive/register.ts",
+        "src/cognitive/dreamer.ts"
+      ]
+    },
+    {
+      "id": "F09",
+      "priority": "P2",
+      "evidence_level": "Source-confirmed",
+      "title": "Strategy adaptation rewards generation before usefulness",
+      "source_anchors": [
+        "src/cognitive/dreamer.ts"
+      ]
+    },
+    {
+      "id": "F10",
+      "priority": "P1",
+      "evidence_level": "Design/evaluation gap",
+      "title": "Promotion confidence is not measured factual accuracy",
+      "source_anchors": [
+        "src/cognitive/normalizer.ts",
+        "src/cognitive/metacognition.ts",
+        "src/cognitive/evidence-ledger.ts",
+        "src/cognitive/trust-state.ts",
+        "src/cognitive/calibration-evaluation.ts"
+      ]
+    },
+    {
+      "id": "F11",
+      "priority": "P1",
+      "evidence_level": "Reproduced",
+      "title": "Healthy can conceal critical graph debt",
+      "source_anchors": [
+        "src/tools/graph-health.ts",
+        "python/analytics/cognitive_load.py",
+        "src/server/dashboard.ts"
+      ]
+    },
+    {
+      "id": "F12",
+      "priority": "P1",
+      "evidence_level": "Reproduced in isolated process",
+      "title": "Dashboard accepts invalid event settings",
+      "source_anchors": [
+        "src/server/dashboard.ts",
+        "src/cognitive/event-router.ts"
+      ]
+    },
+    {
+      "id": "F13",
+      "priority": "P1",
+      "evidence_level": "Source-confirmed",
+      "title": "Configuration persistence differs by section",
+      "source_anchors": [
+        "src/server/dashboard.ts",
+        "src/cognitive/scheduler.ts",
+        "src/cognitive/event-router.ts",
+        "src/cognitive/narrator.ts"
+      ]
+    },
+    {
+      "id": "F14",
+      "priority": "P1",
+      "evidence_level": "Source-confirmed shared state; overlap not exercised",
+      "title": "Architect execution ownership is broader than an MCP session",
+      "source_anchors": [
+        "src/index.ts",
+        "src/architect/routes.ts"
+      ]
+    },
+    {
+      "id": "F15",
+      "priority": "P1",
+      "evidence_level": "Source-confirmed",
+      "title": "Plan projection can lose blocked/verifying intent",
+      "source_anchors": [
+        "src/architect/plan-registry.ts"
+      ]
+    },
+    {
+      "id": "F16",
+      "priority": "P2",
+      "evidence_level": "Inventory + reproduced error contract",
+      "title": "MCP contracts lack consistent machine guidance",
+      "source_anchors": [
+        "src/tools",
+        "src/cognitive/register.ts",
+        "src/discipline",
+        "src/resources/register.ts"
+      ]
+    },
+    {
+      "id": "F17",
+      "priority": "P1",
+      "evidence_level": "Historical data reproduced",
+      "title": "DreamGraph own graph needs a governed integrity refresh",
+      "source_anchors": [
+        "python/analytics/orphan_pressure.py",
+        "src/tools/scan-state.ts",
+        "src/graph",
+        "src/tools/graph-health.ts"
+      ]
+    },
+    {
+      "id": "F18",
+      "priority": "P1",
+      "evidence_level": "Measured coverage limitation",
+      "title": "Passing tests leave important execution paths uncovered",
+      "source_anchors": [
+        "vitest.config.ts",
+        ".github/workflows/codeql.yml",
+        "tests",
+        "extensions/vscode/src/test"
+      ]
+    },
+    {
+      "id": "F19",
+      "priority": "P1",
+      "evidence_level": "Source-confirmed benchmark limitation",
+      "title": "Benchmark labels exceed what the default workload measures",
+      "source_anchors": [
+        "scripts/benchmark-scan-mcp.mjs",
+        "scripts/benchmark-token-economy.mjs"
+      ]
+    },
+    {
+      "id": "F20",
+      "priority": "P1",
+      "evidence_level": "Source-confirmed exposure; exploit not attempted",
+      "title": "HTTP trust boundaries need an explicit local/remote policy",
+      "source_anchors": [
+        "src/index.ts",
+        "src/server/dashboard.ts",
+        "src/architect/routes.ts"
+      ]
+    },
+    {
+      "id": "F21",
+      "priority": "P1",
+      "evidence_level": "Alignment gap; foundations exist",
+      "title": "Subsystem projections need a shared semantic contract",
+      "source_anchors": [
+        "src/cognitive",
+        "src/graph",
+        "src/explorer",
+        "python/analytics",
+        "src/architect"
+      ]
+    },
+    {
+      "id": "F22",
+      "priority": "P1",
+      "evidence_level": "Source-confirmed; request added by user",
+      "title": "Modern-model support exists but is not a complete role policy",
+      "source_anchors": [
+        "src/cognitive/llm.ts",
+        "src/cognitive/strategies/llm-dream.ts",
+        "src/cognitive/normalizer.ts",
+        "src/server/dashboard.ts"
+      ]
+    },
+    {
+      "id": "F23",
+      "priority": "P2",
+      "evidence_level": "Source and live landing-page confirmation; requested expansion",
+      "title": "Dashboard navigation and engine.env coverage need expansion",
+      "source_anchors": [
+        "src/server/dashboard.ts",
+        "src/utils/engine-env.ts",
+        "templates/default/config/engine.env",
+        "templates/ollama/config/engine.env",
+        "templates/lmstudio/config/engine.env"
+      ]
+    }
+  ],
+  "plan": {
+    "id": "graph-trust-and-agent-effectiveness",
+    "expected_slices": 29,
+    "status": "draft",
+    "parser_verification": "passed: 29 unique pending slices, draft/idle, paired log, zero implementation checkpoints",
+    "native_payload": "discipline-plan.json"
+  },
+  "reproduction": [
+    "From repository root: npm ci --no-audit --no-fund; npm run build; npm test (separate sequential commands).",
+    "Coverage: temporarily install @vitest/coverage-v8 matching Vitest with --no-save --package-lock=false; npx vitest run --coverage --coverage.provider=v8 --coverage.reporter=json-summary --coverage.reporter=json --coverage.reportsDirectory=.codex/audit-run/coverage --coverage.include=src/**/*.ts --coverage.include=packages/*/src/**/*.ts; restore with npm ci. Keep logs outside reportsDirectory.",
+    "From extensions/vscode: npm run build, then node --test --test-reporter=tap dist/test/*.test.js.",
+    "Read-only MCP: discover tools/resources; read system://capabilities and system://features; call query_resource for those URIs and dream://status; call graph_rag_retrieve with query compiler optimization, mode comprehensive, depth 2, token_budget 100/500/2000; parse JSON and compare token_count. Use your own disposable or authorized instance.",
+    "Isolated dashboard: invoke handleDashboardRoute for POST /config with _section=events, tension_threshold=not-a-number, runtime_error_threshold=-1, cooldown_ms=-42, max_auto_cycles_per_hour=-7; inspect status and in-memory effective config. Never use a live user daemon for this mutation.",
+    "Python analytics: run each inventoried module against a copied own-instance data directory with bytecode writes disabled; compare golden expected metrics separately from exit/JSON checks.",
+    "Plan: import loadPlanDetail from dist/architect/plan-registry.js in the DreamGraph project scope; inspect draft status, all 29 unique pending slices, paired log and no implementation checkpoints.",
+    "The script/runtime logs under .codex/audit-run are local-only. discipline-delta.json and discipline-plan.json contain replayable tool payloads referencing this audit session; re-registration requires a new session/evidence binding, not blind replay into an unrelated instance."
+  ],
+  "limits": [
+    "No full live execution of all 93 tools",
+    "No paid model or database-write test",
+    "No full browser/IDE interaction suite executed",
+    "No concurrency/fault-injection/exploit proof during this audit",
+    "No factual-quality precision/recall oracle yet",
+    "Root source coverage excludes separately run extension and may miss dist-resolved package attribution"
+  ],
+  "own_live_followup": {
+    "port": 8010,
+    "server": {
+      "name": "dreamgraph",
+      "version": "13.4.0"
+    },
+    "repository_name": "dreamgraph",
+    "repository_binding_confirmed": true,
+    "tools": 93,
+    "resources": 30,
+    "root_explorer_link_present": false,
+    "plan_registry_http_status": 200
+  },
+  "governance": {
+    "session_id": "e211864f-0e9e-4beb-b198-4f8acc3348eb",
+    "markdown_slices": 29,
+    "delta_entries": 23,
+    "plan_items": 66,
+    "approved": false,
+    "session_status": "completed audit-only",
+    "native_plan_status": "draft",
+    "parity_note": "Gap-only selected delta; 0% parity is not overall project correctness."
+  },
+  "live_retrieval_budget_observations": [
+    {
+      "requested": 100,
+      "reported": 132,
+      "duration_ms": 3101
+    },
+    {
+      "requested": 500,
+      "reported": 535,
+      "duration_ms": 2896
+    },
+    {
+      "requested": 2000,
+      "reported": 2039,
+      "duration_ms": 2944
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, utimes, writeFile } from "node:fs/promises";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
@@ -72,6 +72,31 @@ describe("daemon onboarding readiness projection", () => {
     expect(projection.project_map.status).toBe("ready");
     expect(projection.required_to_start.every((check) => check.status === "ready")).toBe(true);
     expect(projection.suggested_next_action).toMatchObject({ id: "open_architect", target: "/architect" });
+  });
+
+  it("keeps an old valid map available without inferring age-only staleness", async () => {
+    const scope = await makeScope({ nodes: [{ id: "feature" }], edges: [] });
+    await utimes(join(scope.dataDir, "dream_graph.json"), new Date("2001-01-01"), new Date("2001-01-01"));
+    vi.spyOn(lifecycle, "getActiveScope").mockReturnValue(scope as never);
+    const projection = buildOnboardingReadinessProjection({ adapter: "deterministic_fallback", provider: "none", model: "" });
+    expect(projection.project_map).toMatchObject({ status: "ready", last_refreshed_at: "2001-01-01T00:00:00.000Z" });
+    expect(projection.required_to_start.find(check => check.id === "project_map")?.detail).toContain("age does not establish graph staleness");
+  });
+
+  it("revalidates changed map bytes and reports unreadable maps without proposing an automatic scan", async () => {
+    const scope = await makeScope({ nodes: [{ id: "feature" }], edges: [] });
+    vi.spyOn(lifecycle, "getActiveScope").mockReturnValue(scope as never);
+    const runtime = { adapter: "deterministic_fallback", provider: "none", model: "" };
+    expect(buildOnboardingReadinessProjection(runtime).project_map.node_count).toBe(1);
+    await writeFile(join(scope.dataDir, "dream_graph.json"), JSON.stringify({ nodes: [{ id: "feature" }, { id: "another" }], edges: [] }));
+    const returned = buildOnboardingReadinessProjection(runtime);
+    expect(returned.project_map.node_count).toBe(2);
+    returned.project_map.node_count = 999;
+    expect(buildOnboardingReadinessProjection(runtime).project_map.node_count).toBe(2);
+    await writeFile(join(scope.dataDir, "dream_graph.json"), "{broken");
+    const unavailable = buildOnboardingReadinessProjection(runtime);
+    expect(unavailable.project_map.status).toBe("unavailable");
+    expect(unavailable.suggested_next_action).toMatchObject({ id: "inspect_project_map", kind: "open_route", target: "/status" });
   });
 
   it("renders a plain-language Dashboard Start Here card with governed repair paths", async () => {

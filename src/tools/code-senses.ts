@@ -17,6 +17,13 @@ import { success, error, safeExecute } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 import { recordFileRead, recordToolCall } from "../utils/metrics.js";
 import type { ToolResponse } from "../types/index.js";
+import { managedSourceEffect, managedSourceWrite } from "../graph/change-obligations.js";
+
+function sourceEffectStatus(effect: Awaited<ReturnType<typeof managedSourceEffect>>): string {
+  return effect.state === "failed"
+    ? `Source unchanged; no graph reconciliation required (operation: ${effect.id}).`
+    : `Graph reconciliation pending: ${effect.id}.`;
+}
 
 const MAX_READ_SOURCE_CODE_CHARS = 24000;
 const READ_SOURCE_CODE_PREVIEW_HEAD_CHARS = 12000;
@@ -665,12 +672,14 @@ export function registerCodeSensesTools(server: McpServer): void {
       content: z
         .string()
         .describe("File content to write."),
+      expected_hash: z.string().regex(/^sha256:[a-f0-9]{64}$/).nullable().optional()
+        .describe('Optional exact current file hash; null requires the file to be absent. Refuses a changed file before source intent/write.'),
       repo: z
         .string()
         .optional()
         .describe(repoDesc),
     },
-    async ({ filePath: reqPath, content, repo }) => {
+    async ({ filePath: reqPath, content, repo, expected_hash }) => {
       logger.debug(
         `create_file called: filePath="${reqPath}", repo="${repo ?? "(auto)"}", bytes=${content.length}`
       );
@@ -713,12 +722,12 @@ export function registerCodeSensesTools(server: McpServer): void {
           }
 
           try {
-            // Ensure parent directory exists
-            const dir = path.dirname(safePath);
-            await fs.mkdir(dir, { recursive: true });
-
-            await fs.writeFile(safePath, content, "utf-8");
-            return success(`File created: ${safePath} (${content.length} bytes)`);
+            const effect = await managedSourceEffect({changes:[{file:safePath,content,
+              ...(expected_hash===undefined?{}:{expected_hash})}],apply:async()=>{
+              await fs.mkdir(path.dirname(safePath),{recursive:true});
+              await fs.writeFile(safePath,content,'utf8');
+            }});
+            return success(`File created: ${safePath} (${content.length} bytes). ${sourceEffectStatus(effect)}`);
           } catch (err: unknown) {
             const msg =
               err instanceof Error ? err.message : String(err);
@@ -843,11 +852,11 @@ export function registerCodeSensesTools(server: McpServer): void {
             newContent = newContent.replace(/\n/g, "\r\n");
           }
           try {
-            await fs.writeFile(safePath, newContent, "utf-8");
+            const effect = await managedSourceWrite(safePath, newContent, content);
             const linesChanged = old_text.split("\n").length;
             return success(
               `Edited ${safePath}: replaced ${linesChanged} line(s). ` +
-              `File size: ${content.length} → ${newContent.length} bytes.`
+              `File size: ${content.length} → ${newContent.length} bytes. ${sourceEffectStatus(effect)}`
             );
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
@@ -876,12 +885,14 @@ export function registerCodeSensesTools(server: McpServer): void {
           "File path relative to the repository root " +
             "(e.g. 'src/utils/old-helper.ts') or an absolute path."
         ),
+      expected_hash: z.string().regex(/^sha256:[a-f0-9]{64}$/).optional()
+        .describe('Optional exact hash of the reviewed file. Refuses newer bytes before source intent/deletion.'),
       repo: z
         .string()
         .optional()
         .describe(repoDesc),
     },
-    async ({ filePath: reqPath, repo }) => {
+    async ({ filePath: reqPath, repo, expected_hash }) => {
       logger.debug(`delete_file called: filePath="${reqPath}", repo="${repo ?? "(auto)"}"`);
 
       const result = await safeExecute<string>(
@@ -913,8 +924,10 @@ export function registerCodeSensesTools(server: McpServer): void {
             if (!stat.isFile()) {
               return error("INVALID_TARGET", `Path '${reqPath}' is not a file (use rmdir for directories).`);
             }
-            await fs.unlink(safePath);
-            return success(`Deleted: ${safePath}`);
+            const before = await fs.readFile(safePath);
+            const effect = await managedSourceEffect({ changes: [{ file: safePath, content: null, expected_content: before,
+              ...(expected_hash===undefined?{}:{expected_hash}) }], apply: () => fs.unlink(safePath) });
+            return success(`Deleted: ${safePath}. ${sourceEffectStatus(effect)}`);
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
             if (msg.includes("ENOENT")) {
@@ -996,8 +1009,9 @@ export function registerCodeSensesTools(server: McpServer): void {
             await fs.mkdir(path.dirname(safeNew), { recursive: true });
 
             // Move the file
-            await fs.rename(safeOld, safeNew);
-            return success(`Renamed: ${safeOld} → ${safeNew}`);
+            const before = await fs.readFile(safeOld);
+            const effect = await managedSourceEffect({ changes: [{ file: safeOld, content: null, expected_content: before }, { file: safeNew, content: before, expected_content: null }], apply: () => fs.rename(safeOld, safeNew) });
+            return success(`Renamed: ${safeOld} → ${safeNew}. ${sourceEffectStatus(effect)}`);
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
             if (msg.includes("ENOENT")) {
@@ -1107,13 +1121,13 @@ export function registerCodeSensesTools(server: McpServer): void {
           const newContent = [...before, new_source, ...after].join("\n");
 
           try {
-            await fs.writeFile(safePath, newContent, "utf-8");
+            const effect = await managedSourceWrite(safePath, newContent, content);
             const oldLineCount = loc.endLine - loc.startLine + 1;
             const newLineCount = new_source.split("\n").length;
             return success(
               `Replaced ${loc.kind} "${entityName}" in ${reqPath} ` +
               `(was lines ${loc.startLine}–${loc.endLine}, ${oldLineCount} lines → ${newLineCount} lines). ` +
-              `File size: ${content.length} → ${newContent.length} bytes.`
+              `File size: ${content.length} → ${newContent.length} bytes. ${sourceEffectStatus(effect)}`
             );
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
@@ -1238,10 +1252,10 @@ export function registerCodeSensesTools(server: McpServer): void {
           }
 
           try {
-            await fs.writeFile(safePath, finalContent, "utf-8");
+            const effect = await managedSourceWrite(safePath, finalContent, content);
             return success(
               `Patched ${safePath}: applied ${edits.length} edit(s), ${totalLinesChanged} line(s) replaced. ` +
-                `File size: ${startSize} → ${finalContent.length} bytes.`
+                `File size: ${startSize} → ${finalContent.length} bytes. ${sourceEffectStatus(effect)}`
             );
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
@@ -1345,10 +1359,10 @@ export function registerCodeSensesTools(server: McpServer): void {
           }
 
           try {
-            await fs.writeFile(safePath, newContent, "utf-8");
+            const effect = await managedSourceWrite(safePath, newContent, content);
             return success(
               `Appended ${normalizedAddition.length} byte(s) to ${safePath} at position="${position}". ` +
-                `File size: ${content.length} → ${newContent.length} bytes.`
+                `File size: ${content.length} → ${newContent.length} bytes. ${sourceEffectStatus(effect)}`
             );
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
@@ -1527,11 +1541,11 @@ export function registerCodeSensesTools(server: McpServer): void {
           if (useCRLF) newContent = newContent.replace(/\n/g, "\r\n");
 
           try {
-            await fs.writeFile(safePath, newContent, "utf-8");
+            const effect = await managedSourceWrite(safePath, newContent, content);
             return success(
               `Replaced section "${heading}" (level ${headingLevel}, occurrence ${occurrence}) in ${reqPath}: ` +
                 `${oldBodyLineCount} line(s) → ${bodyLines.length} line(s). ` +
-                `File size: ${content.length} → ${newContent.length} bytes.`
+                `File size: ${content.length} → ${newContent.length} bytes. ${sourceEffectStatus(effect)}`
             );
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
@@ -2057,10 +2071,10 @@ export function registerCodeSensesTools(server: McpServer): void {
         let newContent = nextLines.join("\n");
         if (read.useCRLF) newContent = newContent.replace(/\n/g, "\r\n");
         try {
-          await fs.writeFile(read.safePath, newContent, "utf-8");
+          const effect = await managedSourceWrite(read.safePath, newContent, read.content);
           return success(
             `Patched markdown chapter "${chapter.headingPath}" (op=${operation}) in ${filePath}: ` +
-              `${read.content.length} → ${newContent.length} bytes.`,
+              `${read.content.length} → ${newContent.length} bytes. ${sourceEffectStatus(effect)}`,
           );
         } catch (err: unknown) {
           const msg = err instanceof Error ? err.message : String(err);

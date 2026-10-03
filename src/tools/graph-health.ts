@@ -6,7 +6,12 @@
 
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { readFile, stat } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { loadCanonicalGraph, type CanonicalGraphRead } from "../graph/read-model.js";
+import { graphIdentityKey } from "../graph/contracts.js";
+import { getActiveScope } from "../instance/index.js";
+import { DEFAULT_ENRICHMENT_CONTEXT_HOPS } from "../utils/enrichment-context.js";
+import { readDirtyPartitions } from "../graph/change-obligations.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
@@ -67,6 +72,12 @@ export interface GraphMaintenanceRecommendation {
 }
 
 export interface GraphHealthReport {
+  definition_version:"2.0.0";
+  revision:CanonicalGraphRead["revision"];
+  currency:CanonicalGraphRead["currency"];
+  state:CanonicalGraphRead["state"];
+  dimensions:{integrity:"sound"|"defective"|"unknown";freshness:CanonicalGraphRead["state"]["freshness"];coverage:"complete"|"partial"|"empty";readiness:"ready"|"attention"|"unavailable";workload:{open_tensions:number;dirty_regions:number;optional_pending_regions:number}};
+  task_usefulness:{measured:false;understanding_gain:null;avoided_rereads:null;reason:string};
   schema: "dreamgraph.graph_health.v1";
   generated_at: string;
   status: "excellent" | "healthy" | "needs_attention" | "poor" | "empty";
@@ -122,8 +133,9 @@ function envPositive(name: string, fallback: number): number {
 async function readJson<T>(filename: string, fallback: T): Promise<T> {
   try {
     return JSON.parse(await readFile(dataPath(filename), "utf-8")) as T;
-  } catch {
-    return fallback;
+  } catch(error) {
+    if((error as NodeJS.ErrnoException).code==="ENOENT")return fallback;
+    throw error;
   }
 }
 
@@ -206,14 +218,6 @@ function isoAgeHours(value: string | null | undefined): number | null {
   return Number.isFinite(time) ? Math.max(0, (Date.now() - time) / 3_600_000) : null;
 }
 
-async function newestMtimeIso(filenames: string[]): Promise<string | null> {
-  const times = await Promise.all(filenames.map(async (filename) => {
-    try { return (await stat(dataPath(filename))).mtimeMs; } catch { return 0; }
-  }));
-  const latest = Math.max(0, ...times);
-  return latest > 0 ? new Date(latest).toISOString() : null;
-}
-
 async function repositoryDrift(state: GraphMaintenanceState): Promise<{ modified: number; commits: number; heads: Record<string, string> }> {
   let modified = 0;
   let commits = 0;
@@ -288,6 +292,7 @@ export async function assessGraphHealth(): Promise<GraphHealthReport> {
 }
 
 async function assessGraphHealthUnlocked(): Promise<GraphHealthReport> {
+  const canonical=await loadCanonicalGraph(getActiveScope()?.uuid??process.env.DREAMGRAPH_INSTANCE_UUID??"legacy");
   const [
     featuresRaw, workflowsRaw, dataModelRaw, capabilitiesRaw, datastoresRaw,
     auxiliaryRaw, uiRaw, candidates, validated, tensions, state,
@@ -305,28 +310,27 @@ async function assessGraphHealthUnlocked(): Promise<GraphHealthReport> {
     loadGraphMaintenanceState(),
   ]);
 
-  const uiEntries = realEntries(uiRaw.elements).filter((entry) => hasText(entry.source_repo));
+  const family=(kind:CanonicalKind)=>canonical.entities.filter(e=>e.identity.kind===kind).map(e=>({...e.payload,id:graphIdentityKey(e.identity),name:e.label,links:canonical.relationships.filter(r=>r.kind==="fact"&&r.source&&graphIdentityKey(r.source)===graphIdentityKey(e.identity)).map(r=>({target:r.target?graphIdentityKey(r.target):r.target_ref,relationship:r.relation}))}));
   const groups: Record<CanonicalKind, CanonicalNode[]> = {
-    feature: asCanonical(realEntries(featuresRaw), "feature"),
-    workflow: asCanonical(realEntries(workflowsRaw), "workflow"),
-    data_model: asCanonical(realEntries(dataModelRaw), "data_model"),
-    capability: asCanonical(realEntries(capabilitiesRaw), "capability"),
-    datastore: asCanonical(realEntries(datastoresRaw), "datastore"),
-    ui_element: asCanonical(uiEntries, "ui_element"),
-    auxiliary: asCanonical(realEntries(auxiliaryRaw.entries), "auxiliary"),
+    feature: asCanonical(family("feature"), "feature"),
+    workflow: asCanonical(family("workflow"), "workflow"),
+    data_model: asCanonical(family("data_model"), "data_model"),
+    capability: asCanonical(family("capability"), "capability"),
+    datastore: asCanonical(family("datastore"), "datastore"),
+    ui_element: asCanonical(family("ui_element"), "ui_element"),
+    auxiliary: asCanonical(family("auxiliary"), "auxiliary"),
   };
   const nodes = Object.values(groups).flat();
   const total = nodes.length;
   const scanStaleHours = envPositive("DREAMGRAPH_GRAPH_STALE_HOURS", DEFAULT_SCAN_STALE_HOURS);
   const enrichmentStaleHours = envPositive("DREAMGRAPH_ENRICHMENT_STALE_HOURS", DEFAULT_ENRICHMENT_STALE_HOURS);
   const majorChangeFiles = envPositive("DREAMGRAPH_MAJOR_REPOSITORY_CHANGE_FILES", DEFAULT_MAJOR_CHANGE_FILES);
-  const fallbackTimestamp = await newestMtimeIso(["features.json", "workflows.json", "data_model.json", "ui_registry.json", "auxiliary_entities.json"]);
   const lastEnrichment = state.last_enrichment_at ?? nodes
     .map((node) => node.enrichment?.enriched_at)
     .filter((value): value is string => Boolean(value))
     .sort()
     .at(-1) ?? null;
-  const scanAge = isoAgeHours(state.last_scan_at ?? fallbackTimestamp);
+  const scanAge = isoAgeHours(canonical.currency.last_full_scan_at??state.last_scan_at);
   const enrichmentAge = isoAgeHours(lastEnrichment);
   const drift = await repositoryDrift(state);
   const currentDbFingerprint = datastoreConnectionFingerprint(config.database.connectionString || process.env.DATABASE_URL);
@@ -356,8 +360,8 @@ async function assessGraphHealthUnlocked(): Promise<GraphHealthReport> {
   const datastoreTotal = groups.datastore.length + groups.data_model.filter((node) => hasText(node.table_name) || hasText(node.storage)).length;
   const connected = connectivity(nodes);
   const unresolvedTensions = tensions.signals.filter((signal) => !signal.resolved).length;
-  const promotionBase = candidates.results.length;
-  const promotedCandidates = candidates.results.filter((result) => result.status === "validated").length || validated.edges.length;
+  const promotionBase = canonical.entities.filter(e=>e.identity.kind==="candidate"&&e.payload.dream_type).length;
+  const promotedCandidates = canonical.entities.filter(e=>e.identity.kind==="candidate"&&e.assertion_class==="validated_insight").length;
   const promotionRate = promotionBase > 0 ? Math.min(1, promotedCandidates / promotionBase) : 0;
   const linkedMetric = metric(connected.linked, total, total > 0);
   const enrichedMetric = metric(enrichedCount, enrichmentDenominator, enrichmentDenominator > 0);
@@ -370,6 +374,10 @@ async function assessGraphHealthUnlocked(): Promise<GraphHealthReport> {
   const observe = (signal: string, severity: GraphHealthObservation["severity"], observed: string, impact: string): void => {
     observations.push({ signal, severity, observed, reasoning_impact: impact });
   };
+  const integrityDefects=canonical.state.reasons.filter(r=>/INVALID|UNAVAILABLE|UNPUBLISHED|DUPLICATE|MISSING|DANGLING/.test(r.code));
+  for(const reason of integrityDefects)observe(reason.code,"critical",reason.detail,`Canonical context is incomplete in ${reason.scope.join(", ")||"an unknown scope"}; aggregate coverage cannot hide this defect.`);
+  const requiredGaps=canonical.state.reasons.filter(r=>["SOURCE_RECONCILIATION_PENDING","SOURCE_EFFECT_UNKNOWN"].includes(r.code));
+  for(const reason of requiredGaps)observe(reason.code,"critical",reason.detail,`Reconcile the declared scope ${reason.scope.join(", ")}; unrelated recent mutations do not settle this obligation.`);
   if (total === 0) observe("empty_graph", "critical", "No canonical graph nodes are present.", "Architectural planning and retrieval have no project model to ground decisions.");
   if (parserOnly > 0) observe("parser_only_nodes", parserOnly / Math.max(total, 1) > 0.2 ? "critical" : "warning", `${parserOnly} parser-origin nodes lack successful LLM enrichment.`, "Mechanical nodes bias retrieval toward syntax and filenames instead of intent and responsibility.");
   if (enrichedCount < enrichmentDenominator && enrichmentDenominator > 0) {
@@ -391,20 +399,20 @@ async function assessGraphHealthUnlocked(): Promise<GraphHealthReport> {
   if (connected.orphanFeatures > 0 || connected.featureClusters > 1) observe("disconnected_feature_clusters", "warning", `${connected.orphanFeatures} orphan features across ${connected.featureClusters} feature-bearing clusters.`, "Disconnected clusters hide cross-feature dependencies and weaken causal path discovery.");
   if (unresolvedTensions > 0) observe("unresolved_tensions", unresolvedTensions > 10 ? "critical" : "warning", `${unresolvedTensions} tension signals remain unresolved.`, "Unresolved contradictions lower confidence in recommendations and may represent active architectural risk.");
   if (promotionBase >= 10 && promotionRate < 0.05) observe("low_dream_promotion", "warning", `${promotedCandidates}/${promotionBase} normalized dream candidates were promoted.`, "Low promotion can mean the graph lacks evidence, dreams are poorly targeted, or normalization is stale.");
-  if (scanAge === null || scanAge > scanStaleHours) observe("stale_scan", "warning", scanAge == null ? "No durable scan timestamp exists." : `Last scan is ${scanAge.toFixed(1)} hours old.`, "Architect may reason from code topology that no longer matches the repository.");
-  if (enrichmentAge === null || enrichmentAge > enrichmentStaleHours) observe("stale_enrichment", "warning", enrichmentAge == null ? "No successful enrichment timestamp exists." : `Last enrichment is ${enrichmentAge.toFixed(1)} hours old.`, "Intent and relationships may lag behind the current implementation.");
-  if (drift.modified >= majorChangeFiles || drift.commits > 0) observe("repository_drift", "warning", `${drift.modified} modified files and ${drift.commits} commits since the recorded scan.`, "Repository change volume makes existing graph evidence potentially incomplete.");
+  if (scanAge === null || scanAge > scanStaleHours) observe("scan_history", "info", scanAge == null ? "Full-scan time is unavailable." : `Full scan occurred ${scanAge.toFixed(1)} hours ago.`, "Historical scan age does not establish graph staleness; managed mutations and scoped reconciliation determine currency.");
+  if (enrichmentAge === null || enrichmentAge > enrichmentStaleHours) observe("enrichment_history", "info", enrichmentAge == null ? "Successful enrichment time is unavailable." : `Last enrichment occurred ${enrichmentAge.toFixed(1)} hours ago.`, "Elapsed time alone is not proof of outdated intent or relationships.");
+  if (drift.modified >= majorChangeFiles || drift.commits > 0) observe("repository_activity", "info", `${drift.modified} modified files and ${drift.commits} commits since the recorded scan.`, "Activity may already be managed by DreamGraph. The user decides whether outside-contract changes require an inclusive scan.");
   if (databaseChanged) observe("datastore_configuration_changed", "warning", "A configured DATABASE_URL differs from the last scanned datastore fingerprint.", "Table ownership and persistence links have not yet been grounded for this datastore configuration.");
 
   const recommendations: GraphMaintenanceRecommendation[] = [];
   const graphEmpty = total === 0;
-  const repositoryStale = scanAge == null || scanAge > scanStaleHours || drift.modified >= majorChangeFiles || drift.commits > 0;
+  const repositoryStale = requiredGaps.length>0;
   const semanticPoor = parserOnly > 0 || hollow > 0 || enrichedCount < enrichmentDenominator || semanticDensity < 0.65 || richUiCount < uiNodes.length;
   // Smallest-capable operation ordering is deliberate: enrich before scan;
   // scan before bootstrap. Drift is the exception because enrichment cannot
   // discover source entities that are absent from the graph.
   if (!graphEmpty && semanticPoor && !repositoryStale) {
-    recommendations.push(recommendation(10, "Force semantic enrichment", "enrich_parser_nodes", { target: "all", force: true, context_hops: 3, model_source: "auto" }, "The source map is current but semantic coverage is incomplete.", "Refresh intent, contracts, UI knowledge, and multi-hop relations without an expensive source scan."));
+    recommendations.push(recommendation(10, "Review semantic enrichment debt", "enrich_parser_nodes", { target: "all", force: false, context_hops: DEFAULT_ENRICHMENT_CONTEXT_HOPS, model_source: "auto" }, "Semantic coverage is incomplete; this does not itself prove source staleness.", "Enrich eligible unresolved nodes within the effective role policy and spend/hop caps."));
   }
   if (!graphEmpty && repositoryStale) {
     const baseline = await loadScanState();
@@ -449,10 +457,14 @@ async function assessGraphHealthUnlocked(): Promise<GraphHealthReport> {
   if (repositoryStale) score -= 0.08;
   if (promotionBase >= 10 && promotionRate < 0.05) score -= 0.05;
   score = Math.max(0, Math.min(1, score));
-  const status: GraphHealthReport["status"] = total === 0 ? "empty" : score >= 0.85 ? "excellent" : score >= 0.7 ? "healthy" : score >= 0.45 ? "needs_attention" : "poor";
+  const status: GraphHealthReport["status"] = total === 0 ? "empty" : integrityDefects.length||requiredGaps.length?"poor":observations.some(o=>o.severity==="critical")?"needs_attention":score >= 0.85 ? "excellent" : score >= 0.7 ? "healthy" : score >= 0.45 ? "needs_attention" : "poor";
+  const dirty=(await readDirtyPartitions()).partitions.filter(p=>p.state!=="settled");
 
   return {
     schema: "dreamgraph.graph_health.v1",
+    definition_version:"2.0.0",revision:canonical.revision,currency:canonical.currency,state:canonical.state,
+    dimensions:{integrity:integrityDefects.length?"defective":canonical.state.completeness==="unknown"?"unknown":"sound",freshness:canonical.state.freshness,coverage:total===0?"empty":semanticPoor?"partial":"complete",readiness:canonical.state.availability==="unavailable"?"unavailable":status==="healthy"||status==="excellent"?"ready":"attention",workload:{open_tensions:unresolvedTensions,dirty_regions:dirty.length,optional_pending_regions:dirty.filter(p=>!p.pending_stages.includes("reconciliation")).length}},
+    task_usefulness:{measured:false,understanding_gain:null,avoided_rereads:null,reason:"Requires matched task evaluation; coverage, confidence and context delivered do not measure understanding."},
     generated_at: new Date().toISOString(),
     status,
     score: Number(score.toFixed(4)),

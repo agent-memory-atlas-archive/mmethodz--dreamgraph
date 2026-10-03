@@ -1,16 +1,25 @@
 import type { IncomingMessage } from "node:http";
 import { spawn } from "node:child_process";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { constants as FS, existsSync } from "node:fs";
 import { access, copyFile, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
 import { delimiter, isAbsolute, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import type { LlmMessage } from "../cognitive/llm.js";
-import { mcpListTools } from "../cli/utils/mcp-call.js";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { createRequire } from "node:module";
+import { nativeCliModelExecution } from "../cognitive/model-execution.js";
+import { getArchitectLlmConfig } from "../cognitive/llm.js";
+import { providerUsage } from "../cognitive/provider-outcome.js";
+import type { LlmMessage, TokenUsage } from "../cognitive/llm.js";
+import { mcpListTools, architectMcpHeaders } from "../cli/utils/mcp-call.js";
 import { getArchitectProjectRoot } from "./plan-registry.js";
 import { createArchitectToolResultPreview, type ArchitectToolTraceEntry } from "./native-tool-loop.js";
 import { resolveArchitectNarrativeDensity, type ArchitectVerbosityMode } from "./verbosity.js";
+import { getSessionContext } from "../server/session-context.js";
+import { executionPolicyProjection, type ExecutionApproval } from "../server/execution-policy.js";
+import { beginHostExecution, endHostExecution, withHostExecution } from "../server/managed-execution.js";
+import type { PlanExecutionIntent } from "../graph/contracts.js";
+import { deliverManagedContext, readManagedContext, type ManagedExecutionContext } from "../graph/execution-context.js";
 
 export type ArchitectCliAdapter = "codex-cli" | "copilot-cli";
 
@@ -39,6 +48,9 @@ export interface ArchitectCliBridgeRoute {
   exit_code: number | null;
   signal: NodeJS.Signals | null;
   timed_out: boolean;
+  adapter_version?: string;
+  effective_controls?: ReturnType<typeof executionPolicyProjection>;
+  output_controls?: { provider: "configured_optional" | "unsupported"; prompt: "guided"; presentation: "enforced"; exact_density: "not_guaranteed" };
 }
 
 export interface ArchitectCliBridgeProvenance {
@@ -61,6 +73,9 @@ export interface ArchitectCliBridgeResult {
   route: ArchitectCliBridgeRoute;
   provenance: ArchitectCliBridgeProvenance;
   tool_trace: ArchitectToolTraceEntry[];
+  usage?: TokenUsage;
+  usage_provenance: "native_reported" | "unavailable";
+  graph_execution?: ManagedExecutionContext;
 }
 
 export interface RunArchitectCliBridgeInput {
@@ -71,9 +86,17 @@ export interface RunArchitectCliBridgeInput {
   model: string;
   timeoutMs: number;
   verbosityMode?: ArchitectVerbosityMode;
+  autonomyMode?: "manual" | "supervised" | "autonomous";
+  approvedActions?: ExecutionApproval;
+  operatorReviewEnabled?: boolean;
+  reasoningEffort?: string;
   toolRequirements?: ArchitectCliToolRequirements | null;
   signal?: AbortSignal;
   onToolTrace?: (entry: ArchitectToolTraceEntry) => void;
+  executionId?: string;
+  planId?: string;
+  sliceId?: string;
+  planExecution?: PlanExecutionIntent;
 }
 
 interface ProcessResult {
@@ -102,6 +125,7 @@ const CODEX_HOME_AUTH_ARTIFACTS = Object.freeze(["auth.json", "version.json", "i
 const BRIDGE_LOCAL_DREAMGRAPH_TOOLS = Object.freeze(["run_command"] as const);
 const BRIDGE_MCP_CONFIG_ENV_KEYS = Object.freeze([
   "DREAMGRAPH_HOST_MCP_URL",
+  "DREAMGRAPH_BRIDGE_SESSION_BEARER",
   "DREAMGRAPH_BRIDGE_AUDIT_DIR",
   "DREAMGRAPH_AUDIT_PATH",
   "DREAMGRAPH_RUN_ID",
@@ -128,12 +152,15 @@ const WINDOWS_PATH_EXTS: readonly string[] = IS_WINDOWS
   : [];
 
 export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): Promise<ArchitectCliBridgeResult> {
+  input.signal?.throwIfAborted();
+  if (input.reasoningEffort && input.adapter !== "codex-cli") throw new Error("CLI_EFFORT_UNQUALIFIED");
   const mcpPort = architectMcpPort(input.req);
   if (mcpPort == null) {
     throw new Error("ARCHITECT_CLI_BRIDGE_MCP_PORT_UNAVAILABLE: request host did not expose a local MCP port");
   }
 
-  const upstreamTools = await mcpListTools(mcpPort);
+  const headers = architectMcpHeaders(input.req);
+  const upstreamTools = await mcpListTools(mcpPort, { headers, signal: input.signal });
   const availableToolNames = resolveArchitectCliBridgeToolNames(upstreamTools.map((tool) => tool.name));
   const toolRequirements = resolveCliToolRequirements(input.toolRequirements, availableToolNames);
   const missingTools = REQUIRED_DREAMGRAPH_TOOLS.filter((name) => !availableToolNames.includes(name));
@@ -141,19 +168,41 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     throw new Error(`ARCHITECT_CLI_BRIDGE_MCP_TOOL_MISMATCH: missing required DreamGraph MCP tool(s): ${missingTools.join(", ")}`);
   }
 
-  const runId = `architect-${input.adapter}-${randomUUID()}`;
+  const runId = input.executionId ?? `architect-${input.adapter}-${randomUUID()}`;
   const scratchDir = await mkdtemp(join(tmpdir(), `dreamgraph-architect-${input.adapter}-`));
   const auditDir = join(scratchDir, "audit");
-  const auditPath = join(auditDir, `${runId}.ndjson`);
+  // Logical execution IDs are opaque; a browser session ID may contain Windows-invalid colons.
+  const auditPath = join(auditDir, `${createHash("sha256").update(runId).digest("hex")}.ndjson`);
   const bridgeSpawn = resolveBridgeSpawn();
-  const prompt = serializeCliPrompt(input.messages, input.userMessage, input.adapter, toolRequirements.requirements);
+  let prompt = serializeCliPrompt(input.messages, input.userMessage, input.adapter, toolRequirements.requirements, { autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced" });
   const model = input.model && input.model !== "auto" ? input.model : undefined;
   const timeoutMs = Number.isFinite(input.timeoutMs) && input.timeoutMs > 0
-    ? Math.max(30_000, Math.min(input.timeoutMs, CLI_DEFAULT_TIMEOUT_MS))
-    : CLI_DEFAULT_TIMEOUT_MS;
+    ? Math.max(30_000, Math.min(input.timeoutMs, 300000))
+    : Math.min(CLI_DEFAULT_TIMEOUT_MS, 300000);
   const startedAt = Date.now();
+  const context = getSessionContext();
+  if (!context) { await rm(scratchDir, { recursive: true, force: true }); throw new Error("CLI_EXECUTION_SESSION_REQUIRED"); }
+  let lease: Awaited<ReturnType<typeof beginHostExecution>> | undefined;
+  let executionSignal: AbortSignal;
+  let dispatched = false, finished = false;
+  try {
+    lease = await beginHostExecution({ id: runId, query: input.userMessage, adapter: input.adapter,
+      plan_id: input.planId, slice_id: input.sliceId, plan_execution: input.planExecution,
+      autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced",
+      approved_actions: input.approvedActions, timeout_ms: Math.trunc(timeoutMs) }, input.signal, input.operatorReviewEnabled === true);
+    prompt += "\n\n" + lease.execution.block;
+    if (Buffer.byteLength(prompt) > 128 * 1024) throw new Error("CLI_REQUIRED_PROMPT_BYTE_BOUND: narrow the task without clipping required evidence");
+    executionSignal = await withHostExecution(runId, async () => getSessionContext()!.execution_policy!.signal);
+    executionSignal.throwIfAborted();
+  }
+  catch (error) {
+    try { if (lease) await endHostExecution({ execution_id: runId, outcome: "failed", work_termination: "confirmed" }); }
+    finally { await rm(scratchDir, { recursive: true, force: true }); }
+    throw error;
+  }
 
   try {
+    const capability = await probeCliControlCapability(input.adapter, executionSignal);
     await mkdir(auditDir, { recursive: true, mode: 0o700 });
     const envBase = buildBridgeEnv({
       mcpPort,
@@ -162,22 +211,26 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       auditPath,
       workspaceRoot: getArchitectProjectRoot(),
       verbosityMode: input.verbosityMode,
+      sessionBearer: lease.worker_bearer,
     });
     const invocation = input.adapter === "codex-cli"
-      ? await prepareCodexInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames, verbosityMode: input.verbosityMode })
+      ? await prepareCodexInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames, verbosityMode: input.verbosityMode, reasoningEffort: input.reasoningEffort })
       : await prepareCopilotInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames });
+
+    await deliverManagedContext(runId, prompt);
 
     const auditTail = startAuditTraceTail(auditPath, input.onToolTrace);
     let processResult: ProcessResult;
     try {
-      processResult = await runProcess({
-        command: invocation.command,
-        args: invocation.args,
-        cwd: invocation.cwd,
-        env: invocation.env,
-        stdin: invocation.stdin,
-        timeoutMs,
-        signal: input.signal,
+      const baseConfig = getArchitectLlmConfig();
+      const admitted = await nativeCliModelExecution({ ...baseConfig, maxTokens: baseConfig.maxTokens, timeoutMs }, input.adapter, input.model, input.reasoningEffort, "architect", runId);
+      processResult = await admitted.request({ provider: baseConfig.provider, model: input.model, payload: prompt,
+        output_tokens: baseConfig.maxTokens, signal: executionSignal }, async signal => {
+        signal.throwIfAborted(); dispatched = true;
+        const result = await runProcess({ command: invocation.command, args: invocation.args, cwd: invocation.cwd,
+          env: invocation.env, stdin: invocation.stdin, timeoutMs, signal });
+        return { result, usage: input.adapter === "codex-cli" ? extractArchitectCodexUsage(result.stdout) : undefined,
+          acknowledged: result.exitCode !== null && !result.timedOut && !signal.aborted };
       });
     } finally {
       await auditTail.stop();
@@ -187,8 +240,9 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     auditTail.emitEntries(toolTrace);
 
     const content = await extractAssistantContent(input.adapter, processResult, invocation.outputPath);
+    const usage = input.adapter === "codex-cli" ? extractArchitectCodexUsage(processResult.stdout) : undefined;
     const completedTools = toolTrace.filter((entry) => entry.status === "completed").length;
-    const failureReason = processResult.timedOut
+    const failureReason = executionSignal.aborted ? "ARCHITECT_CLI_CANCELLED" : processResult.timedOut
       ? `${input.adapter.toUpperCase()}_BRIDGE_TIMEOUT: timeout after ${timeoutMs}ms; completed tools ${completedTools}/${toolTrace.length}`
       : processResult.exitCode !== 0
         ? `${input.adapter.toUpperCase()}_BRIDGE_NONZERO_EXIT: exit=${processResult.exitCode}; stderr=${compact(processResult.stderr)}`
@@ -196,8 +250,15 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
           ? `${input.adapter.toUpperCase()}_BRIDGE_EMPTY_RESPONSE: CLI completed without assistant text`
           : null;
 
+    const cancelled = executionSignal.aborted;
+    const effectiveControls = cancelled ? lease.controls : await withHostExecution(runId, async () => executionPolicyProjection(getSessionContext()!.execution_policy!));
+    await endHostExecution({ execution_id: runId, outcome: cancelled ? "cancelled" : failureReason ? "failed" : "completed",
+      work_termination: !failureReason && !processResult.signal ? "confirmed" : "unconfirmed" }); finished = true;
     return {
-      content: content.trim(),
+      graph_execution: await readManagedContext(runId),
+      content: failureReason || cancelled ? "" : content.trim(),
+      ...(usage ? { usage } : {}),
+      usage_provenance: usage ? "native_reported" : "unavailable",
       model: input.model,
       route: {
         enabled: true,
@@ -209,7 +270,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         required_tools: toolRequirements.requirements?.required_tools ?? [],
         unavailable_required_tools: toolRequirements.unavailable_required_tools,
         iterations: 1,
-        stop_reason: processResult.timedOut ? "cli_timed_out" : processResult.exitCode !== 0 ? "cli_failed" : failureReason ? "cli_empty_response" : "cli_completed",
+        stop_reason: cancelled ? "cli_cancelled" : processResult.timedOut ? "cli_timed_out" : processResult.exitCode !== 0 ? "cli_failed" : failureReason ? "cli_empty_response" : "cli_completed",
         fallback_reason: failureReason,
         run_id: runId,
         executable: invocation.command,
@@ -218,6 +279,9 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         exit_code: processResult.exitCode,
         signal: processResult.signal,
         timed_out: processResult.timedOut,
+        adapter_version: capability.version,
+        effective_controls: effectiveControls,
+        output_controls: { provider: input.adapter === "codex-cli" ? "configured_optional" : "unsupported", prompt: "guided", presentation: "enforced", exact_density: "not_guaranteed" },
       },
       provenance: {
         authority: "dreamgraph_mcp",
@@ -235,7 +299,11 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       tool_trace: toolTrace,
     };
   } finally {
-    await rm(scratchDir, { recursive: true, force: true }).catch(() => undefined);
+    try { if (!finished) await endHostExecution({ execution_id: runId, outcome: executionSignal.aborted ? "cancelled" : "failed",
+      work_termination: dispatched ? "unconfirmed" : "confirmed" }); }
+    finally {
+      await rm(scratchDir, { recursive: true, force: true }).catch(() => undefined);
+    }
   }
 }
 
@@ -258,7 +326,7 @@ function resolveBridgeSpawn(): { entryPath: string; command: string; args: strin
   }
   const source = fileURLToPath(new URL("./cli-mcp-bridge.ts", import.meta.url));
   if (existsSync(source)) {
-    return { entryPath: source, command: process.execPath, args: [...process.execArgv, source] };
+    return { entryPath: source, command: process.execPath, args: [...process.execArgv, "--import", pathToFileURL(createRequire(import.meta.url).resolve("tsx/esm")).href, source] };
   }
   throw new Error("ARCHITECT_CLI_BRIDGE_ENTRY_MISSING: cli-mcp-bridge entry file was not found");
 }
@@ -270,12 +338,15 @@ function buildBridgeEnv(input: {
   auditPath: string;
   workspaceRoot: string;
   verbosityMode?: ArchitectVerbosityMode;
+  reasoningEffort?: string;
+  sessionBearer?: string;
 }): Record<string, string> {
   const env = stringEnv(process.env);
   const density = resolveArchitectNarrativeDensity(input.verbosityMode);
   return {
     ...env,
     DREAMGRAPH_HOST_MCP_URL: `http://127.0.0.1:${input.mcpPort}/mcp`,
+    DREAMGRAPH_BRIDGE_SESSION_BEARER: input.sessionBearer ?? "",
     DREAMGRAPH_BRIDGE_AUDIT_DIR: input.auditDir,
     DREAMGRAPH_AUDIT_PATH: input.auditPath,
     DREAMGRAPH_RUN_ID: input.runId,
@@ -428,6 +499,7 @@ async function prepareCodexInvocation(input: {
   runId: string;
   availableToolNames: string[];
   verbosityMode?: ArchitectVerbosityMode;
+  reasoningEffort?: string;
 }): Promise<{ command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string; outputPath: string | null }> {
   const command = await resolveArchitectCliExecutable("codex-cli");
   const codexHome = join(input.scratchDir, "codex-home");
@@ -458,6 +530,7 @@ async function prepareCodexInvocation(input: {
     "--ephemeral",
   ];
   if (input.model) args.push("--model", input.model);
+  if (input.reasoningEffort) args.push("-c", "model_reasoning_effort=" + JSON.stringify(input.reasoningEffort));
   args.push("-");
 
   return {
@@ -505,7 +578,7 @@ async function prepareCopilotInvocation(input: {
 
   const args = [];
   if (input.model) args.push("--model", input.model);
-  args.push("--allow-all-tools", "--output-format", "json", "--deny-tool", "shell", "--deny-tool", "write");
+  args.push("--allow-all-tools", "--disable-builtin-mcps", "--output-format", "json", "--deny-tool", "shell", "--deny-tool", "write");
   for (const tool of input.availableToolNames) {
     args.push("--allow-tool", `dreamgraph(${tool})`);
   }
@@ -531,6 +604,18 @@ export function createArchitectCodexConfigToml(input: {
   const lines = [
     "# Generated by DreamGraph for an isolated standalone Architect Codex CLI run.",
     ...(input.modelVerbosity ? [`model_verbosity = ${tomlString(input.modelVerbosity)}`, ""] : []),
+    // A native CLI feature flag is not a C17 grant. Ordinary passes cannot
+    // acquire computer/browser authority through the CLI's default features.
+    "[computer_use]",
+    'default_app_access = "deny"',
+    "",
+    "[features]",
+    "computer_use = false",
+    "browser_use = false",
+    "browser_use_external = false",
+    "browser_use_full_cdp_access = false",
+    "in_app_browser = false",
+    "",
     "[mcp_servers.dreamgraph]",
     `command = ${tomlString(input.bridgeCommand)}`,
     `args = ${tomlArray(input.bridgeArgs)}`,
@@ -579,6 +664,7 @@ export function serializeCliPrompt(
   userMessage: string,
   adapter: ArchitectCliAdapter,
   toolRequirements?: ArchitectCliToolRequirements | null,
+  controls?: { autonomy: "manual" | "supervised" | "autonomous"; verbosity: ArchitectVerbosityMode },
 ): string {
   const contextMessages = messages.filter((message) => message.role !== "user");
   return [
@@ -587,17 +673,27 @@ export function serializeCliPrompt(
     "Graph-bound execution contract: every repository-specific pass must ground itself with dreamgraph:query_resource and dreamgraph:query_architecture_decisions before acting; use graph_rag_retrieve, query_api_surface, search_data_model, workflows, or data-model resources when they fit the task.",
     "Cognitive-health contract: before substantial architectural work, call dreamgraph:graph_health_report and explain any evidence-backed reasoning risk. Recommend the smallest repair (enrich before scan; scan before bootstrap), but do not execute maintenance unless the current user request approves it. Approved maintenance runs through DreamGraph MCP, never by redirecting the user to a CLI.",
     "Mutation contract: source, docs, UI, data-model, or plan changes must be recorded back into DreamGraph evidence using the appropriate governed graph tool, such as enrich_seed_data, modify_api_surface, register_ui_element, solidify_cognitive_insight, or another exposed graph-write tool.",
-    "Living-graph contract: every major implementation must leave the graph semantically richer and schedule a targeted follow-up dream with affected focus_entities, focus_hops of at least 2, and a focus_reason.",
+    "Living-graph contract: record governed source effects and targeted reconciliation/digestion obligations. Keep hypotheses separate from facts. Run only approved bounded cognition over affected focus_entities; hop depth is a configured maximum, never a mandatory minimum.",
     "ADR contract: if the pass introduces a new durable architectural policy, reverses a guard rail, or creates a lasting cross-module decision, record it with record_architecture_decision; otherwise report the ADRs consulted and why no new ADR was needed.",
     "Do not use provider-native shell/read/write routes; use dreamgraph:run_command, read_source_code, patch_file, query_resource, query_architecture_decisions, and related DreamGraph MCP tools.",
     "The user request appears only in CURRENT USER REQUEST. Do not reconstruct it from prior sections.",
     createArchitectCliToolRequirementsSection(toolRequirements),
+    createCliControlInstructions(controls?.autonomy ?? "manual", controls?.verbosity ?? "balanced"),
     "",
     ...contextMessages.map((message) => `## ${message.role.toUpperCase()}\n${message.content}`),
     "",
     "## CURRENT USER REQUEST",
     userMessage,
   ].join("\n\n");
+}
+export function createCliControlInstructions(autonomy: "manual" | "supervised" | "autonomous", verbosity: ArchitectVerbosityMode): string {
+  const action = autonomy === "manual" ? "Inspect/propose. Execute at most one specifically approved bounded effect, then return control. Do not continue to another slice."
+    : autonomy === "supervised" ? "Execute only the approved checkpoint scope. Stop at its review checkpoint, unresolved question, scope change or governance gate."
+    : "Continue eligible work within the approved task scope until task completion, a governance gate, resource limit, contradiction or user stop. Completing an intermediate slice does not complete the task.";
+  const density = verbosity === "concise" ? "Give a brief outcome and essential evidence. Keep supporting diagnostics compact."
+    : verbosity === "detailed" ? "Explain the outcome, relevant rationale, alternatives and uncertainty, with evidence links and diagnostic summary."
+    : "Give the outcome with focused evidence and useful reasoning summary.";
+  return `Effective controls: autonomy=${autonomy}; verbosity=${verbosity}. ${action} ${density} All modes preserve graph/ADR anchors, provenance, failures, scoped currency/completeness warnings and reconciliation obligations. Output density is guidance, never permission or guaranteed word count. The daemon enforces approved effect arguments and finite limits; no native Computer Use permission is implied.`;
 }
 
 export function createArchitectCliToolRequirementsSection(toolRequirements?: ArchitectCliToolRequirements | null): string {
@@ -751,6 +847,7 @@ function runProcess(input: {
       stdio: ["pipe", "pipe", "pipe"],
       windowsHide: true,
       windowsVerbatimArguments: spawnPlan.windowsVerbatimArguments,
+      detached: !IS_WINDOWS,
     });
 
     let stdout = "";
@@ -758,8 +855,9 @@ function runProcess(input: {
     let timedOut = false;
     let settled = false;
     const terminateChild = () => {
-      child.kill("SIGTERM");
-      setTimeout(() => child.kill("SIGKILL"), 2_000).unref?.();
+      if (!child.pid) return;
+      if (IS_WINDOWS) { const killer = spawn("taskkill.exe", ["/PID", String(child.pid), "/T", "/F"], { windowsHide: true, stdio: "ignore" }); killer.on("error", () => undefined); }
+      else try { process.kill(-child.pid, "SIGKILL"); } catch { child.kill("SIGKILL"); }
     };
     const timer = setTimeout(() => {
       timedOut = true;
@@ -803,6 +901,61 @@ function runProcess(input: {
 
     child.stdin.end(input.stdin);
   });
+}
+/** Read-only native discovery is distinct from scope/control/receipt qualification. */
+export function parseCodexComputerDiscovery(versionOutput:string,featureOutput:string) {
+  if(Buffer.byteLength(versionOutput,"utf8")>1024||Buffer.byteLength(featureOutput,"utf8")>32768)throw new Error("COMPUTER_CLI_PROBE_BYTE_BOUND");
+  const version=versionOutput.trim().match(/^codex-cli (\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?)$/)?.[1];
+  if(!version)throw new Error("COMPUTER_CLI_VERSION_UNVERIFIED");
+  const names=["computer_use","browser_use","browser_use_external","browser_use_full_cdp_access","in_app_browser"];
+  const features:Record<string,{stage:string;enabled:boolean}>={};
+  for(const line of featureOutput.split(/\r?\n/)){
+    const name=line.trim().split(/\s+/)[0];if(!names.includes(name))continue;
+    const match=line.trim().match(/^(\S+)\s+(.+?)\s+(true|false)$/);
+    if(!match||features[name])throw new Error("COMPUTER_CLI_FEATURE_UNVERIFIED");
+    features[name]={stage:match[2],enabled:match[3]==="true"};
+  }
+  return {adapter:"codex-cli",version,features,checked_at:new Date().toISOString(),
+    native_feature_detected:Object.keys(features).length>0,qualified:false as const,
+    qualification_missing:["scoped_target_grant","bounded_native_actions","privacy_and_disclosure","independent_physical_stop","durable_normalized_receipts"]};
+}
+const codexComputerProbes=new Map<string,{expires:number;value:Promise<ReturnType<typeof parseCodexComputerDiscovery>>}>();
+export async function inspectCodexNativeComputer() {
+  const command=await resolveArchitectCliExecutable("codex-cli"),cached=codexComputerProbes.get(command);
+  if(cached&&cached.expires>Date.now())return structuredClone(await cached.value);
+  const value=(async()=>{
+    const env=Object.fromEntries(Object.entries(process.env).filter((entry):entry is [string,string]=>typeof entry[1]==="string"));
+    const version=await runProcess({command,args:["--version"],cwd:process.cwd(),env,stdin:"",timeoutMs:6000});
+    if(version.exitCode!==0||version.timedOut)throw new Error("COMPUTER_CLI_VERSION_PROBE_FAILED");
+    const features=await runProcess({command,args:["features","list"],cwd:process.cwd(),env,stdin:"",timeoutMs:6000});
+    if(features.exitCode!==0||features.timedOut)throw new Error("COMPUTER_CLI_FEATURE_PROBE_FAILED");
+    return parseCodexComputerDiscovery(version.stdout,features.stdout);
+  })();
+  codexComputerProbes.set(command,{expires:Date.now()+300000,value});
+  try{return structuredClone(await value);}catch(error){codexComputerProbes.delete(command);throw error;}
+}
+export function qualifyCliControlHelp(adapter: ArchitectCliAdapter, versionOutput: string, help: string) {
+  const version = /\b(\d+\.\d+\.\d+)\b/.exec(versionOutput)?.[1];
+  const flags = adapter === "codex-cli" ? ["--sandbox", "--json", "--output-last-message", "--ephemeral", "--ignore-rules"]
+    : ["--allow-all-tools", "--deny-tool", "--disable-builtin-mcps", "--output-format", "--prompt"];
+  if (!version || flags.some(flag => !help.includes(flag))) throw new Error("CLI_CONTROL_CAPABILITY_UNQUALIFIED");
+  return { version, verified_flags: flags, source: "installed_read_only_version_and_help", output_density: "optional_provider_config_and_prompt_guidance" };
+}
+async function probeCliControlCapability(adapter: ArchitectCliAdapter, signal?: AbortSignal) {
+  const command = await resolveArchitectCliExecutable(adapter), env = stringEnv(process.env);
+  const version = await runProcess({ command, args: ["--version"], cwd: process.cwd(), env, stdin: "", timeoutMs: 10000, signal });
+  const help = await runProcess({ command, args: adapter === "codex-cli" ? ["exec", "--help"] : ["--help"], cwd: process.cwd(), env, stdin: "", timeoutMs: 10000, signal });
+  if (version.exitCode !== 0 || help.exitCode !== 0 || version.timedOut || help.timedOut) throw new Error("CLI_CONTROL_CAPABILITY_PROBE_FAILED");
+  return qualifyCliControlHelp(adapter, version.stdout, help.stdout);
+}
+
+/** Report token components only when the native worker supplies them. */
+export function extractArchitectCodexUsage(stdout: string): TokenUsage | undefined {
+  let usage: TokenUsage | undefined;
+  for (const line of stdout.split(/\r?\n/)) {
+    try { const event = JSON.parse(line); if (event.type === "turn.completed") usage = providerUsage("openai", { input_tokens: event.usage?.input_tokens, output_tokens: event.usage?.output_tokens, input_tokens_details: { cached_tokens: event.usage?.cached_input_tokens } }); } catch { /* No inferred usage from prose/diagnostics. */ }
+  }
+  return usage;
 }
 
 async function extractAssistantContent(adapter: ArchitectCliAdapter, result: ProcessResult, outputPath: string | null): Promise<string> {

@@ -1,11 +1,13 @@
-import { Fragment, useEffect, useState, type ReactNode } from "react";
-import { fetchNode } from "./api";
+import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
+import { fetchNode, fetchAgentContext } from "./api";
 import type { ExplorerEdge, ExplorerNode, NodeRecord, StatsResult } from "./types";
 
 interface Props {
   selected: ExplorerNode | null;
   stats: StatsResult | null;
   onNavigate: (id: string) => void;
+  etag?:string;
+  onRefresh?:()=>void;
 }
 
 /**
@@ -13,10 +15,15 @@ interface Props {
  * On selection, fetches the full NodeRecord (entity + outgoing/incoming
  * edges) and renders the type-specific entity payload + adjacency lists.
  */
-export function Inspector({ selected, stats, onNavigate }: Props) {
-  const [record, setRecord] = useState<NodeRecord | null>(null);
+export function Inspector({selected,stats,onNavigate,etag,onRefresh}:Props){
+  const [loadedRecord, setRecord] = useState<NodeRecord | null>(null);
+  const record=loadedRecord?.id===selected?.id?loadedRecord:null;
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [offset,setOffset]=useState(0);
+  const [context,setContext]=useState<Awaited<ReturnType<typeof fetchAgentContext>>|null>(null);
+  const contextGeneration=useRef(0);
+  useEffect(()=>{contextGeneration.current++;setOffset(0);setContext(null);},[selected?.id,etag]);
 
   useEffect(() => {
     if (!selected) {
@@ -25,9 +32,10 @@ export function Inspector({ selected, stats, onNavigate }: Props) {
       return;
     }
     let cancelled = false;
+    setRecord(previous=>previous?.id===selected.id?previous:null);
     setLoading(true);
     setError(null);
-    fetchNode(selected.id)
+    fetchNode(selected.id,etag,offset)
       .then((r) => {
         if (cancelled) return;
         setRecord(r);
@@ -42,7 +50,7 @@ export function Inspector({ selected, stats, onNavigate }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [selected]);
+  }, [selected?.id,etag,offset]);
 
   if (!selected) {
     return (
@@ -59,14 +67,14 @@ export function Inspector({ selected, stats, onNavigate }: Props) {
             <div><span>Connections</span><strong>{stats.totals.edges.toLocaleString()}</strong></div>
           </div>
           <div className="health-summary">
-            <div><span>Graph health</span><strong>{Math.round(stats.health_mean * 100)}%</strong></div>
-            <progress value={stats.health_mean} max={1} aria-label="Mean graph health" />
+            <div><span>Topology coverage proxy</span><strong>{Math.round(stats.health_mean * 100)}%</strong></div>
+            <progress value={stats.health_mean} max={1} aria-label="Topology coverage proxy, not correctness" />
           </div>
           <dl className="kv overview-details">
             <dt>Tensions (active)</dt><dd>{stats.totals.tensions_active}</dd>
             <dt>Tensions (resolved)</dt><dd>{stats.totals.tensions_resolved}</dd>
-            <dt>Mean health</dt><dd>{stats.health_mean.toFixed(2)}</dd>
-            <dt>Mean confidence</dt><dd>{stats.confidence_mean.toFixed(2)}</dd>
+            <dt>Topology proxy</dt><dd>{stats.health_mean.toFixed(2)}</dd>
+            <dt>Recorded confidence</dt><dd>{stats.confidence_mean===null?"Unknown":stats.confidence_mean.toFixed(2)} · not truth</dd>
           </dl>
           </>
         ) : (
@@ -101,31 +109,46 @@ export function Inspector({ selected, stats, onNavigate }: Props) {
   return (
     <div className="inspector">
       <h2 className="inspector-title">{selected.label}</h2>
-      <p className="inspector-id">{selected.type} · {selected.id}</p>
+      <p className="inspector-id">{selected.identity?.kind??selected.type} · {selected.identity?.id??selected.id}</p>
+      <p className={`trust-badge trust-${selected.assertion_class??"unknown"}`}>{(record?.canonical?.assertion_class??selected.assertion_class??"unknown").replaceAll("_"," ")}</p>
       <dl className="kv">
         <dt>Degree</dt><dd>{selected.degree}</dd>
         {selected.type !== "tension" ? (
           <>
-            <dt>Health</dt><dd>{selected.health.toFixed(2)}</dd>
+            <dt>Topology proxy</dt><dd>{selected.health.toFixed(2)} · not correctness</dd>
           </>
         ) : null}
         {selected.type === "dream_node" ? (
           <>
-            <dt>Confidence</dt><dd>{selected.confidence.toFixed(2)}</dd>
+            <dt>Confidence</dt><dd>{selected.confidence_known===false?"Unknown":selected.confidence.toFixed(2)}</dd>
           </>
         ) : null}
       </dl>
-      {loading ? <p className="inspector-empty">Loading…</p> : null}
-      {error ? <p className="inspector-error">{error}</p> : null}
+      {loading ? <p className="inspector-empty">{record?'Updating details…':'Loading…'}</p> : null}
+      {record && record.etag!==etag ? <p className="inspector-empty">Showing revision {record.revision?.publication_sequence??'unknown'} while the displayed snapshot updates.</p> : null}
+      {error ? <p className="inspector-error">{error}{onRefresh?<button type="button" onClick={onRefresh}>Refresh snapshot</button>:null}</p> : null}
       {record ? (
         <>
+          <details className="evidence-details"><summary>Evidence and current applicability</summary>
+            <p>Revision {record.revision?.publication_sequence??"unknown"} · {record.state?.freshness??"unknown"} · {record.state?.completeness??"unknown"}</p>
+            <StructuredValue value={record.canonical?.evidence??[]} path={["evidence"]} onNavigate={onNavigate}/>
+            <StructuredValue value={record.canonical?.payload.current_evidence_assessment??"No independent validation claim recorded"} path={["assessment"]} onNavigate={onNavigate}/>
+          </details>
+          <button type="button" disabled={loading} onClick={()=>{const generation=contextGeneration.current;setError(null);void fetchAgentContext(selected.id,record.etag).then(value=>{if(contextGeneration.current===generation)setContext(value);}).catch((e:Error)=>{if(contextGeneration.current===generation)setError(e.message);});}}>View agent context</button>
+          {context?<details className="evidence-details" open><summary>Bounded agent context</summary><p>{context.state.freshness} · {context.state.completeness} · revision {context.revision.publication_sequence}</p>
+            <p>{context.token_count} UTF-8 byte upper bound · {context.omissions.reduce((sum,o)=>sum+o.count,0)} omitted records</p>
+            <pre className="agent-context">{context.context_text}</pre><button type="button" onClick={()=>{void navigator.clipboard.writeText(context.context_text).catch((e:Error)=>setError(e.message));}}>Copy context</button></details>:null}
           <EntityBlock record={record} onNavigate={onNavigate} />
+          {record.relationships?.length?<details className="evidence-details"><summary>Connection claims and original evidence</summary><StructuredValue value={record.relationships} path={["relationships"]} onNavigate={onNavigate}/></details>:null}
           <EdgeList
             title="Outgoing"
             edges={record.outgoing}
             otherKey="t"
             onNavigate={onNavigate}
           />
+          {record.adjacency && (record.adjacency.next_offset!==null||record.adjacency.offset>0)?<nav className="adjacency-pages" aria-label="Connection pages"><span>{record.adjacency.offset+1}–{record.adjacency.offset+Math.max(record.outgoing.length,record.incoming.length)} of {Math.max(record.adjacency.outgoing_total,record.adjacency.incoming_total)}</span>
+            <button type="button" disabled={loading||!offset} onClick={()=>setOffset(Math.max(0,offset-50))}>Previous</button>
+            <button type="button" disabled={loading||record.adjacency.next_offset===null} onClick={()=>setOffset(record.adjacency!.next_offset!)}>Next</button></nav>:null}
           <EdgeList
             title="Incoming"
             edges={record.incoming}
@@ -315,6 +338,7 @@ export function StructuredValue({
   depth?: number;
 }): ReactNode {
   const parsed = parseStructuredJson(value);
+  if(depth>8)return <span className="structured-empty">Nested details available in the canonical API response.</span>;
 
   if (parsed === null || parsed === undefined) return <span className="structured-empty">Not set</span>;
   if (typeof parsed === "string" || typeof parsed === "number" || typeof parsed === "boolean") {
@@ -329,17 +353,18 @@ export function StructuredValue({
     if (scalarOnly) {
       return (
         <ul className="structured-chips">
-          {parsed.map((item, index) => (
+          {parsed.slice(0,100).map((item, index) => (
             <li key={`${String(item)}-${index}`}>
               <ScalarValue value={item as string | number | boolean} path={path} onNavigate={onNavigate} />
             </li>
           ))}
+          {parsed.length>100?<li>{parsed.length-100} further values in the API response</li>:null}
         </ul>
       );
     }
     return (
       <div className="structured-list">
-        {parsed.map((item, index) => {
+        {parsed.slice(0,100).map((item, index) => {
           const itemRecord = isRecord(item) ? item : null;
           const summary = itemRecord ? summaryForRecord(itemRecord) : null;
           return (
@@ -354,6 +379,7 @@ export function StructuredValue({
             </article>
           );
         })}
+        {parsed.length>100?<p>{parsed.length-100} further records in the API response</p>:null}
       </div>
     );
   }

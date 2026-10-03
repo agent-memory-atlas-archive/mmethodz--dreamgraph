@@ -1,0 +1,60 @@
+name: Ashoka offline conformance
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ashoka-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  conformance:
+    name: Offline gate (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        # Existing v14 qualification scope; additional environments belong to field-feedback patches.
+        include:
+          - os: ubuntu-24.04
+            node: '20.20.2'
+          - os: windows-latest
+            node: '25.2.1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            explorer/package-lock.json
+            extensions/vscode/package-lock.json
+      - name: Install locked dependencies
+        run: |
+          npm ci --no-audit --no-fund
+          npm ci --prefix explorer --no-audit --no-fund
+          npm ci --prefix extensions/vscode --no-audit --no-fund
+      - name: Install pinned isolated fixture browser
+        run: npm exec --yes --package=playwright@1.62.1 -- playwright install --with-deps chromium
+      - name: Read back installed browser identity
+        run: node scripts/ashoka-ci-browser.mjs
+      - name: Build and run complete offline gate
+        run: npm run ashoka:system:check -- --out .ashoka-ci
+      - name: Preserve passed and failed traces
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ashoka-${{ matrix.os }}-node-${{ matrix.node }}
+          path: .ashoka-ci/
+          if-no-files-found: warn
+          retention-days: 14

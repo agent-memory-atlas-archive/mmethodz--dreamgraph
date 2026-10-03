@@ -1,0 +1,758 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dreamgraph://analytics/payload/v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "dreamgraph.analytics_payload.v1"
+    },
+    "definition_version": {
+      "const": "2.0.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "instance_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "object",
+      "properties": {
+        "publication_sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "graph_revision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "domains": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        }
+      },
+      "required": [
+        "publication_sequence",
+        "graph_revision",
+        "domains"
+      ],
+      "additionalProperties": false
+    },
+    "currency": {
+      "type": "object",
+      "properties": {
+        "last_graph_mutation_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "last_full_scan_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "last_source_reconciliation_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_reconciliation_scope": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          }
+        },
+        "source_reconciliation_revision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "last_graph_mutation_at",
+        "last_full_scan_at",
+        "last_source_reconciliation_at",
+        "source_reconciliation_scope",
+        "source_reconciliation_revision"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "type": "string",
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        },
+        "completeness": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "partial",
+            "unknown"
+          ]
+        },
+        "freshness": {
+          "type": "string",
+          "enum": [
+            "current",
+            "stale",
+            "unknown"
+          ]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "scope": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                }
+              },
+              "detail": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "scope",
+              "detail"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "availability",
+        "completeness",
+        "freshness",
+        "reasons"
+      ],
+      "additionalProperties": false
+    },
+    "dependency_hashes": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "identity": {
+            "type": "object",
+            "properties": {
+              "instance_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "feature",
+                  "workflow",
+                  "data_model",
+                  "capability",
+                  "datastore",
+                  "ui_element",
+                  "auxiliary",
+                  "dream_node",
+                  "candidate",
+                  "validated",
+                  "tension",
+                  "adr",
+                  "temporal",
+                  "causal",
+                  "narrative",
+                  "plan",
+                  "slice"
+                ]
+              },
+              "repository_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              }
+            },
+            "required": [
+              "instance_id",
+              "kind",
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "label": {
+            "type": "string"
+          },
+          "assertion_class": {
+            "type": "string",
+            "enum": [
+              "source_assertion",
+              "human_assertion",
+              "hypothesis",
+              "validated_insight",
+              "tension",
+              "decision",
+              "historical",
+              "unknown"
+            ]
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "origin": {
+                  "type": "string",
+                  "enum": [
+                    "source",
+                    "human",
+                    "model",
+                    "validation",
+                    "imported",
+                    "derived"
+                  ]
+                },
+                "ancestry": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "revision": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "observed_at": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "source_repo": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "source_path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "content_hash": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "semantic_anchor": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "operation_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "validation": {
+                  "type": "string",
+                  "enum": [
+                    "unreviewed",
+                    "hypothesis",
+                    "disputed",
+                    "validated",
+                    "rejected",
+                    "withdrawn"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "origin",
+                "ancestry",
+                "revision",
+                "observed_at",
+                "validation"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "payload": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "identity",
+          "label",
+          "assertion_class",
+          "confidence",
+          "evidence",
+          "payload"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "fact",
+              "dream",
+              "candidate",
+              "validated",
+              "tension"
+            ]
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "instance_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "feature",
+                      "workflow",
+                      "data_model",
+                      "capability",
+                      "datastore",
+                      "ui_element",
+                      "auxiliary",
+                      "dream_node",
+                      "candidate",
+                      "validated",
+                      "tension",
+                      "adr",
+                      "temporal",
+                      "causal",
+                      "narrative",
+                      "plan",
+                      "slice"
+                    ]
+                  },
+                  "repository_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "instance_id",
+                  "kind",
+                  "id"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "instance_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "feature",
+                      "workflow",
+                      "data_model",
+                      "capability",
+                      "datastore",
+                      "ui_element",
+                      "auxiliary",
+                      "dream_node",
+                      "candidate",
+                      "validated",
+                      "tension",
+                      "adr",
+                      "temporal",
+                      "causal",
+                      "narrative",
+                      "plan",
+                      "slice"
+                    ]
+                  },
+                  "repository_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "instance_id",
+                  "kind",
+                  "id"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "target_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "relation": {
+            "type": "string"
+          },
+          "assertion_class": {
+            "type": "string",
+            "enum": [
+              "source_assertion",
+              "human_assertion",
+              "hypothesis",
+              "validated_insight",
+              "tension",
+              "decision",
+              "historical",
+              "unknown"
+            ]
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "origin": {
+                  "type": "string",
+                  "enum": [
+                    "source",
+                    "human",
+                    "model",
+                    "validation",
+                    "imported",
+                    "derived"
+                  ]
+                },
+                "ancestry": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "revision": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "observed_at": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "source_repo": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "source_path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "content_hash": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "semantic_anchor": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "operation_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                },
+                "validation": {
+                  "type": "string",
+                  "enum": [
+                    "unreviewed",
+                    "hypothesis",
+                    "disputed",
+                    "validated",
+                    "rejected",
+                    "withdrawn"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "origin",
+                "ancestry",
+                "revision",
+                "observed_at",
+                "validation"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "payload": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "source",
+          "target",
+          "source_ref",
+          "target_ref",
+          "relation",
+          "assertion_class",
+          "confidence",
+          "evidence",
+          "payload"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "type": "string"
+        },
+        "additionalProperties": {}
+      }
+    },
+    "dream_edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "type": "string"
+        },
+        "additionalProperties": {}
+      }
+    },
+    "resolved_tensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "type": "string"
+        },
+        "additionalProperties": {}
+      }
+    },
+    "dirty_regions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "type": "string"
+        },
+        "additionalProperties": {}
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "definition_version",
+    "generated_at",
+    "instance_id",
+    "revision",
+    "currency",
+    "state",
+    "dependency_hashes",
+    "entities",
+    "relationships",
+    "history",
+    "dream_edges",
+    "resolved_tensions",
+    "dirty_regions"
+  ],
+  "additionalProperties": false
+}

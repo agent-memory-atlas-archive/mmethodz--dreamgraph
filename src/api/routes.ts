@@ -7,12 +7,14 @@
  * Endpoints:
  *   GET  /api/instance                  — Instance identity and state
  *   POST /api/graph-context             — Graph-side enrichment for a file / feature set
+ *   POST /api/context/v1                — Canonical bounded context/evidence and unattested external receipt
  *   POST /api/validate                  — Combined validation (ADR + UI + API surface)
  *   GET  /api/orchestrate/capabilities  — Capability negotiation (v1 stub: available=false)
  *   POST /api/orchestrate               — Daemon-side Architect (v1 stub: 501)
  *
  * Boundary principle: the extension owns editor context; the daemon owns
- * graph and operational reasoning. These endpoints return graph facts only.
+ * graph and operational reasoning. Canonical results preserve assertion classes;
+ * human assertions and hypotheses are not relabeled as source facts.
  *
  * @see TDD_VSCODE_EXTENSION.md §8.1
  */
@@ -32,6 +34,8 @@ import {
   MissingFileError,
 } from "../utils/json-store.js";
 import { z } from "zod";
+import { ContextQuerySchema, buildContextPack } from "../graph/context-pack.js";
+import { loadCanonicalGraph } from "../graph/read-model.js";
 import {
   getActiveScope,
   isInstanceMode,
@@ -134,10 +138,15 @@ async function loadOrEmpty<T>(
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 /** Parse JSON body from an incoming request. */
-async function parseJsonBody<T = unknown>(req: IncomingMessage): Promise<T> {
+async function parseJsonBody<T = unknown>(req: IncomingMessage, maxBytes = 8 * 1024 * 1024): Promise<T> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
-    req.on("data", (chunk: Buffer) => chunks.push(chunk));
+    let bytes = 0;
+    req.on("data", (chunk: Buffer) => {
+      bytes += chunk.length;
+      if (bytes > maxBytes) { reject(new Error("BODY_LIMIT_EXCEEDED")); return; }
+      chunks.push(chunk);
+    });
     req.on("end", () => {
       try {
         const raw = Buffer.concat(chunks).toString("utf-8");
@@ -1130,6 +1139,33 @@ export async function handleApiRoute(
     res.once("finish", finalize);
     res.once("close", finalize);
   };
+
+  if(pathname.startsWith("/api/schedules/v2")||pathname.startsWith("/api/jobs/v1")){recordOnce(`${method} ${pathname}`);return (await import("../server/schedule-api.js")).handleScheduleApi(req,res,pathname);}
+  if(pathname.startsWith("/api/executions/v1/")){recordOnce(`${method} ${pathname}`);return (await import("../server/managed-execution.js")).handleManagedExecutionApi(req,res,pathname);}
+  if (pathname === "/api/dashboard/v1" || pathname === "/api/config/v1" || pathname.startsWith("/api/config/v1/")) {
+    recordOnce(`${method} ${pathname}`);
+    return (await import("../server/dashboard.js")).handleDashboardRoute(req, res, pathname);
+  }
+
+  if(pathname==="/api/analytics/v1/snapshot"&&method==="GET"){
+    recordOnce("GET /api/analytics/v1/snapshot");
+    try{const snapshot=await (await import("../observability/analytics-snapshot.js")).captureAnalyticsSnapshot();res.writeHead(200,{"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store"});res.end(JSON.stringify(snapshot));}
+    catch(error){res.writeHead(503,{"Content-Type":"application/json"});res.end(JSON.stringify({ok:false,code:"ANALYTICS_SNAPSHOT_UNAVAILABLE",message:String(error)}));}return true;
+  }
+
+  if (pathname === "/api/context/v1" && method === "POST") {
+    recordOnce("POST /api/context/v1");
+    try {
+      const request = ContextQuerySchema.parse(await parseJsonBody(req, 65536));
+      const pack = buildContextPack(await loadCanonicalGraph(getActiveScope()?.uuid ?? config.instance.uuid ?? "legacy"), request);
+      // Transport delivery is not an external client's injection acknowledgement.
+      res.setHeader("Cache-Control", "no-store"); json(res, 200, pack);
+    } catch (error) {
+      const invalid = error instanceof z.ZodError || /JSON body|BODY_LIMIT/.test(String(error));
+      jsonError(res, invalid ? 400 : 503, invalid ? "CONTEXT_REQUEST_INVALID" : "CONTEXT_UNAVAILABLE", String(error));
+    }
+    return true;
+  }
 
   // GET /api/instance
   if (method === "GET" && pathname === "/api/instance") {

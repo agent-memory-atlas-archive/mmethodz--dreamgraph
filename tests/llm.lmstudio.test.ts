@@ -1,3 +1,4 @@
+import { installOfflineAdmissionFixtures } from "./helpers/offline-admission.js";
 /**
  * LM Studio provider parity tests.
  *
@@ -23,6 +24,8 @@ function withEnv(overrides: Record<string, string | undefined>, fn: () => void |
     }
   });
 }
+
+installOfflineAdmissionFixtures();
 
 describe("parseLlmConfig — lmstudio", () => {
   it("resolves provider=lmstudio with LM Studio defaults when no other vars set", async () => {

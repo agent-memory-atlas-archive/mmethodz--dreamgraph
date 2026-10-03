@@ -87,7 +87,7 @@ test("GPT-6.1 Sol uses Responses for tools and supports images", async () => {
     assert.deepEqual(body.reasoning, { effort: "medium" });
     assert.equal(body.store, false);
     assert.deepEqual(body.include, ["reasoning.encrypted_content"]);
-    return Response.json({ output_text: "Done", output: [], usage: {} });
+    return Response.json({ status: "completed", output_text: JSON.stringify({ narrative: "Done", summary: "Completed fixture", goal_status: "complete", progress_status: "advancing", uncertainty: "low", recommended_next_steps: [] }), output: [], usage: {} });
   };
   await llm.callWithTools([{ role: "user", content: "Inspect" }], []);
   assert.equal(llm.getModelCapabilities("openai", "gpt-6.1-sol").imageAttachments, true);
@@ -107,3 +107,47 @@ test("switching providers translates neutral history instead of replaying foreig
     [RESPONSES_RAW_ITEMS_KEY]: [{ type: "thinking", signature: "claude-only" }] }]);
   assert.deepEqual(translated, [{ role: "assistant", content: "Earlier reply" }]);
 });
+
+const passEnvelope = () => ({ narrative: "Done", summary: "Fixture completed", goal_status: "complete", progress_status: "advancing", uncertainty: "low", recommended_next_steps: [] });
+function sse(events: unknown[]): Response { return new Response(events.map(event => 'data: ' + JSON.stringify(event) + '\n\n').join(''), { headers: { 'Content-Type': 'text/event-stream' } }); }
+test("Responses streaming preserves actual usage and validates the authoritative final response", async () => {
+  const llm = client("gpt-6.1-sol", "openai"), text = JSON.stringify(passEnvelope());
+  fetchRequest = async (url, options) => {
+    assert.match(String(url), /\/responses$/); const body = JSON.parse(options!.body as string); assert.equal(body.stream, true); assert.deepEqual(body.reasoning, { effort: "medium" });
+    return sse([{ type: "response.output_text.delta", delta: text }, { type: "response.completed", response: { status: "completed", output_text: text, output: [], usage: { input_tokens: 20, output_tokens: 10, total_tokens: 30, input_tokens_details: { cached_tokens: 15 } } } }]);
+  };
+  const chunks: string[] = []; const response = await llm.stream([{ role: "user", content: "Finish" }], value => chunks.push(value));
+  assert.match(response.content, /Done/); assert.equal(response.usage?.totalTokens, 30); assert.equal(response.usage?.cachedInputTokens, 15); assert.match(chunks.join(''), /Done/);
+});
+test("Responses truncated/refused streams and invalid strict outputs are never accepted", async () => {
+  const llm = client("gpt-6.1-sol", "openai");
+  fetchRequest = async () => sse([{ type: "response.output_text.delta", delta: "partial" }]);
+  await assert.rejects(llm.stream([], () => {}), (error: any) => error.code === "PROVIDER_INCOMPLETE");
+  fetchRequest = async () => sse([{ type: "response.refusal.delta", delta: "refused" }]);
+  await assert.rejects(llm.stream([], () => {}), (error: any) => error.code === "PROVIDER_REFUSAL");
+  fetchRequest = async () => Response.json({ status: "completed", output_text: JSON.stringify({ narrative: "wrong shape" }), output: [] });
+  await assert.rejects(llm.call([]), (error: any) => error.code === "PROVIDER_OUTPUT_INVALID");
+});
+test("explicit Chat preserves model/effort and rejects GPT-6 tool reasoning before dispatch", async () => {
+  const llm = client("gpt-6-sol", "openai"); settings["openai.api"] = "chat_completions"; settings["openai.reasoningEffort"] = "high";
+  let calls = 0; fetchRequest = async (url, options) => { calls++; assert.match(String(url), /chat\/completions$/); const body = JSON.parse(options!.body as string); assert.equal(body.model, "gpt-6-sol"); assert.equal(body.reasoning_effort, "high"); return Response.json({ choices: [{ finish_reason: "stop", message: { content: JSON.stringify(passEnvelope()) } }] }); };
+  await llm.call([]); await assert.rejects(llm.callWithTools([], []), /TOOLS_REQUIRE_RESPONSES/); assert.equal(calls, 1);
+});
+test("Claude opt-in native schemas retain effort and locally validate the original output", async () => {
+  const llm = client("claude-opus-5-5"); settings.structuredOutput = true; settings["anthropic.effort"] = "high";
+  fetchRequest = async (_url, options) => { const body = JSON.parse(options!.body as string); assert.equal(body.output_config.format.type, "json_schema"); assert.equal(body.output_config.effort, "high"); assert.equal(body.temperature, undefined); return Response.json({ content: [{ type: "text", text: JSON.stringify(passEnvelope()) }], stop_reason: "end_turn", usage: { input_tokens: 3, cache_read_input_tokens: 10, output_tokens: 5 } }); };
+  const response = await llm.call([]); assert.equal(response.usage?.inputTokens, 13); assert.match(response.content, /Done/);
+});
+
+for (const [model, provider] of [["gpt-6.1-sol", "openai"], ["claude-opus-5-5", "anthropic"]] as const) {
+  test(`${provider}: whole serialized Unicode request above the byte ceiling is refused before provider dispatch`, async () => {
+    const llm = client(model, provider); settings.structuredOutput = false;
+    let calls = 0;
+    fetchRequest = async () => { calls++; throw new Error("oversized request must not dispatch"); };
+    const input = "漢".repeat(3 * 1024 * 1024);
+    // Fewer than 8 MiB characters, more than 8 MiB UTF-8 bytes: this is not a token count.
+    assert.ok(input.length < 8 * 1024 * 1024); assert.ok(Buffer.byteLength(input, "utf8") > 8 * 1024 * 1024);
+    await assert.rejects(llm.callWithTools([{ role: "user", content: input }], []), /REQUEST_UTF8_BYTE_BOUND/);
+    assert.equal(calls, 0);
+  });
+}

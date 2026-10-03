@@ -1,0 +1,27 @@
+# Engine jobs and scheduling — Slice 17
+
+The Slice 17 dependency handoff is verified. The stable root suite passed 1,557 tests across 140 files with two existing skips; the complete VS Code build and 488 extension tests passed. Native twenty-item review accepted the declared scope with no gaps or regressions. Final client, schedule workspace, native Computer Use and release qualification remain in Slices 25, 29, 31, 27 and 28.
+
+The canonical job is embedded in the existing `jobs.json` owner. Acceptance freezes action/version/parameters, role policies and exact operator tariffs (references, never secret values), parent resource ceilings, input revision, session/execution and physical instance. Engine conflict lanes persist before dispatch. New producer jobs cannot interrupt unrelated work.
+
+A generation fence is checked inside the publication writer and before managed source effects and inference. Cancellation aborts the supplied signal, revokes the generation and records recovery-required until work actually settles. A promise timeout does not prove termination. Late provider settlement is retained by control bookkeeping even when its execution no longer has mutation authority. Unknown provider and source effects preserve conflict ownership.
+
+Parent admission counts every child/role/fallback attempt against the same finite request, token, retry, elapsed, concurrency and monetary allocation in addition to the child's own limits. Missing price or paid allocation blocks paid dispatch; API tariffs never measure CLI subscription usage. Immutable policies and tariffs do not become looser after a dashboard edit.
+
+Restart fences prior running work and retains uncertain lanes. Exact accepted operation replays are not new dispatch authority. Queue/history capacity blocks admission instead of erasing receipts. Schedule definition CAS, immutable occurrences, previews, missed/DST/overlap policies, core producer adoption and bounded dirty-generation digestion have offline qualification in the Slice 17 packet.
+
+Adoption includes manual scan/enrichment, common MCP cognitive dispatch, schedule CAS/immutable occurrences, typed JSON ports, observed-only readiness, event/bootstrap/webhook producers and bounded affected-region staging. Qualification includes durable recovery, cancellation, delivery uncertainty and generation conflicts. No real-model, live migration or native GUI execution was used as evidence.
+
+Job cancellation now binds the observed fence and operation ID under the publication writer before aborting local work. Exact replay returns the original cancellation receipt. Explicit authority, lifetime, timeout and budget changes cannot reuse an accepted job operation. A returned action with unacknowledged effects reports recovery_required rather than successful completion, while retaining its original result and receipts.
+
+Cron outage recovery chooses at most the latest missed occurrence within a 32-day search horizon. The immutable claim is persisted before the tick cursor advances or a slow action executes; skip/catch_up_once determines dispatch. No unbounded historical replay is performed. Archive commands use revision CAS and payload-bound receipts. Coarse dirty partitions retain affected source scopes from their unsettled generation window; unknown/unmapped scope records a partial diagnostic and dispatches no whole-graph replacement.
+
+Webhook intent and each attempted send are committed in jobs.json before transport. The immutable envelope and delivery ID are reused; exact successful replay returns the original outcome. HTTP response acknowledgement, transport uncertainty and local action termination are tracked separately. Transport uncertainty holds the lane and requires receiver/effect proof; it is never silently retried. Known non-2xx responses allow bounded retries with the same delivery identity. Delivery is at least once; receivers must deduplicate X-DreamGraph-Delivery and no remote rollback or exactly-once promise is made. Worker stop aborts fetch/backoff and preserves unresolved effects. Queued undispatched intents resume; running/orphaned intents require recovery. A subscription pause prevents future delivery and does not erase accepted history. Readiness and webhook stores now fail closed on malformed/unpublished state and use the common publication writer.
+
+A locally settled job can reconcile late provider/source/receiver acknowledgements without redispatch. An orphan with unconfirmed action termination cannot use this path to release a lane. Daemon recovery precedes tool/background dispatch even when the scheduler is disabled; shutdown waits for durable cancellation bookkeeping and bounded webhook drainage.
+
+## Slice 17 qualification
+
+The stable full regression and native review are recorded in `slice-17-verification.json`. Earlier failed runs are retained separately with their repairs in the implementation log. Fixtures exercise original receiver identity, durable send-before-transport and proof-based lane release. An underlying non-cooperative action remains unconfirmed until its owner actually acknowledges termination.
+
+Preview uses the dispatch evaluator for all four trigger families. Cycle previews require the explicit observed cycle context; absent context is reported as context_required rather than an invented upcoming run. Idle previews use persisted last activity and expose one stable idle occurrence. Per-schedule eligibility, queue/cooldown/budget and pending recovery remain separate from timing previews.

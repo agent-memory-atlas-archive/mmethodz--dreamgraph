@@ -1,0 +1,143 @@
+{
+  "date": "2026-09-30",
+  "type": "read-only planning probe, not implementation acceptance",
+  "project": "dreamgraph",
+  "health": {
+    "status": "needs_attention",
+    "enriched": {
+      "value": 357,
+      "total": 1339,
+      "ratio": 0.2666168782673637,
+      "applicable": true
+    },
+    "scan_revision": null,
+    "scan_age_hours": 951.42,
+    "reasoning_gaps": [
+      {
+        "signal": "parser_only_nodes",
+        "reasoning_impact": "Mechanical nodes bias retrieval toward syntax and filenames instead of intent and responsibility."
+      },
+      {
+        "signal": "unenriched_eligible_nodes",
+        "reasoning_impact": "Pending or failed eligible knowledge lowers semantic confidence; ineligible canonical nodes are excluded from this debt."
+      },
+      {
+        "signal": "machine_name_leakage",
+        "reasoning_impact": "Machine labels make graph evidence harder to interpret and can collapse distinct architectural concepts."
+      },
+      {
+        "signal": "missing_contracts",
+        "reasoning_impact": "Missing contracts obscure data flow, validation boundaries, and compatibility impacts."
+      },
+      {
+        "signal": "missing_workflow_knowledge",
+        "reasoning_impact": "Incomplete workflows hide triggers, state transitions, coordination boundaries, and verification paths."
+      },
+      {
+        "signal": "missing_ui_metadata",
+        "reasoning_impact": "Architect cannot reliably reason about UI ownership, appearance, or composition."
+      },
+      {
+        "signal": "disconnected_feature_clusters",
+        "reasoning_impact": "Disconnected clusters hide cross-feature dependencies and weaken causal path discovery."
+      },
+      {
+        "signal": "stale_scan",
+        "reasoning_impact": "Architect may reason from code topology that no longer matches the repository."
+      },
+      {
+        "signal": "stale_enrichment",
+        "reasoning_impact": "Intent and relationships may lag behind the current implementation."
+      }
+    ]
+  },
+  "retrieval": {
+    "requested_tokens": 1400,
+    "reported_tokens": 1419,
+    "mode": "entity_focused",
+    "included_ids": [
+      "dreamgraph_extensions_vscode_src",
+      "dreamgraph_extensions_vscode_src_context_fetchers",
+      "dreamgraph_src_cli",
+      "dreamgraph_src_cognitive_strategies",
+      "api_routes",
+      "cognitive_engine",
+      "graph_enrichment",
+      "graph_snapshot",
+      "graph_context_manager",
+      "cross_domain_strategy",
+      "graph_enrichment_agent",
+      "security_audit_gateway",
+      "standalone-architect-cli-bridge"
+    ],
+    "reported_edges": 2,
+    "limitations": "Fallback-heavy context; reported budget 1419 exceeds 1400. No completeness/current revision guarantee inferred. No paid cognition or scan run."
+  },
+  "adrs": [
+    {
+      "id": "ADR-047",
+      "title": "Two-pass graph context fetch with confidence-gated direct feature refinement",
+      "decision": "Use a two-pass graph context fetch inside _resolveGraphContext. Pass 1 always queries by file_path and evidence flags. Then a local confidence-gated pre-scorer evaluates Pass-1 features against the active anchor identity. When a candidate score is >= 0.75, Pass 2 re-queries /api/graph-context with feature_ids:[candidateId] to trigger the daemon's exact-match path and higher per-entity relevance. Merge Pass-2 entities into the existing graph context, de-duplicating by ID and upgrading relevance in place. If no strong candidate exists or Pass 2 fails, retain the Pass-1 result unchanged."
+    },
+    {
+      "id": "ADR-086",
+      "title": "Use stateless Responses API for GPT-5.5 Architect initially",
+      "decision": "Keep the Architect GPT-5.5 Responses API adapter stateless initially. Continue replaying relevant context and tool-call items explicitly. Defer previous_response_id/store-based statefulness to a later optional optimization layer after GPT-5.5 tool-call correctness is verified."
+    },
+    {
+      "id": "ADR-171",
+      "title": "Architect orchestrator binds to ProjectGraphReader/Recorder, not DreamGraph",
+      "decision": "Define two narrow ports in 8A.1 — ProjectGraphReader (richness signal, subgraph retrieval, neighbors) and ProjectGraphRecorder (record cards, decisions, outcomes, continuations) — and add them to OrchestratorPorts. The orchestrator, ContextBuilder, PromptComposer, and Memory layers consume only these ports. The DreamGraph adapter is implemented in 8A.3 behind the Reader port and in 8A.4 behind the Recorder port; nothing in architect-v2/orchestrator/, architect-v2/context/, architect-v2/prompts/, or architect-v2/memory/ (outside an explicit */adapters/dreamgraph/ subfolder) may import mcp_dreamgraph_*. Sparse/no-graph projects receive top-tier behavior via filesystem/runtime/LSP context reconstruction; resulting cognition is still recorded through the Recorder when one is wired."
+    },
+    {
+      "id": "ADR-097",
+      "title": "Hard-reserved token slice for graph evidence in architect context",
+      "decision": "Reserve a hard token slice: 70% core logic / 15% user request + active code/selection / 15% graph evidence. Absolute caps per window: 8k → 800–1200 tokens; 32k → 2k–4k tokens; 128k+ → dynamic, capped at ~10% of window. Graph slice is curated only — selected node + immediate neighborhood, transitive impacted nodes (depth ≤ 2, ranked), tensions touching the request, ADR constraints touching the request, plus confidence markers. Golden rule: better 300 curated tokens than 3000 garbage tokens."
+    },
+    {
+      "id": "ADR-203",
+      "title": "LLM-enabled tools use connected model, daemon model, then deterministic fallback",
+      "decision": "All LLM-enabled DreamGraph tools must select models in this order: first use the connected interactive model supplied by Architect, an external LLM, or caller context; second use the configured daemon-side LLM, choosing the appropriate dreamer or normalizer model and task-appropriate temperature; third fall back to the deterministic implementation when no LLM layer is available or validated LLM output fails."
+    },
+    {
+      "id": "ADR-234",
+      "title": "Implementation status requires verified executable behavior, not plan/graph/doc updates",
+      "decision": "Treat plan, graph, documentation, and project-scope updates as non-implementation changes unless executable behavior changed in the source code and was verified. Implementation status may only be claimed after code-level changes exist and appropriate verification has passed or is explicitly documented. Graph updates must follow and reflect actual implementation state; graph changes alone are never sufficient evidence of implementation."
+    },
+    {
+      "id": "ADR-236",
+      "title": "Incremental reconciliation uses a journaled cross-store commit boundary",
+      "decision": "Use one instance-scoped reconciliation lease plus a durable write-ahead journal containing previous and next store bodies. Check the expected scan revision before commit, publish writes under the lease, remove the journal only after all writes succeed, and roll back from the journal on failure or daemon recovery."
+    },
+    {
+      "id": "ADR-237",
+      "title": "Committed graph revisions are isolated by an instance read/write reconciliation barrier",
+      "decision": "Supersede ADR-236's reader-compatibility exception with a durable instance-level consistency policy: preview and staging remain outside the critical section; authoritative reconciliation acquires one exclusive graph barrier, revalidates the expected revision, journals prior and next bodies, replaces canonical stores, publishes scan_state.json last, invalidates caches, and releases only after success or complete rollback. Canonical multi-store readers hold the shared side for their entire snapshot. Ordinary enrichment, dream, scheduler, Architect/MCP, and manual atomic graph mutations use the exclusive side and cannot cross reconciliation."
+    },
+    {
+      "id": "ADR-172",
+      "title": "runPass is pure-shaped over OrchestratorPorts; no direct I/O",
+      "decision": "runPass is a pure-shaped async function over an injected OrchestratorPorts bag. All effects (context build, prompt compose, provider call, tool execution, persistence, graph reads, graph recording, time) go through one of: ContextBuilderPort, PromptComposerPort, ExecutorPort, MemoryPort, ProjectGraphReader, ProjectGraphRecorder, ClockPort. The loop never imports vscode, fs, http, or mcp_* modules. Tests assemble runPass from in-memory fakes; production assembles from real adapters wired by the extension activate function (Slice 8A.5)."
+    },
+    {
+      "id": "ADR-177",
+      "title": "MemoryPort + ContextDiscoveryRecorder split incidental from deliberate cognition",
+      "decision": "Two new ports land in 8A.4. (1) MemoryPort gets a DefaultMemoryAdapter backed by a KeyValueStore seam (vscode.Memento-shaped); InMemoryKeyValueStore covers tests; NullMemoryPort covers dry-runs. PassLog history is bounded (default 200 entries) so workspace state never grows unbounded. (2) A NEW narrow port ContextDiscoveryRecorder is owned by the assembler (context/) and called by DefaultContextBuilder when assembly produces concrete artifact references (file URIs from fallback excerpts/walk, graph node URIs from retrieved subgraphs). The builder calls recordDiscoveries fire-and-forget at the end of assembly; failures are swallowed. The DreamGraph adapter (orchestrator/adapters/dreamgraph/recorder.ts) implements BOTH ProjectGraphRecorder AND ContextDiscoveryRecorder against the McpClient seam, batching discoveries into wire_links calls with relation 'context_touched_via_fallback' or 'context_referenced'. Keeping the two recorder ports separate enforces that incidental cognition cannot accidentally synthesize decisions and deliberate cognition cannot accidentally write incidental data without the orchestrator's consent."
+    },
+    {
+      "id": "ADR-198",
+      "title": "Copilot CLI adapter uses bounded prompt-file context injection",
+      "decision": "Keep Copilot CLI prompt composition inside the Copilot adapter/provider boundary, build the Architect envelope with context-economy controls, retain a bounded history window, mark the current turn explicitly, and fall back to a temporary prompt.md file when the serialized prompt exceeds the safe argv byte budget. Surface prompt byte count, history count, advertised MCP server/tool count, current-turn marker status, and model selection to the Context Inspector."
+    },
+    {
+      "id": "ADR-207",
+      "title": "Defend graph purity by separating durable plans from adaptive operational graph cognition",
+      "decision": "Plans remain as permanent markdown-backed historical artifacts, while graph workflow cognition is adaptive and temporary. During active work, plans may be operationalized into graph workflow entities such as plan nodes, slice nodes, gates, continuation state, checkpoints, candidate futures, and execution entities. As work completes and stabilizes, those temporary structures must crystallize into durable project knowledge by creating, mutating, enriching, superseding, merging into, or removing durable entities such as Feature, DataModel, Workflow, API, Capability, Tool, UIRegistryElement, ADR, and related project-state entities. Completed implementation instructions should not remain indefinitely active as future execution cognition."
+    },
+    {
+      "id": "ADR-217",
+      "title": "Standalone Architect CLI adapters execute through a daemon MCP bridge",
+      "decision": "Standalone Architect chat requests with adapter codex-cli or copilot-cli now invoke a daemon-owned CLI bridge. The bridge materializes per-run CLI home/config files, exposes the active daemon MCP endpoint to the selected CLI through a stdio MCP proxy, audits tool calls, and returns normalized content, route, provenance, and tool trace metadata. Metadata-only fallback is no longer used for selected CLI chat execution."
+    }
+  ]
+}

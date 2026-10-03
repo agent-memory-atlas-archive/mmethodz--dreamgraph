@@ -1,4 +1,7 @@
 export type CognitiveTrustState =
+  | "source_assertion"
+  | "human_assertion"
+  | "disputed_claim"
   | "accepted_fact"
   | "validated_insight"
   | "advisory_candidate"
@@ -18,6 +21,7 @@ export interface CognitiveTrustDescriptor {
 export type TrustStateDistribution = Record<CognitiveTrustState, number>;
 
 export const TRUST_STATE_ORDER: readonly CognitiveTrustState[] = [
+  "source_assertion", "human_assertion", "disputed_claim",
   "accepted_fact",
   "validated_insight",
   "advisory_candidate",
@@ -28,6 +32,9 @@ export const TRUST_STATE_ORDER: readonly CognitiveTrustState[] = [
 ] as const;
 
 const TRUST_DESCRIPTORS: Record<CognitiveTrustState, CognitiveTrustDescriptor> = {
+  source_assertion: { state: "source_assertion", label: "Source-backed assertion", authority: "source", reviewable: true, implies_authority: false },
+  human_assertion: { state: "human_assertion", label: "Human assertion", authority: "human_review", reviewable: true, implies_authority: false },
+  disputed_claim: { state: "disputed_claim", label: "Disputed claim", authority: "daemon_validation", reviewable: true, implies_authority: false },
   accepted_fact: {
     state: "accepted_fact",
     label: "Accepted fact",
@@ -81,6 +88,7 @@ const TRUST_DESCRIPTORS: Record<CognitiveTrustState, CognitiveTrustDescriptor> =
 
 export function emptyTrustStateDistribution(): TrustStateDistribution {
   return {
+    source_assertion: 0, human_assertion: 0, disputed_claim: 0,
     accepted_fact: 0,
     validated_insight: 0,
     advisory_candidate: 0,

@@ -104,17 +104,24 @@ export function createHostAudit(opts: HostAuditOptions): CopilotCliMcpAuditPort 
 
       let raw: string;
       try {
-        await stat(state.path);
+        if ((await stat(state.path)).size > 16 * 1024 * 1024) throw new Error("CLI_AUDIT_BYTE_BOUND");
         raw = await readFile(state.path, "utf8");
-      } catch {
+      } catch (error) {
         // No audit file exists → run made zero MCP calls.
-        return Object.freeze([]);
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") return Object.freeze([]);
+        throw new Error(`CLI_AUDIT_UNAVAILABLE: ${String(error)}`);
       }
       const lines = raw.split(/\r?\n/);
       const out: RecordedMcpToolCall[] = [];
+      const pending = new Set<string>();
       for (let i = 0; i < lines.length; i += 1) {
         const line = lines[i]!.trim();
         if (line.length === 0) continue;
+        // The canonical bridge records intent separately. Pending intent is never a completed call.
+        try {
+          const record = JSON.parse(line);
+          if (record.status === "running") { pending.add(typeof record.correlationId === "string" ? record.correlationId : `unidentified:${i}`); continue; }
+        } catch { /* malformed diagnostic below */ }
         const parsed = parseRecordOrNull(line);
         if (parsed === null) {
           // eslint-disable-next-line no-console
@@ -123,8 +130,12 @@ export function createHostAudit(opts: HostAuditOptions): CopilotCliMcpAuditPort 
           );
           continue;
         }
+        const record = JSON.parse(line);
+        if (["completed", "failed"].includes(record.status) && typeof record.correlationId === "string") pending.delete(record.correlationId);
         out.push(parsed);
       }
+      // Retain the physical journal for recovery. An unfinished intent is not an empty/successful audit.
+      if (pending.size) throw new Error(`CLI_AUDIT_UNSETTLED: ${pending.size} retained intents at ${state.path}`);
 
       // Best-effort delete: the audit file lives inside COPILOT_HOME,
       // which the orchestrator scrubs anyway. Failing to delete is
@@ -154,14 +165,17 @@ export function parseRecordOrNull(line: string): RecordedMcpToolCall | null {
   }
   if (typeof raw !== "object" || raw === null) return null;
   const r = raw as Record<string, unknown>;
+  if (r["status"] === "running") return null;
+  if (r["status"] !== undefined && !["completed", "failed"].includes(String(r["status"]))) return null;
   if (
     typeof r["server"] !== "string" ||
     typeof r["tool"] !== "string" ||
     typeof r["inputJson"] !== "string" ||
     typeof r["resultJson"] !== "string" ||
     typeof r["isError"] !== "boolean" ||
-    typeof r["durationMs"] !== "number" ||
-    typeof r["startedAtEpochMs"] !== "number"
+    typeof r["durationMs"] !== "number" || !Number.isFinite(r["durationMs"]) || r["durationMs"] < 0 ||
+    typeof r["startedAtEpochMs"] !== "number" || !Number.isFinite(r["startedAtEpochMs"]) || r["startedAtEpochMs"] < 0 ||
+    r["status"] === "failed" && r["isError"] !== true || r["status"] === "completed" && r["isError"] !== false
   ) {
     return null;
   }

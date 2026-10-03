@@ -8,6 +8,7 @@ import { focusFactSnapshot, type FactEntity, type FactSnapshot } from "../../src
 import { loadGraphMaintenanceState } from "../../src/cognitive/graph-maintenance-state.js";
 import { executeEnrichSeedData } from "../../src/tools/enrich-seed-data.js";
 import { getDataDir, setDataDirOverride } from "../../src/utils/paths.js";
+import { releaseGraphWriter } from "../../src/graph/writer-lease.js";
 
 let tempDir: string;
 let previousDataDir: string;
@@ -41,6 +42,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  await releaseGraphWriter(tempDir);
   setDataDirOverride(previousDataDir);
   if (previousMajorThreshold === undefined) delete process.env.DREAMGRAPH_MAJOR_GRAPH_CHANGE_NODES;
   else process.env.DREAMGRAPH_MAJOR_GRAPH_CHANGE_NODES = previousMajorThreshold;

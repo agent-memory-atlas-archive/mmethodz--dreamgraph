@@ -15,10 +15,17 @@
  * Philosophy: DreamGraph should not only SEE problems — it should
  * propose the first credible fix, so the developer can say "yes" or "refine".
  *
- * READ-ONLY: generates plans from data, writes nothing.
+ * Drafts advisory plans; persists their selection and review history. No action or resolution is implied.
  */
 
 import { readFile } from "node:fs/promises";
+import { z } from "zod";
+import { riskDigest } from "./risk-lifecycle.js";
+import { loadCanonicalGraph } from "../graph/read-model.js";
+import { getActiveScope } from "../instance/index.js";
+import { readCognitiveStore } from "./cognitive-store.js";
+import { withGraphRead,withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
+import { commitGraphWrites,findOperationReceipt } from "../graph/publication.js";
 import { existsSync } from "node:fs";
 import { dataPath } from "../utils/paths.js";
 import { atomicWriteFile } from "../utils/atomic-write.js";
@@ -56,7 +63,7 @@ const REMEDIATION_LOG_FILENAME = "remediation_log.json";
 export const MAX_REMEDIATION_FUTURE_SIGNALS = 200;
 export const MAX_REMEDIATION_FUTURE_OUTCOMES = 200;
 export const MAX_REMEDIATION_CANDIDATE_RUNS = 100;
-const SCHEMA_VERSION = "1.0";
+const SCHEMA_VERSION = "1.1.0";
 const FUTURE_SIGNAL_STALE_WINDOW_MS = 1000 * 60 * 60 * 24 * 30;
 const ADR_ANCHOR_PATTERN = /^ADR-\d+$/;
 const NEGATIVE_FUTURE_SIGNAL_SOURCES = new Set<FutureSignal["source"]>(["rejected", "overridden", "reverted", "drift"]);
@@ -120,20 +127,10 @@ function normalizeAdrEntry(entry: unknown): AdrSummary {
  * Load ADR log entries with their `affected_entities` and `tags`.
  * Used by `findAdrConflicts()` for entity-overlap matching.
  */
-async function loadAdrLog(): Promise<AdrSummary[]> {
-  try {
-    const p = dataPath("adr_log.json");
-    if (!existsSync(p)) return [];
-    const raw = await readFile(p, "utf-8");
-    const data = JSON.parse(raw);
-    const entries = data?.decisions ?? data?.adrs ?? data?.entries ?? [];
-    if (!Array.isArray(entries)) return [];
-    return entries
-      .map((entry: unknown) => normalizeAdrEntry(entry))
-      .filter((adr) => adr.status !== "deprecated" && adr.status !== "superseded");
-  } catch {
-    return [];
-  }
+async function loadAdrLog():Promise<AdrSummary[]> {
+  const graph=await loadCanonicalGraph(getActiveScope()?.uuid??"legacy");
+  if(graph.state.reasons.some(reason=>reason.scope.includes("adr_log.json")))throw new Error("REMEDIATION_ADR_CONTEXT_UNAVAILABLE");
+  return graph.entities.filter(entity=>entity.identity.kind==="adr"&&entity.payload.status==="accepted").map(entity=>normalizeAdrEntry(entity.payload));
 }
 
 // ---------------------------------------------------------------------------
@@ -147,29 +144,21 @@ interface EntitySummary {
   relationships: Array<{ type: string; target: string; via: string }>;
   links: Array<{ target: string; type?: string; relationship?: string; description?: string; strength?: string }>;
   domain: string;
+  evidence_fingerprint?:string;
 }
 
 /** Build a lookup of entity_id → known facts from data_model.json. */
-async function loadDataModelMap(): Promise<Map<string, EntitySummary>> {
-  const map = new Map<string, EntitySummary>();
-  try {
-    const entries = await loadJsonArray<DataModelEntity>("data_model.json");
-    for (const e of entries) {
-      const id = (e as { id?: unknown }).id;
-      if (typeof id !== "string" || !id) continue;
-      map.set(id, {
-        id,
-        exists: true,
-        source_files: Array.isArray(e.source_files) ? e.source_files.filter((x): x is string => typeof x === "string") : [],
-        relationships: Array.isArray(e.relationships) ? e.relationships : [],
-        links: Array.isArray(e.links) ? (e.links as EntitySummary["links"]) : [],
-        domain: typeof e.domain === "string" ? e.domain : "unknown",
-      });
-    }
-  } catch (err) {
-    logger.warn(`loadDataModelMap: could not read data_model.json — phantom-entity detection disabled (${(err as Error).message})`);
-  }
-  return map;
+async function loadDataModelMap():Promise<Map<string,EntitySummary>> {
+  const graph=await loadCanonicalGraph(getActiveScope()?.uuid??"legacy"),map=new Map<string,EntitySummary>();
+  const families=new Set(["features.json","workflows.json","data_model.json","capabilities.json","datastores.json","ui_registry.json","auxiliary_entities.json"]);
+  if(graph.state.reasons.some(reason=>reason.scope.some(scope=>families.has(scope))))throw new Error("REMEDIATION_FACT_CONTEXT_UNAVAILABLE");
+  for(const entity of graph.entities.filter(e=>["feature","workflow","data_model","capability","datastore","ui_element","auxiliary"].includes(e.identity.kind))){
+    const id=entity.identity.id,raw=entity.payload;
+    if(map.has(id))throw new Error("REMEDIATION_ENTITY_SCOPE_AMBIGUOUS");
+    map.set(id,{id,exists:true,source_files:Array.isArray(raw.source_files)?raw.source_files.filter((v):v is string=>typeof v==="string"):[],
+      relationships:Array.isArray(raw.relationships)?raw.relationships as EntitySummary["relationships"]:[],links:Array.isArray(raw.links)?raw.links as EntitySummary["links"]:[],
+      domain:typeof raw.domain==="string"?raw.domain:"unknown",evidence_fingerprint:riskDigest([entity.identity,entity.assertion_class,raw])});
+  }return map;
 }
 
 function lookupEntity(id: string, map: Map<string, EntitySummary>): EntitySummary {
@@ -232,118 +221,64 @@ function findRecentRejectedDream(
 // Persistence: data/remediation_log.json
 // ---------------------------------------------------------------------------
 
-async function loadRemediationLog(): Promise<RemediationLogFile> {
-  const empty: RemediationLogFile = {
-    metadata: {
-      description: "DreamGraph remediation plans — current per tension + history of superseded plans",
-      schema_version: SCHEMA_VERSION,
-      last_updated: null,
-    },
-    current: {},
-    history: [],
-  };
-  try {
-    const p = dataPath(REMEDIATION_LOG_FILENAME);
-    if (!existsSync(p)) return empty;
-    const raw = await readFile(p, "utf-8");
-    const parsed = JSON.parse(raw) as Partial<RemediationLogFile>;
-    return {
-      metadata: { ...empty.metadata, ...(parsed.metadata ?? {}) },
-      current: (parsed.current && typeof parsed.current === "object") ? parsed.current as Record<string, RemediationPlan> : {},
-      history: Array.isArray(parsed.history) ? parsed.history : [],
-    };
-  } catch (err) {
-    logger.warn(`loadRemediationLog: could not read ${REMEDIATION_LOG_FILENAME} — starting fresh (${(err as Error).message})`);
-    return empty;
-  }
+const persistedSignal=z.object({id:z.string().min(1),description:z.string(),source:z.enum(["accepted","edited","rejected","overridden","reverted","explicit_preference","recurring_pattern","drift"]),
+  evidence_anchor_ids:z.array(z.string()).max(256),confidence:z.number().min(0).max(1),observed_at:z.string().datetime({offset:true}),status:z.enum(["active","stale","superseded"]).optional()}).passthrough();
+const persistedPlan=z.object({id:z.string().min(1),tension_id:z.string().min(1),title:z.string(),steps:z.array(z.object({description:z.string()}).passthrough()).max(100),generated_at:z.string().datetime({offset:true})}).passthrough();
+const persistedOutcome=z.object({tension_id:z.string(),evidence_bundle_id:z.string(),selected_plan_id:z.string(),recorded_at:z.string().datetime({offset:true}),
+  stage:z.literal("proposal_selected").optional(),assertion_class:z.literal("advisory").optional()}).passthrough();
+const remediationSchema=z.object({metadata:z.object({schema_version:z.enum(["1.0","1.0.0","1.1.0"])}).passthrough(),current:z.record(persistedPlan),history:z.array(persistedPlan).max(10000),
+  future_signal_history:z.array(persistedSignal).max(10000).optional(),adaptive_future:z.object({signals:z.array(persistedSignal).max(10000),outcomes:z.array(persistedOutcome).max(10000),
+    candidate_runs:z.array(z.object({evidence_bundle_id:z.string(),recorded_at:z.string().datetime({offset:true})}).passthrough()).max(10000),metrics:z.object({total_runs:z.number().int().nonnegative()}).passthrough()}).passthrough().optional()}).passthrough();
+export async function loadRemediationLog():Promise<RemediationLogFile> {
+  const empty:RemediationLogFile={metadata:{description:"Advisory remediation proposals and retained review history",schema_version:SCHEMA_VERSION,last_updated:null},current:{},history:[]};
+  const data=await readCognitiveStore(REMEDIATION_LOG_FILENAME,empty,["history"]);
+  if(Buffer.byteLength(JSON.stringify(data))>16*1024*1024)throw new Error("REMEDIATION_STORE_CAPACITY");
+  return remediationSchema.parse(data) as unknown as RemediationLogFile;
 }
-
-async function persistRemediationPlans(
-  plans: RemediationPlan[],
-  outcomes: RemediationPlanOutcome[] = [],
-  candidateRuns: Array<{
-    evidence_bundle_id: string;
-    selected_candidate_id?: string;
-    selected_source?: "llm" | "heuristic" | "fallback";
-    rejected_candidate_ids: string[];
-    model_layer: GeneratedRemediationPlanSet["model_layer"];
-    fallback_reason?: string;
-    fallback_used?: boolean;
-    validation_failures: string[];
-    future_fit_score?: number;
-    objection_count: number;
-    future_signal_ids: string[];
-    recorded_at: string;
-  }> = [],
-  futureSignals: FutureSignal[] = []
-): Promise<void> {
-  if (plans.length === 0 && outcomes.length === 0 && candidateRuns.length === 0 && futureSignals.length === 0) return;
-  await withFileLock(REMEDIATION_LOG_FILENAME, async () => {
-    const log = await loadRemediationLog();
-    const now = new Date().toISOString();
-    for (const plan of plans) {
-      const prior = log.current[plan.tension_id];
-      if (prior) {
-        prior.superseded_by = plan.id;
-        plan.supersedes = prior.id;
-        log.history.push(prior);
-      }
-      log.current[plan.tension_id] = plan;
+function semanticRecord<T>(value:T):unknown {
+  if(!value||typeof value!=="object")return value;
+  if(Array.isArray(value))return value.map(semanticRecord);
+  return Object.fromEntries(Object.entries(value).filter(([key])=>!["generated_at","recorded_at","reviewed_at","observed_at","last_updated","supersedes","superseded_by"].includes(key)).map(([key,v])=>[key,semanticRecord(v)]));
+}
+function remediationInput(tension:TensionSignal,adrs:AdrSummary[],ctx:PlanContext):string {
+  return riskDigest([tension.id,tension.revision??0,tension.description,tension.entities,tension.urgency,
+    [...new Set(tension.entities)].sort().map(id=>lookupEntity(id,ctx.dataModel)),
+    adrs.filter(adr=>adr.affected_entities.some(id=>tension.entities.includes(id))).sort((a,b)=>a.id.localeCompare(b.id))]);
+}
+async function persistRemediationPlans(plans:RemediationPlan[],outcomes:RemediationPlanOutcome[]=[],candidateRuns:NonNullable<RemediationLogFile["adaptive_future"]>["candidate_runs"]=[],futureSignals:FutureSignal[]=[]):Promise<RemediationPlan[]> {
+  if(!plans.length&&!outcomes.length&&!candidateRuns.length&&!futureSignals.length)return [];
+  const intent=semanticRecord({plans,outcomes,candidateRuns,futureSignals}) as Record<string,unknown>,operation_id=`remediation:${riskDigest(intent)}`;
+  return withGraphReconciliation(()=>withFileLock(REMEDIATION_LOG_FILENAME,async()=>{
+    const [risks,adrs,dataModel]=await Promise.all([engine.loadTensions(),loadAdrLog(),loadDataModelMap()]);
+    for(const plan of plans){const risk=risks.signals.find(s=>s.id===plan.tension_id);
+      if(!risk||plan.input_fingerprint!==remediationInput(risk,adrs,{dataModel,recentDreams:[]}))throw new Error("REMEDIATION_INPUT_REVISION_CONFLICT");}
+    const priorReceipt=await findOperationReceipt(operation_id,"remediation");
+    if(priorReceipt){await commitGraphWrites({actor:"remediation",operation_id,writes:[],scope:[REMEDIATION_LOG_FILENAME],intent});return (priorReceipt.result as {plans:RemediationPlan[]}).plans;}
+    const log=await loadRemediationLog(),now=new Date().toISOString();
+    for(const plan of plans){const prior=log.current[plan.tension_id];
+      if(prior?.id===plan.id)continue;
+      if(prior){log.history.push({...prior,superseded_by:plan.id});plan.supersedes=prior.id;}
+      log.current[plan.tension_id]=plan;
     }
-
-    const adaptiveFuture = log.adaptive_future ?? {
-      signals: [],
-      outcomes: [],
-      candidate_runs: [],
-      metrics: {
-        total_runs: 0,
-        total_outcomes: 0,
-        total_candidate_runs: 0,
-        total_signals: 0,
-        llm_selected_runs: 0,
-        deterministic_fallback_runs: 0,
-        average_future_fit_score: null,
-        last_recorded_at: null,
-      },
-    };
-
-    const signalIndexes = new Map(adaptiveFuture.signals.map((signal, index) => [signal.id, index] as const));
-    for (const signal of futureSignals) {
-      const existingIndex = signalIndexes.get(signal.id);
-      if (existingIndex == null) {
-        adaptiveFuture.signals.push(signal);
-        signalIndexes.set(signal.id, adaptiveFuture.signals.length - 1);
-        continue;
-      }
-      adaptiveFuture.signals[existingIndex] = {
-        ...adaptiveFuture.signals[existingIndex],
-        ...signal,
-      };
+    const memory=log.adaptive_future??{signals:[],outcomes:[],candidate_runs:[],metrics:{total_runs:0,total_outcomes:0,total_candidate_runs:0,total_signals:0,llm_selected_runs:0,deterministic_fallback_runs:0,average_future_fit_score:null,last_recorded_at:null}};
+    for(const signal of futureSignals){const index=memory.signals.findIndex(s=>s.id===signal.id),prior=memory.signals[index];
+      if(prior&&riskDigest(semanticRecord(prior))===riskDigest(semanticRecord(signal)))continue;
+      if(prior){(log.future_signal_history??=[]).push(structuredClone(prior));memory.signals[index]={...signal,observed_at:prior.observed_at};}
+      else memory.signals.push(signal);
     }
-    adaptiveFuture.outcomes.push(...outcomes);
-    adaptiveFuture.candidate_runs.push(...candidateRuns);
-
-    adaptiveFuture.signals = adaptiveFuture.signals.slice(-200);
-    adaptiveFuture.outcomes = adaptiveFuture.outcomes.slice(-200);
-    adaptiveFuture.candidate_runs = adaptiveFuture.candidate_runs.slice(-200);
-
-    const scoredRuns = adaptiveFuture.candidate_runs.filter((run) => typeof run.future_fit_score === "number");
-    const scoreSum = scoredRuns.reduce((sum, run) => sum + (run.future_fit_score ?? 0), 0);
-    adaptiveFuture.metrics = {
-      total_runs: adaptiveFuture.metrics.total_runs + 1,
-      total_outcomes: adaptiveFuture.outcomes.length,
-      total_candidate_runs: adaptiveFuture.candidate_runs.length,
-      total_signals: adaptiveFuture.signals.length,
-      llm_selected_runs: adaptiveFuture.candidate_runs.filter((run) => run.model_layer !== "deterministic_fallback" && run.selected_candidate_id).length,
-      deterministic_fallback_runs: adaptiveFuture.candidate_runs.filter((run) => run.model_layer === "deterministic_fallback").length,
-      average_future_fit_score: scoredRuns.length === 0 ? null : Number((scoreSum / scoredRuns.length).toFixed(3)),
-      last_recorded_at: now,
-    };
-    log.adaptive_future = adaptiveFuture;
-    log.metadata.last_updated = now;
-    log.metadata.schema_version = SCHEMA_VERSION;
-    await atomicWriteFile(dataPath(REMEDIATION_LOG_FILENAME), JSON.stringify(log, null, 2), "utf-8");
-  });
+    for(const row of outcomes)if(!memory.outcomes.some(old=>old.id===row.id))memory.outcomes.push(row);
+    for(const row of candidateRuns)if(!memory.candidate_runs.some(old=>riskDigest(semanticRecord(old))===riskDigest(semanticRecord(row))))memory.candidate_runs.push(row);
+    if([log.history,log.future_signal_history??[],memory.signals,memory.outcomes,memory.candidate_runs].some(rows=>rows.length>10000))throw new Error("REMEDIATION_HISTORY_CAPACITY_REQUIRES_ARCHIVE");
+    const scores=memory.candidate_runs.flatMap(run=>typeof run.future_fit_score==="number"?[run.future_fit_score]:[]);
+    memory.metrics={total_runs:memory.metrics.total_runs+1,total_outcomes:memory.outcomes.length,total_candidate_runs:memory.candidate_runs.length,total_signals:memory.signals.length,
+      llm_selected_runs:memory.candidate_runs.filter(r=>r.model_layer!=="deterministic_fallback"&&r.selected_candidate_id).length,
+      deterministic_fallback_runs:memory.candidate_runs.filter(r=>r.model_layer==="deterministic_fallback").length,
+      average_future_fit_score:scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null,last_recorded_at:now};
+    log.adaptive_future=memory;log.metadata.last_updated=now;log.metadata.schema_version=SCHEMA_VERSION;
+    const body=JSON.stringify(remediationSchema.parse(log),null,2);if(Buffer.byteLength(body)>16*1024*1024)throw new Error("REMEDIATION_HISTORY_CAPACITY_REQUIRES_ARCHIVE");
+    const committed=plans.map(plan=>log.current[plan.tension_id]);
+    await commitGraphWrites({actor:"remediation",operation_id,intent,scope:[REMEDIATION_LOG_FILENAME],writes:[{file:REMEDIATION_LOG_FILENAME,content:body}],result:{plans:committed}});return committed;
+  }));
 }
 
 interface PlanContext {
@@ -1024,14 +959,14 @@ function withResolutionStep(plan: RemediationPlan, draft: DraftPlan): Remediatio
   if (!alreadyHasResolution) {
     plan.steps.push({
       order: plan.steps.length + 1,
-      description: `Close the tension via resolve_tension once the steps above are applied.`,
+      description: `Review actual verification evidence, then explicitly dispose or verify the tension. Action success alone cannot close it.`,
       files: [],
       tests_to_add: [],
       estimated_effort: "trivial",
       action: draft.resolution,
     });
   }
-  plan.resolution_call = draft.resolution;
+  plan.resolution_call={...draft.resolution,resolved_by:"human",evidence:`Human review required: ${draft.resolution.evidence}`};
   return plan;
 }
 
@@ -1238,7 +1173,9 @@ export function harvestRemediationFutureSignals(
     anchorIds.length > 0 && anchorIds.every((anchorId) => knownAnchorIds.has(anchorId));
   const pushSignal = (signal: FutureSignal): void => {
     if (scopedAnchorIds(signal.evidence_anchor_ids)) {
-      signals.push(signal);
+      const index=signals.findIndex(prior=>prior.id===signal.id);
+      if(index<0)signals.push(signal);
+      else signals[index]={...signal,observed_at:signals[index].observed_at};
     }
   };
   const createSignal = (
@@ -1315,7 +1252,7 @@ export function harvestRemediationFutureSignals(
   createSignal({
     id: `future_signal:${bundle.id}:preferred_action`,
     description: `Deterministic remediation strategy prefers ${preferredActionClass}.`,
-    source: "explicit_preference",
+    source: "recurring_pattern",
     evidence_anchor_ids: hasTensionAnchor ? [tensionAnchorId] : bundle.evidence_anchors.slice(0, 1).map((anchor) => anchor.id),
     confidence: 0.72,
     status: "active",
@@ -1684,13 +1621,13 @@ export async function buildRemediationEvidenceBundles(
   maxPlans: number = 5,
   minUrgency: number = 0.3
 ): Promise<RemediationEvidenceBundle[]> {
-  const [tensionFile, adrs, dataModel, dreamGraph, remediationLog] = await Promise.all([
+  const [tensionFile, adrs, dataModel, dreamGraph, remediationLog] = await withGraphRead(()=>Promise.all([
     engine.loadTensions(),
     loadAdrLog(),
     loadDataModelMap(),
     engine.loadDreamGraph(),
     loadRemediationLog(),
-  ]);
+  ]));
   const ctx: PlanContext = { dataModel, recentDreams: dreamGraph.edges };
   const { candidates } = selectRemediationCandidates(tensionFile.signals, maxPlans, minUrgency, Date.now());
   return candidates.map((tension) => attachAdaptiveFutureMemory(buildRemediationEvidenceBundle(tension, adrs, ctx), remediationLog));
@@ -1708,13 +1645,13 @@ export async function generateRemediationPlans(
 ): Promise<RemediationPlanOutput> {
   logger.info(`Generating remediation plans (max=${maxPlans}, minUrgency=${minUrgency})`);
 
-  const [tensionFile, adrs, dataModel, dreamGraph, remediationLog] = await Promise.all([
+  const [tensionFile, adrs, dataModel, dreamGraph, remediationLog] = await withGraphRead(()=>Promise.all([
     engine.loadTensions(),
     loadAdrLog(),
     loadDataModelMap(),
     engine.loadDreamGraph(),
     loadRemediationLog(),
-  ]);
+  ]));
 
   logger.info(
     `Remediation planner loaded ${adrs.length} ADRs and ${dataModel.size} data_model entries.`
@@ -1747,6 +1684,7 @@ export async function generateRemediationPlans(
     evidence_bundle_id: string;
     selected_candidate_id?: string;
     rejected_candidate_ids: string[];
+    selected_source?:"llm"|"heuristic"|"fallback";fallback_used?:boolean;
     model_layer: GeneratedRemediationPlanSet["model_layer"];
     fallback_reason?: string;
     validation_failures: string[];
@@ -1797,7 +1735,8 @@ export async function generateRemediationPlans(
     }
 
     const planBase: RemediationPlan = {
-      id: `rem_${tension.id}_${Date.now().toString(36)}`,
+      id:`rem_${riskDigest([tension.id,draft,adrConflicts,llmCandidate?.title,remediationInput(tension,adrs,ctx)])}`,
+      input_fingerprint:remediationInput(tension,adrs,ctx),stage:"proposed",assertion_class:"advisory",
       tension_id: tension.id,
       title: llmCandidate?.title ?? draft.approach,
       severity: severityFromUrgency(tension.urgency),
@@ -1816,6 +1755,7 @@ export async function generateRemediationPlans(
       evidence_bundle_id: evidenceBundle.id,
       selected_candidate_id: llmCandidate?.id,
       rejected_candidate_ids: rankedCandidates.slice(1).map((candidate) => candidate.id),
+      selected_source:llmCandidate?"llm":generatedSet?.fallback_reason?"fallback":"heuristic",fallback_used:!!generatedSet?.fallback_reason,
       model_layer: generatedSet?.model_layer ?? "deterministic_fallback",
       fallback_reason: generatedSet?.fallback_reason,
       validation_failures: generatedSet?.validation_failures ?? [],
@@ -1825,6 +1765,7 @@ export async function generateRemediationPlans(
       recorded_at: planBase.generated_at,
     });
     planOutcomes.push({
+      id:`selection:${completedPlan.id}`,stage:"proposal_selected",assertion_class:"advisory",
       tension_id: tension.id,
       evidence_bundle_id: evidenceBundle.id,
       selected_plan_id: completedPlan.id,
@@ -1845,11 +1786,8 @@ export async function generateRemediationPlans(
   );
 
   // Persist for cross-session continuity (item 6 of FIX_REMEDIATION_PLAN_ENGINE).
-  try {
-    await persistRemediationPlans(plans, planOutcomes, candidateRunAudit, futureSignalsForPersistence);
-  } catch (err) {
-    logger.warn(`persistRemediationPlans: ${(err as Error).message}`);
-  }
+  const committedPlans=await persistRemediationPlans(plans,planOutcomes,candidateRunAudit,futureSignalsForPersistence);
+  plans.splice(0,plans.length,...committedPlans);
 
   const severityCounts = {
     critical: plans.filter((p) => p.severity === "critical").length,

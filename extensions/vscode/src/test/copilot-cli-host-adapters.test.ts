@@ -21,6 +21,7 @@ import {
   HOST_FS,
   HOST_PROCESS,
 } from "../architect-core/adapters/copilot-cli/host/index.js";
+import { HOST_PROCESS as CODEX_PROCESS } from "../architect-core/adapters/codex-cli/host/index.js";
 
 const IS_WINDOWS = process.platform === "win32";
 
@@ -278,6 +279,20 @@ test("HOST_PROCESS.spawn: aborting twice is idempotent and still settles", async
   });
   assert.equal(result.aborted, true);
   assert.ok(result.durationMs < 10_000, `expected fast settle, got ${result.durationMs}ms`);
+});
+
+test('both native process ports refuse an already-cancelled child before it can create a source effect', async () => {
+  const directory=await HOST_FS.mkdtemp('dg-cli-admission-');
+  try{for(const [name,port] of [['copilot',HOST_PROCESS],['codex',CODEX_PROCESS]] as const){
+    const marker=join(directory,name+'.txt'),control=join(directory,name+'-control.txt');
+    const code="require('node:fs').writeFileSync(process.argv[1], 'child entered')";
+    const completed=await port.spawn({command:process.execPath,args:['-e',code,control],stdin:'',cwd:directory,env:filteredEnv(),timeoutMs:10000});
+    assert.equal(completed.exitCode,0);assert.equal(await readFile(control,'utf8'),'child entered');
+    const cancellation=new AbortController();cancellation.abort();
+    const stopped=await port.spawn({command:process.execPath,args:['-e',code,marker],stdin:'',cwd:directory,env:filteredEnv(),timeoutMs:10000,abortSignal:cancellation.signal});
+    assert.equal(stopped.aborted,true);assert.equal(stopped.exitCode,null);
+    await assert.rejects(access(marker),{code:'ENOENT'});
+  }}finally{await HOST_FS.rmRecursive(directory);}
 });
 
 test("HOST_PROCESS.spawn: aborted child stops emitting stdout chunks before resolve", async () => {

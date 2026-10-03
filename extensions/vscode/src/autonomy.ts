@@ -1,4 +1,9 @@
 export type AutonomyMode = 'cautious' | 'conscientious' | 'eager' | 'autonomous';
+/** Preserve legacy labels/budgets; canonical mode never widens granted effects. */
+export function canonicalAutonomyPolicy(mode: AutonomyMode) {
+  return { native_label: mode, autonomy: mode === 'cautious' ? 'manual' as const : mode === 'autonomous' ? 'autonomous' as const : 'supervised' as const,
+    within_task_continuation: mode === 'eager' || mode === 'autonomous', authority: 'existing_approved_scope' as const };
+}
 export type UncertaintyLevel = 'low' | 'medium' | 'high';
 export type ProgressStatus = 'advancing' | 'slowing' | 'stalled';
 export type SelectionMode = 'user' | 'self' | 'none';

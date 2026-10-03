@@ -16,6 +16,7 @@ import re
 from collections import Counter
 from pathlib import Path
 
+from .definitions import qualified
 from . import loader
 from ._common import add_common_args, emit, fmt_table, resolve_data_dir_from_args
 
@@ -31,6 +32,7 @@ def _is_weak_text(s: str | None) -> bool:
     return bool(s and WEAK_PATTERNS.search(s))
 
 
+@qualified("meaningful_edges")
 def analyze(data_dir: Path) -> dict:
     cand = loader.candidate_edges(data_dir)
     val = loader.validated_edges(data_dir)

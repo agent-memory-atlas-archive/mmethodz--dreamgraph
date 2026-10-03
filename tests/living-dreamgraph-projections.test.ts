@@ -109,7 +109,7 @@ describe("Living DreamGraph projections", () => {
     });
 
     expect(projection.transitions.map((entry) => `${entry.artifact_kind}:${entry.new_state}`)).toEqual(expect.arrayContaining([
-      "future:superseded", "tension:retired", "insight:expired", "narrative:expired",
+      "future:superseded", "tension:retired", "insight:expired", "narrative:decayed",
     ]));
     expect(projection.transitions.find((entry) => entry.artifact_id === "future-old")?.superseding_artifact).toBe("future-new");
     expect(projection.transitions.find((entry) => entry.artifact_id === "retired-tension")?.authority).toBe("human");
@@ -142,8 +142,10 @@ describe("Living DreamGraph projections", () => {
 
     expect(playback.cycle_id).toBe("cycle-3");
     expect(playback.promoted_edges).toHaveLength(1);
-    expect(playback.promoted_edges[0]?.trust.state).toBe("validated_insight");
-    expect(playback.promoted_edges[0]?.evidence_ledger.grouped_evidence.model_output).toHaveLength(1);
+    expect(playback.promoted_edges[0]?.trust.state).toBe("advisory_candidate");
+    expect(playback.interpretation).toBe("historical_projection");
+    expect(playback.promoted_edges[0]?.evidence_ledger.grouped_evidence.model_output).toHaveLength(2);
+    expect(playback.promoted_edges[0]?.evidence_ledger.grouped_evidence.runtime_observation).toHaveLength(0);
     expect(playback.promoted_edges[0]?.evidence_ledger.semantic_anchors).toEqual(["a", "b", "supports"]);
     expect(playback.rejected_by_reason.insufficient_evidence).toBe(1);
     expect(playback.hypothesis_trust.map((entry) => entry.trust.state)).toEqual(expect.arrayContaining([

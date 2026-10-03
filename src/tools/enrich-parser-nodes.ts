@@ -46,10 +46,13 @@
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { createHash } from "node:crypto";
 
 import {
   createLlmProviderForConfig,
   getArchitectLlmConfig,
+  getRoleLlmProvider,
+  getRoleModelPolicy,
   llmRouteFailureReason,
   selectLlmRoute,
   type LlmCompletionOptions,
@@ -58,9 +61,12 @@ import {
   type LlmResponse,
   type LlmRouteSelection,
 } from "../cognitive/llm.js";
+import { nativeCliModelExecution } from "../cognitive/model-execution.js";
+import { summarizeProviderUsage } from "../cognitive/provider-usage.js";
+import { ModelAdmissionError } from "../cognitive/model-admission.js";
+import { completionSignal, compileOutputValidator, validateCompletionText, providerUsage, ProviderOutcomeError } from "../cognitive/provider-outcome.js";
 import { buildAdaptiveFutureAuditTrail } from "../cognitive/adaptive-future-scaffold.js";
-import { loadJsonArray, invalidateCache } from "../utils/cache.js";
-import { atomicWriteFile } from "../utils/atomic-write.js";
+import { loadJsonArray } from "../utils/cache.js";
 import { dataPath } from "../utils/paths.js";
 import { success, error, safeExecute } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
@@ -80,6 +86,8 @@ import {
 import { updateGraphMaintenanceState } from "../cognitive/graph-maintenance-state.js";
 import { scheduleTargetedDreamStabilization } from "../cognitive/targeted-dreams.js";
 import { loadScanState } from "./scan-state.js";
+import { enrichmentNodeKey, publishEnrichmentBatch, type EnrichmentDelta, type EnrichmentBatchInput } from "./enrichment-publication.js";
+import { findOperationReceipt } from "../graph/publication.js";
 import {
   classifyEnrichmentFailure,
   createEnrichmentRun,
@@ -96,7 +104,6 @@ import type {
   EnrichmentMetadata,
   Feature,
   DataModelEntity,
-  AuxiliaryEntitiesFile,
   UIRegistryFile,
   SemanticElement,
 } from "../types/index.js";
@@ -194,9 +201,13 @@ interface EnrichResult {
   enriched_node_ids_truncated: boolean;
   batches_run: number;
   llm_calls: number;
-  tokens_used: number;
+  tokens_used: number | null;
+  usage?: LlmResponse["usage"];
+  usage_provenance?: "unavailable" | "partial" | "provider_reported";
+  stopped_reason?: string;
   duration_ms: number;
   errors: string[];
+  publication: { attempted: number; generated: number; committed: number; failed: number; conflicts: number; receipt_ids: string[] };
   notes: string[];
   /** UI nodes that received rich semantic metadata but still lack an evidenced relation. */
   ui_relation_gaps: string[];
@@ -517,13 +528,6 @@ async function loadUiRegistry(): Promise<UIRegistryFile | null> {
     logger.warn(`enrich_parser_nodes: failed to load ui_registry.json: ${err instanceof Error ? err.message : err}`);
     return null;
   }
-}
-
-async function saveUiRegistry(file: UIRegistryFile): Promise<void> {
-  file.metadata.total_elements = file.elements.length;
-  file.metadata.last_updated = new Date().toISOString();
-  await atomicWriteFile(dataPath("ui_registry.json"), JSON.stringify(file, null, 2));
-  invalidateCache("ui_registry.json");
 }
 
 export function chunk<T>(arr: T[], n: number): T[][] {
@@ -1003,6 +1007,9 @@ function uiHasEvidencedRelation(node: ParserNodeRecord, enrichment: PerNodeEnric
 // ---------------------------------------------------------------------------
 
 interface EnrichOptions {
+  signal?: AbortSignal;
+  /** Internal affected-region port; an explicit empty scope never means the entire graph. */
+  entityScope?: Array<{ repository_id:string;kind:string;id:string }>;
   target: TargetSpec;
   maxNodes: number;
   batchSize: number;
@@ -1187,6 +1194,7 @@ interface SourceEvidenceEntry {
   repo: string;
   file: string;
   excerpt: string;
+  content_hash: string;
 }
 
 function normalizedSourceFile(value: string): string {
@@ -1365,6 +1373,7 @@ async function loadSourceEvidence(
           repo: node.source_repo ?? "",
           file: resolved.relative,
           excerpt: content.slice(0, 6000),
+          content_hash: createHash("sha256").update(content).digest("hex"),
         }))
         .catch(() => null);
       cache.set(resolved.key, pending);
@@ -1396,7 +1405,11 @@ class ArchitectCodexEnrichmentProvider implements LlmProvider {
   }
 
   async complete(messages: LlmMessage[], options: LlmCompletionOptions = {}): Promise<LlmResponse> {
+    let signal = completionSignal(this.timeoutMs, options.signal);
+    if (options.images?.length) throw new Error("CLI_IMAGES_UNQUALIFIED");
+    if (options.jsonSchema) compileOutputValidator(options.jsonSchema.schema);
     const executable = await this.executable();
+    signal.throwIfAborted();
     if (!executable) throw new Error("Architect Codex CLI executable was not found");
     const scratch = await mkdtemp(path.join(tmpdir(), "dreamgraph-enrich-"));
     const outputFile = path.join(scratch, "last-message.json");
@@ -1411,41 +1424,71 @@ class ArchitectCodexEnrichmentProvider implements LlmProvider {
       args.push("--output-schema", schemaFile);
     }
     if (model && model !== "auto") args.push("--model", model);
-    if (/^gpt-6(?:\.1)?(?:$|[-_])/.test(model) || model.startsWith("gpt-5.6")) args.push("-c", 'model_reasoning_effort="xhigh"');
+    if (options.reasoningEffort) args.push("-c", "model_reasoning_effort=" + JSON.stringify(options.reasoningEffort));
     args.push("-");
     const prompt = messages.map((message) => `## ${message.role.toUpperCase()}\n${message.content}`).join("\n\n");
 
+    let reportedUsage: LlmResponse["usage"];
+    let closed = false;
+    const configured = getArchitectLlmConfig();
+    const admission = await nativeCliModelExecution({ ...configured, maxTokens: options.maxTokens ?? configured.maxTokens, timeoutMs: this.timeoutMs },
+      "codex-cli", model, options.reasoningEffort, "enrichment", options.admissionRunId);
     try {
-      const stderr = await new Promise<string>((resolve, reject) => {
+      const completed = await admission.request({ provider: configured.provider, model, payload: prompt,
+        output_tokens: options.maxTokens ?? configured.maxTokens, signal }, async admittedSignal => {
+        signal = admittedSignal;
+        try { const result = await new Promise<string>((resolve, reject) => {
         const spawnPlan = createArchitectCliBridgeSpawnPlan(executable, args);
         const child = spawn(spawnPlan.command, spawnPlan.args, {
           cwd: scratch,
           env: { ...process.env, ELECTRON_RUN_AS_NODE: "1" },
-          stdio: ["pipe", "ignore", "pipe"],
+          stdio: ["pipe", "pipe", "pipe"],
           windowsHide: true,
           windowsVerbatimArguments: spawnPlan.windowsVerbatimArguments,
         });
-        let errors = "";
-        const timer = setTimeout(() => child.kill(), Math.max(30_000, this.timeoutMs));
-        child.stderr.on("data", (chunk) => { errors += String(chunk); });
-        child.on("error", (err) => { clearTimeout(timer); reject(err); });
+        let errors = "", stdoutBuffer = "", stdoutBytes = 0, outputExceeded = false;
+        const readEvent = (line: string) => {
+          try { const event = JSON.parse(line); if (event.type === "turn.completed" && event.usage) reportedUsage = providerUsage("openai", { input_tokens: event.usage.input_tokens, output_tokens: event.usage.output_tokens, input_tokens_details: { cached_tokens: event.usage.cached_input_tokens } }); } catch { /* Diagnostics are not usage evidence. */ }
+        };
+        const abort = () => child.kill();
+        signal.addEventListener("abort", abort, { once: true });
+        child.stdout.on("data", chunk => {
+          stdoutBuffer += String(chunk); stdoutBytes += Buffer.byteLength(chunk);
+          if (stdoutBytes > 512 * 1024) { outputExceeded = true; stdoutBuffer = ""; child.kill(); return; }
+          const lines = stdoutBuffer.split("\n"); stdoutBuffer = lines.pop() ?? "";
+          for (const line of lines) readEvent(line);
+        });
+        child.stderr.on("data", chunk => { errors = (errors + String(chunk)).slice(-8192); });
+        child.on("error", err => { signal.removeEventListener("abort", abort); reject(err); });
         child.on("close", (code) => {
-          clearTimeout(timer);
+          closed = true;
+          signal.removeEventListener("abort", abort);
+          if (outputExceeded) { reject(new Error("CLI_OUTPUT_LIMIT")); return; }
+          if (stdoutBuffer) readEvent(stdoutBuffer);
+          if (signal.aborted) { reject(signal.reason); return; }
           if (code === 0) resolve(errors);
           else reject(new Error(`Architect Codex CLI exited ${code}: ${errors.slice(-2000)}`));
         });
+        if (signal.aborted) abort();
         child.stdin.end(prompt);
+        });
+        return { result: { stderr: result, failure: null as unknown }, usage: reportedUsage, acknowledged: closed && !signal.aborted };
+        } catch (failure) { return { result: { stderr: "", failure }, usage: reportedUsage, acknowledged: closed && !signal.aborted }; }
       });
-      void stderr;
+      if (completed.failure) throw completed.failure;
+      void completed.stderr;
       const text = await readFile(outputFile, "utf-8");
-      return { text, model: model || "architect-codex-cli", tokensUsed: 0 };
+      validateCompletionText(text, options, "codex-cli", model, reportedUsage);
+      return { text, model: model || "architect-codex-cli", ...(reportedUsage ? { usage: reportedUsage, tokensUsed: reportedUsage.outputTokens } : {}) };
     } finally {
-      await rm(scratch, { recursive: true, force: true }).catch(() => undefined);
+      const scratchRoot = path.resolve(scratch), tempRoot = path.resolve(tmpdir());
+      if (path.dirname(scratchRoot) === tempRoot && path.basename(scratchRoot).startsWith("dreamgraph-enrich-")) await rm(scratchRoot, { recursive: true, force: true }).catch(() => undefined);
     }
   }
 }
 
 async function selectEnrichmentRoute(modelSource: ModelSource): Promise<LlmRouteSelection> {
+  let automaticPrimary: LlmRouteSelection | null = null;
   if (modelSource !== "architect") {
     const standalone = await selectLlmRoute({
       task: "graph_enrichment",
@@ -1454,10 +1497,17 @@ async function selectEnrichmentRoute(modelSource: ModelSource): Promise<LlmRoute
       max_tokens: 8192,
     });
     if (modelSource === "standalone" || standalone.layer !== "deterministic_fallback") return standalone;
+    automaticPrimary = standalone;
   }
 
-  const architect = getArchitectLlmConfig();
   const architectAdapter = process.env.DREAMGRAPH_LLM_ARCHITECT_ADAPTER?.trim().toLowerCase();
+  const binding = architectAdapter === "codex-cli" ? null : await getRoleLlmProvider("architect");
+  const architect = binding?.config ?? getArchitectLlmConfig();
+  if (automaticPrimary) {
+    const configured = (await getRoleModelPolicy("enrichment")).policy.fallbacks;
+    const candidateAdapter = architectAdapter === "codex-cli" ? "codex-cli" : `${architect.provider}-api`;
+    if (!configured.some(item => item.approved && item.provider === architect.provider && item.model === architect.model && item.adapter === candidateAdapter)) return automaticPrimary;
+  }
   if (architectAdapter === "codex-cli") {
     const boundedTimeoutMs = Math.max(60_000, Math.min(architect.timeoutMs, 180_000));
     const cliProvider = new ArchitectCodexEnrichmentProvider(architect.model || "auto", boundedTimeoutMs);
@@ -1466,7 +1516,7 @@ async function selectEnrichmentRoute(modelSource: ModelSource): Promise<LlmRoute
         layer: "connected",
         provider: cliProvider,
         model: architect.model || "auto",
-        options: { maxTokens: 8192, model: architect.model || "auto" },
+        options: { maxTokens: 8192, model: architect.model || "auto", ...(architect.reasoningEffort ? { reasoningEffort: architect.reasoningEffort } : {}) },
         provenance: {
           task: "graph_enrichment",
           layer: "connected",
@@ -1477,20 +1527,21 @@ async function selectEnrichmentRoute(modelSource: ModelSource): Promise<LlmRoute
       };
     }
   }
-  const provider = createLlmProviderForConfig(architect);
+  const provider = binding?.provider ?? createLlmProviderForConfig(architect);
   if (architect.provider !== "none" && architect.model && await provider.isAvailable()) {
     return {
       layer: "connected",
       provider,
       model: architect.model,
-      options: { temperature: 0.2, maxTokens: Math.max(4096, architect.maxTokens), model: architect.model },
+      options: { temperature: architect.temperature, maxTokens: architect.maxTokens, model: architect.model, ...(architect.api ? { api: architect.api } : {}), ...(architect.reasoningEffort ? { reasoningEffort: architect.reasoningEffort } : {}), ...(architect.store !== undefined ? { store: architect.store } : {}) },
       provenance: {
         task: "graph_enrichment",
         layer: "connected",
         provider: provider.name,
         model: architect.model,
         source: "architect",
-        temperature: 0.2,
+        cognitive_role: "architect",
+        ...(binding ? { role_policy_fingerprint: binding.policy.fingerprint, role_policy_revision: binding.policy.policy.revision } : {}),
       },
     };
   }
@@ -1509,9 +1560,20 @@ async function executeEnrichParserNodes(
   opts: EnrichOptions,
 ): Promise<ToolResponse<EnrichResult>> {
   try {
-    return await withGraphOperation("enrichment", () => executeEnrichmentPass(opts));
+    if(opts.dryRun)return withGraphOperation("enrichment",()=>executeEnrichmentPass(opts));
+    const { withEngineJob }=await import("../cognitive/jobs.js");
+    return await withEngineJob({operation_id:`enrichment:${crypto.randomUUID()}`,owner:"enrichment",action:"enrich_parser_nodes",roles:["enrichment"],
+      scope:[opts.target],parameters:{target:opts.target,context_hops:opts.contextHops,max_nodes:opts.maxNodes}},
+      signal=>withGraphOperation("enrichment", () => executeEnrichmentPass({...opts,signal})),opts.signal);
   } catch (err) {
     if (err instanceof GraphOperationBusyError) return error(err.code, err.message);
+    const { EngineJobError } = await import("../cognitive/jobs.js");
+    if (err instanceof EngineJobError && err.code === "JOB_CONFLICT_BLOCKED") {
+      // This request has no scheduler/retry owner. Retire its undispatched intent.
+      const { EngineJobs } = await import("../cognitive/jobs.js");
+      await new EngineJobs().cancel(err.job_id, "overlapping_enrichment_rejected");
+      return error("GRAPH_OPERATION_BUSY", `An engine job owns the graph operation; enrichment was not dispatched (${err.job_id}).`);
+    }
     throw err;
   }
 }
@@ -1520,14 +1582,16 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
   const started = Date.now();
   const route = await selectEnrichmentRoute(opts.modelSource);
   logger.info(`enrich_parser_nodes: starting (model=${route.model ?? "none"}, provider=${route.provenance.provider ?? "none"}, context_hops=${opts.contextHops}, batch_size=${opts.batchSize})`);
-  const standaloneFallbackRoute = opts.modelSource === "architect"
-    ? await selectLlmRoute({
-        task: "graph_enrichment",
-        daemon_component: "dreamer",
-        daemon_temperature: 0.2,
-        max_tokens: 8192,
-      })
-    : null;
+  const enrichmentPolicy = await getRoleModelPolicy("enrichment");
+  const effectivePolicy = await getRoleModelPolicy(opts.modelSource === "architect" ? "architect" : "enrichment");
+  if (opts.contextHops > effectivePolicy.policy.budget.max_hops) throw new ModelAdmissionError("ADMISSION_MAX_HOPS_LIMIT", "enrichment");
+  opts = { ...opts, relationContextSize: Math.min(opts.relationContextSize, effectivePolicy.policy.budget.max_neighbors) };
+  const usageByCall: Array<LlmResponse["usage"]> = [];
+  let stoppedReason: string | undefined;
+  const proposedFallback = opts.modelSource === "architect" && enrichmentPolicy.policy.fallbacks.some(item => item.approved)
+    ? await selectLlmRoute({ task: "graph_enrichment", daemon_component: "dreamer", daemon_temperature: 0.2, max_tokens: 8192 }) : null;
+  const standaloneFallbackRoute = proposedFallback && enrichmentPolicy.policy.fallbacks.some(item => item.approved && item.provider === proposedFallback.provenance.provider && item.model === proposedFallback.model && item.adapter === enrichmentPolicy.effective.adapter)
+    ? proposedFallback : null;
 
   // Always load both files: features supply anchor context even when only
   // data_model is being enriched.
@@ -1585,6 +1649,7 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
     { key: "ui", filename: "ui_registry.json", entries: uiEntries, wrapped: "ui" },
     { key: "auxiliary", filename: "auxiliary_entities.json", entries: allAuxiliary, wrapped: "auxiliary" },
   ];
+  const inScope=(entry:ParserNodeRecord)=>opts.entityScope===undefined||opts.entityScope.some(identity=>identity.id===entry.id&&identity.kind===entry.graph_type&&identity.repository_id===entry.source_repo);
   const selected = resolvedTarget === "all"
     ? new Set<TargetFile>(everyTarget.map((target) => target.key))
     : resolvedTarget === "both"
@@ -1593,6 +1658,7 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
   const targets = everyTarget.filter((target) => selected.has(target.key) && (resolvedTarget !== "all" || target.entries.length > 0));
   const allNodes = everyTarget.flatMap((target) => target.entries);
   const scanBaseline = await loadScanState();
+  if (scanBaseline.status !== "missing" && scanBaseline.status !== "compatible") throw new Error(`ENRICHMENT_SCAN_UNAVAILABLE: ${scanBaseline.reason}`);
   const scanRevision = scanBaseline.state?.committed_revision ?? "legacy-unscoped";
   const providerFingerprint = [
     route.layer,
@@ -1600,19 +1666,40 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
     route.model ?? "none",
     standaloneFallbackRoute?.provenance.provider ?? "none",
     standaloneFallbackRoute?.model ?? "none",
+    enrichmentPolicy.fingerprint,
+    effectivePolicy.fingerprint,
+    JSON.stringify([opts.contextHops, opts.relationContextSize, opts.featureContextSize, opts.batchSize,opts.entityScope??null]),
+    JSON.stringify(route.options),
+    JSON.stringify(standaloneFallbackRoute?.options ?? {}),
   ].join(":");
   const checkpointFile = dataPath("enrichment_state.json");
   const eligibleIds = targets.flatMap((target) =>
-    target.entries.filter((entry) => entry.id && (opts.force || !isAlreadyEnriched(entry))).map((entry) => entry.id),
+    target.entries.filter((entry) => inScope(entry)&&entry.id && (opts.force || !isAlreadyEnriched(entry))).map((entry) => enrichmentNodeKey(target.filename, entry)),
   );
   const loadedCheckpoint = opts.dryRun ? null : await loadEnrichmentRun(checkpointFile);
-  let checkpoint: EnrichmentRunState = loadedCheckpoint &&
+  let checkpoint: EnrichmentRunState = !opts.force && loadedCheckpoint &&
     loadedCheckpoint.scan_revision === scanRevision &&
     loadedCheckpoint.provider_fingerprint === providerFingerprint
       ? loadedCheckpoint
       : createEnrichmentRun(scanRevision, providerFingerprint, eligibleIds);
+  // Migrate legacy ID-only checkpoints only when the mapping is unambiguous.
+  if (checkpoint === loadedCheckpoint) {
+    const typed = new Map<string, string[]>();
+    for (const target of everyTarget) for (const node of target.entries) {
+      if (!node.id) continue;
+      typed.set(node.id, [...(typed.get(node.id) ?? []), enrichmentNodeKey(target.filename, node)]);
+    }
+    const known = new Set([...typed.values()].flat());
+    const nodes: EnrichmentRunState["nodes"] = {};
+    for (const [id, outcome] of Object.entries(checkpoint.nodes)) {
+      const matches = known.has(id) ? [id] : typed.get(id) ?? [];
+      if (matches.length > 1) throw new Error(`AMBIGUOUS_LEGACY_ENRICHMENT_CHECKPOINT: ${id}`);
+      nodes[matches[0] ?? id] = outcome;
+    }
+    checkpoint = { ...checkpoint, nodes };
+  }
   const resumableIds = new Set(resumableNodeIds(checkpoint));
-  if (!opts.dryRun && !loadedCheckpoint) await persistEnrichmentRun(checkpointFile, checkpoint);
+  if (!opts.dryRun && JSON.stringify(loadedCheckpoint) !== JSON.stringify(checkpoint)) await persistEnrichmentRun(checkpointFile, checkpoint);
   const semanticGraph = buildSemanticAdjacency(allNodes);
   const graphTypeById = new Map<string, GraphNodeType>(allNodes.map((node) => [node.id, node.graph_type ?? "capability"]));
   const sourceMtimeCache = new Map<string, Promise<number | null>>();
@@ -1634,6 +1721,7 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
     tokens_used: 0,
     duration_ms: 0,
     errors: [],
+    publication: { attempted: 0, generated: 0, committed: 0, failed: 0, conflicts: 0, receipt_ids: [] },
     notes: [...deprecationNotes],
     ui_relation_gaps: [],
     semantic_coverage: {
@@ -1690,11 +1778,11 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
 
   let nodesProcessed = 0;
 
-  for (const t of targets) {
+  targetLoop: for (const t of targets) {
     result.files_processed.push(t.key);
 
     const eligible = t.entries.filter((e) =>
-      e.id && (opts.force || !isAlreadyEnriched(e)) && (opts.dryRun || resumableIds.has(e.id)),
+      inScope(e)&&e.id && (opts.force || !isAlreadyEnriched(e)) && (opts.dryRun || resumableIds.has(enrichmentNodeKey(t.filename, e))),
     );
     result.total_eligible += eligible.length;
     result.semantic_coverage.total_nodes += eligible.length;
@@ -1730,7 +1818,12 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
     for (const [bkey, bucketNodes] of buckets) {
       const [repo, domain] = bkey.split("::");
       for (const batch of chunk(bucketNodes, opts.batchSize)) {
+        if (stoppedReason || opts.signal?.aborted) { stoppedReason ??= "cancelled"; break targetLoop; }
         result.batches_run++;
+        result.publication.attempted += batch.length;
+        const checkpointBefore = checkpoint;
+        const batchDeltas: EnrichmentDelta[] = [];
+        const mergedByKey = new Map<string, ParserNodeRecord>();
 
         const contexts = new Map<string, ParserNodeRecord[]>();
         const relationTargets = new Map<string, GraphNodeType>();
@@ -1892,6 +1985,8 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
                 ];
                 const structuredOptions = {
                   ...route.options,
+                  admissionRunId: checkpoint.run_id,
+                  signal: opts.signal,
                   maxTokens: Math.min(route.options.maxTokens ?? 8192, 8192),
                   jsonMode: true,
                   jsonSchema: {
@@ -1906,23 +2001,32 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
                   result.llm_calls++;
                   resp = await provider.complete(messages, structuredOptions);
                 } catch (primaryError) {
+                  const admission = (primaryError as { admission?: LlmResponse["admission"] }).admission;
+                  if (admission) { result.llm_calls += admission.calls - 1; usageByCall.push(...admission.usage_by_call.map(usage => usage ?? undefined)); }
+                  else usageByCall.push(primaryError instanceof ProviderOutcomeError ? primaryError.usage : undefined);
                   const fallbackProvider = standaloneFallbackRoute?.layer !== "deterministic_fallback"
                     ? standaloneFallbackRoute?.provider
                     : null;
-                  if (!fallbackProvider || fallbackProvider === provider) throw primaryError;
+                  if (primaryError instanceof ModelAdmissionError || opts.signal?.aborted || !fallbackProvider || fallbackProvider === provider || primaryError instanceof ProviderOutcomeError && ["PROVIDER_REFUSAL", "PROVIDER_INCOMPLETE"].includes(primaryError.code)) throw primaryError;
                   const primaryMessage = primaryError instanceof Error ? primaryError.message : String(primaryError);
                   result.errors.push(
                     `Batch (${bkey}, ${batch.length} nodes): Architect provider failed (${primaryMessage}); retrying with standalone provider.`,
                   );
                   logger.warn(result.errors[result.errors.length - 1]);
                   result.llm_calls++;
-                  resp = await fallbackProvider.complete(messages, {
+                  try { resp = await fallbackProvider.complete(messages, {
                     ...structuredOptions,
                     ...standaloneFallbackRoute?.options,
                     maxTokens: Math.min(standaloneFallbackRoute?.options.maxTokens ?? 8192, 8192),
-                  });
+                  }); } catch (failure) {
+                    const admission = (failure as { admission?: LlmResponse["admission"] }).admission;
+                    if (admission) { result.llm_calls += admission.calls - 1; usageByCall.push(...admission.usage_by_call.map(usage => usage ?? undefined)); }
+                    else usageByCall.push(failure instanceof ProviderOutcomeError ? failure.usage : undefined);
+                    throw failure;
+                  }
                 }
-                result.tokens_used += resp.tokensUsed ?? 0;
+                if (resp.admission) { result.llm_calls += resp.admission.calls - 1; usageByCall.push(...resp.admission.usage_by_call.map(usage => usage ?? undefined)); }
+                else usageByCall.push(resp.usage ?? (resp.tokensUsed !== undefined ? { outputTokens: resp.tokensUsed } : undefined));
                 modelUsed = resp.model ?? route.model ?? standaloneFallbackRoute?.model ?? route.layer;
                 responseText = resp.text;
                 const finishReason = resp.finishReason ?? resp.stopReason;
@@ -1933,6 +2037,7 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
                 }
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
+                if (err instanceof ModelAdmissionError || opts.signal?.aborted) throw err;
                 throw new Error(`${llmRouteFailureReason("provider")}: ${msg}`);
               }
 
@@ -1979,6 +2084,7 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
             } catch (err) {
               const msg = err instanceof Error ? err.message : String(err);
               const classified = classifyEnrichmentFailure(err);
+              if (err instanceof ModelAdmissionError || opts.signal?.aborted) stoppedReason = err instanceof ModelAdmissionError ? err.code : "cancelled";
               if (classified.state === "failed_retryable") {
                 retryableFailureReason = classified.reason;
                 result.errors.push(`Batch (${bkey}, ${batch.length} nodes): ${msg}; checkpointed as retryable.`);
@@ -2000,8 +2106,6 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
 
         const nowIso = new Date().toISOString();
         let batchEnriched = 0;
-        let batchAnchors = 0;
-        let batchRelations = 0;
 
         for (const node of batch) {
           const enrichment = resultsById.get(node.id);
@@ -2009,12 +2113,12 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
           if (!enrichment) {
             result.total_skipped++;
             result.errors.push(`Node ${node.id}: missing in enrichment response`);
-            if (!opts.dryRun) checkpoint = recordEnrichmentOutcome(checkpoint, node.id, retryableFailureReason
+            if (!opts.dryRun) checkpoint = recordEnrichmentOutcome(checkpoint, enrichmentNodeKey(t.filename, node), retryableFailureReason
               ? { state: "failed_retryable", reason: retryableFailureReason }
               : { state: "failed_terminal", reason: "missing_enrichment_response" });
             continue;
           }
-          const { node: merged, anchorsAdded, relationsAdded } = mergeEnrichment(
+          const { node: merged } = mergeEnrichment(
             node,
             enrichment,
             validAnchorIds,
@@ -2061,88 +2165,100 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
               result.ui_relation_gaps.push(node.id);
             }
           }
-          const idx = indexById.get(node.id);
-          if (idx !== undefined) t.entries[idx] = merged;
-          // Make successful enrichments immediately reusable by later batches
-          // in the same invocation, including the semantic links just learned.
-          semanticGraph.byId.set(node.id, merged);
-          for (const link of merged.links ?? []) {
-            if (!semanticGraph.byId.has(link.target) || link.target === node.id) continue;
-            const own = semanticGraph.adjacency.get(node.id) ?? new Set<string>();
-            own.add(link.target);
-            semanticGraph.adjacency.set(node.id, own);
-            const reciprocal = semanticGraph.adjacency.get(link.target) ?? new Set<string>();
-            reciprocal.add(node.id);
-            semanticGraph.adjacency.set(link.target, reciprocal);
+          const key = enrichmentNodeKey(t.filename, node);
+          mergedByKey.set(key, merged);
+          let base: Record<string, unknown> = cleanForPersistence(node);
+          let next: Record<string, unknown> = cleanForPersistence(merged);
+          if (t.wrapped === "ui") {
+            const original = uiRegistry?.elements[uiIndexById.get(node.id) ?? -1];
+            if (!original) throw new Error(`UI_ENTITY_MISSING: ${node.id}`);
+            base = { ...original };
+            next = { ...base };
+            for (const field of ["description", "tags", "intent", "description_raw", "enrichment", "links", "data_contract", "interactions", "visual_semantics", "layout_semantics", "used_by", "children"]) {
+              if (merged[field] !== undefined) next[field] = merged[field];
+            }
           }
+          const kind = t.wrapped === "auxiliary" ? "auxiliary" : node.graph_type ?? "capability";
+          batchDeltas.push({ file: t.filename, kind, checkpoint_id: key, base, next });
           batchEnriched++;
-          if (result.enriched_node_ids.length < 100) result.enriched_node_ids.push(node.id);
-          else result.enriched_node_ids_truncated = true;
-          batchAnchors += anchorsAdded;
-          batchRelations += relationsAdded;
           if (fallbackNodeIds.has(node.id)) result.semantic_coverage.fallback_nodes++;
           else result.semantic_coverage.llm_enriched++;
-          if (!opts.dryRun) checkpoint = recordEnrichmentOutcome(checkpoint, node.id, {
+          if (!opts.dryRun) checkpoint = recordEnrichmentOutcome(checkpoint, key, {
             state: fallbackNodeIds.has(node.id) ? "failed_retryable" : "enriched",
             ...(fallbackNodeIds.has(node.id) ? { reason: "evidence_only_fallback" } : {}),
           });
         }
 
-        result.total_enriched += batchEnriched;
-        result.feature_anchors_written += batchAnchors;
-        result.relations_written += batchRelations;
-        logger.info(
-          `Semantic enrichment batch ${result.batches_run}: ${batchEnriched}/${batch.length} persisted candidates, ` +
-          `${fallbackNodeIds.size} fallback, ${result.semantic_coverage.llm_enriched}/${result.semantic_coverage.total_nodes} LLM-enriched overall`,
-        );
-        // Per-batch persistence: crash-safe — work done so far survives.
-        if (!opts.dryRun && batchEnriched > 0) {
+        result.publication.generated += batchEnriched;
+        let appliedKeys = [...mergedByKey.keys()];
+        if (!opts.dryRun) {
+          let publicationInput: EnrichmentBatchInput | null = null;
           try {
-            if (t.wrapped === "ui") {
-              // UI registry: merge enriched fields back into the wrapped file.
-              if (!uiRegistry) throw new Error("ui_registry.json missing during write");
-              for (const node of batch) {
-                const idx = uiIndexById.get(node.id);
-                if (idx === undefined) continue;
-                const updated = t.entries[indexById.get(node.id) ?? -1];
-                if (!updated) continue;
-                const el = uiRegistry.elements[idx];
-                el.description = updated.description;
-                el.tags = Array.isArray(updated.tags) ? [...updated.tags] : el.tags;
-                if (typeof updated.intent === "string" && updated.intent.length > 0) el.intent = updated.intent;
-                if (typeof updated.description_raw === "string") el.description_raw = updated.description_raw;
-                if (updated.enrichment) el.enrichment = updated.enrichment;
-                if (Array.isArray(updated.links)) {
-                  el.links = (updated.links as GraphLink[]).map((l) => ({ ...l }));
-                }
-                if (updated.data_contract) el.data_contract = updated.data_contract;
-                if (updated.interactions) el.interactions = updated.interactions;
-                if (updated.visual_semantics) el.visual_semantics = updated.visual_semantics;
-                if (updated.layout_semantics) el.layout_semantics = updated.layout_semantics;
-                if (updated.used_by) el.used_by = updated.used_by;
-                if (updated.children) el.children = updated.children;
-              }
-              await saveUiRegistry(uiRegistry);
-            } else if (t.wrapped === "auxiliary") {
-              const wrapped: AuxiliaryEntitiesFile = {
-                metadata: { ...auxiliaryFile.metadata, total: t.entries.length, last_scanned: new Date().toISOString() },
-                entries: t.entries.map(cleanForPersistence) as unknown as AuxiliaryEntitiesFile["entries"],
-              };
-              await atomicWriteFile(dataPath(t.filename), JSON.stringify(wrapped, null, 2));
-              invalidateCache(t.filename);
-            } else {
-              await atomicWriteFile(dataPath(t.filename), JSON.stringify(t.entries.map(cleanForPersistence), null, 2));
-              invalidateCache(t.filename);
-            }
+            const attempts = batch.map(node => [enrichmentNodeKey(t.filename, node), checkpointBefore.nodes[enrichmentNodeKey(t.filename, node)]?.attempts ?? 0]);
+            const operation_id = `${checkpoint.run_id}:batch:${createHash("sha256").update(JSON.stringify(attempts)).digest("hex")}`;
+            const checks = [...evidenceCatalog.values()].flatMap(source => {
+              const resolved = resolveRepoSource({ id: "source-check", source_repo: source.repo }, source.file);
+              if (!resolved) return [];
+              return [{ path: resolved.absolute, content_hash: source.content_hash, checkpoint_ids: batch.filter(node => sourceById.get(node.id)?.some(entry => entry.evidence_id === source.evidence_id)).map(node => enrichmentNodeKey(t.filename, node)) }];
+            });
+            publicationInput = { operation_id, scan_revision: scanRevision,
+              checkpoint_before: checkpointBefore, checkpoint_after: checkpoint, deltas: batchDeltas, source_checks: checks };
+            const published = await publishEnrichmentBatch(publicationInput);
+            checkpoint = published.checkpoint;
+            appliedKeys = published.batch.applied_ids;
+            result.publication.committed += appliedKeys.length;
+            result.publication.conflicts += published.batch.conflicts.length;
+            result.publication.receipt_ids.push(published.receipt.operation_id);
+            for (const conflict of published.batch.conflicts) result.errors.push(`Node ${conflict.checkpoint_id}: ${conflict.reason}; generated enrichment was not committed.`);
           } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
             result.errors.push(`Persist ${t.filename}: ${msg}`);
+            // A lost result may follow a committed marker. Recover persisted state
+            // before reporting counts or retrying; never overwrite it with memory.
+            if (publicationInput && await findOperationReceipt(publicationInput.operation_id, "semantic_enrichment")) {
+              const recovered = await publishEnrichmentBatch(publicationInput);
+              checkpoint = recovered.checkpoint; appliedKeys = recovered.batch.applied_ids;
+              result.publication.committed += appliedKeys.length;
+              result.publication.conflicts += recovered.batch.conflicts.length;
+              result.publication.receipt_ids.push(recovered.receipt.operation_id);
+              result.notes.push(`Recovered committed batch ${recovered.receipt.operation_id} after a lost result; no provider or delta was repeated.`);
+            } else {
+              const recovered = await loadEnrichmentRun(checkpointFile);
+              checkpoint = recovered?.run_id === checkpointBefore.run_id ? recovered : checkpointBefore;
+              appliedKeys = [];
+            }
           }
         }
-        if (!opts.dryRun) await persistEnrichmentRun(checkpointFile, checkpoint);
+        const rejectedKeys = [...mergedByKey.keys()].filter(key => !appliedKeys.includes(key));
+        result.publication.failed += rejectedKeys.length;
+        for (const key of rejectedKeys) {
+          const node = mergedByKey.get(key)!;
+          if (fallbackNodeIds.has(node.id)) result.semantic_coverage.fallback_nodes--;
+          else result.semantic_coverage.llm_enriched--;
+        }
+        result.total_enriched += appliedKeys.length;
+        // Counts of relations/anchors reflect only accepted deltas.
+        for (const key of appliedKeys) {
+          const merged = mergedByKey.get(key)!;
+          const original = batch.find(node => enrichmentNodeKey(t.filename, node) === key)!;
+          const addedLinks = (merged.links ?? []).filter(link => !(original.links ?? []).some(old => old.target === link.target));
+          result.feature_anchors_written += addedLinks.filter(link => link.type === "feature").length;
+          result.relations_written += addedLinks.filter(link => link.type !== "feature").length;
+          const idx = indexById.get(merged.id);
+          if (idx !== undefined) t.entries[idx] = merged;
+          semanticGraph.byId.set(merged.id, merged);
+          for (const link of merged.links ?? []) {
+            if (!semanticGraph.byId.has(link.target) || link.target === merged.id) continue;
+            const own = semanticGraph.adjacency.get(merged.id) ?? new Set<string>(); own.add(link.target); semanticGraph.adjacency.set(merged.id, own);
+            const reciprocal = semanticGraph.adjacency.get(link.target) ?? new Set<string>(); reciprocal.add(merged.id); semanticGraph.adjacency.set(link.target, reciprocal);
+          }
+          if (result.enriched_node_ids.length < 100) result.enriched_node_ids.push(merged.id);
+          else result.enriched_node_ids_truncated = true;
+        }
+        logger.info(`Semantic enrichment batch ${result.batches_run}: ${appliedKeys.length}/${batch.length} committed, ${rejectedKeys.length} uncommitted, ${fallbackNodeIds.size} fallback`);
         opts.onProgress?.(
-          `Semantic enrichment batch ${result.batches_run}: ${batchEnriched}/${batch.length} persisted, ` +
-          `${fallbackNodeIds.size} fallback`,
+          `Semantic enrichment batch ${result.batches_run}: ${appliedKeys.length}/${batch.length} ${opts.dryRun ? "generated" : "committed"}, ` +
+          `${rejectedKeys.length} uncommitted, ${fallbackNodeIds.size} fallback`,
           result.batches_run,
         );
 
@@ -2160,7 +2276,6 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
   if (exhaustedCount > 0) {
     result.notes.push(`${exhaustedCount} node(s) remain unresolved after the retry limit or a terminal failure.`);
   }
-  if (!opts.dryRun) await persistEnrichmentRun(checkpointFile, checkpoint);
   if (result.ui_relation_gaps.length > 0) {
     result.notes.push(
       `${result.ui_relation_gaps.length} richly enriched UI node(s) still lack an evidenced relation; ` +
@@ -2229,6 +2344,11 @@ async function executeEnrichmentPass(opts: EnrichOptions): Promise<ToolResponse<
       `errors=${result.errors.length} dry_run=${result.dry_run}`,
   );
 
+  const measured = summarizeProviderUsage(usageByCall);
+  result.usage = measured.usage;
+  result.usage_provenance = measured.usage_provenance;
+  result.tokens_used = result.llm_calls === 0 ? 0 : measured.usage?.outputTokens ?? null;
+  if (stoppedReason) { result.stopped_reason = stoppedReason; result.notes.push(`Stopped safely: ${stoppedReason}; unfinished nodes remain checkpointed for an explicit continuation.`); }
   return success<EnrichResult>(result);
 }
 
@@ -2242,6 +2362,7 @@ export async function enrichParserNodesProgrammatic(
     return Math.max(0, Math.min(1, Number.isFinite(candidate) ? candidate : fallback));
   };
   const merged: EnrichOptions = {
+    ...(opts.entityScope!==undefined?{entityScope:structuredClone(opts.entityScope)}:{}),
     target: opts.target ?? "all",
     maxNodes: opts.maxNodes ?? Number.MAX_SAFE_INTEGER,
     batchSize: opts.batchSize ?? 10,
@@ -2264,6 +2385,7 @@ export async function enrichParserNodesProgrammatic(
       0.75,
     ),
     onProgress: opts.onProgress,
+    signal: opts.signal,
   };
   return executeEnrichParserNodes(merged);
 }
@@ -2333,7 +2455,7 @@ export function registerEnrichParserNodesTool(server: McpServer): void {
         .default(20)
         .describe("How many sibling features to include as anchor context per bucket."),
       context_hops: z.number().int().min(0).max(MAX_ENRICHMENT_CONTEXT_HOPS).default(DEFAULT_ENRICHMENT_CONTEXT_HOPS)
-        .describe("Maximum semantic graph hops for every node (default 3; 0 omits graph-neighbor context)."),
+        .describe("Maximum semantic graph hops for every node (default 2; 0 omits graph-neighbor context)."),
       relation_context_size: z.number().int().min(5).max(100).default(40)
         .describe("Maximum related nodes supplied as semantic context for each node."),
       model_source: z.enum(["auto", "standalone", "architect"]).default("auto")
@@ -2379,6 +2501,7 @@ export function registerEnrichParserNodesTool(server: McpServer): void {
             semanticCache: semantic_cache,
             semanticCacheMinConfidence: semantic_cache_min_confidence,
             semanticCacheMinCoverage: semantic_cache_min_coverage,
+            signal: extra.signal,
             onProgress: (message, batch) => {
               extra.sendNotification({
                 method: "notifications/progress" as const,

@@ -25,6 +25,10 @@
 
 import { readFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
+import { withGraphRead,withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
+import { withFileLock } from "../utils/mutex.js";
+import { readCognitiveStore } from "./cognitive-store.js";
+import { riskDigest,observeRisk } from "./risk-lifecycle.js";
 import { atomicWriteFile } from "../utils/atomic-write.js";
 import { existsSync } from "node:fs";
 import { loadJsonArray } from "../utils/cache.js";
@@ -80,6 +84,8 @@ async function buildSecuritySnapshot(): Promise<Map<string, SecurityEntity>> {
   ]);
 
   const entities = new Map<string, SecurityEntity>();
+  const ids=[...features,...workflows,...dataModel].map(e=>e.id);
+  if(new Set(ids).size!==ids.length)throw new Error("THREAT_SCOPE_ID_AMBIGUOUS");
 
   for (const f of features) {
     const text = `${f.name} ${f.description} ${(f.tags ?? []).join(" ")} ${(f.keywords ?? []).join(" ")}`.toLowerCase();
@@ -172,8 +178,8 @@ function threatId(): string {
  * finding for dedup purposes — re-running the same heuristic against
  * the same graph topology must not grow the log indefinitely.
  */
-function canonicalThreatKey(t: Pick<ThreatEdge, "from" | "to" | "threat_category" | "cwe_id">): string {
-  return `${t.from}|${t.to}|${t.threat_category}|${t.cwe_id ?? ""}`;
+export function canonicalThreatKey(t:Pick<ThreatEdge,"from"|"to"|"threat_category"|"cwe_id">):string {
+  return riskDigest([t.from,t.to,t.threat_category,t.cwe_id??null]);
 }
 
 /**
@@ -419,24 +425,13 @@ function scanBrokenAccessControl(
 // Threat Log I/O
 // ---------------------------------------------------------------------------
 
-async function loadThreatLog(): Promise<ThreatLogFile> {
-  try {
-    if (!existsSync(threatLogPath())) return emptyThreatLog();
-    const raw = await readFile(threatLogPath(), "utf-8");
-    const p = JSON.parse(raw);
-    const e = emptyThreatLog();
-    return {
-      metadata: { ...e.metadata, ...(p.metadata && typeof p.metadata === "object" ? p.metadata : {}) },
-      threats: Array.isArray(p.threats) ? p.threats : [],
-    };
-  } catch {
-    return emptyThreatLog();
-  }
+async function loadThreatLog():Promise<ThreatLogFile> {
+  const data=await readCognitiveStore("threat_log.json",emptyThreatLog(),["threats"],["archived_threats"]);
+  if(data.threats.some(t=>!t||typeof t.id!=="string"||typeof t.from!=="string"||typeof t.to!=="string"))throw new Error("THREAT_STORE_INVALID");
+  if(Buffer.byteLength(JSON.stringify(data))>16*1024*1024)throw new Error("THREAT_HISTORY_CAPACITY");return data;
 }
-
-async function saveThreatLog(data: ThreatLogFile): Promise<void> {
-  data.metadata.total_threats = data.threats.length;
-  await atomicWriteFile(threatLogPath(), JSON.stringify(data, null, 2));
+async function saveThreatLog(data:ThreatLogFile):Promise<void> {
+  data.metadata.total_threats=data.threats.length;await atomicWriteFile(threatLogPath(),JSON.stringify(data,null,2));
 }
 
 function emptyThreatLog(): ThreatLogFile {
@@ -469,7 +464,7 @@ export async function nightmare(
 
   const startTime = Date.now();
   const cycle = engine.getCurrentDreamCycle();
-  const entities = await buildSecuritySnapshot();
+  const entities=await withGraphRead(()=>buildSecuritySnapshot());
 
   logger.info(
     `NIGHTMARE cycle starting: strategy=${strategy}, entities=${entities.size}`
@@ -525,39 +520,31 @@ export async function nightmare(
   //     but we never grow the threats array with redundant rows).
   // This stops the emitter from re-emitting the same 4 findings every
   // 5 minutes the way cycle 676 did (20 rows from 4 unique findings).
-  const log = await loadThreatLog();
-  const canonicalIndex = new Map<string, ThreatEdge>();
-  for (const existing of log.threats) {
-    canonicalIndex.set(canonicalThreatKey(existing), existing);
-  }
-  const nowIso = new Date().toISOString();
-  const freshThreats: ThreatEdge[] = [];
-  let suppressedCount = 0;
-  for (const t of allThreats) {
-    const key = canonicalThreatKey(t);
-    const existing = canonicalIndex.get(key);
-    if (existing) {
-      existing.duplicate_count = (existing.duplicate_count ?? 1) + 1;
-      existing.last_seen_at = nowIso;
-      existing.last_seen_cycle = cycle;
-      suppressedCount++;
-      continue;
+  allThreats=await withGraphReconciliation(()=>withFileLock("threat_log.json",async()=>{
+    const current=await buildSecuritySnapshot();
+    if(riskDigest([...current.entries()])!==riskDigest([...entities.entries()]))throw new Error("THREAT_INPUT_REVISION_CONFLICT");
+    const log=await loadThreatLog(),tensions=await engine.loadTensions(),now=new Date().toISOString();
+    const index=new Map(log.threats.map(t=>[canonicalThreatKey(t),t])),fresh:ThreatEdge[]=[];
+    for(const threat of allThreats){
+      const key=canonicalThreatKey(threat),existing=index.get(key),fingerprint=riskDigest([entities.get(threat.from),entities.get(threat.to),threat.severity,threat.attack_vector]);
+      const row=existing??{...threat,id:`threat_${key}`,assertion_class:"hypothesis" as const};
+      if(existing){row.duplicate_count=(row.duplicate_count??1)+1;row.last_seen_at=now;row.last_seen_cycle=cycle;
+        if(row.evidence_fingerprint!==fingerprint){
+          (row.review_history??=[]).push({at:now,reason:"Material detection inputs changed; prior disposition retained for review",previous_lifecycle:row.lifecycle,
+            previous_acknowledged:row.acknowledged,evidence_fingerprint:row.evidence_fingerprint??"legacy_unknown"});
+          row.lifecycle="review_required";row.acknowledged=false;row.severity=threat.severity;row.attack_vector=threat.attack_vector;row.description=threat.description;fresh.push(row);
+        }
+      }else{log.threats.push(row);index.set(key,row);fresh.push(row);}
+      row.evidence_fingerprint=fingerprint;row.assertion_class="hypothesis";
+      const risk=observeRisk(tensions,{type:"code_insight",domain:"security",entities:[row.from,row.to],description:row.description,
+        urgency:Math.min(1,row.confidence),risk_key:`threat:${row.id}`,observation_fingerprint:fingerprint},engine.riskPolicy(),now);
+      row.tension_id=risk.signal.id;
     }
-    freshThreats.push(t);
-    canonicalIndex.set(key, t);
-  }
-  if (suppressedCount > 0) {
-    logger.debug(
-      `  dedupe: suppressed ${suppressedCount} re-emission(s); appending ${freshThreats.length} new finding(s)`
-    );
-  }
-  allThreats = freshThreats;
-
-  // Persist to threat log
-  log.threats.push(...allThreats);
-  log.metadata.last_nightmare_cycle = nowIso;
-  log.metadata.total_nightmare_cycles++;
-  await saveThreatLog(log);
+    log.metadata.total_threats=log.threats.length;log.metadata.last_nightmare_cycle=now;log.metadata.total_nightmare_cycles++;
+    if(log.threats.length>10000||log.threats.some(t=>(t.review_history?.length??0)>10000))throw new Error("THREAT_HISTORY_CAPACITY_REQUIRES_ARCHIVE");
+    const body=JSON.stringify(log,null,2);if(Buffer.byteLength(body)>16*1024*1024)throw new Error("THREAT_HISTORY_CAPACITY_REQUIRES_ARCHIVE");
+    await engine.saveTensions(tensions,[{file:"threat_log.json",content:body}]);return fresh;
+  }));
 
   // Build attack surface summary
   const surfaceMap = new Map<string, { type: string; severity: ThreatSeverity }>();
@@ -633,6 +620,9 @@ export async function getThreatLog(): Promise<ThreatLogFile> {
  * Clear threat log.
  */
 export async function clearThreatLog(): Promise<void> {
-  await saveThreatLog(emptyThreatLog());
+  await withGraphReconciliation(()=>withFileLock("threat_log.json",async()=>{
+    const prior=await loadThreatLog(),empty=emptyThreatLog();empty.archived_threats=[...(prior.archived_threats??[]),...prior.threats];
+    if(empty.archived_threats.length>10000)throw new Error("THREAT_HISTORY_CAPACITY_REQUIRES_ARCHIVE");await saveThreatLog(empty);
+  }));
   logger.info("Threat log cleared");
 }

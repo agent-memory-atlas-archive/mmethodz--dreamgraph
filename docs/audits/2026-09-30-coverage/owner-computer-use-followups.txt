@@ -1,0 +1,18 @@
+Owner clarification, 2026-09-30:
+
+The wants can remain ambitious: operate browsers and native apps, use vision, exploit structured accessibility/DOM data where possible, interact autonomously when permitted, feed results back into the graph, resume/recover, work naturally through Architect.
+
+The musts are where Ashoka should be uncompromising: cross-platform contract, explicit scope/authority, graph integration, session isolation, lifecycle correctness, evidence/provenance, bounded spend, safe cancellation, no dependence on one provider/model, no API continuation assumptions leaking into CLI adapters, and no one platform becoming the de-facto architectural definition.
+
+Third is the realities. What are the realities on each platform and how to overcome them.
+
+Execution detail clarification:
+Computer use should be detailed enough plan for Sol 6.1 to execute. (Well Sol 6.1 is the executor for the complete v14 but I suspect computer use plan needs one step further in detail. Maybe. Don't overdo it though.)
+
+Adapter routing clarification:
+yes possibly when using cli adapter the codex cli computer use can be a possibility. for native api adapter it should be provided by the dreamgraph harness
+
+naturally when using codex cli for example the codex cli computer use capabilities are the way to go. it will depend on the adapter in this case.
+
+Final owner formulation:
+so simply the rule for computer use capability simplified is: use the best native capability available but normalize the contract above it

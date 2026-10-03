@@ -1,8 +1,12 @@
 # DreamGraph v5.0 Cognitive Engine
 
+Ashoka [claim evidence](ashoka/normalization-evidence.md) separates claim-specific source corroboration from semantic fit, repeated generation and human assertions. Native ADR-241 amends only ADR-096's relaxed factual-evidence clause while preserving cold-start exploration and its dual exit. Slice 15 integration and qualification are in progress.
+
 > *"The graph dreams, forgets, and learns."*
 
 The Cognitive Engine is the heart of DreamGraph's autonomous learning system. It operates as a stateful cognitive loop that continuously analyzes the knowledge graph, generates hypotheses, validates them, and maintains architectural memory over time.
+
+Ashoka's [canonical context packs](ashoka/retrieval.md) are shared by RAG, cognitive preambles and task compilation. All graph families retain evidence and truth classes, with independent context/metadata budgets and whole-unit omission. Deterministic retrieval requires no provider. Managed source effects affect only known dependent scopes until reconciliation; pending optional dreaming and scan age do not make reconciled facts stale.
 
 ---
 
@@ -102,7 +106,7 @@ The tool requires `confirm: true` and is classified as `internal-only` in the di
 
 ## Dream Strategies
 
-DreamGraph supports multiple dream-generation strategies.
+DreamGraph has eleven active executors in one [strategy catalogue](../src/cognitive/strategy-catalog.ts); dispatch, resource advertisement, dashboard choices and allocation consume it. See the [execution contract](ashoka/strategies.md).
 
 | Strategy | Purpose |
 |---|---|
@@ -114,11 +118,11 @@ DreamGraph supports multiple dream-generation strategies.
 | `symmetry_completion` | Adds likely reverse / mirrored relationships |
 | `tension_directed` | Focuses dreaming around unresolved tensions |
 | `causal_replay` | Mines historical cause → effect chains |
-| `reflective` | Agent-driven insight capture after code reading |
+| `reflective` | Retired: historical requests receive `STRATEGY_RETIRED`; use explicit reviewed graph observations |
 | `orphan_bridging` | Attaches degree-0 fact-graph entities to nearest plausible neighbor using relaxed signals (capped per cycle by `DG_ORPHAN_BUDGET`, default 20). Adds a +0.15 score bonus when both endpoints transitively touch the same datastore. |
 | `pgo_wave` | Stochastic Lévy-flight divergence — long-range reseeding of the dream search distribution |
-| `schema_grounding` | Uses scanned datastore tables (`scan_database`) to (1) propose `stored_in` edges from `data_model` entities to their datastore (exact match conf 0.85, fuzzy 0.55), (2) propose `shares_state_with` edges between top-level entities in different repos that resolve to the same datastore, and (3) raise `phantom_entity` / `shadow_table` tensions. Inert when no datastores are configured or no scan has run. |
-| `all` | Runs the full strategy set |
+| `schema_grounding` | Proposes persistence hypotheses from scanned tables and bounded shadow-table tensions. Ambiguous table/store matches do not select an arbitrary anchor; information structures need no datastore. |
+| `all` | Runs admitted active strategies within one combined node/edge/tension budget |
 
 ---
 
@@ -319,8 +323,8 @@ The `engine.env` file uses simple `KEY=VALUE` syntax (supports comments with `#`
 
 When `strategy="all"` is used (the default for scheduled dream cycles):
 
-1. **LLM dream runs first** — allocated 40% of the total dream budget
-2. **Structural strategies split the remaining 60%** — gap detection, weak reinforcement, etc.
+1. **LLM dream runs first** — default weight 35%; PGO has 15%. Explicit zero disables its aggregate allocation.
+2. **Structural strategies share the remainder** — exact largest-remainder allocation bounds the combined output, including zero/tiny budgets. A single selected strategy receives the full budget. Missing abstraction reserves room for its hub and connections together.
 3. **Normalization runs next** — validates or retains latent signals
 4. **Tensions and narratives update** — the graph's memory evolves
 
@@ -395,3 +399,38 @@ Instead of every session starting from zero, the system:
 - improves through repeated cycles
 - keeps reasoning grounded in a durable graph rather than transient prompts
 <!-- CONTINUATION TEST SLICE 10 -->
+
+## Ashoka provider implementation checkpoint
+
+Daemon dreaming, semantic normalization, tension proposal, scan extraction and enrichment bind independent immutable role policies. Native schema requests require qualified evidence; refusal/truncation/incomplete outcomes retain usage and cannot be accepted as ordinary results. See [provider boundaries](ashoka/providers.md) for explicit fallback, original-schema validation, cancellation and outstanding CLI/readiness/client gates.
+
+### Cognitive output attribution and evaluated policy choice
+
+Dreamer and normalizer outputs carry [versioned prompt/schema/context/policy provenance](ashoka/cognitive-policy-evaluation.md) with requested/reported model and actual admission telemetry. Attribution is not independent support. The frozen offline evaluator counts contrary evidence, repeated ancestry, novel hypotheses, unjustified promotion and justified abstention. It preserves actual legacy-normalizer output rather than rewriting unfavorable evidence; the truth gate follows in Slice 15. Real paid/Computer Use comparisons remain unrun until separate consent and bounded supervised execution. Background sampling never borrows a connecting MCP client's authority; direct sampling requests bind their exact session transport.
+
+Architect output preferences never change trust or independent source evidence. CLI autonomy is an execution scope fence; native density can remain prompt-guided without weakening evidence/failure reporting.
+
+Ashoka Slice 14 [persistent strategy learning](ashoka/strategy-learning.md) stores post-dedup observations and reviewed usefulness in existing `meta_log.json`, with atomic dream/learning publication and explicit fixed-allocation recovery. Source owners include `src/cognitive/strategy-portfolio.ts` and `src/cognitive/dream-deduplication.ts`; repeated generation is neither evidence nor labeled accuracy. Qualification is pending.
+
+Ashoka Slice 16 [curation and retention](ashoka/curation-retention.md) adds append-only dispositions to existing `graph_maintenance.json` and reversible hash-bound archives. The source owner is `src/cognitive/curation.ts`. Reject/retire/reopen, dream decay and quarantine share the graph publication writer; human acceptance remains a human assertion and assessment history is preserved. `mutate_validated_edge` now requires `reason` and `expected_revision` and accepts `operation_id`/`dry_run`; retarget creates a proposal requiring revalidation. Qualification is pending.
+
+## Durable job execution (Slice 17, implementation in progress)
+
+[Job ownership](ashoka/engine-jobs.md) pins configuration and aggregates role/fallback admission under one job. Aborting waiting is distinct from work termination. Revoked generations cannot publish; unknown provider liability and unresolved source effects retain recovery state and conflict ownership. Scheduler, dirty-region and bootstrap integration and qualification are pending.
+
+Slice 17 schedule parameters now reject unknown/invalid fields before work; zero dream allocation and zero focus hops remain explicit. Revision CAS and operation identities protect updates and manual-run replay. Schedule history retains original action/parameters/version rather than interpreting a newer definition. Readiness is capability evidence, not authority to spend. Event intake is bounded and replay-bound, retains history, and explicitly labels recommendations advisory. Dirty enrichment/digestion stages coalesce managed edits, use bounded affected entity scopes and retain generation/cost/unknown-scope diagnostics. Their production qualification remains in progress.
+
+Engine scheduling also owns the existing outbound webhook path: durable immutable send intent, finite retries/deadline, abortable transport/backoff and truthful unknown-effect recovery. The event router persists causal deduplication and automatic-event cooldowns from its existing log; advisory intake is never reported as executed cognition. Manual re-enrichment shares parent admission and selected-role hop ceilings. Daemon startup recovery is independent of scheduled cognition enablement.
+
+### Ashoka temporal and federation evidence
+
+Historical observations retain event/observation time and derived ancestry. Causal API names expose correlation hypotheses without intervention proof. Versioned foreign records remain unreviewed hypotheses; no repeated-import confidence or source-root promotion. See [Slice 18](ashoka/temporal-federation.md).
+
+### Ashoka risk and remediation lifecycle (Slice 19, in progress)
+
+Connection-risk system closure requires the exact declared predicate and current independently supported canonical normalization. Human rationale remains a disposition; proposals, actions and expiry cannot prove a fix. Retained events/revisions protect concurrent updates, and affected-region digestion rechecks the stored proof without touching unrelated risks. See ashoka/risk-remediation.md.
+
+
+Ashoka Slice20 is in progress: narrative/playback/lifecycle views consume a revision-bound derived source context and separate historical counts from current proof. Story history is retained in archived_chapters/archived_digests; missing/corrupt published history fails closed. Lucid exploration has a finite session-owned existing engine job lease and durable lucid_log.json intent/actions/recovery. Human acceptance records a rationale and human_assertion with zero independent roots, never inflated confidence or source verification. No source/provider/user wait occurs under the writer. Qualification is pending; see docs/ashoka/lifecycle-narrative.md.
+
+The Slice27 [admitted matched answer collector](ashoka/admitted-agent-evaluation.md) pins explicit reviewed tariffs in the original core job snapshot and checkpoints actual API replies to existing private result artifacts. Its ordinary callback harness rejects real-model execution. Native read-only collection requires exact original-operator disclosure approval and shared run/day allocation; partial/uncertain outcomes remain inspectable. Collected answers retain pending independent review and establish no material-understanding gain by themselves.

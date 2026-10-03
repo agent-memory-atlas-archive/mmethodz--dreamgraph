@@ -1,6 +1,6 @@
 {
   "name": "@dreamgraph/sdk",
-  "version": "13.4.0",
+  "version": "14.0.0",
   "description": "DreamGraph plugin authoring SDK",
   "type": "module",
   "main": "dist/index.js",
@@ -37,6 +37,14 @@
     "./seams/tools": {
       "types": "./dist/seams/tools.d.ts",
       "import": "./dist/seams/tools.js"
+    },
+    "./seams/computer-control": {
+      "types": "./dist/seams/computer-control.d.ts",
+      "import": "./dist/seams/computer-control.js"
+    },
+    "./seams/computer-pass": {
+      "types": "./dist/seams/computer-pass.d.ts",
+      "import": "./dist/seams/computer-pass.js"
     },
     "./seams/resources": {
       "types": "./dist/seams/resources.d.ts",

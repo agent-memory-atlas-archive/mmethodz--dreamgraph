@@ -9,6 +9,12 @@
 - Fit-graph and pause-flow controls, navigation hints, reduced-motion support, and consistent filters and two-hop Focus in both views.
 - Correct premultiplied-alpha output for Sigma, and a linear HDR → bloom → output color conversion → SMAA pipeline for Three.js. Screenshot capture retains the live view's exposure.
 
+## Browser Architect
+
+- Web64 IDE v2-inspired workstation styling: neutral charcoal surfaces, compact beveled controls, flat tabs, and amber keyboard focus.
+- Denser plan navigation and inspector accordions, clearer conversation and composer surfaces, and consistent onboarding, runtime controls, and ADR editing.
+- Responsive stacked sidebars, reduced-motion support, and proper hiding of inactive controls. Provider routing, plan state, and daemon authority are unchanged.
+
 ## Scan and enrichment
 
 - `dg scan <instance> --max-hops N` and `dg enrich <instance> --max-hops N` control semantic neighborhood expansion, from 0 through 6. The default remains 3; 0 omits neighbor context. MCP tools accept the equivalent `context_hops` input.

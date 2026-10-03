@@ -1,3 +1,8 @@
+import { resolveProviderCapability } from "./generated/provider-capabilities.js";
+import { AsyncLocalStorage } from 'node:async_hooks';
+import type { ManagedModelSession, NativeModelTicket } from './managed-model-session.js';
+import type { ManagedModelBinding } from './generated/graph-contracts.js';
+import { assertProviderOutcome, assertClientFunctionOutput, providerUsage, compileOutputValidator, validateCompletionText, anthropicOutputSchema, ProviderOutcomeError, type TokenUsage } from "./generated/provider-outcome.js";
 /**
  * DreamGraph Architect LLM Provider — Layer 2 (Context Orchestration).
  *
@@ -64,6 +69,7 @@ export interface ArchitectResponse {
   promptTokens: number;
   completionTokens: number;
   durationMs: number;
+  usage?: TokenUsage;
 }
 
 export interface ToolUseRequest {
@@ -176,8 +182,7 @@ const ANTHROPIC_EFFORT_MODELS = [
 ] as const;
 
 export function supportsAnthropicEffortConfig(model: string): boolean {
-  const normalized = model.trim().toLowerCase();
-  return ANTHROPIC_EFFORT_MODELS.some((prefix) => normalized.startsWith(prefix));
+  return Boolean(resolveProviderCapability("anthropic", model.trim())?.efforts.length);
 }
 
 export function supportsAnthropicAdaptiveThinking(model: string): boolean {
@@ -202,7 +207,8 @@ function logAnthropicThinkingDrops(model: string, transformations: unknown): voi
 export function getAnthropicDefaultEffortForModel(model: string): AnthropicEffort {
   if (model.trim().toLowerCase().startsWith("claude-opus-5-5")) return "medium";
   if (/^claude-(sonnet-5|fable-5-1|mythos-5-1)/i.test(model.trim())) return "high";
-  return supportsAnthropicEffortConfig(model) ? "xhigh" : "high";
+  const supported = resolveProviderCapability("anthropic", model.trim())?.efforts as readonly string[] | undefined;
+  return supported?.includes("xhigh") ? "xhigh" : "high";
 }
 
 export function getAnthropicMaxTokensForModel(model: string): number {
@@ -222,14 +228,12 @@ export function getAnthropicMaxTokensForModel(model: string): number {
 /*  Emergency input-budget brakes                                     */
 /* ------------------------------------------------------------------ */
 /**
- * Per-section warning threshold (chars). Telemetry only � no requests are
- * rejected client-side. The pressure-aware `BudgetCoordinator` (token economy)
- * is the sole authority on context sizing; provider APIs reject anything that
- * actually overflows their server-side window. We only log here so unusually
- * large sections (system prompt blow-ups, runaway tool histories, etc.) remain
- * visible in the "DreamGraph Context" output channel.
+ * Per-section warning threshold (chars). Character/token estimates are telemetry.
+ * An independent UTF-8 byte ceiling refuses the complete serialized request;
+ * neither this defensive ceiling nor the soft coordinator measures model tokens.
  */
 const SECTION_WARN_CHARS = 80_000;
+const MAX_NATIVE_REQUEST_BYTES = 8 * 1024 * 1024;
 
 /**
  * Optional sink that receives structured budget summaries.
@@ -287,6 +291,9 @@ function _logRequestBudget(callsite: string, model: string, body: Record<string,
 
 function _serializeAndLogRequest(callsite: string, model: string, body: Record<string, unknown>): string {
   const serialized = JSON.stringify(body);
+  if (Buffer.byteLength(serialized, 'utf8') > MAX_NATIVE_REQUEST_BYTES) {
+    throw new Error('REQUEST_UTF8_BYTE_BOUND: whole request exceeds 8 MiB; narrow the input. Required evidence was not clipped, and no provider request was sent.');
+  }
   _logRequestBudget(callsite, model, body, serialized);
   return serialized;
 }
@@ -294,6 +301,109 @@ function _serializeAndLogRequest(callsite: string, model: string, body: Record<s
 export class ArchitectLlm implements vscode.Disposable {
   private _config: ArchitectConfig | null = null;
   private _secretStorage: vscode.SecretStorage;
+  private _managedModelsRequired = false;
+  private readonly _modelScope = new AsyncLocalStorage<ManagedModelSession>();
+  private readonly _modelCall = new AsyncLocalStorage<{ session: ManagedModelSession; retry: boolean; ticket?: NativeModelTicket; launched: boolean; terminal: boolean; usage?: TokenUsage; controller: AbortController }>();
+
+  /** Scope follows asynchronous continuations, without sharing authority between concurrent host passes. */
+  withinModelAdmission<T>(session: ManagedModelSession, work: () => Promise<T>): Promise<T> {
+    if (this._modelScope.getStore()) throw new Error('NATIVE_MODEL_SCOPE_ALREADY_BOUND');
+    return this._modelScope.run(session, work);
+  }
+  /** Production editor entry points cannot silently become an unaccounted provider adapter. */
+  requireModelAdmission(): void { this._managedModelsRequired = true; }
+  private async _inference<T extends ArchitectResponse>(retry: boolean, work: () => Promise<T>): Promise<T> {
+    const session = this._modelScope.getStore();
+    if (!session) {
+      if (this._managedModelsRequired) throw new Error('NATIVE_MODEL_MANAGED_SCOPE_REQUIRED: use the original DreamGraph host model admission');
+      return work(); // Standalone embedders remain explicitly unattested until they adopt a host port.
+    }
+    const frame = { session, retry, launched: false, terminal: false, controller: new AbortController() } as NonNullable<ReturnType<ArchitectLlm['_modelCall']['getStore']>>;
+    return this._modelCall.run(frame, async () => {
+      let reply: T | undefined, failure: unknown;
+      try { reply = await work(); } catch (error) { failure = error; }
+      try {
+        if (frame.ticket) await session.settle(frame.ticket, reply?.usage ?? frame.usage ?? (failure instanceof ProviderOutcomeError ? failure.usage : undefined),
+          frame.terminal || !frame.launched ? 'confirmed' : 'unconfirmed', frame.terminal || !frame.launched);
+      } catch (error) {
+        throw new Error(`NATIVE_MODEL_REPORT_REQUIRED: ${session.executionId}; ${String(error)}${failure ? `; native outcome: ${String(failure)}` : ''}`, { cause: failure ?? error });
+      } finally { frame.controller.abort(new Error('NATIVE_MODEL_REQUEST_CLOSED')); }
+      if (failure !== undefined) throw failure;
+      if (!reply) throw new Error('NATIVE_MODEL_REPLY_UNAVAILABLE');
+      if (frame.ticket && !frame.terminal) throw new Error('NATIVE_MODEL_TERMINAL_UNCONFIRMED');
+      return reply;
+    });
+  }
+  private async _fetch(config: ArchitectConfig, url: string, init: RequestInit): Promise<Response> {
+    const frame = this._modelCall.getStore();
+    if (!frame) return fetch(url, init);
+    if (frame.ticket) throw new Error('NATIVE_MODEL_SECOND_DISPATCH_FORBIDDEN');
+    if (typeof init.body !== 'string') throw new Error('NATIVE_MODEL_SERIALIZED_BODY_REQUIRED');
+    const body = JSON.parse(init.body), api = url === `${config.baseUrl}/responses` ? 'responses'
+      : url === `${config.baseUrl}/chat/completions` ? 'chat_completions'
+      : url === `${config.baseUrl}/messages` ? 'messages' : url === `${config.baseUrl}/api/chat` ? 'local' : undefined;
+    if (!api || !['openai', 'anthropic', 'ollama', 'lmstudio'].includes(config.provider)) throw new Error('NATIVE_MODEL_ENDPOINT_UNSUPPORTED');
+    const output = body.max_output_tokens ?? body.max_completion_tokens ?? body.max_tokens ?? body.options?.num_predict;
+    const binding: ManagedModelBinding = { provider: config.provider as ManagedModelBinding['provider'], adapter: 'native_api', model: config.model,
+      api, base_url: config.baseUrl, effort: body.reasoning?.effort ?? body.reasoning_effort ?? body.output_config?.effort ?? null,
+      retention: body.store === false ? 'store_false' : body.store === true ? 'store_true' : api === 'local' ? 'local_only' : 'provider_default',
+      strict_schema: body.response_format?.json_schema?.strict === true || body.text?.format?.strict === true || body.output_config?.format?.type === 'json_schema', output_tokens: output };
+    frame.ticket = await frame.session.admit(binding, init.body, output, init.signal ?? undefined, frame.retry);
+    frame.ticket.signal.throwIfAborted();
+    frame.launched = true;
+    const signal = AbortSignal.any([frame.ticket.signal, frame.controller.signal]);
+    const response = await fetch(url, { ...init, signal });
+    // A finite whole-response ceiling preserves live streaming; it is byte safety, not token measurement.
+    const reader = response.body?.getReader(); let bytes = 0, eventBuffer = '';
+    const decoder = new TextDecoder(), rawUsage: Record<string, unknown> = {};
+    const observe = (data: any) => {
+      if (!data || typeof data !== 'object') return;
+      const providerData = data.response ?? data;
+      if (binding.provider === 'openai' && (binding.api === 'responses'
+        ? ['completed', 'incomplete', 'failed', 'cancelled'].includes(providerData.status)
+        : ['stop', 'tool_calls', 'function_call', 'length', 'content_filter'].includes(data.choices?.[0]?.finish_reason))
+        || binding.provider === 'lmstudio' && ['stop', 'tool_calls', 'function_call', 'length', 'content_filter'].includes(data.choices?.[0]?.finish_reason)
+        || binding.provider === 'anthropic' && (data.type === 'message_stop' || ['end_turn', 'tool_use', 'max_tokens', 'stop_sequence', 'refusal', 'pause_turn', 'model_context_window_exceeded'].includes(data.stop_reason))
+        || binding.provider === 'ollama' && data.done === true) frame.terminal = true;
+      Object.assign(rawUsage, data.message?.usage ?? {}, providerData.usage ?? data.usage ?? {});
+      const usage = providerUsage(binding.provider, binding.provider === 'ollama' ? data : rawUsage);
+      if (usage) frame.usage = { ...frame.usage, ...usage };
+    };
+    const observeLine = (line: string) => {
+      const value = binding.provider === 'ollama' ? line.trim() : line.startsWith('data:') ? line.slice(5).trim() : '';
+      if (!value || value === '[DONE]') return; // A transport sentinel alone cannot attest provider completion.
+      try { observe(JSON.parse(value)); } catch { /* The native parser owns malformed protocol refusal. */ }
+    };
+    const bounded = reader ? new ReadableStream<Uint8Array>({
+      async pull(controller) {
+        try {
+          signal.throwIfAborted(); const part = await reader.read();
+          if (part.done) {
+            if (body.stream) { eventBuffer += decoder.decode(); if (eventBuffer.trim()) observeLine(eventBuffer); }
+            reader.releaseLock(); controller.close(); return;
+          }
+          bytes += part.value.byteLength;
+          if (bytes > 8 * 1024 * 1024) { await reader.cancel(); throw new Error('NATIVE_MODEL_RESPONSE_UTF8_BYTE_BOUND'); }
+          if (body.stream && response.ok) {
+            eventBuffer += decoder.decode(part.value, { stream: true });
+            const lines = eventBuffer.split('\n'); eventBuffer = lines.pop() ?? '';
+            if (Buffer.byteLength(eventBuffer, 'utf8') > 4 * 1024 * 1024) throw new Error('NATIVE_MODEL_STREAM_FRAME_BYTE_BOUND');
+            lines.forEach(observeLine);
+          }
+          controller.enqueue(part.value);
+        } catch (error) { await reader.cancel().catch(() => undefined); controller.error(error); }
+      },
+      cancel(reason) { return reader.cancel(reason); },
+    }) : null;
+    const result = new Response(bounded, { status: response.status, statusText: response.statusText, headers: response.headers });
+    if (!body.stream || !result.ok && [400, 401, 403, 404, 422, 429].includes(result.status)) {
+      const content = await result.text(); signal.throwIfAborted();
+      if (!result.ok && [400, 401, 403, 404, 422, 429].includes(result.status)) frame.terminal = true;
+      else if (result.ok) { try { observe(JSON.parse(content)); } catch { /* Native validation refuses the invalid whole result. */ } }
+      return new Response(content || null, { status: result.status, statusText: result.statusText, headers: result.headers });
+    }
+    return result;
+  }
 
   constructor(secretStorage: vscode.SecretStorage) {
     this._secretStorage = secretStorage;
@@ -329,17 +439,8 @@ export class ArchitectLlm implements vscode.Disposable {
 
     switch (effectiveProvider) {
       case "anthropic":
-        return { textAttachments: true, imageAttachments: effectiveModel.startsWith("claude") };
-      case "openai": {
-        const imageCapable =
-          effectiveModel.startsWith("gpt-5") ||
-          effectiveModel.startsWith("gpt-6") ||
-          effectiveModel.startsWith("gpt-4.1") ||
-          effectiveModel.startsWith("gpt-4o") ||
-          effectiveModel.startsWith("o4") ||
-          effectiveModel.startsWith("o3");
-        return { textAttachments: true, imageAttachments: imageCapable };
-      }
+      case "openai":
+        return { textAttachments: true, imageAttachments: resolveProviderCapability(effectiveProvider, effectiveModel)?.images ?? false };
       case "ollama":
         return { textAttachments: true, imageAttachments: false };
       case "lmstudio":
@@ -362,9 +463,7 @@ export class ArchitectLlm implements vscode.Disposable {
       : undefined;
 
     if (normalized) {
-      if (model.startsWith("claude-opus-4-6") && normalized === "xhigh") {
-        return "high";
-      }
+      if (!(resolveProviderCapability("anthropic", model)?.efforts as readonly string[] | undefined)?.includes(normalized)) throw new Error("REASONING_EFFORT_UNSUPPORTED");
       return normalized;
     }
 
@@ -432,6 +531,7 @@ export class ArchitectLlm implements vscode.Disposable {
       }
     }
 
+    if (this._isStructuredOutputEnabled(config.provider)) body.output_config = { ...(body.output_config as Record<string, unknown> ?? {}), format: { type: "json_schema", schema: anthropicOutputSchema(ARCHITECT_PASS_JSON_SCHEMA) } };
     return body;
   }
 
@@ -467,6 +567,9 @@ export class ArchitectLlm implements vscode.Disposable {
   }
 
   async call(messages: ArchitectMessage[], signal?: AbortSignal): Promise<ArchitectResponse> {
+    return this._inference(false, () => this._callConfigured(messages, signal));
+  }
+  private async _callConfigured(messages: ArchitectMessage[], signal?: AbortSignal): Promise<ArchitectResponse> {
     this._ensureConfigured();
     const config = this._config!;
     const start = Date.now();
@@ -485,6 +588,9 @@ export class ArchitectLlm implements vscode.Disposable {
   }
 
   async stream(messages: ArchitectMessage[], onChunk: StreamCallback, signal?: AbortSignal): Promise<ArchitectResponse> {
+    return this._inference(false, () => this._streamConfigured(messages, onChunk, signal));
+  }
+  private async _streamConfigured(messages: ArchitectMessage[], onChunk: StreamCallback, signal?: AbortSignal): Promise<ArchitectResponse> {
     this._ensureConfigured();
     const config = this._config!;
     const start = Date.now();
@@ -503,6 +609,11 @@ export class ArchitectLlm implements vscode.Disposable {
   }
 
   async callWithTools(
+    messages: ArchitectMessage[], tools: ToolDefinition[], rawMessages?: unknown[], signal?: AbortSignal, retry = false,
+  ): Promise<ArchitectToolResponse> {
+    return this._inference(retry, () => this._callWithToolsConfigured(messages, tools, rawMessages, signal));
+  }
+  private async _callWithToolsConfigured(
     messages: ArchitectMessage[],
     tools: ToolDefinition[],
     rawMessages?: unknown[],
@@ -518,26 +629,36 @@ export class ArchitectLlm implements vscode.Disposable {
       provider: config.provider,
     });
 
+    const validators = new Map(tools.map(tool => [tool.name, compileOutputValidator(tool.inputSchema)]));
+    const validate = async (operation: Promise<ArchitectToolResponse>) => {
+      const response = await operation;
+      const seen = new Set<string>();
+      for (const call of response.toolCalls) {
+        if (!call.id || seen.has(call.id) || !validators.get(call.name)?.(call.input)) throw new ProviderOutcomeError("TOOL_ARGUMENTS_INVALID", config.provider, config.model, "tool_contract_mismatch", response.usage);
+        seen.add(call.id);
+      }
+      return response;
+    };
     switch (config.provider) {
       case "anthropic":
-        return this._callAnthropicWithTools(
+        return validate(this._callAnthropicWithTools(
           config,
           compactedRequest.messages,
           compactedRequest.tools ?? [],
           start,
           compactedRequest.rawMessages,
           signal,
-        );
+        ));
       case "openai":
       case "lmstudio":
-        return this._callOpenAIWithTools(
+        return validate(this._callOpenAIWithTools(
           config,
           compactedRequest.messages,
           compactedRequest.tools ?? [],
           start,
           compactedRequest.rawMessages,
           signal,
-        );
+        ));
       case "ollama": {
         const resp = await this._callOllama(config, compactedRequest.messages, start, signal);
         return { ...resp, toolCalls: [], stopReason: "end_turn" };
@@ -680,7 +801,7 @@ export class ArchitectLlm implements vscode.Disposable {
       system,
     );
 
-    const res = await fetch(`${config.baseUrl}/messages`, {
+    const res = await this._fetch(config, `${config.baseUrl}/messages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -692,7 +813,7 @@ export class ArchitectLlm implements vscode.Disposable {
       signal,
     });
 
-    if (!res.ok) throw new Error(`Anthropic API error (${res.status}): ${await res.text()}`);
+    if (!res.ok) throw new Error(`Anthropic API error (${res.status})`);
 
     const data = (await res.json()) as {
       content: Array<{ type: string; text?: string }>;
@@ -700,10 +821,12 @@ export class ArchitectLlm implements vscode.Disposable {
       input_transformations?: unknown[];
     };
 
+    assertProviderOutcome(config.provider, config.model, data, providerUsage(config.provider, data.usage));
     logAnthropicThinkingDrops(config.model, data.input_transformations);
 
     return {
-      content: data.content.filter((c) => c.type === "text").map((c) => c.text ?? "").join(""),
+      content: this._maybeProjectStructuredContent(config, data.content.filter((c) => c.type === "text").map((c) => c.text ?? "").join("")),
+      usage: providerUsage(config.provider, data.usage),
       promptTokens: data.usage?.input_tokens ?? 0,
       completionTokens: data.usage?.output_tokens ?? 0,
       durationMs: Date.now() - start,
@@ -730,7 +853,7 @@ export class ArchitectLlm implements vscode.Disposable {
       : messages.filter((m) => m.role !== "system").map((m) => ({ role: m.role, content: this._toAnthropicContent(m.content) }));
 
     const requestBody = this._buildAnthropicMessagesRequest(config, apiMessages, system, tools);
-    const res = await fetch(`${config.baseUrl}/messages`, {
+    const res = await this._fetch(config, `${config.baseUrl}/messages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -742,7 +865,7 @@ export class ArchitectLlm implements vscode.Disposable {
       signal,
     });
 
-    if (!res.ok) throw new Error(`Anthropic API error (${res.status}): ${await res.text()}`);
+    if (!res.ok) throw new Error(`Anthropic API error (${res.status})`);
 
     const data = (await res.json()) as {
       content: Array<{ type: string; text?: string; id?: string; name?: string; input?: Record<string, unknown> }>;
@@ -751,10 +874,13 @@ export class ArchitectLlm implements vscode.Disposable {
       input_transformations?: unknown[];
     };
 
+    assertProviderOutcome(config.provider, config.model, data, providerUsage(config.provider, data.usage));
     logAnthropicThinkingDrops(config.model, data.input_transformations);
 
+    assertClientFunctionOutput(config.provider,config.model,data.content,"anthropic",providerUsage(config.provider,data.usage));
     return {
-      content: data.content.filter((c) => c.type === "text").map((c) => c.text ?? "").join(""),
+      content: this._maybeProjectStructuredContent(config, data.content.filter((c) => c.type === "text").map((c) => c.text ?? "").join(""), data.content.some(c => c.type === "tool_use")),
+      usage: providerUsage(config.provider, data.usage),
       promptTokens: data.usage?.input_tokens ?? 0,
       completionTokens: data.usage?.output_tokens ?? 0,
       durationMs: Date.now() - start,
@@ -766,17 +892,26 @@ export class ArchitectLlm implements vscode.Disposable {
     };
   }
 
-    private _usesOpenAIResponsesApi(model: string): boolean {
-    return usesOpenAIResponsesApi(model);
+    private _usesOpenAIResponsesApi(model: string, tools = false): boolean {
+    const selected = vscode.workspace.getConfiguration("dreamgraph.architect").get<string>("openai.api") ?? "auto";
+    const evidence = resolveProviderCapability("openai", model);
+    if (!["auto", "responses", "chat_completions"].includes(selected)) throw new Error("PROVIDER_API_UNSUPPORTED");
+    const api = selected === "auto" ? evidence?.default_api ?? "chat-completions" : selected === "responses" ? "responses" : "chat-completions";
+    if (evidence && !(evidence.apis as readonly string[]).includes(api)) throw new Error("PROVIDER_API_UNSUPPORTED");
+    const efforts = evidence?.tool_api_efforts;
+    if (tools && efforts && (!(api in efforts) || efforts[api] !== null && !(efforts[api] as readonly string[]).includes(this._getOpenAIReasoningEffort() ?? "provider_default"))) throw new Error("TOOLS_REQUIRE_RESPONSES");
+    return api === "responses";
   }
 
-  private _getOpenAIReasoningEffort(): "low" | "medium" | "high" | "xhigh" {
+  private _getOpenAIReasoningEffort(): "none" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max" | undefined {
     const cfg = vscode.workspace.getConfiguration("dreamgraph.architect");
     const configured = (cfg.get<string>("openai.reasoningEffort") ?? "").trim().toLowerCase();
-    if (configured === "low" || configured === "medium" || configured === "high" || configured === "xhigh") {
-      return configured;
-    }
-    return "medium";
+    const evidence = resolveProviderCapability("openai", this._config?.model ?? "");
+    const efforts: readonly string[] = evidence?.efforts ?? [];
+    if (!configured && efforts.length === 0) return undefined;
+    const effort = configured || (efforts.includes("medium") ? "medium" : efforts.includes("high") ? "high" : efforts[0]);
+    if (!efforts.includes(effort)) throw new Error("REASONING_EFFORT_UNSUPPORTED");
+    return effort as "none" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max";
   }
 
   private _getOpenAITextVerbosity(): "low" | "medium" | "high" {
@@ -831,13 +966,15 @@ export class ArchitectLlm implements vscode.Disposable {
   private _isStructuredOutputEnabled(provider: ArchitectProvider): boolean {
     const cfg = vscode.workspace.getConfiguration("dreamgraph.architect");
     const explicit = cfg.get<boolean>("structuredOutput");
+    const evidence = resolveProviderCapability(provider, this._config?.model ?? "");
+    if ((explicit === true || explicit === undefined && provider === "openai") && !evidence?.strict_schema) throw new Error("STRICT_SCHEMA_CAPABILITY_REQUIRED");
     if (typeof explicit === "boolean") return explicit;
     // Default ON for OpenAI (strict json_schema is grammar-constrained server-side).
     // Default OFF for ollama and lmstudio: schema support exists in recent Ollama
     // (>=0.5) and via OpenAI-compat in LM Studio, but enforcement quality depends
     // on the loaded model, so users opt in. Default OFF for anthropic: forced
-    // tool-use is the only API-level enforcement and it conflicts with the
-    // agentic tool loop, so we keep Anthropic on its prompt-driven envelope.
+    // Native JSON schemas are available; preserve explicit opt-in because the
+    // legacy Claude route used a prompt-driven envelope by default.
     return provider === "openai";
   }
 
@@ -884,7 +1021,9 @@ export class ArchitectLlm implements vscode.Disposable {
    * fails or structured output is off, the original content is returned
    * unchanged.
    */
-  private _maybeProjectStructuredContent(config: ArchitectConfig, content: string): string {
+  private _maybeProjectStructuredContent(config: ArchitectConfig, content: string, allowEmptyForTools = false): string {
+    if (!content.trim() && !allowEmptyForTools && this._isStructuredOutputEnabled(config.provider)) throw new ProviderOutcomeError("PROVIDER_OUTPUT_INVALID", config.provider, config.model, "empty_structured_output");
+    if (content.trim() && this._isStructuredOutputEnabled(config.provider)) validateCompletionText(content, { jsonSchema: { name: ARCHITECT_PASS_SCHEMA_NAME, schema: ARCHITECT_PASS_JSON_SCHEMA } }, config.provider, config.model);
     if (!this._isStructuredOutputEnabled(config.provider)) return content;
     const projection = projectStrictEnvelopeToLegacy(content);
     return projection ? projection.legacyContent : content;
@@ -897,7 +1036,7 @@ export class ArchitectLlm implements vscode.Disposable {
     signal?: AbortSignal,
   ): Promise<ArchitectResponse> {
     const requestBody = this._buildOpenAIResponsesRequest(config, messages);
-    const res = await fetch(`${config.baseUrl}/responses`, {
+    const res = await this._fetch(config, `${config.baseUrl}/responses`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -907,13 +1046,15 @@ export class ArchitectLlm implements vscode.Disposable {
       signal,
     });
 
-    if (!res.ok) throw new Error(`OpenAI Responses API error (${res.status}): ${await res.text()}`);
+    if (!res.ok) throw new Error(`OpenAI Responses API error (${res.status})`);
 
     const data = (await res.json()) as OpenAIResponsesData;
+    assertProviderOutcome(config.provider, config.model, data, providerUsage(config.provider, data.usage));
     const result = normalizeOpenAIResponsesResult(data);
 
     return {
       content: this._maybeProjectStructuredContent(config, result.text),
+      usage: providerUsage(config.provider, result.usage),
       promptTokens: result.usage?.input_tokens ?? 0,
       completionTokens: result.usage?.output_tokens ?? 0,
       durationMs: Date.now() - start,
@@ -929,7 +1070,7 @@ export class ArchitectLlm implements vscode.Disposable {
     signal?: AbortSignal,
   ): Promise<ArchitectToolResponse> {
     const requestBody = this._buildOpenAIResponsesRequest(config, messages, rawMessages, tools);
-    const res = await fetch(`${config.baseUrl}/responses`, {
+    const res = await this._fetch(config, `${config.baseUrl}/responses`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -939,14 +1080,17 @@ export class ArchitectLlm implements vscode.Disposable {
       signal,
     });
 
-    if (!res.ok) throw new Error(`OpenAI Responses API error (${res.status}): ${await res.text()}`);
+    if (!res.ok) throw new Error(`OpenAI Responses API error (${res.status})`);
 
     const data = (await res.json()) as OpenAIResponsesData;
+    assertProviderOutcome(config.provider, config.model, data, providerUsage(config.provider, data.usage));
     const result = normalizeOpenAIResponsesResult(data);
     const toolCalls = extractOpenAIResponsesToolCalls(data);
+    assertClientFunctionOutput(config.provider,config.model,data.output??[],"responses",providerUsage(config.provider,data.usage));
 
     return {
-      content: this._maybeProjectStructuredContent(config, result.text),
+      content: this._maybeProjectStructuredContent(config, result.text, toolCalls.length > 0),
+      usage: providerUsage(config.provider, result.usage),
       promptTokens: result.usage?.input_tokens ?? 0,
       completionTokens: result.usage?.output_tokens ?? 0,
       durationMs: Date.now() - start,
@@ -965,7 +1109,7 @@ export class ArchitectLlm implements vscode.Disposable {
     rawMessages?: unknown[],
     signal?: AbortSignal,
   ): Promise<ArchitectToolResponse> {
-    if (this._usesOpenAIResponsesApi(config.model)) {
+    if (this._usesOpenAIResponsesApi(config.model, true)) {
       return this._callOpenAIResponsesWithTools(config, messages, tools, start, rawMessages, signal);
     }
 
@@ -987,7 +1131,7 @@ export class ArchitectLlm implements vscode.Disposable {
       (apiMessages as Array<Record<string, unknown>>).unshift({ role: "system", content: system });
     }
 
-    const res = await fetch(`${config.baseUrl}/chat/completions`, {
+    const res = await this._fetch(config, `${config.baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -996,6 +1140,7 @@ export class ArchitectLlm implements vscode.Disposable {
       body: _serializeAndLogRequest('callOpenAIWithTools', config.model, {
         model: config.model,
         max_completion_tokens: 16384,
+        ...(this._getOpenAIReasoningEffort() ? { reasoning_effort: this._getOpenAIReasoningEffort() } : {}),
         messages: apiMessages,
         tools: openaiTools,
         ...this._openAIChatResponseFormat(config.provider),
@@ -1003,7 +1148,7 @@ export class ArchitectLlm implements vscode.Disposable {
       signal,
     });
 
-    if (!res.ok) throw new Error(`OpenAI API error (${res.status}): ${await res.text()}`);
+    if (!res.ok) throw new Error(`OpenAI API error (${res.status})`);
 
     const data = (await res.json()) as {
       choices: Array<{
@@ -1013,16 +1158,18 @@ export class ArchitectLlm implements vscode.Disposable {
       usage: { prompt_tokens: number; completion_tokens: number };
     };
 
+    assertProviderOutcome(config.provider, config.model, data, providerUsage(config.provider, data.usage));
     const choice = data.choices[0];
     return {
-      content: this._maybeProjectStructuredContent(config, choice?.message?.content ?? ""),
+      content: this._maybeProjectStructuredContent(config, choice?.message?.content ?? "", !!choice?.message?.tool_calls?.length),
+      usage: providerUsage(config.provider, data.usage),
       promptTokens: data.usage?.prompt_tokens ?? 0,
       completionTokens: data.usage?.completion_tokens ?? 0,
       durationMs: Date.now() - start,
       toolCalls: (choice?.message?.tool_calls ?? []).map((tc) => ({
         id: tc.id,
         name: tc.function.name,
-        input: JSON.parse(tc.function.arguments),
+        input: (() => { try { return JSON.parse(tc.function.arguments); } catch { throw new ProviderOutcomeError("TOOL_ARGUMENTS_INVALID", config.provider, config.model, "invalid_json", providerUsage(config.provider, data.usage)); } })(),
       })),
       stopReason: choice?.finish_reason === "tool_calls" ? "tool_use" : (choice?.finish_reason ?? "stop"),
     };
@@ -1044,7 +1191,7 @@ export class ArchitectLlm implements vscode.Disposable {
       true,
     );
 
-    const res = await fetch(`${config.baseUrl}/messages`, {
+    const res = await this._fetch(config, `${config.baseUrl}/messages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1056,8 +1203,9 @@ export class ArchitectLlm implements vscode.Disposable {
       signal,
     });
 
-    if (!res.ok) throw new Error(`Anthropic API error (${res.status}): ${await res.text()}`);
-    return this._readSSEStream(res, onChunk, start, "anthropic");
+    if (!res.ok) throw new Error(`Anthropic API error (${res.status})`);
+    const result = await this._readSSEStream(res, onChunk, start, "anthropic");
+    return { ...result, content: this._maybeProjectStructuredContent(config, result.content) };
   }
 
   private async _callOpenAI(
@@ -1070,7 +1218,7 @@ export class ArchitectLlm implements vscode.Disposable {
       return this._callOpenAIResponses(config, messages, start, signal);
     }
 
-    const res = await fetch(`${config.baseUrl}/chat/completions`, {
+    const res = await this._fetch(config, `${config.baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1079,30 +1227,69 @@ export class ArchitectLlm implements vscode.Disposable {
       body: _serializeAndLogRequest('callOpenAI', config.model, {
         model: config.model,
         max_completion_tokens: 16384,
+        ...(this._getOpenAIReasoningEffort() ? { reasoning_effort: this._getOpenAIReasoningEffort() } : {}),
         messages: messages.map((m) => ({ role: m.role, content: this._toOpenAIContent(m.content) })),
         ...this._openAIChatResponseFormat(config.provider),
       }),
       signal,
     });
 
-    if (!res.ok) throw new Error(`OpenAI API error (${res.status}): ${await res.text()}`);
+    if (!res.ok) throw new Error(`OpenAI API error (${res.status})`);
 
     const data = (await res.json()) as {
       choices: Array<{ message: { content: string } }>;
       usage: { prompt_tokens: number; completion_tokens: number };
     };
 
+    assertProviderOutcome(config.provider, config.model, data, providerUsage(config.provider, data.usage));
     const rawContent = data.choices[0]?.message?.content ?? "";
-    const projectedContent = this._isStructuredOutputEnabled(config.provider)
-      ? (projectStrictEnvelopeToLegacy(rawContent)?.legacyContent ?? rawContent)
-      : rawContent;
+    const projectedContent = this._maybeProjectStructuredContent(config, rawContent);
 
     return {
       content: projectedContent,
+      usage: providerUsage(config.provider, data.usage),
       promptTokens: data.usage?.prompt_tokens ?? 0,
       completionTokens: data.usage?.completion_tokens ?? 0,
       durationMs: Date.now() - start,
     };
+  }
+
+  private async _streamOpenAIResponses(config: ArchitectConfig, messages: ArchitectMessage[], onChunk: StreamCallback, start: number, signal?: AbortSignal): Promise<ArchitectResponse> {
+    const body = { ...this._buildOpenAIResponsesRequest(config, messages), stream: true };
+    const res = await this._fetch(config, `${config.baseUrl}/responses`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${config.apiKey}` }, body: _serializeAndLogRequest("streamOpenAIResponses", config.model, body), signal });
+    if (!res.ok) throw new Error(`OpenAI Responses API error (${res.status})`);
+    const reader = res.body?.getReader(); if (!reader) throw new Error("No response body");
+    let buffer = "", content = "", completed: OpenAIResponsesData | null = null;
+    const decoder = new TextDecoder(), extractor = this._isStructuredOutputEnabled(config.provider) ? new StrictNarrativeStreamExtractor() : null;
+    try {
+      while (true) {
+        const { done, value } = await reader.read(); if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        if (buffer.length > 4 * 1024 * 1024) throw new ProviderOutcomeError("PROVIDER_OUTPUT_INVALID", "openai", config.model, "stream_frame_limit");
+        const lines = buffer.split("\n"); buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          const data = line.slice(5).trim(); if (!data || data === "[DONE]") continue;
+          let event: any; try { event = JSON.parse(data); } catch { throw new ProviderOutcomeError("PROVIDER_OUTPUT_INVALID", "openai", config.model, "invalid_stream"); }
+          if (event.type === "error") throw new ProviderOutcomeError("PROVIDER_FAILED", "openai", config.model, "stream_error");
+          if (event.type === "response.refusal.delta" || event.type === "response.refusal.done") throw new ProviderOutcomeError("PROVIDER_REFUSAL", "openai", config.model, "refusal");
+          if (event.type === "response.failed" || event.type === "response.incomplete") assertProviderOutcome("openai", config.model, event.response ?? { status: event.type.slice(9) }, providerUsage("openai", event.response?.usage));
+          if (event.type === "response.output_text.delta" && typeof event.delta === "string") {
+            content += event.delta; if (content.length > 512 * 1024) throw new ProviderOutcomeError("PROVIDER_OUTPUT_INVALID", "openai", config.model, "output_limit");
+            const visible = extractor ? extractor.feed(event.delta) : event.delta; if (visible) onChunk(visible);
+          }
+          if (event.type === "response.completed") {
+            if (!event.response || event.response.status !== "completed") throw new ProviderOutcomeError("PROVIDER_OUTPUT_INVALID", "openai", config.model, "missing_completed_response");
+            completed = event.response; assertProviderOutcome("openai", config.model, completed, providerUsage("openai", completed!.usage));
+          }
+        }
+      }
+      if (!completed) throw new ProviderOutcomeError("PROVIDER_INCOMPLETE", "openai", config.model, "stream_ended_without_completion");
+      const final = normalizeOpenAIResponsesResult(completed), usage = providerUsage("openai", completed.usage);
+      // The completed authoritative response wins over preview deltas.
+      const text = final.text || content;
+      return { content: this._maybeProjectStructuredContent(config, text), usage, promptTokens: usage?.inputTokens ?? 0, completionTokens: usage?.outputTokens ?? 0, durationMs: Date.now() - start };
+    } finally { await reader.cancel().catch(() => undefined); }
   }
 
   private async _streamOpenAI(
@@ -1112,7 +1299,8 @@ export class ArchitectLlm implements vscode.Disposable {
     start: number,
     signal?: AbortSignal,
   ): Promise<ArchitectResponse> {
-    const res = await fetch(`${config.baseUrl}/chat/completions`, {
+    if (this._usesOpenAIResponsesApi(config.model)) return this._streamOpenAIResponses(config, messages, onChunk, start, signal);
+    const res = await this._fetch(config, `${config.baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1121,6 +1309,7 @@ export class ArchitectLlm implements vscode.Disposable {
       body: _serializeAndLogRequest('streamOpenAI', config.model, {
         model: config.model,
         max_completion_tokens: 16384,
+        ...(this._getOpenAIReasoningEffort() ? { reasoning_effort: this._getOpenAIReasoningEffort() } : {}),
         stream: true,
         messages: messages.map((m) => ({ role: m.role, content: this._toOpenAIContent(m.content) })),
         ...this._openAIChatResponseFormat(config.provider),
@@ -1128,7 +1317,7 @@ export class ArchitectLlm implements vscode.Disposable {
       signal,
     });
 
-    if (!res.ok) throw new Error(`OpenAI API error (${res.status}): ${await res.text()}`);
+    if (!res.ok) throw new Error(`OpenAI API error (${res.status})`);
 
     // When strict structured-output is on, the wire content is a single JSON
     // object that begins with `{`. Stream the unescaped `narrative` field to
@@ -1146,8 +1335,7 @@ export class ArchitectLlm implements vscode.Disposable {
       // everything (the wrapper above only forwarded narrative chars). The
       // SSE reader assembled the full content from deltas; feed any unfed
       // tail by replacing the buffer wholesale via finalize on raw content.
-      const projection = projectStrictEnvelopeToLegacy(raw.content);
-      return projection ? { ...raw, content: projection.legacyContent } : raw;
+      return { ...raw, content: this._maybeProjectStructuredContent(config, raw.content) };
     }
     return this._readSSEStream(res, onChunk, start, "openai");
   }
@@ -1159,13 +1347,14 @@ export class ArchitectLlm implements vscode.Disposable {
     start: number,
     signal?: AbortSignal,
   ): Promise<ArchitectResponse> {
-    const res = await fetch(`${config.baseUrl}/api/chat`, {
+    const res = await this._fetch(config, `${config.baseUrl}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: _serializeAndLogRequest('callOllama', config.model, {
         model: config.model,
         messages: messages.map((m) => ({ role: m.role, content: this._toOllamaContent(m.content) })),
         stream: false,
+        options: { num_predict: 8192 },
         ...this._ollamaFormatField(config.provider),
       }),
       signal,
@@ -1179,8 +1368,11 @@ export class ArchitectLlm implements vscode.Disposable {
       eval_count?: number;
     };
 
+    if (this._modelCall.getStore() && (data as { done?: boolean }).done !== true) throw new ProviderOutcomeError('PROVIDER_INCOMPLETE', config.provider, config.model, 'missing_local_completion', providerUsage(config.provider, data));
+    assertProviderOutcome(config.provider, config.model, data, providerUsage(config.provider, data));
     return {
       content: this._maybeProjectStructuredContent(config, data.message?.content ?? ""),
+      usage: providerUsage(config.provider, data),
       promptTokens: data.prompt_eval_count ?? 0,
       completionTokens: data.eval_count ?? 0,
       durationMs: Date.now() - start,
@@ -1194,13 +1386,14 @@ export class ArchitectLlm implements vscode.Disposable {
     start: number,
     signal?: AbortSignal,
   ): Promise<ArchitectResponse> {
-    const res = await fetch(`${config.baseUrl}/api/chat`, {
+    const res = await this._fetch(config, `${config.baseUrl}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: _serializeAndLogRequest('streamOllama', config.model, {
         model: config.model,
         messages: messages.map((m) => ({ role: m.role, content: this._toOllamaContent(m.content) })),
         stream: true,
+        options: { num_predict: 8192 },
         ...this._ollamaFormatField(config.provider),
       }),
       signal,
@@ -1211,128 +1404,83 @@ export class ArchitectLlm implements vscode.Disposable {
     const reader = res.body?.getReader();
     if (!reader) throw new Error("No response body");
     const decoder = new TextDecoder();
-    let fullContent = "";
-    let promptTokens = 0;
-    let completionTokens = 0;
-
-    // When structured-output mode is on the wire content is a strict JSON
-    // envelope; stream the unescaped narrative to the live UI and project
-    // to the legacy fenced shape on completion. Mirrors the OpenAI Chat
-    // Completions streaming path so downstream consumers see one shape.
-    const structuredOn = this._isStructuredOutputEnabled(config.provider);
-    const extractor = structuredOn ? new StrictNarrativeStreamExtractor() : null;
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const line = decoder.decode(value, { stream: true }).trim();
-      if (!line) continue;
-      try {
-        const parsed = JSON.parse(line) as {
-          message?: { content?: string };
-          done?: boolean;
-          prompt_eval_count?: number;
-          eval_count?: number;
-        };
-        const chunk = parsed.message?.content ?? "";
-        if (chunk) {
-          fullContent += chunk;
-          if (extractor) {
-            const visible = extractor.feed(chunk);
-            if (visible) onChunk(visible);
-          } else {
-            onChunk(chunk);
-          }
-        }
-        if (parsed.done) {
-          promptTokens = parsed.prompt_eval_count ?? promptTokens;
-          completionTokens = parsed.eval_count ?? completionTokens;
-        }
-      } catch {
-        // skip malformed lines
-      }
-    }
-
-    const projectedContent = structuredOn
-      ? (projectStrictEnvelopeToLegacy(fullContent)?.legacyContent ?? fullContent)
-      : fullContent;
-
-    return {
-      content: projectedContent,
-      promptTokens,
-      completionTokens,
-      durationMs: Date.now() - start,
+    let fullContent = '', buffer = '', terminal = false, usage: TokenUsage | undefined;
+    const extractor = this._isStructuredOutputEnabled(config.provider) ? new StrictNarrativeStreamExtractor() : null;
+    const consume = (line: string) => {
+      if (!line.trim()) return;
+      let data: any;
+      try { data = JSON.parse(line); } catch { throw new ProviderOutcomeError('PROVIDER_OUTPUT_INVALID', config.provider, config.model, 'invalid_local_stream', usage); }
+      assertProviderOutcome(config.provider, config.model, data, providerUsage(config.provider, data));
+      const text = data.message?.content ?? '';
+      if (typeof text !== 'string') throw new ProviderOutcomeError('PROVIDER_OUTPUT_INVALID', config.provider, config.model, 'invalid_local_content', usage);
+      fullContent += text;
+      if (Buffer.byteLength(fullContent, 'utf8') > 512 * 1024) throw new ProviderOutcomeError('PROVIDER_OUTPUT_INVALID', config.provider, config.model, 'local_output_byte_bound', usage);
+      const visible = extractor ? extractor.feed(text) : text;
+      if (visible) onChunk(visible);
+      if (data.done === true) { terminal = true; usage = providerUsage(config.provider, data); }
     };
+    try {
+      for (;;) {
+        signal?.throwIfAborted();
+        const part = await reader.read();
+        if (part.done) break;
+        buffer += decoder.decode(part.value, { stream: true });
+        const lines = buffer.split('\n'); buffer = lines.pop() ?? '';
+        if (Buffer.byteLength(buffer, 'utf8') > 4 * 1024 * 1024) throw new ProviderOutcomeError('PROVIDER_OUTPUT_INVALID', config.provider, config.model, 'local_frame_byte_bound', usage);
+        lines.forEach(consume);
+      }
+      buffer += decoder.decode(); if (buffer.trim()) consume(buffer);
+      if (!terminal) throw new ProviderOutcomeError('PROVIDER_INCOMPLETE', config.provider, config.model, 'local_stream_ended_without_completion', usage);
+      return { content: this._maybeProjectStructuredContent(config, fullContent), usage,
+        promptTokens: usage?.inputTokens ?? 0, completionTokens: usage?.outputTokens ?? 0, durationMs: Date.now() - start };
+    } finally { await reader.cancel().catch(() => undefined); }
   }
-
   private async _readSSEStream(
     res: Response,
     onChunk: StreamCallback,
     start: number,
     provider: "anthropic" | "openai",
   ): Promise<ArchitectResponse> {
-    let fullContent = "";
-    let promptTokens = 0;
-    let completionTokens = 0;
-
+    let fullContent = "", buffer = "", terminal = false;
+    const rawUsage: Record<string, unknown> = {};
+    let stopReason: string | undefined;
     const reader = res.body?.getReader();
     if (!reader) throw new Error("No response body");
-
     const decoder = new TextDecoder();
-    let buffer = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() ?? "";
-
-      for (const line of lines) {
-        if (!line.startsWith("data: ")) continue;
-        const data = line.slice(6).trim();
-        if (data === "[DONE]") continue;
-
-        try {
-          const parsed = JSON.parse(data);
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n"); buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          const data = line.slice(5).trim();
+          if (data === "[DONE]") { terminal = true; continue; }
+          let parsed: any;
+          try { parsed = JSON.parse(data); } catch { throw new ProviderOutcomeError("PROVIDER_OUTPUT_INVALID", provider, this._config?.model ?? "unknown", "invalid_stream", providerUsage(provider, rawUsage)); }
+          if (parsed.error || parsed.type === "error") throw new ProviderOutcomeError("PROVIDER_FAILED", provider, this._config?.model ?? "unknown", "stream_error", providerUsage(provider, rawUsage));
           if (provider === "anthropic") {
-            if (parsed.type === "content_block_delta" && parsed.delta?.text) {
-              fullContent += parsed.delta.text;
-              onChunk(parsed.delta.text);
-            }
-            if (parsed.type === "message_delta" && parsed.usage) {
-              completionTokens = parsed.usage.output_tokens ?? 0;
-            }
             if (parsed.type === "message_start") {
+              Object.assign(rawUsage, parsed.message?.usage ?? {});
               logAnthropicThinkingDrops(this._config?.model ?? "", parsed.input_transformations ?? parsed.message?.input_transformations);
             }
-            if (parsed.type === "message_start" && parsed.message?.usage) {
-              promptTokens = parsed.message.usage.input_tokens ?? 0;
-            }
+            if (parsed.type === "message_delta") { Object.assign(rawUsage, parsed.usage ?? {}); stopReason = parsed.delta?.stop_reason ?? stopReason; }
+            if (parsed.type === "message_stop") terminal = true;
+            if (parsed.type === "content_block_delta" && parsed.delta?.text) { fullContent += parsed.delta.text; onChunk(parsed.delta.text); }
           } else {
-            const text = parsed.choices?.[0]?.delta?.content;
-            if (text) {
-              fullContent += text;
-              onChunk(text);
-            }
-            if (parsed.usage) {
-              promptTokens = parsed.usage.prompt_tokens ?? 0;
-              completionTokens = parsed.usage.completion_tokens ?? 0;
-            }
+            Object.assign(rawUsage, parsed.usage ?? {});
+            const choice = parsed.choices?.[0]; stopReason = choice?.finish_reason ?? stopReason;
+            if (choice?.delta?.refusal) throw new ProviderOutcomeError("PROVIDER_REFUSAL", provider, this._config?.model ?? "unknown", "refusal", providerUsage(provider, rawUsage));
+            if (choice?.delta?.content) { fullContent += choice.delta.content; onChunk(choice.delta.content); }
           }
-        } catch {
-          // Skip malformed SSE events
         }
       }
-    }
-
-    return {
-      content: fullContent,
-      promptTokens,
-      completionTokens,
-      durationMs: Date.now() - start,
-    };
+      const usage = providerUsage(provider, rawUsage);
+      if (!terminal || !stopReason) throw new ProviderOutcomeError("PROVIDER_INCOMPLETE", provider, this._config?.model ?? "unknown", "stream_ended_without_completion", usage);
+      assertProviderOutcome(provider, this._config?.model ?? "unknown", { stop_reason: stopReason }, usage);
+      return { content: fullContent, promptTokens: usage?.inputTokens ?? 0, completionTokens: usage?.outputTokens ?? 0, usage, durationMs: Date.now() - start };
+    } finally { await reader.cancel().catch(() => undefined); }
   }
 
   private _splitSystem(messages: ArchitectMessage[]): { system: string | undefined; userMessages: ArchitectMessage[] } {

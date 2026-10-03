@@ -1,0 +1,78 @@
+{
+  "schema": "dreamgraph.ashoka.slice_verification.v1",
+  "slices": [
+    20,
+    22
+  ],
+  "status": "verified",
+  "recorded_at": "2026-10-01T15:16:10.788Z",
+  "native_review": {
+    "status": "compliant",
+    "declared_entries": 24,
+    "matched": 24,
+    "gaps": 0,
+    "regressions": 0,
+    "decision": "accept",
+    "source_audit_id": "tc_1790867320609_dzh6uy"
+  },
+  "root": {
+    "command": "npx vitest run --maxWorkers=4 --reporter=json --outputFile=docs/ashoka/wave-20-22-root-tests.json",
+    "files": 144,
+    "passed": 1603,
+    "failed": 0,
+    "skipped": 2
+  },
+  "extension": {
+    "build": "passed",
+    "command": "node --test dist/test/*.test.js",
+    "passed": 488,
+    "failed": 0,
+    "evidence": "wave-20-22-extension-tests.log"
+  },
+  "builds": {
+    "server": "passed",
+    "explorer": "passed",
+    "vscode": "passed"
+  },
+  "catalog": {
+    "tools": 93,
+    "resources": 31,
+    "classifications": 94
+  },
+  "contracts": 31,
+  "baseline": 10,
+  "provider_artifact": "r3",
+  "configuration": {
+    "typed": 308,
+    "literal": 101
+  },
+  "metrics": {
+    "definitions": 13,
+    "version": "2.0.0",
+    "generated_input_schema": "dreamgraph.analytics_payload.v1",
+    "check": "passed"
+  },
+  "source_audit": "wave-20-22-source-audit.json",
+  "focused_evidence": [
+    "wave-20-22-focused-stable-tests.json",
+    "wave-20-22-integration-stable-tests.json",
+    "wave-20-22-xs21-tests.json"
+  ],
+  "preserved_failures": [
+    "slice-20-first-tests.json",
+    "slice-20-repair-tests.json",
+    "wave-20-22-first-tests.json",
+    "wave-20-22-repair-tests.json",
+    "wave-20-22-focused-tests.json",
+    "wave-20-22-qualified-focused-tests.json",
+    "wave-20-22-integration-tests.json",
+    "wave-20-22-http-repair-tests.json"
+  ],
+  "limits": [
+    "Offline/disposable core qualification; no paid request, live graph migration, global install/restart or release bump.",
+    "Prior-process lucid recovery is simulated; actual child-daemon transport disconnect verifies retained cancellation and settled lease.",
+    "Canonical analytics are measured independently; legacy diagnostics are labeled heuristics; delivered context, scan age, confidence and volume do not measure agent usefulness.",
+    "Bounded declarative source proof decoder preserves derived origin; no universal source/runtime verifier claim.",
+    "Full client25, schedule workspace29, migration26, native31, final usefulness27 and synchronized release28 remain required."
+  ]
+}

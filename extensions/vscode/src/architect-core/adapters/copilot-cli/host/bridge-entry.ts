@@ -2,10 +2,10 @@
 //
 // Copilot CLI adapter — DreamGraph MCP inheritance bridge.
 //
-// This file is BUNDLED INTO ITS OWN STANDALONE ARTIFACT and shipped
-// alongside the extension at `dist/copilot-cli-bridge.js`. Copilot
-// CLI spawns it (per `mcp-config.json`) when it wants to talk to the
-// DreamGraph MCP server.
+// Historical unbound implementation retained for source compatibility.
+// The shipped dist/copilot-cli-bridge.js is now bundled directly from
+// core src/architect/cli-mcp-bridge.ts; execution authority, observation,
+// context refresh and acknowledgement have one canonical owner.
 //
 // CRITICAL DESIGN POINT (and the difference from a "spawn a second
 // dreamgraph child" naive proxy): the architect (extension host)

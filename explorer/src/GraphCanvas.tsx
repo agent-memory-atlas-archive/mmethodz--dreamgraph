@@ -145,7 +145,7 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
     if (!containerRef.current) return;
 
     const graph = new Graph<NodeAttrs, EdgeAttrs>({
-      multi: false,
+      multi: true,
       type: "directed",
     });
 
@@ -172,7 +172,7 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
     for (const e of snapshot.edges) {
       if (!graph.hasNode(e.s) || !graph.hasNode(e.t)) continue;
       const style = EDGE_STYLES[e.kind];
-      const id = `${e.s}->${e.t}::${e.kind}`;
+      const id = e.id??`${e.s}->${e.t}::${e.kind}`;
       if (graph.hasEdge(id)) continue;
       const sNode = graph.getNodeAttributes(e.s);
       const tNode = graph.getNodeAttributes(e.t);
@@ -198,7 +198,7 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
     const t0 = performance.now();
     const fa2Settings = forceAtlas2.inferSettings(graph);
     forceAtlas2.assign(graph, {
-      iterations: 120,
+      iterations: Math.max(12,Math.min(120,Math.floor(120000/Math.max(1,graph.order)))),
       settings: { ...fa2Settings, barnesHutOptimize: true, slowDown: 5 },
     });
     const layoutMs = Math.round(performance.now() - t0);
@@ -485,7 +485,7 @@ export function GraphCanvas({ snapshot, onSelect, filters, mode, selected, pulse
       sigma.kill();
       sigmaRef.current = null;
     };
-  }, [snapshot, onSelect]);
+  }, [snapshot.render_key??snapshot.etag, onSelect]);
 
   // Filter / mode / selection changes need the reducers to re-run; the
   // hover-driven ripple already triggers refreshes via the rAF loop.

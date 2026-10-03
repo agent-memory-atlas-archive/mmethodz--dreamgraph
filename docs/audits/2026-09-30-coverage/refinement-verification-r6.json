@@ -1,0 +1,62 @@
+{
+  "plan_id": "graph-trust-and-agent-effectiveness",
+  "title": "DreamGraph v14.0.0 - Ashoka",
+  "release_name": "Ashoka",
+  "plan_revision": 6,
+  "status": "draft",
+  "slice_count": 32,
+  "all_pending": true,
+  "original_29_ids_preserved": true,
+  "all_31_ids_preserved": true,
+  "checkpoint_count": 0,
+  "execution_state": "idle",
+  "policy_count": 14,
+  "contract_count": 17,
+  "task_cases": 12,
+  "lifecycle_cases": 16,
+  "graph_execution_cases": 16,
+  "architect_interaction_cases": 12,
+  "computer_use_cases": 24,
+  "computer_use_work_packages": 8,
+  "computer_use_qualification": "specified CU01-CU24; not executed",
+  "dependency_dag": "acyclic",
+  "release_dependency_closure": 32,
+  "implementation_test_status": "not run; plan-only requirements, not implemented guarantees",
+  "comparative_agent_evaluation": "specified, not executed",
+  "browser_interaction_verification": "specified UX01-UX12; not executed",
+  "known_current_projection_defect": {
+    "lifecycle": "draft",
+    "current": "slice-0-establish-the-engine-alignment-contract",
+    "active": "slice-0-establish-the-engine-alignment-contract",
+    "next": "slice-0-establish-the-engine-alignment-contract",
+    "disposition": "F15/C14 baseline only; active/current assignment remains incorrect until Slice 21 is implemented"
+  },
+  "governance": {
+    "session_id": "6b16dd05-1f3d-43fb-923d-ef85018bdb2c",
+    "session_status": "completed",
+    "task_scope": "revision-6 Ashoka Computer Use investigation and plan refinement only",
+    "native_plan_status": "draft",
+    "approved": false,
+    "delta_entries": 43,
+    "native_plan_items": 253,
+    "original_session": "e211864f-0e9e-4beb-b198-4f8acc3348eb",
+    "previous_session": "08ecc10d-b25f-454d-aa4e-33ff4def8843",
+    "supersession": "Revision 6 is the canonical scope for future implementation; original audit artifacts retained historically."
+  },
+  "live_registry": {
+    "instance_id": "ee9ce3b9-0313-4768-b5f1-24b9b3fffc4b",
+    "title": "DreamGraph v14.0.0 - Ashoka",
+    "status": "draft",
+    "slice_count": 32,
+    "checkpoint_count": 0
+  },
+  "plan_sha256": "06d55f9732b30844309a5be29389a36c1b1f086a482be1d8ba2fedef7b0a752d",
+  "release_target": "14.0.0",
+  "file_checks": {
+    "relative_links": "pass",
+    "source_anchors": "pass",
+    "markdown_manifest_dependencies": "match",
+    "resolved_policy_ids": "NP01-NP14 present",
+    "package_versions": "unchanged by planning update"
+  }
+}

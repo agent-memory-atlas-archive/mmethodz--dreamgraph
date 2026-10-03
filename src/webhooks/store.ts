@@ -6,20 +6,21 @@
  *   data/webhook_subscriptions.json   { subscriptions: WebhookSubscription[] }
  *   data/webhook_dead_letter.json     { entries: DeadLetterEntry[] }
  *
- * Both files are owned by the daemon. Reads are best-effort (return empty
- * shape if missing); writes go through `withFileLock` + `atomicWriteFile`
- * to coordinate with concurrent worker activity.
+ * Both files use the daemon publication writer and verified reads. Corrupt or
+ * unpublished data is unavailable; accepted delivery evidence is never silently
+ * discarded at capacity.
  *
  * See plans/DREAMGRAPH_SDK_ROADMAP.md §7 (Webhooks) for wire format.
  */
 
-import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { dataPath } from "../utils/paths.js";
 import { atomicWriteFile } from "../utils/atomic-write.js";
-import { withFileLock } from "../utils/mutex.js";
-import { logger } from "../utils/logger.js";
+import { z } from "zod";
+import { withGraphRead, withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
+import { loadPublicationState, publicationContentHash, recoverGraphPublication } from "../graph/publication.js";
+import { stripBom } from "../utils/read-json.js";
 import type { GraphEventKind } from "../graph/events.js";
 
 export const SUBSCRIPTIONS_FILE = "webhook_subscriptions.json";
@@ -75,48 +76,30 @@ interface DeadLetterFile {
   entries: DeadLetterEntry[];
 }
 
-const MAX_DEAD_LETTER_ENTRIES = 500;
-
-async function loadSubscriptionsFile(): Promise<SubscriptionsFile> {
-  const file = dataPath(SUBSCRIPTIONS_FILE);
-  if (!existsSync(file)) return { subscriptions: [] };
-  try {
-    const raw = await readFile(file, "utf-8");
-    const parsed = JSON.parse(raw) as Partial<SubscriptionsFile>;
-    return { subscriptions: Array.isArray(parsed.subscriptions) ? parsed.subscriptions : [] };
-  } catch (err) {
-    logger.warn(
-      `webhook-store: unreadable ${SUBSCRIPTIONS_FILE} — treating as empty (${
-        err instanceof Error ? err.message : err
-      })`,
-    );
-    return { subscriptions: [] };
-  }
+const StatsSchema=z.object({delivered:z.number().int().nonnegative(),failed:z.number().int().nonnegative(),dead_lettered:z.number().int().nonnegative(),
+ last_delivery_at:z.string().nullable(),last_status:z.number().int().nullable(),last_error:z.string().nullable()}).strict();
+const SubscriptionSchema=z.object({id:z.string().min(1),url:z.string().url(),secret:z.string().min(16),events:z.array(z.string().min(1)).min(1).max(100),
+ label:z.string().optional(),created_at:z.string(),enabled:z.boolean(),stats:StatsSchema}).strict();
+const DeadLetterSchema=z.object({delivery_id:z.string().min(1),subscription_id:z.string().min(1),url:z.string().url(),event_kind:z.string().min(1),event_seq:z.number().int().nonnegative(),
+ attempts:z.number().int().nonnegative(),last_error:z.string(),last_status:z.number().int().nullable(),body:z.string(),failed_at:z.string()}).strict();
+async function checkedLoad<T>(name:string,schema:z.ZodTypeAny,empty:T):Promise<T>{
+ return withGraphRead(async()=>{const publication=await loadPublicationState();try{const body=await readFile(dataPath(name),"utf8");
+  if(publication.stores[name]&&publication.stores[name].hash!==publicationContentHash(body))throw new Error("UNPUBLISHED_WEBHOOK_CHANGE");
+  if(Buffer.byteLength(body)>16*1024*1024)throw new Error("WEBHOOK_STORE_BYTE_LIMIT");return schema.parse(JSON.parse(stripBom(body))) as T;
+ }catch(error){if((error as NodeJS.ErrnoException).code==="ENOENT"&&!publication.stores[name])return empty;throw new Error(`WEBHOOK_STORE_UNAVAILABLE: ${String(error)}`);}});
 }
-
-async function saveSubscriptionsFile(file: SubscriptionsFile): Promise<void> {
-  await atomicWriteFile(dataPath(SUBSCRIPTIONS_FILE), JSON.stringify(file, null, 2));
+async function withStoreWrite<T>(_name:string,work:()=>Promise<T>):Promise<T>{
+ return withGraphReconciliation(async()=>{await recoverGraphPublication();return work();});
 }
-
-async function loadDeadLetterFile(): Promise<DeadLetterFile> {
-  const file = dataPath(DEAD_LETTER_FILE);
-  if (!existsSync(file)) return { entries: [] };
-  try {
-    const raw = await readFile(file, "utf-8");
-    const parsed = JSON.parse(raw) as Partial<DeadLetterFile>;
-    return { entries: Array.isArray(parsed.entries) ? parsed.entries : [] };
-  } catch (err) {
-    logger.warn(
-      `webhook-store: unreadable ${DEAD_LETTER_FILE} — treating as empty (${
-        err instanceof Error ? err.message : err
-      })`,
-    );
-    return { entries: [] };
-  }
+async function loadSubscriptionsFile():Promise<SubscriptionsFile>{return checkedLoad(SUBSCRIPTIONS_FILE,z.object({subscriptions:z.array(SubscriptionSchema).max(1024)}).strict(),{subscriptions:[]});}
+async function saveSubscriptionsFile(file:SubscriptionsFile):Promise<void>{
+ const body=JSON.stringify(file);if(Buffer.byteLength(body)>16*1024*1024||file.subscriptions.length>1024)throw new Error("WEBHOOK_CAPACITY_REQUIRES_ARCHIVE");
+ await atomicWriteFile(dataPath(SUBSCRIPTIONS_FILE),body);
 }
-
-async function saveDeadLetterFile(file: DeadLetterFile): Promise<void> {
-  await atomicWriteFile(dataPath(DEAD_LETTER_FILE), JSON.stringify(file, null, 2));
+async function loadDeadLetterFile():Promise<DeadLetterFile>{return checkedLoad(DEAD_LETTER_FILE,z.object({entries:z.array(DeadLetterSchema).max(10000)}).strict(),{entries:[]});}
+async function saveDeadLetterFile(file:DeadLetterFile):Promise<void>{
+ const body=JSON.stringify(file);if(Buffer.byteLength(body)>16*1024*1024||file.entries.length>10000)throw new Error("WEBHOOK_CAPACITY_REQUIRES_ARCHIVE");
+ await atomicWriteFile(dataPath(DEAD_LETTER_FILE),body);
 }
 
 // ---------------------------------------------------------------------------
@@ -180,7 +163,7 @@ export async function registerSubscription(
     },
   };
 
-  await withFileLock(SUBSCRIPTIONS_FILE, async () => {
+  await withStoreWrite(SUBSCRIPTIONS_FILE, async () => {
     const file = await loadSubscriptionsFile();
     file.subscriptions.push(subscription);
     await saveSubscriptionsFile(file);
@@ -191,7 +174,7 @@ export async function registerSubscription(
 
 export async function removeSubscription(id: string): Promise<boolean> {
   let removed = false;
-  await withFileLock(SUBSCRIPTIONS_FILE, async () => {
+  await withStoreWrite(SUBSCRIPTIONS_FILE, async () => {
     const file = await loadSubscriptionsFile();
     const before = file.subscriptions.length;
     file.subscriptions = file.subscriptions.filter((s) => s.id !== id);
@@ -203,7 +186,7 @@ export async function removeSubscription(id: string): Promise<boolean> {
 
 export async function setEnabled(id: string, enabled: boolean): Promise<boolean> {
   let updated = false;
-  await withFileLock(SUBSCRIPTIONS_FILE, async () => {
+  await withStoreWrite(SUBSCRIPTIONS_FILE, async () => {
     const file = await loadSubscriptionsFile();
     const sub = file.subscriptions.find((s) => s.id === id);
     if (!sub) return;
@@ -230,7 +213,7 @@ export async function recordDeliveryOutcome(
     | { kind: "failed"; status: number | null; error: string }
     | { kind: "dead_lettered"; status: number | null; error: string },
 ): Promise<void> {
-  await withFileLock(SUBSCRIPTIONS_FILE, async () => {
+  await withStoreWrite(SUBSCRIPTIONS_FILE, async () => {
     const file = await loadSubscriptionsFile();
     const sub = file.subscriptions.find((s) => s.id === subscriptionId);
     if (!sub) return;
@@ -263,20 +246,18 @@ export async function getDeadLetter(deliveryId: string): Promise<DeadLetterEntry
 }
 
 export async function appendDeadLetter(entry: DeadLetterEntry): Promise<void> {
-  await withFileLock(DEAD_LETTER_FILE, async () => {
+  await withStoreWrite(DEAD_LETTER_FILE, async () => {
     const file = await loadDeadLetterFile();
+    const prior=file.entries.find(old=>old.delivery_id===entry.delivery_id);
+    if(prior){if(JSON.stringify(prior)!==JSON.stringify(entry))throw new Error("WEBHOOK_DELIVERY_IDENTITY_CONFLICT");return;}
     file.entries.push(entry);
-    // Keep dead-letter store bounded — drop oldest entries if oversized.
-    if (file.entries.length > MAX_DEAD_LETTER_ENTRIES) {
-      file.entries.splice(0, file.entries.length - MAX_DEAD_LETTER_ENTRIES);
-    }
     await saveDeadLetterFile(file);
   });
 }
 
 export async function removeDeadLetter(deliveryId: string): Promise<boolean> {
   let removed = false;
-  await withFileLock(DEAD_LETTER_FILE, async () => {
+  await withStoreWrite(DEAD_LETTER_FILE, async () => {
     const file = await loadDeadLetterFile();
     const before = file.entries.length;
     file.entries = file.entries.filter((e) => e.delivery_id !== deliveryId);

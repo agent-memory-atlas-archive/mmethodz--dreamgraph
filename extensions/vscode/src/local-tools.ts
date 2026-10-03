@@ -10,7 +10,8 @@
  *   write_file    — Create or overwrite a file in the workspace
  *   read_local_file — Read a local file (full or line range)
  *
- * Also exports registerRunnerCommands() for manual palette access to run_command.
+ * Also exports registerRunnerCommands() for captured, daemon-owned palette execution.
+ * Palette commands never call the historical local tool dispatcher.
  */
 
 import * as vscode from 'vscode';
@@ -19,6 +20,7 @@ import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
 
 import { changeReviewService } from './change-review-service';
+import type { ManagedExecutionSnapshot } from './generated/graph-contracts.js';
 
 /* ------------------------------------------------------------------ */
 /*  Tool definitions (same shape as MCP ToolDefinition)               */
@@ -794,40 +796,67 @@ export async function executeLocalTool(
 /*  Manual palette commands (dreamgraph.runCommand, dreamgraph.runBuild) */
 /* ------------------------------------------------------------------ */
 
-export function registerRunnerCommands(ctx: vscode.ExtensionContext): void {
+export interface ManualRunnerOutcome {
+  result: unknown;
+  execution: ManagedExecutionSnapshot;
+  reviewError?: string;
+}
+/** Capture before prompting; the callback must retain the original instance and refuse redirects. */
+export type CaptureManualRunner = () => (input: Record<string, unknown>) => Promise<ManualRunnerOutcome>;
+
+async function showManagedRunnerOutcome(run: ReturnType<CaptureManualRunner>, input: Record<string, unknown>, label: string): Promise<void> {
+  const output = getOutput();
+  try {
+    const outcome = await run(input);
+    // Preserve the whole owner payload/closure. Exit 0 is distinct from graph reconciliation.
+    output.appendLine(JSON.stringify(outcome, null, 2));
+    const execution = outcome.execution;
+    const owner = outcome.result as { isError?: boolean; content?: Array<{ type: string; text?: string }> } | null;
+    let command: { exitCode?: unknown; timedOut?: unknown } | undefined;
+    for (const block of owner?.content ?? []) {
+      if (block.type !== 'text' || !block.text) continue;
+      try { const value = JSON.parse(block.text); if (typeof value?.exitCode === 'number' || value?.exitCode === null) command = value; } catch { /* full literal result remains in Output */ }
+    }
+    const message = `${label}: exit ${command?.exitCode ?? 'unconfirmed'}; ${execution.status} (${execution.execution_id}).`;
+    if (owner?.isError === true || command?.exitCode !== 0 || command?.timedOut || outcome.reviewError
+      || execution.authority_active || !['no_change', 'state_committed', 'graph_committed'].includes(execution.status)) {
+      void vscode.window.showWarningMessage(message + (outcome.reviewError ? ` File review: ${outcome.reviewError}` : ' Inspect the original outcome before repeating work.'));
+    } else void vscode.window.showInformationMessage(message);
+  } catch (error) {
+    output.appendLine(`${label}: ${String(error)}`);
+    void vscode.window.showErrorMessage(`${label}: ${String(error)}`);
+  } finally { output.show(true); }
+}
+
+export function registerRunnerCommands(ctx: vscode.ExtensionContext, capture: CaptureManualRunner): void {
   // dreamgraph.runCommand — prompt for arbitrary shell command
   ctx.subscriptions.push(
     vscode.commands.registerCommand('dreamgraph.runCommand', async () => {
+      const run = capture();
       const command = await vscode.window.showInputBox({
-        prompt: 'Shell command to run in workspace',
+        prompt: 'Command to run through the selected DreamGraph daemon (captured before this prompt)',
         placeHolder: 'e.g. npm run build',
       });
       if (!command) return;
-      const result = await handleRunCommand({ command });
-      const parsed = JSON.parse(result);
-      if (parsed.exitCode === 0) {
-        void vscode.window.showInformationMessage(`✓ Command finished (exit 0)`);
-      } else {
-        void vscode.window.showWarningMessage(`Command exited with code ${parsed.exitCode}`);
-      }
-      getOutput().show(true);
+      await showManagedRunnerOutcome(run, { command }, 'Command');
     }),
   );
 
   // dreamgraph.runBuild — pick an npm script from package.json
   ctx.subscriptions.push(
     vscode.commands.registerCommand('dreamgraph.runBuild', async () => {
+      const run = capture();
       const wsRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
       if (!wsRoot) { void vscode.window.showErrorMessage('No workspace open'); return; }
 
       // Scan for package.json scripts
-      let scripts: string[] = [];
+      let scripts: Array<{label:string;script:string;cwd:string}> = [];
       try {
         const pkgPath = path.join(wsRoot, 'package.json');
         const raw = await fs.readFile(pkgPath, 'utf-8');
         const pkg = JSON.parse(raw);
         if (pkg.scripts && typeof pkg.scripts === 'object') {
-          scripts = Object.keys(pkg.scripts);
+          scripts = Object.keys(pkg.scripts).map(script=>({label:script,script,cwd:wsRoot}));
         }
       } catch { /* no package.json or not parseable */ }
 
@@ -837,7 +866,7 @@ export function registerRunnerCommands(ctx: vscode.ExtensionContext): void {
         const raw = await fs.readFile(extPkgPath, 'utf-8');
         const pkg = JSON.parse(raw);
         if (pkg.scripts && typeof pkg.scripts === 'object') {
-          scripts.push(...Object.keys(pkg.scripts).map(s => `ext:${s}`));
+          scripts.push(...Object.keys(pkg.scripts).map(script=>({label:`ext:${script}`,script,cwd:path.join(wsRoot,'extensions','vscode')})));
         }
       } catch { /* no ext package.json */ }
 
@@ -851,23 +880,13 @@ export function registerRunnerCommands(ctx: vscode.ExtensionContext): void {
       });
       if (!picked) return;
 
-      let command: string;
-      let cwd: string | undefined;
-      if (picked.startsWith('ext:')) {
-        command = `npm run ${picked.slice(4)}`;
-        cwd = path.join(wsRoot, 'extensions', 'vscode');
-      } else {
-        command = `npm run ${picked}`;
+      const script = picked.script;
+      if (!/^[A-Za-z0-9][A-Za-z0-9:_.-]*$/.test(script)) {
+        void vscode.window.showErrorMessage('This script name cannot be represented safely by the command route. Use Run Command with an explicit command.');
+        return;
       }
 
-      const result = await handleRunCommand({ command, cwd });
-      const parsed = JSON.parse(result);
-      if (parsed.exitCode === 0) {
-        void vscode.window.showInformationMessage(`✓ Build "${picked}" succeeded`);
-      } else {
-        void vscode.window.showWarningMessage(`Build "${picked}" exited with code ${parsed.exitCode}`);
-      }
-      getOutput().show(true);
+      await showManagedRunnerOutcome(run, { command:`npm run -- ${script}`, cwd:picked.cwd }, `Build "${picked.label}"`);
     }),
   );
 }

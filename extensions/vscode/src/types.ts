@@ -232,6 +232,9 @@ export interface EditorContextEnvelope {
   } | null;
 
   graphContext: {
+    /** Core-owned whole context; legacy lists below are navigation hints, not proof. */
+    canonicalPack?: import("./generated/graph-contracts.js").ContextPack;
+    contextGap?: { code: string; detail: string };
     relatedFeatures: Array<{ id: string; name: string; relevance?: number }>;
     relatedWorkflows: Array<{ id: string; name: string; relevance?: number }>;
     applicableAdrs: Array<{ id: string; title: string; relevance?: number }>;
@@ -280,6 +283,7 @@ export interface EditorContextEnvelope {
 }
 
 export type ContextEvidenceKind =
+  | "graph_context"
   | "task"
   | "environment"
   | "code"

@@ -31,10 +31,20 @@ import {
   type ToolDefinition,
 } from './architect-llm';
 import type { McpClient } from './mcp-client';
+import type { DaemonClient } from './daemon-client.js';
+import { ManagedCliPass } from './managed-cli-pass.js';
+import { ManagedNativePass, MANAGED_RUN_COMMAND_TOOL, managedReadOnlyModel } from './managed-native-pass.js';
+import { ExecutionReviewController, type ExecutionReviewView } from './execution-review.js';
+import { executionReviewMarkup, executionReviewStyles, getExecutionReviewScript } from './webview/execution-review.js';
+import {ComputerControlController,type ComputerControlView} from './computer-control.js';
+import {computerControlMarkup,computerControlStyles,getComputerControlScript} from './webview/computer-control.js';
+import {ComputerPassController,type ComputerPassView} from './computer-pass.js';
+import {computerPassStyles,getComputerPassScript} from './webview/computer-pass.js';
 import type { ContextBuilder } from './context-builder';
 import type { ChangedFilesView, ChangeType } from './changed-files-view';
-import { LOCAL_TOOL_DEFINITIONS, isLocalTool, executeLocalTool } from './local-tools.js';
-import { changeReviewService, type PendingChangeReview } from './change-review-service';
+import { isLocalTool } from './local-tools.js';
+import { changeReviewService, UndoDispatchRefusal, UndoOutcomeUnconfirmed, type PendingChangeReview, type ReviewAuthority } from './change-review-service';
+import type { ManagedExecutionSnapshot } from './generated/graph-contracts.js';
 import { assemblePrompt, inferTask } from './prompts/index.js';
 import { selectToolGroups } from './tool-groups.js';
 import { runPassViaCodexCli, runPassViaCore, runPassViaCopilotCli } from './architect-core/runner.js';
@@ -83,8 +93,8 @@ import { analyzePass, advanceAutonomyStateIfContinued, buildContinuationPrompt, 
 import { isWriteToolName, narrowToWriteAndVerify, pickPreferredWriteTool, APPLY_LABEL_PATTERN } from './tool-classification.js';
 import { extractStructuredPassEnvelope, type StructuredPassEnvelope } from './autonomy-structured.js';
 import { extractPrimaryEnvelope } from './envelope-utils.js';
-import { getAutonomyMode, getAutonomyPassBudget, parseAutonomyRequest } from './reporting.js';
-import { applyModeProfileToState, getModeProfile, type AutonomyMode } from './autonomy.js';
+import { getAutonomyMode, getAutonomyPassBudget, getReportingMode, parseAutonomyRequest } from './reporting.js';
+import { applyModeProfileToState, canonicalAutonomyPolicy, getModeProfile, type AutonomyMode } from './autonomy.js';
 
 /**
  * Build the initial AutonomyState for a given mode, honouring the user's
@@ -106,6 +116,7 @@ import {
   type BudgetSnapshot,
 } from './budget-coordinator.js';
 import { compressToolResult } from './tool-result-compression.js';
+import { boundMachineResult, hasRequiredEvidence } from '@dreamgraph/token-economy';
 import { RESPONSES_RAW_ITEMS_KEY } from './openai-responses-adapter.js';
 import {
   type ImplicitEntityDetectionResult,
@@ -218,6 +229,13 @@ function _elideStaleToolResults(rawMessages: unknown[], keepLastPairs: number): 
     const msg = rawMessages[idx] as { content: Array<{ type: string; tool_use_id: string; content: string; is_error?: boolean }> };
     msg.content = msg.content.map((b) => {
       if (typeof b.content !== 'string' || b.content.length <= ELIDE_MIN_CHARS) return b;
+      // Older results still own receipts. Preserve whole anchors or refuse future
+      // request admission; consumed history is not permission to clip evidence.
+      try {
+        const machine = boundMachineResult(b.content, ELIDE_MIN_CHARS);
+        if (machine) return { ...b, content: machine.content };
+      } catch { return b; }
+      if (hasRequiredEvidence(b.content)) return b;
       const omitted = b.content.length - HEAD_KEEP - TAIL_KEEP;
       const head = b.content.slice(0, HEAD_KEEP);
       const tail = b.content.slice(-TAIL_KEEP);
@@ -326,6 +344,10 @@ type ExtensionToWebviewMessage =
   | { type: 'tool-progress'; tool: string; message: string; progress?: number; total?: number }
   | { type: 'state'; state: { messages: ChatMessage[] } }
   | { type: 'pendingReviews'; reviews: PendingReviewViewModel[]; collapsed?: boolean }
+  | { type: 'operatorExecution'; active: boolean; recovery?: { executionId: string; authority: ReviewAuthority; canCheck: boolean; message: string } }
+  | { type: 'executionReview'; view: ExecutionReviewView }
+  | { type: 'computerView'; view: ComputerControlView }
+  | { type: 'computerPassView'; view: ComputerPassView }
   | { type: 'updateModels'; providers: string[]; models: string[]; current: { provider: string; model: string }; capabilities: ArchitectModelCapabilities }
   | { type: 'setAttachments'; attachments: AttachmentPreview[] }
   | { type: 'error'; error: string }
@@ -397,6 +419,9 @@ interface PendingReviewDiffLineViewModel {
 }
 
 interface PendingReviewViewModel {
+  reviewId: string;
+  recoveryRequired: boolean;
+  recoveryCanCheck: boolean;
   filePath: string;
   relativePath: string;
   status: 'pending' | 'conflict';
@@ -462,6 +487,20 @@ type WebviewToExtensionMessage =
   | { type: 'pasteImage'; dataBase64: string; mimeType: string }
   | { type: 'clear' }
   | { type: 'stop' }
+  | { type: 'executionReviewDecision'; executionId: string; approvalId: string; action: 'approve' | 'decline' }
+  | { type: 'executionReviewInspect'; executionId: string; approvalId: string }
+  | { type: 'computerRefresh'; more?: boolean }
+  | { type: 'computerSelect'; id: string }
+  | { type: 'computerEvidence'; id: string }
+  | { type: 'computerEvidenceClear' }
+  | { type: 'computerControl'; id: string; action: 'pause'|'resume'|'stop'|'recover-stop' }
+  | { type: 'computerPassSetup' }
+  | { type: 'computerPassPrepare'; interact: boolean; duration_ms: number }
+  | { type: 'computerPassConfirm'; id: string }
+  | { type: 'computerPassCancel'; id: string }
+  | { type: 'computerPassStart'; id: string; message: string }
+  | { type: 'computerPassStop' }
+  | { type: 'computerPassInspect' }
   | { type: 'changeProvider'; provider: string }
   | { type: 'changeModel'; model: string }
   | { type: 'setApiKey' }
@@ -482,8 +521,10 @@ type WebviewToExtensionMessage =
   | { type: 'resetAutonomy' }
   | { type: 'refreshPendingReviews' }
   | { type: 'togglePendingReviews' }
-  | { type: 'keepPendingReview'; filePath: string }
-  | { type: 'undoPendingReview'; filePath: string }
+  | { type: 'keepPendingReview'; filePath: string; reviewId: string }
+  | { type: 'undoPendingReview'; filePath: string; reviewId: string }
+  | { type: 'recoverPendingReview'; filePath: string; reviewId: string }
+  | { type: 'recoverOperatorExecution'; executionId: string }
   | { type: 'openPendingReview'; filePath: string };
 
 export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable {
@@ -497,12 +538,17 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   private architectLlm?: ArchitectLlm;
   private contextBuilder?: ContextBuilder;
   private mcpClient?: McpClient;
+  private daemonClient?: DaemonClient;
   private contextInspector?: import('./context-inspector.js').ContextInspector;
   private _restoringAnchors = false;
   private changedFilesView?: ChangedFilesView;
   private currentInstanceId = 'default';
   private streaming = false;
   private abortController: AbortController | null = null;
+  private _operatorController: AbortController | null = null;
+  private _operatorRecovery?: { executionId: string; authority: ReviewAuthority; port: DaemonClient; finish?: (signal?:AbortSignal) => Promise<ManagedExecutionSnapshot>; message?: string };
+  private _reviewActionQueue: Promise<void> = Promise.resolve();
+  private _reviewActionGeneration = 0;
   private streamingContent = '';
   private steeringQueue: string[] = [];
   private draftText = '';
@@ -541,6 +587,19 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   private _budgetTurnCounter = 0;
   /** The coordinator instantiated for the current turn, if any. */
   private _currentBudgetCoordinator: BudgetCoordinator | null = null;
+  private readonly _executionReview = new ExecutionReviewController(view => { void this.postMessage({ type: 'executionReview', view }); });
+  private readonly _computerControl = new ComputerControlController(view => { void this.postMessage({type:'computerView',view}); });
+  private readonly _computerPass = new ComputerPassController(view=>{void this.postMessage({type:'computerPassView',view});},{
+    authority:async(execution,signal)=>{
+      if(!this.daemonClient||execution.instance_id!==this.currentInstanceId)throw new Error('COMPUTER_PASS_OWNER_CHANGED');
+      await this._executionReview.start(this.daemonClient,execution.execution_id,signal);
+    },
+    session:(port,instanceId,executionId,id,value)=>{
+      if(this.daemonClient!==port||this.currentInstanceId!==instanceId)throw new Error('COMPUTER_PASS_OWNER_CHANGED');
+      this._computerControl.trackOriginalSession(this.daemonClient,instanceId,executionId,id,value);
+    },
+    closure:execution=>{this._executionReview.stop(!execution.authority_active&&['no_change','state_committed','graph_committed'].includes(execution.status));},
+  });
   /** Set after restoreMessages hydrates persisted budget state, so we don't re-load mid-session. */
   private _budgetStateHydrated = false;
   /**
@@ -603,11 +662,13 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   public setArchitectLlm(llm: ArchitectLlm): void { this.architectLlm = llm; }
   public setContextBuilder(cb: ContextBuilder): void { this.contextBuilder = cb; }
   public setMcpClient(mcp: McpClient): void { this.mcpClient = mcp; }
+  public setDaemonClient(daemon: DaemonClient): void { if(this.daemonClient&&this.daemonClient!==daemon)this._computerPass.ownerChanged();this.daemonClient = daemon; }
   public setChangedFilesProvider(provider: ChangedFilesView): void { this.changedFilesView = provider; }
   public setContextInspector(inspector: import('./context-inspector.js').ContextInspector): void { this.contextInspector = inspector; }
 
   public setInstance(instanceId: string): void {
     if (this.currentInstanceId === instanceId) return;
+    this._computerPass.ownerChanged();this._computerControl.dispose();
     this.currentInstanceId = instanceId;
     void this.restoreMessages();
   }
@@ -652,6 +713,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
           break;
         case 'send':
           if (typeof message.text === 'string' && message.text.trim().length > 0) {
+            if(this._computerPass.blocksContinuation){await this.postMessage({type:'error',error:'Finish, cancel or recover the original Computer Use pass before another request. This API pass does not accept mid-pass steering.'});break;}
             if (this.streaming) {
               this.steeringQueue.push(message.text.trim());
               const steerMsg = `\n\n💬 *Steering: "${message.text.trim()}"*\n`;
@@ -677,6 +739,39 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
           break;
         case 'stop':
           this.abortGeneration();
+          break;
+        case 'executionReviewDecision':
+          try {
+            if (message.action !== 'approve' && message.action !== 'decline') throw new Error('EXECUTION_REVIEW_DECISION_INVALID');
+            await this._executionReview.decide(message.executionId, message.approvalId, message.action);
+          } catch (error) { await this.postMessage({ type: 'error', error: String(error) }); }
+          break;
+        case 'computerRefresh':
+          try{await this._computerControl.refresh(this.daemonClient,this.currentInstanceId,message.more===true);}catch(error){await this.postMessage({type:'error',error:String(error)});}break;
+        case 'computerSelect':
+          try{await this._computerControl.select(this.daemonClient,this.currentInstanceId,message.id);}catch(error){await this.postMessage({type:'error',error:String(error)});}break;
+        case 'computerEvidence':
+          try{await this._computerControl.inspectEvidence(this.daemonClient,this.currentInstanceId,message.id);}catch(error){await this.postMessage({type:'error',error:String(error)});}break;
+        case 'computerEvidenceClear':this._computerControl.clearEvidence();break;
+        case 'computerControl':
+          try{await this._computerControl.act(this.daemonClient,this.currentInstanceId,message.id,message.action);}catch(error){await this.postMessage({type:'error',error:String(error)});}break;
+        case 'computerPassSetup':
+          try{this.assertComputerPassAvailable();await this._computerPass.setup(this.daemonClient,this.currentInstanceId);}catch(error){await this.postMessage({type:'error',error:String(error)});}break;
+        case 'computerPassPrepare':
+          try{this.assertComputerPassAvailable();await this._computerPass.prepare(this.daemonClient,this.currentInstanceId,{interact:message.interact,duration_ms:message.duration_ms});}catch(error){await this.postMessage({type:'error',error:String(error)});}break;
+        case 'computerPassConfirm':
+          try{this.assertComputerPassAvailable();await this._computerPass.confirm(this.daemonClient,this.currentInstanceId,message.id);}catch(error){await this.postMessage({type:'error',error:String(error)});}break;
+        case 'computerPassCancel':
+          try{await this._computerPass.cancel(this.daemonClient,this.currentInstanceId,message.id);}catch(error){await this.postMessage({type:'error',error:String(error)});}break;
+        case 'computerPassStart':
+          try{await this.runComputerPass(message.id,message.message);}catch(error){await this.postMessage({type:'error',error:String(error)});}break;
+        case 'computerPassStop':
+          try{await this._computerPass.stop();}catch(error){await this.postMessage({type:'error',error:String(error)});}break;
+        case 'computerPassInspect':
+          try{await this._computerPass.inspect(this.daemonClient,this.currentInstanceId);}catch(error){await this.postMessage({type:'error',error:String(error)});}break;
+        case 'executionReviewInspect':
+          try{await this._executionReview.inspect(message.executionId,message.approvalId);}
+          catch(error){await this.postMessage({type:'error',error:String(error)});}
           break;
         case 'changeProvider':
           await this._changeProvider(message.provider as ArchitectProvider);
@@ -825,15 +920,47 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
           break;
         }
         case 'keepPendingReview': {
-          const result = await changeReviewService.keep(message.filePath);
-          void vscode.window.showInformationMessage(result.message);
-          await this._postPendingReviews();
+          await this._queueReviewAction(async()=>{
+            if(this.streaming || this._operatorController) throw new Error('EXECUTION_ACTIVE: wait or stop before Keep.');
+            const result = await changeReviewService.keep(message.filePath,message.reviewId);
+            if(result.ok) void vscode.window.showInformationMessage(result.message);
+            else void vscode.window.showWarningMessage(result.message);
+            await this._postPendingReviews();
+          });
           break;
         }
         case 'undoPendingReview': {
-          const result = await changeReviewService.undo(message.filePath);
-          void vscode.window.showInformationMessage(result.message);
-          await this._postPendingReviews();
+          await this._queueReviewAction(async()=>{
+            const result = await changeReviewService.undo(message.filePath,message.reviewId,async action=>{
+              const returned=await this._executeOperatorTool(action.tool,action.arguments,action.authority);
+              if(this._ownerResultFailed(returned.result)) {
+                if(returned.execution.status==='no_change') throw new UndoDispatchRefusal(helpers.stringifyToolResult(returned.result));
+                throw new helpers.ToolOwnerResultError(returned.result);
+              }
+              return {executionId:returned.execution.execution_id,closureStatus:returned.execution.status};
+            });
+            if(result.ok) void vscode.window.showInformationMessage(result.message);
+            else void vscode.window.showWarningMessage(result.message);
+            await this._postPendingReviews();
+          });
+          break;
+        }
+        case 'recoverPendingReview': {
+          await this._queueReviewAction(async()=>{
+            const result=await changeReviewService.recoverUndo(message.filePath,message.reviewId,async(executionId,authority)=>{
+              const execution=await this._recoverOperatorExecution(executionId,authority);
+              return {executionId:execution.execution_id,closureStatus:execution.status,authorityActive:execution.authority_active};
+            });
+            if(result.ok)void vscode.window.showInformationMessage(result.message);else void vscode.window.showWarningMessage(result.message);
+            await this._postPendingReviews();
+          });
+          break;
+        }
+        case 'recoverOperatorExecution': {
+          await this._queueReviewAction(async()=>{
+            await this._recoverOperatorExecution(message.executionId);
+            await this._postPendingReviews();
+          });
           break;
         }
         case 'openPendingReview': {
@@ -853,10 +980,21 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   }
 
   public dispose(): void {
+    this._computerControl.dispose();
+    this.abortGeneration();
+    this._computerPass.dispose();
+    this._executionReview.stop();
     while (this.disposables.length > 0) this.disposables.pop()?.dispose();
   }
 
   async handleUserMessage(text: string): Promise<void> {
+  if(this._computerPass.blocksContinuation){await this.postMessage({type:'error',error:'The original Computer Use scope needs completion, cancellation or recovery before another pass.'});return;}
+  if(this._requiresOperatorRecovery()){await this.postMessage({type:'error',error:`Operator execution ${this._operatorRecovery!.executionId} requires recovery before another pass on this instance.`});return;}
+  if(this._operatorController){await this.postMessage({type:'error',error:'An operator action is running. Wait or stop it before another pass.'});return;}
+  if (this._executionReview.blocksContinuation) {
+    await this.postMessage({ type: 'error', error: 'Execution review requires recovery before another pass. Retry the captured approval; do not repeat uncertain work.' });
+    return;
+  }
   if (this.streaming) {
     this.steeringQueue.push(text);
     return;
@@ -1065,6 +1203,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   this.streaming = true;
   this.streamingContent = '';
   this.abortController = new AbortController();
+  let managedCliPass: ManagedCliPass | undefined;
 
   try {
     await this.postMessage({ type: 'stream-start' });
@@ -1081,7 +1220,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
         description: tool.description ?? '',
         inputSchema: (tool.inputSchema ?? {}) as Record<string, unknown>,
       })),
-      ...LOCAL_TOOL_DEFINITIONS.map((tool) => ({
+      ...[MANAGED_RUN_COMMAND_TOOL].map((tool) => ({
         name: tool.name,
         description: tool.description ?? '',
         inputSchema: tool.inputSchema as Record<string, unknown>,
@@ -1119,6 +1258,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     const copilotCliRoute = nativeCliProvider === 'copilot-cli';
     const codexCliRoute = nativeCliProvider === 'codex-cli';
     const nativeCliRoute = copilotCliRoute || codexCliRoute;
+    if (nativeCliRoute) managedCliPass = await this._beginManagedCliPass(trimmed, userMessage.instanceId);
     let effectiveTools: ToolDefinition[] = nativeCliRoute ? [] : tools;
 
     // Cross-turn write-pressure narrowing. The autonomy-continuation path
@@ -1150,8 +1290,8 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       }
     }
 
-    if (effectiveTools.length > 0) {
-      fullContent = await this.runAgenticLoop(conversation, effectiveTools);
+    if (!nativeCliRoute) {
+      fullContent = await this.runAgenticLoop(conversation, effectiveTools, userMessage.instanceId);
     } else {
       // ADR-089 Phase 3a — text-only seam route. When the user enables
       // `dreamgraph.architect.useCorePass`, the no-tools branch goes
@@ -1175,6 +1315,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
             droppedAttachmentNames: capturedDroppedAttachmentNames,
             attachmentSummary: capturedAttachmentSummary,
             stopContextBlock: capturedStopContextBlock,
+            managedCliPass,
           },
         );
         // Copilot CLI executes tools inside its own subprocess, so the
@@ -1184,10 +1325,10 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
         // files written by MCP tools during the run register as pending
         // reviews. Without this the diff view never appears for copilot-cli.
         const copilotCliReviewSnapshot = copilotCliRoute
-          ? await changeReviewService.captureWorkspaceSnapshot()
+          ? await changeReviewService.captureWorkspaceSnapshot(managedCliPass ? {endpoint:managedCliPass.ownerEndpoint,instanceId:managedCliPass.instanceId}:undefined)
           : null;
         const codexCliReviewSnapshot = codexCliRoute
-          ? await changeReviewService.captureWorkspaceSnapshot()
+          ? await changeReviewService.captureWorkspaceSnapshot(managedCliPass ? {endpoint:managedCliPass.ownerEndpoint,instanceId:managedCliPass.instanceId}:undefined)
           : null;
         const req = this._createRequestSignal(this._getLlmTimeoutMs({ mode: 'stream' }));
         try {
@@ -1202,7 +1343,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
                 host,
                 text: trimmed,
                 tools: [],
-                providerOptions: this._buildCopilotCliProviderOptions(),
+                providerOptions: this._buildCopilotCliProviderOptions(managedCliPass),
                 onStreamChunk: streamNativeCliChunk,
                 abortSignal: req.signal,
               })
@@ -1211,7 +1352,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
                   host,
                   text: trimmed,
                   tools: [],
-                  providerOptions: this._buildCodexCliProviderOptions(),
+                  providerOptions: this._buildCodexCliProviderOptions(managedCliPass),
                   onStreamChunk: streamNativeCliChunk,
                   abortSignal: req.signal,
                 })
@@ -1275,12 +1416,12 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       } else {
         const req = this._createRequestSignal(this._getLlmTimeoutMs({ mode: 'stream' }));
         try {
-          await this.architectLlm.stream(conversation, (chunk: string) => {
+          await this._streamManagedNative(conversation, (chunk: string) => {
             const safeChunk = this._redactSecrets(chunk);
             fullContent += safeChunk;
             this.streamingContent += safeChunk;
             void this.postMessage({ type: 'stream-chunk', chunk: safeChunk });
-          }, req.signal);
+          }, req.signal, userMessage.instanceId);
         } finally {
           req.dispose();
         }
@@ -1334,7 +1475,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     }
     }
   } catch (err) {
-    const recovered = await this._recoverFromLlmTimeout(err, trimmed, envelope);
+    const recovered = await this._recoverFromLlmTimeout(err, trimmed, envelope, userMessage.instanceId);
     if (!recovered) {
       const message = err instanceof Error ? err.message : String(err);
       // Provider-auth recovery: native CLI providers surface "not logged in"
@@ -1381,6 +1522,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       }
     }
   } finally {
+    if (managedCliPass) await this._closeManagedCliPass(managedCliPass);
     this._finalizeCurrentBudgetTurn();
     this.resetStreamState();
   }
@@ -1431,7 +1573,48 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
    * CLI's invocation cwd so file tools resolve relative paths the
    * way the user expects.
    */
-  private _buildCopilotCliProviderOptions(): CopilotCliProviderPortOptions {
+  private async _beginManagedCliPass(query: string, expectedInstance?: string): Promise<ManagedCliPass> {
+    if(this._computerPass.blocksContinuation)throw new Error('COMPUTER_PASS_ORIGINAL_RECOVERY_REQUIRED');
+    if (!this.daemonClient || !this.mcpClient || this.daemonClient.baseUrl !== this.mcpClient.baseUrl)
+      throw new Error('MANAGED_EDITOR_AUTHORITY_UNAVAILABLE: connect the selected DreamGraph daemon.');
+    const reporting = getReportingMode();
+    const pass = await ManagedCliPass.begin(this.daemonClient, {
+      id: `vscode:${this._createMessageId()}`, adapter: `vscode/${this.architectLlm?.provider}`,
+      query, autonomy: canonicalAutonomyPolicy(this._autonomyState.mode).autonomy,
+      verbosity: reporting === 'quiet' ? 'concise' : reporting === 'standard' ? 'balanced' : 'detailed',
+      timeout_ms: Math.min(300000, this._getLlmTimeoutMs({ mode: 'stream' })),
+      approved_actions: [],
+    }, this.abortController?.signal);
+    // A delayed context build or connection change cannot redirect an already captured turn.
+    try {
+      const snapshot = await this.daemonClient.readExecution(pass.executionId, this.abortController?.signal);
+      if (expectedInstance && expectedInstance !== 'default' && snapshot.instance_id !== expectedInstance)
+        throw new Error('MANAGED_EDITOR_INSTANCE_CHANGED');
+      await this._executionReview.start(this.daemonClient, pass.executionId, this.abortController?.signal);
+    } catch (error) {
+      try { await pass.finish(); this._executionReview.stop(true); }
+      catch (closureError) { this._executionReview.stop(); throw new Error(`MANAGED_EDITOR_CLOSURE_UNCONFIRMED: ${String(closureError)}; original refusal: ${String(error)}`, { cause: error }); }
+      throw error;
+    }
+    return pass;
+  }
+
+  private async _closeManagedCliPass(pass: ManagedCliPass): Promise<boolean> {
+    try {
+      const closed = await pass.finish(this.abortController?.signal.aborted === true);
+      this._executionReview.stop(true);
+      await this.postMessage({ type: 'tool-progress', tool: 'DreamGraph execution',
+        message: `${closed.execution_id}: ${closed.status}; ${closed.graph_receipt_ids.length} graph receipts, ${closed.obligation_ids.length} source obligations. Host transport delivery does not prove model understanding.` });
+      return ['no_change', 'state_committed', 'graph_committed'].includes(closed.status) && !this._executionReview.blocksContinuation;
+    } catch (error) {
+      this._executionReview.stop();
+      await this.postMessage({ type: 'error', error: `Execution closure is unconfirmed. Retain ${pass.executionId} for recovery; do not repeat uncertain work. ${String(error)}` });
+      return false;
+    }
+  }
+
+  private _buildCopilotCliProviderOptions(managedPass?: ManagedCliPass): CopilotCliProviderPortOptions {
+    if (!managedPass) throw new Error('MANAGED_CLI_PASS_REQUIRED');
     if (!this.architectLlm) {
       throw new Error('Cannot build Copilot CLI provider options: architectLlm is not initialized.');
     }
@@ -1477,6 +1660,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
 
     const registry = createHostRegistry({
       hostMcpUrl,
+      sessionBearer: managedPass?.workerBearer,
       bridgeEntryPath,
       nodeExecPath: process.execPath,
       auditDirAbsPath,
@@ -1498,8 +1682,12 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     const model = llm.currentConfig?.model;
     return {
       hostLlm: llm,
+      preparePrompt: (prompt, signal) => managedPass.admitPrompt(prompt, { provider: 'none', model: model || 'auto', adapter: 'copilot-cli',
+        api: 'native_cli', base_url: '', effort: null, retention: 'provider_default', strict_schema: false, output_tokens: 8192 }, signal),
+      admissionSignal: () => managedPass.admissionSignal,
+      settleRun: result => managedPass.settleRun(result),
       invocationCwd: workspaceCwd,
-      timeoutMs,
+      timeoutMs: managedPass ? Math.min(timeoutMs, managedPass.timeoutMs) : timeoutMs,
       idleTimeoutMs,
       baseEnv: process.env,
       // Skip the `--model` flag when the user picked `auto` so the
@@ -1599,7 +1787,8 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     };
   }
 
-  private _buildCodexCliProviderOptions(): CodexCliProviderPortOptions {
+  private _buildCodexCliProviderOptions(managedPass?: ManagedCliPass): CodexCliProviderPortOptions {
+    if (!managedPass) throw new Error('MANAGED_CLI_PASS_REQUIRED');
     if (!this.architectLlm) {
       throw new Error('Cannot build Codex CLI provider options: architectLlm is not initialized.');
     }
@@ -1632,6 +1821,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
 
     const registry = createHostRegistry({
       hostMcpUrl,
+      sessionBearer: managedPass?.workerBearer,
       bridgeEntryPath,
       nodeExecPath: process.execPath,
       auditDirAbsPath,
@@ -1644,8 +1834,12 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
 
     return {
       hostLlm: llm,
+      preparePrompt: (prompt, signal) => managedPass.admitPrompt(prompt, { provider: 'none', model: model || 'auto', adapter: 'codex-cli',
+        api: 'native_cli', base_url: '', effort: null, retention: 'provider_default', strict_schema: false, output_tokens: 8192 }, signal),
+      admissionSignal: () => managedPass.admissionSignal,
+      settleRun: result => managedPass.settleRun(result),
       invocationCwd: workspaceCwd,
-      timeoutMs,
+      timeoutMs: managedPass ? Math.min(timeoutMs, managedPass.timeoutMs) : timeoutMs,
       idleTimeoutMs,
       baseEnv: process.env,
       model: model && model !== 'auto' ? model : undefined,
@@ -1749,6 +1943,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       attachmentSummary: string;
       stopContextBlock: string | undefined;
       internalPrompt?: boolean;
+      managedCliPass?: ManagedCliPass;
     },
   ): ChatPanelHost {
     // The seam composer rebuilds `conversation` from prior + new turn,
@@ -1762,6 +1957,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     const llm = this.architectLlm!;
     const cb = this.contextBuilder!;
     const panel = this;
+    const originalInstance = this.currentInstanceId, originalEndpoint = this.daemonClient?.baseUrl;
 
     return {
       architectLlm: llm,
@@ -1825,6 +2021,10 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       // bubble's enter animation and the user's scroll state — also
       // matches v1 continuation's broadcast.
       persistAssistantMessage: async (args) => {
+        if (args.execution && (panel.currentInstanceId !== originalInstance
+          || originalEndpoint !== panel.daemonClient?.baseUrl
+          || originalInstance !== 'default' && originalInstance !== args.execution.instance_id))
+          throw new Error(`MANAGED_CORE_PERSIST_TARGET_CHANGED: retain ${args.execution.execution_id}`);
         // Preserve the model's pre-abort prose. When the pass driver
         // aborts (user stop, wrapper timeout, orchestrator TIMEOUT,
         // host abort, etc.) it passes only the synthetic "Pass aborted:
@@ -1865,7 +2065,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
           fullContent: redactedFullContent,
           implicitEntityNotice,
           timestamp: new Date().toISOString(),
-          instanceId: panel.currentInstanceId,
+          instanceId: args.execution?.instance_id ?? panel.currentInstanceId,
           verdict: panel._lastVerdict ?? undefined,
           toolTrace: panel._lastToolTrace.length > 0 ? [...panel._lastToolTrace] : undefined,
         };
@@ -1889,7 +2089,12 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
         if (assistantMessage.id) {
           panel._broadcastSummaryCard(redactedFullContent, assistantMessage.id);
         }
-        if (panel._autonomyEnabled && assistantMessage.id) {
+        if (args.execution) await panel.postMessage({ type: 'tool-progress', tool: 'DreamGraph execution',
+          message: `${args.execution.execution_id}: ${args.execution.status}; ${args.execution.graph_receipt_ids.length} graph receipts, ${args.execution.obligation_ids.length} source obligations. Delivery attests host handoff only.` });
+        const closureAllowsContinuation = args.execution
+          ? args.stopReason === 'complete' && ['no_change', 'state_committed', 'graph_committed'].includes(args.execution.status)
+          : !perTurn.managedCliPass || await panel._closeManagedCliPass(perTurn.managedCliPass);
+        if (closureAllowsContinuation && panel._autonomyEnabled && assistantMessage.id) {
           await panel._handleAutonomyPassComplete(
             redactedFullContent,
             assistantMessage.id,
@@ -2120,7 +2325,26 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     await this._syncAttachments();
   }
 
-  private abortGeneration(): void { this.abortController?.abort(); }
+  private abortGeneration(): void { this.abortController?.abort(); this._operatorController?.abort(); this._reviewActionGeneration++;
+    if(this._computerPass.blocksContinuation)void this._computerPass.stop().catch(error=>this.postMessage({type:'error',error:String(error)}));
+  }
+
+  private assertComputerPassAvailable(){
+    if(this.streaming||this._operatorController||this._requiresOperatorRecovery()||this._executionReview.blocksContinuation)throw new Error('COMPUTER_PASS_BUSY_OR_RECOVERY_REQUIRED');
+    if(!this.daemonClient||this.currentInstanceId==='default')throw new Error('COMPUTER_PASS_INSTANCE_REQUIRED');
+  }
+  private async runComputerPass(id:string,message:string){this.assertComputerPassAvailable();
+    const originalInstance=this.currentInstanceId,port=this.daemonClient!,endpoint=port.baseUrl;
+    if(typeof message!=='string'||!message.trim()||message.length>16384)throw new Error('COMPUTER_PASS_TASK_INVALID');
+    const reporting=getReportingMode();this.streaming=true;await this.postMessage({type:'stream-start'});
+    try{this.addExternalMessage('user',message);
+      const reply=await this._computerPass.start(port,originalInstance,{computer_preparation_id:id,message,
+        autonomy_mode:canonicalAutonomyPolicy(this._autonomyState.mode).autonomy,
+        verbosity_mode:reporting==='quiet'?'concise':reporting==='standard'?'balanced':'detailed'});
+      if(this.currentInstanceId===originalInstance&&this.daemonClient===port&&port.baseUrl===endpoint)
+        this.addExternalMessage('assistant',`${reply.content}\n\nComputer Use · ${reply.provider}/${reply.model} · ${reply.execution_id}: ${reply.execution.status}. ${reply.execution.graph_receipt_ids.length} graph receipts; ${reply.execution.obligation_ids.length} source obligations.`);
+    }finally{this.resetStreamState();}
+  }
 
   /**
    * Create a child AbortSignal that fires on EITHER user abort OR timeout.
@@ -2169,8 +2393,11 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     err: unknown,
     originalText: string,
     envelope: import('./types.js').EditorContextEnvelope | null,
+    expectedInstance = this.currentInstanceId,
   ): Promise<boolean> {
     if (!this._isTimeoutError(err) || !this.architectLlm) return false;
+    // A failed managed pass retains its original allocation/termination state; no fresh recovery model run.
+    if (/MANAGED_NATIVE|MANAGED_READ_ONLY|NATIVE_MODEL/.test(String(err))) return false;
 
     const provider = this.architectLlm.provider ?? 'unknown';
     const model = this.architectLlm.currentConfig?.model;
@@ -2196,12 +2423,12 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     let fullContent = '';
     const req = this._createRequestSignal(recoveryTimeoutMs);
     try {
-      await this.architectLlm.stream(recoveryMessages, (chunk: string) => {
+      await this._streamManagedNative(recoveryMessages, (chunk: string) => {
         const safeChunk = this._redactSecrets(chunk);
         fullContent += safeChunk;
         this.streamingContent += safeChunk;
         void this.postMessage({ type: 'stream-chunk', chunk: safeChunk });
-      }, req.signal);
+      }, req.signal, expectedInstance);
     } catch (recoveryErr) {
       this._logTimeoutDiagnostics({
         provider,
@@ -2280,6 +2507,8 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   }
 
   private async rehydrateWebview(): Promise<void> {
+    await this.postMessage({ type: 'executionReview', view: this._executionReview.view });
+    await this.postMessage({type:'computerPassView',view:this._computerPass.view});
     await this.postState();
     if (this.draftText) await this.postMessage({ type: 'restoreDraft', text: this.draftText });
     await this._syncAttachments();
@@ -2300,11 +2529,15 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       this._pendingReviewsCollapsed = true;
     }
     await this.postMessage({ type: 'pendingReviews', reviews, collapsed: this._pendingReviewsCollapsed });
+    await this._postOperatorState();
   }
 
   private async _toPendingReviewViewModel(review: PendingChangeReview): Promise<PendingReviewViewModel> {
     const diff = await this._summarizePendingReviewDiff(review);
     return {
+      reviewId: review.id,
+      recoveryRequired: review.undoUnconfirmed === true,
+      recoveryCanCheck: !!review.undoExecutionId && review.authority?.endpoint===this.daemonClient?.baseUrl && review.authority?.instanceId===this.currentInstanceId,
       filePath: review.filePath,
       relativePath: vscode.workspace.asRelativePath(review.filePath),
       status: review.status === 'conflict' ? 'conflict' : 'pending',
@@ -2623,7 +2856,15 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
         if (!action.toolName) {
           throw new Error('Tool action is missing a tool name.');
         }
+        if(!message.instanceId || message.instanceId!==this.currentInstanceId)throw new Error('MESSAGE_ACTION_INSTANCE_CHANGED');
+        const targetInstance=message.instanceId,history=this.messages;
         const result = await this._executeMessageActionTool(action.toolName, action.toolArgs ?? {});
+        const returned=result as {result:unknown;execution:ManagedExecutionSnapshot;reviewError?:string};
+        const ownerFailed=this._ownerResultFailed(returned.result);
+        const actionFailed=ownerFailed||!!returned.reviewError||!['no_change','state_committed','graph_committed'].includes(returned.execution.status);
+        const actionError=ownerFailed?'The owner refused this action; see its complete outcome.':returned.reviewError
+          ?'File review failed; the owner outcome and committed changes remain recorded.'
+          :`Execution ${returned.execution.execution_id}: ${returned.execution.status}. Source effects are retained; closure is incomplete.`;
         // Patch #1 (renderer invariant): never dump raw JSON into chat.
         // Emit a typed `outcome` fence the webview renders as a collapsible
         // OutcomeCard. The payload sits inside an inner <details> so it is
@@ -2634,7 +2875,8 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
         const summaryLine = helpers.summarizeOutcomePayload(payloadText);
         const fenceBody = [
           `tool: ${action.toolName}`,
-          `status: ok`,
+          `status: ${returned.execution.status}`,
+          `owner_status: ${ownerFailed?'failed':'returned'}`,
           summaryLine ? `summary: ${summaryLine}` : '',
           '',
           this._redactSecrets(payloadText),
@@ -2644,13 +2886,14 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
           role: 'system',
           content: `Action result (${action.label})\n\n\`\`\`outcome\n${fenceBody}\n\`\`\``,
           timestamp: new Date().toISOString(),
-          instanceId: this.currentInstanceId,
+          instanceId: targetInstance,
         };
-        this.messages.push(toolMessage);
-        await this.persistMessages();
-        await this.postMessage({ type: 'addMessage', message: toolMessage, actions: this._buildMessageActions(toolMessage), roleMeta: this._roleMetaFor(toolMessage), contextFooter: this._contextFooterFor(toolMessage) });
-        this._actionLog.push({ timestamp: new Date().toISOString(), actionType: action.actionType, sourceMessageId: messageId, outcome: 'completed', detail: action.toolName });
-        await this.postMessage({ type: 'messageActionState', messageId, actionId, status: 'completed' });
+        history.push(toolMessage);
+        if(this.memory)await this.memory.save(targetInstance,history as PersistedMessage[]);
+        if(this.currentInstanceId===targetInstance&&this.messages===history)
+          await this.postMessage({ type: 'addMessage', message: toolMessage, actions: this._buildMessageActions(toolMessage), roleMeta: this._roleMetaFor(toolMessage), contextFooter: this._contextFooterFor(toolMessage) });
+        this._actionLog.push({ timestamp: new Date().toISOString(), actionType: action.actionType, sourceMessageId: messageId, outcome: actionFailed?'failed':'completed', detail: action.toolName });
+        await this.postMessage({ type: 'messageActionState', messageId, actionId, status: actionFailed?'failed':'completed',...(actionFailed?{error:actionError}:{}) });
         return;
       }
 
@@ -3272,6 +3515,11 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     nextStepActions: RecommendedAction[] = [],
     options: { readonly internalPrompt?: boolean; readonly preserveExistingToolTrace?: boolean } = {},
   ): Promise<void> {
+    if(this._operatorController || this._requiresOperatorRecovery())return;
+    if (this._executionReview.blocksContinuation) {
+      await this.postMessage({ type: 'error', error: 'Execution review is unresolved; continuation is paused for the captured approval.' });
+      return;
+    }
     if (this._autonomyContinuing) {
       console.warn('[DreamGraph] _runAutonomyContinuationPass: re-entrant call dropped — a continuation is already in progress.');
       // F-08: surface the dropped re-entrant call so the user knows their
@@ -3284,6 +3532,8 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       return; // prevent re-entrancy
     }
     this._autonomyContinuing = true;
+    let managedCliPass: ManagedCliPass | undefined;
+    const expectedInstance = this.currentInstanceId;
 
     try {
       // Build continuation message
@@ -3345,7 +3595,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
           description: t.description ?? '',
           inputSchema: (t.inputSchema ?? {}) as Record<string, unknown>,
         })),
-        ...LOCAL_TOOL_DEFINITIONS.map((t) => ({
+        ...[MANAGED_RUN_COMMAND_TOOL].map((t) => ({
           name: t.name,
           description: t.description ?? '',
           inputSchema: t.inputSchema as Record<string, unknown>,
@@ -3402,11 +3652,13 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       const copilotCliRoute = nativeCliProvider === 'copilot-cli';
       const codexCliRoute = nativeCliProvider === 'codex-cli';
       const nativeCliRoute = copilotCliRoute || codexCliRoute;
+      if (nativeCliRoute) managedCliPass = await this._beginManagedCliPass(prompt, expectedInstance);
       // Native CLI providers handle tool selection internally - force
       // the no-tools branch (tools=[]) and route through the selected
       // ProviderPort. Without this, continuations fall through to
       // `this.architectLlm!.stream(...)`, which rejects native CLI providers.
-      const seamRoute = (useCorePass || nativeCliRoute) && envelope !== null;
+      if (nativeCliRoute && !envelope) throw new Error('MANAGED_CLI_HOST_CONTEXT_UNAVAILABLE');
+      const seamRoute = nativeCliRoute && envelope !== null;
       let seamOwnedAssistant = false;
 
       let fullContent = '';
@@ -3423,6 +3675,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
             attachmentSummary: '',
             stopContextBlock: undefined,
             internalPrompt: options.internalPrompt,
+            managedCliPass,
           },
         );
         // Reset the re-entrancy guard BEFORE the seam runs so the
@@ -3435,10 +3688,10 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
         // happen inside the CLI subprocess, so the diff view requires a
         // turn-level workspace snapshot bookend.
         const copilotCliReviewSnapshot = copilotCliRoute
-          ? await changeReviewService.captureWorkspaceSnapshot()
+          ? await changeReviewService.captureWorkspaceSnapshot(managedCliPass ? {endpoint:managedCliPass.ownerEndpoint,instanceId:managedCliPass.instanceId}:undefined)
           : null;
         const codexCliReviewSnapshot = codexCliRoute
-          ? await changeReviewService.captureWorkspaceSnapshot()
+          ? await changeReviewService.captureWorkspaceSnapshot(managedCliPass ? {endpoint:managedCliPass.ownerEndpoint,instanceId:managedCliPass.instanceId}:undefined)
           : null;
         const req = this._createRequestSignal(this._getLlmTimeoutMs({ mode: 'stream' }));
         try {
@@ -3453,7 +3706,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
                 host,
                 text: prompt,
                 tools: [],
-                providerOptions: this._buildCopilotCliProviderOptions(),
+                providerOptions: this._buildCopilotCliProviderOptions(managedCliPass),
                 onStreamChunk: streamNativeCliChunk,
                 abortSignal: req.signal,
               })
@@ -3462,7 +3715,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
                   host,
                   text: prompt,
                   tools: [],
-                  providerOptions: this._buildCodexCliProviderOptions(),
+                  providerOptions: this._buildCodexCliProviderOptions(managedCliPass),
                   onStreamChunk: streamNativeCliChunk,
                   abortSignal: req.signal,
                 })
@@ -3510,23 +3763,23 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
           }
           req.dispose();
         }
-      } else if (tools.length > 0) {
+      } else if (!nativeCliRoute) {
         if (options.internalPrompt === true) {
           llmMessages.push({ role: 'user', content: prompt });
         }
-        fullContent = await this.runAgenticLoop(llmMessages, tools);
+        fullContent = await this.runAgenticLoop(llmMessages, tools, expectedInstance);
       } else {
         if (options.internalPrompt === true) {
           llmMessages.push({ role: 'user', content: prompt });
         }
         const req = this._createRequestSignal();
         try {
-          await this.architectLlm!.stream(llmMessages, (chunk: string) => {
+          await this._streamManagedNative(llmMessages, (chunk: string) => {
             const safeChunk = this._redactSecrets(chunk);
             fullContent += safeChunk;
             this.streamingContent += safeChunk;
             void this.postMessage({ type: 'stream-chunk', chunk: safeChunk });
-          }, req.signal);
+          }, req.signal, expectedInstance);
         } finally {
           req.dispose();
         }
@@ -3614,6 +3867,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       await this.persistMessages();
       await this.postMessage({ type: 'addMessage', message: errMsg, actions: [], roleMeta: this._roleMetaFor(errMsg), contextFooter: undefined });
     } finally {
+      if (managedCliPass) await this._closeManagedCliPass(managedCliPass);
       this._autonomyContinuing = false;
       this.resetStreamState();
     }
@@ -3829,7 +4083,8 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   ): ReturnType<ArchitectLlm['callWithTools']> {
     for (let attempt = 0; attempt <= ChatPanel.MAX_RETRIES; attempt++) {
       try {
-        return await this.architectLlm!.callWithTools(llmMessages, tools, rawMessages, signal);
+        signal?.throwIfAborted();
+        return await this.architectLlm!.callWithTools(llmMessages, tools, rawMessages, signal, attempt > 0);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         const is429 = msg.includes('429') || msg.toLowerCase().includes('rate_limit');
@@ -3844,7 +4099,11 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
         this.streamingContent += note;
         void this.postMessage({ type: 'stream-chunk', chunk: note });
 
-        await new Promise((resolve) => setTimeout(resolve, waitMs));
+        await new Promise<void>((resolve, reject) => {
+          const abort = () => { clearTimeout(timer); reject(signal?.reason ?? new Error('NATIVE_MODEL_RETRY_CANCELLED')); };
+          const timer = setTimeout(() => { signal?.removeEventListener('abort', abort); resolve(); }, waitMs);
+          signal?.addEventListener('abort', abort, { once: true }); if (signal?.aborted) abort();
+        });
       }
     }
     throw new Error('Rate limit retries exhausted'); // unreachable but satisfies TS
@@ -3854,7 +4113,48 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     return helpers.toolTimeoutMs(toolName);
   }
 
-  private async runAgenticLoop(initialMessages: ArchitectMessage[], tools: ToolDefinition[]): Promise<string> {
+  private async _beginManagedNativePass(query: string, expectedInstance?: string) {
+    if(this._computerPass.blocksContinuation)throw new Error('COMPUTER_PASS_ORIGINAL_RECOVERY_REQUIRED');
+    if (!this.daemonClient || !this.mcpClient || this.daemonClient.baseUrl !== this.mcpClient.baseUrl)
+      throw new Error('MANAGED_EDITOR_AUTHORITY_UNAVAILABLE: connect the selected DreamGraph daemon.');
+    const reporting = getReportingMode();
+    return ManagedNativePass.begin(this.daemonClient, {
+      id: `vscode:${this._createMessageId()}`, adapter: `vscode/${this.architectLlm?.provider}`, query,
+      autonomy: canonicalAutonomyPolicy(this._autonomyState.mode).autonomy,
+      verbosity: reporting === 'quiet' ? 'concise' : reporting === 'standard' ? 'balanced' : 'detailed',
+      timeout_ms: 300000, approved_actions: [],
+    }, this.abortController?.signal, expectedInstance);
+  }
+
+  private async runAgenticLoop(initialMessages: ArchitectMessage[], tools: ToolDefinition[], expectedInstance = this.currentInstanceId): Promise<string> {
+    if(this._operatorController || this._requiresOperatorRecovery())throw new Error('OPERATOR_EXECUTION_BUSY_OR_RECOVERY_REQUIRED');
+    if (this._executionReview.blocksContinuation) throw new Error('EXECUTION_REVIEW_RECOVERY_REQUIRED');
+    const lastUser = [...initialMessages].reverse().find(message => message.role === 'user');
+    const query = typeof lastUser?.content === 'string' ? lastUser.content : lastUser?.content.filter(block => block.type === 'text').map(block => (block as { text: string }).text).join('\n') ?? '';
+    const pass = await this._beginManagedNativePass(query, expectedInstance);
+    let result = '', failure: unknown, completed = false;
+    try {
+      await this._executionReview.start(this.daemonClient!, pass.executionId, pass.signal);
+      const governedTools = tools.filter(tool => !isLocalTool(tool.name) || tool.name === 'run_command');
+      result = await this._runManagedAgenticLoop(initialMessages, governedTools, pass);
+      await this._executionReview.waitForResolution(pass.signal); completed = true;
+    } catch (error) { failure = error; }
+    let closed: Awaited<ReturnType<ManagedNativePass['finish']>>;
+    try {
+      closed = await pass.finish(this.abortController?.signal.aborted ? 'cancelled' : completed ? 'completed' : 'failed');
+      this._executionReview.stop(true);
+      await this.postMessage({ type: 'tool-progress', tool: 'DreamGraph execution', message: `${closed.execution_id}: ${closed.status}; ${closed.graph_receipt_ids.length} graph receipts, ${closed.obligation_ids.length} source obligations. Delivery attests host handoff only.` });
+    } catch (closureError) {
+      this._executionReview.stop();
+      throw new Error(`MANAGED_NATIVE_CLOSURE_UNCONFIRMED: ${pass.executionId}: ${String(closureError)}${failure ? `; original outcome: ${String(failure)}` : ''}`, { cause: failure ?? closureError });
+    }
+    if (!['no_change', 'state_committed', 'graph_committed'].includes(closed.status) || this._executionReview.blocksContinuation)
+      throw new Error(`MANAGED_NATIVE_${closed.status.toUpperCase()}: preserve ${pass.executionId}; reconciliation/recovery must settle before continuation${failure ? `; original outcome: ${String(failure)}` : ''}`, { cause: failure });
+    if (!completed) throw failure;
+    return result;
+  }
+
+  private async _runManagedAgenticLoop(initialMessages: ArchitectMessage[], tools: ToolDefinition[], managedPass: ManagedNativePass): Promise<string> {
   if (!this.architectLlm) {
     throw new Error('Architect LLM not configured');
   }
@@ -3908,11 +4208,16 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   while (pass < maxPasses) {
     pass += 1;
     const timeoutMs = this._getLlmTimeoutMs({ mode: 'tool', toolCount: tools.length });
-    const req = this._createRequestSignal(timeoutMs);
+    const request = this._createRequestSignal(timeoutMs);
+    const req = { signal: AbortSignal.any([request.signal, managedPass.signal]), dispose: request.dispose };
 
     try {
       await this.postMessage({ type: 'stream-thinking', active: true });
-      const response = await this._callWithToolsRetry(llmMessages, tools, rawMessages, req.signal);
+      req.signal.throwIfAborted();
+      await this._executionReview.waitForResolution(req.signal);
+      const prepared = await managedPass.prepare(llmMessages, tools, rawMessages, req.signal);
+      const response = await managedPass.runModel(this.architectLlm, () => this._callWithToolsRetry(prepared.messages, tools, prepared.raw, req.signal), req.signal);
+      req.signal.throwIfAborted();
 
       if (response.content) {
         const safeChunk = this._redactSecrets(response.content);
@@ -3951,17 +4256,23 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
 
       const toolResultBlocks: Array<{ type: 'tool_result'; tool_use_id: string; content: string; is_error?: boolean }> = [];
       for (const toolCall of response.toolCalls) {
+        req.signal.throwIfAborted();
         const toolStartedAt = Date.now();
         await this.postMessage({ type: 'tool-progress', tool: toolCall.name, message: `Running ${toolCall.name}…` });
 
         const reviewSnapshot = isWriteToolName(toolCall.name)
-          ? await changeReviewService.captureWorkspaceSnapshot()
+          ? await changeReviewService.captureWorkspaceSnapshot({endpoint:managedPass.ownerEndpoint,instanceId:managedPass.instanceId})
           : null;
 
+        let ownerResult: unknown;
+        let receivedResult = false;
         try {
-          const result = isLocalTool(toolCall.name)
-            ? await executeLocalTool(toolCall.name, toolCall.input ?? {})
-            : await this._callMcpToolWithLazyConnect(toolCall.name, toolCall.input ?? {});
+          const result = await managedPass.callTool(toolCall.name, toolCall.input ?? {}, req.signal, ChatPanel._toolTimeoutMs(toolCall.name));
+          ownerResult = result;
+          receivedResult = true;
+          if (result && typeof result === 'object' && (result as { isError?: unknown }).isError === true) {
+            throw new helpers.ToolOwnerResultError(result);
+          }
           if (reviewSnapshot) {
             const changedReviewPaths = await changeReviewService.recordWorkspaceChanges(reviewSnapshot);
             if (changedReviewPaths.length > 0) {
@@ -4018,7 +4329,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
               console.warn('[DreamGraph] Failed to record pending review changes after failed write tool:', reviewErr);
             }
           }
-          const toolError = toolErr instanceof Error ? toolErr.message : String(toolErr);
+          const toolError = helpers.stringifyToolFailure(toolErr, ownerResult, receivedResult);
           toolResultBlocks.push({
             type: 'tool_result',
             tool_use_id: toolCall.id,
@@ -4186,10 +4497,14 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       const wrapMessages = [...rawMessages, { role: 'user', content: wrapPrompt }];
 
       const wrapTimeout = this._getLlmTimeoutMs({ mode: 'stream' });
-      const wrapReq = this._createRequestSignal(wrapTimeout);
+      const wrapRequest = this._createRequestSignal(wrapTimeout);
+      const wrapReq = { signal: AbortSignal.any([wrapRequest.signal, managedPass.signal]), dispose: wrapRequest.dispose };
       try {
         await this.postMessage({ type: 'stream-thinking', active: true });
-        const wrapResponse = await this.architectLlm.callWithTools(wrapMessages as ArchitectMessage[], [], wrapMessages as unknown[], wrapReq.signal);
+        await this._executionReview.waitForResolution(wrapReq.signal);
+        const prepared = await managedPass.prepare(llmMessages, [], wrapMessages, wrapReq.signal);
+        const wrapResponse = await managedPass.runModel(this.architectLlm!, () => this.architectLlm!.callWithTools(prepared.messages, [], prepared.raw, wrapReq.signal), wrapReq.signal);
+        wrapReq.signal.throwIfAborted();
         if (wrapResponse.content) {
           const safeChunk = this._redactSecrets(wrapResponse.content);
           finalText += safeChunk;
@@ -4275,8 +4590,8 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
    * the race, or the instance was bound after activation), we try to
    * bring it up here so the architect can use MCP tools without the
    * user having to manually invoke `DreamGraph: Connect`. Failure is
-   * non-fatal — we degrade to "no MCP tools" so the architect can still
-   * answer using local tools + LLM-only knowledge.
+   * explicit capability information. Native dispatch still requires its
+   * selected daemon lease; no local tool can bypass unavailable authority.
    */
   private async _listMcpToolsLazy(): Promise<Array<{ name: string; description?: string; inputSchema: unknown }>> {
     if (!this.mcpClient) return [];
@@ -4303,45 +4618,61 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   }
 
   /**
-   * Best-effort `callTool` that lazy-connects the MCP client. Used by
+   * Whole-result agent call that lazy-connects the MCP client. Used by
    * the agentic loop so a stale/never-connected client is repaired
    * inline rather than crashing the whole turn.
    */
-  private async _callMcpToolWithLazyConnect(name: string, args: Record<string, unknown>): Promise<unknown> {
+  private async _callMcpToolWithLazyConnect(name: string, args: Record<string, unknown>, signal?: AbortSignal): Promise<unknown> {
+    signal?.throwIfAborted();
     if (!this.mcpClient) {
       throw new Error(`Tool "${name}" is not available — MCP client is not configured.`);
     }
     if (!this.mcpClient.isConnected) {
       await this.mcpClient.connect();
     }
-    return this.mcpClient.callTool(name, args);
+    signal?.throwIfAborted();
+    return this.mcpClient.callToolRaw(name, args, ChatPanel._toolTimeoutMs(name), undefined, signal);
   }
 
-  private async _executeMessageActionTool(toolName: string, input: Record<string, unknown>): Promise<unknown> {
+  /** Explicit palette invocation captures its original target before asynchronous user input. */
+  public captureManualCommand() {
+    const authority=this._reviewAuthority();
+    return async(input:Record<string,unknown>)=>{
+      if(!authority || authority.endpoint!==this.daemonClient?.baseUrl || authority.instanceId!==this.currentInstanceId)
+        throw new UndoDispatchRefusal('OPERATOR_AUTHORITY_CHANGED: reconnect the originally selected instance; no local fallback.');
+      return this._executeMessageActionTool('run_command',input,{authority});
+    };
+  }
+  private async _streamManagedNative(messages: ArchitectMessage[], onChunk: (chunk: string) => void, signal: AbortSignal, expectedInstance = this.currentInstanceId) {
+    if (!this.architectLlm || !this.daemonClient || !this.mcpClient || this.daemonClient.baseUrl !== this.mcpClient.baseUrl)
+      throw new Error('MANAGED_EDITOR_AUTHORITY_UNAVAILABLE: connect the selected DreamGraph daemon.');
+    if (this._operatorController || this._requiresOperatorRecovery() || this._executionReview.blocksContinuation)
+      throw new Error('MANAGED_EDITOR_RECOVERY_REQUIRED');
+    const result = await managedReadOnlyModel(this.daemonClient, this.architectLlm, messages,
+      (prepared, currentSignal) => this.architectLlm!.stream(prepared, onChunk, currentSignal), { signal, expectedInstance });
+    await this.postMessage({ type: 'tool-progress', tool: 'DreamGraph execution', message: `${result.execution.execution_id}: ${result.execution.status}; model and graph context stayed with the original host.` });
+    return result.response;
+  }
+
+  private async _executeMessageActionTool(toolName: string, input: Record<string, unknown>, captured?:{authority:ReviewAuthority|undefined}) {
     const startedAt = Date.now();
     let status: 'completed' | 'failed' = 'completed';
+    const authority=captured?captured.authority:this._reviewAuthority();
+    let snapshot:Awaited<ReturnType<typeof changeReviewService.captureWorkspaceSnapshot>>|undefined;
+    let returned:{result:unknown;execution:ManagedExecutionSnapshot;reviewError?:string}|undefined;
     try {
-      if (isLocalTool(toolName)) {
-        return await executeLocalTool(toolName, input);
-      }
-      if (!this.mcpClient?.isConnected) {
-        // Lazy-connect attempt — same rationale as `_listMcpToolsLazy`.
-        if (this.mcpClient) {
-          try {
-            await this.mcpClient.connect();
-          } catch {
-            // fall through to the explicit "not connected" error below
-          }
-        }
-        if (!this.mcpClient?.isConnected) {
-          throw new Error(`Tool "${toolName}" is not available — MCP client is not connected.`);
-        }
-      }
-      return await this.mcpClient.callTool(toolName, input, ChatPanel._toolTimeoutMs(toolName));
+      if(isWriteToolName(toolName)||toolName==='run_command')snapshot=await changeReviewService.captureWorkspaceSnapshot(authority);
+      const result=await this._executeOperatorTool(toolName,input,authority);returned=result;
+      if(this._ownerResultFailed(result.result))status='failed';
+      return result;
     } catch (error) {
       status = 'failed';
       throw error;
     } finally {
+      if(snapshot){
+        try{await changeReviewService.recordWorkspaceChanges(snapshot);await this._postPendingReviews();}
+        catch(error){status='failed';if(returned)returned.reviewError=String(error);console.warn('[DreamGraph] Operator file review failed; owner result and closure remain unchanged:',error);}
+      }
       this._lastToolTrace.push({
         tool: toolName,
         argsSummary: this._summarizeToolArgs(input),
@@ -4349,6 +4680,105 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
         durationMs: Date.now() - startedAt,
         status,
       });
+    }
+  }
+
+  private _reviewAuthority(): ReviewAuthority | undefined {
+    return this.daemonClient && this.currentInstanceId!=='default' ? {endpoint:this.daemonClient.baseUrl,instanceId:this.currentInstanceId}:undefined;
+  }
+  private _requiresOperatorRecovery():boolean {
+    return !!this._operatorRecovery && this._operatorRecovery.authority.endpoint===this.daemonClient?.baseUrl && this._operatorRecovery.authority.instanceId===this.currentInstanceId;
+  }
+  private async _postOperatorState() {
+    const recovery=this._operatorRecovery;
+    await this.postMessage({type:'operatorExecution',active:this._operatorController!==null,...(recovery?{recovery:{executionId:recovery.executionId,
+      authority:{...recovery.authority},canCheck:this._requiresOperatorRecovery()&&recovery.port.baseUrl===recovery.authority.endpoint,
+      message:recovery.message??'Outcome unconfirmed. Check the original execution; do not repeat its action.'}}:{})});
+  }
+  /** Read/retry closure on the original host; never repeat the tool or strengthen termination evidence. */
+  private async _recoverOperatorExecution(executionId:string,authority?:ReviewAuthority):Promise<ManagedExecutionSnapshot> {
+    const recovery=this._operatorRecovery;
+    if(this.streaming||this._operatorController)throw new Error('OPERATOR_EXECUTION_BUSY');
+    const binding=authority??recovery?.authority;
+    if(!binding || binding.endpoint!==this.daemonClient?.baseUrl || binding.instanceId!==this.currentInstanceId
+      || recovery&&recovery.executionId!==executionId)throw new Error('OPERATOR_RECOVERY_TARGET_CHANGED');
+    const port=recovery?.port??this.daemonClient!;
+    if(port.baseUrl!==binding.endpoint)throw new Error('OPERATOR_RECOVERY_ENDPOINT_CHANGED');
+    const controller=new AbortController();this._operatorController=controller;
+    try{
+      await this._postOperatorState();
+      let execution=await port.readExecution(executionId,controller.signal);
+      controller.signal.throwIfAborted();
+      if(execution.execution_id!==executionId||execution.instance_id!==binding.instanceId)throw new Error('OPERATOR_RECOVERY_IDENTITY_CHANGED');
+      if(execution.authority_active || recovery && ['work_pending','recovery_required'].includes(execution.status)){
+        if(!recovery)throw new Error('OPERATOR_RECOVERY_AUTHORITY_STILL_ACTIVE');
+        // If begin never returned, this host never dispatched a worker. Otherwise retry the captured finish exactly.
+        execution=recovery.finish?await recovery.finish(controller.signal):await port.finishExecution(executionId,'failed','confirmed',controller.signal);
+        controller.signal.throwIfAborted();
+      }
+      if(execution.execution_id!==executionId||execution.instance_id!==binding.instanceId||port.baseUrl!==binding.endpoint)throw new Error('OPERATOR_RECOVERY_IDENTITY_CHANGED');
+      if(!execution.authority_active&&['no_change','state_committed','graph_committed','reconciliation_pending'].includes(execution.status)){
+        if(this._operatorRecovery===recovery)this._operatorRecovery=undefined;
+      }else if(recovery)recovery.message=`${executionId}: ${execution.status}. Authority ${execution.authority_active?'active':'revoked'}; recovery remains required.`;
+      await this.postMessage({type:'tool-progress',tool:'DreamGraph operator recovery',message:`${executionId}: ${execution.status}; no action was repeated.`}).catch(()=>undefined);
+      return execution;
+    }finally{if(this._operatorController===controller)this._operatorController=null;await this._postOperatorState().catch(()=>undefined);}
+  }
+  private _ownerResultFailed(result:unknown):boolean {
+    if(!result || typeof result!=='object')return false;
+    if((result as {isError?:unknown}).isError===true)return true;
+    return ((result as {content?:Array<{type:string;text?:string}>}).content??[]).some(block=>{
+      if(block.type!=='text'||!block.text)return false;
+      try{return JSON.parse(block.text).success===false;}catch{return false;}
+    });
+  }
+  private async _queueReviewAction(action:()=>Promise<void>) {
+    const generation=this._reviewActionGeneration;
+    const queued=this._reviewActionQueue.then(async()=>{if(generation===this._reviewActionGeneration)await action();});
+    this._reviewActionQueue=queued.catch(error=>{void vscode.window.showErrorMessage(String(error));});
+    return this._reviewActionQueue;
+  }
+  /** Explicit operator click authorizes this captured action once; no model or local fallback. */
+  private async _executeOperatorTool(toolName:string,input:Record<string,unknown>,authority?:ReviewAuthority) {
+    if(this._computerPass.blocksContinuation)throw new UndoDispatchRefusal('COMPUTER_PASS_ORIGINAL_RECOVERY_REQUIRED');
+    if(this.streaming || this._operatorController || this._requiresOperatorRecovery() || this._executionReview.blocksContinuation)throw new UndoDispatchRefusal('OPERATOR_EXECUTION_BUSY_OR_RECOVERY_REQUIRED');
+    const host=this.daemonClient;
+    if(!host || !this.mcpClient || host.baseUrl!==this.mcpClient.baseUrl || !authority || authority.endpoint!==host.baseUrl || authority.instanceId!==this.currentInstanceId)
+      throw new UndoDispatchRefusal('OPERATOR_AUTHORITY_CHANGED: reconnect the original instance; no local fallback.');
+    const argumentsCopy=JSON.parse(JSON.stringify(input)),controller=new AbortController();this._operatorController=controller;
+    const executionId=`vscode:operator:${this._createMessageId()}`;
+    let pass:ManagedNativePass|undefined,result:unknown,failure:unknown,received=false,admissionRequested=false;
+    try{
+      await this.postMessage({type:'operatorExecution',active:true});
+      admissionRequested=true;
+      pass=await ManagedNativePass.begin(host,{id:executionId,adapter:'vscode/operator',query:`Operator ${toolName} for ${String(argumentsCopy.filePath??'selected target')}`,
+        timeout_ms:300000,approved_actions:[{tool:toolName,arguments:argumentsCopy,scope_id:authority.instanceId,calls:1}]},controller.signal,authority.instanceId);
+      await pass.prepare([{role:'user',content:`Operator requested ${toolName}. Source bytes and graph closure are distinct.`}],[],[],pass.signal);
+      result=await pass.callTool(toolName,argumentsCopy,pass.signal,ChatPanel._toolTimeoutMs(toolName));received=true;
+    }catch(error){failure=error;}
+    try{
+      if(!pass){
+        if(admissionRequested){
+          this._operatorRecovery={executionId,authority:{...authority},port:host};
+          throw new UndoOutcomeUnconfirmed(`OPERATOR_ADMISSION_UNCONFIRMED: ${executionId}; ${String(failure)}`,executionId,{cause:failure});
+        }
+        throw new UndoDispatchRefusal(String(failure));
+      }
+      let execution:Awaited<ReturnType<ManagedNativePass['finish']>>;
+      const outcome=controller.signal.aborted?'cancelled':received&&!this._ownerResultFailed(result)?'completed':'failed';
+      const termination=pass.workTermination,finish=(signal?:AbortSignal)=>host.finishExecution(executionId,outcome,termination,signal);
+      try{execution=await pass.finish(outcome);}
+      catch(error){this._operatorRecovery={executionId,authority:{...authority},port:host,finish};throw new UndoOutcomeUnconfirmed(`OPERATOR_CLOSURE_UNCONFIRMED: ${executionId}; ${String(error)}`,executionId,{cause:failure??error});}
+      if(['recovery_required','work_pending'].includes(execution.status))this._operatorRecovery={executionId,authority:{...authority},port:host,finish};
+      await this.postMessage({type:'tool-progress',tool:'DreamGraph operator execution',message:`${execution.execution_id}: ${execution.status}; ${execution.obligation_ids.length} source obligations.`}).catch(()=>undefined);
+      if(!received){
+        if(execution.status==='no_change')throw new UndoDispatchRefusal(`OPERATOR_EXECUTION_NO_CHANGE: ${executionId}; ${String(failure)}`);
+        throw new UndoOutcomeUnconfirmed(`OPERATOR_EXECUTION_${execution.status.toUpperCase()}: ${executionId}; ${String(failure)}`,executionId,{cause:failure});
+      }
+      return {result,execution};
+    }finally{
+      if(this._operatorController===controller)this._operatorController=null;
+      await this._postOperatorState().catch(()=>undefined);
     }
   }
 
@@ -4663,7 +5093,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   <meta charset="UTF-8" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} https: data:; style-src 'unsafe-inline' ${webview.cspSource}; script-src 'nonce-${nonce}' ${webview.cspSource};">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>${getStyles()}</style>
+  <style>${getStyles()}${executionReviewStyles}${computerControlStyles}${computerPassStyles}</style>
 </head>
 <body>
   <div class="header">
@@ -4694,6 +5124,10 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   </div>
 
   <div id="pending-reviews" class="pending-reviews" style="display:none"></div>
+  <section id="operator-recovery" hidden aria-live="polite" style="margin:2px 8px;padding:6px 8px;border:1px solid var(--vscode-panel-border);border-radius:4px;flex-shrink:0">
+    <div id="operator-recovery-status" style="font-size:11px;overflow-wrap:anywhere"></div>
+    <button id="operator-recovery-check" class="message-action-btn" style="margin-top:4px">Check outcome</button>
+  </section>
   <div id="messages"></div>
   <div id="empty-state">
     <div class="empty-logo">🌙</div>
@@ -4713,6 +5147,8 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     <div id="tool-progress-list"></div>
   </div>
   <div id="attachments"></div>
+  ${executionReviewMarkup}
+  ${computerControlMarkup}
   <div id="composer">
     <button id="attach-btn" class="icon-btn" title="Attach files" aria-label="Attach files">📎</button>
     <textarea id="prompt" rows="1" placeholder="Ask DreamGraph Architect…"></textarea>
@@ -4728,6 +5164,9 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
   ${!this._webviewBundleUri ? entityLinkScript : ''}
   <script nonce="${nonce}">
     const vscode = acquireVsCodeApi();
+    ${getExecutionReviewScript()}
+    ${getComputerControlScript()}
+    ${getComputerPassScript()}
     const pendingReviewsEl = document.getElementById('pending-reviews');
     const messagesEl = document.getElementById('messages');
     const emptyStateEl = document.getElementById('empty-state');
@@ -4748,6 +5187,8 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     let draftSaveTimer = null;
     let lastToolTrace = [];
     let pendingReviews = [];
+    let operatorExecuting = false;
+    let operatorRecovery = null;
     let pendingReviewsCollapsed = true;
     let lastVerdict = null;
     let streamingBubble = null;
@@ -4792,6 +5233,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       button.className = className;
       button.textContent = label;
       button.addEventListener('click', handler);
+      button.disabled = !!operatorExecuting;
       return button;
     }
 
@@ -4841,6 +5283,8 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
         + '<strong>' + (pendingReviews.length === 1 ? '1 file changed' : pendingReviews.length + ' files changed') + '</strong>'
         + ' <span style="color:var(--vscode-gitDecoration-addedResourceForeground,#3fb950)">+' + totalAdded + '</span>'
         + ' <span style="color:var(--vscode-gitDecoration-deletedResourceForeground,#f85149)">-' + totalDeleted + '</span>';
+      const unresolved=pendingReviews.filter(review=>review.recoveryRequired).length;
+      if(unresolved){const label=document.createElement('span');label.textContent=' · '+unresolved+' outcome'+(unresolved===1?'':'s')+' unconfirmed';label.style.fontSize='11px';titleButton.appendChild(label);}
       titleButton.addEventListener('click', () => {
         pendingReviewsCollapsed = !pendingReviewsCollapsed;
         vscode.postMessage({ type: 'togglePendingReviews' });
@@ -4851,11 +5295,12 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       bulkActions.style.display = 'flex';
       bulkActions.style.gap = '6px';
       bulkActions.appendChild(makePendingReviewButton('Keep', 'message-action-btn primary', () => {
-        for (const review of pendingReviews) vscode.postMessage({ type: 'keepPendingReview', filePath: review.filePath });
+        for (const review of pendingReviews.filter(review=>!review.recoveryRequired)) vscode.postMessage({ type: 'keepPendingReview', filePath: review.filePath, reviewId: review.reviewId });
       }));
       bulkActions.appendChild(makePendingReviewButton('Undo', 'message-action-btn', () => {
-        for (const review of pendingReviews) vscode.postMessage({ type: 'undoPendingReview', filePath: review.filePath });
+        for (const review of pendingReviews.filter(review=>!review.recoveryRequired)) vscode.postMessage({ type: 'undoPendingReview', filePath: review.filePath, reviewId: review.reviewId });
       }));
+      if (pendingReviews.every(review=>review.recoveryRequired)) for(const button of bulkActions.querySelectorAll('button')) button.disabled=true;
       header.appendChild(titleButton);
       header.appendChild(bulkActions);
       pendingReviewsEl.appendChild(header);
@@ -4897,6 +5342,17 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
 
         row.appendChild(pathButton);
         row.appendChild(stats);
+        if(review.recoveryRequired){
+          const recovery=document.createElement('div');recovery.style.gridColumn='1 / -1';recovery.style.fontSize='11px';
+          const reason=document.createElement('span');reason.textContent='Undo outcome unconfirmed. ';recovery.appendChild(reason);
+          const check=makePendingReviewButton('Check Undo outcome','message-action-btn',()=>vscode.postMessage({type:'recoverPendingReview',filePath:review.filePath,reviewId:review.reviewId}));
+          check.disabled=operatorExecuting||!review.recoveryCanCheck;
+          if(!review.recoveryCanCheck)check.title='Reconnect the original managed instance; an outcome cannot be inferred from local file bytes.';
+          recovery.appendChild(check);
+          row.appendChild(recovery);
+        }else if(review.status==='conflict'){
+          const reason=document.createElement('div');reason.style.gridColumn='1 / -1';reason.style.fontSize='11px';reason.textContent='File review has a conflict; current bytes must match before Keep or Undo.';row.appendChild(reason);
+        }
         list.appendChild(row);
       }
 
@@ -4914,7 +5370,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       if (optimisticSubmitBubble) optimisticSubmitBubble.remove();
       optimisticSubmitBubble = null;
       optimisticSubmitMarkdownEl = null;
-      if (!keepBusy && !streamingBubble) {
+      if (!keepBusy && !streamingBubble && !operatorExecuting) {
         sendBtn.style.display = 'inline-flex';
         stopBtn.style.display = 'none';
         thinkingEl.style.display = 'none';
@@ -5593,6 +6049,9 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
       clearImmediateSubmitFeedback();
       vscode.postMessage({ type: 'stop' });
     });
+    document.getElementById('operator-recovery-check').addEventListener('click',()=>{
+      if(operatorRecovery&&operatorRecovery.canCheck&&!operatorExecuting)vscode.postMessage({type:'recoverOperatorExecution',executionId:operatorRecovery.executionId});
+    });
     clearBtn.addEventListener('click', () => {
       clearImmediateSubmitFeedback();
       vscode.postMessage({ type: 'clear' });
@@ -5755,6 +6214,19 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
           }];
           vscode.setState({ ...state, messages: entries });
           addMessage(msg.message, msg.actions || [], msg.roleMeta, msg.contextFooter, uiState);
+          break;
+        }
+        case 'operatorExecution': {
+          operatorExecuting = msg.active === true;
+          operatorRecovery = msg.recovery || null;
+          const recoveryPanel=document.getElementById('operator-recovery');recoveryPanel.hidden=!operatorRecovery;
+          document.getElementById('operator-recovery-status').textContent=operatorRecovery ? operatorRecovery.message+' Original instance: '+operatorRecovery.authority.instanceId+' at '+operatorRecovery.authority.endpoint : '';
+          document.getElementById('operator-recovery-check').disabled=operatorExecuting||!operatorRecovery||!operatorRecovery.canCheck;
+          sendBtn.disabled = operatorExecuting;
+          promptEl.disabled = operatorExecuting;
+          if (operatorExecuting) { sendBtn.style.display = 'none'; stopBtn.style.display = 'inline-flex'; }
+          else if (!streamingBubble && !optimisticSubmitBubble) { sendBtn.style.display = 'inline-flex'; stopBtn.style.display = 'none'; }
+          renderPendingReviews(pendingReviews, pendingReviewsCollapsed);
           break;
         }
         case 'messageActionState': {

@@ -1,8 +1,14 @@
 # DreamGraph Data Model
 
-> All 20 data stores that make up DreamGraph's persistent state.
+The in-progress Slice 25 execution journal adds backward-compatible `approval_reviews` metadata: original review ID, context receipt/revision, policy revision, time and tool/scope/argument hashes. It contains no worker credential or raw approval arguments. Existing records default to an empty review list. Publication of a review does not attest an active grant after expiry or restart. Baseline 14 reviews the additive canonical request; actual HTTP/core recovery checks pass. Operator UI and ordinary-loop adoption remain open. See [client integration](ashoka/client-integration.md).
+
+The registered `plan_state.json` metadata store now has a typed authority format under implementation: `dreamgraph.plan_authority.v1` contains v2 plan workflow records, original Markdown/log backups, typed event history and one materialized projection. It publishes through the existing journal and does not advance graph currency. [C14 details and rollout limits](ashoka/plan-authority.md) distinguish schema-readable v1 records from governed v2 transitions; no legacy completion prose is automatically imported.
+
+> Persistent store schemas and relationships. Ashoka's reviewed physical-format inventory is in [the foundation baseline](../tests/fixtures/ashoka/baseline.json).
 
 ---
+
+The physical registry names **39 stores: 21 graph and 18 metadata**. Dynamic, immutable outcome artifacts are not additional named stores. The reviewed format inventory and registry govern optional bootstrap absence and compatibility.
 
 ## Store Relationship Map
 
@@ -10,8 +16,9 @@
 graph TB
     FG[("Fact Graph<br/>(immutable)")]
     DG[("Dream Graph<br/>(speculative)")]
-    CE[("Candidate Edges<br/>(audit log)")]
-    VE[("Validated Edges<br/>(promoted truth)")]
+    CE[("Candidate Edges<br/>(assessment history)")]
+    NE[("Claim Evidence<br/>(source/human/generated)")]
+    VE[("Validated Edges<br/>(promotion history)")]
     TL[("Tension Log<br/>(questions)")]
     DH[("Dream History<br/>(trail)")]
     TH[("Threat Log<br/>(nightmares)")]
@@ -28,7 +35,8 @@ graph TB
 
     FG -.->|validates against| DG
     DG -->|feeds into| CE
-    CE -->|promotes to| VE
+    NE -.->|current independent claim proof| CE
+    CE -->|qualified atomic publication| VE
     VE -->|abstracted into| AR
     DG -->|summarized in| DH
     DH -->|builds| ST
@@ -550,6 +558,68 @@ Append-only log of cognitive events dispatched through the event router. Each ev
 <!-- CONTINUATION TEST SLICE 4 -->
 ## Incremental scan state and evidence lifecycle
 
-`scan_state.json` uses schema `dreamgraph.scan_state.v1`. It is the final publication marker for a committed full or incremental repository revision and records repository snapshots, content hashes, ignore/Git basis, covered targets, and the structural evidence ledger. Structural claims use stable semantic keys and explicit supporters rather than timestamps or line numbers.
+`scan_state.json` uses schema `dreamgraph.scan_state.v1`. It records the independent source-scan revision, repository snapshots, content hashes, ignore/Git basis, covered targets, and the structural evidence ledger. Structural claims use stable semantic keys and explicit supporters rather than timestamps or line numbers. In Ashoka, `publication_state.json` is the final durable publication marker; the source-scan store participates in that transaction. See [publication and recovery](ashoka/foundation.md#publication-and-recovery) for receipt, journal and compatibility semantics.
 
 Source-derived lifecycle values are `active`, `stale_candidate`, `deprecated`, `orphaned`, and `purge_eligible`. Incremental reconciliation withdraws individual supporters, preserves independently supported claims and governed/non-source fields, and deprecates unsupported claims without automatic purge. Derived hubs are evaluated from grounded contributor IDs; datastore, ADR, plan, schedule, tension, plugin, manual, and protected UI knowledge is outside source-deletion authority.
+
+## Ashoka canonical graph and publication metadata
+
+The [canonical schema artifact](contracts/graph-contracts.v1.json) separates stable identities, literal payloads, assertion classes, confidence, evidence origin/ancestry, endpoints, completeness/freshness and revision vectors. Repository-local IDs have an explicit namespace. Unknown confidence and historical timestamps stay null. Malformed stores and ambiguous references are scoped limitations, rather than empty success or synthesized facts.
+
+`publication_state.json` uses `dreamgraph.publication.v1`: epoch, publication/domain/graph revisions, independent currency, committed store hashes, receipts and notification outbox. `last_graph_mutation_at` advances only for a successful graph-changing publication; no-op, checkpoint-only, retry and rolled-back operations do not advance it. `last_full_scan_at` and scoped source-reconciliation metadata are separate. Their age never defines graph staleness.
+
+`reconciliation_journal.json` uses `dreamgraph.reconciliation_journal.v2`. Recovery rolls back before the receipt-bearing marker and rolls forward after it. Previous v1 is supported with its original rollback behavior. Both files belong to the daemon publication/recovery authority; ordinary writers cannot edit them. [Foundation status](ashoka/foundation.md) distinguishes primitives from unqualified consumers and migration work.
+
+Ashoka configuration backups and prepared/terminal apply receipts use `config/.engine-config/<file-identity>/<operation-hash>.json`. They contain private before/after settings, are excluded from graph/model resources, and support revision-aware recovery/undo. They are configuration authority records, not additional graph entity families. See [configuration persistence](ashoka/configuration.md).
+
+### Private session authority metadata and cognitive attribution
+
+`session_authority.json` (`dreamgraph.session_authority.v1`) contains instance/revision, session ID/principal/token hash/expiry/preferences, finite confirmation challenges, and canonical scoped grants with two confirmations/expiry/revocation. It is publication-owned private metadata, not an additional graph family. Bearer secrets are never stored. It does not advance last graph mutation time. Limits and recovery are documented in [session authority](ashoka/session-authority.md); legacy unowned private histories are not implicitly reassigned.
+
+Dream nodes, edge metadata and semantic validation records optionally carry `dreamgraph.cognitive_provenance.v1`: prompt/schema versions/hashes, exact supplied context hash, source/ancestry IDs, immutable role policy fingerprint, provider/requested/reported model/API/adapter/effort/retention, elapsed/response hash and actual admission telemetry. Existing rows remain valid without invented historical provenance; this does not create independent evidence or change assertion class. [Offline protocol and baseline](ashoka/cognitive-policy-evaluation.md) retain original output and unmeasured cost/model-quality fields.
+
+
+`normalization_evidence.json` (`dreamgraph.normalization_evidence.v1`) retains exact typed claims, immutable observations, source proofs, ancestry and withdrawal records. Original observations and operation receipts survive revocation. [Claim evidence](ashoka/normalization-evidence.md) defines its source/human/generated distinctions and finite bounds; Slice 15 qualification is in progress.
+
+### Claim evidence and full normalization outcomes
+
+`normalization_evidence.json` uses `dreamgraph.normalization_evidence.v1`: exact typed `claim`, directed verdict, immutable observation ID, origin, parents, source proof, operation ID and observation time. Separate withdrawals retain observation IDs and reasons. A source proof binds repository/path, SHA-256, JSON pointer and producer-assigned independence. It is accepted only by the internal qualified decoder and publication receipt.
+
+`normalization-result-<operation-sha256>.json` retains one full pass outcome. A small C04 receipt binds actor, operation, artifact filename/hash and affected participants. Candidate history is retained; the canonical graph projects the latest assessment for each typed `edge:<dream-id>` or `node:<dream-id>` candidate. Same-cycle duplicates remain errors. Promotions are history, not permanent current trust. Source/claim/evidence dependencies and unresolved managed effects determine present applicability, including real paths behind repository aliases.
+
+Ashoka Slice 14 [persistent strategy learning](ashoka/strategy-learning.md) stores post-dedup observations and reviewed usefulness in existing `meta_log.json`, with atomic dream/learning publication and explicit fixed-allocation recovery. Source owners include `src/cognitive/strategy-portfolio.ts` and `src/cognitive/dream-deduplication.ts`; repeated generation is neither evidence nor labeled accuracy. Qualification is pending.
+
+Ashoka Slice 16 [curation and retention](ashoka/curation-retention.md) adds append-only dispositions to existing `graph_maintenance.json` and reversible hash-bound archives. The source owner is `src/cognitive/curation.ts`. Reject/retire/reopen, dream decay and quarantine share the graph publication writer; human acceptance remains a human assertion and assessment history is preserved. `mutate_validated_edge` now requires `reason` and `expected_revision` and accepts `operation_id`/`dry_run`; retarget creates a proposal requiring revalidation. Qualification is pending.
+
+## jobs.json execution owner (Slice 17)
+
+The existing registered metadata store holds `dreamgraph.jobs.v1`: instance, revision and bounded job records. Each embeds the canonical `dreamgraph.job.v1`, immutable action/version/parameters, role-policy and tariff references (no credentials), parent budget, conflict lanes, process lease and original bounded outcome. No new named store is introduced. `spend_ledger.json` runs carry optional `parent_run_id` (legacy runs load as null); all child attempts are charged against the shared parent and their own role ceilings. Running jobs recovered after restart become recovery-required rather than redispatched. Qualification and producer adoption are in progress.
+
+`schedules.json` v2 metadata adds revision and last activity; definitions add `definition_revision`, action version, timezone/fold/missed/overlap policy and archive timestamp. Immutable canonical occurrence plus definition snapshots, original executions, definition history and payload-bound operation receipts survive edits and archive. Reads parse legacy valid definitions with explicit UTC policy and reject malformed stores; invalid action parameters block dispatch. Capacity requires archival, rather than silently deleting history. `graph_maintenance.json.digestion` embeds bounded staged records; source roots remain in `change_obligations.json`. Reconciliation accepts only exact current source hashes or a verified contiguous chain of managed edits. Each stage pins generation/fingerprint/affected identities; completing G cannot clear G+1. Job outcomes larger than 64 KiB use atomic hash-bound `job-result-<sha>.json` artifacts up to the 8 MiB machine boundary. These archives are not additional named stores.
+
+Slice17 job records additionally retain work_settled and bounded external_effects (dispatch intent, endpoint/payload hash, acknowledgement or uncertainty and receipt). This separates response acknowledgement from local termination. The jobs file keeps payload-bound cancel_receipts; these receipts do not authorize another dispatch. Large original results stay in published hash-bound artifacts. Existing webhook subscription/dead-letter owners use the common writer and verified reads, with capacity backpressure instead of deleting oldest accepted failures. Existing bootstrap fingerprint history records pending_admission without paid work and fails closed on unavailable published history.
+
+### Ashoka temporal/causal/federation encodings
+
+Existing temporal_graph.json and causal_graph.json owners use dreamgraph.temporal_observations.v1 and dreamgraph.correlation_hypotheses.v1. Existing dream_archetypes.json uses dreamgraph.federation_store.v2 with origin hypotheses, import receipts, export manifests and bounded quarantine history. Read-only views omit original quarantined bytes. Fixed-vocabulary v2 exchange artifacts are manifests, not new graph stores. Legacy local v1 requires reviewed migration. See [evidence contract](ashoka/temporal-federation.md).
+
+### Risk lifecycle fields (Slice 19)
+
+The existing tension_log.json owns stable risk_key, per-risk revision, observation fingerprint, proposal/event history, explicit resolution_state and retained reappearance/verification data. metadata.revision detects stale whole-store writes. expired_unverified is a retirement disposition, not correctness evidence. No new persistence owner is introduced.
+
+
+Ashoka Slice20 is verified at its declared core handoff: narrative/playback/lifecycle views consume a revision-bound derived source context and separate historical counts from current proof. Story history is retained in archived_chapters/archived_digests; missing/corrupt published history fails closed. Lucid exploration has a finite session-owned existing engine job lease and durable lucid_log.json intent/actions/recovery. Human acceptance records a rationale and human_assertion with zero independent roots, never inflated confidence or source verification. No source/provider/user wait occurs under the writer. See docs/ashoka/lifecycle-narrative.md and wave-20-22-verification.json for qualification and consumer limits.
+# Ashoka surface projections
+
+Slice25 adds `execution_contexts.json` (`dreamgraph.execution_contexts.v1`) as registered non-graph execution metadata. Entries retain principal/session/execution identity, strict context query, whole canonical pack/receipt, affected-input and named-source hashes, unresolved named-source gaps, prompt hash, monotonic record revision, exact delivery state, bounded effect observations and existing change-obligation IDs. `assembled`/`running` are distinct from `no_change`, `state_committed`, `graph_committed`, `work_pending`, `reconciliation_pending` and `recovery_required`. Effects distinguish actual graph receipts from operational-state receipts; closure validates their execution scope and physical store domain. An unsettled execution-owned job prevents terminal closure. Capacity is 1,024 entries/16 MiB; overflow requires archival rather than lost receipts. Host delivery attests injection, not model understanding; exact acknowledgement retries are idempotent. Source command observation uses repository intent followed by exact changed paths; `failed` on that obligation is the existing no-source-effect recovery disposition when the observed scope is unchanged. External effects remain unattested. Pending closure can recover a later committed reconciliation without repeating the effect. Qualification/recovery/client adoption remain in progress; see [client integration](ashoka/client-integration.md).
+
+Explorer v2 is a derived, bounded canonical view, not a new graph store. Typed `identity`, `assertion_class`, current provenance, revision/currency, render scope, `canonical_state`, ETag and drawable `render_key` accompany nodes/relationships. Unknown recorded confidence stays unknown in inspection; a renderer's neutral scalar is not evidence. Schedule workspace responses read existing `schedules.json`, `jobs.json` and dirty partitions at one stable revision; no new scheduling persistence owner is introduced. See [Explorer](ashoka/explorer-evidence.md) and [schedules](ashoka/schedule-workspace.md).
+
+The execution index also retains up to 128 immutable archive descriptors: exact file/hash, original execution IDs and archive time. Each `execution-context-archive-<sha256>.json` (`dreamgraph.execution_context_archive.v1`) contains up to 128 complete settled records/16 MiB. Moving records and publishing the index occur in one journaled commit. Archived context remains owner/session bound and hash checked; IDs remain reserved. Unknown/pending work cannot be archived as settled or evicted to make space. New-instance schedule fallback and default template use the canonical v2 empty document; existing legacy schedule conversion remains a reviewed migration.
+
+Each execution retains bounded whole `model_reports` and separate `native_stop_observations` (up to128 each). A model report is saved before acknowledgment and cannot change on retry or restart. The original host's independently observed stop is bound to its original request/attempt and records the acknowledged original attempt set in `native_stop_recovery`; it creates no new model permit. Plan-bound recovery also requires the committed original C14 stop-recovery command. These private metadata fields preserve the first report/closure and unknown effect history while allowing the effective stopped state to converge. Unknown usage remains conservative liability; unrelated source uncertainty and obligations are still pending. Missing historical reports remain unavailable rather than being reconstructed from ledger acknowledgment.
+
+Explicit native plan tasks add optional private fields to an execution entry: `plan_execution` pins the C14 instance/project/plan, task kind, slice, reviewed revision/definition and approval; `plan_source` retains the original physical Markdown identity/hash; `plan_closure` records the first requested/effective termination and exact C14 end command before publishing it. Existing entries remain readable. These fields do not create another plan lifecycle writer. Public managed snapshots expose only the task intent and shared effective C14 state; private source paths and closure commands stay out of model context and browser chat provenance. A context-only plan selection creates none of these execution fields. Baseline17 adds the explicit intent contract and optional snapshot projection (42 generated schemas), preserving all frozen tasks, owners and evidence.
+
+A private closure command may be null only for proven zero dispatch: the original context is still assembled and undelivered, has no effects, and its C14 scope has no execution lease. This lets a rejected admission close without inventing an implementation attempt or retaining an uncloseable context. It does not release an admitted or uncertain native job. The first requested/effective disposition remains immutable on retry.
+Managed source obligations use `failed` for a confirmed source-no-effect disposition as well as recovery of an unapplied intent. A no-op write settles its dirty region without reconciliation/enrichment/digestion and cannot be repeated by replaying its operation ID. Source observer receipts bind the complete after-snapshot digest; exact acknowledgement retry returns the latest saved disposition, including graph reconciliation, without rewriting history. A conflicting after-snapshot cannot replace it.

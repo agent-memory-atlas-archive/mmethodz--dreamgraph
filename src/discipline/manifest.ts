@@ -53,7 +53,7 @@ const ANALYSIS_PHASES: DisciplinePhase[] = [
 // ---------------------------------------------------------------------------
 
 /**
- * Complete classification of all 73 MCP tools (72 server + 1 local extension equivalent).
+ * Complete classification of all 94 tools (93 server + 1 local extension equivalent).
  */
 export const TOOL_CLASSIFICATIONS: ToolClassification[] = [
   // =====================================================================
@@ -796,6 +796,21 @@ export const MANDATORY_TOOL_RULES: MandatoryToolRule[] = [
 // ---------------------------------------------------------------------------
 // Manifest Builder
 // ---------------------------------------------------------------------------
+
+// ADR-123: each added tool inherits its source-confirmed nearest peer's phase,
+// protection, audit and plan posture. Exact registration parity is generated.
+for (const [peer, names] of Object.entries({
+  read_source_code: ["search_source_code", "list_markdown_chapters", "read_markdown_chapter"],
+  edit_file: ["patch_markdown_chapter"],
+  enrich_seed_data: ["enrich_parser_nodes"],
+  record_architecture_decision: ["plugin_reload", "plugin_unload", "webhook_register", "webhook_remove", "webhook_set_enabled", "webhook_test", "webhook_replay"],
+  query_runtime_metrics: ["webhook_list", "webhook_dead_letter_list", "graph_health_report"],
+  solidify_cognitive_insight: ["mutate_validated_edge"],
+})) {
+  const reference = TOOL_CLASSIFICATIONS.find(tool => tool.tool_name === peer);
+  if (!reference) throw new Error(`DISCIPLINE_PEER_MISSING:${peer}`);
+  for (const name of names) TOOL_CLASSIFICATIONS.push({ ...reference, tool_name: name, allowed_phases: [...reference.allowed_phases] });
+}
 
 /**
  * Build the complete discipline manifest.

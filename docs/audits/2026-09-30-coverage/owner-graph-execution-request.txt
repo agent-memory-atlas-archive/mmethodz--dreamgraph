@@ -1,0 +1,106 @@
+Make the graph central to all agent execution.
+
+DreamGraph's value is not merely that it can index a repository. Its graph is
+intended to accumulate architectural knowledge that substantially exceeds what
+an executing agent can recover efficiently by repeatedly rereading source:
+relationships, provenance, decisions, constraints, history, workflows,
+capabilities, evidence, tensions, causal/temporal knowledge, human intent,
+validated insights and the consequences of earlier work.
+
+The v14 alignment must therefore treat graph utilization as a first-class
+execution invariant.
+
+Before and during agent work:
+- Use the graph aggressively to provide the most relevant available project
+  knowledge to the executing agent.
+- Retrieval must be revision-aware, provenance-backed and explicit about
+  incompleteness or uncertainty.
+- Select context according to the task, active plan/slice, affected entities,
+  changed files, relationships, ADRs, evidence and execution history.
+- Prefer graph-derived knowledge over broad repository rereads when the graph
+  already contains sufficiently fresh and trustworthy information.
+- Allow targeted source reads where evidence must be verified or graph
+  knowledge is incomplete/stale. The graph augments source authority; it does
+  not replace verification when verification is required.
+- Maximize useful knowledge per injected token. Do not simply dump increasingly
+  large neighborhoods. Rank and reserve mandatory evidence, then expand only
+  where it improves the task.
+- Record why context was selected and what relevant knowledge was omitted.
+
+Injection is adapter-specific:
+- Architect may inject governed plan state, active slice, evidence, relevant
+  graph neighborhood and execution history directly into orchestration.
+- MCP clients may retrieve the same semantics through bounded structured graph
+  resources/tools.
+- Native API adapters may use richer continuation/context facilities.
+- CLI adapters must preserve their native execution model and must not be
+  forced into API-specific continuation envelopes.
+- Dreaming and normalization require different graph projections from coding
+  agents, but they must operate from the same canonical graph semantics.
+- Compression or summarization must preserve mandatory graph/ADR/evidence
+  anchors.
+
+After agent work:
+- Every material project change must be reconciled back into DreamGraph.
+- Changed files, entities, relationships, decisions, implementation state,
+  evidence, plan/slice state and relevant provenance must not remain known only
+  to the executing agent or its transcript.
+- Record mutations through the canonical graph authority with revision and
+  commit semantics.
+- Do not treat generated prose as graph truth. New assertions enter with the
+  correct provenance/trust class and are validated through existing evidence
+  and normalization mechanisms.
+- Detect affected graph regions instead of requiring a whole-project rescan
+  whenever possible.
+
+Add bounded post-change digestion where useful:
+- Maintain a dirty/affected subgraph from committed changes.
+- After a meaningful mutation batch, schedule a small targeted digestion pass
+  rather than immediately dreaming across the entire graph.
+- Prefer debounce/on-idle/after-commit scheduling so a rapid sequence of edits
+  stabilizes before cognition runs.
+- Target the changed entities and their relevant neighborhoods.
+- Dream, normalize, resolve/reopen tensions, update narratives or other derived
+  knowledge only where the change can plausibly affect them.
+- Preserve strict spend/call/context limits and expose when digestion is still
+  pending.
+- Repeated edits should coalesce into one digestion workload rather than
+  creating an unbounded queue.
+- The graph must remain usable while digestion is pending; affected knowledge
+  should be visibly marked stale or awaiting reconciliation where appropriate.
+
+Measure whether this works:
+- Compare graph-assisted agents with source-only/broad-reread baselines on the
+  frozen task corpus.
+- Measure mandatory-evidence retrieval, source rereads avoided, context tokens,
+  latency, unsupported assertions, stale-context mistakes and task outcome.
+- A shorter prompt is not a success if required knowledge was omitted.
+- A large graph injection is not a success merely because more nodes were sent.
+- Success means the agent receives the smallest sufficiently rich context that
+  lets it act correctly while preserving access to deeper evidence on demand.
+
+The intended closed loop is:
+
+    project reality
+        ↓
+    DreamGraph canonical graph
+        ↓
+    task-specific rich graph context
+        ↓
+    executing agent
+        ↓
+    committed project changes
+        ↓
+    graph reconciliation
+        ↓
+    bounded targeted digestion
+        ↓
+    stabilized richer graph
+
+No shipped execution surface should routinely bypass this loop.
+
+The ultimate acceptance criterion is that, on an established DreamGraph
+instance, an agent should normally begin a task with materially better project
+understanding than it could obtain from an equivalent fresh source-code read,
+while retaining the ability to verify against source whenever the graph is
+stale, uncertain or insufficient.

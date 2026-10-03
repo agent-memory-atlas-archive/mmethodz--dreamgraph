@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  canonicalAutonomyPolicy,
   decrementPassBudget,
   shouldContinueAfterPass,
   type AutonomyMode,
@@ -114,4 +115,11 @@ test('switching modes after exhaustion does not revive the budget', () => {
   });
   assert.equal(decision.shouldContinue, false);
   assert.match(decision.reason, /pass budget exhausted/i);
+});
+
+test('Ashoka canonical profiles preserve legacy labels without widening approved scope', () => {
+  for (const [mode, canonical] of [['cautious', 'manual'], ['conscientious', 'supervised'], ['eager', 'supervised'], ['autonomous', 'autonomous']] as const) {
+    assert.deepEqual(canonicalAutonomyPolicy(mode), { native_label: mode, autonomy: canonical,
+      within_task_continuation: mode === 'eager' || mode === 'autonomous', authority: 'existing_approved_scope' });
+  }
 });

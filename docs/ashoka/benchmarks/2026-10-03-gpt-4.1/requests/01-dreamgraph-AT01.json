@@ -1,0 +1,86 @@
+{
+  "schema": "dreamgraph.completion_pair_specification.v1",
+  "task": {
+    "id": "dreamgraph:AT01",
+    "project": "dreamgraph",
+    "prompt": "Recover the governed current slice, a blocker and the next eligible slice from a revisioned test plan; ignore another session selection.",
+    "required_outcomes": [
+      "authoritative_plan_id",
+      "current_slice_id",
+      "blocker",
+      "last_verified_checkpoint",
+      "resume_reason"
+    ],
+    "mandatory_evidence_ids": [],
+    "forbidden_assertions": [
+      "completion inferred from prose",
+      "pending first slice reported as running",
+      "another session selection used as authority"
+    ]
+  },
+  "scope": "read_only_supplied_context_completion",
+  "local_results": "private_job_artifact",
+  "execution": {
+    "provider": "openai",
+    "model": "gpt-4.1-2025-04-14",
+    "api": "responses",
+    "effort": null,
+    "prompt_version": "ashoka.bounded-real-pilot.v1",
+    "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+    "input_tokens": 32768,
+    "output_tokens": 1600,
+    "context_bytes": 24000,
+    "output_bytes": 16000,
+    "max_calls": 1,
+    "max_elapsed_ms": 60000,
+    "retention": "store_false",
+    "currency": "USD",
+    "max_amount": 0.16
+  },
+  "arms": [
+    {
+      "arm": "graph_assisted",
+      "context": "Declared disposable contract input (not a live graph):\n{\"plan\":{\"id\":\"fixture:dreamgraph:plan\",\"revision\":3,\"lifecycle\":\"implementing\",\"current_slice_ids\":[\"fixture:dreamgraph:plan:blocked\"],\"running_slice_ids\":[],\"last_verified_slice_id\":\"fixture:dreamgraph:plan:done\",\"slices\":[{\"id\":\"fixture:dreamgraph:plan:done\",\"status\":\"verified\",\"depends_on\":[],\"evidence_ids\":[\"checkpoint:done\"],\"blockers\":[]},{\"id\":\"fixture:dreamgraph:plan:blocked\",\"status\":\"blocked\",\"depends_on\":[\"fixture:dreamgraph:plan:done\"],\"evidence_ids\":[],\"blockers\":[\"required source unavailable\"]},{\"id\":\"fixture:dreamgraph:plan:dependent\",\"status\":\"pending\",\"depends_on\":[\"fixture:dreamgraph:plan:blocked\"],\"evidence_ids\":[],\"blockers\":[]},{\"id\":\"fixture:dreamgraph:plan:independent\",\"status\":\"pending\",\"depends_on\":[\"fixture:dreamgraph:plan:done\"],\"evidence_ids\":[],\"blockers\":[]}]},\"other_session_selection\":\"fixture:dreamgraph:plan:dependent\",\"historical_checkpoint\":{\"slice_id\":\"fixture:dreamgraph:plan:done\",\"status\":\"verified\"}}",
+      "context_bytes": 1007,
+      "construction_ms": 0.4011000000000422,
+      "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488"
+    },
+    {
+      "arm": "source_only",
+      "context": "Declared disposable contract input (not a live graph):\n{\"plan\":{\"id\":\"fixture:dreamgraph:plan\",\"revision\":3,\"lifecycle\":\"implementing\",\"current_slice_ids\":[\"fixture:dreamgraph:plan:blocked\"],\"running_slice_ids\":[],\"last_verified_slice_id\":\"fixture:dreamgraph:plan:done\",\"slices\":[{\"id\":\"fixture:dreamgraph:plan:done\",\"status\":\"verified\",\"depends_on\":[],\"evidence_ids\":[\"checkpoint:done\"],\"blockers\":[]},{\"id\":\"fixture:dreamgraph:plan:blocked\",\"status\":\"blocked\",\"depends_on\":[\"fixture:dreamgraph:plan:done\"],\"evidence_ids\":[],\"blockers\":[\"required source unavailable\"]},{\"id\":\"fixture:dreamgraph:plan:dependent\",\"status\":\"pending\",\"depends_on\":[\"fixture:dreamgraph:plan:blocked\"],\"evidence_ids\":[],\"blockers\":[]},{\"id\":\"fixture:dreamgraph:plan:independent\",\"status\":\"pending\",\"depends_on\":[\"fixture:dreamgraph:plan:done\"],\"evidence_ids\":[],\"blockers\":[]}]},\"other_session_selection\":\"fixture:dreamgraph:plan:dependent\",\"historical_checkpoint\":{\"slice_id\":\"fixture:dreamgraph:plan:done\",\"status\":\"verified\"}}",
+      "context_bytes": 1007,
+      "construction_ms": 0.4011000000000422,
+      "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488"
+    }
+  ],
+  "order": "source_first",
+  "endpoint": "https://api.openai.com/v1",
+  "api_key_env": "DREAMGRAPH_EVALUATION_API_KEY",
+  "pricing": {
+    "version": "openai-gpt41-reviewed-2026-10-03",
+    "provider": "openai",
+    "model": "gpt-4.1-2025-04-14",
+    "currency": "USD",
+    "source": "https://developers.openai.com/api/docs/models/gpt-4.1 (official page read 2026-10-03)",
+    "input_per_million": 2,
+    "output_per_million": 8,
+    "output_includes_reasoning": true,
+    "input_includes_images": true
+  },
+  "budget": {
+    "requests": 2,
+    "input_tokens": 65536,
+    "output_tokens": 3200,
+    "reasoning_tokens": 0,
+    "retries": 0,
+    "elapsed_ms": 120000,
+    "concurrency": 1,
+    "max_hops": 0,
+    "max_neighbors": 0,
+    "run_amount": 0.16,
+    "day_amount": 2.5,
+    "currency": "USD",
+    "pricing_version": "openai-gpt41-reviewed-2026-10-03",
+    "billing_principal": "benchmark-operator"
+  }
+}

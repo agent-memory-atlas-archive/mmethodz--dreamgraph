@@ -17,6 +17,9 @@
  */
 
 import type { Socket } from "node:net";
+import { DaemonHttpAuthority } from "./server/http-authority.js";
+import { withSessionContext, type SessionContext } from "./server/session-context.js";
+import { getDataDir } from "./utils/paths.js";
 import { createServer } from "./server/server.js";
 import { handleDashboardRoute, setDashboardContext } from "./server/dashboard.js";
 import { handleApiRoute } from "./api/routes.js";
@@ -28,6 +31,8 @@ import { initLlmProvider } from "./cognitive/llm.js";
 import { logger } from "./utils/logger.js";
 import { getRuntimeMetricsSnapshotV1 } from "./observability/runtime-metrics.js";
 import { bootstrapPlugins } from "./plugins/manager.js";
+import { recoverGraphPublication } from "./graph/publication.js";
+import { recoverSourceEffects } from "./graph/change-obligations.js";
 
 /* ------------------------------------------------------------------ */
 /*  CLI argument parsing                                              */
@@ -98,7 +103,10 @@ async function startStdio(): Promise<void> {
     "@modelcontextprotocol/sdk/server/stdio.js"
   );
 
-  const server = createServer();
+  const { randomUUID } = await import("node:crypto");
+  const identity: SessionContext = { principal: "local-machine", session_id: `stdio:${randomUUID()}`, directory: getDataDir(), channel: "stdio", environment: {}, continuation_key: randomUUID() };
+  const server = createServer(identity);
+  identity.sampling_server = server.server;
   const transport = new StdioServerTransport();
   await server.connect(transport);
   logger.info("DreamGraph MCP Server running on stdio");
@@ -121,11 +129,16 @@ async function startHTTP(port: number): Promise<void> {
     "@modelcontextprotocol/sdk/server/streamableHttp.js"
   );
 
+  const authority = new DaemonHttpAuthority(port);
+
   // Map sessionId → { server, transport } for multi-client support
   const sessions = new Map<
     string,
     {
       transport: InstanceType<typeof StreamableHTTPServerTransport>;
+      server: ReturnType<typeof createServer>;
+      identity: SessionContext;
+      browser_session_id: string | null;
     }
   >();
 
@@ -135,29 +148,20 @@ async function startHTTP(port: number): Promise<void> {
   startDataDirWatcher();
 
   // Provide runtime context to dashboard (session count, port)
-  setDashboardContext({ getSessionCount: () => sessions.size, port });
+  setDashboardContext({ getSessionCount: () => sessions.size, port, authority: authority.publicStatus() });
 
   const httpServer = http.createServer(async (req, res) => {
     try {
-      // --- CORS (allow any origin for local-dev / CLI usage) ----------
-      res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, DELETE, OPTIONS",
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, mcp-session-id, X-DreamGraph-Instance, X-DreamGraph-Dry-Run, If-Match, If-None-Match, Last-Event-ID",
-    );
-    res.setHeader("Access-Control-Expose-Headers", "mcp-session-id, ETag");
-
-    if (req.method === "OPTIONS") {
-      res.writeHead(204);
-      res.end();
-      return;
-    }
-
+      const identity = await authority.authorize(req, res);
+      if (!identity) return;
+      await withSessionContext(identity, async () => {
+      if (await authority.handle(req, res, identity)) return;
     const url = new URL(req.url ?? "/", `http://localhost:${port}`);
+    if (req.method === "GET" && url.pathname === "/api/contracts/v1/mcp") {
+      const { coreCatalog } = await import("./server/core-catalog.js");
+      res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+      res.end(JSON.stringify(coreCatalog())); return;
+    }
 
     // ---- /mcp — the single Streamable HTTP endpoint ----------------
     // Accept both "/mcp" and "/mcp/" so clients (e.g. VS Code Copilot Chat)
@@ -168,18 +172,28 @@ async function startHTTP(port: number): Promise<void> {
       // Existing session? Route to its transport.
       if (sessionId && sessions.has(sessionId)) {
         const session = sessions.get(sessionId)!;
-        await session.transport.handleRequest(req, res);
+        if (session.identity.principal !== identity.principal || session.browser_session_id && session.browser_session_id !== identity.session_id
+          || session.identity.execution_policy?.id !== identity.execution_policy?.id) {
+          res.writeHead(403, { "Content-Type": "application/json" }); res.end(JSON.stringify({ error: "MCP_SESSION_OWNER_MISMATCH" })); return;
+        }
+        await withSessionContext(session.identity, () => session.transport.handleRequest(req, res));
         return;
       }
 
-      // POST without a known session → likely an initialize request.
+      if (sessionId) { res.writeHead(404, { "Content-Type": "application/json" }); res.end(JSON.stringify({ error: "MCP_SESSION_UNKNOWN" })); return; }
+      // Only sessionless POST may initialize a new transport.
       // Create a new transport + server pair.
       if (req.method === "POST") {
+        if (sessions.size >= 256) { res.writeHead(503); res.end(); return; }
+        const nativeId = crypto.randomUUID();
+        const sessionIdentity: SessionContext = { ...identity, channel: "mcp",
+          session_id: identity.channel === "browser" ? identity.session_id : nativeId,
+          continuation_key: identity.channel === "browser" ? identity.continuation_key : crypto.randomBytes(32).toString("base64url") };
         const transport = new StreamableHTTPServerTransport({
-          sessionIdGenerator: () => crypto.randomUUID(),
+          sessionIdGenerator: () => nativeId,
           onsessioninitialized: (id) => {
             logger.info(`Streamable HTTP session initialized: ${id}`);
-            sessions.set(id, { transport });
+            sessions.set(id, { transport, server, identity: sessionIdentity, browser_session_id: identity.channel === "browser" ? identity.session_id : null });
           },
         });
 
@@ -188,16 +202,22 @@ async function startHTTP(port: number): Promise<void> {
           const id = transport.sessionId;
           if (id) {
             logger.info(`Session closed: ${id}`);
-            sessions.delete(id);
+            const closed = sessions.get(id); sessions.delete(id);
+            if(closed)void withSessionContext(closed.identity,async()=>{
+              try{await (await import("./cognitive/lucid.js")).cancelLucidSession();}
+              finally{await closed.server.close();}
+            }).catch(error=>logger.error(`Session closure requires recovery: ${String(error)}`));
           }
         };
 
         // Create a dedicated McpServer for this session
-        const server = createServer();
+        const server = withSessionContext(sessionIdentity, () => createServer(sessionIdentity));
+        sessionIdentity.sampling_server = server.server;
         await server.connect(transport);
 
         // Now handle the original request (the initialize message)
-        await transport.handleRequest(req, res);
+        try { await withSessionContext(sessionIdentity, () => transport.handleRequest(req, res)); }
+        finally { if (!transport.sessionId) await server.close(); }
         return;
       }
 
@@ -247,6 +267,7 @@ async function startHTTP(port: number): Promise<void> {
             status: "ok",
             transport: "streamable-http",
             sessions: sessions.size,
+            authority: authority.publicStatus(),
           }),
         );
         return;
@@ -287,6 +308,7 @@ async function startHTTP(port: number): Promise<void> {
 
       res.writeHead(404, { "Content-Type": "text/plain" });
       res.end("Not found");
+      });
     } catch (error) {
       logger.error(`HTTP request failed (${req.method ?? "UNKNOWN"} ${req.url ?? "/"}): ${(error as Error).message}`);
       if (!res.headersSent) res.writeHead(500, { "Content-Type": "application/json" });
@@ -301,8 +323,10 @@ async function startHTTP(port: number): Promise<void> {
       return;
     }
     try {
+      const identity = await authority.authorize(req, undefined, true);
+      if (!identity) { socket.destroy(); return; }
       const { handleArchitectTerminalUpgrade } = await import("./architect/routes.js");
-      const handled = await handleArchitectTerminalUpgrade(req, socket, head, url.pathname);
+      const handled = await withSessionContext(identity, () => handleArchitectTerminalUpgrade(req, socket, head, url.pathname));
       if (!handled) socket.destroy();
     } catch (error) {
       logger.error(`Architect terminal WebSocket upgrade failed: ${(error as Error).message}`);
@@ -310,9 +334,9 @@ async function startHTTP(port: number): Promise<void> {
     }
   });
 
-  httpServer.listen(port, () => {
+  httpServer.listen(port, authority.policy.bind, () => {
     logger.info(
-      `DreamGraph MCP Server running on Streamable HTTP — http://localhost:${port}/mcp`,
+      `DreamGraph MCP Server running on ${authority.policy.bind}:${port} — remote=${authority.policy.remote}, authentication=${authority.policy.remote ? "required" : "local-machine"}`,
     );
   });
 }
@@ -329,6 +353,11 @@ const opts = parseArgs();
 // (no DREAMGRAPH_INSTANCE_UUID env var) this is a harmless no-op.
 resolveInstanceAtStartup()
   .then(async () => {
+    // Establish sole physical-store ownership and recover before accepting readers/jobs.
+    const recovered = await recoverGraphPublication();
+    const effects = await recoverSourceEffects();
+    if (effects.unknown.length) logger.warn(`${effects.unknown.length} source effect(s) require recovery; their dirty scope remains explicit.`);
+    if (recovered !== "clean") logger.warn(`Recovered graph publication: ${recovered}`);
     // Hydrate cognitive engine counters from persisted dream graph
     await engine.hydrate();
 

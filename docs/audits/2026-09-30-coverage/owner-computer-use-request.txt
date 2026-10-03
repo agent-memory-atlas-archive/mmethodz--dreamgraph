@@ -1,0 +1,415 @@
+Investigate and design first-class Computer Use capability for DreamGraph Architect.
+
+This is an AUDIT / ARCHITECTURE / PLAN-REFINEMENT task first. Do not implement Computer Use merely because a plausible integration path is found. Inspect the existing DreamGraph v14 plan, current Architect implementation, daemon/authority model, provider/API adapters, CLI adapters, session model, lifecycle controls, graph contracts, full-access policy, and relevant existing tests before proposing changes.
+
+The goal is to determine how DreamGraph Architect can safely and usefully allow an executing agent to operate graphical applications, browser pages, and where appropriate the local desktop, while preserving DreamGraph's authority, graph-centric knowledge model, lifecycle semantics, budget controls, provenance, and adapter independence.
+
+Computer Use must not become a parallel uncontrolled execution path.
+
+CORE QUESTION
+
+Determine what "Computer Use in Architect" should actually mean in DreamGraph.
+
+Investigate at least these possible forms separately:
+
+1. Provider-native computer-use capability through supported APIs.
+2. Computer-use capability exposed by Codex or other CLI adapters.
+3. Browser-only interaction against pages controlled/opened by Architect.
+4. Local desktop/application interaction through a DreamGraph-hosted local execution bridge.
+5. VS Code Architect-specific interaction where relevant.
+6. Future remote/cloud execution, if appropriate, without weakening the local-only default.
+
+Do not assume these mechanisms are equivalent.
+
+CURRENT CAPABILITY RESEARCH
+
+Verify current capabilities rather than relying on remembered model behavior.
+
+For each supported/provider-relevant route:
+- OpenAI API / Responses capabilities.
+- OpenAI Codex CLI.
+- Anthropic API / CLI if applicable.
+- Any existing DreamGraph or installed bridge/runtime facilities.
+- Browser APIs or existing browser automation dependencies already present in the repository.
+
+Determine:
+- which models actually support Computer Use;
+- required API/tool schemas;
+- screenshot/input representation;
+- coordinate/click/type/scroll/key semantics;
+- continuation requirements;
+- whether execution is provider-hosted, client-hosted or must be implemented by DreamGraph;
+- supported operating environments;
+- cancellation semantics;
+- tool-result requirements;
+- latency and token/image cost behavior;
+- provider storage/retention implications;
+- limitations around local files, dialogs, multiple monitors, native applications, browser security boundaries and authentication.
+
+Use official provider documentation and installed CLI/version behavior as authoritative evidence where available. Record uncertainty rather than guessing.
+
+ARCHITECTURE AUDIT
+
+Trace the current Architect execution path end-to-end:
+
+user intent
+→ Architect session
+→ plan/slice authority
+→ adapter selection
+→ model invocation
+→ tool exposure
+→ tool execution
+→ result/continuation
+→ lifecycle update
+→ graph reconciliation
+
+Identify exactly where Computer Use would fit.
+
+Do not invent a second orchestration engine if the current daemon, Architect runtime, CLI bridge, plugin/tool registry, lifecycle authority or session machinery can own the responsibility.
+
+Explicitly identify:
+- authoritative owner of a Computer Use session;
+- execution host;
+- adapter interface;
+- screenshot ownership;
+- input-event ownership;
+- cancellation owner;
+- session/execution identity;
+- tool-call IDs and replay semantics;
+- reconnect behavior;
+- crash recovery;
+- concurrency policy;
+- multi-client behavior;
+- whether actions survive browser refresh;
+- what state is durable versus ephemeral.
+
+ADAPTER INDEPENDENCE
+
+Preserve DreamGraph's existing separation between native API adapters and CLI adapters.
+
+Do not force API-style continuation envelopes onto CLI adapters.
+
+Define a canonical DreamGraph Computer Use capability contract at the semantic level, while allowing each adapter to implement it using its native mechanism.
+
+For every adapter expose:
+- requested capability;
+- actual supported capability;
+- effective mode;
+- limitations;
+- unsupported actions;
+- model/provider requirements;
+- whether execution is native, bridged or unavailable.
+
+Never silently downgrade Computer Use into a weaker mechanism or silently switch to a more expensive model.
+
+GRAPH-CENTRIC EXECUTION
+
+Computer Use must participate in the same graph-centric execution loop as other Architect work.
+
+Before interaction:
+- inject relevant plan/slice state;
+- retrieve relevant graph entities, relationships, ADRs, evidence and previous interaction knowledge;
+- avoid broad source/UI rediscovery where DreamGraph already has current trustworthy knowledge.
+
+During interaction:
+- allow targeted graph retrieval as the agent encounters applications, screens, files, workflows or concepts;
+- preserve mandatory graph/evidence anchors through continuation and context compression.
+
+After interaction:
+- reconcile material observations and changes back into DreamGraph;
+- record affected entities, files, UI elements, workflows, decisions and relationships where appropriate;
+- preserve correct provenance: an observed screen state is evidence/observation, not automatically a validated architectural fact;
+- mark affected graph regions stale or dirty where the interaction changed project reality;
+- allow bounded targeted digestion after meaningful mutation batches when appropriate.
+
+Computer Use must increase the value of DreamGraph's accumulated knowledge, not create another transcript silo.
+
+OBSERVATION AND PROVENANCE
+
+Define how GUI observations enter the evidence system.
+
+Distinguish:
+- screenshot/image observation;
+- OCR/text extracted from a screen;
+- DOM/accessibility-tree evidence if available;
+- application state obtained through APIs;
+- agent interpretation;
+- inferred UI semantics;
+- confirmed resulting state after an action.
+
+Do not collapse these into one confidence field.
+
+Specify how observations are:
+- timestamped;
+- tied to execution/session;
+- tied to application/window/page identity when possible;
+- associated with graph revision;
+- retained or discarded;
+- redacted;
+- referenced by later reasoning.
+
+Investigate whether screenshots themselves should be durable evidence, short-lived artifacts, hashes plus extracted observations, or configurable.
+
+SECURITY AND AUTHORITY
+
+Computer Use is consequential and must obey DreamGraph authority.
+
+Preserve:
+- local-only daemon default;
+- authenticated explicit remote mode;
+- session isolation;
+- plan/slice authority;
+- configured cost limits;
+- provider/data-retention policy;
+- full-access policy;
+- auditability.
+
+Determine action classes such as:
+- passive observation;
+- navigation;
+- ordinary reversible UI actions;
+- filesystem-changing actions;
+- external communication;
+- account/security changes;
+- purchases/payments;
+- destructive actions;
+- credential/secret exposure;
+- privileged OS operations.
+
+Map these to existing DreamGraph authority/approval mechanisms rather than creating an unrelated permission system where possible.
+
+Computer Use must never interpret "autonomous" as "unbounded".
+
+Investigate:
+- explicit enablement per session or profile;
+- application/window/site scope;
+- read-only/observe mode;
+- interaction mode;
+- bounded full-access mode;
+- expiry;
+- revocation;
+- emergency stop;
+- visible active-use indicator;
+- action audit trail;
+- screenshot/privacy controls.
+
+A Computer Use capability must not bypass permissions simply because it can click the same control a human could.
+
+CREDENTIALS AND PRIVATE DATA
+
+Design explicit handling for:
+- password fields;
+- API keys;
+- payment information;
+- private addresses;
+- authentication dialogs;
+- clipboard contents;
+- system notifications;
+- unrelated windows;
+- other monitors;
+- personally sensitive material.
+
+Determine what the model may see, what the local executor may handle without exposing to the model, and what must require explicit user action.
+
+Do not claim privacy guarantees that the underlying provider or transport cannot support.
+
+HUMAN CONTROL / UX
+
+Design the Architect UX without turning it into a bulky SaaS control panel.
+
+Preserve the compact desktop-tool direction.
+
+Investigate a minimal but clear interaction model:
+- Computer Use status in the active execution state;
+- current target window/page/application;
+- observe/interact state;
+- adapter/model actually in use;
+- stop/pause control;
+- approval-required state;
+- action/event history;
+- screenshot/observation inspection where useful;
+- unsupported-capability feedback;
+- reconnect/recovery state.
+
+State must not depend on color alone.
+
+Selection in the UI must remain distinct from the authoritative active execution.
+
+Avoid modal confirmation spam for ordinary allowed actions, but require explicit confirmation where DreamGraph policy says the action crosses an authority boundary.
+
+COMPUTER USE AND PLAN LIFECYCLE
+
+Integrate Computer Use with the v14 plan lifecycle design.
+
+Define:
+- whether a slice can require Computer Use;
+- how availability affects eligibility/blocking;
+- how execution status is represented;
+- what happens if capability disappears mid-slice;
+- how a stopped/failed Computer Use session affects slice state;
+- how verification distinguishes "action sent" from "desired state observed";
+- how restart/resume finds the correct unfinished work.
+
+Never mark a slice complete simply because a click/tool call succeeded.
+
+Verification should depend on resulting evidence.
+
+COST AND CONTEXT
+
+Computer Use may be expensive because screenshots and repeated model turns can dominate cost.
+
+Investigate:
+- screenshot/image token cost;
+- repeated visual state transmission;
+- caching;
+- incremental screenshots/diffs where supported;
+- action batching;
+- maximum iterations;
+- timeout;
+- retry limits;
+- per-session/job spend limits.
+
+Expose estimated/known usage honestly.
+
+Do not label subscription-based CLI usage as API dollars.
+
+Unknown price is not zero.
+
+COMPUTER USE VERSUS EXISTING TOOLS
+
+Determine when Computer Use should NOT be used.
+
+Prefer structured/native tools where they are more reliable:
+- filesystem APIs;
+- terminal commands;
+- MCP tools;
+- HTTP APIs;
+- database queries;
+- application-specific integrations;
+- DOM/accessibility interfaces where appropriate.
+
+Computer Use should primarily cover interactions where no superior structured interface exists or where visual verification is itself important.
+
+Document routing guidance such as:
+
+structured tool/API
+    ↓ unavailable/inadequate
+browser/DOM interaction
+    ↓ unavailable/inadequate
+visual Computer Use
+
+Do not replace deterministic operations with mouse clicks merely because Computer Use exists.
+
+TESTING / ACCEPTANCE
+
+Create deterministic tests where possible before paid/live-provider testing.
+
+Include at least:
+- observe a known test window/page;
+- locate and activate a target;
+- type into a controlled field;
+- scroll/navigation;
+- recover after layout movement;
+- reject interaction outside allowed scope;
+- stop/cancel mid-sequence;
+- browser refresh/reconnect;
+- stale screenshot/action rejection;
+- two concurrent Architect sessions;
+- model/adapter without Computer Use;
+- provider refusal/incomplete response;
+- lost tool result;
+- application closes mid-operation;
+- confirmation-required action;
+- exhausted budget;
+- graph observation/writeback;
+- verification of resulting state.
+
+Include adversarial UI cases:
+- deceptive labels;
+- overlapping windows;
+- unexpected modal;
+- permission dialog;
+- changed screen between observation and click;
+- coordinate drift;
+- slow rendering;
+- hidden/disabled controls.
+
+Actions based on stale visual state must fail safely rather than clicking blindly.
+
+REAL-PROVIDER CANARIES
+
+Ordinary CI must remain free of paid Computer Use calls.
+
+Any real-provider test must be:
+- explicitly opted in;
+- model/provider pinned;
+- spend bounded;
+- test environment disposable;
+- data scope declared;
+- retention policy known;
+- resulting screenshots/logs sanitized.
+
+Do not perform live Computer Use against production accounts or consequential external systems merely to prove the integration.
+
+PLAN INTEGRATION
+
+After the investigation, reconcile findings into the existing DreamGraph v14 plan.
+
+Do not create a parallel plan unless absolutely necessary.
+
+Identify:
+- existing slices that should absorb parts of the work;
+- whether Computer Use deserves one dedicated slice;
+- new contracts/guardrails required;
+- dependencies;
+- implementation anchors;
+- migration/compatibility impact;
+- nervous points;
+- acceptance scenarios;
+- release documentation requirements.
+
+Likely impacted areas include, but are not limited to:
+- provider capability contracts;
+- Architect/CLI adapter integration;
+- session/transport authority;
+- lifecycle management;
+- graph retrieval/writeback;
+- budget controls;
+- UI/observability;
+- conformance/release gates.
+
+Do not mechanically force this mapping if repository evidence shows a better ownership structure.
+
+DELIVERABLE
+
+Produce:
+
+1. Current-state audit with source evidence.
+2. Provider/adapter Computer Use capability matrix.
+3. Recommended canonical DreamGraph Computer Use contract.
+4. Execution-host and authority design.
+5. Security/privacy/approval model.
+6. Graph-context and graph-writeback design.
+7. Lifecycle integration.
+8. UX proposal.
+9. Cost/budget model.
+10. Deterministic and opt-in live acceptance matrix.
+11. Explicit unsupported/deferred areas.
+12. Concrete modifications to the existing v14 plan.
+
+Separate:
+- observed current behavior;
+- documented provider capability;
+- inferred design recommendation;
+- unresolved architectural question.
+
+Do not implement until the investigation and resulting plan refinement are reviewed.
+
+The target is not merely "Architect can click things."
+
+The target is:
+
+DreamGraph Architect can deliberately delegate visual computer interaction to
+a capable execution adapter, with the same graph knowledge, governance,
+evidence, lifecycle, security, cost control and recoverability expected from
+every other DreamGraph execution path.

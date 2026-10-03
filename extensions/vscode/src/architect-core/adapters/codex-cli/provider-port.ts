@@ -52,6 +52,12 @@ export interface CodexCliProviderPortOptions {
   readonly markCurrentTurn?: boolean;
   readonly cliToolsManifest?: CliToolsManifest;
   readonly onPromptComposed?: (info: PromptComposedInfo) => void;
+  /** Awaited admission after serialization, before any CLI launch; failures must propagate. */
+  readonly preparePrompt?: (prompt: string, signal?: AbortSignal) => Promise<string>;
+  /** Captured after awaited admission; propagated through the native child lifetime. */
+  readonly admissionSignal?: () => AbortSignal | undefined;
+  /** Mandatory accounting failures propagate and fence continuation; not a UI observer. */
+  readonly settleRun?: (result: CodexCliRunResult) => Promise<void>;
 }
 
 export interface PromptComposedInfo {
@@ -155,13 +161,18 @@ export function createCodexCliProviderPort(
       const cliToolsManifest = options.cliToolsManifest
         ? await resolveLiveToolsManifest(options)
         : undefined;
-      const promptText = serializeConversationForCodexCli(input.prompt.conversation, {
+      let promptText = serializeConversationForCodexCli(input.prompt.conversation, {
         ...(options.historyKeepLast !== undefined
           ? { historyKeepLast: options.historyKeepLast }
           : {}),
         markCurrentTurn: options.markCurrentTurn ?? true,
         ...(cliToolsManifest ? { cliToolsManifest } : {}),
       });
+
+      if (options.preparePrompt) promptText = await options.preparePrompt(promptText, input.abortSignal);
+      const permitSignal = options.admissionSignal?.();
+      const executionSignal = permitSignal && input.abortSignal ? AbortSignal.any([permitSignal, input.abortSignal]) : permitSignal ?? input.abortSignal;
+      executionSignal?.throwIfAborted();
 
       if (options.onPromptComposed) {
         try {
@@ -189,7 +200,7 @@ export function createCodexCliProviderPort(
       let deltasStreamed = false;
       let streamedSnapshot = "";
       const emitToolWitness = (witness: CodexToolCallWitness): void => {
-        if (!witnessEnabled || !currentRunId || input.abortSignal?.aborted === true) return;
+        if (!witnessEnabled || !currentRunId || executionSignal?.aborted === true) return;
         const key = [
           witness.server,
           witness.tool,
@@ -212,7 +223,7 @@ export function createCodexCliProviderPort(
             const handler = options.onToolCall!;
             void live
               .subscribe(runId, (call) => {
-                if (input.abortSignal?.aborted === true) return;
+                if (executionSignal?.aborted === true) return;
                 try {
                   handler(runId, call);
                 } catch {
@@ -299,7 +310,7 @@ export function createCodexCliProviderPort(
             ...(options.profile ? { profile: options.profile } : {}),
             ...(options.configOverrides ? { configOverrides: options.configOverrides } : {}),
             ...(options.binaryName ? { binaryName: options.binaryName } : {}),
-            ...(input.abortSignal ? { abortSignal: input.abortSignal } : {}),
+            ...(executionSignal ? { abortSignal: executionSignal } : {}),
             ...(onRunIdAssigned ? { onRunIdAssigned } : {}),
             ...(onStdoutChunk ? { onStdoutChunk } : {}),
             ...(onStderrChunk ? { onStderrChunk } : {}),
@@ -318,6 +329,7 @@ export function createCodexCliProviderPort(
         }
       }
 
+      await options.settleRun?.(result);
       if (options.onRunResult) {
         try {
           options.onRunResult(result);
@@ -328,7 +340,7 @@ export function createCodexCliProviderPort(
 
       if (!result.ok) {
         const err = buildFailureError(result);
-        if (result.failure?.code === "CANCELLED" || input.abortSignal?.aborted === true) {
+        if (result.failure?.code === "CANCELLED" || executionSignal?.aborted === true) {
           err.name = "AbortError";
         }
         throw err;

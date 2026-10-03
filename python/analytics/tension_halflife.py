@@ -7,6 +7,7 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
+from .definitions import qualified
 from . import loader
 from ._common import add_common_args, emit, fmt_table, resolve_data_dir_from_args
 
@@ -15,7 +16,8 @@ def _parse(ts: str | None):
     if not ts:
         return None
     try:
-        return datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        parsed=datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        return parsed if parsed.tzinfo is not None else None
     except Exception:
         return None
 
@@ -27,6 +29,7 @@ def _seconds(a: str | None, b: str | None) -> float | None:
     return (db - da).total_seconds()
 
 
+@qualified("tension_halflife")
 def analyze(data_dir: Path) -> dict:
     tlog = loader.tension_log(data_dir)
     resolved = tlog["resolved_tensions"]
@@ -48,7 +51,8 @@ def analyze(data_dir: Path) -> dict:
         by_domain[orig.get("domain") or "unknown"].append(secs)
 
     # Active tensions: age = now - first_seen
-    now = datetime.now().astimezone()
+    snapshot=loader.current_snapshot()
+    now = _parse(snapshot["generated_at"]) if snapshot else datetime.now().astimezone()
     ages_sec: list[float] = []
     for s in active:
         age = _seconds(s.get("first_seen"), now.isoformat())

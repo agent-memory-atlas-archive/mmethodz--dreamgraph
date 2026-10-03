@@ -22,6 +22,7 @@ interface Props {
 export function CandidatesPanel({ instanceUuid, etag, onConflict, onApplied, onInspect }: Props) {
   const [rows, setRows] = useState<CandidateRow[] | null>(null);
   const [orphaned, setOrphaned] = useState<number>(0);
+  const [omitted,setOmitted]=useState(0);
   const [error, setError] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [openKind, setOpenKind] = useState<"promote" | "reject" | null>(null);
@@ -29,11 +30,13 @@ export function CandidatesPanel({ instanceUuid, etag, onConflict, onApplied, onI
   useEffect(() => {
     let cancelled = false;
     setError(null);
-    fetchCandidates()
+    setRows(null);
+    fetchCandidates(etag)
       .then((r) => {
         if (!cancelled) {
           setRows(r.candidates);
           setOrphaned(r.orphaned ?? 0);
+          setOmitted(r.omitted??0);
         }
       })
       .catch((e: Error) => {
@@ -58,6 +61,7 @@ export function CandidatesPanel({ instanceUuid, etag, onConflict, onApplied, onI
 
   return (
     <div className="muts-list">
+      {omitted?<p className="muts-stale-banner">{omitted} candidates outside this bounded view. Use a focused agent query to inspect the rest.</p>:null}
       {orphaned > 0 ? (
         <div className="muts-stale-banner">
           {orphaned} stale candidate(s) hidden — their underlying dream node/edge was pruned and they cannot be acted on.
@@ -122,7 +126,7 @@ function CandidateRowView(props: {
 
   const fallback =
     openKind === "promote"
-      ? `Promoting ${describeRow(row)}: confidence ${row.confidence.toFixed(2)} with ${row.evidence_count} supporting signals.`
+      ? `Human acceptance of ${describeRow(row)}. This is a human assertion, not independent source proof.`
       : `Rejecting ${describeRow(row)}: ${row.reason || "evidence insufficient for promotion"}.`;
 
   async function submit() {

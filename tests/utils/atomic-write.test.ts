@@ -11,6 +11,7 @@ const renameMock = vi.fn();
 const unlinkMock = vi.fn();
 
 vi.mock("node:fs/promises", () => ({
+  realpath: async (path: string) => path,
   open: openMock,
   rename: renameMock,
   unlink: unlinkMock,
@@ -45,14 +46,16 @@ describe("atomicWriteFile", () => {
     await vi.advanceTimersByTimeAsync(25);
     await write;
 
-    expect(openMock).toHaveBeenCalledWith("C:/state/dream_graph.json.tmp", "w");
+    const temporary = openMock.mock.calls[0][0];
+    expect(temporary).toMatch(/^C:\/state\/dream_graph\.json\.[\da-f-]+\.tmp$/);
+    expect(openMock).toHaveBeenCalledWith(temporary, "wx");
     expect(fd.writeFile).toHaveBeenCalledWith("{}", "utf-8");
     expect(fd.datasync).toHaveBeenCalledOnce();
     expect(fd.close).toHaveBeenCalledOnce();
     expect(renameMock).toHaveBeenCalledTimes(2);
     expect(renameMock).toHaveBeenNthCalledWith(
       1,
-      "C:/state/dream_graph.json.tmp",
+      temporary,
       "C:/state/dream_graph.json",
     );
     expect(unlinkMock).not.toHaveBeenCalled();

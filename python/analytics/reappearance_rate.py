@@ -5,6 +5,7 @@ import argparse
 from collections import defaultdict
 from pathlib import Path
 
+from .definitions import qualified
 from . import loader
 from ._common import add_common_args, emit, fmt_table, resolve_data_dir_from_args
 
@@ -15,6 +16,7 @@ def _pair(entities) -> tuple[str, ...]:
     return tuple(sorted(str(e) for e in entities if e))
 
 
+@qualified("reappearance_rate")
 def analyze(data_dir: Path) -> dict:
     tlog = loader.tension_log(data_dir)
 
@@ -22,7 +24,7 @@ def analyze(data_dir: Path) -> dict:
     resolved_pairs: dict[tuple[str, ...], dict] = defaultdict(lambda: {"count": 0, "first_resolved_at": None, "types": set()})
     for r in tlog["resolved_tensions"]:
         orig = r.get("original") or {}
-        pair = _pair(orig.get("entities"))
+        pair = (r.get("tension_id") or orig.get("id"),) if r.get("tension_id") or orig.get("id") else ()
         if not pair:
             continue
         rec = resolved_pairs[pair]
@@ -35,7 +37,7 @@ def analyze(data_dir: Path) -> dict:
     # Active signals on a pair that was previously resolved → reappearance
     reappearances = []
     for s in tlog["signals"]:
-        pair = _pair(s.get("entities"))
+        pair = (s["id"],) if s.get("id") else ()
         if pair in resolved_pairs:
             r = resolved_pairs[pair]
             reappearances.append({
@@ -71,7 +73,7 @@ def analyze(data_dir: Path) -> dict:
 
 def render(result: dict) -> None:
     s = result["summary"]
-    print(f"Distinct resolved pairs:        {s['distinct_resolved_pairs']}")
+    print(f"Distinct resolved risk identities: {s['distinct_resolved_pairs']}")
     print(f"Pairs resolved >1 times:        {s['pairs_resolved_more_than_once']}")
     print(f"Active tensions on resolved pairs: {s['active_reappearances']}")
     print(f"Reappearance rate:              {s['reappearance_rate']:.2%}")

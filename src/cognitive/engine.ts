@@ -1,3 +1,5 @@
+import { currentJob,withoutJobContext } from "./job-context.js";
+import { observeRisk,riskEvent,riskRevision,riskDigest,verifyRiskClaim,type RiskObservation } from "./risk-lifecycle.js";
 /**
  * DreamGraph Cognitive Engine — State machine and persistence.
  *
@@ -33,6 +35,14 @@ import { loadIndexableUIElements } from "../utils/ui-index.js";
 import { getActiveCognitiveTuning } from "../instance/index.js";
 import { atomicWriteFile } from "../utils/atomic-write.js";
 import { withFileLock } from "../utils/mutex.js";
+import { withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
+import { commitGraphWrites } from "../graph/publication.js";
+import { readCognitiveStore } from "./cognitive-store.js";
+import { deduplicateDreamCandidates } from "./dream-deduplication.js";
+import { curateGraph, curationSuppressions, emptyCuration, decayArchiveWrites } from "./curation.js";
+import { loadGraphMaintenanceState } from "./graph-maintenance-state.js";
+import { loadPublicationState } from "../graph/publication.js";
+import type { FactSnapshot } from "./strategies/_shared.js";
 import { graphEventBus } from "../graph/events.js";
 import { getLlmReadinessStatus } from "./llm-readiness.js";
 import {
@@ -85,30 +95,6 @@ const historyPath        = () => dataPath("dream_history.json");
 // Cognitive Engine (Singleton)
 // ---------------------------------------------------------------------------
 
-/**
- * Reinforcement memory entry — survives edge expiry so re-generated
- * duplicates inherit accumulated evidence instead of starting at zero.
- */
-interface ReinforcementMemory {
-  /** Canonical edge key (sorted from|to + base relation) */
-  key: string;
-  /** Accumulated reinforcement count from all prior incarnations */
-  reinforcement_count: number;
-  /** Best confidence ever recorded for this edge */
-  peak_confidence: number;
-  /** Cycle when this memory was last updated */
-  last_cycle: number;
-}
-
-type CanonicalProvenanceKind = "source_backed" | "derived_hub" | "human_asserted";
-
-interface CanonicalPromotionProvenance {
-  sourceRepo: string;
-  sourceFiles: string[];
-  kind: CanonicalProvenanceKind;
-  derivedFromNodeIds: string[];
-}
-
 interface ProvenanceCarrier {
   id?: string;
   source_repo?: unknown;
@@ -156,8 +142,6 @@ class CognitiveEngine {
    * history so evidence actually accumulates across incarnations.
    * Memory entries expire after 30 cycles of inactivity.
    */
-  private reinforcementMemory = new Map<string, ReinforcementMemory>();
-  private static readonly MEMORY_TTL_CYCLES = Number(process.env.DG_MEMORY_TTL_CYCLES) || 30;
 
   // -------------------------------------------------------------------------
   // Cold-start bootstrap state — ADR-096
@@ -257,6 +241,7 @@ class CognitiveEngine {
 
   /** Assert that the engine is in a specific state */
   assertState(expected: CognitiveStateName, operation: string): void {
+    currentJob()?.signal.throwIfAborted();
     if (this.state !== expected) {
       throw new Error(
         `COGNITIVE VIOLATION: "${operation}" requires state "${expected}" but current state is "${this.state}". ` +
@@ -607,23 +592,7 @@ class CognitiveEngine {
   // -------------------------------------------------------------------------
 
   async loadDreamGraph(): Promise<DreamGraphFile> {
-    try {
-      if (!existsSync(dreamGraphPath())) return this.emptyDreamGraphFile();
-      const raw = await readFile(dreamGraphPath(), "utf-8");
-      const p = JSON.parse(raw);
-      const e = this.emptyDreamGraphFile();
-      return {
-        metadata: { ...e.metadata, ...(p.metadata && typeof p.metadata === "object" ? p.metadata : {}) },
-        nodes: Array.isArray(p.nodes) ? p.nodes : [],
-        edges: Array.isArray(p.edges) ? p.edges : [],
-      };
-    } catch (err) {
-      logger.warn(
-        `loadDreamGraph: failed to read/parse dream_graph.json — returning empty graph. ` +
-        `Error: ${err instanceof Error ? err.message : err}`
-      );
-      return this.emptyDreamGraphFile();
-    }
+    return readCognitiveStore("dream_graph.json", this.emptyDreamGraphFile(), ["nodes", "edges"]);
   }
 
   private emptyDreamGraphFile(): DreamGraphFile {
@@ -689,135 +658,47 @@ class CognitiveEngine {
    * - Confidence reduced by decay_rate
    * - TTL decremented by 1
    * - Items with TTL <= 0 OR confidence <= 0 are removed (expired)
-   * - **Expired edges are saved to reinforcement memory** so their
-   *   evidence survives for future re-generation.
+   * - Expired speculation is archived atomically for inspection;
+   *   rediscovery never inherits confidence or evidence credit.
    *
    * Returns { decayedEdges, decayedNodes } = count of removed items.
    * Must be called during REM, before new dreams are appended.
    */
   async applyDecay(): Promise<{ decayedEdges: number; decayedNodes: number }> {
     this.assertState("rem", "applyDecay");
-    const graph = await this.loadDreamGraph();
-    const currentCycle = this.totalDreamCycles;
-
-    let decayedEdges = 0;
-    let decayedNodes = 0;
-
-    // Build tension relevance set: entities mentioned in active tensions.
-    // Edges/nodes involving these entities decay at half rate — they're
-    // actively relevant and shouldn't expire before the system resolves them.
-    const tensionEntityIds = new Set<string>();
-    try {
-      const tensions = await this.getUnresolvedTensions();
-      for (const t of tensions) {
-        for (const eid of t.entities) tensionEntityIds.add(eid);
-      }
-    } catch (err) {
-      logger.debug(`applyDecay: could not load tensions for decay protection: ${err instanceof Error ? err.message : err}`);
-    }
-
-    // Decay edges
-    const survivingEdges: DreamEdge[] = [];
-    for (const edge of graph.edges) {
-      // Skip edges reinforced this cycle (they just got refreshed)
-      if (edge.last_reinforced_cycle === currentCycle) {
-        survivingEdges.push(edge);
-        continue;
-      }
-
-      // Tension-aware decay: halve rate for edges involving tension entities
-      const tensionRelevant = tensionEntityIds.has(edge.from) || tensionEntityIds.has(edge.to);
-      // Rejected-edge fast decay: 2x rate, 2x ttl drain — overrides tension protection
-      // so normalizer-rejected hypotheses can actually expire instead of being
-      // re-reinforced into permanence by deterministic strategies.
-      const isRejected = edge.status === "rejected";
-      const baseDecay = edge.decay_rate ?? this.decayConfig.decay_rate;
-      const decayRate = isRejected
-        ? baseDecay * 2
-        : tensionRelevant
-          ? baseDecay * 0.5
-          : baseDecay;
-      const ttlDecrement = isRejected ? 2 : tensionRelevant ? 0.5 : 1;
-
-      // Apply decay
-      const newTtl = (edge.ttl ?? this.decayConfig.ttl) - ttlDecrement;
-      const newConfidence = edge.confidence - decayRate;
-
-      if (newTtl <= 0 || newConfidence <= 0) {
-        // SAVE TO REINFORCEMENT MEMORY before expiring
-        const key = normalizeEdgeKey(edge);
-        const existing = this.reinforcementMemory.get(key);
-        const prevCount = existing?.reinforcement_count ?? 0;
-        const prevPeak = existing?.peak_confidence ?? 0;
-        this.reinforcementMemory.set(key, {
-          key,
-          reinforcement_count: prevCount + (edge.reinforcement_count ?? 0) + 1,
-          peak_confidence: Math.max(prevPeak, edge.confidence + (edge.decay_rate ?? this.decayConfig.decay_rate)),
-          last_cycle: currentCycle,
-        });
-
-        decayedEdges++;
-        logger.debug(`Dream edge expired: ${edge.id} (ttl=${newTtl}, conf=${newConfidence.toFixed(2)}) — saved to reinforcement memory (count=${prevCount + (edge.reinforcement_count ?? 0) + 1})`);
-        continue;
-      }
-
-      edge.ttl = newTtl;
-      edge.confidence = Math.round(newConfidence * 100) / 100;
-      survivingEdges.push(edge);
-    }
-
-    // Decay nodes
-    const survivingNodes: DreamNode[] = [];
-    for (const node of graph.nodes) {
-      if (node.last_reinforced_cycle === currentCycle) {
-        survivingNodes.push(node);
-        continue;
-      }
-
-      // Tension-aware decay: halve rate for nodes related to tension entities
-      const nodeTensionRelevant = node.inspiration.some(id => tensionEntityIds.has(id));
-      const nodeDecayRate = nodeTensionRelevant
-        ? (node.decay_rate ?? this.decayConfig.decay_rate) * 0.5
-        : (node.decay_rate ?? this.decayConfig.decay_rate);
-      const nodeTtlDecrement = nodeTensionRelevant ? 0.5 : 1;
-
-      const newTtl = (node.ttl ?? this.decayConfig.ttl) - nodeTtlDecrement;
-      const newConfidence = node.confidence - nodeDecayRate;
-
-      if (newTtl <= 0 || newConfidence <= 0) {
-        decayedNodes++;
-        logger.debug(`Dream node expired: ${node.id} (ttl=${newTtl}, conf=${newConfidence.toFixed(2)})`);
-        continue;
-      }
-
-      node.ttl = newTtl;
-      node.confidence = Math.round(newConfidence * 100) / 100;
-      survivingNodes.push(node);
-    }
-
-    graph.edges = survivingEdges;
-    graph.nodes = survivingNodes;
-    await this.saveDreamGraph(graph);
-
-    // Evict stale reinforcement memory entries (older than MEMORY_TTL_CYCLES)
-    for (const [key, mem] of this.reinforcementMemory) {
-      if (currentCycle - mem.last_cycle > CognitiveEngine.MEMORY_TTL_CYCLES) {
-        this.reinforcementMemory.delete(key);
-      }
-    }
-
-    if (decayedEdges > 0 || decayedNodes > 0) {
-      logger.info(
-        `Decay pass: removed ${decayedEdges} edges, ${decayedNodes} nodes ` +
-        `(reinforcement memory: ${this.reinforcementMemory.size} entries)`
-      );
-    }
-
-    return { decayedEdges, decayedNodes };
+    return withGraphReconciliation(async () => {
+      this.assertState("rem", "applyDecay");
+      const graph = await this.loadDreamGraph(), currentCycle = this.totalDreamCycles;
+      const tensionIds = new Set((await this.getUnresolvedTensions()).flatMap(t => t.entities));
+      const expiredNodes: DreamNode[] = [], expiredEdges: DreamEdge[] = [];
+      const decay = (row: DreamNode | DreamEdge): boolean => {
+        // Corroborated/human history has evidence validity, never speculative TTL validity.
+        if (row.status === "validated" || "promoted_at" in row && row.promoted_at || "from" in row && row.meta?.human_assertion) return false;
+        if (row.status !== "rejected" && row.last_reinforced_cycle === currentCycle) return false;
+        const relevant = "from" in row ? tensionIds.has(row.from) || tensionIds.has(row.to) : row.inspiration.some(id => tensionIds.has(id));
+        const factor = row.status === "rejected" ? 2 : relevant ? .5 : 1;
+        row.ttl = (row.ttl ?? this.decayConfig.ttl) - factor;
+        row.confidence = Math.max(0, Math.round((row.confidence - (row.decay_rate ?? this.decayConfig.decay_rate) * factor) * 100) / 100);
+        return row.ttl <= 0 || row.confidence <= 0;
+      };
+      // Archive original rows before changing TTL/confidence, preserving the inspection/undo record.
+      graph.nodes = graph.nodes.filter(row => { const original = structuredClone(row); if (!decay(row)) return true; expiredNodes.push(original); return false; });
+      const expiredIds = new Set(expiredNodes.map(n => n.id));
+      graph.edges = graph.edges.filter(row => {
+        const original = structuredClone(row);
+        if (!expiredIds.has(row.from) && !expiredIds.has(row.to) && !decay(row)) return true;
+        expiredEdges.push(original); return false;
+      });
+      const writes = expiredNodes.length || expiredEdges.length ? await decayArchiveWrites(expiredNodes, expiredEdges, currentCycle) : [];
+      writes.push({ file: "dream_graph.json", content: JSON.stringify(graph, null, 2) });
+      await commitGraphWrites({ writes, actor: "dream_decay", cause: "dream_decay",
+        result: { decayedEdges: expiredEdges.length, decayedNodes: expiredNodes.length } });
+      return { decayedEdges: expiredEdges.length, decayedNodes: expiredNodes.length };
+    });
   }
 
   // -------------------------------------------------------------------------
-  // Duplicate Suppression — merge similar edges by reinforcing existing
+  // Duplicate Suppression — rediscovery grants no confidence/evidence credit
   // -------------------------------------------------------------------------
 
   /**
@@ -831,158 +712,35 @@ class CognitiveEngine {
    * Returns the list of truly new edges (not duplicates).
    * Duplicates get their existing counterpart reinforced.
    */
-  async deduplicateAndAppendEdges(newEdges: DreamEdge[]): Promise<{ appended: DreamEdge[]; merged: number }> {
-    this.assertState("rem", "deduplicateAndAppendEdges");
-    const graph = await this.loadDreamGraph();
-    const currentCycle = this.totalDreamCycles;
-
-    // Build lookup of existing edges by normalized key
-    const existingByKey = new Map<string, DreamEdge>();
-    for (const edge of graph.edges) {
-      const key = normalizeEdgeKey(edge);
-      existingByKey.set(key, edge);
-    }
-
-    const trulyNew: DreamEdge[] = [];
-    let mergeCount = 0;
-    let memoryInherited = 0;
-
-    for (const candidate of newEdges) {
-      const key = normalizeEdgeKey(candidate);
-      const existing = existingByKey.get(key);
-
-      if (existing) {
-        // REJECTED edges must NEVER be reinforced. Deterministic strategies
-        // (symmetry_completion, gap_detection, causal_replay, …) re-derive the
-        // same edge every cycle; without this guard, +0.12 reinforcement bumps
-        // outpace the −0.05 decay and saturate confidence at 1.0 even though
-        // the normalizer already judged the edge unsupported. Drop the duplicate
-        // silently — the existing rejected edge will continue to decay.
-        if (existing.status === "rejected") {
-          mergeCount++;
-          logger.debug(
-            `Duplicate suppressed (rejected, no reinforcement): "${candidate.id}" → "${existing.id}" ` +
-              `(conf=${existing.confidence}, reinf_count=${existing.reinforcement_count ?? 0})`
-          );
-          continue;
-        }
-
-        // Diminishing-returns reinforcement curve. Same-edge re-derivation
-        // contributes proportionally less the more often it has already been
-        // counted, so confidence asymptotes well below 1.0 unless distinct
-        // evidence keeps arriving. Formula: bump = base * (1 / (1 + n * 0.1))
-        // → after 10 reinforcements the per-merge boost is halved; after 40
-        // it's roughly 1/5th of the original.
-        const priorCount = existing.reinforcement_count ?? 0;
-        const dampening = 1 / (1 + priorCount * 0.1);
-        const bump = candidate.confidence * 0.3 * dampening;
-        existing.confidence = Math.min(
-          Math.round((existing.confidence + bump) * 100) / 100,
-          1.0
-        );
-        existing.ttl = this.decayConfig.ttl; // Reset TTL
-        existing.reinforcement_count = priorCount + 1;
-        existing.last_reinforced_cycle = currentCycle;
-        mergeCount++;
-        logger.debug(
-          `Duplicate suppressed: "${candidate.id}" merged into "${existing.id}" ` +
-            `(reinforcement #${existing.reinforcement_count}, +${bump.toFixed(3)}, conf=${existing.confidence})`
-        );
-      } else {
-        // CHECK REINFORCEMENT MEMORY — inherit evidence from expired incarnations
-        const memory = this.reinforcementMemory.get(key);
-        if (memory) {
-          candidate.reinforcement_count = memory.reinforcement_count;
-          candidate.last_reinforced_cycle = currentCycle;
-          // Confidence boost: base + 5% per remembered reinforcement (capped at +0.20)
-          const memoryBoost = Math.min(memory.reinforcement_count * 0.05, 0.20);
-          candidate.confidence = Math.min(
-            Math.round((candidate.confidence + memoryBoost) * 100) / 100,
-            1.0
-          );
-          // Give it extended TTL since it has proven persistent
-          candidate.ttl = this.decayConfig.ttl + Math.min(memory.reinforcement_count, 4);
-          memoryInherited++;
-          logger.debug(
-            `Memory inherited: "${candidate.id}" carries ${memory.reinforcement_count} prior reinforcements ` +
-              `(conf boosted to ${candidate.confidence}, ttl=${candidate.ttl})`
-          );
-          // Clear the memory entry — it has been consumed
-          this.reinforcementMemory.delete(key);
-        }
-
-        trulyNew.push(candidate);
-        existingByKey.set(key, candidate); // Prevent duplicates within the same batch
-      }
-    }
-
-    // Save reinforced existing edges + append truly new ones
-    graph.edges = [...graph.edges.filter(e => !existingByKey.has(normalizeEdgeKey(e)) || graph.edges.includes(e))];
-    // Actually simpler: we mutated the existing edges in-place, just append new ones
-    graph.edges.push(...trulyNew);
-    graph.metadata.last_dream_cycle = new Date().toISOString();
-    graph.metadata.total_cycles = this.totalDreamCycles;
-    await this.saveDreamGraph(graph);
-
-    if (mergeCount > 0 || memoryInherited > 0) {
-      logger.info(
-        `Duplicate suppression: ${mergeCount} merged, ${trulyNew.length} truly new` +
-        (memoryInherited > 0 ? `, ${memoryInherited} inherited from reinforcement memory` : "")
-      );
-    }
-
-    return { appended: trulyNew, merged: mergeCount };
+  /** One publication contains both post-dedup candidates and their learning observations. */
+  async publishDreamCandidates(nodes: DreamNode[], edges: DreamEdge[], options: {
+    snapshot?: FactSnapshot;
+    prepare_writes?: (result: ReturnType<typeof deduplicateDreamCandidates>) => Promise<Array<{ file: string; content: string }>>;
+    operation_id?: string;
+  } = {}) {
+    this.assertState("rem", "publishDreamCandidates");
+    return withGraphReconciliation(async () => {
+      this.assertState("rem", "publishDreamCandidates");
+      const graph = await this.loadDreamGraph();
+      const suppressed = curationSuppressions((await loadGraphMaintenanceState()).curation ?? emptyCuration());
+      const result = deduplicateDreamCandidates(graph, nodes, edges, options.snapshot, suppressed);
+      graph.metadata.last_dream_cycle = new Date().toISOString();
+      graph.metadata.total_cycles = this.totalDreamCycles;
+      const writes = await options.prepare_writes?.(result) ?? [];
+      writes.push({ file: "dream_graph.json", content: JSON.stringify(graph, null, 2) });
+      await commitGraphWrites({ writes, actor: "dreamer", operation_id: options.operation_id,
+        intent: { nodes, edges, cycle: this.totalDreamCycles }, cause: "dream_candidates",
+        result: { node_ids: result.nodes.map(n => n.id), edge_ids: result.edges.map(e => e.id), merged: result.merged } });
+      return result;
+    });
   }
-
-  /**
-   * Same for nodes — deduplicate by name similarity.
-   */
-  async deduplicateAndAppendNodes(newNodes: DreamNode[]): Promise<{ appended: DreamNode[]; merged: number }> {
-    this.assertState("rem", "deduplicateAndAppendNodes");
-    const graph = await this.loadDreamGraph();
-    const currentCycle = this.totalDreamCycles;
-
-    const existingByName = new Map<string, DreamNode>();
-    for (const node of graph.nodes) {
-      existingByName.set(node.name.toLowerCase(), node);
-    }
-
-    const trulyNew: DreamNode[] = [];
-    let mergeCount = 0;
-
-    for (const candidate of newNodes) {
-      const key = candidate.name.toLowerCase();
-      const existing = existingByName.get(key);
-
-      if (existing) {
-        // Mirror edge logic: skip rejected, dampened reinforcement curve.
-        if (existing.status === "rejected") {
-          mergeCount++;
-          continue;
-        }
-        const priorCount = existing.reinforcement_count ?? 0;
-        const dampening = 1 / (1 + priorCount * 0.1);
-        const bump = candidate.confidence * 0.3 * dampening;
-        existing.confidence = Math.min(
-          Math.round((existing.confidence + bump) * 100) / 100,
-          1.0
-        );
-        existing.ttl = this.decayConfig.ttl;
-        existing.reinforcement_count = priorCount + 1;
-        existing.last_reinforced_cycle = currentCycle;
-        mergeCount++;
-      } else {
-        trulyNew.push(candidate);
-        existingByName.set(key, candidate);
-      }
-    }
-
-    graph.nodes.push(...trulyNew);
-    graph.metadata.last_dream_cycle = new Date().toISOString();
-    graph.metadata.total_cycles = this.totalDreamCycles;
-    await this.saveDreamGraph(graph);
-
-    return { appended: trulyNew, merged: mergeCount };
+  async deduplicateAndAppendEdges(edges: DreamEdge[]): Promise<{ appended: DreamEdge[]; merged: number }> {
+    const result = await this.publishDreamCandidates([], edges);
+    return { appended: result.edges, merged: result.merged };
+  }
+  async deduplicateAndAppendNodes(nodes: DreamNode[]): Promise<{ appended: DreamNode[]; merged: number; id_mapping: Record<string, string | null> }> {
+    const result = await this.publishDreamCandidates(nodes, []);
+    return { appended: result.nodes, merged: result.merged, id_mapping: result.id_mapping };
   }
 
   // -------------------------------------------------------------------------
@@ -990,22 +748,7 @@ class CognitiveEngine {
   // -------------------------------------------------------------------------
 
   async loadCandidateEdges(): Promise<CandidateEdgesFile> {
-    try {
-      if (!existsSync(candidateEdgesPath())) return this.emptyCandidateEdgesFile();
-      const raw = await readFile(candidateEdgesPath(), "utf-8");
-      const p = JSON.parse(raw);
-      const e = this.emptyCandidateEdgesFile();
-      return {
-        metadata: { ...e.metadata, ...(p.metadata && typeof p.metadata === "object" ? p.metadata : {}) },
-        results: Array.isArray(p.results) ? p.results : [],
-      };
-    } catch (err) {
-      logger.warn(
-        `loadCandidateEdges: failed to read/parse candidate_edges.json — returning empty. ` +
-        `Error: ${err instanceof Error ? err.message : err}`
-      );
-      return this.emptyCandidateEdgesFile();
-    }
+    return readCognitiveStore("candidate_edges.json", this.emptyCandidateEdgesFile(), ["results"]);
   }
 
   private emptyCandidateEdgesFile(): CandidateEdgesFile {
@@ -1055,22 +798,7 @@ class CognitiveEngine {
   // -------------------------------------------------------------------------
 
   async loadValidatedEdges(): Promise<ValidatedEdgesFile> {
-    try {
-      if (!existsSync(validatedEdgesPath())) return this.emptyValidatedEdgesFile();
-      const raw = await readFile(validatedEdgesPath(), "utf-8");
-      const p = JSON.parse(raw);
-      const e = this.emptyValidatedEdgesFile();
-      return {
-        metadata: { ...e.metadata, ...(p.metadata && typeof p.metadata === "object" ? p.metadata : {}) },
-        edges: Array.isArray(p.edges) ? p.edges : [],
-      };
-    } catch (err) {
-      logger.warn(
-        `loadValidatedEdges: failed to read/parse validated_edges.json — returning empty. ` +
-        `Error: ${err instanceof Error ? err.message : err}`
-      );
-      return this.emptyValidatedEdgesFile();
-    }
+    return readCognitiveStore("validated_edges.json", this.emptyValidatedEdgesFile(), ["edges"]);
   }
 
   private emptyValidatedEdgesFile(): ValidatedEdgesFile {
@@ -1093,305 +821,19 @@ class CognitiveEngine {
     logger.debug("Validated edges saved to disk");
   }
 
-  async promoteEdges(edges: ValidatedEdge[]): Promise<void> {
+  /** Compatibility entry point: qualification and coherent publication belong to normalize(). */
+  async promoteEdges(_edges: ValidatedEdge[]): Promise<void> {
     this.assertState("normalizing", "promoteEdges");
-    const validated = await this.loadValidatedEdges();
-    validated.edges.push(...edges);
-    validated.metadata.last_validation = new Date().toISOString();
-    validated.metadata.total_validated = validated.edges.length;
-    await this.saveValidatedEdges(validated);
-    logger.info(`Promoted ${edges.length} dream edges to validated status`);
-    // Phase 3 / Slice 2: pulse both endpoints of each promoted edge.
-    for (const e of edges) {
-      graphEventBus.emit("candidate.promoted", {
-        affected_ids: [e.from, e.to].filter(Boolean) as string[],
-        payload: {
-          from: e.from,
-          to: e.to,
-          confidence: e.confidence,
-        },
-      });
-    }
+    throw new Error("NORMALIZATION_PUBLICATION_REQUIRED: direct promotion cannot bypass claim evidence and the C04 transaction; use normalize()");
   }
-
-  // -------------------------------------------------------------------------
-  // Entity Promotion — Dream nodes → Fact graph seed files
-  // -------------------------------------------------------------------------
 
   private stringArray(value: unknown): string[] {
-    return Array.isArray(value)
-      ? value.filter((v): v is string => typeof v === "string" && v.trim().length > 0)
-      : [];
+    return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string" && v.trim().length > 0) : [];
   }
 
-  private stringValue(value: unknown): string {
-    return typeof value === "string" ? value.trim() : "";
-  }
-
-  private buildGroundedEntityIndex(
-    features: Feature[],
-    workflows: Workflow[],
-    dataModel: DataModelEntity[]
-  ): { groundedIds: Set<string>; reposById: Map<string, string> } {
-    const all = [...features, ...workflows, ...dataModel] as ProvenanceCarrier[];
-    const byId = new Map<string, ProvenanceCarrier>();
-    const groundedIds = new Set<string>();
-    const reposById = new Map<string, string>();
-
-    for (const entity of all) {
-      if (!entity.id) continue;
-      byId.set(entity.id, entity);
-      const repo = this.stringValue(entity.source_repo);
-      if (repo) reposById.set(entity.id, repo);
-      if (repo && this.stringArray(entity.source_files).length > 0) {
-        groundedIds.add(entity.id);
-      }
-      if (repo && entity.human_asserted === true) {
-        groundedIds.add(entity.id);
-      }
-    }
-
-    // Derived hubs are grounded only when their declared supports already have
-    // a repo-grounded path. Iterate to a fixed point so hubs can derive from hubs.
-    let changed = true;
-    while (changed) {
-      changed = false;
-      for (const entity of all) {
-        if (!entity.id || groundedIds.has(entity.id)) continue;
-        const repo = reposById.get(entity.id) ?? "";
-        const supports = this.stringArray(entity.derived_from_node_ids);
-        if (repo && supports.length > 0 && supports.every((id) => groundedIds.has(id))) {
-          groundedIds.add(entity.id);
-          changed = true;
-        }
-      }
-    }
-
-    return { groundedIds, reposById };
-  }
-
-  private resolveCanonicalPromotionProvenance(
-    node: DreamNode,
-    groundedIds: Set<string>,
-    reposById: Map<string, string>
-  ): CanonicalPromotionProvenance | null {
-    const carrier = node as ProvenanceCarrier;
-    const sourceFiles = this.stringArray(carrier.source_files);
-    const explicitRepo = this.stringValue(carrier.source_repo);
-    const declaredSupports = this.stringArray(carrier.derived_from_node_ids);
-    const inspirationSupports = this.stringArray(carrier.inspiration);
-    const derivedFromNodeIds = declaredSupports.length > 0 ? declaredSupports : inspirationSupports;
-
-    // Middle route: a hub may lack direct source files, but it still must be
-    // scoped to a repository. If the dream node did not carry source_repo yet,
-    // infer it only when all grounded support nodes point to exactly one repo.
-    const supportRepos = new Set(
-      derivedFromNodeIds
-        .filter((id) => groundedIds.has(id))
-        .map((id) => reposById.get(id) ?? "")
-        .filter((repo) => repo.length > 0)
-    );
-    const sourceRepo = explicitRepo || (supportRepos.size === 1 ? [...supportRepos][0] : "");
-    if (!sourceRepo) return null;
-
-    if (sourceFiles.length > 0) {
-      return { sourceRepo, sourceFiles, kind: "source_backed", derivedFromNodeIds: [] };
-    }
-
-    if (carrier.human_asserted === true) {
-      return { sourceRepo, sourceFiles: [], kind: "human_asserted", derivedFromNodeIds: [] };
-    }
-
-    if (derivedFromNodeIds.length > 0 && derivedFromNodeIds.every((id) => groundedIds.has(id))) {
-      return { sourceRepo, sourceFiles: [], kind: "derived_hub", derivedFromNodeIds };
-    }
-
-    return null;
-  }
-
-  /**
-   * Promote validated dream nodes into the fact graph.
-   *
-   * Promotion is not validation-by-density. A canonical entity must belong to a
-   * repository and must have a provenance path back to real evidence: direct
-   * source files, explicit human assertion, or a derived-hub chain whose support
-   * nodes are already grounded. This preserves useful semantic hubs while
-   * preventing self-consistent fictional clouds from becoming facts.
-   *
-   * Each grounded node is written to the appropriate seed file based on its
-   * category (feature, workflow, or data_model), then the resource index is
-   * rebuilt.
-   *
-   * The dream node is marked with `promoted_at` so it won't be
-   * promoted again, but remains in dream_graph.json as provenance.
-   */
-  async promoteNodesToFactGraph(nodes: DreamNode[]): Promise<{ promoted: number; skipped: number }> {
+  async promoteNodesToFactGraph(_nodes: DreamNode[]): Promise<{ promoted: number; skipped: number }> {
     this.assertState("normalizing", "promoteNodesToFactGraph");
-
-    if (nodes.length === 0) return { promoted: 0, skipped: 0 };
-
-    // Load current seed files
-    const [features, workflows, dataModel] = await Promise.all([
-      loadJsonArray<Feature>("features.json"),
-      loadJsonArray<Workflow>("workflows.json"),
-      loadJsonArray<DataModelEntity>("data_model.json"),
-    ]);
-
-    // Build existing ID sets to prevent duplicates and provenance indexes for
-    // validating derived hubs. Every canonical node must be repo-scoped, and a
-    // source-less hub must derive from already-grounded nodes rather than from
-    // other ungrounded dreams.
-    const existingIds = new Set<string>([
-      ...features.map(f => f.id),
-      ...workflows.map(w => w.id),
-      ...dataModel.map(d => d.id),
-    ]);
-    const { groundedIds, reposById } = this.buildGroundedEntityIndex(features, workflows, dataModel);
-
-    let promoted = 0;
-    let skipped = 0;
-    const now = new Date().toISOString();
-
-    for (const node of nodes) {
-      // Strip dream_ prefix for the fact graph ID
-      const factId = node.id.replace(/^dream_(llm_)?/, "");
-
-      if (existingIds.has(factId) || existingIds.has(node.id)) {
-        skipped++;
-        continue;
-      }
-
-      const provenance = this.resolveCanonicalPromotionProvenance(node, groundedIds, reposById);
-      if (!provenance) {
-        skipped++;
-        logger.warn(
-          `Entity promotion blocked for "${node.id}": missing repository-scoped source evidence, ` +
-          `human assertion, or grounded derived-hub support`
-        );
-        continue;
-      }
-
-      const category = node.category ?? "feature";
-      // Intent enriches the description, but canonical status comes from provenance.
-      const description = node.intent
-        ? `${node.description}. Intent: ${node.intent}`
-        : node.description;
-      const provenanceFields = {
-        source_repo: provenance.sourceRepo,
-        source_files: provenance.sourceFiles,
-        provenance_kind: provenance.kind,
-        ...(provenance.derivedFromNodeIds.length > 0
-          ? { derived_from_node_ids: provenance.derivedFromNodeIds }
-          : {}),
-      };
-
-      if (category === "feature") {
-        features.push({
-          id: factId,
-          name: node.name,
-          description,
-          ...provenanceFields,
-          status: "discovered",
-          category: node.domain ?? "dream-promoted",
-          tags: ["dream-promoted", provenance.kind],
-          domain: node.domain ?? "",
-          keywords: node.keywords ?? [],
-          links: [],
-        });
-      } else if (category === "workflow") {
-        workflows.push({
-          id: factId,
-          name: node.name,
-          description,
-          ...provenanceFields,
-          trigger: provenance.kind === "derived_hub" ? "derived from grounded behavioral evidence" : "source evidence",
-          steps: [],
-          domain: node.domain ?? "",
-          keywords: node.keywords ?? [],
-          status: "discovered",
-          links: [],
-        });
-      } else {
-        dataModel.push({
-          id: factId,
-          name: node.name,
-          description,
-          ...provenanceFields,
-          key_fields: [],
-          relationships: [],
-          domain: node.domain ?? "",
-          keywords: node.keywords ?? [],
-          status: "discovered",
-          links: [],
-        });
-      }
-
-      groundedIds.add(factId);
-      reposById.set(factId, provenance.sourceRepo);
-
-      // Mark the dream node as promoted
-      node.promoted_at = now;
-      existingIds.add(factId);
-      promoted++;
-    }
-
-    if (promoted === 0) return { promoted: 0, skipped };
-
-    // Write updated seed files
-    const writes: Promise<void>[] = [];
-
-    const writeSeed = async (filename: string, data: unknown) => {
-      await withFileLock(filename, async () => {
-        await atomicWriteFile(dataPath(filename), JSON.stringify(data, null, 2));
-      });
-      invalidateCache(filename);
-    };
-
-    writes.push(writeSeed("features.json", features));
-    writes.push(writeSeed("workflows.json", workflows));
-    writes.push(writeSeed("data_model.json", dataModel));
-    await Promise.all(writes);
-
-    // Rebuild resource index
-    const entities: Record<string, IndexEntry> = {};
-    for (const f of features.filter(e => !("_schema" in e))) {
-      entities[f.id] = { type: "feature", uri: `dreamgraph://resource/feature/${f.id}`, name: f.name, source_repo: f.source_repo };
-    }
-    for (const w of workflows.filter(e => !("_schema" in e))) {
-      entities[w.id] = { type: "workflow", uri: `dreamgraph://resource/workflow/${w.id}`, name: w.name, source_repo: w.source_repo };
-    }
-    for (const d of dataModel.filter(e => !("_schema" in e))) {
-      entities[d.id] = { type: "data_model", uri: `dreamgraph://resource/data_model/${d.id}`, name: d.name, source_repo: d.source_repo };
-    }
-    // Slice 1 — first-class UI graph citizens. Only source-bound entries.
-    for (const u of await loadIndexableUIElements()) {
-      entities[u.id] = {
-        type: "ui_element",
-        uri: `dreamgraph://resource/ui_element/${u.id}`,
-        name: u.name,
-        source_repo: u.source_repo,
-      };
-    }
-    const index: ResourceIndex = { entities };
-    await withFileLock("index.json", async () => {
-      await atomicWriteFile(dataPath("index.json"), JSON.stringify(index, null, 2));
-    });
-    invalidateCache("index.json");
-
-    // Save dream graph with promoted_at markers
-    const dreamGraph = await this.loadDreamGraph();
-    const promotedIds = new Set(nodes.filter(n => n.promoted_at).map(n => n.id));
-    for (const n of dreamGraph.nodes) {
-      if (promotedIds.has(n.id)) n.promoted_at = now;
-    }
-    await this.saveDreamGraph(dreamGraph);
-
-    logger.info(
-      `Entity promotion: ${promoted} dream nodes became fact entities ` +
-      `(${skipped} skipped as duplicates) — intent is now factual`
-    );
-
-    return { promoted, skipped };
+    throw new Error("NORMALIZATION_PUBLICATION_REQUIRED: direct entity promotion cannot turn model provenance into facts; use normalize()");
   }
 
   /** Get the N most recently validated edges (for LLM dream context). */
@@ -1407,35 +849,64 @@ class CognitiveEngine {
   // -------------------------------------------------------------------------
 
   async loadTensions(): Promise<TensionFile> {
-    try {
-      if (!existsSync(tensionPath())) {
-        return this.emptyTensionFile();
-      }
-      const raw = await readFile(tensionPath(), "utf-8");
-      const p = JSON.parse(raw);
-      const e = this.emptyTensionFile();
-      return {
-        metadata: { ...e.metadata, ...(p.metadata && typeof p.metadata === "object" ? p.metadata : {}) },
-        signals: Array.isArray(p.signals) ? p.signals : [],
-        resolved_tensions: Array.isArray(p.resolved_tensions) ? p.resolved_tensions : [],
-      };
-    } catch (err) {
-      logger.warn(
-        `loadTensions: failed to read/parse tension_log.json — returning empty. ` +
-        `Error: ${err instanceof Error ? err.message : err}`
-      );
-      return this.emptyTensionFile();
-    }
+    const data=await readCognitiveStore("tension_log.json",this.emptyTensionFile(),["signals"],["resolved_tensions"]);
+    data.metadata.revision??=0;return data;
   }
 
-  async saveTensions(data: TensionFile): Promise<void> {
-    data.metadata.total_signals = data.signals.length;
-    data.metadata.total_resolved = data.resolved_tensions?.length ?? 0;
-    data.metadata.last_updated = new Date().toISOString();
-    await withFileLock("tension_log.json", async () => {
-      await atomicWriteFile(tensionPath(), JSON.stringify(data, null, 2));
-    });
-    logger.debug("Tension log saved to disk");
+  private async persistTensions(data:TensionFile,additionalWrites:Array<{file:string;content:string}>=[]):Promise<void> {
+    data.metadata.total_signals=data.signals.length;data.metadata.total_resolved=data.resolved_tensions?.length??0;
+    data.metadata.last_updated=new Date().toISOString();data.metadata.revision=(data.metadata.revision??0)+1;
+    const writes=await this.prepareTimeEvidence(data,(await this.loadDreamHistory()).sessions);
+    const content=JSON.stringify(data,null,2);if(Buffer.byteLength(content)>16*1024*1024)throw new Error("RISK_STORE_CAPACITY_REQUIRES_ARCHIVE");
+    await commitGraphWrites({actor:"tension_observation",cause:"tension_observation",writes:[{file:"tension_log.json",content},...writes,...additionalWrites]});
+  }
+  async saveTensions(data:TensionFile,additionalWrites:Array<{file:string;content:string}>=[]):Promise<void> {
+    await withGraphReconciliation(()=>withFileLock("tension_log.json",async()=>{
+      const current=await this.loadTensions();
+      if((data.metadata.revision??0)!==current.metadata.revision)throw new Error("TENSION_REVISION_CONFLICT");
+      await this.persistTensions(data,additionalWrites);
+    }));
+  }
+  private async mutateTensions<T>(change:(data:TensionFile)=>Promise<{result:T;changed:boolean}>|{result:T;changed:boolean}):Promise<T> {
+    return withGraphReconciliation(()=>withFileLock("tension_log.json",async()=>{
+      const data=await this.loadTensions(),outcome=await change(data);if(outcome.changed)await this.persistTensions(data);return outcome.result;
+    }));
+  }
+  /** Policy snapshot for the existing threat/tension compound publication. */
+  riskPolicy():TensionConfig{return {...this.tensionConfig};}
+
+  /** Called under the common writer; event/observation time and affected generations share the source publication. */
+  private async prepareTimeEvidence(data:TensionFile,sessions:DreamHistoryEntry[]):Promise<Array<{file:string;content:string}>> {
+      const { prepareTemporalObservations } = await import("./temporal-evidence.js");
+      const { prepareCausalHypotheses } = await import("./causal.js");
+      const temporal = await prepareTemporalObservations(data);
+      const causal = await prepareCausalHypotheses(data, sessions);
+      let affected: Array<{file:string;content:string}> = [];
+      if (temporal.length || causal.length) {
+        const { loadCanonicalGraph } = await import("../graph/read-model.js");
+        const { graphIdentityKey } = await import("../graph/contracts.js");
+        const { prepareEvidenceGeneration } = await import("../graph/change-obligations.js");
+        const { timeDigest, loadTemporalObservations, readEvidenceStore } = await import("./temporal-evidence.js");
+        const graph = await loadCanonicalGraph(process.env.DREAMGRAPH_INSTANCE_UUID || "legacy");
+        const previousEvents=new Set((await loadTemporalObservations()).events.map(e=>e.id));
+        const changedEntities=temporal.flatMap(w=>(JSON.parse(w.content).events as Array<{id:string;entities:string[]}>).filter(e=>!previousEvents.has(e.id)).flatMap(e=>e.entities));
+        if(causal.length){
+          const oldCausal=await readEvidenceStore("causal_graph.json") as {hypotheses?:Array<{id:string;cause_entity:string;effect_entity:string;applicability:string}>}|null;
+          const previous={hypotheses:oldCausal?.hypotheses?.filter(h=>h.applicability==="current")};
+          const next=(JSON.parse(causal[0].content).hypotheses as Array<{id:string;cause_entity:string;effect_entity:string;applicability:string}>).filter(h=>h.applicability==="current");
+          const oldIds=new Set(previous?.hypotheses?.map(h=>h.id)),newIds=new Set(next.map(h=>h.id));
+          for(const hypothesis of [...next.filter(h=>!oldIds.has(h.id)),...(previous?.hypotheses??[]).filter(h=>!newIds.has(h.id))])changedEntities.push(hypothesis.cause_entity,hypothesis.effect_entity);
+        }
+        const ids=[...new Set(changedEntities)];
+        const scope: string[] = []; let unknown = false;
+        for (const id of ids) {
+          const matches = graph.entities.filter(e=>e.identity.id===id&&e.identity.repository_id&&["feature","workflow","data_model","capability","datastore","ui_element","auxiliary"].includes(e.identity.kind));
+          if(matches.length!==1)unknown=true;else scope.push(graphIdentityKey(matches[0].identity));
+        }
+        if(ids.length)affected = await prepareEvidenceGeneration({id:"temporal:tension_observations",scope:scope.length&&scope.length<=100?scope:["temporal:impact_unknown"],
+          fingerprint:timeDigest([temporal,causal]),unknown_impact:unknown||scope.length>100||!scope.length});
+      }
+      return [...temporal,...causal,...affected];
   }
 
   /**
@@ -1443,91 +914,13 @@ class CognitiveEngine {
    * increment its occurrence count and urgency.
    * New: assigns domain group and TTL for decay.
    */
-  async recordTension(signal: Omit<TensionSignal, "id" | "occurrences" | "first_seen" | "last_seen" | "attempted" | "resolved" | "ttl" | "domain"> & { domain?: TensionDomain }): Promise<TensionSignal> {
-    const tensions = await this.loadTensions();
-    const now = new Date().toISOString();
-
-    // Check for existing similar tension (same type + BOTH entities match)
-    // Previously used .some() which caused greedy merging — 27+ separate
-    // rejections would collapse into 1 mega-tension. Now require ALL
-    // entities from the new signal to already exist in the existing tension.
-    const existing = tensions.signals.find(
-      (s) =>
-        s.type === signal.type &&
-        !s.resolved &&
-        signal.entities.every((e) => s.entities.includes(e))
-    );
-
-    // If no existing match, enforce max_active_tensions cap
-    // Merging into existing tensions (occurrences++) is always allowed.
-    if (!existing) {
-      const activeCount = tensions.signals.filter((s) => !s.resolved).length;
-      if (activeCount >= this.tensionConfig.max_active_tensions) {
-        logger.debug(`Tension cap reached (${activeCount}/${this.tensionConfig.max_active_tensions}), skipping new tension for [${signal.entities.join(", ")}]`);
-        // Return a stub so callers don't break — but don't persist
-        return {
-          id: "capped",
-          type: signal.type,
-          domain: "general",
-          entities: signal.entities,
-          description: signal.description,
-          occurrences: 0,
-          urgency: 0,
-          first_seen: now,
-          last_seen: now,
-          attempted: false,
-          resolved: true,
-          ttl: 0,
-        } as TensionSignal;
-      }
-    }
-
-    if (existing) {
-      existing.occurrences++;
-      existing.last_seen = now;
-      existing.urgency = Math.min(
-        Math.round((existing.urgency + 0.1) * 100) / 100,
-        1.0
-      );
-      // Reset TTL on re-observation (tension is still alive)
-      existing.ttl = this.tensionConfig.default_tension_ttl;
-      await this.saveTensions(tensions);
-      return existing;
-    }
-
-    // Infer domain from entity IDs if not provided
-    const domain = signal.domain ?? this.inferTensionDomain(signal.entities, signal.description);
-
-    const newSignal: TensionSignal = {
-      id: `tension_${Date.now()}_${tensions.signals.length + 1}`,
-      type: signal.type,
-      domain,
-      entities: signal.entities,
-      description: signal.description,
-      occurrences: 1,
-      urgency: signal.urgency,
-      first_seen: now,
-      last_seen: now,
-      attempted: false,
-      resolved: false,
-      ttl: this.tensionConfig.default_tension_ttl,
-    };
-
-    tensions.signals.push(newSignal);
-    await this.saveTensions(tensions);
-    // Phase 3 / Slice 2: notify Explorer that a brand-new tension exists.
-    // Merge-into-existing and capped paths above intentionally don't emit —
-    // there's no new graph topology in those cases.
-    graphEventBus.emit("tension.created", {
-      affected_ids: [newSignal.id, ...newSignal.entities],
-      payload: {
-        tension_id: newSignal.id,
-        type: newSignal.type,
-        domain: newSignal.domain,
-        urgency: newSignal.urgency,
-      },
+  async recordTension(signal:RiskObservation):Promise<TensionSignal> {
+    const outcome=await this.mutateTensions(data=>{
+      const observation=observeRisk(data,{...signal,domain:signal.domain??this.inferTensionDomain(signal.entities,signal.description)},this.tensionConfig);
+      return {result:observation,changed:observation.changed};
     });
-    return newSignal;
+    if(outcome.changed)graphEventBus.emit("tension.created",{affected_ids:[outcome.signal.id,...outcome.signal.entities],payload:{tension_id:outcome.signal.id,type:outcome.signal.type,domain:outcome.signal.domain,urgency:outcome.signal.urgency}});
+    return outcome.signal;
   }
 
   /**
@@ -1535,202 +928,66 @@ class CognitiveEngine {
    * Moves the tension to resolved_tensions archive instead of deleting.
    * Sets urgency to 0 and marks resolved so it stops driving dreams.
    */
-  async resolveTension(
-    tensionId: string,
-    resolvedBy: TensionResolutionAuthority = "system",
-    resolutionType: TensionResolutionType = "confirmed_fixed",
-    evidence?: string,
-    recheckTtl?: number
-  ): Promise<ResolvedTension | null> {
-    const tensions = await this.loadTensions();
-    const idx = tensions.signals.findIndex((s) => s.id === tensionId);
-    if (idx === -1) return null;
-
-    const signal = tensions.signals[idx];
-    const now = new Date().toISOString();
-
-    // Create archive entry
-    const resolved: ResolvedTension = {
-      tension_id: tensionId,
-      resolved_at: now,
-      resolved_by: resolvedBy,
-      resolution_type: resolutionType,
-      evidence,
-      recheck_ttl: recheckTtl,
-      original: { ...signal },
-    };
-
-    // Mark as resolved (urgency drops to 0)
-    signal.resolved = true;
-    signal.urgency = 0;
-
-    // Move to resolved archive
-    if (!tensions.resolved_tensions) {
-      tensions.resolved_tensions = [];
-    }
-    tensions.resolved_tensions.push(resolved);
-
-    // Remove from active signals
-    tensions.signals.splice(idx, 1);
-
-    await this.saveTensions(tensions);
-    logger.info(
-      `Tension resolved: "${tensionId}" by ${resolvedBy} as ${resolutionType}` +
-      (evidence ? ` (evidence: ${evidence})` : "")
-    );
-    // Phase 3 / Slice 2: notify Explorer that the tension is gone.
-    graphEventBus.emit("tension.resolved", {
-      affected_ids: [tensionId, ...(resolved.original.entities ?? [])],
-      payload: {
-        tension_id: tensionId,
-        resolved_by: resolvedBy,
-        resolution_type: resolutionType,
-      },
+  async resolveTension(tensionId:string,resolvedBy:TensionResolutionAuthority="system",resolutionType:TensionResolutionType="confirmed_fixed",
+    evidence?:string,recheckTtl?:number,options:{expected_revision?:number;verification_claim?:import("./normalization-evidence.js").NormalizationClaim}={}):Promise<ResolvedTension|null> {
+    const resolved=await this.mutateTensions(async data=>{
+      const index=data.signals.findIndex(s=>s.id===tensionId);if(index<0)return {result:null,changed:false};
+      const signal=data.signals[index];riskRevision(signal,options.expected_revision);
+      if(!evidence?.trim())throw new Error("RISK_RESOLUTION_RATIONALE_REQUIRED");
+      if(resolutionType==="expired_unverified")throw new Error("RISK_EXPIRY_IS_INTERNAL_ONLY");
+      let verification:ResolvedTension["verification"];
+      if(resolvedBy==="system"){
+        if(resolutionType!=="confirmed_fixed")throw new Error("RISK_HUMAN_DISPOSITION_REQUIRED");
+        verification=await verifyRiskClaim(signal,options.verification_claim??signal.resolution_candidate?.verification_claim);
+      }
+      const now=new Date().toISOString();riskEvent(signal,"resolved",evidence,{authority:resolvedBy,type:resolutionType,verification},now);
+      const archive:ResolvedTension={id:`${signal.id}@resolution:${signal.lifecycle_history!.at(-1)!.id}`,tension_id:tensionId,resolved_at:now,resolved_by:resolvedBy,resolution_type:resolutionType,evidence,
+        recheck_ttl:recheckTtl,original:structuredClone(signal),resolution_state:verification?"verified":"human_disposition",verification};
+      (data.resolved_tensions??=[]).push(archive);data.signals.splice(index,1);return {result:archive,changed:true};
     });
+    if(resolved)graphEventBus.emit("tension.resolved",{affected_ids:[tensionId,...resolved.original.entities],payload:{tension_id:tensionId,resolved_by:resolvedBy,resolution_type:resolutionType}});
     return resolved;
   }
 
-  /**
-   * Apply decay to all active tensions.
-   * - Urgency reduced by tension_urgency_decay per cycle
-   * - TTL decremented by 1
-   * - Tensions with TTL <= 0 or urgency below threshold are auto-expired
-   * - Auto-expired tensions are moved to resolved_tensions as "false_positive"
-   *
-   * Returns count of expired tensions.
-   */
-  async applyTensionDecay(): Promise<{ expired: number; decayed: number }> {
-    const tensions = await this.loadTensions();
-    const surviving: TensionSignal[] = [];
-    let expired = 0;
-    let decayed = 0;
-
-    if (!tensions.resolved_tensions) {
-      tensions.resolved_tensions = [];
-    }
-
-    for (const signal of tensions.signals) {
-      if (signal.resolved) continue; // Already resolved, skip
-
-      // Decay
-      signal.ttl = (signal.ttl ?? this.tensionConfig.default_tension_ttl) - 1;
-      signal.urgency = Math.round(
-        Math.max(signal.urgency - this.tensionConfig.tension_urgency_decay, 0) * 100
-      ) / 100;
-
-      // Check expiry conditions
-      if (
-        signal.ttl <= 0 ||
-        signal.urgency < this.tensionConfig.min_urgency_threshold
-      ) {
-        // Auto-expire: move to resolved as false_positive (noise that faded)
-        tensions.resolved_tensions.push({
-          tension_id: signal.id,
-          resolved_at: new Date().toISOString(),
-          resolved_by: "system",
-          resolution_type: "false_positive",
-          evidence: signal.ttl <= 0
-            ? "TTL expired without re-observation"
-            : "Urgency decayed below threshold (" + signal.urgency + ")",
-          original: { ...signal },
-        });
-        expired++;
-        logger.debug(
-          `Tension expired: "${signal.id}" (ttl=${signal.ttl}, urgency=${signal.urgency})`
-        );
-        continue;
+  /** TTL retires attention, never verifies a fix or false positive. */
+  async applyTensionDecay():Promise<{expired:number;decayed:number}> {
+    return this.mutateTensions(data=>{
+      let expired=0,decayed=0;const survivors:TensionSignal[]=[];
+      for(const signal of data.signals){if(signal.resolved)continue;
+        signal.ttl=(signal.ttl??this.tensionConfig.default_tension_ttl)-1;
+        signal.urgency=Math.round(Math.max(signal.urgency-this.tensionConfig.tension_urgency_decay,0)*100)/100;
+        if(signal.ttl<=0||signal.urgency<this.tensionConfig.min_urgency_threshold){
+          const now=new Date().toISOString();riskEvent(signal,"expired","Attention expired without verification",undefined,now);
+          (data.resolved_tensions??=[]).push({id:`${signal.id}@resolution:${signal.lifecycle_history!.at(-1)!.id}`,tension_id:signal.id,resolved_at:now,resolved_by:"system",resolution_type:"expired_unverified",
+            resolution_state:"expired_unverified",evidence:"TTL/urgency attention policy; risk correctness unverified",original:structuredClone(signal)});expired++;
+        }else{survivors.push(signal);decayed++;}
       }
-
-      decayed++;
-      surviving.push(signal);
-    }
-
-    tensions.signals = surviving;
-    await this.saveTensions(tensions);
-
-    if (expired > 0) {
-      logger.info(
-        `Tension decay: ${expired} expired, ${surviving.length} surviving`
-      );
-    }
-
-    return { expired, decayed };
+      data.signals=survivors;return {result:{expired,decayed},changed:expired+decayed>0};
+    });
   }
 
-  /**
-   * Check resolved tensions for recheck_ttl expiry.
-   *
-   * Contradictory-evidence hook (F-02):
-   *   While a resolved tension's recheck window is still open
-   *   (recheck_ttl > 0), scan currently active tensions for any signal that
-   *   overlaps with the resolved tension's original entities AND shares its
-   *   domain. Such an overlap means the system has independently re-raised
-   *   the same concern after we marked it resolved — strong evidence the
-   *   resolution was premature. The original tension is restored to the
-   *   active list (with a fresh TTL and a small urgency bump) and removed
-   *   from the resolved archive. Reactivations are logged.
-   *
-   *   Resolutions that are explicitly `wont_fix` are NOT reactivated — the
-   *   user accepted the risk. `confirmed_fixed` and `false_positive` may be
-   *   reactivated.
-   */
-  async processRecheckWindows(): Promise<number> {
-    const tensions = await this.loadTensions();
-    if (!tensions.resolved_tensions || tensions.resolved_tensions.length === 0) {
-      return 0;
-    }
-
-    const activeSignals = tensions.signals.filter((s) => !s.resolved);
-    let reactivated = 0;
-    const stillResolved: ResolvedTension[] = [];
-
-    for (const resolved of tensions.resolved_tensions) {
-      // Closed window — keep archived as-is.
-      if (resolved.recheck_ttl === undefined || resolved.recheck_ttl <= 0) {
-        stillResolved.push(resolved);
-        continue;
+  /** Recheck only stored verification predicates; overlapping entities are not contradictory proof. */
+  async processRecheckWindows(affectedEntityIds?:string[]):Promise<number> {
+    const outcome=await this.mutateTensions(async data=>{
+      let reactivated=0,changed=false;const affected=affectedEntityIds?new Set(affectedEntityIds):null;
+      const reopened:TensionSignal[]=[];
+      const archived=(data.resolved_tensions??[]).filter(r=>!r.reopened_at&&(!affected||r.original.entities.some(id=>affected.has(id))));
+      if(archived.length>1000)throw new Error("RISK_REVIEW_SCOPE_BOUND");
+      for(const prior of archived){
+        let reason:string|undefined;
+        if(prior.verification){try{await verifyRiskClaim(prior.original,prior.verification.claim);}catch(error){reason=`Current resolution evidence requires review: ${String(error)}`;}}
+        if(reason&&!data.signals.some(s=>s.id===prior.tension_id)){
+          if(data.signals.length>=this.tensionConfig.max_active_tensions)throw new Error("RISK_ACTIVE_CAPACITY_REQUIRES_REVIEW");
+          const now=new Date().toISOString(),signal={...structuredClone(prior.original),resolved:false,attempted:false,lifecycle:"review_required" as const,last_seen:now,ttl:this.tensionConfig.default_tension_ttl};
+          delete signal.resolution_candidate;riskEvent(signal,"reopened",reason,{previous_resolution:prior.resolution_type},now);
+          prior.reopened_at=now;prior.reappearance_reason=reason;data.signals.push(signal);reopened.push(signal);reactivated++;changed=true;
+        }
+        if(prior.recheck_ttl!==undefined&&prior.recheck_ttl>0){prior.recheck_ttl--;changed=true;}
       }
-
-      const original = resolved.original;
-      const originalEntities = new Set(original.entities ?? []);
-      const contradicted =
-        resolved.resolution_type !== "wont_fix" &&
-        activeSignals.some(
-          (sig) =>
-            sig.id !== original.id &&
-            sig.domain === original.domain &&
-            (sig.entities ?? []).some((e) => originalEntities.has(e))
-        );
-
-      if (contradicted) {
-        // Reactivate: restore the original signal with refreshed TTL and a
-        // small urgency bump so the dreamer notices it on the next cycle.
-        const reborn: TensionSignal = {
-          ...original,
-          attempted: false,
-          resolved: false,
-          ttl: this.tensionConfig.default_tension_ttl,
-          urgency: Math.min(1, (original.urgency ?? 0.5) + 0.1),
-          last_seen: new Date().toISOString(),
-        };
-        tensions.signals.push(reborn);
-        reactivated++;
-        logger.info(
-          `Tension reactivated by contradictory evidence: "${original.id}" ` +
-            `(domain=${original.domain}, recheck_ttl was ${resolved.recheck_ttl})`
-        );
-        continue; // Drop from resolved archive.
-      }
-
-      resolved.recheck_ttl--;
-      stillResolved.push(resolved);
-    }
-
-    tensions.resolved_tensions = stillResolved;
-    if (reactivated > 0) {
-      await this.saveTensions(tensions);
-    }
-    return reactivated;
+      return {result:{reactivated,reopened},changed};
+    });
+    for(const signal of outcome.reopened)graphEventBus.emit("tension.created",{affected_ids:[signal.id,...signal.entities],payload:{tension_id:signal.id,type:signal.type,domain:signal.domain,urgency:signal.urgency,reopened:true}});
+    return outcome.reactivated;
   }
 
   /** Get unresolved tensions sorted by urgency, capped at max_active_tensions */
@@ -1780,38 +1037,51 @@ class CognitiveEngine {
   //   1. proposeTensionResolution  → stamps a candidate on the tension.
   //   2. runTensionResolverCycle   → bulk proposer (heuristic or injected LLM).
   //   3. validateResolutionCandidates → after the validation_window expires:
-  //        - confirms (resolveTension/confirmed_fixed) when bridging evidence
-  //          appears in validated_edges,
-  //        - accepts wont_fix candidates as resolved/wont_fix,
-  //        - escalates everything else (urgency bump, candidate cleared,
-  //          attempted=true).
+  //        - verifies an exact declared connection predicate using current
+  //          independently supported canonical normalization,
+  //        - otherwise retains the proposal and requests explicit review;
+  //          timeout/wont_fix/action success cannot prove a disposition.
   //   4. getResolutionPipelineStats surfaces queue depth for cognitive_status.
   // -------------------------------------------------------------------------
 
   /** Stamp a resolution candidate onto an open tension (idempotent — overwrites). */
-  async proposeTensionResolution(
-    tensionId: string,
-    candidate: Omit<TensionResolutionCandidate, "proposed_at"> & { proposed_at?: string }
-  ): Promise<TensionSignal | null> {
-    let updated: TensionSignal | null = null;
-    await withFileLock("tension_log.json", async () => {
-      const tensions = await this.loadTensions();
-      const idx = tensions.signals.findIndex((s) => s.id === tensionId);
-      if (idx === -1) return;
-      const signal = tensions.signals[idx];
-      if (signal.resolved) return;
-      signal.resolution_candidate = {
-        strategy: candidate.strategy,
-        rationale: candidate.rationale,
-        validation_window: Math.max(1, candidate.validation_window),
-        source: candidate.source,
-        proposed_at: candidate.proposed_at ?? new Date().toISOString(),
-      };
-      tensions.signals[idx] = signal;
-      await atomicWriteFile(tensionPath(), JSON.stringify(tensions, null, 2));
-      updated = signal;
+  async proposeTensionResolution(tensionId:string,candidate:Omit<TensionResolutionCandidate,"proposed_at">&{proposed_at?:string},expectedRevision?:number):Promise<TensionSignal|null> {
+    return this.mutateTensions(data=>{
+      const signal=data.signals.find(s=>s.id===tensionId&&!s.resolved);if(!signal)return {result:null,changed:false};riskRevision(signal,expectedRevision);
+      if(!candidate.rationale?.trim()||!Number.isSafeInteger(candidate.validation_window)||candidate.validation_window<1||candidate.validation_window>100)throw new Error("RISK_PROPOSAL_INVALID");
+      const intent={strategy:candidate.strategy,rationale:candidate.rationale,source:candidate.source,proposed_action:candidate.proposed_action,verification_claim:candidate.verification_claim};
+      const id=riskDigest([tensionId,signal.observation_fingerprint,intent]);if(signal.resolution_candidate?.id===id)return {result:signal,changed:false};
+      const proposal={...candidate,id,proposed_at:candidate.proposed_at??new Date().toISOString()};
+      signal.proposal_history??=[];
+      if(!signal.proposal_history.some(prior=>prior.id===id))signal.proposal_history.push(structuredClone(proposal));
+      if(signal.proposal_history.length>1000)throw new Error("RISK_PROPOSAL_CAPACITY_REQUIRES_ARCHIVE");
+      signal.resolution_candidate=proposal;signal.lifecycle="proposed";riskEvent(signal,"proposed",candidate.rationale,{proposal_id:id});return {result:signal,changed:true};
     });
-    return updated;
+  }
+
+  async recordTensionAction(tensionId:string,proposalId:string,outcome:{state:"completed"|"failed"|"unknown";receipt_ids:string[];reason:string}):Promise<void> {
+    const job=currentJob();
+    if(job){const {EngineJobs}=await import("./jobs.js");
+      // The legacy executor has no effect receipt bound to this intent. Even a
+      // completed tool response cannot release the job's recovery ownership.
+      await withoutJobContext(()=>new EngineJobs(job.directory).settleExternalEffect(job.id,`risk-action:${riskDigest([tensionId,proposalId])}`,false,`risk-outcome:${riskDigest(outcome)}`));}
+    await this.mutateTensions(data=>{
+      const signal=data.signals.find(s=>s.id===tensionId);if(!signal)throw new Error("RISK_ACTION_TARGET_UNAVAILABLE");
+      const fingerprint=riskDigest([proposalId,outcome]);if(signal.lifecycle_history?.some(e=>e.kind==="action"&&e.details?.fingerprint===fingerprint))return {result:undefined,changed:false};
+      if(!signal.proposal_history?.some(p=>p.id===proposalId))throw new Error("RISK_ACTION_PROPOSAL_UNAVAILABLE");
+      riskEvent(signal,"action",outcome.reason,{proposal_id:proposalId,...outcome,fingerprint});signal.lifecycle="review_required";return {result:undefined,changed:true};
+    });
+  }
+
+  /** Persist before dispatch; a lost result cannot authorize redispatch of this proposal. */
+  async beginTensionAction(tensionId:string,proposalId:string):Promise<boolean> {
+    return this.mutateTensions(async data=>{
+      const signal=data.signals.find(s=>s.id===tensionId);if(!signal||signal.resolution_candidate?.id!==proposalId)throw new Error("RISK_ACTION_PROPOSAL_CHANGED");
+      if(signal.lifecycle_history?.some(event=>event.kind==="action"&&event.details?.proposal_id===proposalId))return {result:false,changed:false};
+      const job=currentJob();if(job){const {EngineJobs}=await import("./jobs.js");
+        await new EngineJobs(job.directory).beginExternalEffect(job.id,job.fence,{id:`risk-action:${riskDigest([tensionId,proposalId])}`,kind:"risk_remediation",target:tensionId,payload_hash:riskDigest(signal.resolution_candidate.proposed_action)});}
+      riskEvent(signal,"action","Action intent committed; result not yet known",{proposal_id:proposalId,state:"intent",receipt_ids:[]});return {result:true,changed:true};
+    });
   }
 
   /**
@@ -1926,7 +1196,8 @@ class CognitiveEngine {
       }
       if (!candidate) candidate = this.heuristicCandidate(sig);
       if (!candidate) { skipped++; continue; }
-      await this.proposeTensionResolution(sig.id, candidate);
+      const stamped=await this.proposeTensionResolution(sig.id,candidate,sig.revision??0);
+      if(!stamped){skipped++;continue;}
       proposed++;
 
       // Auto-apply: execute graph_enrichment payloads immediately.
@@ -1936,6 +1207,7 @@ class CognitiveEngine {
         "tool" in candidate.proposed_action &&
         candidate.proposed_action.tool === "enrich_seed_data"
       ) {
+        if(!await this.beginTensionAction(sig.id,stamped.resolution_candidate!.id!)){skipped++;continue;}
         try {
           const action = candidate.proposed_action;
           const result = await executeEnrichSeedData({
@@ -1944,18 +1216,20 @@ class CognitiveEngine {
             mode: action.mode,
           });
           if (result.success) {
-            auto_applied++;
+            await this.recordTensionAction(sig.id,stamped.resolution_candidate!.id!,{state:"unknown",receipt_ids:[],reason:"Tool returned success but exposes no bound action receipt; inspect/recover before retry. Resolution remains unverified"});
             logger.info(
               `runTensionResolverCycle: auto-applied enrich_seed_data for ${sig.id} — ` +
               `${(result.data as { entries_inserted: number; entries_updated: number }).entries_inserted} new, ` +
               `${(result.data as { entries_inserted: number; entries_updated: number }).entries_updated} updated`
             );
           } else {
+            await this.recordTensionAction(sig.id,stamped.resolution_candidate!.id!,{state:"unknown",receipt_ids:[],reason:`Tool failed; inspect possible partial effect before retry: ${result.error?.message}`});
             logger.warn(
               `runTensionResolverCycle: auto-apply for ${sig.id} failed — ${result.error?.code}: ${result.error?.message}`
             );
           }
         } catch (err) {
+          await this.recordTensionAction(sig.id,stamped.resolution_candidate!.id!,{state:"unknown",receipt_ids:[],reason:String(err)});
           logger.warn(
             `runTensionResolverCycle: auto-apply for ${sig.id} threw — ` +
             `${err instanceof Error ? err.message : err}`
@@ -1971,102 +1245,28 @@ class CognitiveEngine {
    * window hits 0, classifies the candidate as confirmed / accepted / escalated
    * based on the current validated-edges graph.
    */
-  async validateResolutionCandidates(): Promise<{
-    confirmed: number;
-    accepted_wont_fix: number;
-    escalated: number;
-    awaiting: number;
-  }> {
-    const validated = await this.loadValidatedEdges();
-
-    // v8.2.6 — index bridges by entity-pair AND by validation timestamp so
-    // we can require the bridge to have appeared *after* the candidate was
-    // proposed. A pre-existing bridge no longer counts as evidence that the
-    // resolution worked.
-    const bridgeFirstSeen = new Map<string, number>(); // key -> earliest validated_at ms
-    for (const e of validated.edges) {
-      if (!e.from || !e.to) continue;
-      const ts = e.validated_at ? Date.parse(e.validated_at) : NaN;
-      const stamp = Number.isFinite(ts) ? ts : 0;
-      const k1 = `${e.from}\u0000${e.to}`;
-      const k2 = `${e.to}\u0000${e.from}`;
-      const prev1 = bridgeFirstSeen.get(k1);
-      const prev2 = bridgeFirstSeen.get(k2);
-      if (prev1 === undefined || stamp < prev1) bridgeFirstSeen.set(k1, stamp);
-      if (prev2 === undefined || stamp < prev2) bridgeFirstSeen.set(k2, stamp);
-    }
-
-    const decisions: Array<{ id: string; outcome: "confirmed" | "wont_fix" | "escalate" }> = [];
-    const tensions = await this.loadTensions();
-
-    for (const sig of tensions.signals) {
-      if (sig.resolved || !sig.resolution_candidate) continue;
-      sig.resolution_candidate.validation_window -= 1;
-      if (sig.resolution_candidate.validation_window > 0) continue;
-
-      const proposedAtMs = Date.parse(sig.resolution_candidate.proposed_at);
-      const proposedThreshold = Number.isFinite(proposedAtMs) ? proposedAtMs : 0;
-
-      const ents = sig.entities;
-      const hasFreshBridge = ents.length >= 2 && (() => {
-        for (let i = 0; i < ents.length; i++) {
-          for (let j = i + 1; j < ents.length; j++) {
-            const ts = bridgeFirstSeen.get(`${ents[i]}\u0000${ents[j]}`);
-            if (ts === undefined) continue;
-            // Strict: bridge must have first appeared at or after proposal.
-            // Allow a small clock-skew tolerance of 1 second.
-            if (ts >= proposedThreshold - 1000) return true;
-          }
+  async validateResolutionCandidates():Promise<{confirmed:number;accepted_wont_fix:number;escalated:number;awaiting:number}> {
+    const outcome=await this.mutateTensions(async data=>{
+      let confirmed=0,escalated=0,awaiting=0,changed=false;
+      const resolved:TensionSignal[]=[];
+      for(const signal of [...data.signals]){
+        const candidate=signal.resolution_candidate;if(signal.resolved||!candidate)continue;changed=true;candidate.validation_window--;
+        if(candidate.validation_window>0){awaiting++;continue;}
+        let verification:ResolvedTension["verification"],failure="Proposal requires explicit human disposition or a declared current evidence predicate";
+        if(candidate.verification_claim){try{verification=await verifyRiskClaim(signal,candidate.verification_claim);}catch(error){failure=String(error);}}
+        if(verification){
+          const now=new Date().toISOString();riskEvent(signal,"resolved","Declared connection predicate independently verified",{proposal_id:candidate.id,verification},now);
+          (data.resolved_tensions??=[]).push({id:`${signal.id}@resolution:${signal.lifecycle_history!.at(-1)!.id}`,tension_id:signal.id,resolved_at:now,resolved_by:"system",resolution_type:"confirmed_fixed",resolution_state:"verified",
+            evidence:"Current independently supported declared bridge",verification,original:structuredClone(signal)});
+          data.signals=data.signals.filter(s=>s.id!==signal.id);resolved.push(signal);confirmed++;
+        }else{
+          signal.attempted=true;signal.lifecycle="review_required";riskEvent(signal,"review_required",failure,{proposal_id:candidate.id});delete signal.resolution_candidate;escalated++;
         }
-        return false;
-      })();
-
-      if (hasFreshBridge) {
-        decisions.push({ id: sig.id, outcome: "confirmed" });
-      } else if (sig.resolution_candidate.strategy === "wont_fix") {
-        decisions.push({ id: sig.id, outcome: "wont_fix" });
-      } else {
-        decisions.push({ id: sig.id, outcome: "escalate" });
       }
-    }
-
-    // Persist the window-decrement first so the counters above are durable
-    // even if the resolveTension calls below short-circuit.
-    await this.saveTensions(tensions);
-
-    let confirmed = 0;
-    let accepted_wont_fix = 0;
-    let escalated = 0;
-
-    for (const d of decisions) {
-      if (d.outcome === "confirmed") {
-        await this.resolveTension(d.id, "system", "confirmed_fixed", "validated_edges contains a bridging connection between tension entities");
-        confirmed++;
-      } else if (d.outcome === "wont_fix") {
-        await this.resolveTension(d.id, "system", "wont_fix", "resolution candidate proposed wont_fix and validation window expired");
-        accepted_wont_fix++;
-      } else {
-        // Escalate: bump urgency, mark attempted, clear the failed candidate.
-        await withFileLock("tension_log.json", async () => {
-          const t = await this.loadTensions();
-          const idx = t.signals.findIndex((s) => s.id === d.id);
-          if (idx === -1) return;
-          const s = t.signals[idx];
-          s.urgency = Math.min(1, Math.round((s.urgency + 0.05) * 100) / 100);
-          s.attempted = true;
-          delete s.resolution_candidate;
-          t.signals[idx] = s;
-          await atomicWriteFile(tensionPath(), JSON.stringify(t, null, 2));
-        });
-        escalated++;
-      }
-    }
-
-    const awaiting = (await this.loadTensions()).signals.filter(
-      (s) => !s.resolved && !!s.resolution_candidate
-    ).length;
-
-    return { confirmed, accepted_wont_fix, escalated, awaiting };
+      return {result:{stats:{confirmed,accepted_wont_fix:0,escalated,awaiting},resolved},changed};
+    });
+    for(const signal of outcome.resolved)graphEventBus.emit("tension.resolved",{affected_ids:[signal.id,...signal.entities],payload:{tension_id:signal.id,resolved_by:"system",resolution_type:"confirmed_fixed"}});
+    return outcome.stats;
   }
 
   /** Pipeline stats for cognitive_status. */
@@ -2130,33 +1330,21 @@ class CognitiveEngine {
   // -------------------------------------------------------------------------
 
   async loadDreamHistory(): Promise<DreamHistoryFile> {
-    try {
-      if (!existsSync(historyPath())) {
-        return this.emptyHistoryFile();
-      }
-      const raw = await readFile(historyPath(), "utf-8");
-      const p = JSON.parse(raw);
-      const e = this.emptyHistoryFile();
-      return {
-        metadata: { ...e.metadata, ...(p.metadata && typeof p.metadata === "object" ? p.metadata : {}) },
-        sessions: Array.isArray(p.sessions) ? p.sessions : [],
-      };
-    } catch (err) {
-      logger.warn(
-        `loadDreamHistory: failed to read/parse dream_history.json — returning empty. ` +
-        `Error: ${err instanceof Error ? err.message : err}`
-      );
-      return this.emptyHistoryFile();
-    }
+    return readCognitiveStore("dream_history.json", this.emptyHistoryFile(), ["sessions"]);
   }
 
   async appendHistoryEntry(entry: DreamHistoryEntry): Promise<void> {
-    const history = await this.loadDreamHistory();
-    history.sessions.push(entry);
-    history.metadata.total_sessions = history.sessions.length;
-    await withFileLock("dream_history.json", async () => {
-      await atomicWriteFile(historyPath(), JSON.stringify(history, null, 2));
-    });
+    const committed=await withGraphReconciliation(()=>withFileLock("dream_history.json",async()=>{
+      const history=await this.loadDreamHistory();
+      const {timeDigest}=await import("./temporal-evidence.js");
+      const prior=history.sessions.find(e=>entry.session_id?e.session_id===entry.session_id:e.timestamp===entry.timestamp&&e.cycle_number===entry.cycle_number);
+      if(prior){if(timeDigest(prior)!==timeDigest(entry))throw new Error("HISTORY_IDENTITY_CONFLICT");return false;}
+      history.sessions.push(entry);history.metadata.total_sessions=history.sessions.length;
+      const writes=await this.prepareTimeEvidence(await this.loadTensions(),history.sessions);
+      await commitGraphWrites({actor:"history_observation",cause:"history_observation",writes:[{file:"dream_history.json",content:JSON.stringify(history,null,2)},...writes]});
+      return true;
+    }));
+    if(!committed)return;
     logger.debug(`Dream history entry recorded: session ${entry.session_id}`);
     // Phase 3 / Slice 2: appendHistoryEntry is the canonical "a cycle just
     // finished" signal — every dream/normalization/nightmare path funnels
@@ -2270,6 +1458,9 @@ class CognitiveEngine {
    * repo-scoped and derived from grounded source-backed/human/hub nodes.
    */
   async quarantineSourceLessFacts(): Promise<SourceLessFactQuarantineResult> {
+    return withGraphReconciliation(() => this.quarantineSourceLessFactsUnlocked());
+  }
+  private async quarantineSourceLessFactsUnlocked(): Promise<SourceLessFactQuarantineResult> {
     const timestamp = new Date().toISOString();
     const quarantineFilename = `source_less_fact_quarantine_${timestamp.replace(/[:.]/g, "-")}.json`;
     const quarantineFile = dataPath(quarantineFilename);
@@ -2289,13 +1480,18 @@ class CognitiveEngine {
       ...workflows.filter((e) => !("_schema" in e)),
       ...dataModel.filter((e) => !("_schema" in e)),
     ] as ProvenanceCarrier[];
+    const ids = canonicalEntities.map(e => e.id).filter(Boolean);
+    if (new Set(ids).size !== ids.length) throw new Error("QUARANTINE_TYPED_IDENTITY_REQUIRED");
     const groundedIds = this.buildGroundedCanonicalIdSet(canonicalEntities);
     const canonicalIds = new Set(canonicalEntities.map((e) => e.id).filter((id): id is string => typeof id === "string"));
     const affectedNodeIds = new Set<string>();
 
     for (const entity of canonicalEntities) {
       if (!entity.id) continue;
-      if (!groundedIds.has(entity.id)) affectedNodeIds.add(entity.id);
+      const raw = entity as ProvenanceCarrier & Record<string, unknown>;
+      const provenance = raw.provenance as Record<string, unknown> | undefined;
+      const human = raw.human_asserted === true || raw.origin === "lucid" || raw.source_kind === "manual" || provenance?.kind === "manual" || ["human_asserted", "human", "manual"].includes(String(raw.provenance_kind));
+      if (!groundedIds.has(entity.id) && !human) affectedNodeIds.add(entity.id);
     }
 
     const invalidCanonical = (entity: ProvenanceCarrier): boolean => !!entity.id && affectedNodeIds.has(entity.id);
@@ -2338,9 +1534,7 @@ class CognitiveEngine {
 
     const quarantinedValidatedEdges = validated.edges.filter((edge) =>
       affectedNodeIds.has(edge.from) ||
-      affectedNodeIds.has(edge.to) ||
-      (canonicalIds.has(edge.from) && !groundedIds.has(edge.from)) ||
-      (canonicalIds.has(edge.to) && !groundedIds.has(edge.to))
+      affectedNodeIds.has(edge.to)
     );
     for (const edge of quarantinedValidatedEdges) affectedNodeIds.add(edge.id);
 
@@ -2369,39 +1563,41 @@ class CognitiveEngine {
       resolved_tensions: quarantinedResolvedTensions,
     };
 
-    await withFileLock(quarantineFilename, async () => {
-      await atomicWriteFile(quarantineFile, JSON.stringify(quarantineReport, null, 2));
-    });
-
-    const writeSeed = async (filename: string, data: unknown) => {
-      await withFileLock(filename, async () => {
-        await atomicWriteFile(dataPath(filename), JSON.stringify(data, null, 2));
-      });
-      invalidateCache(filename);
-    };
-
-    await Promise.all([
-      writeSeed("features.json", nextFeatures),
-      writeSeed("workflows.json", nextWorkflows),
-      writeSeed("data_model.json", nextDataModel),
-    ]);
+    const writes = [{ file: quarantineFilename, content: JSON.stringify(quarantineReport, null, 2) },
+      { file: "features.json", content: JSON.stringify(nextFeatures) },
+      { file: "workflows.json", content: JSON.stringify(nextWorkflows) },
+      { file: "data_model.json", content: JSON.stringify(nextDataModel) }];
 
     dreamGraph.nodes = dreamGraph.nodes.filter((node) => !quarantinedDreamNodes.some((q) => q.id === node.id));
     dreamGraph.edges = dreamGraph.edges.filter((edge) => !quarantinedDreamEdges.some((q) => q.id === edge.id));
-    await this.saveDreamGraph(dreamGraph);
+    writes.push({ file: "dream_graph.json", content: JSON.stringify(dreamGraph) });
 
     candidates.results = candidates.results.filter((result) => !quarantinedCandidateResults.includes(result));
-    await this.saveCandidateEdges(candidates);
+    writes.push({ file: "candidate_edges.json", content: JSON.stringify(candidates) });
 
     validated.edges = validated.edges.filter((edge) => !quarantinedValidatedEdges.includes(edge));
     validated.metadata.total_validated = validated.edges.length;
-    await this.saveValidatedEdges(validated);
+    writes.push({ file: "validated_edges.json", content: JSON.stringify(validated) });
 
     tensions.signals = tensions.signals.filter((signal) => !quarantinedActiveTensions.includes(signal));
     tensions.resolved_tensions = (tensions.resolved_tensions ?? []).filter((resolved) => !quarantinedResolvedTensions.includes(resolved));
-    await this.saveTensions(tensions);
+    writes.push({ file: "tension_log.json", content: JSON.stringify(tensions) });
 
-    const entities: Record<string, IndexEntry> = {};
+    let previousIndex: ResourceIndex = { entities: {} };
+    try { previousIndex = JSON.parse(await readFile(dataPath("index.json"), "utf8")); }
+    catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
+    if (!previousIndex.entities || typeof previousIndex.entities !== "object" || Array.isArray(previousIndex.entities)) throw new Error("QUARANTINE_INDEX_INVALID");
+    const entities: Record<string, IndexEntry> = { ...previousIndex.entities };
+    for (const [key, value] of Object.entries(entities)) {
+      if (!["feature", "workflow", "data_model"].includes(value.type)) continue;
+      let indexedId = key;
+      try {
+        const uri = new URL(value.uri);
+        const parts = uri.pathname.split("/").filter(Boolean);
+        if (uri.protocol === "dreamgraph:" && uri.hostname === "resource" && parts.length === 2 && parts[0] === value.type) indexedId = decodeURIComponent(parts[1]);
+      } catch { /* Preserve unrelated/unknown index addresses instead of guessing identity. */ }
+      if (affectedNodeIds.has(indexedId)) delete entities[key];
+    }
     for (const f of nextFeatures.filter((e) => !("_schema" in e))) {
       entities[f.id] = { type: "feature", uri: `dreamgraph://resource/feature/${f.id}`, name: f.name, source_repo: f.source_repo };
     }
@@ -2421,10 +1617,9 @@ class CognitiveEngine {
       };
     }
     const index: ResourceIndex = { entities };
-    await withFileLock("index.json", async () => {
-      await atomicWriteFile(dataPath("index.json"), JSON.stringify(index, null, 2));
-    });
-    invalidateCache("index.json");
+    writes.push({ file: "index.json", content: JSON.stringify(index, null, 2) });
+    await commitGraphWrites({ writes, actor: "source_less_quarantine", cause: "graph_maintenance", result: { quarantine_file: quarantineFilename, affected_ids: [...affectedNodeIds] } });
+    writes.forEach(w => invalidateCache(w.file));
 
     const result: SourceLessFactQuarantineResult = {
       quarantined_nodes: quarantinedNodes.length,
@@ -2465,8 +1660,14 @@ class CognitiveEngine {
   }
 
   async clearTensions(): Promise<void> {
-    await this.saveTensions(this.emptyTensionFile());
-    logger.info("Tension log cleared");
+    await this.mutateTensions(data=>{
+      const now=new Date().toISOString();
+      for(const signal of data.signals){riskEvent(signal,"expired","Explicit attention reset; correctness unverified",undefined,now);
+        (data.resolved_tensions??=[]).push({id:`${signal.id}@resolution:${signal.lifecycle_history!.at(-1)!.id}`,tension_id:signal.id,resolved_at:now,resolved_by:"system",resolution_type:"expired_unverified",
+          resolution_state:"expired_unverified",evidence:"Explicit attention reset; original history retained",original:structuredClone(signal)});}
+      const changed=data.signals.length>0;data.signals=[];return {result:undefined,changed};
+    });
+    logger.info("Tension attention cleared; history retained");
   }
 
   async clearHistory(): Promise<void> {
@@ -2685,79 +1886,21 @@ class CognitiveEngine {
    * `ValidatedEdge`, removes the candidate's `ValidationResult`, persists
    * both files, and emits `candidate.promoted`.
    */
-  async userPromoteCandidate(
-    dreamId: string,
-  ): Promise<{
-    edge: ValidatedEdge | null;
-    affected_ids: string[];
-    candidate?: ValidationResult;
-  }> {
-    const candidates = await this.loadCandidateEdges();
-    const idx = candidates.results.findIndex((r) => r.dream_id === dreamId);
-    if (idx === -1) return { edge: null, affected_ids: [dreamId] };
-    const candidate = candidates.results[idx];
-
-    const dreamGraph = await this.loadDreamGraph();
-    const dreamEdge = dreamGraph.edges.find((e) => e.id === dreamId);
-    if (!dreamEdge) {
-      logger.warn(
-        `userPromoteCandidate: dream edge ${dreamId} missing from dream_graph.json — cannot promote`,
-      );
-      return { edge: null, affected_ids: [dreamId], candidate };
-    }
-
-    // Build a ValidatedEdge from the dream edge + the candidate's score.
-    const promotedAt = new Date().toISOString();
-    const validatedType: ValidatedEdge["type"] =
-      dreamEdge.type === "feature" || dreamEdge.type === "workflow" || dreamEdge.type === "data_model"
-        ? dreamEdge.type
-        : "feature";
-    const validatedEdge: ValidatedEdge = {
-      id: `validated_${dreamEdge.id}`,
-      from: dreamEdge.from,
-      to: dreamEdge.to,
-      type: validatedType,
-      relation: dreamEdge.relation,
-      description: dreamEdge.reason,
-      confidence: candidate.confidence,
-      plausibility: candidate.plausibility,
-      evidence_score: candidate.evidence_score,
-      origin: "rem",
-      status: "validated",
-      evidence_summary: candidate.reason,
-      evidence_count: candidate.evidence_count,
-      reinforcement_count: dreamEdge.reinforcement_count,
-      dream_cycle: dreamEdge.dream_cycle,
-      normalization_cycle: candidate.normalization_cycle,
-      validated_at: promotedAt,
-    };
-
-    const validated = await this.loadValidatedEdges();
-    validated.edges.push(validatedEdge);
-    validated.metadata.last_validation = promotedAt;
-    validated.metadata.total_validated = validated.edges.length;
-    await this.saveValidatedEdges(validated);
-
-    candidates.results.splice(idx, 1);
-    candidates.metadata.last_normalization = promotedAt;
-    await this.saveCandidateEdges(candidates);
-
-    logger.info(`User-promoted candidate ${dreamId} → validated edge`);
-    graphEventBus.emit("candidate.promoted", {
-      affected_ids: [validatedEdge.from, validatedEdge.to].filter(Boolean) as string[],
-      payload: {
-        from: validatedEdge.from,
-        to: validatedEdge.to,
-        confidence: validatedEdge.confidence,
-        actor: "user",
-      },
+  async userPromoteCandidate(dreamId: string, options: { reason?: string; actor?: string; operation_id?: string;
+    expected_revision?: string | null } = {}): Promise<{ edge: ValidatedEdge | null; affected_ids: string[]; candidate?: ValidationResult }> {
+    return withGraphReconciliation(async () => {
+      const candidates = await this.loadCandidateEdges();
+      const candidate = candidates.results.filter(r => r.dream_id === dreamId && r.dream_type === "edge").sort((a,b) => b.normalization_cycle - a.normalization_cycle)[0];
+      if (!candidate) return { edge: null, affected_ids: [dreamId] };
+      const graph = await this.loadDreamGraph(), row = graph.edges.find(e => e.id === dreamId);
+      if (!row) return { edge: null, affected_ids: [dreamId], candidate };
+      await curateGraph({ target_id: dreamId, target_type: "edge", action: "assert", actor: options.actor ?? "operator",
+        reason: options.reason ?? "Operator explicitly accepted this relationship as a human assertion", operation_id: options.operation_id,
+        expected_revision: options.expected_revision === undefined ? (await loadPublicationState()).revision.graph_revision : options.expected_revision });
+      const edge = (await this.loadValidatedEdges()).edges.find(e => e.id === `validated_${dreamId}`)!;
+      graphEventBus.emit("candidate.promoted", { affected_ids: [row.from, row.to], payload: { from: row.from, to: row.to, actor: "human", assertion_class: "human_assertion" } });
+      return { edge, affected_ids: [dreamId, row.from, row.to], candidate };
     });
-
-    return {
-      edge: validatedEdge,
-      affected_ids: [dreamId, validatedEdge.from, validatedEdge.to].filter(Boolean) as string[],
-      candidate,
-    };
   }
 
   /**
@@ -2765,47 +1908,29 @@ class CognitiveEngine {
    * and persist). Does not delete — provenance is preserved. Emits
    * `candidate.rejected`.
    */
-  async userRejectCandidate(
-    dreamId: string,
-  ): Promise<{ candidate: ValidationResult | null; affected_ids: string[] }> {
-    const candidates = await this.loadCandidateEdges();
-    const candidate = candidates.results.find((r) => r.dream_id === dreamId);
-    if (!candidate) return { candidate: null, affected_ids: [dreamId] };
-
-    candidate.status = "rejected";
-    candidates.metadata.last_normalization = new Date().toISOString();
-    await this.saveCandidateEdges(candidates);
-
-    logger.info(`User-rejected candidate ${dreamId}`);
-    graphEventBus.emit("candidate.rejected", {
-      affected_ids: [dreamId],
-      payload: {
-        dream_id: dreamId,
-        dream_type: candidate.dream_type,
-      },
+  async userRejectCandidate(dreamId: string, options: { reason?: string; actor?: string; operation_id?: string;
+    expected_revision?: string | null; target_type?: "edge" | "node" } = {}): Promise<{ candidate: ValidationResult | null; affected_ids: string[] }> {
+    return withGraphReconciliation(async () => {
+      const candidates = await this.loadCandidateEdges();
+      const matches = candidates.results.filter(r => r.dream_id === dreamId && (!options.target_type || r.dream_type === options.target_type));
+      if (new Set(matches.map(r => r.dream_type)).size > 1) throw new Error("CURATION_TYPED_TARGET_REQUIRED");
+      const candidate = matches.sort((a,b) => b.normalization_cycle - a.normalization_cycle)[0];
+      if (!candidate) return { candidate: null, affected_ids: [dreamId] };
+      const revision = (await loadPublicationState()).revision.graph_revision;
+      await curateGraph({ target_id: dreamId, target_type: candidate.dream_type, action: "reject", actor: options.actor ?? "operator",
+        reason: options.reason ?? "Operator explicitly rejected this candidate", operation_id: options.operation_id,
+        expected_revision: options.expected_revision === undefined ? revision : options.expected_revision });
+      const updated = { ...candidate, status: "rejected" as const, reason: options.reason ?? "Operator explicitly rejected this candidate" };
+      graphEventBus.emit("candidate.rejected", { affected_ids: [dreamId], payload: { dream_id: dreamId, dream_type: candidate.dream_type } });
+      return { candidate: updated, affected_ids: [dreamId] };
     });
-
-    return { candidate, affected_ids: [dreamId] };
   }
+
 }
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-/** Normalize an edge into a canonical key for deduplication.
- *  Key = sorted(from, to) + relation base (strip "strengthened_", "reverse_of_", etc.)
- */
-function normalizeEdgeKey(edge: DreamEdge): string {
-  const pair = [edge.from, edge.to].sort().join("|");
-  // Strip common prefixes that indicate the same underlying relationship
-  const baseRelation = edge.relation
-    .replace(/^strengthened_/, "")
-    .replace(/^reverse_of_/, "")
-    .replace(/^potential_/, "")
-    .replace(/^cross_domain_bridge_\w+_\w+$/, "cross_domain_bridge");
-  return `${pair}:${baseRelation}`;
-}
 
 // ---------------------------------------------------------------------------
 // Singleton export

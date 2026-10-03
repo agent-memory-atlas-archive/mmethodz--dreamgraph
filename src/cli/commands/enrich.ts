@@ -79,7 +79,7 @@ Options:
                             Multiple targets enrich the complete graph for relation context.
   --batch-size <n>          Nodes per LLM call during enrichment (default: 10, max: 50).
   --max-nodes <n>           Hard cap on nodes enriched per invocation (default: 1000000).
-  --max-hops <0-6>          Maximum enrichment graph hops in both passes (default: 3).
+  --max-hops <0-6>          Maximum enrichment graph hops in both passes (default: 2).
                             0 omits graph neighbors; source/node evidence is still used.
   --model-source <source>   auto, standalone, or architect (default: auto).
   --no-semantic-cache      Disable enriched-neighborhood evidence reuse.
@@ -250,7 +250,8 @@ Options:
         }
         if (d.batches_run != null) console.log(`  Batches run:        ${d.batches_run}`);
         if (d.llm_calls != null) console.log(`  LLM calls:          ${d.llm_calls}`);
-        if (d.tokens_used != null) console.log(`  Tokens used:        ${d.tokens_used}`);
+        console.log(`  Reported output tokens: ${d.tokens_used ?? "unavailable"}`);
+        if (d.stopped_reason) console.log(`  Stopped: ${d.stopped_reason}; unfinished work is checkpointed.`);
         if (Array.isArray(d.errors) && d.errors.length > 0) {
           console.log(`  Errors (${d.errors.length}):`);
           for (const e of d.errors.slice(0, 5)) console.log(`    - ${String(e)}`);

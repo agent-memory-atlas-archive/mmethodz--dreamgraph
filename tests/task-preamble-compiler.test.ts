@@ -1,3 +1,4 @@
+import { installOfflineAdmissionFixtures } from "./helpers/offline-admission.js";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -81,6 +82,8 @@ afterEach(async () => {
   }
 });
 
+installOfflineAdmissionFixtures({ directory: false });
+
 describe("compileTaskPreamble", () => {
   it("does not fail or add prompt context when no provider and no evidence are available", async () => {
     initLlmProvider(noProviderConfig);
@@ -163,9 +166,9 @@ describe("compileTaskPreamble", () => {
   });
 });
 
-describe("getCognitivePreamble adaptive_future", () => {
+describe("explicit legacy getCognitivePreamble adaptive_future comparison", () => {
   it("omits advisory next steps when no bounded preamble evidence qualifies", async () => {
-    const result = await getCognitivePreamble(120);
+    const result = await getCognitivePreamble(120, "legacy");
 
     expect(result.adaptive_future).toMatchObject({
       surface: "get_cognitive_preamble",
@@ -192,7 +195,7 @@ describe("getCognitivePreamble adaptive_future", () => {
       ],
     });
 
-    const result = await getCognitivePreamble(160);
+    const result = await getCognitivePreamble(160, "legacy");
 
     expect(result.adaptive_future?.next_steps).toEqual([]);
     expect(result.adaptive_future?.validation_failures).toEqual([
@@ -239,7 +242,7 @@ describe("getCognitivePreamble adaptive_future", () => {
       },
     });
 
-    const result = await getCognitivePreamble(20);
+    const result = await getCognitivePreamble(20, "legacy");
 
     expect(result.adaptive_future?.next_steps).toEqual([
       expect.objectContaining({

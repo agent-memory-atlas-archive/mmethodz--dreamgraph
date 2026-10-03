@@ -18,9 +18,14 @@ def add_common_args(p: argparse.ArgumentParser) -> None:
     g.add_argument("--data-dir", help="Path to a data directory (escape hatch; bypasses the registry).")
     g.add_argument("--master-dir", help="Override the master directory (default: $DREAMGRAPH_MASTER_DIR or ~/.dreamgraph).")
     p.add_argument("--json", action="store_true", help="Emit JSON instead of a human-readable summary.")
+    p.add_argument("--snapshot", help="Immutable core analytics export; overrides instance/data-dir selection.")
+    p.add_argument("--legacy", action="store_true", help="Explicit unverified compatibility mode for raw legacy stores; no canonical revision or currentness claim.")
 
 
 def resolve_data_dir_from_args(args: argparse.Namespace) -> Path:
+    from . import loader
+    if getattr(args,"legacy",False): loader.allow_legacy()
+    if getattr(args,"snapshot",None):return Path(args.snapshot).resolve()
     return inst_mod.resolve_data_dir(
         instance=getattr(args, "instance", None),
         data_dir=getattr(args, "data_dir", None),
@@ -34,6 +39,8 @@ def emit(result: dict, args: argparse.Namespace, *, render) -> None:
         json.dump(result, sys.stdout, indent=2, default=str)
         sys.stdout.write("\n")
     else:
+        print(f"Definition {result.get('definition',{}).get('version','unknown')}: {result.get('definition',{}).get('interpretation','unverified')}")
+        print(f"Snapshot: {result.get('snapshot',{}).get('state',{})}; canonical measurement: {result.get('measurement')}")
         render(result)
 
 

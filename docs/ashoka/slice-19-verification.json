@@ -1,0 +1,59 @@
+{
+  "schema": "dreamgraph.ashoka.slice_verification.v1",
+  "slice": 19,
+  "status": "verified",
+  "native_review": {
+    "status": "compliant",
+    "declared_entries": 22,
+    "matched": 22,
+    "gaps": 0,
+    "regressions": 0,
+    "decision": "accept",
+    "source_audit_id": "tc_1790861370948_rzuty6"
+  },
+  "recorded_at": "2026-10-01T13:34:25.102Z",
+  "root": {
+    "command": "npx vitest run --maxWorkers=4 --reporter=json --outputFile=docs/ashoka/slice-19-qualified-tests.json",
+    "files": 142,
+    "passed": 1589,
+    "failed": 0,
+    "skipped": 2
+  },
+  "extension": {
+    "build": "passed",
+    "passed": 488,
+    "failed": 0,
+    "build_evidence": "slice-19-extension-build.log",
+    "test_evidence": "slice-19-extension-tests.log"
+  },
+  "server_build": "passed",
+  "catalog": {
+    "tools": 93,
+    "resources": 31,
+    "classifications": 94
+  },
+  "contracts": 31,
+  "baseline": 10,
+  "provider_artifact": "r3",
+  "configuration": {
+    "typed": 308,
+    "literal": 101
+  },
+  "source_audit": "slice-19-source-audit.json",
+  "focused_evidence": [
+    "slice-19-qualified-focused-tests.json",
+    "slice-19-final-risk-tests.json"
+  ],
+  "preserved_failures": [
+    "slice-19-first-tests.json",
+    "slice-19-risk-tests.json",
+    "slice-19-final-focused-tests.json"
+  ],
+  "limits": [
+    "Offline/disposable core dependency qualification; no paid provider/live graph rewrite or global installation.",
+    "Generic risk resolution requires human disposition; only declared connection predicates have qualified independent automatic verification.",
+    "Legacy remediation executor lacks a bound effect receipt; its dispatched action remains unknown and parent jobs retain recovery ownership.",
+    "Adaptive futures/proposal selections and imported/derived claims remain advisory, never source evidence.",
+    "Consumer25, legacy migration26, usefulness27 and synchronized release28 remain required."
+  ]
+}

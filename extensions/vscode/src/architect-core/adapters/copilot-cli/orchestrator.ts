@@ -519,6 +519,7 @@ export async function runCopilotCli(
       onStdoutChunk: stdoutTap,
       onStderrChunk: input.onStderrChunk,
     };
+    input.abortSignal?.throwIfAborted();
     const spawn = await deps.process.spawn(spawnInput);
 
     // Drain any partial trailing line the spawn may have left buffered.

@@ -10,7 +10,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { LoggingMessageNotificationSchema } from "@modelcontextprotocol/sdk/types.js";
-import * as vscode from "vscode";
+import type * as vscode from "vscode";
 import { EXTENSION_VERSION } from "./version.js";
 
 /* ------------------------------------------------------------------ */
@@ -21,11 +21,14 @@ export class McpClient implements vscode.Disposable {
   private _client: Client | null = null;
   private _transport: StreamableHTTPClientTransport | null = null;
   private _baseUrl: string;
+  private _connecting: Promise<void> | null = null;
+  private _pendingClient: Client | null = null;
+  private _generation = 0;
 
   /** External listener for server log/progress messages (set by ChatPanel). */
   public onServerLog: ((level: string, message: string) => void) | null = null;
 
-  constructor(baseUrl: string) {
+  constructor(baseUrl: string, private readonly authority?: { readonly sessionBearer: string }) {
     this._baseUrl = baseUrl;
   }
 
@@ -39,52 +42,72 @@ export class McpClient implements vscode.Disposable {
    * Establish an MCP session with the daemon.
    */
   async connect(): Promise<void> {
-    await this.disconnect();
-
-    this._transport = new StreamableHTTPClientTransport(
+    if (this._client) return;
+    if (this._connecting) return this._connecting;
+    const generation = this._generation;
+    const transport = new StreamableHTTPClientTransport(
       new URL(`${this._baseUrl}/mcp`),
+      this.authority ? { requestInit: { headers: { "X-DreamGraph-Session": this.authority.sessionBearer } } } : undefined,
     );
-
-    this._client = new Client(
+    const client = new Client(
       { name: "dreamgraph-vscode", version: EXTENSION_VERSION },
       { capabilities: {} },
     );
-
-    await this._client.connect(this._transport);
-
-    // Subscribe to server log notifications and forward to the external listener
-    this._client.setNotificationHandler(
+    this._pendingClient = client;
+    client.onclose = () => {
+      if (this._client === client) { this._client = null; this._transport = null; }
+    };
+    client.setNotificationHandler(
       LoggingMessageNotificationSchema,
       (notification) => {
-        if (this.onServerLog) {
+        if (generation === this._generation && this.onServerLog) {
           const p = notification.params;
           const msg = typeof p.data === 'string' ? p.data : JSON.stringify(p.data);
           this.onServerLog(p.level, msg);
         }
       },
     );
+    const connecting = (async () => {
+      try {
+        await client.connect(transport);
+        if (generation !== this._generation) throw new Error("MCP_CONNECTION_SUPERSEDED");
+        this._client = client;
+        this._transport = transport;
+      } catch (error) {
+        await client.close().catch(() => undefined);
+        throw error;
+      }
+    })();
+    this._connecting = connecting;
+    try { await connecting; }
+    finally {
+      if (this._connecting === connecting) this._connecting = null;
+      if (this._pendingClient === client) this._pendingClient = null;
+    }
   }
 
   /**
    * Close the MCP session gracefully.
    */
   async disconnect(): Promise<void> {
-    if (this._client) {
-      try {
-        await this._client.close();
-      } catch {
-        // Best-effort close
-      }
-      this._client = null;
-      this._transport = null;
-    }
+    this._generation++;
+    const clients = new Set([this._client, this._pendingClient]);
+    // Invalidate before awaiting close so an old handshake cannot overwrite a new one.
+    this._client = null;
+    this._pendingClient = null;
+    this._transport = null;
+    this._connecting = null;
+    await Promise.all([...clients].map(client => client?.close().catch(() => undefined)));
   }
 
   /**
    * Update the MCP endpoint URL (e.g. after port change).
    */
   updateBaseUrl(url: string): void {
+    if (url === this._baseUrl) return;
+    if (this.authority) throw new Error("MCP_WORKER_AUTHORITY_ENDPOINT_BOUND");
     this._baseUrl = url;
+    void this.disconnect();
   }
 
   /**
@@ -130,12 +153,30 @@ export class McpClient implements vscode.Disposable {
     timeoutMs = 300_000,
     onprogress?: (message: string, progress: number, total?: number) => void,
   ): Promise<unknown> {
-    this._ensureConnected();
-    const result = await this._client!.callTool(
+    const result = await this.callToolRaw(name, args, timeoutMs, onprogress);
+    // Convenience projection for legacy UI readers. Agent execution must use callToolRaw.
+    if (result.content && Array.isArray(result.content)) {
+      const textParts = result.content
+        .filter((c: { type: string }) => c.type === "text")
+        .map((c: { type: string; text: string }) => c.text);
+      if (textParts.length === 1) {
+        try { return JSON.parse(textParts[0]); } catch { return textParts[0]; }
+      }
+      return textParts.length > 0 ? textParts : result.content;
+    }
+    return result;
+  }
+
+  /** Whole owner result, including errors, metadata, structured content and receipts. */
+  async callToolRaw(name: string, args: Record<string, unknown> = {}, timeoutMs = 300_000,
+    onprogress?: (message: string, progress: number, total?: number) => void, signal?: AbortSignal) {
+    this._ensureConnected(); signal?.throwIfAborted();
+    return this._client!.callTool(
       { name, arguments: args },
       undefined,
       {
         timeout: timeoutMs,
+        ...(signal ? { signal } : {}),
         ...(onprogress
           ? {
               onprogress: (p: { progress: number; total?: number; message?: string }) => {
@@ -145,24 +186,6 @@ export class McpClient implements vscode.Disposable {
           : {}),
       },
     );
-    // MCP tool results have a `content` array; extract text content
-    if (result.content && Array.isArray(result.content)) {
-      const textParts = result.content
-        .filter(
-          (c: { type: string }) => c.type === "text",
-        )
-        .map((c: { type: string; text: string }) => c.text);
-      if (textParts.length === 1) {
-        // Try to parse as JSON
-        try {
-          return JSON.parse(textParts[0]);
-        } catch {
-          return textParts[0];
-        }
-      }
-      return textParts.length > 0 ? textParts : result.content;
-    }
-    return result;
   }
 
   /* ---- Resource Reads ---- */

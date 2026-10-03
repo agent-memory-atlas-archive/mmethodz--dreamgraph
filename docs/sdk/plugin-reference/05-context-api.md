@@ -17,6 +17,7 @@ interface PluginContext {
   readonly archetypes:     PluginArchetypesSurface;
   readonly markdownFences: PluginMarkdownFencesSurface;
   readonly architect:      PluginArchitectSurface;
+  readonly graph:          GraphContextPort;
   readonly signal:         AbortSignal;
 }
 ```
@@ -179,3 +180,6 @@ import {
 ```
 
 Each `define*` simply returns its argument with the matching type.
+Tool and resource invocation contexts include an unload/unregister/request/execution-aware `signal`. This requests cancellation; it does not attest private work termination. `ctx.graph` remains the capability-gated canonical read port documented in [Plugin Context](../plugin-context.md), with unattested delivery. No host approval or worker credential is added to `ctx`.
+
+Contributed handlers can return complete MCP tool/resource results. The host preserves original error flags, literal content/media, structured data and owner metadata, while retaining the legacy text wrapper for ordinary strings/objects. Explicit failure objects remain failed results. Invalid or over-bound whole results are rejected without clipping. Callback settlement, cancellation requested and private effect status are separate; inspect owner receipts for effects. Seven actual manager/MCP/modern-boundary cases qualify these semantics; full executor/usefulness qualification remains open.

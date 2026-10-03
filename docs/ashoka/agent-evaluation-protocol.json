@@ -1,0 +1,926 @@
+{
+  "schema": "dreamgraph.agent_evaluation_protocol.v1",
+  "version": "ashoka.GE16.v1",
+  "frozen_at": "2026-09-30T23:25:16Z",
+  "baseline_revision": 7,
+  "baseline_sha256": "d8acba015369963165acef92ad8933a02608efeb8fbde036a10d32857fec3521",
+  "task_ids": [
+    "dreamgraph:AT01",
+    "dreamgraph:AT02",
+    "dreamgraph:AT03",
+    "dreamgraph:AT04",
+    "dreamgraph:AT05",
+    "dreamgraph:AT06",
+    "web64-react:AT01",
+    "web64-react:AT02",
+    "web64-react:AT03",
+    "web64-react:AT04",
+    "web64-react:AT05",
+    "web64-react:AT06"
+  ],
+  "task_labels": [
+    {
+      "id": "dreamgraph:AT01",
+      "family": "AT01",
+      "project": "dreamgraph",
+      "prompt": "Recover the governed current slice, a blocker and the next eligible slice from a revisioned test plan; ignore another session selection.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "authoritative_plan_id",
+        "current_slice_id",
+        "blocker",
+        "last_verified_checkpoint",
+        "resume_reason"
+      ],
+      "forbidden_assertions": [
+        "completion inferred from prose",
+        "pending first slice reported as running",
+        "another session selection used as authority"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "plan": {
+          "id": "fixture:dreamgraph:plan",
+          "revision": 3,
+          "lifecycle": "implementing",
+          "current_slice_ids": [
+            "fixture:dreamgraph:plan:blocked"
+          ],
+          "running_slice_ids": [],
+          "last_verified_slice_id": "fixture:dreamgraph:plan:done",
+          "slices": [
+            {
+              "id": "fixture:dreamgraph:plan:done",
+              "status": "verified",
+              "depends_on": [],
+              "evidence_ids": [
+                "checkpoint:done"
+              ],
+              "blockers": []
+            },
+            {
+              "id": "fixture:dreamgraph:plan:blocked",
+              "status": "blocked",
+              "depends_on": [
+                "fixture:dreamgraph:plan:done"
+              ],
+              "evidence_ids": [],
+              "blockers": [
+                "required source unavailable"
+              ]
+            },
+            {
+              "id": "fixture:dreamgraph:plan:dependent",
+              "status": "pending",
+              "depends_on": [
+                "fixture:dreamgraph:plan:blocked"
+              ],
+              "evidence_ids": [],
+              "blockers": []
+            },
+            {
+              "id": "fixture:dreamgraph:plan:independent",
+              "status": "pending",
+              "depends_on": [
+                "fixture:dreamgraph:plan:done"
+              ],
+              "evidence_ids": [],
+              "blockers": []
+            }
+          ]
+        },
+        "other_session_selection": "fixture:dreamgraph:plan:dependent",
+        "historical_checkpoint": {
+          "slice_id": "fixture:dreamgraph:plan:done",
+          "status": "verified"
+        }
+      },
+      "expected": {
+        "plan_id": "fixture:dreamgraph:plan",
+        "current_slice_ids": [
+          "fixture:dreamgraph:plan:blocked"
+        ],
+        "running_slice_ids": [],
+        "next_slice_ids": [
+          "fixture:dreamgraph:plan:independent"
+        ],
+        "last_verified_slice_id": "fixture:dreamgraph:plan:done",
+        "preserved_blocker": "required source unavailable"
+      }
+    },
+    {
+      "id": "dreamgraph:AT02",
+      "family": "AT02",
+      "project": "dreamgraph",
+      "prompt": "Explain scan-to-publication-to-agent retrieval, distinguishing scan and graph revisions.",
+      "mandatory_evidence_ids": [
+        "dg-scan",
+        "dg-rag"
+      ],
+      "required_outcomes": [
+        "required_source_anchors",
+        "correct_boundary",
+        "unsupported_parts_disclosed"
+      ],
+      "forbidden_assertions": [
+        "wrong source attribution",
+        "unsupported architecture relationship"
+      ],
+      "fixture_kind": "source-reviewed project task",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "query": "Explain scan-to-publication-to-agent retrieval, distinguishing scan and graph revisions.",
+        "required_evidence_ids": [
+          "dg-scan",
+          "dg-rag"
+        ],
+        "token_budgets": [
+          100,
+          500,
+          2000
+        ],
+        "distractors": {
+          "count": 300,
+          "prefix": "fixture:dreamgraph:unrelated:",
+          "description": "Unrelated UI styling and build configuration."
+        }
+      },
+      "expected": {
+        "mandatory_anchors": [
+          "dg-scan",
+          "dg-rag"
+        ],
+        "if_evidence_cannot_fit": "explicit_insufficiency_or_continuation",
+        "unsupported_claim_count": 0
+      }
+    },
+    {
+      "id": "dreamgraph:AT03",
+      "family": "AT03",
+      "project": "dreamgraph",
+      "prompt": "Classify a mixed graph containing a source assertion, human assertion, dream, validated insight, decision and tension.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "origin_classification",
+        "confidence_not_independent_evidence",
+        "shared_ancestry",
+        "contradiction"
+      ],
+      "forbidden_assertions": [
+        "hypothesis promoted by confidence",
+        "tension called a proven defect",
+        "circulated evidence counted twice"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "records": [
+          {
+            "id": "source",
+            "source_repo": "dreamgraph",
+            "source_files": [
+              "fixture/source.ts"
+            ],
+            "source_verified": false,
+            "confidence": 1
+          },
+          {
+            "id": "human",
+            "origin": "lucid",
+            "confidence": 1
+          },
+          {
+            "id": "dream",
+            "origin": "rem",
+            "confidence": 1,
+            "inspiration": [
+              "source"
+            ]
+          },
+          {
+            "id": "validated",
+            "kind": "validated",
+            "evidence_ancestry": [
+              "source"
+            ],
+            "confidence": 0.9
+          },
+          {
+            "id": "decision",
+            "kind": "adr",
+            "decided_by": "human"
+          },
+          {
+            "id": "tension",
+            "kind": "tension",
+            "description": "Possible contradiction",
+            "entities": [
+              "source",
+              "dream"
+            ]
+          }
+        ],
+        "independent_source_groups": [
+          [
+            "source",
+            "dream",
+            "validated"
+          ]
+        ]
+      },
+      "expected": {
+        "class_by_id": {
+          "source": "source_assertion",
+          "human": "human_assertion",
+          "dream": "hypothesis",
+          "validated": "validated_insight",
+          "decision": "decision",
+          "tension": "tension"
+        },
+        "independent_source_count": 1,
+        "proven_defect": false
+      }
+    },
+    {
+      "id": "dreamgraph:AT04",
+      "family": "AT04",
+      "project": "dreamgraph",
+      "prompt": "Retrieve DreamGraph schedule dispatch/ownership without dashboard styling noise.",
+      "mandatory_evidence_ids": [
+        "dg-scheduler"
+      ],
+      "required_outcomes": [
+        "required_source_anchors",
+        "scope",
+        "within_budget",
+        "omissions"
+      ],
+      "forbidden_assertions": [
+        "mandatory anchor lost",
+        "false completeness",
+        "relevant evidence buried in noise"
+      ],
+      "fixture_kind": "source-reviewed project task",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "query": "Retrieve DreamGraph schedule dispatch/ownership without dashboard styling noise.",
+        "required_evidence_ids": [
+          "dg-scheduler"
+        ],
+        "token_budgets": [
+          100,
+          500,
+          2000
+        ],
+        "distractors": {
+          "count": 300,
+          "prefix": "fixture:dreamgraph:unrelated:",
+          "description": "Unrelated UI styling and build configuration."
+        }
+      },
+      "expected": {
+        "mandatory_anchors": [
+          "dg-scheduler"
+        ],
+        "if_evidence_cannot_fit": "explicit_insufficiency_or_continuation",
+        "unsupported_claim_count": 0
+      }
+    },
+    {
+      "id": "dreamgraph:AT05",
+      "family": "AT05",
+      "project": "dreamgraph",
+      "prompt": "Apply an authorized mutation to disposable state, lose the reply, retry, conflict and read back.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "durable_receipt",
+        "same_revision_readback",
+        "single_effect",
+        "stale_write_rejected",
+        "recoverable_interruption"
+      ],
+      "forbidden_assertions": [
+        "success before commit",
+        "duplicate effect",
+        "unrelated state overwritten"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "instance_id": "fixture:dreamgraph",
+        "actor": "fixture:authorized-agent",
+        "operation_id": "fixture:mutation:1",
+        "before": {
+          "features": []
+        },
+        "requested_delta": {
+          "features": [
+            {
+              "id": "fixture:added",
+              "source_repo": "dreamgraph",
+              "source_files": [
+                "fixture/source.ts"
+              ]
+            }
+          ]
+        },
+        "interruptions": [
+          "before_publication",
+          "after_publication_reply_lost"
+        ],
+        "retry_same_payload": true,
+        "conflicting_payload": {
+          "features": []
+        }
+      },
+      "expected": {
+        "before_publication": "rolled_back",
+        "after_publication": "committed",
+        "retry": "same_receipt",
+        "conflicting_payload": "identity_conflict",
+        "effect_count": 1
+      }
+    },
+    {
+      "id": "dreamgraph:AT06",
+      "family": "AT06",
+      "project": "dreamgraph",
+      "prompt": "Use incomplete or changed evidence; distinguish an old full scan from a concrete scope gap.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "scoped_limit",
+        "no_age_only_staleness",
+        "unknown_is_unknown",
+        "justified_abstention",
+        "recovery"
+      ],
+      "forbidden_assertions": [
+        "bluffing",
+        "old scan equated with stale graph",
+        "recent unrelated dream hides source gap"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "last_full_scan_at": "2001-01-01T00:00:00Z",
+        "managed_source_revision": "source:3",
+        "covered_scope": [
+          "fixture/source.ts"
+        ],
+        "concrete_gap": {
+          "path": "fixture/other.ts",
+          "expected_hash": "sha256:before",
+          "observed_hash": "sha256:after"
+        },
+        "unrelated_recent_dream": {
+          "scope": [
+            "fixture/unrelated.ts"
+          ],
+          "graph_revision": "graph:4"
+        },
+        "unavailable_source": "fixture/missing.ts"
+      },
+      "expected": {
+        "covered_scope_freshness": "current",
+        "changed_scope_freshness": "stale",
+        "unavailable_source_freshness": "unknown",
+        "age_only_warning": false,
+        "unrelated_dream_closes_gap": false
+      }
+    },
+    {
+      "id": "web64-react:AT01",
+      "family": "AT01",
+      "project": "web64-react",
+      "prompt": "Recover the governed current slice, a blocker and the next eligible slice from a revisioned test plan; ignore another session selection.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "authoritative_plan_id",
+        "current_slice_id",
+        "blocker",
+        "last_verified_checkpoint",
+        "resume_reason"
+      ],
+      "forbidden_assertions": [
+        "completion inferred from prose",
+        "pending first slice reported as running",
+        "another session selection used as authority"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "plan": {
+          "id": "fixture:web64-react:plan",
+          "revision": 3,
+          "lifecycle": "implementing",
+          "current_slice_ids": [
+            "fixture:web64-react:plan:blocked"
+          ],
+          "running_slice_ids": [],
+          "last_verified_slice_id": "fixture:web64-react:plan:done",
+          "slices": [
+            {
+              "id": "fixture:web64-react:plan:done",
+              "status": "verified",
+              "depends_on": [],
+              "evidence_ids": [
+                "checkpoint:done"
+              ],
+              "blockers": []
+            },
+            {
+              "id": "fixture:web64-react:plan:blocked",
+              "status": "blocked",
+              "depends_on": [
+                "fixture:web64-react:plan:done"
+              ],
+              "evidence_ids": [],
+              "blockers": [
+                "required source unavailable"
+              ]
+            },
+            {
+              "id": "fixture:web64-react:plan:dependent",
+              "status": "pending",
+              "depends_on": [
+                "fixture:web64-react:plan:blocked"
+              ],
+              "evidence_ids": [],
+              "blockers": []
+            },
+            {
+              "id": "fixture:web64-react:plan:independent",
+              "status": "pending",
+              "depends_on": [
+                "fixture:web64-react:plan:done"
+              ],
+              "evidence_ids": [],
+              "blockers": []
+            }
+          ]
+        },
+        "other_session_selection": "fixture:web64-react:plan:dependent",
+        "historical_checkpoint": {
+          "slice_id": "fixture:web64-react:plan:done",
+          "status": "verified"
+        }
+      },
+      "expected": {
+        "plan_id": "fixture:web64-react:plan",
+        "current_slice_ids": [
+          "fixture:web64-react:plan:blocked"
+        ],
+        "running_slice_ids": [],
+        "next_slice_ids": [
+          "fixture:web64-react:plan:independent"
+        ],
+        "last_verified_slice_id": "fixture:web64-react:plan:done",
+        "preserved_blocker": "required source unavailable"
+      }
+    },
+    {
+      "id": "web64-react:AT02",
+      "family": "AT02",
+      "project": "web64-react",
+      "prompt": "Explain the Web64 compiler/runtime boundary: compileWeb64IdeProject produces program artifacts; handoffProgram passes program bytes to runtime.loadMedia after readiness.",
+      "mandatory_evidence_ids": [
+        "web-compiler",
+        "web-handoff"
+      ],
+      "required_outcomes": [
+        "required_source_anchors",
+        "correct_boundary",
+        "unsupported_parts_disclosed"
+      ],
+      "forbidden_assertions": [
+        "wrong source attribution",
+        "unsupported architecture relationship"
+      ],
+      "fixture_kind": "source-reviewed project task",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "query": "Explain the Web64 compiler/runtime boundary: compileWeb64IdeProject produces program artifacts; handoffProgram passes program bytes to runtime.loadMedia after readiness.",
+        "required_evidence_ids": [
+          "web-compiler",
+          "web-handoff"
+        ],
+        "token_budgets": [
+          100,
+          500,
+          2000
+        ],
+        "distractors": {
+          "count": 300,
+          "prefix": "fixture:web64-react:unrelated:",
+          "description": "Unrelated UI styling and build configuration."
+        }
+      },
+      "expected": {
+        "mandatory_anchors": [
+          "web-compiler",
+          "web-handoff"
+        ],
+        "if_evidence_cannot_fit": "explicit_insufficiency_or_continuation",
+        "unsupported_claim_count": 0
+      }
+    },
+    {
+      "id": "web64-react:AT03",
+      "family": "AT03",
+      "project": "web64-react",
+      "prompt": "Classify a mixed graph containing a source assertion, human assertion, dream, validated insight, decision and tension.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "origin_classification",
+        "confidence_not_independent_evidence",
+        "shared_ancestry",
+        "contradiction"
+      ],
+      "forbidden_assertions": [
+        "hypothesis promoted by confidence",
+        "tension called a proven defect",
+        "circulated evidence counted twice"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "records": [
+          {
+            "id": "source",
+            "source_repo": "web64-react",
+            "source_files": [
+              "fixture/source.ts"
+            ],
+            "source_verified": false,
+            "confidence": 1
+          },
+          {
+            "id": "human",
+            "origin": "lucid",
+            "confidence": 1
+          },
+          {
+            "id": "dream",
+            "origin": "rem",
+            "confidence": 1,
+            "inspiration": [
+              "source"
+            ]
+          },
+          {
+            "id": "validated",
+            "kind": "validated",
+            "evidence_ancestry": [
+              "source"
+            ],
+            "confidence": 0.9
+          },
+          {
+            "id": "decision",
+            "kind": "adr",
+            "decided_by": "human"
+          },
+          {
+            "id": "tension",
+            "kind": "tension",
+            "description": "Possible contradiction",
+            "entities": [
+              "source",
+              "dream"
+            ]
+          }
+        ],
+        "independent_source_groups": [
+          [
+            "source",
+            "dream",
+            "validated"
+          ]
+        ]
+      },
+      "expected": {
+        "class_by_id": {
+          "source": "source_assertion",
+          "human": "human_assertion",
+          "dream": "hypothesis",
+          "validated": "validated_insight",
+          "decision": "decision",
+          "tension": "tension"
+        },
+        "independent_source_count": 1,
+        "proven_defect": false
+      }
+    },
+    {
+      "id": "web64-react:AT04",
+      "family": "AT04",
+      "project": "web64-react",
+      "prompt": "Retrieve Web64 emulator speed policy without compiler or color-picker noise.",
+      "mandatory_evidence_ids": [
+        "web-speed"
+      ],
+      "required_outcomes": [
+        "required_source_anchors",
+        "scope",
+        "within_budget",
+        "omissions"
+      ],
+      "forbidden_assertions": [
+        "mandatory anchor lost",
+        "false completeness",
+        "relevant evidence buried in noise"
+      ],
+      "fixture_kind": "source-reviewed project task",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "query": "Retrieve Web64 emulator speed policy without compiler or color-picker noise.",
+        "required_evidence_ids": [
+          "web-speed"
+        ],
+        "token_budgets": [
+          100,
+          500,
+          2000
+        ],
+        "distractors": {
+          "count": 300,
+          "prefix": "fixture:web64-react:unrelated:",
+          "description": "Unrelated UI styling and build configuration."
+        }
+      },
+      "expected": {
+        "mandatory_anchors": [
+          "web-speed"
+        ],
+        "if_evidence_cannot_fit": "explicit_insufficiency_or_continuation",
+        "unsupported_claim_count": 0
+      }
+    },
+    {
+      "id": "web64-react:AT05",
+      "family": "AT05",
+      "project": "web64-react",
+      "prompt": "Apply an authorized mutation to disposable state, lose the reply, retry, conflict and read back.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "durable_receipt",
+        "same_revision_readback",
+        "single_effect",
+        "stale_write_rejected",
+        "recoverable_interruption"
+      ],
+      "forbidden_assertions": [
+        "success before commit",
+        "duplicate effect",
+        "unrelated state overwritten"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "instance_id": "fixture:web64-react",
+        "actor": "fixture:authorized-agent",
+        "operation_id": "fixture:mutation:1",
+        "before": {
+          "features": []
+        },
+        "requested_delta": {
+          "features": [
+            {
+              "id": "fixture:added",
+              "source_repo": "web64-react",
+              "source_files": [
+                "fixture/source.ts"
+              ]
+            }
+          ]
+        },
+        "interruptions": [
+          "before_publication",
+          "after_publication_reply_lost"
+        ],
+        "retry_same_payload": true,
+        "conflicting_payload": {
+          "features": []
+        }
+      },
+      "expected": {
+        "before_publication": "rolled_back",
+        "after_publication": "committed",
+        "retry": "same_receipt",
+        "conflicting_payload": "identity_conflict",
+        "effect_count": 1
+      }
+    },
+    {
+      "id": "web64-react:AT06",
+      "family": "AT06",
+      "project": "web64-react",
+      "prompt": "Use incomplete or changed evidence; distinguish an old full scan from a concrete scope gap.",
+      "mandatory_evidence_ids": [],
+      "required_outcomes": [
+        "scoped_limit",
+        "no_age_only_staleness",
+        "unknown_is_unknown",
+        "justified_abstention",
+        "recovery"
+      ],
+      "forbidden_assertions": [
+        "bluffing",
+        "old scan equated with stale graph",
+        "recent unrelated dream hides source gap"
+      ],
+      "fixture_kind": "disposable contract state",
+      "rubric_version": "ashoka.tasks.v1",
+      "execution_status": "not_run",
+      "input": {
+        "last_full_scan_at": "2001-01-01T00:00:00Z",
+        "managed_source_revision": "source:3",
+        "covered_scope": [
+          "fixture/source.ts"
+        ],
+        "concrete_gap": {
+          "path": "fixture/other.ts",
+          "expected_hash": "sha256:before",
+          "observed_hash": "sha256:after"
+        },
+        "unrelated_recent_dream": {
+          "scope": [
+            "fixture/unrelated.ts"
+          ],
+          "graph_revision": "graph:4"
+        },
+        "unavailable_source": "fixture/missing.ts"
+      },
+      "expected": {
+        "covered_scope_freshness": "current",
+        "changed_scope_freshness": "stale",
+        "unavailable_source_freshness": "unknown",
+        "age_only_warning": false,
+        "unrelated_dream_closes_gap": false
+      }
+    }
+  ],
+  "source_evidence": [
+    {
+      "id": "dg-scan",
+      "project": "dreamgraph",
+      "file": "src/tools/scan-project.ts",
+      "semantic_anchor": "export async function runScanProject",
+      "line": 730,
+      "source_sha256": "cb8fdab36a4e35b2af3cca4d15a476953e5f5d7d05c38066c9db8459b823987f",
+      "excerpt": "export async function runScanProject(opts: RunScanOptions = {}): Promise<ScanProjectResult> {\n  return withGraphOperation(\"scan\", () => executeScanProject(opts));\n}\n\nasync function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResult> {\n  const contextHops = parseEnrichmentContextHops(opts.context_hops);\n  const VALID_TARGETS = [\"features\", \"workflows\", \"data_model\", \"ui\"];\n  const depth = opts.depth ?? \"deep\";\n  const targetList = opts.targets ?? [...VALID_TARGETS];\n  const repos = opts.repos;\n\n  // Validate targets\n  const invalidTargets = targetList.filter(t => !VALID_TARGETS.includes(t));\n  if (invalidTargets.length > 0) {\n    throw new Error(`Invalid target(s): ${invalidTargets.join(\", \")}. Must be one of: ${VALID_TARGETS.join(\", \")}`);\n  }\n\n  // ---- Progress helper ----\n  let _step = 0;\n  const _totalSteps = 2 + targetList.length + 1;\n  function progress(message: string): void {\n    _step++;\n    logger.info(`scan_project: ${message}`);\n    opts.onProgress?.(message, _step, _totalSteps);\n  }\n\n  // Validate repos\n  const availableRepos = Object.keys(config.repos);\n  if (availableRepos.length === 0) {\n    throw new Error(\"No repositories configured. Set project root or DREAMGRAPH_REPOS.\");\n  }\n  const targetRepos = repos ?? availableRepos;\n  const unknown = targetRepos.filter(r => !config.repos[r]);\n  if (unknown.length > 0) {\n    throw new Error(`Unknown repos: ${unknown.join(\", \")}. Available: ${availableRepos.join(\", \")}`);\n  }",
+      "excerpt_sha256": "a70f5f667aa7e47b5eef79023626c015d56db40f7b8eb1257bba8fa707396378",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "dg-rag",
+      "project": "dreamgraph",
+      "file": "src/cognitive/graph-rag.ts",
+      "semantic_anchor": "export async function",
+      "line": 59,
+      "source_sha256": "e9524b9dda721678d85ddd71b7dc8b867275b1d52a7b993a7768407b7a5b0fff",
+      "excerpt": "export async function graphRagRetrieve(input: GraphRAGQuery): Promise<GraphRAGContext> {\n  if (input.representation === \"legacy\" || !input.representation && process.env.DG_GRAPH_CONTEXT_REPRESENTATION === \"legacy\") {\n    if (input.mandatory_identities?.length || input.mandatory_evidence_ids?.length || input.changed_files?.length ||\n      input.kinds?.length || input.domains?.length || input.repositories?.length || input.assertion_classes?.length ||\n      input.plan_id || input.slice_id || input.execution_id || input.adapter && input.adapter !== \"unbound\" ||\n      input.max_neighbors !== undefined && input.max_neighbors !== 20 || input.max_records !== undefined && input.max_records !== 40 ||\n      input.metadata_budget_bytes !== undefined && input.metadata_budget_bytes !== 32768 || input.depth === 0) {\n      throw new Error(\"LEGACY_CONTEXT_CONTROL_UNSUPPORTED: use canonical retrieval for filters, required anchors, receipts and cardinality limits\");\n    }\n    return { ...await legacyGraphRagRetrieve(input), representation: \"legacy\", limitations: [\n      \"Legacy comparison: only features/workflows/data models, validated edges, tensions and story; raw IDs may collide and token counts are estimates.\",\n    ] };\n  }\n  const { representation: _representation, ...query } = input;\n  const pack = await canonicalContext(query);\n  return {\n    representation: \"canonical\", context_pack: pack, context_text: pack.context_text,\n    entities_included: pack.records.filter(record => record.record_type === \"entity\").map(record => record.id),\n    edges_included: pack.records.filter(record => record.record_type === \"relationship\").length,\n    tensions_included: pack.records.filter(record => record.identity?.kind === \"tension\").length,\n    narrative_chapters_included: pack.records.filter(record => record.identity?.kind === \"narrative\").length,\n    token_count: pack.token_count, retrieval_mode: input.mode ?? \"comprehensive\", relevance_scores: [],\n    limitations: [\"Token counts are UTF-8 byte upper bounds; selection reasons are in context_pack.records. The receipt attests assembly, not adapter delivery.\"],\n  };\n}\n\n// ---------------------------------------------------------------------------\n// Token estimation (chars / 4 heuristic â€” conservative)\n// ---------------------------------------------------------------------------\n\nfunction estimateTokens(text: string): number {\n  return Math.ceil(text.length / 4);",
+      "excerpt_sha256": "c4bdddbe0d245d41e674eb1f5181fe0d2dc8e11419a12706c4cfbea8f1f471f9",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "dg-scheduler",
+      "project": "dreamgraph",
+      "file": "src/cognitive/scheduler.ts",
+      "semantic_anchor": "export async function runScheduleNow",
+      "line": 1078,
+      "source_sha256": "86be44e6a362552445098a2f3f2b98b45aa335608157883351abfae0d4b14836",
+      "excerpt": "export async function runScheduleNow(scheduleId: string): Promise<ScheduleExecution> {\n  // Phase 1: snapshot the schedule under the file lock and stamp it as\n  // in-flight so a concurrent tick cannot also pick it up. Released before\n  // executeAction starts so UI calls remain responsive even if the action\n  // takes 30+ seconds (LLM round-trip).\n  const snapshot = await withFileLock(\"schedules.json\", async () => {\n    const file = await loadScheduleFile();\n    const schedule = file.schedules.find((s) => s.id === scheduleId);\n    if (!schedule) {\n      throw new Error(`Schedule not found: ${scheduleId}`);\n    }\n    if (inFlightSchedules.has(scheduleId)) {\n      throw new Error(`Schedule already running: ${schedule.name}`);\n    }\n    inFlightSchedules.add(scheduleId);\n    const claim: ScheduleClaim = {\n      scheduleId: schedule.id,\n      scheduleName: schedule.name,\n      action: schedule.action,\n      startTime: Date.now(),\n      schedule: { ...schedule },\n    };\n    return claim;\n  });\n\n  // Phase 2: execute under the cognitive-execution mutex (no file lock).\n  let resultSummary = \"\";\n  let success = true;\n  let errorMsg: string | undefined;\n\n  try {\n    await withFileLock(SCHEDULER_EXEC_LOCK, async () => {\n      try {\n        logger.info(`Scheduler (forced): ${snapshot.scheduleName} (${snapshot.action})`);\n        resultSummary = await executeActionWithTimeout(snapshot.schedule);\n      } catch (err) {\n        success = false;\n        errorMsg = err instanceof Error ? err.message : String(err);\n        resultSummary = `Error: ${errorMsg}`;\n      }\n    });\n  } finally {\n    inFlightSchedules.delete(scheduleId);\n  }\n\n  // Phase 3: write the execution record back. We rebuild the execution\n  // object here (rather than relying on writeBackExecution) so we can return\n  // the manual-execution id with its `_manual_` infix, preserving the\n  // public surface of this function.\n  return withFileLock(\"schedules.json\", async () => {\n    const file = await loadScheduleFile();\n    const schedule = file.schedules.find((s) => s.id === scheduleId);\n    const completedAt = new Date();\n    const duration = completedAt.getTime() - snapshot.startTime;\n\n    if (schedule) {\n      if (success) {\n        schedule.error_count = 0;\n        schedule.last_error = null;\n      } else {\n        schedule.error_count++;\n        schedule.last_error = errorMsg ?? \"unknown error\";\n      }\n      schedule.last_run_at = completedAt.toISOString();\n      schedule.run_count++;\n      schedule.updated_at = completedAt.toISOString();\n      computeNextRun(schedule);\n    }\n\n    const execution: ScheduleExecution = {",
+      "excerpt_sha256": "0631d1e9a021a697052c473fd4f1d06fed150e83c014b6e770b0daa56a99ac55",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "dg-evidence",
+      "project": "dreamgraph",
+      "file": "src/cognitive/evidence-ledger.ts",
+      "semantic_anchor": "export function buildCandidateEvidenceLedger",
+      "line": 89,
+      "source_sha256": "0ebcd3eb9b026ab189197c45436619329594b1a1872b341bdaaac2cc621856ee",
+      "excerpt": "export function buildCandidateEvidenceLedger(args: {\n  result: ValidationResult;\n  trust: CognitiveTrustDescriptor;\n  model?: string | null;\n  fallbackReason?: string | null;\n}): EvidenceLedger {\n  const groups = emptyEvidenceGroups();\n  const evidence = args.result.evidence;\n\n  for (const entity of evidence.shared_entities) {\n    pushEntry(groups, {\n      id: `${args.result.dream_id}:entity:${entity}`,\n      source_class: \"source_entity\",\n      summary: \"Shared fact-graph entity used as semantic validation evidence.\",\n      semantic_anchor: entity,\n      optional_hints: [],\n    });\n  }\n  for (const workflow of evidence.shared_workflows) {\n    pushEntry(groups, {\n      id: `${args.result.dream_id}:workflow:${workflow}`,\n      source_class: \"workflow\",\n      summary: \"Workflow overlap used as semantic validation evidence.\",\n      semantic_anchor: workflow,\n      optional_hints: [],\n    });\n  }\n  if (evidence.source_repo_match) {\n    pushEntry(groups, {\n      id: `${args.result.dream_id}:runtime:source-repo-match`,\n      source_class: \"runtime_observation\",\n      summary: \"Candidate endpoints share source repository provenance.\",\n      semantic_anchor: \"validation.evidence.source_repo_match\",\n      optional_hints: [],\n    });\n  }\n  pushEntry(groups, {\n    id: `${args.result.dream_id}:model:${args.result.normalization_cycle}`,\n    source_class: \"model_output\",\n    summary: args.result.reason,\n    semantic_anchor: args.result.reason_code,\n    optional_hints: [\n      `confidence:${args.result.confidence}`,\n      `plausibility:${args.result.plausibility}`,\n      `evidence_score:${args.result.evidence_score}`,\n      `contradiction_score:${args.result.contradiction_score}`,\n    ],\n  });\n\n  return {\n    claim_id: args.result.dream_id,\n    claim_type: \"candidate\",\n    trust: args.trust,\n    semantic_anchors: anchorsFromValidationEvidence(evidence),\n    grouped_evidence: groups,\n    validation: {\n      status: args.result.status,\n      reason_code: args.result.reason_code,\n      reason: args.result.reason,\n      evidence_count: args.result.evidence_count,\n    },\n    provenance: {\n      model: args.model ?? null,\n      strategy: args.result.strategy ?? null,\n      normalization_cycle: args.result.normalization_cycle,",
+      "excerpt_sha256": "fb1fad7bba40136ac457d2e5ccdc4cdc7315294a8bcd5f2a13fc68e28b24f328",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "web-compiler",
+      "project": "web64-react",
+      "file": "src/web64-ide/compiler.mjs",
+      "semantic_anchor": "export function compileWeb64IdeProject",
+      "line": 31,
+      "source_sha256": "b39fc4c1747fafcebca3e7da76738a0a78141e57c33cb9bf94c27208ba7fab9b",
+      "excerpt": "export function compileWeb64IdeProject(project = {}, options = {}) {\n    const origin = normalizeAddress(options.origin ?? project.origin ?? project.main?.origin ?? DEFAULT_LOAD_ADDRESS, DEFAULT_LOAD_ADDRESS);\n    let projectSource = '';\n    let fileStore = null;\n    try {\n        projectSource = normalizeProjectSource(project);\n        const hasCInputs = hasWeb64CInputs(project);\n        const requestedAssemblyDialect = options.assemblyDialect\n            ?? project.assemblyDialect\n            ?? project.assembler?.dialect\n            ?? (project.kickAssemblerCompatibilityMode === true ? KICK5_ASSEMBLY_DIALECT : undefined);\n        const assemblyDialect = hasCInputs ? 'web64-native' : requestedAssemblyDialect;\n        const kickCompatibilityEnabled = assemblyDialect === KICK5_ASSEMBLY_DIALECT;\n        const compatibilitySelection = normalizeC64libCompatibilityModules(kickCompatibilityEnabled\n            ? []\n            : project.compatibilityModules || project.c64libCompatibility?.modules || []);\n        const compatibilityManifest = createC64libCompatibilityManifest(compatibilitySelection.modules);\n        const compatibilityFiles = createC64libCompatibilityVirtualFiles(compatibilitySelection.modules);\n        const kickLibraryFiles = kickCompatibilityEnabled ? createWeb64KickC64libVirtualFiles() : [];\n        fileStore = createProjectFileStore(project, { ...options, compatibilityFiles, kickLibraryFiles });\n        const compatibilityUsageSource = [projectSource, ...fileStore.records.map((record) => record.source || '')].join('\\n');\n        let buildGraph = null;\n        let cCompiled = null;\n        let assemblyRuntimeModules = [];\n        let imported = null;\n        let compatibilityRuntime = Object.freeze({ source: '', routines: Object.freeze([]), zeroPageClaims: Object.freeze([]), diagnostics: Object.freeze([]) });\n        let source = '';\n        let sourceOrigins = [];\n        const rootPath = project.path || project.fileName || project.name || 'main.asm';\n        if (hasCInputs) {\n            buildGraph = createWeb64BuildGraph({ ...project, files: [...(project.files || []), ...fileStore.records] }, options);\n            cCompiled = compileWeb64CProject(project, { ...options, buildGraph });\n            const assemblyBundle = collectAssemblySourceForBuild(isLikelyWeb64CSource(projectSource) ? '' : projectSource, fileStore, rootPath, project.compileInputs);\n            const cBundle = {\n                source: cCompiled.assemblySource || '',\n                lineOrigins: (cCompiled.instructionRecords || []).map((record) => record.provenance || null)\n            };\n            const generatedAssetBundle = createGeneratedCAssetSourceBundle(cCompiled, assemblyBundle);",
+      "excerpt_sha256": "80502cacb876f09903d40f09423014491da2234e82c17f13832a2a19d723fb25",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "web-handoff",
+      "project": "web64-react",
+      "file": "src/web64-ide/runtime-handoff.mjs",
+      "semantic_anchor": "export async function handoffProgram",
+      "line": 9,
+      "source_sha256": "78c0b54666d3b74b6ddd34653a96c23bb0a5ccab3a30b227773f6d3f643ee317",
+      "excerpt": "export async function handoffProgram(runtime, bytes, metadata = {}, options = {}) {\n    if (!runtime || typeof runtime.loadMedia !== 'function') {\n        throw new TypeError('runtime must expose loadMedia(media)');\n    }\n    await ensureRuntimeReady(runtime, options);\n    const programBytes = normalizeProgramBytes(bytes);\n    const name = String(options.fileName || metadata.fileName || metadata.name || `${metadata.artifactId || 'web64-ide'}.prg`);\n    const media = Object.freeze({\n        name,\n        kind: 'program',\n        bytes: programBytes,\n        autorun: options.autorun !== false,\n        metadata: freezeMetadata(metadata)\n    });\n    const record = await runtime.loadMedia(media);\n    return Object.freeze({\n        ok: true,\n        record,\n        media,\n        artifactId: metadata.artifactId || null,\n        loadAddress: metadata.loadAddress ?? readPrgLoadAddress(programBytes),\n        byteLength: programBytes.byteLength,\n        autorun: media.autorun\n    });\n}\n\nexport async function ensureRuntimeReady(runtime, options = {}) {\n    if (!runtime || runtime.state !== 'created') {\n        return runtime;\n    }",
+      "excerpt_sha256": "74b5a2ca8452fd47100b06ba46122345d12c49108eafeb1b3782c3fb6fc2e4fd",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "web-speed",
+      "project": "web64-react",
+      "file": "src/web64-emulator-speed.mjs",
+      "semantic_anchor": "export const WEB64_EMULATOR_SPEED_MULTIPLIERS",
+      "line": 1,
+      "source_sha256": "40d75610025912034eebf89720cd3b79d196ed68ceb3ad05daf4339957d429ec",
+      "excerpt": "export const WEB64_EMULATOR_SPEED_MULTIPLIERS = Object.freeze([1, 2, 4, 8, 16]);\n\nexport function normalizeEmulatorSpeedMultiplier(value) {\n  const multiplier = Number(value);\n  return WEB64_EMULATOR_SPEED_MULTIPLIERS.includes(multiplier) ? multiplier : 1;\n}\n\nexport function emulatorSpeedResourceValue(value) {\n  return String(normalizeEmulatorSpeedMultiplier(value) * 100);\n}",
+      "excerpt_sha256": "36c4ab6b3a54315c93f05bca5f6c0e94d8a97a5855d04c8507575eb7c1da5024",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    },
+    {
+      "id": "web-compile-worker",
+      "project": "web64-react",
+      "file": "src/web64-compile.worker.mjs",
+      "semantic_anchor": "self.onmessage",
+      "line": 12,
+      "source_sha256": "52a8b7c0d6038dbf64e08971a7ac6770e2a1a81e3edb7374b9da4d7d70bdba0d",
+      "excerpt": "self.onmessage = async (event) => {\n    const request = event.data || {};\n    if (request.type === 'selection-timing') {\n        try {\n            if (!selectionTimingService) {\n                const { createSelectionTimingService } = await import('./web64-ide/selection-timing.mjs');\n                selectionTimingService ||= createSelectionTimingService(() => latestResult);\n            }\n            const summary = await selectionTimingService(request);\n            self.postMessage({ type: 'selection-timing-result', selectionId: request.selectionId, summary });\n        } catch {\n            self.postMessage({ type: 'selection-timing-result', selectionId: request.selectionId, summary: { status: 'unavailable' } });\n        }\n        return;\n    }\n    if (request.type === 'reset-kick-cache') {\n        kickCompilationCache.clear();\n        latestResult = null;\n        selectionTimingService?.reset();\n        self.postMessage({ type: 'kick-cache-reset', id: request.id });\n        return;\n    }\n    if (request.type === 'compile-targets') {\n        try {\n            const result = await compileWeb64BuildTargetsAsync(request.project || {}, {",
+      "excerpt_sha256": "af828c712743db38a21aae4404f13500d7505fc3cc05a865f449723293c003a0",
+      "origin": "source",
+      "review": "executor source review; no model-generated corroboration"
+    }
+  ],
+  "matched_conditions": [
+    "provider",
+    "model",
+    "api",
+    "effort",
+    "prompt_version",
+    "source_manifest_hash",
+    "context_tokens",
+    "output_tokens",
+    "max_calls",
+    "max_elapsed_ms",
+    "retention",
+    "currency",
+    "max_amount"
+  ],
+  "order": "alternate graph_first/source_first over repeats",
+  "repetitions": 50,
+  "context_budget_sweep": [
+    100,
+    500,
+    2000,
+    10000
+  ],
+  "default_execution": "offline_fixture; no provider construction or credentials",
+  "real_model_status": "unqualified until Slice 6 admission and Slice 25 composition; run at Slice 27 with declared budget",
+  "rubric": {
+    "mandatory": "Every required outcome/evidence anchor passes; forbidden/unsupported/stale assertions fail independently. Tiny budgets explicitly report insufficiency; omitted mandatory evidence never passes.",
+    "understanding": "0 absent, 1 partial, 2 correct relevant account, 3 correct constraint/history/relationship informing a sound next decision; independent named reviewer and rationale required.",
+    "material_gain": "No automatic score/proxy claim. Final review must name recovered constraint/relationship/history and improved decision in each established project; publish ties and regressions.",
+    "cost": "actual optional input/cached/output/reasoning usage and verified reads; unknown remains unknown; construction cost separate"
+  },
+  "latency": {
+    "corpus": "frozen source excerpts plus 300 explicitly synthetic distractors; real local timing over representative task queries, not production/model latency",
+    "reference": "rebuild transient index on each query before identical context packing",
+    "comparison": "reuse content-bound index before identical context packing",
+    "max_p95_ms": 500,
+    "max_p95_ratio": 2,
+    "additive_jitter_ms": 10,
+    "mandatory_selection_differences": 0
+  },
+  "limitations": [
+    "Existing source-reviewed labels are retained verbatim, not reclassified after measurements.",
+    "Offline fixtures prove mechanisms and rubric; final established-instance paired agent gains are still unmeasured.",
+    "Cross-platform latency and real provider/CLI behavior require later explicit qualification."
+  ],
+  "measurement_revision": {
+    "version": 2,
+    "context_bytes": "Exact UTF-8 count and independent byte ceiling",
+    "context_tokens": "Model input allowance; arm context count unavailable unless qualified tokenizer measures it",
+    "output_bytes": "Explicit independent response byte safety ceiling",
+    "output_tokens": "Provider reported output usage only, never bytes divided by a constant",
+    "cancellation": "Execution and assessor receive abort; bounded waiting does not acknowledge underlying termination"
+  }
+}

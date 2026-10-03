@@ -1,4 +1,4 @@
-# Installing DreamGraph v12.1.0 "Living DreamGraph"
+# Installing DreamGraph
 
 One-command install from source. Builds the MCP server, deploys the `dg` CLI globally, serves the architect beta through the daemon, and installs the VS Code extension with DreamGraph Explorer.
 
@@ -38,7 +38,7 @@ bash scripts/install.sh
 That's it. After install, open a **new terminal** and run:
 
 ```bash
-dg --version          # DreamGraph CLI v12.1.0 (Living DreamGraph)
+dg --version          # Shows the installed release
 dg --help             # Show all commands
 ```
 
@@ -48,12 +48,16 @@ dg --help             # Show all commands
 
 1. **Checks prerequisites** -- Node.js >= 20, npm available
 2. **Builds** -- Runs `npm install` + `npm run build` (TypeScript compilation)
-3. **Deploys to `~/.dreamgraph/bin/`** -- Copies compiled `dist/`, creates a production-only `package.json`, runs `npm install --omit=dev`
+3. **Deploys to `~/.dreamgraph/bin/`** -- Copies compiled `dist/`, retains runtime and optional dependencies, runs `npm install --omit=dev`, and verifies installed workspace bytes and daemon imports
 4. **Copies templates** -- Default instance templates to `~/.dreamgraph/templates/`
 5. **Installs VS Code extension** -- Packages a VSIX, installs via `code --install-extension`, then installs runtime dependencies
 6. **Creates command shims** -- `dg` and `dreamgraph` wrappers on PATH
 7. **Configures PATH** -- Windows: adds to user PATH. Linux/macOS: creates shims in `~/.local/bin` or `/usr/local/bin`
 8. **Verifies** -- Runs `dg --version` to confirm everything works
+
+The optional isolated browser runtime is pinned to `playwright-core@1.62.1`. Installation does not download a browser or enable Computer Use. An explicitly selected browser must pass the installed [worker qualification](docs/ashoka/computer-use.md) before activation.
+
+WSL uses Linux Node/npm and its own `$HOME/.dreamgraph` installation. Keep the source checkout on the Linux filesystem and check any `DREAMGRAPH_MASTER_DIR` override. Installing there does not update the Windows daemon. WSL browser proof does not establish native desktop support on a separate Linux machine.
 
 ---
 
@@ -166,7 +170,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 1. Check the extension is installed: Extensions sidebar > search "DreamGraph"
 2. If missing, the installer may have skipped it (VS Code `code` CLI not in PATH)
-3. Manual install: `code --install-extension extensions/vscode/dreamgraph-vscode-8.2.1.vsix`
+3. Manual install after packaging: `code --install-extension extensions/vscode/dreamgraph-vscode-14.0.0.vsix`
 4. Reload VS Code: `Ctrl+Shift+P` > "Reload Window"
 
 ### Extension activation error (missing modules)
@@ -175,11 +179,11 @@ If the extension fails with "Cannot find module '@modelcontextprotocol/sdk'":
 
 ```powershell
 # Windows
-cd "$env:USERPROFILE\.vscode\extensions\siteledger.dreamgraph-vscode-8.2.1"
+cd "$env:USERPROFILE\.vscode\extensions\siteledger-solutions.dreamgraph-vscode-14.0.0"
 npm install --omit=dev
 
 # Linux / macOS
-cd ~/.vscode/extensions/siteledger.dreamgraph-vscode-8.2.1
+cd ~/.vscode/extensions/siteledger-solutions.dreamgraph-vscode-14.0.0
 npm install --omit=dev
 ```
 

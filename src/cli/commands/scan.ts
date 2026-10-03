@@ -35,7 +35,7 @@ must be started first with 'dg start <instance>'.
 Options:
   --depth <shallow|deep>    Scan depth (default: deep)
   --targets <list>          Comma-separated: features,workflows,data_model,ui
-  --max-hops <0-6>          Maximum enrichment graph hops (default: 3; 0 omits neighbors)
+  --max-hops <0-6>          Maximum enrichment graph hops (default: 2; 0 omits neighbors)
   --incremental             Reconcile only repository evidence changed since the baseline
   --dry-run                 Preview the incremental delta without parsing or graph writes
   --json                    Output raw JSON result
@@ -141,7 +141,7 @@ Options:
         if (d.dream_cycle) {
           console.log(`  Dream edges:       ${d.dream_cycle.edges_created ?? 0} created, ${d.dream_cycle.edges_validated ?? 0} validated`);
         }
-        if (d.llm_tokens_used) console.log(`  LLM tokens used:   ${d.llm_tokens_used}`);
+        console.log(`  Reported output tokens: ${d.llm_tokens_used ?? "unavailable"}`);
         if (d.errors?.length > 0) {
           console.log(`\n  Warnings/Errors:`);
           for (const e of d.errors) console.log(`    - ${e}`);

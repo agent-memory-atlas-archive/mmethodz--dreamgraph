@@ -1,0 +1,1600 @@
+{
+  "schema": "dreamgraph.plan_refinement.v1",
+  "plan_id": "graph-trust-and-agent-effectiveness",
+  "revision": 7,
+  "date": "2026-09-30",
+  "implementation_status": "pending",
+  "owner_proposal_sha256": "0af4ef3bb9d7f0739149818860e09e2a7ee9c8988f74f4ae4b75d30c29bfd301",
+  "contract_ids": [
+    "C01",
+    "C02",
+    "C03",
+    "C04",
+    "C05",
+    "C06",
+    "C07",
+    "C08",
+    "C09",
+    "C10",
+    "C11",
+    "C12",
+    "C13",
+    "C14",
+    "C15",
+    "C16",
+    "C17"
+  ],
+  "task_families": [
+    "AT01",
+    "AT02",
+    "AT03",
+    "AT04",
+    "AT05",
+    "AT06"
+  ],
+  "task_projects": [
+    "dreamgraph",
+    "web64-react"
+  ],
+  "task_case_count": 12,
+  "policies": [
+    {
+      "id": "NP01",
+      "title": "Model profiles and enrichment completeness",
+      "contracts": [
+        "C03",
+        "C05",
+        "C06"
+      ],
+      "slices": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "required_proof": "Effective config is previewed/snapshotted; hops and neighborhood/input/spend are separate; useful work survives exhaustion; automatic-dream readiness is unchanged."
+    },
+    {
+      "id": "NP02",
+      "title": "Strong models and useful speculation",
+      "contracts": [
+        "C01",
+        "C08"
+      ],
+      "slices": [
+        9,
+        14,
+        15
+      ],
+      "required_proof": "Confidence or output volume cannot promote weak evidence; unsupported but useful hypotheses remain discoverable."
+    },
+    {
+      "id": "NP03",
+      "title": "Reads, commits and background work",
+      "contracts": [
+        "C03",
+        "C04",
+        "C05",
+        "C15"
+      ],
+      "slices": [
+        1,
+        3,
+        5,
+        6,
+        17
+      ],
+      "required_proof": "Partial/stale reads stay labeled; retries recover receipts; parallel reservations and crash/cancel recovery are tested."
+    },
+    {
+      "id": "NP04",
+      "title": "Legacy clients and browser state",
+      "contracts": [
+        "C02",
+        "C03",
+        "C09",
+        "C14",
+        "C15"
+      ],
+      "slices": [
+        1,
+        11,
+        12,
+        21,
+        25
+      ],
+      "required_proof": "Versioned adapters and reconnect converge on daemon authority; durable jobs survive a tab refresh."
+    },
+    {
+      "id": "NP05",
+      "title": "Coverage versus demonstrated usefulness",
+      "contracts": [
+        "C08",
+        "C15"
+      ],
+      "slices": [
+        0,
+        4,
+        22,
+        27
+      ],
+      "required_proof": "Each important requirement has a test or explicit unverified status; twelve real task cases are separate from structural/enrichment percentages."
+    },
+    {
+      "id": "NP06",
+      "title": "API/CLI model and cost semantics",
+      "contracts": [
+        "C06"
+      ],
+      "slices": [
+        7,
+        8,
+        25
+      ],
+      "required_proof": "Unsupported settings fail visibly; custom-model overrides are validated; API tariffs never masquerade as subscription charges."
+    },
+    {
+      "id": "NP07",
+      "title": "Unknown legacy baselines",
+      "contracts": [
+        "C02",
+        "C10"
+      ],
+      "slices": [
+        2,
+        16,
+        26
+      ],
+      "required_proof": "Unknown history stays unknown; format migration, evidence reconstruction and re-enrichment are separate recoverable jobs."
+    },
+    {
+      "id": "NP08",
+      "title": "Shared identity and confidence meanings",
+      "contracts": [
+        "C01",
+        "C02"
+      ],
+      "slices": [
+        0,
+        2,
+        12,
+        22,
+        25
+      ],
+      "required_proof": "Generated schemas and semantic projection comparisons replace independent interpretations; lossy adapters are disclosed."
+    },
+    {
+      "id": "NP09",
+      "title": "Paid canaries and retention",
+      "contracts": [
+        "C05",
+        "C06",
+        "C09"
+      ],
+      "slices": [
+        6,
+        7,
+        9,
+        10,
+        11
+      ],
+      "required_proof": "No allocation means no paid request; run/day caps reserve in-flight work; source disclosure and retention are independent; full access needs two confirmations."
+    },
+    {
+      "id": "NP10",
+      "title": "Controlled migration and cutover",
+      "contracts": [
+        "C04",
+        "C10"
+      ],
+      "slices": [
+        5,
+        16,
+        26
+      ],
+      "required_proof": "Approval binds revision/delta; restore is tested; writers are fenced; post-cutover writes cannot vanish on rollback."
+    },
+    {
+      "id": "NP11",
+      "title": "Provenance, trust and shared ancestry",
+      "contracts": [
+        "C01",
+        "C04",
+        "C15"
+      ],
+      "slices": [
+        2,
+        15,
+        16,
+        18,
+        19,
+        20
+      ],
+      "required_proof": "Circulating claims do not gain independent evidence; human/source assertions can be stale or unverified; contradictory evidence is retained."
+    },
+    {
+      "id": "NP12",
+      "title": "Compact, understandable UI",
+      "contracts": [
+        "C07",
+        "C11",
+        "C12",
+        "C14",
+        "C16"
+      ],
+      "slices": [
+        21,
+        23,
+        24,
+        29
+      ],
+      "required_proof": "Dense task-oriented controls expose running/blocked/incomplete state and effective policy, with keyboard access and drill-down evidence."
+    },
+    {
+      "id": "NP13",
+      "title": "One living engine",
+      "contracts": [
+        "C01",
+        "C15"
+      ],
+      "slices": [
+        0,
+        13,
+        17,
+        18,
+        19,
+        20,
+        25
+      ],
+      "required_proof": "Extend existing owners; preserve targeted/lucid/adaptive/temporal/causal/federated cognition; remove legacy paths only after consumer migration."
+    },
+    {
+      "id": "NP14",
+      "title": "Computer Use platform, authority and external-effect boundaries",
+      "contracts": [
+        "C17",
+        "C09",
+        "C14",
+        "C15"
+      ],
+      "slices": [
+        8,
+        11,
+        21,
+        25,
+        31,
+        27,
+        28
+      ],
+      "required_proof": "CU01–CU24: qualified CLI-native/API-harness routes, cross-platform semantics, physical-seat isolation, bounded cancellation/spend, honest observation and unknown-effect recovery; no silent route substitution."
+    }
+  ],
+  "slices": [
+    {
+      "number": 0,
+      "title": "Establish the engine alignment contract",
+      "owner": "Core/daemon contract owner",
+      "source_anchors": [
+        "src/graph",
+        "src/types/index.ts",
+        "src/cognitive/types.ts",
+        "packages/sdk",
+        "packages/host"
+      ],
+      "steps": [
+        "Inventory persisted schema versions, semantic concepts, current writers and all 29 consumer families; resolve unknown historical versions explicitly.",
+        "Publish generated schema/SDK artifacts and conformance fixtures from the existing core contract; nominate maintainer review responsibilities for trust, persistence and authority.",
+        "Freeze the twelve task cases and record hashes, mandatory evidence, forbidden assertions and expected outcomes before implementation tuning.",
+        "Freeze the C15 execution-loop invariant, materiality/exception semantics and cross-surface owners; reconcile ADR-047/097/171/172/177/198/207/217/234/236/237 with current paths and required amendments.",
+        "Freeze C16 target/action identities, shared command availability and view-versus-mutation semantics; retain one compact action surface over existing authority rather than inventing another command system.",
+        "Freeze C17 semantic capability/session/target/observation/action/receipt contracts and platform-neutral invariants; keep CLI-native execution distinct from the DreamGraph native-API harness. Record the intended GPT-6.1 Sol implementation executor without constraining product model choice.",
+        "Apply the revision-7 execution handoff: Reviewed C01–C17 types, ADR applicability/amendment disposition, corpus labels and bounded measurement tolerances unblock 2; no claim of all-surface conformance. Required compound evidence: XS01, XS14, XS15."
+      ],
+      "depends_on": [],
+      "findings": [
+        "F21",
+        "F18"
+      ],
+      "trace": "C01,C02,C08,C14,C15,C16,C17; NP05,NP08,NP13; NP14; AT01–AT06",
+      "status": "pending",
+      "id": "slice-0-establish-the-engine-alignment-contract"
+    },
+    {
+      "number": 1,
+      "title": "Make graph responses structured and pageable",
+      "owner": "Core graph query/resource owner",
+      "source_anchors": [
+        "src/resources/register.ts",
+        "src/tools/query-resource.ts",
+        "src/utils/tool-output.ts"
+      ],
+      "steps": [
+        "Inventory consumers of exhaustive JSON and the conflicting capability URI; define version negotiation and a current/previous contract matrix.",
+        "Implement scope/revision/completeness/uncertainty envelopes, cursor continuation and explicit expiry or revision-change errors; counts may be unknown.",
+        "Prove record-union correctness across pages and explicit failure for unsupported clients; preserve distinct empty, partial, stale and unavailable responses.",
+        "Apply the revision-7 execution handoff: All baseline resource families produce whole typed records, explicit empty/partial/unknown/errors and duplicate-free same-revision paging; 3/12 consume this contract. Required compound evidence: XS03, XS13, XS16."
+      ],
+      "depends_on": [
+        0,
+        2
+      ],
+      "findings": [
+        "F01",
+        "F02",
+        "F16"
+      ],
+      "trace": "C02,C03; NP03,NP04; AT02,AT04,AT06",
+      "status": "pending",
+      "id": "slice-1-make-graph-responses-structured-and-pageable"
+    },
+    {
+      "number": 2,
+      "title": "Unify graph identity and read snapshots",
+      "owner": "Core graph/persistence owner",
+      "source_anchors": [
+        "src/graph",
+        "src/types/index.ts",
+        "src/cognitive/strategies/_shared.ts",
+        "src/utils/cache.ts",
+        "src/tools/reconciliation-transaction.ts",
+        "src/utils/graph-reconciliation-barrier.ts",
+        "src/utils/mutex.ts",
+        "src/graph/store.ts",
+        "src/tools/scan-state.ts"
+      ],
+      "steps": [
+        "Map stable typed IDs independently of names and define provenance, validation state, confidence semantics and evidence ancestry.",
+        "Expose one revisioned read model for source facts, human assertions, speculative/validated knowledge and all entity/relationship families.",
+        "Compare old/new projections at the same scope/revision with semantic diffing; flag lossy adapters and keep migration separate from new reads.",
+        "Expose provenance-aware task/role projections and source/entity/evidence dependency indexes so changed scope and stale derived knowledge can be resolved at a committed revision.",
+        "Apply the revision-7 execution handoff: Fault-tested primitive plus same-revision golden projections; old scan with reconciled changes remains current. Unblocks 1/5/7 and supplies validators, not live migration. Required compound evidence: XS02, XS03, XS13, XS21.",
+        "Define canonical last_graph_mutation_at with graph revision/operation identity, separate full-scan and source-reconciliation coverage markers, null legacy values and revision-based ordering."
+      ],
+      "depends_on": [
+        0
+      ],
+      "findings": [
+        "F03",
+        "F17",
+        "F21"
+      ],
+      "trace": "C01,C02,C03,C15; NP08,NP11,NP13; AT02,AT03,AT04",
+      "status": "pending",
+      "id": "slice-2-unify-graph-identity-and-read-snapshots"
+    },
+    {
+      "number": 3,
+      "title": "Provide complete bounded agent retrieval",
+      "owner": "Core retrieval owner",
+      "source_anchors": [
+        "src/cognitive/graph-rag.ts",
+        "src/cognitive/register.ts",
+        "packages/token-economy/src/budget-coordinator.ts"
+      ],
+      "steps": [
+        "Use the shared read model and mandatory evidence reservation; return actual selection/omission reasons and any unknown counts.",
+        "Budget serialized context and metadata separately, including headings, provenance and continuation; enforce neighborhood cardinality independently of hops.",
+        "Test all graph types, relations, permissions, large hubs, tiny budgets and stale scopes; native API/CLI presentation can differ without changing meaning.",
+        "Build the C15 bounded task-context pack and receipt from task intent, canonical plan/slice, changed files, relationships, ADRs, evidence and history; rank optional expansion after mandatory anchors and refresh only relevant changed scope.",
+        "Include bounded UI/application/workflow evidence and previous verified interaction outcomes in C17 task context; preserve source kind, expiry and graph revision rather than reinjecting broad screenshot history.",
+        "Apply the revision-7 execution handoff: Real retrieval budgets/families pass using frozen inputs; GE01–04 retrieval portions pass now. Later client effects and native GUI freshness are mandatory integration evidence, not claimed here. Required compound evidence: XS01, XS07, XS13, XS21."
+      ],
+      "depends_on": [
+        1,
+        2
+      ],
+      "findings": [
+        "F03",
+        "F04"
+      ],
+      "trace": "C03,C08,C15,C17; NP01,NP03,NP04,NP05; NP14; AT02–AT04,AT06",
+      "status": "pending",
+      "id": "slice-3-provide-complete-bounded-agent-retrieval"
+    },
+    {
+      "number": 4,
+      "title": "Index retrieval and evaluate agent usefulness",
+      "owner": "Retrieval/evaluation owner",
+      "source_anchors": [
+        "src/cognitive/graph-rag.ts",
+        "scripts/benchmark-scan-mcp.mjs",
+        "scripts/benchmark-token-economy.mjs"
+      ],
+      "steps": [
+        "Freeze separate DreamGraph and web64-react evidence/task manifests and negative/distractor examples.",
+        "Add revision-keyed indexing and repeatable query instrumentation; preserve Unicode and symbol lookup.",
+        "Evaluate task outcomes, provenance, unsupported claims, abstention, latency and context cost; label synthetic and real measurements separately.",
+        "Build and verify the preregistered paired graph-assisted/source-only AT01–AT06 harness at matched model/source/resource settings; run final composed evaluations after Slice 25 in Slice 27; measure initial understanding, mandatory evidence, verified rereads avoided, total context, latency, unsupported/stale assertions and next-agent recovery, with construction cost separate.",
+        "Apply the revision-7 execution handoff: Index correctness and offline retrieval oracle pass; freeze full GE16/AT matched procedure. Final composed usefulness gains remain required after 25 at 27. Required compound evidence: XS01, XS14, XS16, XS21."
+      ],
+      "depends_on": [
+        3
+      ],
+      "findings": [
+        "F05",
+        "F19"
+      ],
+      "trace": "C08,C15; NP02,NP05; AT01–AT06",
+      "status": "pending",
+      "id": "slice-4-index-retrieval-and-evaluate-agent-usefulness"
+    },
+    {
+      "number": 5,
+      "title": "Commit enrichment and checkpoints coherently",
+      "owner": "Core persistence/enrichment owner",
+      "source_anchors": [
+        "src/tools/enrich-parser-nodes.ts",
+        "src/tools/enrichment-state.ts",
+        "src/utils/atomic-write.ts",
+        "src/graph",
+        "src/tools/incremental-reconciliation.ts",
+        "src/tools/reconciliation-transaction.ts",
+        "src/utils/graph-reconciliation-barrier.ts"
+      ],
+      "steps": [
+        "Define operation identity, expected revision, commit receipt and recovery points for every store involved.",
+        "Commit deltas before success/checkpoint acknowledgment; retries with the same operation identity recover the committed result instead of duplicating it.",
+        "Inject disk failure and lost reply at each boundary, then restart/concurrent curation; expose recovery-required for non-atomic external effects.",
+        "Record material source/docs/config/plan changes, saved working-tree hashes and affected entities as durable obligations; reconcile targeted canonical deltas and invalidation/dirty admission through existing journaled revision/idempotency boundaries, recovering the source-write/graph-write gap.",
+        "Extend existing durable receipt and material-change obligations to C17 observations and GUI effects; distinguish action dispatched, outcome unknown, resulting state verified and graph reconciled. Never blindly retry an ambiguous external GUI mutation.",
+        "Apply the revision-7 execution handoff: Disk/reply/fence faults prove receipt recovery and retained obligations. Schemas permit later CU effects; actual GUI dispatch is deferred to 31. Required compound evidence: XS02, XS03, XS04, XS08, XS09, XS10.",
+        "Publish graph-mutation time atomically with actual graph deltas; failed/no-op writes and replay cannot advance it, and source-reconciliation coverage advances only at its own successful boundary."
+      ],
+      "depends_on": [
+        0,
+        2
+      ],
+      "findings": [
+        "F06"
+      ],
+      "trace": "C04,C15,C17; NP03,NP07,NP10; NP14; AT05,AT06",
+      "status": "pending",
+      "id": "slice-5-commit-enrichment-and-checkpoints-coherently"
+    },
+    {
+      "number": 6,
+      "title": "Bound scan and enrichment cost and recovery",
+      "owner": "Enrichment/job admission owner",
+      "source_anchors": [
+        "src/tools/scan-project.ts",
+        "src/tools/enrich-parser-nodes.ts",
+        "src/tools/enrichment-state.ts",
+        "src/cognitive/llm-readiness.ts"
+      ],
+      "steps": [
+        "Preflight effective role/model/adapter/reasoning/hops, selected-neighbor/input/output/retry limits and job/day allocation.",
+        "Reserve parallel in-flight request costs before dispatch and checkpoint the effective config fingerprint; stop honestly with structural evidence retained.",
+        "Resume only eligible unfinished work under a named policy; distinguish re-enrichment from continuation and retain previous provenance. Preserve the existing automatic-dream completeness gate.",
+        "Apply independent limits to targeted reconciliation/enrichment/digestion, including high-degree one-hop regions; expose unsupported baseline and remaining debt without silently buying a whole-project scan or raising model strength.",
+        "Apply shared run/day admission to C17 model turns, images, input actions, time and retries; enforce worker/native-CLI limits and preserve unknown usage reservations. Keep subscription units separate from API money.",
+        "Apply the revision-7 execution handoff: Offline high-degree, parallel, cancel, retry and restart cases prove finite limits and resumability. CU model/image/action accounting is a fixture contract until 31. Required compound evidence: XS04, XS05, XS09, XS14."
+      ],
+      "depends_on": [
+        5,
+        7,
+        8
+      ],
+      "findings": [
+        "F07"
+      ],
+      "trace": "C05,C06,C15,C17; NP01,NP03,NP09; NP14; AT05,AT06",
+      "status": "pending",
+      "id": "slice-6-bound-scan-and-enrichment-cost-and-recovery"
+    },
+    {
+      "number": 7,
+      "title": "Define role-based model and lifecycle profiles",
+      "owner": "Core configuration/provider-policy owner",
+      "source_anchors": [
+        "src/cognitive/llm.ts",
+        "src/config/config.ts",
+        "src/utils/engine-env.ts"
+      ],
+      "steps": [
+        "Create independently selectable initial-scan, enrichment, dreamer, normalizer and Architect role policies with explicit precedence.",
+        "Separate requested/resolved model, adapter capabilities, pricing policy and provider storage; treat GPT-4.1/GPT-5.4 as examples/saved preferences.",
+        "Expose invalid combinations as actionable errors and keep supported custom endpoints/models; snapshot effective config per job and candidate.",
+        "Add explicit Computer Use model/route and disclosure/retention policy to role profiles without coupling the implementation executor to runtime model choice; CLI-native and native-API billing/retention remain distinct.",
+        "Apply the revision-7 execution handoff: Policy resolver fixtures cover explicit user models/overrides, separate retention/pricing and no permanent GPT ceiling; 8/10 consume it. Required compound evidence: XS05, XS06, XS14."
+      ],
+      "depends_on": [
+        0,
+        2
+      ],
+      "findings": [
+        "F22",
+        "F07",
+        "F13"
+      ],
+      "trace": "C05,C06,C07,C17; NP01,NP06,NP09; NP14; AT03,AT06",
+      "status": "pending",
+      "id": "slice-7-define-role-based-model-and-lifecycle-profiles"
+    },
+    {
+      "number": 8,
+      "title": "Complete Responses and provider capability contracts",
+      "owner": "Provider/adapter owner",
+      "source_anchors": [
+        "src/cognitive/llm.ts",
+        "src/architect/cli-bridge.ts",
+        "extensions/vscode/src"
+      ],
+      "steps": [
+        "Build a capability contract with provenance/version and explicit overrides; model-name patterns alone are not capability evidence.",
+        "Extend current Responses/Chat/Anthropic paths and CLI adapters with effort, schema, incomplete/refusal, cancellation and real usage semantics.",
+        "Validate supported output locally; test explicit fallback approval and guarantees; distinguish API measured/estimated charge from unknown subscription consumption.",
+        "Deliver C15 semantic context/receipt anchors through adapter-native APIs, prompt files or MCP; bind optional continuation/cache state to evidence revisions and never make it the only project-memory copy.",
+        "Negotiate C17 image/tool/native-computer capabilities and versioned OpenAI/Anthropic schemas; native APIs call the DreamGraph harness, while CLI adapters prefer their own native Computer Use. Preserve each route’s native continuation and expose real integration gaps.",
+        "Apply the revision-7 execution handoff: Offline API/CLI fixtures pass. Real CU route control is explicitly unqualified until 31; no circular requirement that a worker already exists. Required compound evidence: XS04, XS10, XS14, XS17."
+      ],
+      "depends_on": [
+        7
+      ],
+      "findings": [
+        "F22",
+        "F26"
+      ],
+      "trace": "C05,C06,C15,C17; NP06,NP09; NP14; AT02,AT03,AT06",
+      "status": "pending",
+      "id": "slice-8-complete-responses-and-provider-capability-contracts"
+    },
+    {
+      "number": 9,
+      "title": "Evaluate mature-graph model policies",
+      "owner": "Cognitive evaluation owner",
+      "source_anchors": [
+        "src/cognitive/strategies/llm-dream.ts",
+        "src/cognitive/normalizer.ts",
+        "src/cognitive/calibration-evaluation.ts"
+      ],
+      "steps": [
+        "Compare fixed evidence/tasks across saved role profiles with frozen prompts/schema versions; include uncertainty, contradiction and genuinely novel hypotheses.",
+        "Measure unsupported promotion, missed contradictions, evidence accuracy and downstream utility alongside cost; repeated/model-consensus evidence shares ancestry.",
+        "Run deterministic fixtures by default; paid canaries require run/day reservations and independent retention/data consent; pin the old profile until acceptance.",
+        "Add optional C17 provider canaries over disposable UI fixtures, separately pinned and budgeted with declared screenshot/DOM disclosure and retention; require task outcome and usage evidence without paid default CI.",
+        "Apply the revision-7 execution handoff: Offline policy/evidence cases and evaluator reproducibility pass; future normalizer/agent/CU superiority is not asserted at this exit. Required compound evidence: XS01, XS05, XS14."
+      ],
+      "depends_on": [
+        4,
+        6,
+        8
+      ],
+      "findings": [
+        "F10",
+        "F19",
+        "F22"
+      ],
+      "trace": "C05,C06,C08,C17; NP02,NP06,NP09,NP11; NP14; AT02,AT03,AT06",
+      "status": "pending",
+      "id": "slice-9-evaluate-mature-graph-model-policies"
+    },
+    {
+      "number": 10,
+      "title": "Validate and persist all configuration",
+      "owner": "Core configuration owner",
+      "source_anchors": [
+        "src/utils/engine-env.ts",
+        "src/server/dashboard.ts",
+        "src/cognitive/scheduler.ts",
+        "src/cognitive/event-router.ts"
+      ],
+      "steps": [
+        "Inventory all consumed/template/documented keys; define typed ranges, units, defaults, source precedence, secrets and hot-reload versus restart semantics.",
+        "Validate and persist an entire candidate config against an expected config revision; expose persisted/requested/effective values without leaking credentials.",
+        "Preview template diff and protected fields, back up then atomically apply; undo checks intervening changes and never resets graph or schedules implicitly.",
+        "Extend the validated setting inventory with C17 enablement, target/worker profiles, route controls, finite action/image/time limits and local/provider retention; upgrade defaults off, preserve secrets and avoid manual engine.env editing.",
+        "Apply the revision-7 execution handoff: Invalid keys/ranges, template previews, atomic disk failure and concurrent undo are tested; no implicit spend/remote/full-access enablement. Required compound evidence: XS06, XS18."
+      ],
+      "depends_on": [
+        0,
+        2,
+        7
+      ],
+      "findings": [
+        "F12",
+        "F13"
+      ],
+      "trace": "C07,C17; NP04,NP09,NP12; configuration and template scenarios; NP14",
+      "status": "pending",
+      "id": "slice-10-validate-and-persist-all-configuration"
+    },
+    {
+      "number": 11,
+      "title": "Isolate sessions and harden transport authority",
+      "owner": "Daemon authority/session owner",
+      "source_anchors": [
+        "src/index.ts",
+        "src/architect/routes.ts",
+        "src/server/dashboard.ts",
+        "src/discipline/session.ts",
+        "packages/host/src/watchdog.ts"
+      ],
+      "steps": [
+        "Default bind to loopback; define authenticated explicit remote mode and visible bind/auth status; reject unsupported unsafe combinations.",
+        "Scope selections/history/provider state/cancel controls by principal, session and execution; retain daemon-owned jobs across browser refresh.",
+        "Add a human-confirmed scoped full-access grant with two explicit confirmations, expiry and revocation; it never removes truth, commit, audit or configured cost limits.",
+        "Provide C17 authenticated worker/native-runtime bindings, session ownership, scope/grant expiry, cancel/pause and recovery. Physical input is arbitrated across daemon instances by interactive seat, not only by one daemon’s mutex.",
+        "Apply the revision-7 execution handoff: Real transport/session/cancel fixtures pass, including full-access finite double confirmation; CU worker/seat behavior is an obligation for 31, not a mocked support claim. Required compound evidence: XS04, XS06, XS07, XS17."
+      ],
+      "depends_on": [
+        0,
+        5,
+        6,
+        7,
+        10
+      ],
+      "findings": [
+        "F14",
+        "F20",
+        "F26"
+      ],
+      "trace": "C09,C17; NP03,NP04,NP09; NP14; AT01,AT05",
+      "status": "pending",
+      "id": "slice-11-isolate-sessions-and-harden-transport-authority"
+    },
+    {
+      "number": 12,
+      "title": "Align the complete MCP catalog and client contracts",
+      "owner": "Daemon MCP contract owner",
+      "source_anchors": [
+        "src/tools",
+        "src/resources/register.ts",
+        "src/cognitive/register.ts",
+        "src/discipline"
+      ],
+      "steps": [
+        "Generate catalogs/SDK schemas and classify effects, idempotency and authority from core; reconcile ADR-123 and existing tool names.",
+        "Conformance-test every tool’s input/result/error/continuation/permission contract with disposable state; avoid duplicating shared suites per transport.",
+        "Test native and bridge serialization, replay and version mismatch; retire legacy presentations only after the published sunset.",
+        "Audit existing tools/resources before extending bounded task-context begin/refresh/change/finish semantics; publish generated contracts/examples and distinguish daemon-enforced actions from unattested external MCP client behavior.",
+        "Expose/reuse versioned command descriptors and eligibility/reason metadata for C16 plan/slice/schedule/ADR/concern targets, including captured identity, relevant revision and existing confirmation/receipt semantics.",
+        "Publish C17 generated semantic contracts and scoped harness operations through the existing registry, while CLI-native tools retain their names and execution mechanism; normalize evidence/status without falsifying missing native telemetry.",
+        "Apply the revision-7 execution handoff: Baseline catalog parity and effect conformance pass now; each later feature registers/tests its contributions in its own slice and 27 closes the final catalog. Required compound evidence: XS03, XS07, XS10, XS13."
+      ],
+      "depends_on": [
+        1,
+        5,
+        8,
+        10,
+        11
+      ],
+      "findings": [
+        "F16",
+        "F18"
+      ],
+      "trace": "C01,C02,C03,C04,C09,C15,C16,C17; NP04,NP05,NP06; NP14; AT01–AT06",
+      "status": "pending",
+      "id": "slice-12-align-the-complete-mcp-catalog-and-client-contracts"
+    },
+    {
+      "number": 13,
+      "title": "Make the strategy registry executable and testable",
+      "owner": "Dreamer strategy owner",
+      "source_anchors": [
+        "src/cognitive/dreamer.ts",
+        "src/cognitive/strategies",
+        "src/cognitive/register.ts"
+      ],
+      "steps": [
+        "Unify advertisement/dispatch/requirements/budgets in the existing strategy mechanism; implement or explicitly retire reflective.",
+        "Add positive, negative, empty and seeded fixtures for all choices, including missing abstraction, symmetry counterexamples and causal replay.",
+        "Assert valid speculative outputs, preserved inputs/ancestry and bounded allocation; creative unproven ideas remain reviewable.",
+        "Define C15 affected-region and stage inputs for each strategy through the existing registry; do not run every strategy for every edit or impose a mandatory minimum-hop expansion.",
+        "Apply the revision-7 execution handoff: Every advertised strategy has bounded deterministic positive/negative/empty fixtures or explicit retirement; reflective disposition is recorded. No confidence-only factual promotion. Required compound evidence: XS09, XS11, XS14."
+      ],
+      "depends_on": [
+        0,
+        2,
+        5,
+        6,
+        12
+      ],
+      "findings": [
+        "F08",
+        "F09",
+        "F18"
+      ],
+      "trace": "C01,C05,C15; NP02,NP11,NP13; AT03",
+      "status": "pending",
+      "id": "slice-13-make-the-strategy-registry-executable-and-testable"
+    },
+    {
+      "number": 14,
+      "title": "Measure and persist useful strategy yield",
+      "owner": "Dreamer adaptation owner",
+      "source_anchors": [
+        "src/cognitive/dreamer.ts",
+        "src/cognitive/metacognition.ts"
+      ],
+      "steps": [
+        "Persist versioned post-dedup yield and cost observations with evidence ancestry and restart behavior.",
+        "Allocate bounded exploitation/exploration without rewarding paraphrase floods, graph growth or confidence alone.",
+        "Test zero/tiny/parallel budgets and repeated restarts against a fixed-allocation baseline; keep novelty separate from factual promotion.",
+        "Measure targeted digestion by useful, evidence-backed incremental outcomes; coalesce equivalent candidates and bound feedback generations instead of rewarding model output volume or repeated rediscovery.",
+        "Apply the revision-7 execution handoff: Fixed-allocation comparisons and replays prove adaptive behavior without rewarding volume, confidence or self-corroboration; final task benefit at 27. Required compound evidence: XS05, XS11, XS15."
+      ],
+      "depends_on": [
+        9,
+        13,
+        15
+      ],
+      "findings": [
+        "F09",
+        "F10"
+      ],
+      "trace": "C05,C08,C15; NP02,NP05,NP11,NP13; AT03",
+      "status": "pending",
+      "id": "slice-14-measure-and-persist-useful-strategy-yield"
+    },
+    {
+      "number": 15,
+      "title": "Calibrate normalization and evidence independence",
+      "owner": "Normalizer/trust owner",
+      "source_anchors": [
+        "src/cognitive/normalizer.ts",
+        "src/cognitive/evidence-ledger.ts",
+        "src/cognitive/trust-state.ts",
+        "src/cognitive/calibration-evaluation.ts"
+      ],
+      "steps": [
+        "Keep provenance and trust separate; explicitly define human assertion, source-backed observation, hypothesis, disputed and validated states.",
+        "Track independent evidence ancestry, revision/freshness and contradiction; on source withdrawal require re-evaluation without erasing history.",
+        "Test repeated circulation through dream/narrative/federation and model consensus cannot launder evidence; evaluate labeled accuracy independently of promotion rate.",
+        "Normalize affected candidates against current evidence/contradictions, retaining ancestry and stale/reopened dispositions; a stronger model or repeated generated claim cannot clear dirty verification debt by confidence alone.",
+        "Apply the revision-7 execution handoff: Labeled independent-evidence/cold-start/contradiction fixtures pass; scoped ADR-096 amendment is reviewed before changed promotion policy activates. Required compound evidence: XS11, XS14, XS15, XS21."
+      ],
+      "depends_on": [
+        2,
+        5,
+        9,
+        13
+      ],
+      "findings": [
+        "F10"
+      ],
+      "trace": "C01,C04,C08,C15; NP02,NP11,NP13; AT03,AT06",
+      "status": "pending",
+      "id": "slice-15-calibrate-normalization-and-evidence-independence"
+    },
+    {
+      "number": 16,
+      "title": "Align decay maintenance and human curation",
+      "owner": "Core maintenance/curation owner",
+      "source_anchors": [
+        "src/cognitive/engine.ts",
+        "src/cognitive/graph-maintenance-state.ts",
+        "src/graph"
+      ],
+      "steps": [
+        "Define TTL, tombstone, rejection memory and source-deletion treatment by provenance/trust class.",
+        "Reuse revisioned commit/recovery for maintenance; retain human contributions and pending contradictions.",
+        "Test rejected rediscovery, rename/delete, revoked evidence and restart; archive before destructive retirement and expose loss/ambiguity.",
+        "Invalidate impacted derived knowledge on source/decision changes while preserving valid unrelated facts and human history; crystallize verified work before retiring obsolete operational plan graph noise.",
+        "Apply the revision-7 execution handoff: Rename/delete/reject/reopen and crash cases preserve history; time-sensitive observations have explicit kind-specific validity, distinct from full-scan age. Required compound evidence: XS02, XS11, XS15, XS21."
+      ],
+      "depends_on": [
+        5,
+        15
+      ],
+      "findings": [
+        "F17",
+        "F21"
+      ],
+      "trace": "C04,C10,C15; NP07,NP10,NP11; AT03,AT05,AT06",
+      "status": "pending",
+      "id": "slice-16-align-decay-maintenance-and-human-curation"
+    },
+    {
+      "number": 17,
+      "title": "Coordinate engine scheduling events and bootstrap",
+      "owner": "Core engine/scheduler owner",
+      "source_anchors": [
+        "src/cognitive/engine.ts",
+        "src/cognitive/scheduler.ts",
+        "src/cognitive/event-router.ts",
+        "src/cognitive/bootstrap-driver.ts",
+        "src/cognitive/graph-maintenance-state.ts",
+        "src/cognitive/llm-readiness.ts",
+        "src/webhooks/worker.ts",
+        "src/webhooks/store.ts"
+      ],
+      "steps": [
+        "Centralize admission for manual/scheduled/event/targeted/bootstrap jobs with one owner, budget and cancellation contract.",
+        "Define durable state transitions, run leases, idempotent dispatch, missed/overlap policies and crash recovery; invalid action parameters block visibly instead of broadening to defaults.",
+        "Expose scheduler preview/validate/update/run/status APIs used by all surfaces; implement C11 semantics before the schedule workspace in Slice 29.",
+        "Implement the C15 durable affected-region ledger and staged digestion on existing maintenance/event/scheduler owners: coalesced generation markers, debounce/idle/max-age fairness, bounded overflow partitions, causal deduplication, budgets, stage receipts and restart recovery.",
+        "Reuse C15 dirty-generation/digestion admission for material Computer Use changes; coalesce outcomes and never trigger paid cognition on every screenshot. Scheduled GUI work requires the appropriate isolated environment and explicit finite grant.",
+        "Apply the revision-7 execution handoff: Offline SC01–13 core, generation and readiness fixtures pass; post-office intent maps to existing event/webhook delivery. No second scheduler/job authority. Required compound evidence: XS04, XS05, XS09, XS11, XS12, XS21."
+      ],
+      "depends_on": [
+        6,
+        10,
+        13,
+        16
+      ],
+      "findings": [
+        "F07",
+        "F21"
+      ],
+      "trace": "C04,C05,C11,C15,C17; NP01,NP03,NP04,NP13; scheduler and lifecycle traces; NP14",
+      "status": "pending",
+      "id": "slice-17-coordinate-engine-scheduling-events-and-bootstrap"
+    },
+    {
+      "number": 18,
+      "title": "Align temporal causal and federated evidence",
+      "owner": "Temporal/causal/federation owner",
+      "source_anchors": [
+        "src/cognitive/temporal.ts",
+        "src/cognitive/causal.ts",
+        "src/cognitive/federation.ts"
+      ],
+      "steps": [
+        "Define event/observation times and foreign origin/schema/trust/redaction rules.",
+        "Make replay/import idempotent, retain shared ancestry and distinguish correlation from causal hypotheses.",
+        "Test out-of-order history, repeated imports, stale sources and unknown versions; local validation remains required for promotion.",
+        "Use C15 evidence dependency changes to re-evaluate only plausibly affected temporal/causal/federated knowledge, preserving origin, event time, stale markers and explicit unknown wider impact.",
+        "Apply the revision-7 execution handoff: Golden history/import/counterexample fixtures prove no causal certainty from correlation or independent support from repeated import. Required compound evidence: XS11, XS15."
+      ],
+      "depends_on": [
+        2,
+        15,
+        16,
+        17
+      ],
+      "findings": [
+        "F10",
+        "F21"
+      ],
+      "trace": "C01,C02,C04,C15; NP08,NP11,NP13; AT03,AT06",
+      "status": "pending",
+      "id": "slice-18-align-temporal-causal-and-federated-evidence"
+    },
+    {
+      "number": 19,
+      "title": "Unify tension remediation and future review",
+      "owner": "Tension/intervention owner",
+      "source_anchors": [
+        "src/cognitive/adversarial.ts",
+        "src/cognitive/tension-clustering.ts",
+        "src/cognitive/intervention.ts"
+      ],
+      "steps": [
+        "Use stable risk/branch IDs and distinguish noise, actionable tension, resolution proposal, action and verified outcome.",
+        "Preserve evidence changes, human overrides and reappearance reasons across remediation and adaptive futures.",
+        "Test contradictions and stale evidence reopen review correctly; execution success alone never resolves a risk.",
+        "Consume affected-region evidence changes to resolve or reopen relevant tensions through existing verification gates; a proposed remedy or completed digestion run is not proof of tension resolution.",
+        "Apply the revision-7 execution handoff: Compound contradiction/reopen/remediation cases prove outcome verification and correct bounded follow-up without source evidence laundering. Required compound evidence: XS09, XS11, XS15."
+      ],
+      "depends_on": [
+        15,
+        17,
+        18
+      ],
+      "findings": [
+        "F11",
+        "F21"
+      ],
+      "trace": "C01,C04,C15; NP02,NP11,NP13; AT03,AT05,AT06",
+      "status": "pending",
+      "id": "slice-19-unify-tension-remediation-and-future-review"
+    },
+    {
+      "number": 20,
+      "title": "Make lifecycle narrative and lucid interaction consistent",
+      "owner": "Narrative/lucid/lifecycle owner",
+      "source_anchors": [
+        "src/cognitive/narrator.ts",
+        "src/cognitive/playback.ts",
+        "src/cognitive/lucid.ts",
+        "src/cognitive/lifecycle-visibility.ts"
+      ],
+      "steps": [
+        "Consume existing trust/evidence projections and bind summaries/playback to revision and time.",
+        "Preserve original evidence ancestry through narration and explicit human intent in lucid sessions; restore ownership on exit/failure.",
+        "Test historical/current distinction, stale summary disclosure and cross-client reconstruction without turning summarization into validation.",
+        "Refresh only affected narrative/lifecycle projections from committed evidence; retain verified consequences and human intent for the next agent, while permanent plan history stays in Markdown/logs under ADR-207.",
+        "Apply the revision-7 execution handoff: Replay/lucid/narration tests preserve temporal truth, per-session control and meaningful exploration; generated-doc re-ingestion retains origin. Required compound evidence: XS07, XS08, XS11, XS16."
+      ],
+      "depends_on": [
+        11,
+        16,
+        19,
+        21
+      ],
+      "findings": [
+        "F21"
+      ],
+      "trace": "C01,C03,C04,C15; NP04,NP11,NP13; AT01,AT03,AT06",
+      "status": "pending",
+      "id": "slice-20-make-lifecycle-narrative-and-lucid-interaction-consistent"
+    },
+    {
+      "number": 21,
+      "title": "Repair plan and discipline lifecycle projection",
+      "owner": "Plan/discipline authority owner",
+      "source_anchors": [
+        "src/architect/plan-registry.ts",
+        "src/architect/routes.ts",
+        "src/discipline",
+        "src/cli",
+        "extensions/vscode/src",
+        "packages/sdk"
+      ],
+      "steps": [
+        "Inventory every plan status writer/reader and capture the supplied zero-checkpoint draft, raw-sidebar and future-review divergence fixtures; preserve stable plan/slice IDs.",
+        "Extend existing plan/discipline authority with typed revisioned transitions and one deterministic reducer; separate design approval, slice implementation/verification and execution leases under C14.",
+        "Implement dependency-aware next eligibility, current/running ownership, valid last-completed and unique-slice progress; preserve blockers, reopenings, accepted deferrals and final plan verification.",
+        "Add idempotent durable commands, conflict receipts, restart recovery and atomic snapshot/event convergence; selection and another client cannot steal or advance work.",
+        "Preview/reconcile legacy Markdown/log status with source hashes and backups; retain unknown evidence, migrate one writer and remove prose/ordinal inference through supported adapters.",
+        "Use effective projected states in every Architect panel, resume/task-memory and future-review path; dim verified cards accessibly, use restrained green only for running work, and preserve compact keyboard navigation.",
+        "Record actual PL01–PL16 and AT01/AT05 evidence; Slice 25 completes the consumer matrix and Slice 27 gates release. No CSS-only or label-only completion claim.",
+        "Bind C14 completion to material-change reconciliation receipts under C15; expose source/graph/digestion outcomes separately and allow optional bounded digestion to remain pending after reconciled verified work.",
+        "Supply C16 stable plan/slice/concern targets and state-appropriate commands. Replace text/index-based concern mutation with stable identity or a revision-bound source anchor, preserving distinct acknowledgement, mitigation and evidence-backed resolution.",
+        "Project C17 required-capability eligibility, lost-capability blockers, pause/stop/recovery and independently verified postconditions into C14 lifecycle; GUI success alone cannot complete a slice.",
+        "Apply the revision-7 execution handoff: PL01–16 authority and core UI fixtures pass; required reconciliation gates verification, optional cognition does not. Future CU consumers bind at 31, full surface matrix at 25. Required compound evidence: XS07, XS08, XS09, XS18."
+      ],
+      "depends_on": [
+        0,
+        5,
+        11,
+        12
+      ],
+      "findings": [
+        "F15",
+        "F21"
+      ],
+      "trace": "C01,C02,C04,C09,C12,C14,C15,C16,C17; NP03,NP04,NP05,NP08,NP12; NP14; AT01,AT05; PL01–PL16",
+      "status": "pending",
+      "id": "slice-21-repair-plan-and-discipline-lifecycle-projection"
+    },
+    {
+      "number": 22,
+      "title": "Align analytics health and observability",
+      "owner": "Core metric definitions/analytics owner",
+      "source_anchors": [
+        "src/tools/graph-health.ts",
+        "src/cognitive/calibration-evaluation.ts",
+        "python/analytics",
+        "src/observability",
+        "python/analytics/loader.py"
+      ],
+      "steps": [
+        "Specify denominators, snapshot revision, unknown counts and freshness for all 13 analytics modules and health/weather summaries.",
+        "Generate shared schema artifacts and compare TypeScript/Python golden outputs without forcing identical presentation.",
+        "Separate structural/semantic coverage, evidence quality, workload and task usefulness; critical failures stay visible; synthetic measures stay labeled.",
+        "Publish C15 context utility, evidence use, justified source rereads, graph-sync lag, dirty age/coalescing, digestion cost and next-agent recovery metrics with comparable revisions and known measurement limits.",
+        "Apply the revision-7 execution handoff: All 13 analytics modules compare semantic goldens; XS21 proves one initial scan plus managed changes stays healthy/current while real scoped gaps remain visible. Required compound evidence: XS13, XS16, XS21.",
+        "Expose canonical graph-mutation/full-scan/source-reconciliation markers in MCP/health/API and every consumer; XS21 proves agents do not infer stale graph from scan age or hide scoped gaps behind an unrelated new mutation."
+      ],
+      "depends_on": [
+        2,
+        5,
+        15,
+        19,
+        21
+      ],
+      "findings": [
+        "F11",
+        "F19",
+        "F21"
+      ],
+      "trace": "C01,C03,C08,C15; NP05,NP08,NP12; AT03,AT06",
+      "status": "pending",
+      "id": "slice-22-align-analytics-health-and-observability"
+    },
+    {
+      "number": 23,
+      "title": "Improve dashboard and configuration workflows",
+      "owner": "Dashboard/configuration surface owner",
+      "source_anchors": [
+        "src/server/dashboard.ts",
+        "src/utils/engine-env.ts",
+        "templates/default/config/engine.env"
+      ],
+      "steps": [
+        "Implement compact searchable tabs from the setting inventory, with contextual explanation of effective values and restart requirements.",
+        "Add template preview/apply/reset/undo using the config authority and secret/path protection; expose budgets, routing, freshness and recovery without card clutter.",
+        "Refresh root navigation including Explorer; embed/link the dedicated schedule workspace owned by Slice 29 rather than recreating schedule policy in forms.",
+        "Expose compact C15 context/reconciliation/digestion indicators and schema-driven cadence/limit settings; show pending affected knowledge, effective role/model/budget and recovery without adding manual engine.env editing.",
+        "Use C16 shared action vocabulary and accessible compact menus where dashboard/configuration/schedule views overlap, consuming the same eligibility and failure reasons rather than implementing separate action semantics.",
+        "Expose C17 optional setup and diagnostics through compact configuration tabs: effective adapter/worker/host, permissions, finite limits, screenshots/privacy and template preview. Reuse native runtime settings where the CLI owns execution.",
+        "Apply the revision-7 execution handoff: Real browser workflow fixtures cover config/reset/search/keyboard/narrow layouts and shared menu/schedule integration; no duplicate schedule semantics. Required compound evidence: XS06, XS07, XS12, XS21."
+      ],
+      "depends_on": [
+        10,
+        11,
+        17,
+        21,
+        22,
+        25,
+        29
+      ],
+      "findings": [
+        "F07",
+        "F11",
+        "F12",
+        "F13",
+        "F23"
+      ],
+      "trace": "C07,C09,C12,C14,C15,C16,C17; NP09,NP12; config/template/browser cases; NP14",
+      "status": "pending",
+      "id": "slice-23-improve-dashboard-and-configuration-workflows"
+    },
+    {
+      "number": 24,
+      "title": "Align Explorer and agent evidence navigation",
+      "owner": "Explorer surface owner",
+      "source_anchors": [
+        "src/explorer",
+        "explorer/src"
+      ],
+      "steps": [
+        "Consume canonical identity/trust/provenance/revision in both graph views and inspectors.",
+        "Keep dense labels, selected short names, reduced motion and bounded updates while linking to the same evidence the agent receives.",
+        "Test realistic dense graphs, long labels, narrow windows and reconnect/stale states; presentation never silently hides semantic omissions.",
+        "Apply the revision-7 execution handoff: Realistic dense graph, glass/edge/label accessibility and versioned mutation tests preserve polish and semantic navigation; source age is informational. Required compound evidence: XS07, XS13, XS16, XS21."
+      ],
+      "depends_on": [
+        3,
+        12,
+        20,
+        22
+      ],
+      "findings": [
+        "F03",
+        "F21"
+      ],
+      "trace": "C01,C03,C12; NP08,NP12; AT02–AT04,AT06",
+      "status": "pending",
+      "id": "slice-24-align-explorer-and-agent-evidence-navigation"
+    },
+    {
+      "number": 25,
+      "title": "Align Architect VS Code CLI plugins and context budgets",
+      "owner": "Client/adapter integration owner",
+      "source_anchors": [
+        "src/architect",
+        "src/cli",
+        "extensions/vscode/src",
+        "packages/host",
+        "packages/sdk",
+        "packages/token-economy",
+        "src/architect/cli-mcp-bridge.ts",
+        "packages/host/src/loader.ts",
+        "packages/host/src/watchdog.ts"
+      ],
+      "steps": [
+        "Migrate each surface via canonical adapters and current/previous contract negotiation; document lossy or unsupported legacy paths.",
+        "Preserve required graph/ADR evidence under compression, while native API continuation and CLI execution keep their own mechanisms.",
+        "Run the six task families through each applicable client, including reconnect, stop, unsupported settings and plugin failure; compare semantics, not byte-identical prose.",
+        "Own C15 end-to-end conformance across browser/VS Code Architect, CLI/API/MCP, native APIs, CLI bridges and SDK/host/plugins: context receipt, guarded action, durable change reconciliation, bounded digestion and next-agent recovery, with honest external-client gaps.",
+        "Implement the C16 contextual action layer for plans, slices, nervous points/open questions, schedules, ADRs and relevant evidence/graph/run targets. Keep four to six useful actions, capture target/revision, reuse existing commands and preserve native text/editor menus; Ask Architect drafts editable context without sending.",
+        "Add an explicit right/down chevron to Nervous Points and nested foldouts, preserving native disclosure semantics and per-plan view state. Implement one ID-based selected-plan reveal for restoration/intentional selection and a compact Reveal selected plan control; preserve filters, center only the rail and ignore stale loads/background re-renders.",
+        "Verify UX01–UX12 in a real browser with fake daemon/executors, including 1,000 variable-height plans, filtering, asynchronous selection races, keyboard/touch/focus, viewport clipping and wrong-target mutation rejection.",
+        "Provide C17 cross-client semantic integration seams for Slice 31: native CLI Computer Use via supported permissions/events/control, native API via DreamGraph harness, typed observation receipts and graph writeback. Preserve CLI tool/image/continuation behavior and review the narrow ADR-217 extension.",
+        "Apply the revision-7 execution handoff: AT/GE/UX composed traces and eight-surface same-revision comparisons pass. C17 seams exist here; actual workers/native interactions and their controls remain 31 obligations. Required compound evidence: XS07, XS09, XS10, XS16, XS17, XS21."
+      ],
+      "depends_on": [
+        3,
+        5,
+        8,
+        12,
+        17,
+        21,
+        22,
+        24,
+        29,
+        30
+      ],
+      "findings": [
+        "F04",
+        "F14",
+        "F16",
+        "F21",
+        "F22",
+        "F26"
+      ],
+      "trace": "C01,C02,C03,C06,C09,C14,C15,C16,C17; NP04,NP06,NP08,NP13; NP14; AT01–AT06",
+      "status": "pending",
+      "id": "slice-25-align-architect-vs-code-cli-plugins-and-context-budgets"
+    },
+    {
+      "number": 26,
+      "title": "Refresh the legacy DreamGraph graph safely",
+      "owner": "Core migration/maintenance owner",
+      "source_anchors": [
+        "src/graph",
+        "src/tools/scan-state.ts",
+        "src/tools/enrichment-state.ts",
+        "src/instance"
+      ],
+      "steps": [
+        "Inventory missing/ambiguous history, collisions and supported schema paths without inventing a baseline; separate migration, evidence reconstruction and re-enrichment.",
+        "Bind the preview/approval to input revision and scope; back up and test restoration, fence incompatible writers, stage and validate before cutover.",
+        "Test crash/cancel/stale-client/concurrent scan and disposition of post-cutover writes; resume separately capped enrichment only after structural migration is coherent.",
+        "Migrate legacy source baselines, unknown evidence mappings and dirty/reconciliation state through C15 preview/backup/recovery; seed bounded unresolved-region markers instead of pretending old plans/transcripts are fully reconciled.",
+        "Apply the revision-7 execution handoff: Disposable full-family crash/restart/post-cutover-write migration passes; optional CU assets/session defaults are installed disabled and qualified by 31/28. Required compound evidence: XS03, XS18, XS19, XS21."
+      ],
+      "depends_on": [
+        2,
+        5,
+        6,
+        16,
+        17,
+        20,
+        21,
+        22,
+        25
+      ],
+      "findings": [
+        "F17"
+      ],
+      "trace": "C02,C04,C10,C15; NP07,NP10; AT05,AT06",
+      "status": "pending",
+      "id": "slice-26-refresh-the-legacy-dreamgraph-graph-safely"
+    },
+    {
+      "number": 27,
+      "title": "Add system lifecycle and recovery regression gates",
+      "owner": "Conformance/release verification owner",
+      "source_anchors": [
+        "tests",
+        "extensions/vscode/src/test",
+        "python/analytics",
+        ".github/workflows"
+      ],
+      "steps": [
+        "Build requirements-to-evidence matrix for every contract, risk resolution, graph/relation class and client family; retain explicit unverified rows.",
+        "Run focused shared suites plus whole-engine traces and the twelve task cases; include schedule/template/full-access/restart failures and PL01–PL16 lifecycle/reconciliation/convergence cases.",
+        "Ordinary CI has zero paid calls; publish fixture hashes and exact results, with no aggregate percentage substituting for failed mandatory cases.",
+        "Add all GE01–GE16 closed-loop cases and matched graph/source task comparisons to the conformance gate; require actual source-to-graph-to-next-agent traces, concurrency/queue/budget failures and adapter-native paths.",
+        "Gate Ashoka on UX01–UX12 actual browser interaction evidence plus daemon command/race tests; static HTML strings and a stubbed scrollIntoView call do not prove menu, chevron or selected-plan navigation behavior.",
+        "Gate Computer Use on CU01–CU24 with deterministic fake providers, real portable-browser tests, named OS-worker qualification and explicit native-CLI route evidence. Keep platform/paid-canary gaps separate from passed tests.",
+        "Apply the revision-7 execution handoff: All mandatory feature/system obligations have actual accepted evidence; explicit supported-platform disposition is published. Ordinary CI spends zero; unrun required comparisons remain open. Required compound evidence: XS01, XS02, XS03, XS04, XS05, XS06, XS07, XS08, XS09, XS10, XS11, XS12, XS13, XS14, XS15, XS16, XS17, XS18, XS19, XS20, XS21."
+      ],
+      "depends_on": [
+        12,
+        14,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        29,
+        30,
+        31
+      ],
+      "findings": [
+        "F18",
+        "F21"
+      ],
+      "trace": "C01–C17; NP01–NP14; AT01–AT06 plus system traces",
+      "status": "pending",
+      "id": "slice-27-add-system-lifecycle-and-recovery-regression-gates"
+    },
+    {
+      "number": 28,
+      "title": "Publish verified contracts and synchronized release",
+      "owner": "Release/install owner",
+      "source_anchors": [
+        "package.json",
+        "src/config/config.ts",
+        "scripts/install.ps1",
+        "README.md",
+        "guide",
+        "scripts/install.sh"
+      ],
+      "steps": [
+        "Publish compatibility matrices, migration/sunset and downgrade limits; derive product versions consistently without confusing them with schema majors.",
+        "Synchronize product/package/runtime/installer versions to v14.0.0, and update model/API/CLI distinctions, configuration/template/schedule instructions and evidence-linked claims across shipped surfaces. Verify the 13.4.0-to-14.0.0 upgrade separately from each schema migration.",
+        "Run disposable install/restart/restore tests and release only after Slice 27; no implementation release or version bump is made by this planning revision.",
+        "Publish C15 execution/receipt/dirty-state contracts, controls, source-verification policy, adapter limits, ADR amendments and honest paired benchmark results alongside synchronized v14 release and upgrade notes.",
+        "Document C16 context actions, keyboard/touch access, proposal-versus-commit behavior, Nervous Points disclosure and Reveal selected plan, with verified limits and consistent Ashoka naming.",
+        "Publish C17 native-CLI versus DreamGraph-harness routing, platform/remedy matrix, model/tool/worker versions, grants/privacy/budgets, recovery and supported install/upgrade/uninstall behavior. Include optional worker assets in synchronized v14.0.0 release metadata.",
+        "Apply the revision-7 execution handoff: Test exact packaged 13.4-to-14 install/restart/restore on disposable data after 27; artifact failure reopens 28, or the affected feature slice if behavior differs. No 27-to-28 acceptance cycle. Required compound evidence: XS18, XS19."
+      ],
+      "depends_on": [
+        27
+      ],
+      "findings": [
+        "F18",
+        "F19",
+        "F21",
+        "F22"
+      ],
+      "trace": "C02,C07,C11,C12,C14,C15,C16,C17; NP04,NP08,NP13; release acceptance; NP14",
+      "status": "pending",
+      "id": "slice-28-publish-verified-contracts-and-synchronized-release"
+    },
+    {
+      "number": 29,
+      "title": "Rebuild dashboard schedule management",
+      "owner": "Dashboard schedule surface owner; core scheduler remains authoritative",
+      "source_anchors": [
+        "src/server/dashboard.ts",
+        "src/cognitive/scheduler.ts",
+        "src/cognitive/register.ts",
+        "src/cli/commands/schedule.ts"
+      ],
+      "steps": [
+        "Replace the append-only table/form flow with a compact schedules list plus inspector/editor and upcoming/runs tabs; support edit, duplicate, pause/resume and archive with retained history.",
+        "Use daemon validation and occurrence preview; support human units, explicit timezone, missed/overlap policy, scope/strategy/model/budget and full parameter diffs.",
+        "Make run-now enqueue a governed job, show queue/block/cancel/partial/recovery state, and snapshot the actual strategy/profile/revision into every run.",
+        "Test two-client edit conflicts, double click/lost reply, restart/missed run, DST, exhausted budgets, invalid configuration, keyboard/narrow layout and retained history after edit/archive.",
+        "Integrate C15 targeted digestion into Schedules/Upcoming/Runs with affected scope/generation, coalesced changes, pending stages, budget/blocked reasons and snapshot-based history; reuse core Slice 17 admission.",
+        "Expose C16 schedule menus through existing C11 edit/preview/run/pause/history workflows; retain one Pause/Resume row, revision-bound targets and normal budget admission. Keep cancellation, duplicate and archive in the relevant detail workflow.",
+        "Apply the revision-7 execution handoff: SC01–13 actual browser plus core integration shows edit/preview/run/pause/cancel distinctions and retained history. Shared menu rendering lands in 25 without making 29 depend on it. Required compound evidence: XS04, XS07, XS12."
+      ],
+      "depends_on": [
+        10,
+        11,
+        17,
+        21,
+        22
+      ],
+      "findings": [
+        "F24",
+        "F07",
+        "F12",
+        "F13",
+        "F21",
+        "F23"
+      ],
+      "trace": "C04,C05,C07,C09,C11,C12,C15,C16; NP03,NP04,NP06,NP09,NP12",
+      "status": "pending",
+      "id": "slice-29-rebuild-dashboard-schedule-management"
+    },
+    {
+      "number": 30,
+      "title": "Make CLI Autonomy and Verbosity effective",
+      "owner": "Architect orchestration and CLI bridge owner",
+      "source_anchors": [
+        "src/architect/routes.ts",
+        "src/architect/cli-bridge.ts",
+        "src/architect/verbosity.ts",
+        "tests/architect-cli-bridge.test.ts",
+        "tests/architect-continuation.test.ts",
+        "tests/standalone-architect-routes.test.ts",
+        "extensions/vscode/src/autonomy.ts"
+      ],
+      "steps": [
+        "Reproduce each mode on a fixed task for Codex and Copilot with an instrumented fake CLI; trace the full selection-to-execution path and document the failed links. Verify actual supported options by installed CLI version before mapping controls.",
+        "Add explicit effective control policy to the existing bridge contract and enforce daemon-owned action/continuation boundaries. Manual, supervised and autonomous differ as C13 specifies without broadening previously granted authority.",
+        "Implement supported CLI output controls, prompt guidance and UI density as separate layers. Preserve required evidence and failure/staleness messages in concise mode; expose unsupported or prompt-only behavior honestly.",
+        "Test input transmission and actual tool/stop/continuation behavior, two-session isolation, request/persisted precedence, mid-job changes, restart, cancellation and fallback. Compare bounded real outputs only through an explicitly opted-in canary.",
+        "Verify C13 autonomy/verbosity under C15: all modes preserve mandatory graph anchors and change recording, concise output does not suppress uncertainty, and autonomous continuation stays within approved reconciliation/digestion scope.",
+        "Verify C13 controls on C17 native CLI interaction: autonomy stays within native grants, verbosity preserves mandatory evidence and stop reaches the real interaction runtime. Shell sandbox or MCP policy alone cannot be claimed to govern native Computer Use.",
+        "Apply the revision-7 execution handoff: Instrumented Codex/Copilot fixtures prove behavior, not just launch strings. Actual native-CU stop/grants tests close in 31, avoiding a circular dependency. Required compound evidence: XS01, XS04, XS07, XS10, XS17."
+      ],
+      "depends_on": [
+        8,
+        11,
+        12,
+        21
+      ],
+      "findings": [
+        "F25",
+        "F14",
+        "F16",
+        "F22"
+      ],
+      "trace": "C06,C09,C12,C13,C15,C17; NP04,NP06,NP09,NP12,NP13; NP14; AT01,AT02,AT05",
+      "status": "pending",
+      "id": "slice-30-make-cli-autonomy-and-verbosity-effective"
+    },
+    {
+      "number": 31,
+      "title": "Deliver governed cross-platform Computer Use",
+      "owner": "Architect execution integration owner with platform maintainers and authority/privacy reviewer",
+      "source_anchors": [
+        "src/architect/routes.ts",
+        "src/architect/native-tool-loop.ts",
+        "src/architect/cli-bridge.ts",
+        "src/architect/cli-mcp-bridge.ts",
+        "src/cognitive/llm.ts",
+        "src/tools/reconciliation-transaction.ts",
+        "packages/host",
+        "packages/sdk",
+        "extensions/vscode/src/architect-core",
+        "tests"
+      ],
+      "steps": [
+        "31A: Freeze C17 platform-neutral schemas, native-CLI versus DreamGraph-harness routes, ADR amendments and fake worker/provider/CLI fixtures; prove requested/supported/permitted/effective capability negotiation.",
+        "31B: Implement authenticated execution binding, scoped grants, cross-instance physical-seat leases, durable intent/outcome receipts, finite admission, local revocation and unknown-result recovery before enabling real input.",
+        "31C: Deliver the isolated portable browser worker using a pinned supported runtime/browser, structured operations and scoped visual evidence; run the same disposable fixture on Windows, macOS and Linux.",
+        "31D: Implement peer native-worker backends for Windows, macOS and Linux portal/accessibility with scoped X11 fallback; qualify permissions, scale/topology, human control, packaging and unsupported operations per environment.",
+        "31E: Connect native APIs to the DreamGraph harness and Codex CLI to its own native Computer Use facilities through supported capability/permission/event/stop seams. Preserve native CLI continuation; a bridge is an explicitly selected alternative only.",
+        "31F: Integrate typed observations, verified postconditions, durable material-change reconciliation and bounded digestion with C15 and C14; preserve uncertainty, partial effects and the correct unfinished work.",
+        "31G: Add compact Architect/VS Code status, target/host/effective mode, pause/stop, approval and observation inspection plus schema-driven dashboard setup; selection never grants control.",
+        "31H: Produce CU01–CU24 conformance and named platform/adapter qualification, optional capped provider canaries, privacy/usage evidence and install/upgrade/recovery documentation for Slices 27/28.",
+        "Apply the revision-7 execution handoff: CU01–24 actual portable-browser and named platform/native-route evidence, plus XS17/20 recovery/graph-loop joins, unblock 27. Common contract is never weakened to a backend minimum. Required compound evidence: XS01, XS09, XS17, XS20."
+      ],
+      "depends_on": [
+        3,
+        5,
+        6,
+        8,
+        10,
+        11,
+        12,
+        17,
+        21,
+        25,
+        30
+      ],
+      "findings": [
+        "F26",
+        "F14",
+        "F15",
+        "F16",
+        "F21",
+        "F22"
+      ],
+      "trace": "C01,C02,C03,C04,C05,C06,C07,C09,C12,C13,C14,C15,C16,C17; NP03,NP04,NP06,NP09,NP11,NP12,NP13,NP14; AT01,AT02,AT05,AT06; CU01–CU24",
+      "status": "pending",
+      "id": "slice-31-deliver-governed-cross-platform-computer-use"
+    }
+  ],
+  "release_target": "14.0.0",
+  "lifecycle_spec": "docs/audits/2026-09-30-coverage/plan-lifecycle-status.md",
+  "lifecycle_case_ids": [
+    "PL01",
+    "PL02",
+    "PL03",
+    "PL04",
+    "PL05",
+    "PL06",
+    "PL07",
+    "PL08",
+    "PL09",
+    "PL10",
+    "PL11",
+    "PL12",
+    "PL13",
+    "PL14",
+    "PL15",
+    "PL16"
+  ],
+  "lifecycle_case_count": 16,
+  "graph_execution_spec": "docs/audits/2026-09-30-coverage/graph-centered-execution.md",
+  "graph_execution_case_ids": [
+    "GE01",
+    "GE02",
+    "GE03",
+    "GE04",
+    "GE05",
+    "GE06",
+    "GE07",
+    "GE08",
+    "GE09",
+    "GE10",
+    "GE11",
+    "GE12",
+    "GE13",
+    "GE14",
+    "GE15",
+    "GE16"
+  ],
+  "graph_execution_case_count": 16,
+  "graph_execution_owner_request_sha256": "56e90020ae1ebfedea197c6ff5fd2f4773d6fd2b977ca7717bf638e89cd81f97",
+  "comparison_design": {
+    "corpus": "AT01-AT06 on both existing project fixtures",
+    "arms": [
+      "graph_assisted",
+      "source_only_broad_reread"
+    ],
+    "status": "specified; not executed",
+    "initial_understanding_probe": true,
+    "quality_before_cost": true
+  },
+  "title": "DreamGraph v14.0.0 - Ashoka",
+  "release_name": "Ashoka",
+  "scope_policy": "One unified release plan; linked specifications are supporting appendices; preserve existing plan and slice IDs.",
+  "planning_state": "execution simulation refined; draft/pending; awaiting implementation request",
+  "architect_interaction_spec": "docs/audits/2026-09-30-coverage/architect-context-actions.md",
+  "architect_interaction_case_ids": [
+    "UX01",
+    "UX02",
+    "UX03",
+    "UX04",
+    "UX05",
+    "UX06",
+    "UX07",
+    "UX08",
+    "UX09",
+    "UX10",
+    "UX11",
+    "UX12"
+  ],
+  "architect_interaction_case_count": 12,
+  "implementation_executor": {
+    "model": "gpt-6.1-sol",
+    "scope": "complete v14.0.0 - Ashoka plan",
+    "source": "explicit owner clarification",
+    "runtime_model_requirement": false
+  },
+  "computer_use_spec": "docs/audits/2026-09-30-coverage/computer-use.md",
+  "computer_use_audit": "docs/audits/2026-09-30-coverage/computer-use-capabilities.md",
+  "computer_use_case_ids": [
+    "CU01",
+    "CU02",
+    "CU03",
+    "CU04",
+    "CU05",
+    "CU06",
+    "CU07",
+    "CU08",
+    "CU09",
+    "CU10",
+    "CU11",
+    "CU12",
+    "CU13",
+    "CU14",
+    "CU15",
+    "CU16",
+    "CU17",
+    "CU18",
+    "CU19",
+    "CU20",
+    "CU21",
+    "CU22",
+    "CU23",
+    "CU24"
+  ],
+  "computer_use_case_count": 24,
+  "computer_use_work_packages": [
+    "31A",
+    "31B",
+    "31C",
+    "31D",
+    "31E",
+    "31F",
+    "31G",
+    "31H"
+  ],
+  "computer_use_route_policy": {
+    "codex_cli": "cli_native",
+    "native_api": "dreamgraph_harness",
+    "other_cli": "adapter_native_if_qualified",
+    "bridge": "explicitly selected alternative only",
+    "silent_substitution": false
+  },
+  "computer_use_owner_request_hashes": {
+    "owner-computer-use-request.txt": "3c1cb1bfeca48000f141a37c61109ec70efa4dcf6118b0e18f0a12fa67fb2475",
+    "owner-computer-use-execution-proposal.txt": "5f0f7887dabc000efa486e3a68379cec76419a1737b05a1f7f6423a7eadaa16a",
+    "owner-computer-use-followups.txt": "00d8ebd1fb043adf5a4475f177afb514fc03160014a7a43df33d5548e3fc93c4"
+  },
+  "computer_use_governing_rule": "Use the best native capability available, and normalize the contract above it.",
+  "execution_simulation_spec": "docs/audits/2026-09-30-coverage/execution-simulation.md",
+  "execution_simulation_manifest": "docs/audits/2026-09-30-coverage/execution-simulation.json",
+  "execution_simulation_owner_request_sha256": "c2f8b945f3a9b0135eb3ed79dd76697a5074cff0c85dac4d063a37ce7a9e80a9",
+  "execution_case_ids": [
+    "XS01",
+    "XS02",
+    "XS03",
+    "XS04",
+    "XS05",
+    "XS06",
+    "XS07",
+    "XS08",
+    "XS09",
+    "XS10",
+    "XS11",
+    "XS12",
+    "XS13",
+    "XS14",
+    "XS15",
+    "XS16",
+    "XS17",
+    "XS18",
+    "XS19",
+    "XS20",
+    "XS21"
+  ],
+  "execution_case_count": 21,
+  "schedule_case_ids": [
+    "SC01",
+    "SC02",
+    "SC03",
+    "SC04",
+    "SC05",
+    "SC06",
+    "SC07",
+    "SC08",
+    "SC09",
+    "SC10",
+    "SC11",
+    "SC12",
+    "SC13"
+  ],
+  "schedule_case_count": 13,
+  "freshness_rule": "Old scan does not equal stale graph. DreamGraph MCP/Architect mutations keep the graph current; inclusive rescan after substantial changes without DreamGraph is the user’s choice.",
+  "dependency_topological_levels": [
+    [
+      0
+    ],
+    [
+      2
+    ],
+    [
+      1,
+      5,
+      7
+    ],
+    [
+      3,
+      8,
+      10
+    ],
+    [
+      4,
+      6
+    ],
+    [
+      9,
+      11
+    ],
+    [
+      12
+    ],
+    [
+      13,
+      21
+    ],
+    [
+      15,
+      30
+    ],
+    [
+      14,
+      16
+    ],
+    [
+      17
+    ],
+    [
+      18
+    ],
+    [
+      19
+    ],
+    [
+      20,
+      22
+    ],
+    [
+      24,
+      29
+    ],
+    [
+      25
+    ],
+    [
+      23,
+      26,
+      31
+    ],
+    [
+      27
+    ],
+    [
+      28
+    ]
+  ],
+  "system_correctness_rule": "DreamGraph guarantees system correctness under valid use. The user owns operating discipline outside that contract.",
+  "owner_execution_clarifications": "docs/audits/2026-09-30-coverage/owner-execution-clarifications.txt",
+  "graph_currency_metadata": {
+    "last_graph_mutation_at": "UTC time of successful canonical graph-changing commit; atomically paired with revision/receipt; never an age-only freshness test",
+    "last_full_scan_at": "Last known fully committed inclusive scan, independent of later updates; unknown legacy scan kind remains unknown",
+    "last_source_reconciliation_at": "Latest successful structural reconciliation with covered scope/revision; distinct from optional cognition and actual graph changes",
+    "ordering": "Monotonic canonical revisions; wall-clock fields are display/audit metadata",
+    "consumers": "MCP/API/CLI, Browser/VSCode Architect, daemon, Explorer, Dashboard, Analytics and SDK exports",
+    "legacy": "Null/unknown unless supported by actual historical evidence; preserve last_scan_at compatibility semantics"
+  }
+}

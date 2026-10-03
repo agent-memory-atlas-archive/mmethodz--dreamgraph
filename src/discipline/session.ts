@@ -1,3 +1,4 @@
+import { getSessionContext, sessionNamespace, sessionStates } from "../server/session-context.js";
 /**
  * DreamGraph MCP Server — Disciplinary Task Session Manager.
  *
@@ -20,6 +21,7 @@ import { logger } from "../utils/logger.js";
 import { canTransition } from "./state-machine.js";
 import { getToolClassification } from "./manifest.js";
 import { MANDATORY_TOOL_RULES } from "./manifest.js";
+import { disciplineArtifactGate } from "./approval.js";
 import type {
   DisciplinePhase,
   TaskType,
@@ -46,13 +48,17 @@ function sessionPath(sessionId: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Active session (process-wide singleton)
+// Active session (private transport namespace)
 // ---------------------------------------------------------------------------
 
-let activeSession: TaskSession | null = null;
+const disciplineStates = sessionStates(() => ({ activeSession: null as TaskSession | null }));
+const scopedDiscipline = new Proxy({ activeSession: null as TaskSession | null }, {
+  get: (_target, key) => disciplineStates.current()[key as "activeSession"],
+  set: (_target, key, value) => { disciplineStates.current()[key as "activeSession"] = value; return true; },
+});
 
 export function getActiveSession(): TaskSession | null {
-  return activeSession;
+  return scopedDiscipline.activeSession;
 }
 
 // ---------------------------------------------------------------------------
@@ -70,9 +76,9 @@ export async function startSession(opts: {
   requires_ground_truth?: boolean;
   instance_uuid?: string;
 }): Promise<TaskSession> {
-  if (activeSession && activeSession.status === "active") {
+  if (scopedDiscipline.activeSession && scopedDiscipline.activeSession.status === "active") {
     throw new Error(
-      `Session ${activeSession.id} is still active. ` +
+      `Session ${scopedDiscipline.activeSession.id} is still active. ` +
       `Complete or abandon it before starting a new one.`
     );
   }
@@ -80,6 +86,7 @@ export async function startSession(opts: {
   const now = new Date().toISOString();
   const session: TaskSession = {
     schema_version: "1.0.0",
+    owner_namespace: getSessionContext() ? sessionNamespace() : undefined,
     id: randomUUID(),
     instance_uuid: opts.instance_uuid ?? process.env.DREAMGRAPH_INSTANCE_UUID ?? "legacy",
     task: {
@@ -109,7 +116,7 @@ export async function startSession(opts: {
     status: "active",
   };
 
-  activeSession = session;
+  scopedDiscipline.activeSession = session;
   await persistSession(session);
   logger.info(`Discipline session started: ${session.id} (${opts.type}: ${opts.description})`);
   return session;
@@ -123,11 +130,11 @@ export async function transitionPhase(
   targetPhase: DisciplinePhase,
   justification?: string,
 ): Promise<{ success: boolean; session: TaskSession; reason: string }> {
-  if (!activeSession || activeSession.status !== "active") {
-    return { success: false, session: activeSession!, reason: "No active session" };
+  if (!scopedDiscipline.activeSession || scopedDiscipline.activeSession.status !== "active") {
+    return { success: false, session: scopedDiscipline.activeSession!, reason: "No active session" };
   }
 
-  const currentPhase = activeSession.current_phase;
+  const currentPhase = scopedDiscipline.activeSession.current_phase;
 
   // Check state machine
   const transition = canTransition(currentPhase, targetPhase);
@@ -139,13 +146,13 @@ export async function transitionPhase(
       reason: transition.reason,
       rule_triggered: "state_machine",
     };
-    activeSession.blocked_actions.push(blocked);
-    await persistSession(activeSession);
-    return { success: false, session: activeSession, reason: transition.reason };
+    scopedDiscipline.activeSession.blocked_actions.push(blocked);
+    await persistSession(scopedDiscipline.activeSession);
+    return { success: false, session: scopedDiscipline.activeSession, reason: transition.reason };
   }
 
   // Check mandatory tool rules for outgoing phase
-  const mandatoryFailures = checkMandatoryTools(activeSession, currentPhase);
+  const mandatoryFailures = checkMandatoryTools(scopedDiscipline.activeSession, currentPhase);
   if (mandatoryFailures.length > 0) {
     const reason = mandatoryFailures.join("; ");
     const blocked: BlockedActionRecord = {
@@ -155,10 +162,21 @@ export async function transitionPhase(
       reason,
       rule_triggered: "mandatory_tools",
     };
-    activeSession.blocked_actions.push(blocked);
-    await persistSession(activeSession);
-    return { success: false, session: activeSession, reason };
+    scopedDiscipline.activeSession.blocked_actions.push(blocked);
+    await persistSession(scopedDiscipline.activeSession);
+    return { success: false, session: scopedDiscipline.activeSession, reason };
   }
+
+  const artifactFailure = disciplineArtifactGate(scopedDiscipline.activeSession, targetPhase);
+  if (artifactFailure) {
+    scopedDiscipline.activeSession.blocked_actions.push({ timestamp: new Date().toISOString(), phase: currentPhase,
+      action: `transition:${currentPhase}→${targetPhase}`, reason: artifactFailure, rule_triggered: "current_artifact_approval" });
+    await persistSession(scopedDiscipline.activeSession);
+    return { success: false, session: scopedDiscipline.activeSession, reason: artifactFailure };
+  }
+  // Entering PLAN revokes historical-wave approval even if a new submission
+  // subsequently fails wire validation before the artifact owner is called.
+  if (targetPhase === "plan") scopedDiscipline.activeSession.approval_generation = (scopedDiscipline.activeSession.approval_generation ?? 0) + 1;
 
   // Transition
   const record: PhaseTransitionRecord = {
@@ -171,11 +189,11 @@ export async function transitionPhase(
     },
   };
 
-  activeSession.current_phase = targetPhase;
-  activeSession.phase_history.push(record);
-  await persistSession(activeSession);
-  logger.info(`Phase transition: ${currentPhase} → ${targetPhase} (session ${activeSession.id})`);
-  return { success: true, session: activeSession, reason: record.guard_check.reason! };
+  scopedDiscipline.activeSession.current_phase = targetPhase;
+  scopedDiscipline.activeSession.phase_history.push(record);
+  await persistSession(scopedDiscipline.activeSession);
+  logger.info(`Phase transition: ${currentPhase} → ${targetPhase} (session ${scopedDiscipline.activeSession.id})`);
+  return { success: true, session: scopedDiscipline.activeSession, reason: record.guard_check.reason! };
 }
 
 /**
@@ -188,12 +206,12 @@ export async function recordToolCall(
   resultSummary: string,
   durationMs: number,
 ): Promise<{ allowed: boolean; reason: string }> {
-  if (!activeSession || activeSession.status !== "active") {
+  if (!scopedDiscipline.activeSession || scopedDiscipline.activeSession.status !== "active") {
     return { allowed: true, reason: "No active discipline session — tool permitted" };
   }
 
   const classification = getToolClassification(toolName);
-  const phase = activeSession.current_phase;
+  const phase = scopedDiscipline.activeSession.current_phase;
 
   // Check if tool is permitted in current phase
   const allowed = classification
@@ -213,22 +231,22 @@ export async function recordToolCall(
     duration_ms: durationMs,
   };
 
-  activeSession.tool_calls.push(record);
+  scopedDiscipline.activeSession.tool_calls.push(record);
 
   if (!allowed) {
     const reason = `Tool '${toolName}' (class: ${classification?.tool_class}) not permitted in phase '${phase}'`;
-    activeSession.blocked_actions.push({
+    scopedDiscipline.activeSession.blocked_actions.push({
       timestamp: record.timestamp,
       phase,
       action: `tool_call:${toolName}`,
       reason,
       rule_triggered: "phase_permissions",
     });
-    await persistSession(activeSession);
+    await persistSession(scopedDiscipline.activeSession);
     return { allowed: false, reason };
   }
 
-  await persistSession(activeSession);
+  await persistSession(scopedDiscipline.activeSession);
   return { allowed: true, reason: `Tool '${toolName}' permitted in phase '${phase}'` };
 }
 
@@ -236,36 +254,36 @@ export async function recordToolCall(
  * Record a discipline violation.
  */
 export async function recordViolation(violation: ViolationRecord): Promise<void> {
-  if (!activeSession) return;
-  activeSession.violations.push(violation);
-  await persistSession(activeSession);
+  if (!scopedDiscipline.activeSession) return;
+  scopedDiscipline.activeSession.violations.push(violation);
+  await persistSession(scopedDiscipline.activeSession);
 }
 
 /**
  * Attach a delta table to the active session.
  */
 export async function attachDeltaTable(delta: DeltaTable): Promise<void> {
-  if (!activeSession) throw new Error("No active session");
-  activeSession.artifacts.delta_tables.push(delta);
-  await persistSession(activeSession);
+  if (!scopedDiscipline.activeSession) throw new Error("No active session");
+  scopedDiscipline.activeSession.artifacts.delta_tables.push(delta);
+  await persistSession(scopedDiscipline.activeSession);
 }
 
 /**
  * Attach an implementation plan to the active session.
  */
 export async function attachPlan(plan: ImplementationPlan): Promise<void> {
-  if (!activeSession) throw new Error("No active session");
-  activeSession.artifacts.plans.push(plan);
-  await persistSession(activeSession);
+  if (!scopedDiscipline.activeSession) throw new Error("No active session");
+  scopedDiscipline.activeSession.artifacts.plans.push(plan);
+  await persistSession(scopedDiscipline.activeSession);
 }
 
 /**
  * Attach a verification report to the active session.
  */
 export async function attachVerificationReport(report: VerificationReport): Promise<void> {
-  if (!activeSession) throw new Error("No active session");
-  activeSession.artifacts.verification_reports.push(report);
-  await persistSession(activeSession);
+  if (!scopedDiscipline.activeSession) throw new Error("No active session");
+  scopedDiscipline.activeSession.artifacts.verification_reports.push(report);
+  await persistSession(scopedDiscipline.activeSession);
 }
 
 /**
@@ -274,12 +292,12 @@ export async function attachVerificationReport(report: VerificationReport): Prom
 export async function completeSession(
   status: "completed" | "failed" | "abandoned" = "completed",
 ): Promise<TaskSession> {
-  if (!activeSession) throw new Error("No active session");
-  activeSession.status = status;
-  activeSession.completed_at = new Date().toISOString();
-  const finished = { ...activeSession };
-  await persistSession(activeSession);
-  activeSession = null;
+  if (!scopedDiscipline.activeSession) throw new Error("No active session");
+  scopedDiscipline.activeSession.status = status;
+  scopedDiscipline.activeSession.completed_at = new Date().toISOString();
+  const finished = { ...scopedDiscipline.activeSession };
+  await persistSession(scopedDiscipline.activeSession);
+  scopedDiscipline.activeSession = null;
   logger.info(`Discipline session ${status}: ${finished.id}`);
   return finished;
 }
@@ -288,11 +306,13 @@ export async function completeSession(
  * Load a session from disk and optionally resume it.
  */
 export async function loadSession(sessionId: string, resume = false): Promise<TaskSession> {
+  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(sessionId)) throw new Error("DISCIPLINE_SESSION_ID_INVALID");
   const filePath = sessionPath(sessionId);
   const raw = await readFile(filePath, "utf-8");
   const session = JSON.parse(raw) as TaskSession;
+  if (getSessionContext() && session.owner_namespace !== sessionNamespace()) throw new Error("DISCIPLINE_SESSION_OWNER_REJECTED");
   if (resume && session.status === "active") {
-    activeSession = session;
+    scopedDiscipline.activeSession = session;
     logger.info(`Resumed discipline session: ${sessionId}`);
   }
   return session;
@@ -311,6 +331,7 @@ export async function listSessions(): Promise<{ id: string; status: string; task
       try {
         const raw = await readFile(resolve(dir, file), "utf-8");
         const s = JSON.parse(raw) as TaskSession;
+        if (getSessionContext() && s.owner_namespace !== sessionNamespace()) continue;
         sessions.push({
           id: s.id,
           status: s.status,

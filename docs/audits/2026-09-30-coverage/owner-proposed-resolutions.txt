@@ -1,0 +1,419 @@
+DREAMGRAPH ENGINE ALIGNMENT — PROPOSED RESOLUTIONS TO THE NERVOUS POINTS
+
+These are proposed policies and acceptance criteria, not claims about what
+the implementation already guarantees. Incorporate them into the existing
+plan and its governed slices rather than starting another architecture.
+
+The objective is to preserve DreamGraph's living, self-adjusting cognitive
+engine while making its knowledge, state transitions and operating costs
+trustworthy across every surface.
+
+
+1. MODEL PROFILES FOR FULL SCANS VERSUS ESTABLISHED-GRAPH WORK
+
+Decision:
+Separate the choice of model from the meaning and completeness of the work.
+Full scanning, targeted enrichment, dreaming and normalization may use
+different user-selected profiles, but must retain their respective evidence
+and output contracts.
+
+GPT-4.1 and GPT-5.4 in the original nervous point should remain examples or
+saved preferences, not permanent architectural defaults. The user has already
+changed scan models in response to actual cost.
+
+Required behavior:
+- Show the effective provider, model, reasoning configuration, hop depth and
+  relevant limits before starting an expensive job.
+- Preserve explicit user choices. Do not escalate to a stronger or more
+  expensive model silently, including through a fallback path.
+- Treat max-hops as a traversal-depth control, not a spending guarantee.
+  A one-hop neighborhood around a large hub may still be expensive.
+- Bound context expansion separately where configured: selected neighbors,
+  input tokens, output allowance, retries and cumulative job spend.
+- Record omitted context and the selection policy. A bounded neighborhood
+  must not be presented as the complete graph.
+- Record the effective enrichment configuration with each result/checkpoint.
+  Changing it must not silently relabel earlier results as newly enriched.
+- Preserve completed source scanning and valid enrichment when a budget is
+  exhausted. Expose which nodes remain evidence-only and support targeted
+  continuation rather than requiring another full scan.
+
+Do not weaken the current completeness requirement for automatic dreaming
+merely to make a budget-limited scan appear successful. Any change to that
+policy needs an explicit decision.
+
+Acceptance:
+A stopped enrichment run retains its useful work, reports its remaining
+coverage accurately, and can continue under an explicitly selected profile.
+No operator must discover the actual model or cost policy from the bill.
+
+
+2. A STRONGER DREAMER CAN GROW POOR EVIDENCE FASTER
+
+Decision:
+Evaluate stronger models by the quality of their supported conclusions and
+useful hypotheses, not by fluency, confidence, output volume or graph growth.
+
+DreamGraph must still be allowed to dream. Novel ideas need not already be
+proven, but they must remain distinguishable from established knowledge.
+
+Required behavior:
+- Keep generated hypotheses separate from evidence-backed assertions.
+- Test models against frozen, representative tasks with reviewed evidence:
+  architecture retrieval, dependency reasoning, stale-source detection,
+  contradictions, missing evidence and genuinely useful proposed changes.
+- Include cases where the correct response is uncertainty, abstention or a
+  request for more evidence.
+- Measure unsupported promotions, missed contradictions, evidence accuracy
+  and downstream usefulness alongside cost.
+- Do not count repeated paraphrases, repeated model passes or agreement
+  between models as independent corroboration.
+- Preserve the ability to revisit a conclusion when its supporting source
+  changes or is withdrawn.
+
+Acceptance:
+A more persuasive answer with the same weak evidence cannot acquire a
+stronger trust status merely because a more capable model produced it.
+Conversely, useful speculative ideas remain available as hypotheses rather
+than being discarded because they are not yet facts.
+
+
+3. RETRIEVAL, MUTATION AND BACKGROUND-JOB CONTRACTS
+
+Decision:
+Establish common guarantees beneath the surfaces, without requiring every
+transport to have an identical presentation.
+
+Retrieval:
+Every result must communicate its scope, relevant revision/freshness,
+completeness and uncertainty. Distinguish:
+- complete for the requested scope;
+- partial because of a limit, permission or unavailable source;
+- stale or awaiting reconciliation;
+- genuinely empty.
+
+Bound large responses and provide continuation through the existing
+retrieval mechanisms. Pagination or continuation must either preserve the
+relevant revision or explicitly disclose that it changed. Never silently
+drop nodes, edge types or provenance to fit a response.
+
+Do not require an expensive global count on every request merely to display
+a completeness label. Report what is actually known.
+
+Mutation:
+Return success only after the authoritative change is durably committed.
+Use existing operation identity, revision checks and recovery facilities.
+A retry after a lost reply must not duplicate the operation.
+
+Where persistence spans files, database state or external effects, define
+the recovery sequence explicitly. Do not promise universal exactly-once
+execution or rollback of effects that cannot actually be reversed.
+
+Background jobs:
+Give each job an owner, cancellation state, checkpoint policy and bounded
+resource use. Account for outstanding parallel calls when enforcing a
+budget; checking spend only after completion is insufficient.
+
+Acceptance:
+Dropped responses, client refreshes, process crashes and concurrent clients
+cannot turn a partial read into a complete one, an uncommitted write into a
+success, or an already committed operation into an accidental duplicate.
+
+
+4. EXISTING CLIENTS ASSUMING UNBOUNDED JSON OR SHARED BROWSER STATE
+
+Decision:
+Change transport and session contracts explicitly. Browser state must not
+become an accidental authority for engine state.
+
+Required behavior:
+- Inventory consumers that assume a response is one exhaustive JSON object.
+- Introduce bounded responses and continuation through negotiated or
+  versioned contracts, with adapters where needed.
+- Test that clients follow continuation and preserve its revision semantics.
+- Make each client able to reconstruct its view from authoritative state
+  after reconnect, refresh or context loss.
+- A browser refresh should not implicitly cancel a durable daemon-owned job.
+  Session-bound work may stop, but that distinction must be explicit.
+- Keep human UI state separate from execution authority. An open tab, a
+  selected plan or a cached badge is not proof of the current job state.
+- Preserve the separation between native API continuation and CLI execution;
+  do not impose API-only envelopes on a CLI adapter.
+
+Acceptance:
+Two clients observing the same engine converge on the same authoritative
+state despite different local caches. A client that cannot understand a new
+response contract fails visibly instead of treating partial data as complete.
+
+
+5. GLOBAL COVERAGE PERCENTAGES ENCOURAGING SHALLOW TESTS
+
+Decision:
+Use percentages as summaries, never as substitutes for demonstrated behavior.
+
+Required behavior:
+Build a requirements-to-evidence matrix covering:
+- important state transitions;
+- graph types and relationship types;
+- adapter and surface contracts;
+- stale, incomplete and contradictory evidence;
+- persistence and recovery failures;
+- concurrency, cancellation and resource limits.
+
+For agent usefulness, include representative tasks from DreamGraph and
+web64-react separately. Success should require the right information and
+provenance, not merely a syntactically valid response or enough returned nodes.
+
+Keep structural coverage, semantic-enrichment coverage, evidence quality and
+task usefulness separate. Evidence-only fallback is not successful LLM
+enrichment, although it can still be valid and useful structural evidence.
+
+Reuse focused tests for distinct behavior. Do not multiply unchanged global
+suites across every model, surface or configuration.
+
+Acceptance:
+Every important requirement has an identifiable test or an explicit unverified
+status. A headline percentage cannot conceal an untested graph class,
+recovery path or agent workflow.
+
+
+6. API CAPABILITIES VERSUS CLI IDENTIFIERS AND MODEL OVERRIDES
+
+Decision:
+Keep model identity, transport capability and cost policy separate.
+
+Required behavior:
+- Distinguish requested model, resolved model and actual execution transport.
+- Maintain API parameter/schema capabilities separately from CLI-supported
+  identifiers, effort settings and output mechanisms.
+- Do not infer temperature support, structured-output guarantees or context
+  limits from a model's name.
+- Validate explicit overrides against the relevant adapter contract. Preserve
+  supported custom-model workflows rather than hard-coding one vendor list.
+- Unsupported settings produce actionable feedback. Do not silently discard
+  them or substitute a different model.
+- Retain host-side output validation where required. A CLI producing valid
+  JSON is not automatically equivalent to API-enforced schema output.
+- Report fallback use explicitly, including its reason and any changed
+  evidence, capability or cost guarantees.
+- Do not apply API token tariffs to subscription CLI usage and label the
+  result as an actual charge. Keep measured cost, estimated cost and unknown
+  subscription consumption distinct.
+
+Acceptance:
+Each execution can be traced to its real model and adapter. No fallback or
+override silently changes spending or weakens the required output contract.
+
+
+7. LEGACY GRAPHS WITHOUT RELIABLE SCAN OR CHECKPOINT BASELINES
+
+Decision:
+Treat absent historical evidence as unknown, not as permission to invent a
+baseline or rebuild the graph destructively.
+
+Required behavior:
+- Inspect schema, stable identities, source references, revisions, checkpoints
+  and available provenance before selecting a repair strategy.
+- Separate known-format migration from evidence reconstruction and semantic
+  re-enrichment. They are different operations.
+- Produce a read-only report of what is recoverable, ambiguous, orphaned,
+  stale or missing.
+- Preserve historical enrichment and human contributions with their original
+  provenance. A new scan must not manufacture an old verification history.
+- Preview repair changes and identity mappings before applying them.
+- Preserve a recoverable baseline and test restoration.
+- Stage expensive re-enrichment separately from structural repair so a
+  depleted API balance does not leave a half-migrated persistent format.
+
+Acceptance:
+A legacy graph can be inspected and repaired without pretending its missing
+history exists. Interrupted repair leaves a recoverable state, and ambiguous
+records are surfaced rather than silently deleted or reassigned.
+
+
+8. INDEPENDENT PROJECTIONS DEPENDING ON OLD IDS AND CONFIDENCE MEANINGS
+
+Decision:
+Create one canonical meaning for shared data; adapt each surface to it.
+Do not attempt to align eight surfaces through eight separate rewrites.
+
+Required behavior:
+- Map each shared concept to its existing engine owner, persisted
+  representation, allowed writers and consumers.
+- Preserve stable identities independently of display names and UI grouping.
+- Document what confidence means wherever it is exposed. Separate model
+  confidence, evidence strength, freshness and validation status.
+- Introduce adapters from legacy representations to the canonical contract
+  where needed. Explicitly flag lossy conversions.
+- Compare old and new projections against the same graph revision and scope.
+  Normalize irrelevant presentation differences before comparison.
+- Test all relevant node/edge classes, permissions, omissions, provenance and
+  continuation—not just fields common to every surface.
+- Include plugin and federation boundaries where they consume these records.
+
+Acceptance:
+MCP, CLI, Architect, Explorer and analytics may present different views, but
+cannot contradict one another about identity, evidence or state because
+they independently interpreted the same field.
+
+
+9. PAID CANARIES, SPEND CAPS AND PROVIDER RETENTION
+
+Decision:
+Ordinary CI makes zero paid model requests. Real-provider evaluation is a
+separately authorized activity with explicit data and budget scope.
+
+Required behavior:
+- Default to deterministic fixtures and existing offline test mechanisms.
+- Require opt-in credentials, approved models, declared test data and a
+  configured monetary limit before paid evaluation.
+- No configured budget means no paid run, not unlimited spending.
+- Reserve a conservative maximum cost before issuing each request, including
+  concurrent calls and retries. Reconcile against returned usage afterward.
+- Unknown price is unknown—not zero. Do not automatically admit a paid
+  request that cannot be bounded under the chosen policy.
+- Record pricing provenance and distinguish estimates from final charges.
+- Disclose exactly what source/evidence is sent to a provider.
+- Configure supported retention/storage settings explicitly and state their
+  limits. Never claim zero retention merely because a client flag was set.
+- Sanitize saved test artifacts, logs and reports; preserve no credentials.
+
+Acceptance:
+A normal test run cannot consume API credit. An opted-in run cannot silently
+escalate its model, retry past its authorized allocation or send additional
+private evidence beyond the declared scope.
+
+
+10. NO UNREVIEWED LEGACY GRAPH REWRITE
+
+Decision:
+A migration is a controlled state transition, not a cleanup command.
+
+Required behavior:
+- Bind approval to a specific migration plan, input revision and change scope.
+- Keep a backup and test the restoration procedure before destructive work.
+- Produce a delta preview covering identities, relationships, trust states,
+  deletions and unresolved mappings—not just row counts.
+- Use staged migration where practical, then perform a controlled cutover.
+- Coordinate with active scans, enrichment jobs and other writers. Pause,
+  fence or reject incompatible writes using the existing lifecycle authority.
+- Detect stale operations prepared against the old revision.
+- Define what happens to writes after cutover. Restoring an old backup must
+  not silently discard legitimate newer work.
+- Use an explicit maintenance/write barrier where safe online reconciliation
+  is not already supported; do not invent live migration to avoid a pause.
+
+Acceptance:
+Crash, cancellation, stale-client and concurrent-scan tests demonstrate that
+the graph cannot be left ambiguously half-migrated. Rollback limitations and
+the treatment of post-cutover writes are documented and tested.
+
+
+11. SOURCE FACTS, HUMAN ASSERTIONS, HYPOTHESES AND VALIDATED INSIGHTS
+
+Decision:
+Preserve both provenance and trust state. They are related but not
+interchangeable dimensions.
+
+Required behavior:
+- Retain whether a claim originated from source evidence, a human assertion,
+  a model hypothesis or a documented validation process.
+- Preserve the actual supporting references, their revisions and the scope
+  of what they support.
+- Do not automatically treat a human assertion as verified, or a
+  source-backed statement as permanently current.
+- An insight's promotion records what validation occurred and what evidence
+  supports the resulting status.
+- Repetition, narration, metacognitive review or federation must not launder
+  an assertion into independent evidence.
+- Track shared evidence ancestry so two derived claims quoting the same
+  source are not counted as two independent confirmations.
+- Surface contradictions instead of resolving them solely by model
+  confidence or majority vote.
+- On evidence change, mark affected claims for re-evaluation without erasing
+  their history.
+
+Acceptance:
+The same unsupported claim cannot become validated by circulating through
+dreaming, narration, normalization and federation. Creative hypotheses
+remain useful, discoverable hypotheses until their evidence changes.
+
+
+12. PRESERVE THE COMPACT UI WHILE IMPROVING UNDERSTANDING
+
+Decision:
+Improve observability and control without undoing the current compact,
+desktop-tool visual direction.
+
+Required behavior:
+- Keep dense layouts, restrained surfaces, compact toolbars and contextual
+  inspectors.
+- Use unobtrusive text/link-style controls for secondary navigation and
+  reveal actions, while retaining correct keyboard and interaction behavior.
+- Reserve stronger visual controls for primary actions and consequential
+  changes. Do not turn every detail into a bordered button.
+- Make freshness, completeness, active execution, recovery state and effective
+  model configuration easy to inspect without permanent visual clutter.
+- Expose the evidence behind health, weather, confidence and similar
+  summaries. Preserve DreamGraph's vocabulary, but make it explainable.
+- Distinguish saved configuration from effective running configuration.
+- Keep full details accessible through contextual inspection; compact must
+  not mean silently omitted.
+- Test realistic dense graphs, long labels, narrow windows, reconnects and
+  partial states—not only attractive empty views.
+
+Acceptance:
+A user can determine what is running, what knowledge is incomplete, why an
+action is blocked and what control will change it. Visual polish must not
+conceal uncertainty or substitute for functional status.
+
+
+13. REUSE THE EXISTING ENGINE INSTEAD OF BUILDING ANOTHER ONE
+
+Decision:
+Align existing trust-state, evidence-ledger, lifecycle, coverage and provider
+modules. Introduce a new subsystem only for a demonstrated responsibility
+that no current owner can reasonably fulfill.
+
+Required behavior:
+- Begin each change with the owning module and contract it repairs.
+- Prefer extending existing APIs and adding adapters over creating competing
+  registries, schedulers, ledgers, evaluators or persistence authorities.
+- Keep transport/UI concerns outside cognitive policy and evidence ownership.
+- Fit work into the current governed slices. Close a useful end-to-end path
+  before broadening the change across every surface.
+- Preserve working behavior through baseline fixtures and focused conformance
+  checks. Correctness defects may require intentional behavior changes, but
+  those changes must be named rather than hidden as refactoring.
+- Remove old paths only after their consumers have migrated and their
+  compatibility obligations have an explicit disposition.
+- Keep audit findings traceable through implementation, tests and migration
+  evidence. Do not mark a finding resolved because a replacement file exists.
+- Retain living-engine behavior: targeted and lucid dreams, intervention,
+  adaptation, temporal/causal reasoning and federation must not be flattened
+  into a static repository index merely because that is easier to standardize.
+
+Acceptance:
+The overhaul reduces duplicated meaning and makes existing capabilities
+compose reliably. It does not leave a new canonical engine alongside an
+unchanged legacy engine with a third layer keeping them synchronized.
+
+
+OVERALL PERSPECTIVE
+
+DreamGraph's coherence should come from explicit ownership, evidence and
+lifecycle contracts—not from requiring one maintainer, one model or one huge
+context window to remember every interaction.
+
+Be strict where mistakes damage trust, persistent state, privacy or budgets.
+Remain flexible where DreamGraph is intentionally exploratory.
+
+The finished system should let an agent:
+- discover the relevant knowledge without silently losing important context;
+- distinguish known, inferred, disputed, stale and incomplete information;
+- act through the proper authority and verify what actually committed;
+- continue safely after interruption;
+- understand the limits and cost of further work.
+
+That is the alignment target: preserve the original ambition while making
+the engine and its surfaces dependable enough to sustain it.

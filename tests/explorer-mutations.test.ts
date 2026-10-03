@@ -267,6 +267,39 @@ describe("Mutation preconditions", () => {
     const audit = await readAudit();
     expect(audit.at(-1)?.error).toBe("etag_mismatch");
   });
+  it("accepts an older displayed snapshot when only an unrelated entity changed", async () => {
+    await seedTension("ten_1", ["a", "b"]);
+    const snap = await getGraphSnapshot();
+    await writeFile(dataPath("features.json"), JSON.stringify({features:[{id:"unrelated",name:"New unrelated feature"}]}));
+    await run("tension.resolve", {body:{tension_id:"ten_1",reason:"Reviewed target is unchanged"},headers:{"If-Match":snap.etag}});
+    expect(captured.status).toBe(200);
+    expect(JSON.parse(captured.body!).affected_ids).toContain("ten_1");
+  });
+  it("refuses a changed tension or a changed referenced entity before invoking the mutation", async () => {
+    await seedTension("ten_1", ["a", "b"]);
+    await writeFile(dataPath("features.json"), JSON.stringify({features:[{id:"a",name:"Before"}]}));
+    const snap = await getGraphSnapshot();
+    await writeFile(dataPath("features.json"), JSON.stringify({features:[{id:"a",name:"After"}]}));
+    await run("tension.resolve", {body:{tension_id:"ten_1",reason:"Review"},headers:{"If-Match":snap.etag}});
+    expect(captured.status).toBe(412);
+    expect(JSON.parse(await readFile(dataPath("tension_log.json"),"utf8")).signals).toHaveLength(1);
+    const next=await getGraphSnapshot(),doc=JSON.parse(await readFile(dataPath("tension_log.json"),"utf8"));doc.signals[0].urgency=0.9;
+    await writeFile(dataPath("tension_log.json"),JSON.stringify(doc));
+    await run("tension.resolve", {body:{tension_id:"ten_1",reason:"Review"},headers:{"If-Match":next.etag}});
+    expect(captured.status).toBe(412);
+  });
+  it.each(["candidate.promote", "candidate.reject"])("%s rebases unrelated changes but refuses changed original claims", async intent => {
+    await seedCandidate("dream_1", "a", "b");
+    await writeFile(dataPath("features.json"), JSON.stringify({features:[{id:"a",name:"A"},{id:"b",name:"B"}]}));
+    const snap = await getGraphSnapshot();
+    await writeFile(dataPath("capabilities.json"),JSON.stringify({capabilities:[{id:"unrelated",name:"Unrelated"}]}));
+    await run(intent, {body:{dream_id:"dream_1",reason:"Review",dry_run:true},headers:{"If-Match":snap.etag}});
+    expect(captured.status).toBe(200);
+    const graph=JSON.parse(await readFile(dataPath("dream_graph.json"),"utf8"));graph.edges[0].relation="changed_claim";
+    await writeFile(dataPath("dream_graph.json"),JSON.stringify(graph));
+    await run(intent, {body:{dream_id:"dream_1",reason:"Review",dry_run:true},headers:{"If-Match":snap.etag}});
+    expect(captured.status).toBe(412);
+  });
 });
 
 describe("Audit row contract", () => {
@@ -375,7 +408,7 @@ describe("candidate.promote", () => {
     vi.spyOn(lifecycle, "getActiveScope").mockReturnValue(null);
   });
 
-  it("appends a validated edge and removes the candidate", async () => {
+  it("records a human assertion and preserves normalization history", async () => {
     await seedCandidate("dream_1", "feat_a", "feat_b");
     const snap = await getGraphSnapshot();
     await run("candidate.promote", {
@@ -387,7 +420,9 @@ describe("candidate.promote", () => {
     expect(validated.edges.length).toBe(1);
     expect(validated.edges[0].from).toBe("feat_a");
     const candidates = JSON.parse(await readFile(dataPath("candidate_edges.json"), "utf-8"));
-    expect(candidates.results.length).toBe(0);
+    expect(candidates.results.length).toBe(1);
+    expect(validated.edges[0].human_asserted).toBe(true);
+    expect(validated.edges[0].evidence_count).toBe(0);
   });
 });
 
@@ -396,7 +431,7 @@ describe("candidate.reject", () => {
     vi.spyOn(lifecycle, "getActiveScope").mockReturnValue(null);
   });
 
-  it("flips status to rejected without adding a validated edge", async () => {
+  it("records rejection without rewriting assessment history or adding source validation", async () => {
     await seedCandidate("dream_2", "feat_c", "feat_d");
     const snap = await getGraphSnapshot();
     await run("candidate.reject", {
@@ -405,7 +440,9 @@ describe("candidate.reject", () => {
     });
     expect(captured.status).toBe(200);
     const candidates = JSON.parse(await readFile(dataPath("candidate_edges.json"), "utf-8"));
-    expect(candidates.results[0].status).toBe("rejected");
+    expect(candidates.results[0].status).toBe("latent");
+    const maintenance = JSON.parse(await readFile(dataPath("graph_maintenance.json"), "utf-8"));
+    expect(maintenance.curation.decisions.at(-1)).toMatchObject({ action: "reject", reason: "noise" });
     // No validated_edges file should be created with content.
     try {
       const validated = JSON.parse(await readFile(dataPath("validated_edges.json"), "utf-8"));

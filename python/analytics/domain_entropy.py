@@ -17,6 +17,7 @@ import math
 from collections import Counter
 from pathlib import Path
 
+from .definitions import qualified
 from . import loader
 from ._common import add_common_args, emit, fmt_table, resolve_data_dir_from_args
 
@@ -57,7 +58,7 @@ def _measure(label: str, items: list[dict], domain_key: str = "domain") -> dict:
         "distinct_domains": len(c),
         "entropy_bits": round(h, 3),
         "normalized_entropy": round(norm, 3),
-        "verdict": _verdict(norm),
+        "verdict": "empty" if not total else "dominated" if norm==0 else _verdict(norm),
         "dominant_domain": dominant[0],
         "dominant_share": round(dominant[1] / total, 3) if total else 0.0,
         "top": [
@@ -67,6 +68,7 @@ def _measure(label: str, items: list[dict], domain_key: str = "domain") -> dict:
     }
 
 
+@qualified("domain_entropy")
 def analyze(data_dir: Path) -> dict:
     fact = loader.all_fact_entities(data_dir)
     dg = loader.dream_graph(data_dir)

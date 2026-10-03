@@ -1,0 +1,1471 @@
+[
+  {
+    "file": "src/cognitive/adaptive-future-scaffold.ts",
+    "local_imports": [],
+    "coverage": {
+      "lines": {
+        "total": 135,
+        "covered": 121,
+        "skipped": 0,
+        "pct": 89.62
+      },
+      "functions": {
+        "total": 9,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 88.88
+      },
+      "statements": {
+        "total": 135,
+        "covered": 121,
+        "skipped": 0,
+        "pct": 89.62
+      },
+      "branches": {
+        "total": 47,
+        "covered": 28,
+        "skipped": 0,
+        "pct": 59.57
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/adversarial.ts",
+    "local_imports": [
+      "../graph/events.js",
+      "../types/index.js",
+      "../utils/atomic-write.js",
+      "../utils/cache.js",
+      "../utils/logger.js",
+      "../utils/paths.js",
+      "./engine.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 445,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 2.47
+      },
+      "functions": {
+        "total": 16,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 445,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 2.47
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/bootstrap-driver.ts",
+    "local_imports": [
+      "../instance/bootstrap.js",
+      "../utils/logger.js",
+      "./bootstrap-registry.js",
+      "./llm-readiness.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 153,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 153,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/bootstrap-registry.ts",
+    "local_imports": [
+      "../utils/atomic-write.js",
+      "../utils/logger.js",
+      "../utils/mutex.js",
+      "../utils/paths.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 44,
+        "covered": 17,
+        "skipped": 0,
+        "pct": 38.63
+      },
+      "functions": {
+        "total": 5,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 40
+      },
+      "statements": {
+        "total": 44,
+        "covered": 17,
+        "skipped": 0,
+        "pct": 38.63
+      },
+      "branches": {
+        "total": 5,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 40
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/calibration-evaluation.ts",
+    "local_imports": [
+      "./lifecycle-visibility.js",
+      "./tension-clustering.js",
+      "./trust-state.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 59,
+        "covered": 58,
+        "skipped": 0,
+        "pct": 98.3
+      },
+      "functions": {
+        "total": 2,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 59,
+        "covered": 58,
+        "skipped": 0,
+        "pct": 98.3
+      },
+      "branches": {
+        "total": 17,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 82.35
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/causal.ts",
+    "local_imports": [
+      "../utils/logger.js",
+      "./engine.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 269,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 1.48
+      },
+      "functions": {
+        "total": 7,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 269,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 1.48
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/dreamer.ts",
+    "local_imports": [
+      "../utils/logger.js",
+      "./causal.js",
+      "./engine.js",
+      "./strategies/_shared.js",
+      "./strategies/cross-domain-bridging.js",
+      "./strategies/gap-detection.js",
+      "./strategies/llm-dream.js",
+      "./strategies/missing-abstraction.js",
+      "./strategies/orphan-bridging.js",
+      "./strategies/pgo-wave.js",
+      "./strategies/schema-grounding.js",
+      "./strategies/symmetry-completion.js",
+      "./strategies/tension-directed.js",
+      "./strategies/weak-reinforcement.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 220,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 7.27
+      },
+      "functions": {
+        "total": 3,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 220,
+        "covered": 16,
+        "skipped": 0,
+        "pct": 7.27
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/engine.ts",
+    "local_imports": [
+      "../config/config.js",
+      "../graph/events.js",
+      "../instance/index.js",
+      "../tools/enrich-seed-data.js",
+      "../types/index.js",
+      "../utils/atomic-write.js",
+      "../utils/cache.js",
+      "../utils/logger.js",
+      "../utils/mutex.js",
+      "../utils/paths.js",
+      "../utils/ui-index.js",
+      "./intervention.js",
+      "./llm-readiness.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 1981,
+        "covered": 1044,
+        "skipped": 0,
+        "pct": 52.7
+      },
+      "functions": {
+        "total": 98,
+        "covered": 60,
+        "skipped": 0,
+        "pct": 61.22
+      },
+      "statements": {
+        "total": 1981,
+        "covered": 1044,
+        "skipped": 0,
+        "pct": 52.7
+      },
+      "branches": {
+        "total": 296,
+        "covered": 202,
+        "skipped": 0,
+        "pct": 68.24
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/event-router.ts",
+    "local_imports": [
+      "../utils/atomic-write.js",
+      "../utils/logger.js",
+      "../utils/paths.js",
+      "./engine.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 232,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 6.46
+      },
+      "functions": {
+        "total": 14,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 232,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 6.46
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/evidence-ledger.ts",
+    "local_imports": [
+      "./trust-state.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 155,
+        "covered": 129,
+        "skipped": 0,
+        "pct": 83.22
+      },
+      "functions": {
+        "total": 7,
+        "covered": 6,
+        "skipped": 0,
+        "pct": 85.71
+      },
+      "statements": {
+        "total": 155,
+        "covered": 129,
+        "skipped": 0,
+        "pct": 83.22
+      },
+      "branches": {
+        "total": 12,
+        "covered": 8,
+        "skipped": 0,
+        "pct": 66.66
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/federation.ts",
+    "local_imports": [
+      "../graph/events.js",
+      "../utils/atomic-write.js",
+      "../utils/logger.js",
+      "../utils/paths.js",
+      "./engine.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 243,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 4.52
+      },
+      "functions": {
+        "total": 11,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 243,
+        "covered": 11,
+        "skipped": 0,
+        "pct": 4.52
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/graph-maintenance-state.ts",
+    "local_imports": [
+      "../utils/atomic-write.js",
+      "../utils/mutex.js",
+      "../utils/paths.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 74,
+        "covered": 68,
+        "skipped": 0,
+        "pct": 91.89
+      },
+      "functions": {
+        "total": 5,
+        "covered": 5,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 74,
+        "covered": 68,
+        "skipped": 0,
+        "pct": 91.89
+      },
+      "branches": {
+        "total": 18,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 72.22
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/graph-paths.ts",
+    "local_imports": [
+      "../types/index.js",
+      "../utils/cache.js",
+      "../utils/logger.js",
+      "../utils/paths.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 434,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 434,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/graph-rag.ts",
+    "local_imports": [
+      "../types/index.js",
+      "../utils/cache.js",
+      "../utils/graph-reconciliation-barrier.js",
+      "../utils/logger.js",
+      "../utils/paths.js",
+      "./llm.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 808,
+        "covered": 328,
+        "skipped": 0,
+        "pct": 40.59
+      },
+      "functions": {
+        "total": 22,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 59.09
+      },
+      "statements": {
+        "total": 808,
+        "covered": 328,
+        "skipped": 0,
+        "pct": 40.59
+      },
+      "branches": {
+        "total": 87,
+        "covered": 66,
+        "skipped": 0,
+        "pct": 75.86
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/intervention.ts",
+    "local_imports": [
+      "../types/index.js",
+      "../utils/atomic-write.js",
+      "../utils/cache.js",
+      "../utils/logger.js",
+      "../utils/mutex.js",
+      "../utils/paths.js",
+      "./engine.js",
+      "./llm.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 1593,
+        "covered": 494,
+        "skipped": 0,
+        "pct": 31.01
+      },
+      "functions": {
+        "total": 51,
+        "covered": 17,
+        "skipped": 0,
+        "pct": 33.33
+      },
+      "statements": {
+        "total": 1593,
+        "covered": 494,
+        "skipped": 0,
+        "pct": 31.01
+      },
+      "branches": {
+        "total": 213,
+        "covered": 147,
+        "skipped": 0,
+        "pct": 69.01
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/lifecycle-visibility.ts",
+    "local_imports": [
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 92,
+        "covered": 86,
+        "skipped": 0,
+        "pct": 93.47
+      },
+      "functions": {
+        "total": 6,
+        "covered": 6,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 92,
+        "covered": 86,
+        "skipped": 0,
+        "pct": 93.47
+      },
+      "branches": {
+        "total": 29,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 44.82
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/llm-readiness.ts",
+    "local_imports": [
+      "../utils/logger.js",
+      "./llm.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 150,
+        "covered": 17,
+        "skipped": 0,
+        "pct": 11.33
+      },
+      "functions": {
+        "total": 7,
+        "covered": 1,
+        "skipped": 0,
+        "pct": 14.28
+      },
+      "statements": {
+        "total": 150,
+        "covered": 17,
+        "skipped": 0,
+        "pct": 11.33
+      },
+      "branches": {
+        "total": 1,
+        "covered": 1,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/llm.ts",
+    "local_imports": [
+      "../utils/logger.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 1170,
+        "covered": 853,
+        "skipped": 0,
+        "pct": 72.9
+      },
+      "functions": {
+        "total": 63,
+        "covered": 48,
+        "skipped": 0,
+        "pct": 76.19
+      },
+      "statements": {
+        "total": 1170,
+        "covered": 853,
+        "skipped": 0,
+        "pct": 72.9
+      },
+      "branches": {
+        "total": 321,
+        "covered": 217,
+        "skipped": 0,
+        "pct": 67.6
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/lucid.ts",
+    "local_imports": [
+      "../types/index.js",
+      "../utils/atomic-write.js",
+      "../utils/cache.js",
+      "../utils/logger.js",
+      "../utils/paths.js",
+      "./engine.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 823,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 823,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/metacognition.ts",
+    "local_imports": [
+      "../utils/atomic-write.js",
+      "../utils/logger.js",
+      "../utils/paths.js",
+      "./engine.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 532,
+        "covered": 23,
+        "skipped": 0,
+        "pct": 4.32
+      },
+      "functions": {
+        "total": 12,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 532,
+        "covered": 23,
+        "skipped": 0,
+        "pct": 4.32
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/narrator.ts",
+    "local_imports": [
+      "../graph/events.js",
+      "../utils/atomic-write.js",
+      "../utils/logger.js",
+      "../utils/paths.js",
+      "./engine.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 527,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 2.65
+      },
+      "functions": {
+        "total": 16,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 527,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 2.65
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/normalizer.ts",
+    "local_imports": [
+      "../instance/policies.js",
+      "../types/index.js",
+      "../utils/cache.js",
+      "../utils/logger.js",
+      "./engine.js",
+      "./llm.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 869,
+        "covered": 464,
+        "skipped": 0,
+        "pct": 53.39
+      },
+      "functions": {
+        "total": 19,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 63.15
+      },
+      "statements": {
+        "total": 869,
+        "covered": 464,
+        "skipped": 0,
+        "pct": 53.39
+      },
+      "branches": {
+        "total": 113,
+        "covered": 48,
+        "skipped": 0,
+        "pct": 42.47
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/playback.ts",
+    "local_imports": [
+      "./evidence-ledger.js",
+      "./trust-state.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 99,
+        "covered": 92,
+        "skipped": 0,
+        "pct": 92.92
+      },
+      "functions": {
+        "total": 3,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 99,
+        "covered": 92,
+        "skipped": 0,
+        "pct": 92.92
+      },
+      "branches": {
+        "total": 20,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 65
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/register.ts",
+    "local_imports": [
+      "../instance/index.js",
+      "../types/index.js",
+      "../utils/errors.js",
+      "../utils/logger.js",
+      "../utils/paths.js",
+      "../utils/tool-output.js",
+      "./adversarial.js",
+      "./causal.js",
+      "./dreamer.js",
+      "./engine.js",
+      "./event-router.js",
+      "./federation.js",
+      "./graph-paths.js",
+      "./graph-rag.js",
+      "./intervention.js",
+      "./llm.js",
+      "./lucid.js",
+      "./metacognition.js",
+      "./narrator.js",
+      "./normalizer.js",
+      "./scheduler.js",
+      "./temporal.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 2928,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 2928,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/scheduler.ts",
+    "local_imports": [
+      "../graph/events.js",
+      "../instance/index.js",
+      "../instance/lifecycle.js",
+      "../utils/atomic-write.js",
+      "../utils/logger.js",
+      "../utils/mutex.js",
+      "../utils/paths.js",
+      "./adversarial.js",
+      "./dreamer.js",
+      "./engine.js",
+      "./event-router.js",
+      "./federation.js",
+      "./llm-readiness.js",
+      "./llm.js",
+      "./metacognition.js",
+      "./narrator.js",
+      "./normalizer.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 914,
+        "covered": 176,
+        "skipped": 0,
+        "pct": 19.25
+      },
+      "functions": {
+        "total": 29,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 24.13
+      },
+      "statements": {
+        "total": 914,
+        "covered": 176,
+        "skipped": 0,
+        "pct": 19.25
+      },
+      "branches": {
+        "total": 26,
+        "covered": 13,
+        "skipped": 0,
+        "pct": 50
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/strategies/_shared.ts",
+    "local_imports": [
+      "../../semantic-invariants.js",
+      "../../types/index.js",
+      "../../utils/cache.js",
+      "../../utils/json-store.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 290,
+        "covered": 58,
+        "skipped": 0,
+        "pct": 20
+      },
+      "functions": {
+        "total": 6,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 33.33
+      },
+      "statements": {
+        "total": 290,
+        "covered": 58,
+        "skipped": 0,
+        "pct": 20
+      },
+      "branches": {
+        "total": 20,
+        "covered": 15,
+        "skipped": 0,
+        "pct": 75
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/strategies/cross-domain-bridging.ts",
+    "local_imports": [
+      "../types.js",
+      "./_shared.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 93,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 3.22
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 93,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 3.22
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/strategies/gap-detection.ts",
+    "local_imports": [
+      "../types.js",
+      "./_shared.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 86,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 3.48
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 86,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 3.48
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/strategies/llm-dream.ts",
+    "local_imports": [
+      "../../semantic-invariants.js",
+      "../../utils/logger.js",
+      "../../utils/senses.js",
+      "../engine.js",
+      "../llm.js",
+      "../types.js",
+      "./_shared.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 369,
+        "covered": 49,
+        "skipped": 0,
+        "pct": 13.27
+      },
+      "functions": {
+        "total": 2,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 369,
+        "covered": 49,
+        "skipped": 0,
+        "pct": 13.27
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/strategies/missing-abstraction.ts",
+    "local_imports": [
+      "../types.js",
+      "./_shared.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 81,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 3.7
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 81,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 3.7
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/strategies/orphan-bridging.ts",
+    "local_imports": [
+      "../types.js",
+      "./_shared.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 182,
+        "covered": 5,
+        "skipped": 0,
+        "pct": 2.74
+      },
+      "functions": {
+        "total": 4,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 182,
+        "covered": 5,
+        "skipped": 0,
+        "pct": 2.74
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/strategies/pgo-wave.ts",
+    "local_imports": [
+      "../../utils/logger.js",
+      "../types.js",
+      "./_shared.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 123,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 3.25
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 123,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 3.25
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/strategies/schema-grounding.ts",
+    "local_imports": [
+      "../../utils/logger.js",
+      "../engine.js",
+      "../types.js",
+      "./_shared.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 220,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 3.18
+      },
+      "functions": {
+        "total": 5,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 220,
+        "covered": 7,
+        "skipped": 0,
+        "pct": 3.18
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/strategies/symmetry-completion.ts",
+    "local_imports": [
+      "../types.js",
+      "./_shared.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 47,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 6.38
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 47,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 6.38
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/strategies/tension-directed.ts",
+    "local_imports": [
+      "../types.js",
+      "./_shared.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 71,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 4.22
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 71,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 4.22
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/strategies/weak-reinforcement.ts",
+    "local_imports": [
+      "../types.js",
+      "./_shared.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 54,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 5.55
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 54,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 5.55
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/targeted-dreams.ts",
+    "local_imports": [
+      "../utils/logger.js",
+      "./graph-maintenance-state.js",
+      "./scheduler.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 65,
+        "covered": 62,
+        "skipped": 0,
+        "pct": 95.38
+      },
+      "functions": {
+        "total": 3,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 65,
+        "covered": 62,
+        "skipped": 0,
+        "pct": 95.38
+      },
+      "branches": {
+        "total": 17,
+        "covered": 14,
+        "skipped": 0,
+        "pct": 82.35
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/temporal.ts",
+    "local_imports": [
+      "../utils/logger.js",
+      "./engine.js",
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 379,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "statements": {
+        "total": 379,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      },
+      "branches": {
+        "total": 1,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 0
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/tension-clustering.ts",
+    "local_imports": [
+      "./types.js"
+    ],
+    "coverage": {
+      "lines": {
+        "total": 82,
+        "covered": 76,
+        "skipped": 0,
+        "pct": 92.68
+      },
+      "functions": {
+        "total": 5,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 80
+      },
+      "statements": {
+        "total": 82,
+        "covered": 76,
+        "skipped": 0,
+        "pct": 92.68
+      },
+      "branches": {
+        "total": 36,
+        "covered": 35,
+        "skipped": 0,
+        "pct": 97.22
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/trust-state.ts",
+    "local_imports": [],
+    "coverage": {
+      "lines": {
+        "total": 100,
+        "covered": 95,
+        "skipped": 0,
+        "pct": 95
+      },
+      "functions": {
+        "total": 5,
+        "covered": 4,
+        "skipped": 0,
+        "pct": 80
+      },
+      "statements": {
+        "total": 100,
+        "covered": 95,
+        "skipped": 0,
+        "pct": 95
+      },
+      "branches": {
+        "total": 10,
+        "covered": 6,
+        "skipped": 0,
+        "pct": 60
+      }
+    }
+  },
+  {
+    "file": "src/cognitive/types.ts",
+    "local_imports": [],
+    "coverage": {
+      "lines": {
+        "total": 107,
+        "covered": 91,
+        "skipped": 0,
+        "pct": 85.04
+      },
+      "functions": {
+        "total": 3,
+        "covered": 2,
+        "skipped": 0,
+        "pct": 66.66
+      },
+      "statements": {
+        "total": 107,
+        "covered": 91,
+        "skipped": 0,
+        "pct": 85.04
+      },
+      "branches": {
+        "total": 9,
+        "covered": 3,
+        "skipped": 0,
+        "pct": 33.33
+      }
+    }
+  }
+]

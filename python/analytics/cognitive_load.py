@@ -1,4 +1,4 @@
-"""Cognitive load index — how confused is the system right now?
+"""Cognitive workload diagnostic — not measured confusion or understanding.
 
 Combines three pressures into a single 0..1 index:
 
@@ -6,7 +6,7 @@ Combines three pressures into a single 0..1 index:
 - hub_fuzziness      : fraction of high-degree fact entities with health<0.5
 - candidate_backlog  : pending (non-validated) candidate edges / max(decided, 1), capped at 1
 
-Each pressure is reported alongside the composite. Higher = more confused.
+Each pressure is reported alongside a legacy heuristic composite. Higher = more recorded workload.
 """
 from __future__ import annotations
 
@@ -15,9 +15,11 @@ from collections import Counter
 from pathlib import Path
 
 from . import hub_health, loader
+from .definitions import qualified
 from ._common import add_common_args, emit, resolve_data_dir_from_args
 
 
+@qualified("cognitive_load")
 def analyze(data_dir: Path) -> dict:
     fact = loader.all_fact_entities(data_dir)
     cand = loader.candidate_edges(data_dir)

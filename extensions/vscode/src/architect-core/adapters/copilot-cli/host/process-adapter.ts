@@ -353,6 +353,7 @@ function captureRun(opts: CaptureOptions): Promise<CapturedRun> {
       // `powershell.exe -File <path>` rewrite (no quote-stripping
       // hazard there because powershell.exe parses argv per .NET
       // rules, which align with CommandLineToArgvW).
+      opts.abortSignal?.throwIfAborted();
       let spawnCommand = opts.command;
       let spawnArgs: string[] = [...opts.args];
       let useVerbatimArgs = false;
@@ -413,8 +414,8 @@ function captureRun(opts: CaptureOptions): Promise<CapturedRun> {
         signal: null,
         durationMs: Date.now() - startedAt,
         timedOut: false,
-        aborted: false,
-        spawnError: err instanceof Error ? err : new Error(String(err)),
+        aborted: opts.abortSignal?.aborted === true,
+        spawnError: opts.abortSignal?.aborted ? null : err instanceof Error ? err : new Error(String(err)),
       });
       return;
     }

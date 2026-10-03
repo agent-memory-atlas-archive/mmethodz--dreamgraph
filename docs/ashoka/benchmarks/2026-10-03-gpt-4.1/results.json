@@ -1,0 +1,1211 @@
+{
+  "schema": "dreamgraph.ashoka.reviewed_pilot.v1",
+  "recorded_at": "2026-10-03T07:16:33.006Z",
+  "collected_at": "2026-10-03T06:19:05.295Z",
+  "status": "completed_with_published_quality_failures",
+  "source_protocol": "../../agent-evaluation-protocol.json",
+  "source_protocol_sha256": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+  "scope": "Twelve frozen supplied-context task pairs and two private established-graph exploratory pairs, one call per arm. Not autonomous agent execution or a statistical usefulness estimate.",
+  "environment": {
+    "os": "win32",
+    "architecture": "x64",
+    "node": "25.2.1"
+  },
+  "totals": {
+    "pairs": 14,
+    "calls": 28,
+    "input_tokens": 38971,
+    "output_tokens": 16538,
+    "cached_input_tokens": 2560,
+    "model_latency_ms": 126246.1228,
+    "reviewed_tariff_usd_before_cache_discount": 0.210246,
+    "day_cap_usd": 2.5,
+    "maximum_reserved_usd": 2.24,
+    "retries": 0
+  },
+  "findings": [
+    "AT01 omits required status fields.",
+    "AT03 blurs trust classes/independence.",
+    "AT05 does not execute and invents effects/readbacks.",
+    "AT06 contains age-only staleness claims.",
+    "DreamGraph AT02 and both GE16 pilot replies contain unsupported boundary guarantees.",
+    "Web64 AT02 and the two AT04 pairs meet their narrow supplied-excerpt outcomes."
+  ],
+  "limitations": [
+    "Expected labels and required-outcome checklist were not injected into the task prompt. Eight pairs use identical raw contract controls, not canonical production preambles. They expose model/harness limitations and are not proof that production authority contracts fail.",
+    "Four retrieval comparisons use the declared frozen corpus with synthetic distractors. The supplied source excerpts are historical; no fresh current-code understanding claim.",
+    "Two established-graph arms add context to the same frozen source; partial/unknown graph state and a single unblinded run cannot establish general gains. No repeat-until-pass, model escalation or label changes.",
+    "No source tool use, rereads avoided, governed mutation or continuation is measured by these read-only completions. No general improvement, cost saving or task-success percentage is claimed.",
+    "Provider-reported whole-request token usage is separate from UTF-8 context bytes. Local construction duration includes both arms and is not added twice. The tariff estimate is not an invoice.",
+    "store:false does not attest account/provider retention. Public fixture answers/requests were reviewed for publication; live graph context, credentials, approvals and original private ledger are excluded."
+  ],
+  "follow_up": {
+    "owner": "Agent evaluation and retrieval maintainers",
+    "target": "Post-14.0.0 field-feedback patch",
+    "work": "Add task-aligned outcome instructions and canonical trust/currency preambles, richer applicable ADR evidence, tool-enabled AT05 and repeated independently reviewed matched comparisons. Preserve this failed pilot."
+  },
+  "runs": [
+    {
+      "task_id": "dreamgraph:AT01",
+      "scope": "identical_contract_input_control",
+      "order": "source_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "2dc14c921366d5c86e1677e39a7c868e2163bdd42ade9074a7e546276a3aed03",
+      "original_specification_sha256": "sha256:e834dbdc24717e9cf9221e9c14986e45591ee07cde814ffb41c8403e3601a5fe",
+      "results": [
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "b50912ea86cc944aa6b93ecb7fd9044485f85bfa68574f09e266b9e0578ce2ab",
+          "context_bytes": 1007,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.4011000000000422,
+          "latency_ms": 3246.9147000000003,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 367,
+            "outputTokens": 258,
+            "totalTokens": 625,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "8601b751aca53147597a973e2b1647d2da4980eedaa444fac7b9d073f39a5b15",
+          "answer": "Based on the supplied context, here is the requested information, clearly distinguishing evidence and inference:\n\nGoverned current slice (evidence):\n- ID: fixture:dreamgraph:plan:blocked\n- Status: blocked\n\nA blocker for the current slice (evidence):\n- \"required source unavailable\"\n\nNext eligible slice (inference from dependency and status):\n- The next eligible slice must be one whose dependencies are all satisfied (i.e., all dependencies are in \"verified\" status) and is not blocked.\n- fixture:dreamgraph:plan:independent depends only on fixture:dreamgraph:plan:done, which is verified, and has no blockers.\n- Therefore, the next eligible slice is:\n  - ID: fixture:dreamgraph:plan:independent\n  - Status: pending\n\nSummary table:\n\n| Role                  | Slice ID                              | Status    | Blocker (if any)              |\n|-----------------------|---------------------------------------|-----------|-------------------------------|\n| Current slice         | fixture:dreamgraph:plan:blocked       | blocked   | required source unavailable   |\n| Next eligible slice   | fixture:dreamgraph:plan:independent   | pending   | none                          |\n\nNo mutations have been committed; this is a read of the supplied context only.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "partial",
+            "finding": "Both arms recover the blocked current slice, blocker and eligible independent slice. Neither gives all required authoritative plan/checkpoint/resume fields explicitly. Identical inputs are controls, not a graph benefit.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "b50912ea86cc944aa6b93ecb7fd9044485f85bfa68574f09e266b9e0578ce2ab",
+          "context_bytes": 1007,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.4011000000000422,
+          "latency_ms": 1919.1315,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 367,
+            "outputTokens": 190,
+            "totalTokens": 557,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "15cce8501ffd5d418b56b3dc72e155e4932b388713e6e6d2fe0461d93296bd1c",
+          "answer": "Governed current slice (evidence):\n- fixture:dreamgraph:plan:blocked is the current slice (from current_slice_ids).\n\nBlocker (evidence):\n- The blocker for fixture:dreamgraph:plan:blocked is \"required source unavailable\" (from blockers field).\n\nNext eligible slice (evidence and inference):\n- fixture:dreamgraph:plan:dependent depends on fixture:dreamgraph:plan:blocked, which is currently blocked, so it is not yet eligible.\n- fixture:dreamgraph:plan:independent depends on fixture:dreamgraph:plan:done, which is verified. It has no blockers and is pending.\n- Therefore, fixture:dreamgraph:plan:independent is the next eligible slice.\n\nSummary (facts only):\n- Current governed slice: fixture:dreamgraph:plan:blocked\n- Blocker: required source unavailable\n- Next eligible slice: fixture:dreamgraph:plan:independent",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "partial",
+            "finding": "Both arms recover the blocked current slice, blocker and eligible independent slice. Neither gives all required authoritative plan/checkpoint/resume fields explicitly. Identical inputs are controls, not a graph benefit.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/01-dreamgraph-AT01.json",
+      "limitation": null
+    },
+    {
+      "task_id": "dreamgraph:AT02",
+      "scope": "frozen_source_retrieval",
+      "order": "graph_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "6a1b1542d8fe15975795ce205d751579fb147b5a06213709b168311649b7210e",
+      "original_specification_sha256": "sha256:3298b93313b4b59d9f9f22221dab7d5cab5c50f3e4557779a9b8bdb6139a4f1f",
+      "results": [
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "0b0c5038582f9a108ea06d98b3c460e6e343367c4a725ece8ec52532b7ff2dc5",
+          "context_bytes": 9811,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 50.59140000000002,
+          "latency_ms": 5499.1684,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 2593,
+            "outputTokens": 767,
+            "totalTokens": 3360,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "d2e6e5bfdb0075b115a014fe65653850f4b742d428d12f276d304066a98bfef1",
+          "answer": "Fact-based explanation from supplied context:\n\n**Scan-to-publication-to-agent retrieval** describes a pipeline in DreamGraph where project data is:\n\n1. **Scanned** from source repositories,\n2. **Published** as a graph revision,\n3. **Retrieved** by an agent for cognitive tasks.\n\nBelow, each stage is explained, with a focus on distinguishing scan and graph revisions.\n\n---\n\n### 1. Scan\n\n**Evidence:**  \n- The function `runScanProject` (from `src/tools/scan-project.ts`) performs a scan of project repositories.\n- It validates targets (features, workflows, data_model, ui) and repositories, then executes the scan.\n\n**Fact:**  \n- A scan is the process of extracting structured information from source repositories (such as features, workflows, data models, and UI components).\n- The scan produces a result (not shown in detail), which is the raw material for graph construction.\n\n**Distinction:**  \n- A scan is an operation on the source code and configuration, not yet a graph revision.\n\n---\n\n### 2. Publication (Graph Revision)\n\n**Evidence:**  \n- The context refers to \"graph revisions\" and \"publication\" (e.g., `\"revision\":\"fixture:7\",\"publication\":7`).\n- No direct code for publication is shown, but the revision/publication numbers indicate a versioned graph state.\n\n**Fact:**  \n- Publication is the process of taking scan results and updating the DreamGraph to a new revision.\n- Each publication creates a new, immutable graph revision, which is referenced by its revision number.\n\n**Distinction:**  \n- A graph revision is a committed, versioned snapshot of the project graph, derived from one or more scans.\n- Scans may be run multiple times before a publication; only publication creates a new graph revision.\n\n---\n\n### 3. Agent Retrieval\n\n**Evidence:**  \n- The function `graphRagRetrieve` (from `src/cognitive/graph-rag.ts`) retrieves context from the published graph for agent use.\n- Retrieval can use either a \"legacy\" or \"canonical\" representation, with various filters and context assembly.\n\n**Fact:**  \n- Agent retrieval queries the published graph revision to assemble relevant context for cognitive tasks (e.g., RAG, planning).\n- Retrieval operates only on published graph revisions, not on raw scan results.\n\n---\n\n### Distinguishing Scan and Graph Revisions\n\n- **Scan:**  \n  - Operation on source repositories.\n  - Produces raw, uncommitted data.\n  - Not versioned as a graph revision.\n\n- **Graph Revision (Publication):**  \n  - Immutable, versioned snapshot of the project graph.\n  - Created by publishing scan results.\n  - Used as the source of truth for agent retrieval.\n\n---\n\n### Summary Table\n\n| Stage         | Input                | Output                | Versioned? | Used by Agent? |\n|---------------|---------------------|-----------------------|------------|---------------|\n| Scan          | Source repositories | Raw scan result       | No         | No            |\n| Publication   | Scan result         | Graph revision        | Yes        | Yes           |\n| Agent Retrieval | Graph revision      | Context for agent     | N/A        | Yes           |\n\n---\n\n### Uncertainties & Missing Context\n\n- The precise mechanics of publication (how scan results are transformed into a graph revision) are not shown in the supplied context.\n- The agent retrieval process is described at the interface level, but the internal assembly logic is not detailed.\n\n---\n\n**Conclusion:**  \nScan-to-publication-to-agent retrieval is a pipeline where scans extract data, publication commits this data as a versioned graph revision, and agents retrieve context from these revisions. Scans are transient and uncommitted; graph revisions are persistent and the basis for all agent operations.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "partial",
+            "finding": "Both cite the scan and retrieval source anchors and acknowledge missing publication code, but then present inferred publication/scan semantics as fact. The assisted answer overstates scans as unversioned/uncommitted and publication as scan-derived. No zero-unsupported-claim pass.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "a46316174f0f7090c9767271c1618928a48e12c09b4fce0355f38dc3da35047b",
+          "context_bytes": 9988,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 50.59140000000002,
+          "latency_ms": 6239.236000000001,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 2739,
+            "outputTokens": 841,
+            "totalTokens": 3580,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "87b73dfa2ae1e3b4881c7ea47f47cccbb4cf457e512df742547380acc97b0375",
+          "answer": "Here is an explanation of scan-to-publication-to-agent retrieval, with a focus on distinguishing scan and graph revisions, based strictly on the supplied context:\n\n---\n\n## Scan-to-Publication-to-Agent Retrieval\n\n### 1. Scan\n\n**Evidence:**\n- The function `runScanProject` (from `scan-project.ts`) initiates a scan of the project, validating targets and repositories, and then executes the scan logic.\n- The scan process involves identifying features, workflows, data models, and UI elements in the codebase, and can be targeted to specific repositories or all available ones.\n\n**Inference:**\n- The scan produces a structured result (`ScanProjectResult`) that likely represents the current state of the project's code and configuration, suitable for further processing or publication.\n\n**Scan Revision:**\n- A \"scan revision\" refers to the state of the project as captured by a specific scan operation. Each scan produces a new snapshot of the project's facts and structure, which can be compared to previous scans to detect changes.\n\n---\n\n### 2. Publication\n\n**Evidence:**\n- While not directly shown in the supplied context, the scan result is typically published or committed to a fact-graph or evidence ledger for downstream use.\n- The evidence ledger (from `evidence-ledger.ts`) organizes and groups evidence from validation results, associating them with semantic anchors and provenance.\n\n**Inference:**\n- Publication is the process of taking the output of a scan and making it available in a structured, queryable form—often as a graph revision or a new entry in the evidence ledger.\n\n**Graph Revision:**\n- A \"graph revision\" is a new version of the project's fact-graph, incorporating the latest scan results and any additional evidence or validation. This revision is what agents and retrieval systems query.\n\n---\n\n### 3. Agent Retrieval\n\n**Evidence:**\n- The function `graphRagRetrieve` (from `graph-rag.ts`) retrieves context from the graph for a given query, supporting both \"legacy\" and \"canonical\" representations.\n- Retrieval can filter by entities, relationships, tensions, narratives, and more, returning a context pack with included records and metadata.\n\n**Inference:**\n- Agents (such as cognitive assistants or automated planners) use this retrieval function to access the most recent, published graph revision. The retrieval provides the agent with the relevant context for reasoning, planning, or answering questions.\n\n---\n\n## Distinguishing Scan and Graph Revisions\n\n- **Scan Revision:**  \n  - Represents a snapshot of the project at the time of scanning.\n  - Captures raw facts and structure from the codebase.\n  - Used as input for publication.\n\n- **Graph Revision:**  \n  - Represents the published, queryable state of the project's fact-graph after processing scan results and evidence.\n  - May include additional validation, evidence grouping, and semantic enrichment.\n  - Is the authoritative source for agent retrieval.\n\n---\n\n## Summary Table\n\n| Stage         | Output                  | Revision Type    | Purpose                                 |\n|---------------|------------------------|------------------|-----------------------------------------|\n| Scan          | ScanProjectResult       | Scan Revision    | Capture project facts and structure     |\n| Publication   | Fact-graph/Evidence     | Graph Revision   | Publish structured, validated knowledge |\n| Agent Retrieve| GraphRAGContext         | Uses Graph Rev.  | Provide context for agent reasoning     |\n\n---\n\n## Uncertainties & Missing Context\n\n- The exact mechanism of \"publication\" is not detailed in the supplied context, but is inferred from the evidence ledger and retrieval process.\n- The relationship between scan results and graph revisions is inferred based on standard patterns and the function of the evidence ledger.\n\n---\n\n**Fact:**  \n- Scan produces a project snapshot (scan revision).\n- Publication creates a new graph revision.\n- Agent retrieval queries the latest graph revision.\n\n**Hypothesis:**  \n- Publication likely involves validation and evidence grouping before updating the graph.\n\n**Tension:**  \n- Publication details are not explicit; further context would clarify the exact mutation path from scan to graph revision.\n\n---\n\nIf you need a more detailed breakdown of any stage, or clarification on the evidence, please specify.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "partial",
+            "finding": "Both cite the scan and retrieval source anchors and acknowledge missing publication code, but then present inferred publication/scan semantics as fact. The assisted answer overstates scans as unversioned/uncommitted and publication as scan-derived. No zero-unsupported-claim pass.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/02-dreamgraph-AT02.json",
+      "limitation": null
+    },
+    {
+      "task_id": "dreamgraph:AT03",
+      "scope": "identical_contract_input_control",
+      "order": "source_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "698a0a2ba631b73c8f2ebdae7b10d89435954ca947af6339d58398e007ba03c7",
+      "original_specification_sha256": "sha256:320ac3acbd17621a075113ce86a8838464756f3d771dcb3209644e75c8074a82",
+      "results": [
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "1406495f2d0d67ba5bdeca206220be734ab9539432a9dc23bf6566139ae85bcb",
+          "context_bytes": 606,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.041999999999916326,
+          "latency_ms": 5941.2968,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 257,
+            "outputTokens": 906,
+            "totalTokens": 1163,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "e05afb91403b4078af293335f2902eb6716e3a2ec3ca772050ada6987931cc86",
+          "answer": "Classification of the Mixed Graph\n\nBased strictly on the supplied context, here is the classification of each node and the overall graph structure, distinguishing facts, hypotheses, dreams, and tensions:\n\n### 1. Source Assertion\n- **Record:** {\"id\":\"source\", ...}\n- **Classification:** Source assertion (fact candidate)\n- **Evidence:** Present in \"source_repo\" dreamgraph, but \"source_verified\": false (not yet validated as fact).\n- **Confidence:** 1 (high, but not verified)\n- **Status:** Fact candidate, not yet a proven fact.\n\n### 2. Human Assertion\n- **Record:** {\"id\":\"human\", ...}\n- **Classification:** Human assertion (fact about authorship)\n- **Evidence:** \"origin\":\"lucid\", confidence: 1\n- **Status:** Fact about human input, not a claim about the domain.\n\n### 3. Dream\n- **Record:** {\"id\":\"dream\", ...}\n- **Classification:** Dream (hypothetical or inspired idea)\n- **Evidence:** \"origin\":\"rem\", \"inspiration\":[\"source\"]\n- **Status:** Hypothesis or creative proposal, not a fact.\n\n### 4. Validated Insight\n- **Record:** {\"id\":\"validated\", ...}\n- **Classification:** Validated insight (fact)\n- **Evidence:** \"kind\":\"validated\", \"evidence_ancestry\":[\"source\"], confidence: 0.9\n- **Status:** Fact (validated, but with confidence < 1, so some residual uncertainty).\n\n### 5. Decision\n- **Record:** {\"id\":\"decision\", ...}\n- **Classification:** Decision (governance/plan artifact)\n- **Evidence:** \"kind\":\"adr\", \"decided_by\":\"human\"\n- **Status:** Fact about process/governance, not a domain fact.\n\n### 6. Tension\n- **Record:** {\"id\":\"tension\", ...}\n- **Classification:** Tension (explicit contradiction or unresolved issue)\n- **Evidence:** \"kind\":\"tension\", \"description\":\"Possible contradiction\", \"entities\":[\"source\",\"dream\"]\n- **Status:** Tension (not a fact or hypothesis, but a relationship indicating conflict or uncertainty).\n\n---\n\n## Graph Structure and Classification\n\n- **Facts:** \n  - Human assertion (about authorship)\n  - Validated insight (with high confidence, but not absolute)\n  - Decision (about process/governance)\n\n- **Fact Candidates:** \n  - Source assertion (not yet verified)\n\n- **Hypotheses/Dreams:** \n  - Dream (inspired by source, not validated)\n\n- **Tensions:** \n  - Tension (explicitly links source and dream as possibly contradictory)\n\n---\n\n## Evidence, Inference, and Uncertainty\n\n- **Evidence:** \n  - \"validated\" is supported by \"source\" (evidence_ancestry)\n  - \"dream\" is inspired by \"source\"\n  - \"tension\" links \"source\" and \"dream\" as possibly contradictory\n\n- **Inference:** \n  - The graph contains both fact-like and hypothesis-like nodes, with explicit governance and tension tracking.\n\n- **Uncertainty:** \n  - \"source\" is not verified, so its factual status is uncertain.\n  - \"validated\" has confidence 0.9, so not absolute.\n  - \"tension\" indicates unresolved contradiction.\n\n---\n\n## Missing Context\n\n- No details on the content of \"source\", \"dream\", or \"validated\".\n- No explicit mutation or execution evidence; this is a static snapshot.\n\n---\n\n## Summary Table\n\n| Node       | Type         | Status/Role                  | Certainty   |\n|------------|--------------|------------------------------|-------------|\n| source     | Fact candidate | Not verified                | Uncertain   |\n| human      | Fact (authorship) | About input, not domain   | Certain     |\n| dream      | Hypothesis   | Inspired by source           | Uncertain   |\n| validated  | Fact         | Validated insight            | High, not absolute |\n| decision   | Fact (governance) | Process artifact         | Certain     |\n| tension    | Tension      | Contradiction indicator      | N/A         |\n\n---\n\n**Overall:**  \nThis mixed graph contains fact candidates, facts, hypotheses (dreams), governance artifacts, and explicit tensions, with clear evidence links and confidence levels, but some residual uncertainty and missing verification for the source assertion.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "failed",
+            "finding": "Replies blur recorded assertion/validated-insight labels with factual truth and do not establish the one independent source root. Confidence and shared ancestry do not justify promotion. The Web64 assisted reply correctly calls the dream a hypothesis, but the complete mandatory rubric is not satisfied.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "1406495f2d0d67ba5bdeca206220be734ab9539432a9dc23bf6566139ae85bcb",
+          "context_bytes": 606,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.041999999999916326,
+          "latency_ms": 5042.8066,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 257,
+            "outputTokens": 880,
+            "totalTokens": 1137,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "543c0dc9b634d65277e7dfab4f0081112863ce0db2b137da80b31bd64dc57e56",
+          "answer": "Classification of the Mixed Graph\n\nBased strictly on the supplied context, here is the classification of each record and the overall graph structure, distinguishing facts, hypotheses, dreams, and tensions, and noting evidence, inference, and uncertainty.\n\n### 1. Source Assertion\n- **Record:** {\"id\":\"source\", ...}\n- **Classification:** Source assertion (fact, but not source-verified; confidence 1)\n- **Evidence:** Directly declared as a source from \"dreamgraph\" repo.\n- **Uncertainty:** Not source-verified.\n\n### 2. Human Assertion\n- **Record:** {\"id\":\"human\", ...}\n- **Classification:** Human assertion (fact, confidence 1)\n- **Evidence:** Origin \"lucid\" (implies human input).\n\n### 3. Dream\n- **Record:** {\"id\":\"dream\", ...}\n- **Classification:** Dream (hypothetical, inspired by \"source\")\n- **Evidence:** Origin \"rem\", inspiration from \"source\".\n- **Inference:** Hypothesis or imagined scenario, not validated.\n\n### 4. Validated Insight\n- **Record:** {\"id\":\"validated\", ...}\n- **Classification:** Validated insight (fact, confidence 0.9)\n- **Evidence:** Kind \"validated\", ancestry from \"source\".\n- **Uncertainty:** Confidence less than 1, so some residual doubt.\n\n### 5. Decision\n- **Record:** {\"id\":\"decision\", ...}\n- **Classification:** Decision (fact, kind \"adr\", decided by \"human\")\n- **Evidence:** Explicitly a decision, with human authority.\n\n### 6. Tension\n- **Record:** {\"id\":\"tension\", ...}\n- **Classification:** Tension (fact, describes a contradiction)\n- **Evidence:** Kind \"tension\", links \"source\" and \"dream\".\n- **Inference:** Indicates a possible contradiction between \"source\" and \"dream\".\n\n---\n\n## Graph Structure and Classification\n\n### Evidence\n- \"source\" and \"human\" are asserted facts (though \"source\" is not verified).\n- \"validated\" is a fact with high but not perfect confidence, derived from \"source\".\n- \"decision\" is a fact, representing an architectural decision.\n\n### Hypotheses/Dreams\n- \"dream\" is a hypothetical or speculative record, inspired by \"source\".\n\n### Tensions\n- \"tension\" is a fact describing a relationship (contradiction) between \"source\" and \"dream\".\n\n### Independent Source Groups\n- The group [\"source\", \"dream\", \"validated\"] is declared as an independent source group, but \"dream\" is not a fact—this may indicate a modeling inconsistency or a hypothesis under consideration.\n\n---\n\n## Summary Table\n\n| Record    | Type         | Fact/Hypothesis/Dream | Evidence/Inference | Confidence | Notes                                             |\n|-----------|--------------|----------------------|--------------------|------------|---------------------------------------------------|\n| source    | Source       | Fact (unverified)    | Evidence           | 1          | Not source-verified                               |\n| human     | Human        | Fact                 | Evidence           | 1          | Human assertion                                   |\n| dream     | Dream        | Dream/Hypothesis     | Inference          | 1          | Inspired by source                                |\n| validated | Validated    | Fact                 | Evidence           | 0.9        | Derived from source, not absolute certainty        |\n| decision  | Decision     | Fact                 | Evidence           | 1          | Architectural decision by human                   |\n| tension   | Tension      | Fact (relation)      | Evidence           | -          | Contradiction between source and dream            |\n\n---\n\n## Missing Context / Uncertainty\n\n- The actual content of \"source\", \"dream\", and \"validated\" is not provided.\n- The nature of the contradiction (\"tension\") is not specified beyond its existence.\n- The meaning of \"independent_source_groups\" including a dream is unclear—may require clarification.\n\n---\n\n## Conclusion\n\n- The graph contains a mix of facts (assertions, decisions, validated insight), a hypothesis/dream, and a tension (contradiction).\n- The classification is supported by explicit fields in the supplied context.\n- Some uncertainty remains due to missing content and the inclusion of a dream in an independent source group.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "failed",
+            "finding": "Replies blur recorded assertion/validated-insight labels with factual truth and do not establish the one independent source root. Confidence and shared ancestry do not justify promotion. The Web64 assisted reply correctly calls the dream a hypothesis, but the complete mandatory rubric is not satisfied.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/03-dreamgraph-AT03.json",
+      "limitation": null
+    },
+    {
+      "task_id": "dreamgraph:AT04",
+      "scope": "frozen_source_retrieval",
+      "order": "graph_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "8001453772644a51fbdd789109a81c42de965d807901b4ddc402d5ec68fb300d",
+      "original_specification_sha256": "sha256:19d4a99505c8f8c1884dc5b6b98c055cc4a9df3d88df1c3ecdb733e517b2e295",
+      "results": [
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "1362abf38da4b405f4bc3385cf25870257d1f3cdbde04dc95fa1aa59b301d3bd",
+          "context_bytes": 10003,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 15.598599999999806,
+          "latency_ms": 3494.8291,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 2603,
+            "outputTokens": 345,
+            "totalTokens": 2948,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "2c896046c6ae9e598877c2d9a649062c5a0776a2f1b973a2fa506c27f429e797",
+          "answer": "Evidence\n\nThe only relevant evidence for DreamGraph schedule dispatch/ownership is from the dg-scheduler feature, specifically the function runScheduleNow in src/cognitive/scheduler.ts. The function's logic is as follows:\n\n- Phase 1: The schedule is snapshotted under a file lock (\"schedules.json\") and marked as in-flight (using inFlightSchedules) to prevent concurrent execution. A ScheduleClaim object is created, containing scheduleId, scheduleName, action, startTime, and a copy of the schedule.\n- Phase 2: The action is executed under a separate execution mutex (SCHEDULER_EXEC_LOCK), not the file lock. Execution results and errors are tracked.\n- Phase 3: After execution, the schedule's record is updated (error counts, last run time, etc.) and the execution record is written back under the file lock.\n\nOwnership and dispatch mechanism (fact):\n\n- Ownership of schedule execution is asserted by acquiring a file lock on \"schedules.json\" and marking the schedule as in-flight (inFlightSchedules).\n- Dispatch is performed by the runScheduleNow function, which executes the schedule's action under a mutex to prevent concurrent execution.\n\nNo evidence of dashboard or UI styling is present in this context.\n\nSummary (fact):\n\n- Schedule dispatch and ownership are managed by file locks and an in-memory inFlightSchedules set.\n- Execution is serialized by mutexes and tracked with explicit claim and execution records.\n\nUncertainties:\n\n- The evidence is partial; details about distributed ownership or multi-process scenarios are not present.\n- Only the core scheduling logic is evidenced; higher-level orchestration or external triggers are not described.\n\nNo dashboard or UI styling noise is present in the supplied evidence.",
+          "review": {
+            "mandatory_pass": true,
+            "disposition": "passed_for_supplied_excerpt",
+            "finding": "Both locate the frozen scheduler excerpt and its file-lock/in-flight/mutex ownership without UI noise. Assisted reply states partial multi-process scope. This describes the frozen historical excerpt, not a current source audit. Both contexts/replies fit their explicit limits.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "a46316174f0f7090c9767271c1618928a48e12c09b4fce0355f38dc3da35047b",
+          "context_bytes": 9988,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 15.598599999999806,
+          "latency_ms": 3010.093,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 2736,
+            "outputTokens": 273,
+            "totalTokens": 3009,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "cb582422ae010a16647de3c68f03f418bc79087914baf2b8425aff82298461ec",
+          "answer": "Here is the DreamGraph schedule dispatch and ownership logic, stripped of dashboard or UI styling details:\n\nEvidence (from src/cognitive/scheduler.ts):\n\n- Schedule dispatch is handled by runScheduleNow(scheduleId: string).\n- Ownership and concurrency are managed using a file lock on schedules.json and an in-memory inFlightSchedules set.\n- When a schedule is dispatched:\n  1. The schedule is snapshot under a file lock and marked as in-flight (prevents concurrent execution).\n  2. The action is executed under a separate execution mutex (SCHEDULER_EXEC_LOCK).\n  3. After execution, the in-flight claim is released.\n  4. The schedule's run metadata (error count, last run time, etc.) is updated and written back under a file lock.\n- If a schedule is already running (in inFlightSchedules), dispatch is rejected.\n- The execution record includes scheduleId, scheduleName, action, startTime, and a copy of the schedule at dispatch.\n\nSummary (fact):\n\n- Schedule dispatch is atomic and exclusive per scheduleId, enforced by file and memory locks.\n- Ownership of a running schedule is claimed at dispatch and released after execution or error.\n- All mutations (status, error count, last run) are committed under file lock to schedules.json.\n\nNo dashboard or UI styling is involved in this logic.",
+          "review": {
+            "mandatory_pass": true,
+            "disposition": "passed_for_supplied_excerpt",
+            "finding": "Both locate the frozen scheduler excerpt and its file-lock/in-flight/mutex ownership without UI noise. Assisted reply states partial multi-process scope. This describes the frozen historical excerpt, not a current source audit. Both contexts/replies fit their explicit limits.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/04-dreamgraph-AT04.json",
+      "limitation": null
+    },
+    {
+      "task_id": "dreamgraph:AT05",
+      "scope": "identical_contract_input_control",
+      "order": "source_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "f92f729828fa3aa69a78328c4e5fb6b953732864339ba5fdef7819c6ea970200",
+      "original_specification_sha256": "sha256:f43e084f542419cb74e242ab72ce1b0ed8562af8fa15beb0b16c11cb8587fe02",
+      "results": [
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "de5327338a0e415a6e2dedff27b23e417f33b79d7a223393d734757a178e03cc",
+          "context_bytes": 441,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.048900000000003274,
+          "latency_ms": 3536.4228,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 206,
+            "outputTokens": 508,
+            "totalTokens": 714,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "632993158ebc012f8765c0e6365a2e110a16a21cc4212c236f96f52e4ce690f2",
+          "answer": "Evidence:\n- The disposable contract input describes an authorized mutation request to add a feature with id \"fixture:added\" to the features array.\n- Interruptions include \"before_publication\" and \"after_publication_reply_lost\", indicating the reply was lost after the mutation attempt.\n- The process includes a retry with the same payload.\n- There is a conflicting payload: {\"features\":[]} (i.e., no features), suggesting a possible state conflict on retry.\n- The actor is \"fixture:authorized-agent\" and the operation is \"fixture:mutation:1\".\n- The instance is \"fixture:dreamgraph\".\n\nFact:\n- The requested mutation is to add {\"id\":\"fixture:added\",\"source_repo\":\"dreamgraph\",\"source_files\":[\"fixture/source.ts\"]} to features.\n\nProcess (from context):\n1. Apply the authorized mutation to disposable state.\n2. The reply is lost after publication (\"after_publication_reply_lost\").\n3. A retry is performed with the same payload.\n4. On retry, a conflicting payload is encountered (features remain empty).\n5. A read-back is performed.\n\nInference:\n- The initial mutation was authorized and attempted, but the reply confirming the mutation was lost.\n- On retry, the system sees a conflicting payload (features: []), indicating the mutation may not have been committed or the state was reset.\n- The read-back after retry shows features: [], meaning the mutation is not present in the final state.\n\nTension:\n- There is a conflict between the intended mutation (add feature) and the final observed state (no features present).\n- Uncertainty exists as to whether the mutation was ever committed or if it was lost due to the interruption and conflict.\n\nMissing context:\n- No explicit confirmation of mutation commit before the reply was lost.\n- No evidence of mutation side effects in the final state.\n\nConclusion (Fact):\n- The mutation to add the feature was authorized and attempted, but due to reply loss and a subsequent conflict, the feature is not present in the final disposable state after retry and read-back.\n\nDreamGraph cognitive role action:\n- Mutation was not proven committed before claiming completion.\n- The disposable state after retry and conflict read-back does not include the requested feature.\n- The process demonstrates correct handling of reply loss, retry, conflict, and state read-back, but the mutation did not persist.\n\nSummary:\n- Authorized mutation attempted.\n- Reply lost, retry performed.\n- Conflict encountered, final state read-back shows mutation not present.\n- Mutation not committed; disposable state unchanged.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "not_an_execution_test",
+            "finding": "Read-only completions receive a proposed interruption scenario, no mutation tools or actual receipt. Replies narrate attempted operations/readbacks that were never performed; some claim the conflicting payload is the observed final state. No durable effect, same-revision readback or recovery is proven. Actual core mutation tests remain separate.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "de5327338a0e415a6e2dedff27b23e417f33b79d7a223393d734757a178e03cc",
+          "context_bytes": 441,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.048900000000003274,
+          "latency_ms": 3607.2634,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 206,
+            "outputTokens": 485,
+            "totalTokens": 691,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "b6cd2e4ce32c99bde0d819dfd0210bcdd134539ed97c8431b3130b1d3ba529ef",
+          "answer": "Evidence:\n- The disposable contract input describes an authorized mutation request to add a feature (id: fixture:added) to the features array.\n- Interruptions occurred: before_publication and after_publication_reply_lost.\n- The system is instructed to retry the same payload after reply loss.\n- A conflicting payload exists (features: []), indicating a possible state conflict.\n- The final step is to read back the state.\n\nFacts:\n- The authorized mutation is: add {\"id\":\"fixture:added\",\"source_repo\":\"dreamgraph\",\"source_files\":[\"fixture/source.ts\"]} to features.\n- The mutation was interrupted, the reply was lost, and a retry with the same payload was performed.\n- There is a conflict with a payload that has no features.\n\nInference:\n- Since the mutation was retried after reply loss, and the final instruction is to read back, the current disposable state should reflect the result of the last committed mutation.\n- If the retry succeeded and no further interruptions occurred, the features array should now include the added feature.\n\nUncertainty:\n- It is not explicitly stated whether the retry succeeded or if the conflict prevented the mutation from being committed.\n- The read-back operation is requested, but the actual state after the retry is not directly provided.\n\nMissing context:\n- Confirmation of whether the retry mutation was successfully committed or if the conflict resolution resulted in the mutation being dropped.\n\nConclusion (based on supplied context only):\n- If the retry of the authorized mutation was successful and committed, the disposable state after read-back should be:\n  ```json\n  {\n    \"features\": [\n      {\n        \"id\": \"fixture:added\",\n        \"source_repo\": \"dreamgraph\",\n        \"source_files\": [\"fixture/source.ts\"]\n      }\n    ]\n  }\n  ```\n- If the conflict resolution favored the conflicting payload (empty features), the state would remain:\n  ```json\n  {\n    \"features\": []\n  }\n  ```\n- Without explicit evidence of the conflict resolution outcome, both are possible. The most likely outcome, given the instruction to retry and read back, is that the mutation was committed and the feature is present.\n\nProven mutation (if committed):\n- Added feature {\"id\":\"fixture:added\",\"source_repo\":\"dreamgraph\",\"source_files\":[\"fixture/source.ts\"]} to features.\n\nIf further confirmation is required, please supply the result of the read-back operation or conflict resolution details.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "not_an_execution_test",
+            "finding": "Read-only completions receive a proposed interruption scenario, no mutation tools or actual receipt. Replies narrate attempted operations/readbacks that were never performed; some claim the conflicting payload is the observed final state. No durable effect, same-revision readback or recovery is proven. Actual core mutation tests remain separate.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/05-dreamgraph-AT05.json",
+      "limitation": "Read-only mutation/recovery reasoning; actual governed effects are qualified by the existing core integration tests. This model is not given mutation tools."
+    },
+    {
+      "task_id": "dreamgraph:AT06",
+      "scope": "identical_contract_input_control",
+      "order": "graph_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "e1bb9e1ac04d598640a9da287acd59942443975e4e58198ff842b51f41c4a9fe",
+      "original_specification_sha256": "sha256:cf7e5e9a70521ab81471f917e600b6e232d657c1a3619181cfe04610b02d991c",
+      "results": [
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "670238ebf5c8e881b9466ad0f3f6dda4a3f4afe6fbdf890910b3519a5bfa0c95",
+          "context_bytes": 409,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.041600000000016735,
+          "latency_ms": 3206.3615,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 213,
+            "outputTokens": 468,
+            "totalTokens": 681,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "c94f341256280e5ac0aacf6b192498042f7dd963647aa605c4b39663060ce62c",
+          "answer": "Here is an analysis based on the supplied context:\n\n**Old Full Scan vs. Concrete Scope Gap**\n\n- **Old Full Scan (Evidence):**\n  - The last full scan was at `\"2001-01-01T00:00:00Z\"`.\n  - The scan covered `\"fixture/source.ts\"` at `\"source:3\"`.\n  - This means the evidence for `\"fixture/source.ts\"` is complete but potentially outdated.\n\n- **Concrete Scope Gap (Evidence):**\n  - There is a specific, concrete gap reported for `\"fixture/other.ts\"`.\n  - The expected hash is `\"sha256:before\"`, but the observed hash is `\"sha256:after\"`.\n  - This is not just incomplete or old evidence; it is a detected change or mismatch in the current state versus what was expected.\n  - This is a concrete, actionable gap, not just a lack of recent scanning.\n\n**Distinction:**\n- An **old full scan** means the evidence is complete for the covered scope but may be stale.\n- A **concrete scope gap** is a specific, current mismatch or missing update for a file, regardless of scan recency.\n\n**Other Context:**\n- `\"fixture/unrelated.ts\"` has a recent dream (hypothetical or planned state) at `\"graph:4\"`, but is unrelated to the current scope or gap.\n- `\"fixture/missing.ts\"` is unavailable, indicating missing context or source, which is a separate issue from a concrete gap.\n\n**Summary Table:**\n\n| Path                   | Evidence Type           | Status/Gap           |\n|------------------------|------------------------|----------------------|\n| fixture/source.ts      | Old full scan          | Complete, but stale  |\n| fixture/other.ts       | Concrete scope gap     | Hash mismatch        |\n| fixture/unrelated.ts   | Unrelated recent dream | Not in scope         |\n| fixture/missing.ts     | Unavailable source     | Missing context      |\n\n**Conclusion:**  \nA concrete scope gap (like the hash mismatch for `\"fixture/other.ts\"`) is a specific, actionable difference between expected and observed state, not just a result of incomplete or outdated evidence. An old full scan is simply evidence that may be stale, but does not itself indicate a gap unless a change is detected.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "failed",
+            "finding": "Both arms identify the concrete hash mismatch and missing source, but still describe covered evidence as outdated/stale based on the old scan. This violates the no-age-only-staleness outcome; unrelated dreams do not repair the gap.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "670238ebf5c8e881b9466ad0f3f6dda4a3f4afe6fbdf890910b3519a5bfa0c95",
+          "context_bytes": 409,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.041600000000016735,
+          "latency_ms": 12064.1991,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 213,
+            "outputTokens": 618,
+            "totalTokens": 831,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "a83ce272f5e08db9709cf91b745b7c7d47cec7afb76677d390733fac18e5722b",
+          "answer": "Here is the analysis based on the supplied context:\n\n**Evidence:**\n- The last full scan was performed on 2001-01-01.\n- The managed source revision is source:3.\n- The covered scope of the last scan was [\"fixture/source.ts\"].\n- There is a concrete gap reported:  \n  - Path: \"fixture/other.ts\"  \n  - Expected hash: sha256:before  \n  - Observed hash: sha256:after\n- There is an unrelated recent dream involving [\"fixture/unrelated.ts\"] at graph:4.\n- \"fixture/missing.ts\" is unavailable.\n\n**Distinguishing incomplete/changed evidence from an old full scan and a concrete scope gap:**\n\n- **Old Full Scan:**  \n  The last full scan is dated 2001-01-01 and only covered \"fixture/source.ts\". This means any changes outside this file since that date are not accounted for by a comprehensive scan.\n\n- **Concrete Scope Gap:**  \n  The gap for \"fixture/other.ts\" is not just a lack of recent scanning; it is a specific, concrete difference: the observed hash (\"sha256:after\") does not match the expected hash (\"sha256:before\"). This is direct evidence of a change in \"fixture/other.ts\" since the last known state.\n\n- **Incomplete/Changed Evidence:**  \n  - For \"fixture/source.ts\", the evidence is simply old (from the last full scan), but there is no direct evidence of change.\n  - For \"fixture/other.ts\", the evidence is not just incomplete; it is changed, as proven by the hash mismatch.\n  - For \"fixture/unrelated.ts\", the recent dream is unrelated to the managed scope and does not affect the current assessment.\n  - For \"fixture/missing.ts\", the evidence is unavailable, representing a gap due to missing data, not a detected change.\n\n**Summary Table:**\n\n| Path                   | Evidence Type         | Status                        |\n|------------------------|----------------------|-------------------------------|\n| fixture/source.ts      | Old full scan        | Evidence is outdated          |\n| fixture/other.ts       | Concrete scope gap   | Direct evidence of change     |\n| fixture/unrelated.ts   | Unrelated recent dream| Out of scope                  |\n| fixture/missing.ts     | Unavailable          | Evidence missing (gap)        |\n\n**Conclusion:**  \n- A concrete scope gap (fixture/other.ts) is direct, actionable evidence of change, not just incomplete or outdated evidence.\n- An old full scan (fixture/source.ts) is merely outdated and does not prove change.\n- Missing or unrelated evidence (fixture/missing.ts, fixture/unrelated.ts) does not inform about the current managed scope.\n\n**Uncertainty:**  \n- No evidence is available for \"fixture/missing.ts\"; its state is unknown.\n- The last full scan is very old, so there may be undetected changes in \"fixture/source.ts\".\n\n**No mutations have been committed; this is a factual analysis based on supplied context only.**",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "failed",
+            "finding": "Both arms identify the concrete hash mismatch and missing source, but still describe covered evidence as outdated/stale based on the old scan. This violates the no-age-only-staleness outcome; unrelated dreams do not repair the gap.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/06-dreamgraph-AT06.json",
+      "limitation": null
+    },
+    {
+      "task_id": "web64-react:AT01",
+      "scope": "identical_contract_input_control",
+      "order": "source_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "7c20725144c6fac3518f9e5aa69c886ffa1a27f522bb945fa9430f063071ae4c",
+      "original_specification_sha256": "sha256:28eb7da760e312ac06005263faae287ebf373501768e4664fc307e1a10f995d5",
+      "results": [
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "b23e1b48c9a509f547794d9fce8afbcc0945b6d2017ef108b769dccfc3dd8e09",
+          "context_bytes": 1019,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.04039999999986321,
+          "latency_ms": 2640.2109,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 367,
+            "outputTokens": 260,
+            "totalTokens": 627,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "5f99a12af1d1c1c127c2c9363a6d890bab669524d22b59d17024fc68a578c2d0",
+          "answer": "Based on the supplied context, here is the requested information, distinguishing evidence and inference:\n\n**Governed current slice (evidence):**\n- ID: fixture:web64-react:plan:blocked\n- Status: blocked\n\n**A blocker (evidence):**\n- \"required source unavailable\" (listed in the blockers array for the current slice)\n\n**Next eligible slice (inference from graph structure and status):**\n- The next eligible slice is the first pending slice whose dependencies are all verified or completed.\n- fixture:web64-react:plan:independent\n  - Status: pending\n  - Depends on: fixture:web64-react:plan:done (which is verified)\n  - No blockers\n\n**Summary Table:**\n\n| Role                | Slice ID                              | Status    | Blocker (if any)                |\n|---------------------|---------------------------------------|-----------|----------------------------------|\n| Current slice       | fixture:web64-react:plan:blocked      | blocked   | required source unavailable      |\n| Next eligible slice | fixture:web64-react:plan:independent  | pending   | none                             |\n\n**Notes:**\n- fixture:web64-react:plan:dependent is not yet eligible, as it depends on the blocked slice.\n- All claims are based solely on the supplied context.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "partial",
+            "finding": "Both arms recover the blocked current slice, blocker and eligible independent slice. Neither gives all required authoritative plan/checkpoint/resume fields explicitly. Identical inputs are controls, not a graph benefit.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "b23e1b48c9a509f547794d9fce8afbcc0945b6d2017ef108b769dccfc3dd8e09",
+          "context_bytes": 1019,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.04039999999986321,
+          "latency_ms": 2226.8867,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 367,
+            "outputTokens": 300,
+            "totalTokens": 667,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "9f3fd84c30942db28111e39f0e60bb6aead76ea17c667d7eb9ea0ba2f9babee5",
+          "answer": "Based on the supplied context, here is the requested information, clearly distinguishing evidence and inference:\n\n**Governed current slice (evidence):**\n- ID: fixture:web64-react:plan:blocked\n- Status: blocked\n\n**A blocker (evidence):**\n- \"required source unavailable\" (listed in the blockers array for the current slice)\n\n**Next eligible slice (evidence and inference):**\n- The next eligible slice is the first pending slice whose dependencies are all verified and which is not blocked.\n- fixture:web64-react:plan:independent\n  - Status: pending\n  - Depends on: fixture:web64-react:plan:done (which is verified)\n  - Blockers: none\n\n**Summary Table:**\n\n| Role                   | Slice ID                              | Status    | Blockers                     |\n|------------------------|---------------------------------------|-----------|------------------------------|\n| Current slice          | fixture:web64-react:plan:blocked      | blocked   | required source unavailable  |\n| Blocker (for current)  | fixture:web64-react:plan:blocked      | blocked   | required source unavailable  |\n| Next eligible slice    | fixture:web64-react:plan:independent  | pending   | none                         |\n\n**Uncertainties & Exclusions:**\n- Only slices from the supplied plan are considered.\n- \"Another session selection\" (fixture:web64-react:plan:dependent) is ignored as instructed.\n\n**No missing context detected for this request.**",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "partial",
+            "finding": "Both arms recover the blocked current slice, blocker and eligible independent slice. Neither gives all required authoritative plan/checkpoint/resume fields explicitly. Identical inputs are controls, not a graph benefit.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/07-web64-react-AT01.json",
+      "limitation": null
+    },
+    {
+      "task_id": "web64-react:AT02",
+      "scope": "frozen_source_retrieval",
+      "order": "graph_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "c30984dc2dd8a07c0b7c6ef34d63a5c9566dbf3037fa678a719b58a55e889732",
+      "original_specification_sha256": "sha256:7957d616df66513605aca8250523a6cbe1e48ab963e3d20a8b855e2ca732110c",
+      "results": [
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "e5239a7f865e43499aa6a2896497f03be9270bdaf5e344ebd8a054187270bda3",
+          "context_bytes": 6950,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 19.484300000000076,
+          "latency_ms": 4765.3436,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 1794,
+            "outputTokens": 737,
+            "totalTokens": 2531,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "e326e4dbcf1f63f24b4f63ccfb19b759ee699c669cba6f6079af37cd8c7e2e12",
+          "answer": "**Web64 Compiler/Runtime Boundary Explanation**\n\n### Evidence\n\n#### 1. Compilation: `compileWeb64IdeProject`\n- **Source:** `src/web64-ide/compiler.mjs`\n- **Function:** `compileWeb64IdeProject(project = {}, options = {})`\n- **Role:** This function takes a project (and options), processes its sources (including C and assembly), manages compatibility modules, and ultimately produces program artifacts (compiled program bytes and related metadata).\n- **Fact:** The output is a set of program artifacts, including the compiled program bytes.\n\n#### 2. Handoff: `handoffProgram`\n- **Source:** `src/web64-ide/runtime-handoff.mjs`\n- **Function:** `handoffProgram(runtime, bytes, metadata = {}, options = {})`\n- **Role:** This function is responsible for passing the compiled program bytes to the runtime. It ensures the runtime is ready, normalizes the program bytes, constructs a media object, and calls `runtime.loadMedia(media)` to load the program into the runtime.\n- **Fact:** The handoff occurs only after runtime readiness is confirmed.\n\n### Boundary Description\n\n**Fact:**  \n- The boundary between the Web64 compiler and runtime is defined by the transition from artifact production to artifact consumption:\n    - The compiler (`compileWeb64IdeProject`) produces program artifacts (notably, the compiled program bytes).\n    - The handoff function (`handoffProgram`) is responsible for transferring these bytes to the runtime.\n\n**Process:**\n1. **Compilation Phase:**  \n   - `compileWeb64IdeProject` compiles the project and outputs program bytes and metadata.\n2. **Readiness Check:**  \n   - Before loading, `handoffProgram` ensures the runtime is ready (via `ensureRuntimeReady`).\n3. **Handoff Phase:**  \n   - `handoffProgram` passes the program bytes (and metadata) to `runtime.loadMedia(media)`, which loads the program into the runtime environment.\n\n**Key Interface:**  \n- The explicit interface at the boundary is the call to `runtime.loadMedia(media)`, where `media` contains:\n    - `name`, `kind`, `bytes` (the compiled program), `autorun` flag, and `metadata`.\n\n### Distinctions\n\n- **Fact:** The compiler and runtime are decoupled; the only required contract is that the runtime exposes a `loadMedia(media)` function.\n- **Fact:** The handoff is explicit and mediated by `handoffProgram`, which acts as the bridge.\n- **Uncertainty:** The exact structure of the program artifacts beyond the bytes and metadata is not fully detailed in the supplied context, but the presence of a `media` object is confirmed.\n\n### Summary Table\n\n| Phase            | Function                  | Responsibility                          | Output/Input                |\n|------------------|--------------------------|------------------------------------------|-----------------------------|\n| Compilation      | compileWeb64IdeProject   | Produce compiled program artifacts       | Program bytes, metadata     |\n| Handoff/Loading  | handoffProgram           | Pass bytes to runtime after readiness    | Calls runtime.loadMedia     |\n| Runtime          | runtime.loadMedia        | Load and (optionally) autorun program    | Consumes media object       |\n\n### Conclusion\n\n**The Web64 compiler/runtime boundary is the point where `compileWeb64IdeProject` produces program artifacts (program bytes), and `handoffProgram` passes these bytes to the runtime by invoking `runtime.loadMedia(media)` after ensuring the runtime is ready.** This boundary is explicit, well-defined, and mediated by the `handoffProgram` function.",
+          "review": {
+            "mandatory_pass": true,
+            "disposition": "passed_for_supplied_excerpt",
+            "finding": "Both identify compileWeb64IdeProject artifact production, handoffProgram readiness and runtime.loadMedia, with source attribution and missing runtime/artifact internals disclosed. No material difference established.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "6505c9892ca76f498d2ce05daf20cca91c73f69929285e2459a0b97a3159e68b",
+          "context_bytes": 6451,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 19.484300000000076,
+          "latency_ms": 4236.878599999999,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 1794,
+            "outputTokens": 756,
+            "totalTokens": 2550,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "62c941c94c76b69854dde434a4da6868753560e28aef66c6bf28a4e21d3d9544",
+          "answer": "**Boundary Explanation: Web64 Compiler/Runtime**\n\n### Evidence\n\n#### 1. Compiler Output (`compileWeb64IdeProject`)\n- **Source:** `src/web64-ide/compiler.mjs`\n- **Function:** `compileWeb64IdeProject(project = {}, options = {})`\n- **Role:** This function compiles a Web64 IDE project. It processes project sources, compatibility modules, and generates program artifacts (such as compiled bytes and metadata).\n- **Fact:** The function produces the program artifacts (compiled output) that are intended for execution.\n\n#### 2. Handoff to Runtime (`handoffProgram`)\n- **Source:** `src/web64-ide/runtime-handoff.mjs`\n- **Function:** `handoffProgram(runtime, bytes, metadata = {}, options = {})`\n- **Role:** This function is responsible for passing the compiled program bytes to the runtime environment.\n- **Fact:** It ensures the runtime is ready (`ensureRuntimeReady`), normalizes the program bytes, and constructs a `media` object (with name, kind, bytes, autorun, metadata).\n- **Fact:** It then calls `runtime.loadMedia(media)` to load the program into the runtime.\n\n### Boundary Description\n\n**Fact:**  \n- The boundary between the Web64 compiler and runtime is defined by the transition from producing program artifacts (by the compiler) to loading/executing those artifacts (by the runtime).\n\n**Process:**\n1. **Compilation Phase:**  \n   - `compileWeb64IdeProject` compiles the project and produces program artifacts (notably, the program bytes and associated metadata).\n2. **Handoff Phase:**  \n   - The compiled program bytes and metadata are passed to `handoffProgram`.\n   - `handoffProgram` ensures the runtime is ready, prepares the program media object, and invokes `runtime.loadMedia(media)` to load the program for execution.\n\n**Key Boundary:**  \n- The **handoff** occurs at the point where the program bytes (output of the compiler) are passed to the runtime's `loadMedia` method via `handoffProgram`.\n\n### Summary Table\n\n| Phase         | Function                    | Responsibility                              | Evidence Location                  |\n|---------------|----------------------------|----------------------------------------------|------------------------------------|\n| Compilation   | compileWeb64IdeProject      | Produces program artifacts (bytes, metadata) | `src/web64-ide/compiler.mjs`       |\n| Handoff       | handoffProgram             | Passes bytes to runtime.loadMedia            | `src/web64-ide/runtime-handoff.mjs`|\n| Runtime Load  | runtime.loadMedia(media)    | Loads program for execution                  | (interface, see handoffProgram)    |\n\n### Distinctions\n\n- **Fact:** The compiler and runtime are separated by the artifact handoff.\n- **Fact:** The handoff is mediated by `handoffProgram`, which ensures readiness and standardizes the media object.\n- **Fact:** The runtime must expose a `loadMedia` function to accept the program.\n\n### Uncertainties / Missing Context\n\n- The exact structure of the program artifact produced by `compileWeb64IdeProject` is not fully detailed in the supplied context, but it is clear that it includes program bytes and metadata.\n- The runtime's internal handling of `loadMedia` is not shown, but its required interface is specified.\n\n---\n\n**Conclusion:**  \nThe Web64 compiler/runtime boundary is the point where `compileWeb64IdeProject` produces program artifacts, and these artifacts (program bytes and metadata) are handed off to the runtime via `handoffProgram`, which calls `runtime.loadMedia` after ensuring the runtime is ready. This boundary is clearly mediated by the `handoffProgram` function.",
+          "review": {
+            "mandatory_pass": true,
+            "disposition": "passed_for_supplied_excerpt",
+            "finding": "Both identify compileWeb64IdeProject artifact production, handoffProgram readiness and runtime.loadMedia, with source attribution and missing runtime/artifact internals disclosed. No material difference established.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/08-web64-react-AT02.json",
+      "limitation": null
+    },
+    {
+      "task_id": "web64-react:AT03",
+      "scope": "identical_contract_input_control",
+      "order": "source_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "cbfe167cee98006061c0b01be9e463ea1e62ee0b1864193ff91858cf22ef2d99",
+      "original_specification_sha256": "sha256:943a1b5270e2ed232d667fd5b419cb7382f596c2f13beffef65adf52a7d9a667",
+      "results": [
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "a15fb735456f1197c632872a647cfcb6a726ec71f196f92eb510a7cd3037858d",
+          "context_bytes": 607,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.04560000000014952,
+          "latency_ms": 3748.3939,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 258,
+            "outputTokens": 628,
+            "totalTokens": 886,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "d4c01a98af953335abb2195caf30e24dfa8d8f4cb334e63a86c9cb6e40282af8",
+          "answer": "Classification of the mixed graph (evidence, inference, uncertainty):\n\n**Facts (direct evidence from context):**\n- The graph contains six nodes: source, human, dream, validated, decision, tension.\n- \"source\" is a source assertion from \"web64-react\", not verified.\n- \"human\" is a human assertion from \"lucid\".\n- \"dream\" is a dream, inspired by \"source\".\n- \"validated\" is a validated insight, with evidence ancestry from \"source\".\n- \"decision\" is an ADR (architectural decision record), decided by \"human\".\n- \"tension\" is a tension, described as \"Possible contradiction\", involving \"source\" and \"dream\".\n- \"independent_source_groups\" lists [\"source\", \"dream\", \"validated\"] as a group.\n\n**Classification by role:**\n- Source assertion: \"source\" (fact, but not verified).\n- Human assertion: \"human\" (fact).\n- Dream: \"dream\" (fact, inspired by \"source\").\n- Validated insight: \"validated\" (fact, derived from \"source\").\n- Decision: \"decision\" (fact, made by \"human\").\n- Tension: \"tension\" (fact, describes contradiction between \"source\" and \"dream\").\n\n**Graph structure (inference from context):**\n- \"dream\" is inspired by \"source\" (directed edge).\n- \"validated\" is derived from \"source\" (evidence ancestry).\n- \"decision\" is made by \"human\" (decided_by).\n- \"tension\" links \"source\" and \"dream\" (entities).\n\n**Uncertainty:**\n- The verification status of \"source\" is false, so its reliability is uncertain.\n- The nature of the contradiction in \"tension\" is not specified beyond \"Possible contradiction\".\n- The meaning of \"independent_source_groups\" is not fully defined, but [\"source\", \"dream\", \"validated\"] are grouped.\n\n**Summary Table:**\n\n| Node      | Type                | Evidence/Inference | Certainty   |\n|-----------|---------------------|--------------------|-------------|\n| source    | Source assertion    | Evidence           | Unverified  |\n| human     | Human assertion     | Evidence           | Certain     |\n| dream     | Dream               | Evidence           | Certain     |\n| validated | Validated insight   | Evidence           | High (0.9)  |\n| decision  | Decision (ADR)      | Evidence           | Certain     |\n| tension   | Tension             | Evidence           | Certain     |\n\n**Missing context:**  \n- Details of the contradiction in \"tension\".\n- The specific content of each assertion or insight.\n- The criteria for \"independent_source_groups\".\n\n**Conclusion:**  \nThe mixed graph contains factual records of assertions (source, human), a dream (inspired by source), a validated insight (from source), a decision (by human), and a tension (contradiction between source and dream). Most relationships are direct evidence; some uncertainty remains regarding the verification of \"source\" and the specifics of the tension.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "failed",
+            "finding": "Replies blur recorded assertion/validated-insight labels with factual truth and do not establish the one independent source root. Confidence and shared ancestry do not justify promotion. The Web64 assisted reply correctly calls the dream a hypothesis, but the complete mandatory rubric is not satisfied.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "a15fb735456f1197c632872a647cfcb6a726ec71f196f92eb510a7cd3037858d",
+          "context_bytes": 607,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.04560000000014952,
+          "latency_ms": 4237.073200000001,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 258,
+            "outputTokens": 663,
+            "totalTokens": 921,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "fc7f6394eb462e4f2c9b1ecb5d606dc7a114832b32dea2b5a271198d60f54048",
+          "answer": "Classification of the mixed graph (evidence, inference, uncertainty):\n\n**1. Source assertion**\n- Evidence: Record id \"source\" from \"web64-react\", file \"fixture/source.ts\".\n- Fact: This is a source assertion, not yet verified (source_verified: false).\n- Confidence: 1 (high, but not validated).\n\n**2. Human assertion**\n- Evidence: Record id \"human\", origin \"lucid\".\n- Fact: Human-originated assertion.\n- Confidence: 1.\n\n**3. Dream**\n- Evidence: Record id \"dream\", origin \"rem\", inspiration [\"source\"].\n- Dream: This is explicitly a \"dream\", inspired by \"source\".\n- Confidence: 1.\n- Not a validated fact; classified as a hypothesis or ideation.\n\n**4. Validated insight**\n- Evidence: Record id \"validated\", kind \"validated\", evidence_ancestry [\"source\"], confidence 0.9.\n- Fact: This is a validated insight, derived from \"source\".\n- Confidence: 0.9 (high, but not absolute).\n- Supported by evidence ancestry.\n\n**5. Decision**\n- Evidence: Record id \"decision\", kind \"adr\", decided_by \"human\".\n- Fact: This is a decision (architecture decision record), made by a human.\n- No explicit evidence ancestry, but classified as a committed decision.\n\n**6. Tension**\n- Evidence: Record id \"tension\", kind \"tension\", description \"Possible contradiction\", entities [\"source\", \"dream\"].\n- Tension: This record identifies a possible contradiction between \"source\" and \"dream\".\n- Not a fact or decision, but a flagged issue or uncertainty.\n\n**Summary Table**\n\n| Record    | Classification     | Evidence/Inference | Certainty   |\n|-----------|--------------------|--------------------|-------------|\n| source    | Source assertion   | Fact               | High (unverified) |\n| human     | Human assertion    | Fact               | High        |\n| dream     | Dream              | Hypothesis/Ideation| High (not validated) |\n| validated | Validated insight  | Fact               | High (0.9)  |\n| decision  | Decision           | Fact (committed)   | High        |\n| tension   | Tension            | Tension/Uncertainty| N/A         |\n\n**Graph Structure Notes**\n- \"dream\" is inspired by \"source\".\n- \"validated\" is derived from \"source\".\n- \"tension\" exists between \"source\" and \"dream\".\n- \"decision\" is made by \"human\" (no explicit ancestry).\n- \"independent_source_groups\" links \"source\", \"dream\", \"validated\" as a group.\n\n**Missing Context / Uncertainties**\n- No explicit validation or verification of \"source\".\n- The nature of the \"decision\" and its relation to other records is not detailed.\n- The specifics of the \"tension\" (contradiction) are not elaborated.\n\n**Conclusion**\nThis mixed graph contains:\n- Facts (source, human, validated, decision)\n- Hypothesis/dream (dream)\n- Tension/uncertainty (tension)\nwith clear evidence ancestry and flagged contradictions, but lacks some detail on verification and decision context.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "failed",
+            "finding": "Replies blur recorded assertion/validated-insight labels with factual truth and do not establish the one independent source root. Confidence and shared ancestry do not justify promotion. The Web64 assisted reply correctly calls the dream a hypothesis, but the complete mandatory rubric is not satisfied.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/09-web64-react-AT03.json",
+      "limitation": null
+    },
+    {
+      "task_id": "web64-react:AT04",
+      "scope": "frozen_source_retrieval",
+      "order": "graph_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "8af51414c5a50ec1148e4092f06f40d6bb055aa5abfe590f6b38064b75e3110d",
+      "original_specification_sha256": "sha256:1a8ef59bb68f33d57733965fcc06dcdc4ca3acc1a12cc58d30c0cf63bcfd504d",
+      "results": [
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "a15ba906ae36921de9946e75072c171a526edf8481de1243ed989b0919fe03bb",
+          "context_bytes": 7828,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 9.4371000000001,
+          "latency_ms": 2087.8334,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 2037,
+            "outputTokens": 185,
+            "totalTokens": 2222,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "46d73a5c5f3843ea91f66ff7272681fe6469fe0fc80ca2091a856e6c7bf192b1",
+          "answer": "Fact (from graph evidence):\n- The Web64 emulator speed policy is defined in src/web64-emulator-speed.mjs as follows:\n  - Allowed speed multipliers: [1, 2, 4, 8, 16]\n  - The function normalizeEmulatorSpeedMultiplier(value) returns the given value as a number if it is one of the allowed multipliers; otherwise, it defaults to 1.\n  - The function emulatorSpeedResourceValue(value) returns the normalized multiplier multiplied by 100, as a string.\n\nNo evidence of compiler or color-picker involvement in this policy.\n\nSummary:\n- Web64 emulator speed policy restricts speed multipliers to 1, 2, 4, 8, or 16. Any other value is coerced to 1. The resource value is the multiplier × 100, as a string.\n\nNo missing context or unproven claims detected.",
+          "review": {
+            "mandatory_pass": true,
+            "disposition": "passed_for_supplied_excerpt",
+            "finding": "Both locate the complete frozen speed-policy excerpt, allowed multipliers, default-to-one and resource conversion, without compiler/color-picker noise. No missing required anchor and both contexts/replies fit their explicit limits.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "6505c9892ca76f498d2ce05daf20cca91c73f69929285e2459a0b97a3159e68b",
+          "context_bytes": 6451,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 9.4371000000001,
+          "latency_ms": 2418.7564999999995,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 1777,
+            "outputTokens": 353,
+            "totalTokens": 2130,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "300e36a5cb4c07db1ae8a51c5046ef0a5d6b27d3eae156534adeef17b1127953",
+          "answer": "Evidence\n\nFrom src/web64-emulator-speed.mjs (excerpt_sha256: 36c4ab6b3a54315c93f05bca5f6c0e94d8a97a5855d04c8507575eb7c1da5024):\n\n- The policy for emulator speed is defined by the constant:\n  ```js\n  export const WEB64_EMULATOR_SPEED_MULTIPLIERS = Object.freeze([1, 2, 4, 8, 16]);\n  ```\n- The function normalizeEmulatorSpeedMultiplier(value) ensures the speed multiplier is one of the allowed values; otherwise, it defaults to 1:\n  ```js\n  export function normalizeEmulatorSpeedMultiplier(value) {\n    const multiplier = Number(value);\n    return WEB64_EMULATOR_SPEED_MULTIPLIERS.includes(multiplier) ? multiplier : 1;\n  }\n  ```\n- emulatorSpeedResourceValue(value) returns the normalized multiplier times 100 as a string.\n\nInference\n\n- The emulator speed policy is to allow only the multipliers 1, 2, 4, 8, or 16.\n- Any value outside this set is coerced to 1.\n\nUncertainty\n\n- No evidence of dynamic or user-configurable policy outside this hardcoded set.\n- No evidence of speed policy in the compiler or color-picker modules.\n\nConclusion\n\nThe Web64 emulator speed policy restricts speed multipliers to 1, 2, 4, 8, or 16. Any other value is normalized to 1. This is enforced by normalizeEmulatorSpeedMultiplier and the WEB64_EMULATOR_SPEED_MULTIPLIERS constant. No compiler or color-picker logic is involved.",
+          "review": {
+            "mandatory_pass": true,
+            "disposition": "passed_for_supplied_excerpt",
+            "finding": "Both locate the complete frozen speed-policy excerpt, allowed multipliers, default-to-one and resource conversion, without compiler/color-picker noise. No missing required anchor and both contexts/replies fit their explicit limits.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/10-web64-react-AT04.json",
+      "limitation": null
+    },
+    {
+      "task_id": "web64-react:AT05",
+      "scope": "identical_contract_input_control",
+      "order": "source_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "9737c7cc08100b7337e79f0043c00cde279a67a1661937cb6df06ed748b842ef",
+      "original_specification_sha256": "sha256:a4df1b226d5a57201c5761598561c73164aa38298dfdbbb8beb31233391d7600",
+      "results": [
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "8c6e665631b0a76961d046a787133873317aefa2a4a8b58c63b1dcd5880a058b",
+          "context_bytes": 443,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.039800000000013824,
+          "latency_ms": 3411.3804999999998,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 207,
+            "outputTokens": 359,
+            "totalTokens": 566,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "8c0305296c19007719360be40489537d323687a1d817d964e8cc2f8c56f25539",
+          "answer": "Evidence:\n- The contract input describes a mutation request to add a feature (id: \"fixture:added\") to the \"features\" array of a disposable state for instance \"fixture:web64-react\".\n- The mutation is authorized by \"fixture:authorized-agent\" and has operation_id \"fixture:mutation:1\".\n- Interruptions occurred: \"before_publication\" and \"after_publication_reply_lost\".\n- The reply was lost after publication, and a retry with the same payload was performed.\n- A conflicting payload exists with \"features\": [] (i.e., no features).\n\nFacts:\n- The requested mutation is to add a feature to an initially empty \"features\" array.\n- The mutation was retried with the same payload after a reply was lost.\n- There is a conflict: the state may have been reset or another operation reverted the \"features\" array to empty.\n\nInference:\n- The intended mutation was applied, but due to interruptions and a lost reply, the final state is uncertain.\n- The conflicting payload suggests that, after retry, the \"features\" array is empty, indicating the mutation may not have been successfully committed or was overwritten.\n\nUncertainty:\n- It is unclear whether the mutation to add the feature was ever committed to the disposable state, due to the lost reply and the presence of a conflicting empty state.\n\nMissing context:\n- There is no direct evidence of the final committed state after the retry and conflict.\n- No confirmation of mutation success or failure is present.\n\nConclusion:\n- The mutation to add the feature was authorized and attempted, but due to interruptions, a lost reply, and a conflicting empty state, there is no evidence that the mutation was successfully committed.\n- The current disposable state, based on the conflicting payload, is: {\"features\": []}.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "not_an_execution_test",
+            "finding": "Read-only completions receive a proposed interruption scenario, no mutation tools or actual receipt. Replies narrate attempted operations/readbacks that were never performed; some claim the conflicting payload is the observed final state. No durable effect, same-revision readback or recovery is proven. Actual core mutation tests remain separate.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "8c6e665631b0a76961d046a787133873317aefa2a4a8b58c63b1dcd5880a058b",
+          "context_bytes": 443,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.039800000000013824,
+          "latency_ms": 3262.4330000000004,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 207,
+            "outputTokens": 468,
+            "totalTokens": 675,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "7e33cf7f3476dd2fe19ee13e1caec75d7a4dc796197789c04329469d71c07e0e",
+          "answer": "Evidence:\n- The disposable contract input describes an attempted mutation to add a feature (id: fixture:added) to the features array of an instance (fixture:web64-react).\n- Interruptions are specified: \"before_publication\" and \"after_publication_reply_lost\".\n- The mutation is retried with the same payload after a lost reply.\n- There is a conflicting payload: features remain empty ([]).\n- The \"before\" state is features: [].\n- The \"requested_delta\" is to add a feature with id \"fixture:added\".\n- The actor is \"fixture:authorized-agent\" and the operation is \"fixture:mutation:1\".\n\nAnalysis:\n- Fact: The mutation was authorized and attempted.\n- Fact: The reply to the mutation was lost after publication (\"after_publication_reply_lost\").\n- Fact: The mutation was retried with the same payload.\n- Fact: There is a conflicting payload indicating features: [] (no feature added).\n- Fact: The contract is disposable, so state is not persistent beyond the test.\n- Tension: There is uncertainty whether the mutation was actually committed, due to the lost reply and conflicting readback.\n- Fact: The readback after retry shows features: [] (no change).\n- Inference: The mutation may not have been applied, or the state was reset/overwritten by the conflicting payload.\n\nMissing context:\n- No direct evidence of the mutation being successfully committed.\n- No evidence of mutation failure, only that the reply was lost and the state readback does not show the change.\n\nConclusion:\n- The mutation was authorized and attempted, but due to reply loss and a conflicting state, there is no evidence that the mutation was committed.\n- The final readback shows no change (features: []), indicating the mutation was not present in the last observed state.\n- There is unresolved tension: it is unclear if the mutation was ever applied before being overwritten or if it was never committed at all.\n\nSummary (facts, hypotheses, tensions):\n- Fact: Mutation authorized and attempted, reply lost, retried, conflicting state observed.\n- Fact: Final readback shows no feature added.\n- Hypothesis: Mutation was not committed, or was overwritten/reset.\n- Tension: No proof of mutation commitment; state is ambiguous due to disposable context and interruptions.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "not_an_execution_test",
+            "finding": "Read-only completions receive a proposed interruption scenario, no mutation tools or actual receipt. Replies narrate attempted operations/readbacks that were never performed; some claim the conflicting payload is the observed final state. No durable effect, same-revision readback or recovery is proven. Actual core mutation tests remain separate.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/11-web64-react-AT05.json",
+      "limitation": "Read-only mutation/recovery reasoning; actual governed effects are qualified by the existing core integration tests. This model is not given mutation tools."
+    },
+    {
+      "task_id": "web64-react:AT06",
+      "scope": "identical_contract_input_control",
+      "order": "graph_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "8cd7fb91ad3b180f20d84eafc1369aa694d1f48e4076cc4e39a9bbeb91434a19",
+      "original_specification_sha256": "sha256:809d41fa2e76222cc4b392cfba5948c68adc0681df652dbf2ea99dc0c82bb3fa",
+      "results": [
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "670238ebf5c8e881b9466ad0f3f6dda4a3f4afe6fbdf890910b3519a5bfa0c95",
+          "context_bytes": 409,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.03929999999991196,
+          "latency_ms": 4825.783100000001,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 213,
+            "outputTokens": 651,
+            "totalTokens": 864,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "c7200dd9e4eb6ecb7414c91b8a1da457d5d09d0aacdfbbdbe0d925a0acaa58d7",
+          "answer": "Here is an analysis based on the supplied context:\n\n**Evidence:**\n- The last full scan was performed on 2001-01-01.\n- The managed source revision is \"source:3\".\n- The last full scan covered only [\"fixture/source.ts\"].\n- There is a concrete scope gap:  \n  - Path: \"fixture/other.ts\"\n  - Expected hash: sha256:before\n  - Observed hash: sha256:after\n- There is an unrelated recent dream (hypothetical/aspirational plan) for [\"fixture/unrelated.ts\"] at \"graph:4\".\n- \"fixture/missing.ts\" is unavailable.\n\n**Distinguishing incomplete/changed evidence vs. old full scan:**\n\n- **Old Full Scan:**  \n  The last full scan is explicitly dated (2001-01-01) and only covered \"fixture/source.ts\". This means any evidence from that scan is outdated and does not reflect the current state of the codebase, especially for files not included in the scan.\n\n- **Concrete Scope Gap:**  \n  The gap for \"fixture/other.ts\" is not just a lack of evidence; it is a detected change: the observed hash (\"sha256:after\") does not match the expected hash (\"sha256:before\"). This is concrete, current evidence of change or drift in \"fixture/other.ts\" since the last known state.\n\n- **Incomplete Evidence:**  \n  For \"fixture/missing.ts\", the source is unavailable. This is a scope gap due to missing context, not a detected change.\n\n- **Unrelated Recent Dream:**  \n  The recent dream for \"fixture/unrelated.ts\" is not evidence of a scan or mutation; it is a plan or aspiration, not a committed or observed change.\n\n**Summary Table:**\n\n| File                     | Evidence Type         | Status/Gap Type                |\n|--------------------------|----------------------|-------------------------------|\n| fixture/source.ts        | Old full scan        | Outdated evidence             |\n| fixture/other.ts         | Concrete scope gap   | Detected change (hash drift)  |\n| fixture/missing.ts       | Incomplete evidence  | Missing/unavailable context   |\n| fixture/unrelated.ts     | Recent dream         | Not evidence, not a gap       |\n\n**Conclusion:**  \n- An old full scan (e.g., for \"fixture/source.ts\") is outdated evidence and does not indicate a current gap unless the scope has changed.\n- A concrete scope gap (e.g., for \"fixture/other.ts\") is a current, specific mismatch between expected and observed state, indicating a real, actionable difference.\n- Incomplete evidence (e.g., \"fixture/missing.ts\") is a lack of information, not a detected change.\n- Dreams or plans (e.g., \"fixture/unrelated.ts\") are not evidence or gaps.\n\n**Uncertainties:**  \n- No evidence of recent scans or mutations for any files except the noted hash drift.\n- The status of files outside the listed scope is unknown.\n\n**Missing Context:**  \n- No live graph or mutation log is available to confirm recent changes or executions.\n- No information on the authority or plan for resolving the detected scope gap.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "failed",
+            "finding": "Both arms identify the concrete hash mismatch and missing source, but still describe covered evidence as outdated/stale based on the old scan. This violates the no-age-only-staleness outcome; unrelated dreams do not repair the gap.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "670238ebf5c8e881b9466ad0f3f6dda4a3f4afe6fbdf890910b3519a5bfa0c95",
+          "context_bytes": 409,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 0.03929999999991196,
+          "latency_ms": 3710.7568,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 213,
+            "outputTokens": 597,
+            "totalTokens": 810,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "96eb6f58ca2e3da84a2cfbe919df83f46d639aba8cf0acafc60351b307293b82",
+          "answer": "Here is the analysis based on the supplied context:\n\n**Evidence:**\n- The last full scan was performed on 2001-01-01.\n- The managed source revision is \"source:3\".\n- The covered scope of the last full scan was [\"fixture/source.ts\"].\n- There is a concrete scope gap reported:\n  - Path: \"fixture/other.ts\"\n  - Expected hash: sha256:before\n  - Observed hash: sha256:after\n- There is an unrelated recent dream for [\"fixture/unrelated.ts\"] at \"graph:4\".\n- \"fixture/missing.ts\" is unavailable.\n\n**Distinguishing incomplete/changed evidence from an old full scan and a concrete scope gap:**\n\n- **Old Full Scan:**  \n  The last full scan is from 2001-01-01 and only covered [\"fixture/source.ts\"]. This means any evidence from this scan is outdated and does not reflect recent changes or the current state of files outside the covered scope.\n\n- **Concrete Scope Gap:**  \n  There is a specific, concrete gap identified for \"fixture/other.ts\". The expected hash (\"sha256:before\") does not match the observed hash (\"sha256:after\"). This is direct evidence of a change in \"fixture/other.ts\" since the last known state, and it is not covered by the last full scan.\n\n- **Incomplete or Changed Evidence:**  \n  The evidence for \"fixture/other.ts\" is incomplete in the sense that the last full scan did not include it, and the only available data is the hash mismatch. This is not just an old scan; it is a concrete, current gap in the scope, with proof of change.\n\n**Summary Table:**\n\n| File                    | Last Full Scan Coverage | Current Evidence Type    | Status/Gap Type         |\n|-------------------------|------------------------|-------------------------|-------------------------|\n| fixture/source.ts       | Yes                    | Old full scan           | Outdated evidence       |\n| fixture/other.ts        | No                     | Concrete scope gap      | Proven change, incomplete evidence |\n| fixture/unrelated.ts    | No                     | Unrelated recent dream  | Not relevant            |\n| fixture/missing.ts      | No                     | Unavailable             | Missing context         |\n\n**Conclusion:**  \nA concrete scope gap (as in \"fixture/other.ts\") is not just an artifact of an old full scan; it is a proven, current discrepancy between expected and observed state, and must be addressed as a live gap. In contrast, an old full scan simply means the evidence is outdated, but does not by itself prove a change or gap unless accompanied by new evidence (like a hash mismatch).\n\n**Uncertainties/Missing Context:**  \n- No live graph or mutation evidence is available.\n- \"fixture/missing.ts\" is unavailable, so its status cannot be determined.\n- The unrelated recent dream does not affect the current scope or gap analysis.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "failed",
+            "finding": "Both arms identify the concrete hash mismatch and missing source, but still describe covered evidence as outdated/stale based on the old scan. This violates the no-age-only-staleness outcome; unrelated dreams do not repair the gap.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": "requests/12-web64-react-AT06.json",
+      "limitation": null
+    },
+    {
+      "task_id": "dreamgraph:GE16-pilot",
+      "scope": "established_graph_plus_frozen_source",
+      "order": "source_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:a4e61c6fb98b521621c0280f4bde7bc0582dbd9420c2aba05c66672e533eec5e",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "5afd26f42738fcfcaa0bd107ed5c7d657ad0bb4a5bbd58f771352b7b19ad652f",
+      "original_specification_sha256": "sha256:f0bbd9201741022e3100a390ae25d547ed64a2d3e952cead51e4aeddd2236404",
+      "results": [
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "a46316174f0f7090c9767271c1618928a48e12c09b4fce0355f38dc3da35047b",
+          "context_bytes": 9988,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 3201.2332,
+          "latency_ms": 8015.5823,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 2774,
+            "outputTokens": 983,
+            "totalTokens": 3757,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "7f30654779d46fb41e632531b06043cf88d7c257c563f49fce8a8e1d951466d7",
+          "answer_withheld": "Established graph context is private; only reviewed finding, hash and resource measurements are published.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "gain_not_established",
+            "finding": "Assisted reply retrieves ADR-036 but extrapolates its title into scan/publication guarantees absent from supplied evidence. Both replies overstate scan side effects. More history was retrieved; improved understanding/decision is not established.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "cd257304c2691c2dd87a7973461a15563b3debd1c6dfb0f2645b60608cb4b653",
+          "context_bytes": 18582,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 3201.2332,
+          "latency_ms": 7882.088199999998,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 7424,
+            "outputTokens": 969,
+            "totalTokens": 8393,
+            "cachedInputTokens": 2560,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "b00241f7f4bfec3952eb6520e761d4fc3d48ce23a3d9e3b71cf9352d1ce34f2d",
+          "answer_withheld": "Established graph context is private; only reviewed finding, hash and resource measurements are published.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "gain_not_established",
+            "finding": "Assisted reply retrieves ADR-036 but extrapolates its title into scan/publication guarantees absent from supplied evidence. Both replies overstate scan side effects. More history was retrieved; improved understanding/decision is not established.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": null,
+      "limitation": "One exploratory pair, not a repeated/statistically significant performance claim."
+    },
+    {
+      "task_id": "web64-react:GE16-pilot",
+      "scope": "established_graph_plus_frozen_source",
+      "order": "graph_first",
+      "execution": {
+        "provider": "openai",
+        "model": "gpt-4.1-2025-04-14",
+        "api": "responses",
+        "effort": null,
+        "prompt_version": "ashoka.bounded-real-pilot.v1",
+        "source_manifest_hash": "sha256:8dde1f727175feb374c86358d07dd3b88d52ff6607065b1bb0c067eb7107de42",
+        "input_tokens": 32768,
+        "output_tokens": 1600,
+        "context_bytes": 24000,
+        "output_bytes": 16000,
+        "max_calls": 1,
+        "max_elapsed_ms": 60000,
+        "retention": "store_false",
+        "currency": "USD",
+        "max_amount": 0.16
+      },
+      "task_hash": "7f13d18a5f827d7cadbaa2b7046f9964e7eb02a36ca8b1a6bf227e18344d1e5e",
+      "original_specification_sha256": "sha256:1ade3cde52213e7025546475ca57c7bdae26243685de112b0b1dd12a6c107df9",
+      "results": [
+        {
+          "arm": "graph_assisted",
+          "outcome": "completed",
+          "context_hash": "c3db1a48bf830ca49c85f90e44e6dfe63b4272328f0d5f07200e2be7ada40e15",
+          "context_bytes": 14704,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 2366.0561,
+          "latency_ms": 5906.9311,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 4708,
+            "outputTokens": 967,
+            "totalTokens": 5675,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "452605f84c39d05341ef70d1f386d924f96c55e276eba091efadb5004dfd7478",
+          "answer_withheld": "Established graph context is private; only reviewed finding, hash and resource measurements are published.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "gain_not_established",
+            "finding": "Assisted reply retrieves the recorded declarative build-target ADR-009 and gives a relevant next-change constraint. It also invents atomic/side-effect-free runtime handoff guarantees. Useful extra history does not establish a reliable net understanding gain from this single pair.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        },
+        {
+          "arm": "source_only",
+          "outcome": "completed",
+          "context_hash": "6505c9892ca76f498d2ce05daf20cca91c73f69929285e2459a0b97a3159e68b",
+          "context_bytes": 6451,
+          "context_tokens": null,
+          "context_token_measurement": "unavailable",
+          "construction_ms": 2366.0561,
+          "latency_ms": 6062.0680999999995,
+          "calls": 1,
+          "usage": {
+            "inputTokens": 1816,
+            "outputTokens": 1123,
+            "totalTokens": 2939,
+            "cachedInputTokens": 0,
+            "reasoningTokens": 0
+          },
+          "answer_hash": "12b7c052f9b4760fce53928d2d1723d05b63b8bfe06982713835d5e261165bf6",
+          "answer_withheld": "Established graph context is private; only reviewed finding, hash and resource measurements are published.",
+          "review": {
+            "mandatory_pass": false,
+            "disposition": "gain_not_established",
+            "finding": "Assisted reply retrieves the recorded declarative build-target ADR-009 and gives a relevant next-change constraint. It also invents atomic/side-effect-free runtime handoff guarantees. Useful extra history does not establish a reliable net understanding gain from this single pair.",
+            "reviewer": "executing_agent",
+            "review_method": "Read both original replies against frozen inputs/rubric; not blinded, not an independent paid judge."
+          }
+        }
+      ],
+      "material_understanding_gain": null,
+      "replay_request": null,
+      "limitation": "One exploratory pair, not a repeated/statistically significant performance claim."
+    }
+  ]
+}

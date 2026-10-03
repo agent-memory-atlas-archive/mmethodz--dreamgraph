@@ -1,3 +1,4 @@
+import { installOfflineAdmissionFixtures } from "./helpers/offline-admission.js";
 import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
@@ -112,6 +113,11 @@ async function executeArchitectShellInJsdom(input: {
         if (url.pathname === "/api/architect/v1/plugin-tabs") {
           return new Response(JSON.stringify({ ok: true, tabs: [] }), { status: 200, headers: { "Content-Type": "application/json" } });
         }
+        if (url.pathname === "/api/architect/v1/graph-upgrade") {
+          // This bootstrap/replay fixture declares a clean format. Actual
+          // migration notices are qualified by the separate daemon/browser run.
+          return Response.json({ ok: true, notice: { state: "no_format_issue_detected" } });
+        }
         if (url.pathname === "/api/architect/v1/repo-setup") {
           return new Response(JSON.stringify({
             ok: true,
@@ -189,6 +195,10 @@ async function executeArchitectShellInJsdom(input: {
   return { dom, errors };
 }
 
+// Inference/journal fixtures must never share the checkout's retained ledger.
+// Tests with explicit instance data still keep those separately scoped directories.
+installOfflineAdmissionFixtures();
+
 describe("standalone Architect route hardening", () => {
   it("maps Architect verbosity modes to shared narrative density", () => {
     expect(resolveArchitectNarrativeDensity("concise")).toEqual({
@@ -261,6 +271,8 @@ describe("standalone Architect route hardening", () => {
     });
 
     expect(content).toContain('model_verbosity = "high"');
+    expect(content).toContain('[computer_use]\ndefault_app_access = "deny"');
+    for(const feature of ['computer_use','browser_use','browser_use_external','browser_use_full_cdp_access','in_app_browser'])expect(content).toContain(`${feature} = false`);
     expect(content.indexOf('model_verbosity = "high"')).toBeLessThan(content.indexOf("[mcp_servers.dreamgraph]"));
     expect(content).toContain('"=C:" = "C:\\\\Users\\\\Mika"');
     expect(content).toContain('DREAMGRAPH_ARCHITECT_VERBOSITY_MODE = "detailed"');
@@ -338,8 +350,8 @@ describe("standalone Architect route hardening", () => {
       expect(script).toContain("refreshArchitectContinuationPills();");
       expect(script).toContain("nextContinuation.status === 'continue'");
       expect(script).toContain("continuationToken: nextContinuation.token");
-      expect(script).toContain("selected_plan_id: dispatchScope === 'plan' ? activePlanId : null");
-      expect(script).toContain("if (dispatchScope === 'plan' && activePlanId) {");
+      expect(script).toContain("selected_plan_id: dispatchPlanId");
+      expect(script).toContain("if (dispatchPlanId) {");
       expect(script).not.toContain("updateChatMessageContent(assistantMessage, result.content || 'Architect returned an empty response.');");
       expect(script).not.toContain("selected_plan_id: activePlanId,");
       expect(script).not.toContain("replace(/s+/g");
@@ -565,6 +577,10 @@ describe("standalone Architect route hardening", () => {
   it("serves the Architect pulse projection contract", async () => {
     await withArchitectServer(async (baseUrl) => {
       const contract = await expectJsonOk(await fetch(`${baseUrl}/api/architect/v1`));
+      expect(contract.plan_projection).toMatchObject({
+        operational_state_source: "typed_plan_authority",
+        legacy_operational_state_source: "legacy_review_projection",
+      });
       const routes = contract.routes as Record<string, string>;
       expect(routes.pulse).toBe("GET /api/architect/v1/pulse");
       expect(routes.desires).toBe("GET /api/architect/v1/desires");
@@ -948,7 +964,7 @@ describe("standalone Architect route hardening", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ title: "ADR Edit Proposal Plan" }),
         });
-        expect(createdResponse.status).toBe(201);
+        expect(createdResponse.status, await createdResponse.clone().text()).toBe(201);
         const created = await createdResponse.json() as Record<string, unknown>;
         const planId = String((created.result as Record<string, unknown>).plan_id);
 
@@ -1243,7 +1259,7 @@ describe("standalone Architect route hardening", () => {
     }
   });
 
-  it("persists and returns refreshed plan cursors for completed standalone Architect passes", async () => {
+  it("retains pass reports as audit evidence without manufacturing slice verification", async () => {
     const tempRoot = await mkdtemp(join(tmpdir(), "dreamgraph-architect-pass-cursor-"));
     const plansDir = join(tempRoot, "plans");
     const scopeSpy = vi.spyOn(lifecycle, "getActiveScope").mockReturnValue({
@@ -1283,7 +1299,7 @@ describe("standalone Architect route hardening", () => {
               name: "run_command",
               arguments: JSON.stringify({ command: "node --version", timeoutMs: 10_000 }),
             }],
-            status: "requires_action",
+            status: "completed",
           }));
           return;
         }
@@ -1345,7 +1361,7 @@ describe("standalone Architect route hardening", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ title: "Pass Cursor Plan" }),
         });
-        expect(createdResponse.status).toBe(201);
+        expect(createdResponse.status, await createdResponse.clone().text()).toBe(201);
         const created = await createdResponse.json() as Record<string, unknown>;
         const planId = String((created.result as Record<string, unknown>).plan_id);
         await writeFile(join(plansDir, `${planId}.md`), [
@@ -1381,8 +1397,9 @@ describe("standalone Architect route hardening", () => {
         const firstResult = first.result as Record<string, unknown>;
         const firstCursor = firstResult.plan_cursor as Record<string, unknown>;
         const firstOperational = firstCursor.operational_state as Record<string, unknown>;
-        expect((firstOperational.last_completed_slice as Record<string, unknown>).title).toBe("Slice 1 - Setup");
-        expect((firstOperational.active_slice as Record<string, unknown>).title).toBe("Slice 2 - Finish");
+        expect(firstOperational.last_completed_slice).toBeNull();
+        expect(firstOperational.active_slice).toBeNull();
+        expect(firstOperational.current_slice_id).toBeNull();
         expect(firstCursor.completed_passes).toBe(1);
 
         const second = await expectJsonOk(await fetch(`${baseUrl}/api/architect/v1/chat`, {
@@ -1401,10 +1418,10 @@ describe("standalone Architect route hardening", () => {
         }));
         const secondCursor = (second.result as Record<string, unknown>).plan_cursor as Record<string, unknown>;
         const secondOperational = secondCursor.operational_state as Record<string, unknown>;
-        expect((secondOperational.last_completed_slice as Record<string, unknown>).title).toBe("Slice 2 - Finish");
+        expect(secondOperational.last_completed_slice).toBeNull();
         expect(secondOperational.active_slice).toBeNull();
         expect(secondOperational.next_slice).toBeNull();
-        expect(secondOperational.plan_lifecycle).toBe("completed");
+        expect(secondOperational.plan_lifecycle).toBe("draft");
         expect(secondCursor.completed_passes).toBe(2);
 
         const refreshed = await expectJsonOk(await fetch(`${baseUrl}/api/architect/v1/plans/${planId}`));
@@ -1412,7 +1429,8 @@ describe("standalone Architect route hardening", () => {
         const refreshedOperational = refreshedPlan.operational_state as Record<string, unknown>;
         expect(refreshedOperational.active_slice).toBeNull();
         expect(refreshedOperational.next_slice).toBeNull();
-        expect(refreshedOperational.plan_lifecycle).toBe("completed");
+        expect(refreshedOperational.reconciliation).toMatchObject({ state: "definition_changed" });
+        expect(refreshedOperational.plan_lifecycle).toBe("draft");
       });
     } finally {
       await new Promise<void>((resolve, reject) => providerServer!.close((error) => error ? reject(error) : resolve()));
@@ -1508,7 +1526,8 @@ describe("standalone Architect route hardening", () => {
         expect(result.plan_cursor_update).toBeNull();
         const cursor = result.plan_cursor as Record<string, unknown>;
         const operational = cursor.operational_state as Record<string, unknown>;
-        expect((operational.active_slice as Record<string, unknown>).title).toBe("Slice 1 - Setup");
+        expect(operational.active_slice).toBeNull();
+        expect(operational.current_slice_id).toBeNull();
         expect(operational.last_completed_slice).toBeNull();
 
         const log = await readFile(join(plansDir, `${planId}.implementation-log.md`), "utf-8");
@@ -1755,9 +1774,9 @@ describe("standalone Architect route hardening", () => {
       readFile(new URL("../src/architect/routes.ts", import.meta.url), "utf-8"),
     ]);
     expect(nativeLoopSource).toContain('completeWithNativeTools as completeLlmWithNativeTools');
-    expect(nativeLoopSource).toContain('return completeLlmWithNativeTools(config, messages, tools);');
+    expect(nativeLoopSource).toContain('return completeLlmWithNativeTools(config, messages, tools, { signal });');
     expect(nativeLoopSource).not.toContain('capabilities.api === "responses"');
-    expect(nativeLoopSource).not.toContain('fetch(`${config.baseUrl}/responses`');
+    expect(nativeLoopSource).not.toContain('admittedModelFetch(config.provider, `${config.baseUrl}/responses`');
     expect(nativeLoopSource).toContain('context_pressure: ${coordinator.getContextPressureLabel()}');
     expect(nativeLoopSource).toContain('compressToolResult(resultText, input.budgetCoordinator, call.name)');
     expect(nativeLoopSource).toContain('recordComponentActual(`tool:${call.name}`, finalTokens)');
@@ -1766,9 +1785,9 @@ describe("standalone Architect route hardening", () => {
     expect(routesSource).toContain('recordComponentActual("preamble", preambleTokens)');
     expect(routesSource).toContain('estimateTokensFromString(promptBundle.systemPrompt) - promptBundle.preambleTokens');
     expect(llmSource).toContain('export async function completeWithNativeTools');
-    expect(llmSource).toContain('capabilities.api === "responses"');
-    expect(llmSource).toContain('fetch(`${config.baseUrl}/responses`');
-    expect(llmSource).toContain('fetch(`${this.baseUrl}/responses`');
+    expect(llmSource).toContain('api === "responses" ? await callOpenAiResponsesWithTools');
+    expect(llmSource).toContain('admittedModelFetch(config.provider, `${config.baseUrl}/responses`');
+    expect(llmSource).toContain('admittedModelFetch(this.name, `${this.baseUrl}/responses`');
   });
 
   it("exposes daemon-owned token economy budget status on fallback chat responses", async () => {
@@ -1847,7 +1866,7 @@ describe("standalone Architect route hardening", () => {
         expect(clearedResult.persisted).toBe(true);
         expect(clearedResult.selected_plan_id).toBeNull();
         const clearedEnv = await readFile(engineEnvPath, "utf-8");
-        expect(clearedEnv).toContain("# DREAMGRAPH_ARCHITECT_SELECTED_PLAN_ID=");
+        expect(clearedEnv).toContain("\nDREAMGRAPH_ARCHITECT_SELECTED_PLAN_ID=\n");
 
         const clearedPlans = await expectJsonOk(await fetch(`${baseUrl}/api/architect/v1/plans`));
         expect(clearedPlans.selected_plan_id).toBeNull();
@@ -1929,7 +1948,7 @@ describe("standalone Architect route hardening", () => {
     }
   });
 
-  it("applies selected-plan chat additions through daemon fallback when CLI adapter is metadata-only", async () => {
+  it("does not mutate a selected plan after a CLI provider failure", async () => {
     const tempRoot = await mkdtemp(join(tmpdir(), "dreamgraph-architect-chat-plan-"));
     const scopeSpy = vi.spyOn(lifecycle, "getActiveScope").mockReturnValue({
       uuid: "standalone-architect-chat-plan-test",
@@ -1967,20 +1986,13 @@ describe("standalone Architect route hardening", () => {
           }),
         }));
         const result = update.result as Record<string, unknown>;
-        const planUpdate = result.plan_update as Record<string, unknown>;
-
-        expect(result.content).toContain("Updated Browser Architect UI Level 2");
-        expect(planUpdate.changed).toBe(true);
-        expect(planUpdate.update_mode).toBe("replace_goal_placeholder");
+        expect(result.plan_update).toBeNull();
         expect(String((result.route as Record<string, unknown>).fallback_reason)).toContain("architect_provider_failed");
-        expect(String((result.route as Record<string, unknown>).fallback_reason)).not.toContain("metadata_only");
-
         const markdown = await readFile(join(tempRoot, "plans", `${planId}.md`), "utf-8");
+        expect(markdown).not.toContain("Plan tree hierarchy");
+        expect(markdown).toContain("Describe the goal for this Architect plan.");
         const log = await readFile(join(tempRoot, "plans", `${planId}.implementation-log.md`), "utf-8");
-        expect(markdown).toContain("Plan tree hierarchy");
-        expect(markdown).not.toContain("Describe the goal for this Architect plan.");
-        expect(log).toContain("chat_plan_update");
-        expect(log).toContain("selected plan markdown was updated by the daemon");
+        expect(log).not.toContain("chat_plan_update");
       });
     } finally {
       scopeSpy.mockRestore();
@@ -2021,7 +2033,7 @@ describe("standalone Architect route hardening", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             planId,
-            adapter: "codex-cli",
+            adapter: "deterministic_fallback",
             provider: "none",
             model: "gpt-5.4",
             mode: "autonomous",
@@ -2083,7 +2095,7 @@ describe("standalone Architect route hardening", () => {
     });
   });
 
-  it("projects implementation-log lifecycle and next-slice status", async () => {
+  it("keeps unimported implementation-log claims separate from lifecycle authority", async () => {
     await withArchitectServer(async (baseUrl) => {
       const response = await fetch(`${baseUrl}/api/architect/v1/plans/browser-architect-ui-level-2`);
       const payload = await expectJsonOk(response);
@@ -2092,10 +2104,15 @@ describe("standalone Architect route hardening", () => {
       const lastCompleted = operational.last_completed_slice as { title?: string } | null;
       const nextSlice = operational.next_slice as { title?: string } | null;
 
-      expect(operational.plan_lifecycle).toBe("implementing");
+      expect(operational.plan_lifecycle).toBe("draft");
       expect(operational.execution_state).toBe("idle");
-      expect(String(lastCompleted?.title ?? lastCompleted?.id ?? "")).toContain("Slice 6");
-      expect(String(nextSlice?.title ?? nextSlice?.id ?? "")).toBe("");
+      expect(lastCompleted).toMatchObject({ title: "Slice 6. Integration hardening + plan update pass", status: "completed" });
+      expect(operational.source).toBe("legacy_review_projection");
+      expect(operational.running_slice_ids).toEqual([]);
+      expect(operational.active_slice).toBeNull();
+      expect(operational.reconciliation).toMatchObject({ state: "legacy_review_required" });
+      expect(operational.progress).toMatchObject({ verified: 0 });
+      expect(nextSlice).toMatchObject({ status: "pending" });
       expect(String(operational.current_slice_id ?? "")).not.toContain("standalone-architect-chat-plan-update");
     });
   });
@@ -2113,12 +2130,12 @@ describe("standalone Architect route hardening", () => {
 
       expect(living.source).toBe("markdown_log_projection");
       expect(living.confidence).toBe("medium");
-      expect(living.review_state).toBe("implementation_ready");
-      expect(String(currentSlice?.title ?? "")).toContain("Slice E");
+      expect(living.review_state).toBe("draft");
+      expect(currentSlice).toMatchObject({ title: "Slice E: Tension Studio", status: "implemented" });
       expect(questions.length).toBeGreaterThan(0);
       expect(nervousPoints.length).toBeGreaterThan(0);
       expect(branches.every((branch) => branch.status === "conceptual_candidate")).toBe(true);
-      expect(branches.some((branch) => String(branch.title).includes("Slice A"))).toBe(false);
+      expect(branches.some((branch) => String(branch.title).includes("Slice A"))).toBe(true);
       expect(anchors.some((anchor) => anchor.id === "ADR-218")).toBe(true);
       expect(String(living.last_changed_because ?? "")).toContain("Slice E");
       expect(String(living.pulse ?? "")).toContain("questions=");
@@ -2173,7 +2190,7 @@ describe("standalone Architect route hardening", () => {
     }
   });
 
-  it("treats implemented slice checkpoints as complete and advances to the next slice", async () => {
+  it("shows exact recorded progress without advancing governed work", async () => {
     const tempRoot = await mkdtemp(join(tmpdir(), "dreamgraph-architect-slice-projection-"));
     const dataDir = join(tempRoot, "data");
     const plansDir = join(tempRoot, "plans");
@@ -2218,9 +2235,15 @@ describe("standalone Architect route hardening", () => {
         const lastCompleted = operational.last_completed_slice as { title?: string } | null;
         const nextSlice = operational.next_slice as { title?: string } | null;
 
-        expect(String(lastCompleted?.title ?? lastCompleted?.id ?? "")).toContain("Slice 2");
+        expect(lastCompleted).toMatchObject({ title: "Slice 2 - Status", status: "completed" });
+        expect(operational.progress).toMatchObject({ verified: 0 });
+        expect(operational.reported_progress).toMatchObject({ completed: 1, implemented: 1 });
         expect(String(nextSlice?.title ?? nextSlice?.id ?? "")).toContain("Slice 3");
-        expect(String(operational.current_slice_title ?? "")).toContain("Slice 3");
+        expect(operational.next_eligibility).toMatchObject({ can_start: false });
+        expect(operational.current_slice_title).toBe("Slice 1 - Foundation");
+        expect(operational.current_status).toBe("implemented");
+        expect(operational.running_slice_ids).toEqual([]);
+        expect(operational.active_slice).toBeNull();
       });
     } finally {
       scopeSpy.mockRestore();
@@ -2228,7 +2251,7 @@ describe("standalone Architect route hardening", () => {
     }
   });
 
-  it("does not project stale resume notes as next slice after all slices complete", async () => {
+  it("rejects ambiguous legacy completion references and keeps resume notes out of governed instructions", async () => {
     const tempRoot = await mkdtemp(join(tmpdir(), "dreamgraph-architect-completed-slice-projection-"));
     const dataDir = join(tempRoot, "data");
     const plansDir = join(tempRoot, "plans");
@@ -2281,23 +2304,24 @@ describe("standalone Architect route hardening", () => {
         const activeSlice = operational.active_slice as { title?: string } | null;
         const lastCompleted = operational.last_completed_slice as { title?: string } | null;
 
-        expect(plan.status).toBe("completed");
-        expect(operational.plan_lifecycle).toBe("completed");
-        expect(operational.execution_state).toBe("complete");
-        expect(operational.next_slice).toBeNull();
+        expect(plan.status).toBe("draft");
+        expect(operational.plan_lifecycle).toBe("draft");
+        expect(operational.execution_state).toBe("idle");
+        expect(operational.next_slice).toMatchObject({ status: "pending" });
         expect(activeSlice).toBeNull();
-        expect(String(lastCompleted?.title ?? lastCompleted?.id ?? "")).toContain("Slice 3");
+        expect(lastCompleted).toBeNull();
         expect(operational.current_slice_id).toBeNull();
         expect(operational.current_slice_title).toBeNull();
-        expect(String(operational.resume_hint ?? "")).toContain("completed after Slice 3");
+        expect(operational.reconciliation).toMatchObject({ state: "legacy_review_required" });
+        expect(operational.resume_action).toBe("review_legacy_progress");
         expect(String(operational.resume_hint ?? "")).not.toContain("continue with Slice 2");
 
         const listResponse = await fetch(`${baseUrl}/api/architect/v1/plans`);
         const listPayload = await expectJsonOk(listResponse);
         const plans = listPayload.plans as Array<{ id?: string; status?: string; operational_state?: Record<string, unknown> }>;
         const filters = listPayload.plan_filters as { status_options?: string[] };
-        expect(plans.find((entry) => entry.id === "completed-slice-projection")?.status).toBe("completed");
-        expect(filters.status_options).toContain("completed");
+        expect(plans.find((entry) => entry.id === "completed-slice-projection")?.status).toBe("draft");
+        expect(filters.status_options).toContain("draft");
         expect(filters.status_options).not.toContain("Draft");
       });
     } finally {
@@ -2306,7 +2330,7 @@ describe("standalone Architect route hardening", () => {
     }
   });
 
-  it("projects current Architect Continuation status from verified implementation log entries", async () => {
+  it("requires typed proof rather than legacy verified headings for Architect Continuation", async () => {
     const tempRoot = await mkdtemp(join(tmpdir(), "dreamgraph-architect-continuation-projection-"));
     const dataDir = join(tempRoot, "data");
     const plansDir = join(tempRoot, "plans");
@@ -2358,13 +2382,14 @@ describe("standalone Architect route hardening", () => {
         const operational = plan.operational_state ?? {};
         const lastCompleted = operational.last_completed_slice as { title?: string } | null;
 
-        expect(plan.status).toBe("completed");
-        expect(operational.plan_lifecycle).toBe("completed");
-        expect(operational.execution_state).toBe("complete");
+        expect(plan.status).toBe("draft");
+        expect(operational.plan_lifecycle).toBe("draft");
+        expect(operational.execution_state).toBe("idle");
         expect(operational.active_slice).toBeNull();
-        expect(operational.next_slice).toBeNull();
-        expect(String(lastCompleted?.title ?? lastCompleted?.id ?? "")).toContain("Slice 4");
-        expect(operational.completed_checkpoint_count).toBe(3);
+        expect(operational.next_slice).toMatchObject({ status: "pending" });
+        expect(lastCompleted).toBeNull();
+        expect(operational.completed_checkpoint_count).toBe(0);
+        expect(operational.progress).toMatchObject({ verified: 0 });
       });
     } finally {
       scopeSpy.mockRestore();
@@ -2471,7 +2496,8 @@ describe("standalone Architect route hardening", () => {
     } as never;
     const status = formatArchitectPlanStatusPayload(detail, "architect-level-3");
     expect(status).toContain("Plan Architect Level 3 (architect-level-3)");
-    expect(status).toContain("Active slice: Slice 4 - Plan Management Slash Commands");
+    expect(status).toContain("Current slice: Slice 4 - Plan Management Slash Commands");
+    expect(status).toContain("Running slice: none");
     expect(status).toContain("ADR bindings: ADR-209, ADR-218");
     expect(formatArchitectPlanNextPayload(detail)).toContain("Slice 5 - Task Execution Control Architecture");
   });

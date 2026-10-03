@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {newerSnapshot,resolveViewIdentity} from "./view-contract";
 import { version as explorerVersion } from "../package.json";
 import {
   DEFAULT_EXPLORER_PREFS,
@@ -49,6 +50,7 @@ function readBool(key: string, fallback: boolean): boolean {
 
 export function App() {
   const [snapshot, setSnapshot] = useState<GraphSnapshot | null>(null);
+  const snapshotCurrent=useRef(snapshot);snapshotCurrent.current=snapshot;
   const [stats, setStats] = useState<StatsResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [versionError, setVersionError] = useState(false);
@@ -60,6 +62,8 @@ export function App() {
   const [prefs, setPrefs] = useState<ExplorerPrefs>(DEFAULT_EXPLORER_PREFS);
   const [render3dError, setRender3dError] = useState<string | null>(null);
   const { events: liveEvents, pulses, connected: sseConnected } = useEventStream();
+  const refreshBusy=useRef(false);
+  const refreshQueued=useRef(false);
 
   // Hydrate the renderer mode from the daemon on mount. Defaults stand
   // until the prefs file roundtrips so first paint is never blocked.
@@ -124,11 +128,15 @@ export function App() {
     setDragging(side);
   };
 
-  const refreshSnapshot = () => {
+  const refreshSnapshot = useCallback(() => {
+    if(refreshBusy.current){refreshQueued.current=true;return;}
+    refreshBusy.current=true;
     const t0 = performance.now();
     fetchSnapshot()
-      .then((s) => {
-        setSnapshot(s);
+      .then(async(s) => {
+        setSnapshot(previous=>newerSnapshot(previous,s));
+        setError(null);setVersionError(false);
+        try{setStats(await fetchStats(s.etag));}catch(err){setStats(null);setError(`Overview unavailable for this revision: ${err instanceof Error?err.message:String(err)}`);}
         const ms = Math.round(performance.now() - t0);
         void fetch("/explorer/api/metrics/client", {
           method: "POST",
@@ -139,19 +147,31 @@ export function App() {
       .catch((err: unknown) => {
         if (err instanceof SnapshotVersionError) setVersionError(true);
         else setError(err instanceof Error ? err.message : String(err));
-      });
-    fetchStats().then(setStats).catch(() => undefined);
-  };
+      }).finally(()=>{refreshBusy.current=false;if(refreshQueued.current){refreshQueued.current=false;refreshSnapshot();}});
+  },[]);
 
   useEffect(() => {
     refreshSnapshot();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Ordinary store activity stays behind the manual refresh boundary. Autonomous
+  // dreaming and explicit snapshot publication remain live update signals.
+  const changeEvent=liveEvents.find(event=>["snapshot.changed","dream.cycle.completed"].includes(event.kind));
+  const changeSeq=changeEvent?.kind==='snapshot.changed'&&changeEvent.etag===snapshot?.etag?undefined:changeEvent?.seq;
+  useEffect(()=>{if(changeSeq===undefined)return;const timer=window.setTimeout(refreshSnapshot,750);return()=>window.clearTimeout(timer);},[changeSeq,refreshSnapshot]);
+  useEffect(()=>{if(sseConnected)refreshSnapshot();},[sseConnected,refreshSnapshot]);
+  const navigate=useCallback((id:string|null)=>{if(!id){setSelected(null);return;}const current=snapshotCurrent.current;if(!current)return;
+    try{const target=resolveViewIdentity(current,id);if(!target){setError("This entity is outside the current render scope. Use its canonical context API or refresh.");return;}setSelected(target);}
+    catch(err){setError(err instanceof Error?err.message:String(err));}},[]);
+
   const selectedNode = useMemo(() => {
     if (!snapshot || !selected) return null;
     return snapshot.nodes.find((n) => n.id === selected) ?? null;
   }, [snapshot, selected]);
+  const eventIdentities=useMemo(()=>{const aliases=new Map<string,string[]>();for(const node of snapshot?.nodes??[]){for(const alias of [node.id,node.identity?.id].filter((id):id is string=>!!id)){const matches=aliases.get(alias)??[];if(!matches.includes(node.id))matches.push(node.id);aliases.set(alias,matches);}}return aliases;},[snapshot]);
+  const mappedPulses=useMemo(()=>pulses.flatMap(pulse=>{const matches=eventIdentities.get(pulse.id);return matches?.length===1?[{...pulse,id:matches[0]}]:[];}),[pulses,eventIdentities]);
+  const mappedEvents=useMemo(()=>liveEvents.map(event=>({...event,affected_ids:event.affected_ids.flatMap(id=>{const matches=eventIdentities.get(id);return matches?.length===1?matches:[];})})),[liveEvents,eventIdentities]);
 
   const nodeColors = NODE_COLORS as Record<ExplorerNodeType, string>;
   const edgeColors = useMemo(() => {
@@ -170,7 +190,7 @@ export function App() {
       <div className="topbar" style={{ gridColumn: "1 / 6" }}>
         <a className="brand" href="/" title="DreamGraph landing page"><span className="brand-mark" aria-hidden="true">◈</span><span>DreamGraph<small>EXPLORER</small></span></a>
         <span className="meta version">v{explorerVersion}</span>
-        <SearchBar onPick={setSelected} />
+        <SearchBar onPick={navigate} />
         <div className="mode-toggle">
           <button
             className={`mode-btn${mode === "atlas" ? " active" : ""}`}
@@ -213,6 +233,13 @@ export function App() {
             instance <strong>{snapshot.instance_uuid.slice(0, 8)}</strong>
           </span>
         ) : null}
+        {snapshot?.state?<details className="snapshot-state"><summary>Graph {snapshot.canonical_state?.freshness??snapshot.state.freshness} · {snapshot.canonical_state?.completeness??snapshot.state.completeness} · r{snapshot.revision?.publication_sequence}</summary>
+          <p>Rendered view: {snapshot.state.completeness}. View exclusions do not change canonical graph completeness.</p>
+          <p>Graph updated: {snapshot.currency?.last_graph_mutation_at??"unknown"}</p><p>Last inclusive scan: {snapshot.currency?.last_full_scan_at??"unknown"} (history only)</p>
+          <p>Source reconciled: {snapshot.currency?.last_source_reconciliation_at??"unknown"}</p>
+          {snapshot.state.reasons.map((reason,i)=><p key={i}><strong>{reason.code}</strong>: {reason.detail}</p>)}
+          <p>Render {snapshot.nodes.length}/{snapshot.scope?.eligible_nodes??"?"} nodes · {snapshot.scope?.omitted_edges??0} relationships outside the render · {snapshot.scope?.excluded_families.join(", ")||"no excluded families"}</p>
+        </details>:null}
         {snapshot ? (
           <span className="meta connection-state" title={`Snapshot ${snapshot.etag}`}>
             <i className={sseConnected ? "connected" : ""} />{sseConnected ? "Live" : "Reconnecting"}
@@ -260,6 +287,10 @@ export function App() {
         onMouseDown={beginDrag("left")}
         role="separator"
         aria-orientation="vertical"
+        tabIndex={0}
+        aria-label="Resize filters"
+        aria-valuemin={SIDEBAR_MIN} aria-valuemax={SIDEBAR_MAX} aria-valuenow={leftWidth}
+        onKeyDown={event=>{if(event.key==="ArrowLeft"||event.key==="ArrowRight"){event.preventDefault();setLeftWidth(width=>Math.max(SIDEBAR_MIN,Math.min(SIDEBAR_MAX,width+(event.key==="ArrowRight"?10:-10))));}}}
       />
 
       <div className="canvas-host">
@@ -277,8 +308,8 @@ export function App() {
                 mode={mode}
                 snapshot={snapshot}
                 selected={selected}
-                onSelect={setSelected}
-                liveEvents={liveEvents}
+                onSelect={navigate}
+                liveEvents={mappedEvents}
                 filters={filters}
                 onFatal={(msg) => {
                   setRender3dError(msg);
@@ -289,11 +320,11 @@ export function App() {
           ) : (
             <GraphCanvas
               snapshot={snapshot}
-              onSelect={setSelected}
+              onSelect={navigate}
               filters={filters}
               mode={mode}
               selected={selected}
-              pulses={pulses}
+              pulses={mappedPulses}
             />
           )
         ) : (
@@ -339,6 +370,10 @@ export function App() {
         onMouseDown={beginDrag("right")}
         role="separator"
         aria-orientation="vertical"
+        tabIndex={0}
+        aria-label="Resize inspector"
+        aria-valuemin={SIDEBAR_MIN} aria-valuemax={SIDEBAR_MAX} aria-valuenow={rightWidth}
+        onKeyDown={event=>{if(event.key==="ArrowLeft"||event.key==="ArrowRight"){event.preventDefault();setRightWidth(width=>Math.max(SIDEBAR_MIN,Math.min(SIDEBAR_MAX,width+(event.key==="ArrowLeft"?10:-10))));}}}
       />
 
       {rightCollapsed ? (
@@ -390,9 +425,11 @@ export function App() {
         ) : null}
         {rightTab === "inspector" ? (
           <Inspector
+            onRefresh={refreshSnapshot}
             selected={selectedNode}
             stats={stats}
-            onNavigate={setSelected}
+            etag={snapshot?.etag}
+            onNavigate={navigate}
           />
         ) : rightTab === "tensions" && snapshot ? (
           <TensionsPanel
@@ -407,7 +444,7 @@ export function App() {
               refreshSnapshot();
             }}
             onInspect={(id) => {
-              setSelected(id);
+              navigate(id);
               setRightTab("inspector");
             }}
           />
@@ -424,7 +461,7 @@ export function App() {
               refreshSnapshot();
             }}
             onInspect={(id) => {
-              setSelected(id);
+              navigate(id);
               setRightTab("inspector");
             }}
           />

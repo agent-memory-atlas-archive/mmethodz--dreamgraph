@@ -5,6 +5,7 @@ import argparse
 from collections import Counter
 from pathlib import Path
 
+from .definitions import qualified
 from . import loader
 from ._common import add_common_args, emit, fmt_table, resolve_data_dir_from_args
 
@@ -13,6 +14,7 @@ def _pct(part: int, total: int) -> str:
     return f"{(100 * part / total):.1f}%" if total else "-"
 
 
+@qualified("domain_saturation")
 def analyze(data_dir: Path) -> dict:
     fact = loader.all_fact_entities(data_dir)
     dg = loader.dream_graph(data_dir)

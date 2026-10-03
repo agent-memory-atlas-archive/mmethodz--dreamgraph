@@ -10,7 +10,7 @@
  *   GET  /           — Dashboard index (links to all pages)
  *   GET  /status     — Cognitive state, dream stats, tensions
  *   GET  /schedules  — Schedule management (view, pause/resume, run now, delete)
- *   POST /schedules  — Schedule actions (toggle, run, delete)
+ *   POST /schedules  — Retired form port (410); use /api/schedules/v2
  *   GET  /config     — Active configuration with inline edit forms
  *   POST /config     — Apply configuration changes at runtime
  *   GET  /docs       — Native markdown viewer for docs/ folder
@@ -22,13 +22,14 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { readFile, readdir } from "node:fs/promises";
 import { resolve, basename, extname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { z } from "zod";
+import { settingSchema } from "../config/setting-schema.js";
 import { config, updateDatabaseConnectionString } from "../config/config.js";
 import { engine } from "../cognitive/engine.js";
 import { getActiveScope, isInstanceMode, getToolCallCount, getEffectiveDataDir } from "../instance/lifecycle.js";
 import { getActiveProfileName, switchProfile } from "../instance/policies.js";
 import {
-  getSchedules, getScheduleHistory, getSchedulerConfig, updateSchedulerConfig,
-  createSchedule, updateSchedule, deleteSchedule, runScheduleNow,
+  getSchedulerConfig, updateSchedulerConfig,
 } from "../cognitive/scheduler.js";
 import {
   getLlmConfig, initLlmProvider,
@@ -36,13 +37,30 @@ import {
   updateDreamerLlmConfig, updateNormalizerLlmConfig,
 } from "../cognitive/llm.js";
 import type { LlmConfig } from "../cognitive/llm.js";
-import type { DreamSchedule, ScheduleExecution, ScheduleAction, ScheduleTriggerType, Datastore } from "../types/index.js";
+import type { Datastore } from "../types/index.js";
 import { updateConfig as updateEventConfig, getConfig as getEventConfig } from "../cognitive/event-router.js";
 import { updateNarrativeConfig, getNarrativeConfig } from "../cognitive/narrator.js";
 import { testDbConnection, resetDbPool, runDatastoreScan } from "../tools/db-senses.js";
 import { loadJsonData, loadJsonArray } from "../utils/cache.js";
-import { writeEngineEnv } from "../utils/engine-env.js";
+import { ENGINE_DEPLOYMENT_OVERRIDES } from "../utils/engine-env.js";
+import { randomUUID } from "node:crypto";
+import { handleScheduleApi } from "./schedule-api.js";
+import {renderScheduleWorkspace,SCHEDULE_WORKSPACE_SCRIPT} from "./schedule-workspace.js";
+import { renderConfigurationWorkspace, CONFIGURATION_WORKSPACE_SCRIPT, configurationTab, configurationModelChoices } from "./configuration-workspace.js";
+import { parseEngineEnvDocument } from "../config/engine-env-document.js";
+import { readEngineTemplateSource } from "../config/engine-template-source.js";
+import { resolveMasterDir } from "../instance/registry.js";
+import { MODEL_ROLES, readRoleProfiles, resolveRolePolicy } from "../config/role-policy.js";
+import { withoutSessionContext } from "./session-context.js";
+import { withGraphRead } from "../utils/graph-reconciliation-barrier.js";
+import { loadCanonicalGraph } from "../graph/read-model.js";
+import { readDirtyPartitions } from "../graph/change-obligations.js";
+import { renderRuntimeWorkspace, RUNTIME_WORKSPACE_SCRIPT } from "./runtime-workspace.js";
+import { applyEngineConfiguration, inspectEngineConfiguration, previewEngineTemplate, applyEngineTemplate, undoEngineConfiguration } from "../config/engine-configuration.js";
+import { engineSettingCatalogue, engineSetting, resolveComponentSettings, componentSettingAlias } from "../config/engine-setting-catalogue.js";
+import type { EventRouterConfig, SchedulerConfig, NarrativeConfig } from "../cognitive/types.js";
 import { logger } from "../utils/logger.js";
+import { embedArchitectWorkspace } from "./architect-workspace-shell.js";
 import { buildOnboardingReadinessProjection } from "../architect/onboarding-readiness.js";
 import { recordOnboardingTelemetryEvent } from "../architect/onboarding-telemetry.js";
 
@@ -51,6 +69,7 @@ import { recordOnboardingTelemetryEvent } from "../architect/onboarding-telemetr
 /* ------------------------------------------------------------------ */
 
 interface DashboardContext {
+  authority?: Record<string, unknown>;
   getSessionCount: () => number;
   port: number;
 }
@@ -58,48 +77,58 @@ interface DashboardContext {
 let _ctx: DashboardContext = { getSessionCount: () => 0, port: 8100 };
 const PACKAGE_ROOT = resolve(fileURLToPath(import.meta.url), "..", "..", "..");
 
-/**
- * Persist the current LLM configuration (base + dreamer + normalizer)
- * to the instance's engine.env so it survives daemon restarts.
- */
-function persistLlmEngineEnv(): void {
-  const scope = getActiveScope();
-  if (!scope) {
-    logger.warn("persistLlmEngineEnv: no active scope — config not persisted");
-    return;
+function templateMasterDir(): string {
+  return getActiveScope()?.masterDir ?? resolveMasterDir();
+}
+
+function configurationPath(): string {
+  const path = getActiveScope()?.engineEnvPath;
+  if (!path) throw new Error("CONFIG_PERSISTENCE_UNAVAILABLE: attach an instance before saving");
+  return path;
+}
+function applyEffectiveEnvironment(updates: Record<string, string | null>): void {
+  for (const [key, value] of Object.entries(updates)) {
+    if (engineSetting(key)?.apply === "restart" || engineSetting(key)?.apply === "read_only") continue;
+    if (ENGINE_DEPLOYMENT_OVERRIDES[key] !== undefined) process.env[key] = ENGINE_DEPLOYMENT_OVERRIDES[key];
+    else if (value === null) delete process.env[key]; else process.env[key] = value;
   }
+}
+function applyComponentSettings(): void {
+  updateSchedulerConfig(resolveComponentSettings("scheduler", process.env) as SchedulerConfig);
+  updateEventConfig(resolveComponentSettings("events", process.env) as EventRouterConfig);
+  updateNarrativeConfig(resolveComponentSettings("narrative", process.env) as NarrativeConfig);
+}
+async function configurationView() {
+  return { ...await inspectEngineConfiguration(configurationPath()), effective_components: {
+    DREAMGRAPH_SCHEDULER: getSchedulerConfig(), DREAMGRAPH_EVENTS: getEventConfig(), DREAMGRAPH_NARRATIVE: getNarrativeConfig(),
+  } };
+}
 
-  const base = getLlmConfig();
-  const dreamer = getDreamerLlmConfig();
-  const normalizer = getNormalizerLlmConfig();
-  const architect = getArchitectLlmConfig();
-
-  // For API key: check both in-memory config and process.env (engine.env loader).
-  // This prevents the key from being lost when the provider changes (e.g. ollama→openai).
-  const effectiveApiKey = base.apiKey || process.env.DREAMGRAPH_LLM_API_KEY || "";
-
-  const vars: Record<string, string> = {
-    // Shared provider settings
-    DREAMGRAPH_LLM_PROVIDER: base.provider,
-    DREAMGRAPH_LLM_URL: base.baseUrl,
-    DREAMGRAPH_LLM_API_KEY: effectiveApiKey,
-    // Architect (standalone browser chat)
-    DREAMGRAPH_LLM_ARCHITECT_PROVIDER: architect.provider,
-    DREAMGRAPH_LLM_ARCHITECT_ADAPTER: process.env.DREAMGRAPH_LLM_ARCHITECT_ADAPTER || "native_api_tool_loop",
-    DREAMGRAPH_LLM_ARCHITECT_MODEL: architect.model,
-    DREAMGRAPH_LLM_ARCHITECT_TEMPERATURE: String(architect.temperature),
-    DREAMGRAPH_LLM_ARCHITECT_MAX_TOKENS: String(architect.maxTokens),
-    // Dreamer (creative dream cycle generation)
-    DREAMGRAPH_LLM_DREAMER_MODEL: dreamer.model,
-    DREAMGRAPH_LLM_DREAMER_TEMPERATURE: String(dreamer.temperature),
-    DREAMGRAPH_LLM_DREAMER_MAX_TOKENS: String(dreamer.maxTokens),
-    // Normalizer (validation / truth-filter pass)
-    DREAMGRAPH_LLM_NORMALIZER_MODEL: normalizer.model,
-    DREAMGRAPH_LLM_NORMALIZER_TEMPERATURE: String(normalizer.temperature),
-    DREAMGRAPH_LLM_NORMALIZER_MAX_TOKENS: String(normalizer.maxTokens),
-  };
-
-  writeEngineEnv(scope.engineEnvPath, vars);
+/** Save and activation are separate outcomes. Existing executions retain their captured policies. */
+async function activateConfiguration(updates: Record<string, string | null>) {
+  const prior = Object.fromEntries(Object.keys(updates).map(key => [key, process.env[key]]));
+  const owners = new Set(Object.keys(updates).map(key => engineSetting(key)?.owner));
+  const previousOwners = { model: { ...getLlmConfig() }, scheduler: { ...getSchedulerConfig() }, events: { ...getEventConfig() }, narrative: { ...getNarrativeConfig() }, database: config.database.connectionString };
+  try {
+    applyEffectiveEnvironment(updates);
+    // Resolve all component candidates before mutating their live owners.
+    const scheduler = owners.has("scheduler") ? resolveComponentSettings("scheduler", process.env) as SchedulerConfig : null;
+    const events = owners.has("events") ? resolveComponentSettings("events", process.env) as EventRouterConfig : null;
+    const narrative = owners.has("narrative") ? resolveComponentSettings("narrative", process.env) as NarrativeConfig : null;
+    if (Object.keys(updates).some(key => key.startsWith("DREAMGRAPH_LLM_"))) withoutSessionContext(() => initLlmProvider());
+    if (scheduler) updateSchedulerConfig(scheduler); if (events) updateEventConfig(events); if (narrative) updateNarrativeConfig(narrative);
+    if (Object.hasOwn(updates, "DATABASE_URL")) { updateDatabaseConnectionString(process.env.DATABASE_URL ?? ""); await resetDbPool(); }
+    return { status: "activated", message: "Live fields are active; next-execution fields apply to new work. Restart-only fields remain staged." };
+  } catch {
+    // Do not expose an exception that may contain an operator secret. Preserve the committed receipt.
+    for (const [key, value] of Object.entries(prior)) if (value === undefined) delete process.env[key]; else process.env[key] = value;
+    try { if (Object.keys(updates).some(key => key.startsWith("DREAMGRAPH_LLM_"))) withoutSessionContext(() => initLlmProvider(previousOwners.model));
+      if(owners.has("scheduler"))updateSchedulerConfig(previousOwners.scheduler);
+      if(owners.has("events"))updateEventConfig(previousOwners.events); if(owners.has("narrative"))updateNarrativeConfig(previousOwners.narrative);
+      if(Object.hasOwn(updates,"DATABASE_URL"))updateDatabaseConnectionString(previousOwners.database); }
+    catch { /* Report the uncertain activation separately from the durable save. */ }
+    return { status: "restart_required", message: "Saved, but runtime activation was not fully confirmed. Restart the instance and read back before new work." };
+  }
 }
 
 /**
@@ -142,6 +171,7 @@ async function shell(title: string, body: string, activeTab: string): Promise<st
     (function() {
       try {
         var activeTab = document.body.dataset.dgActiveTab || '';
+        if (window.parent !== window) return;
         var storageKey = ${JSON.stringify(storageKey)};
         if (activeTab) {
           localStorage.setItem(storageKey, activeTab);
@@ -157,6 +187,8 @@ async function shell(title: string, body: string, activeTab: string): Promise<st
       <a href="/status"    class="${activeTab === "status"    ? "active" : ""}">Status</a>
       <a href="/schedules" class="${activeTab === "schedules" ? "active" : ""}">Schedules</a>
       <a href="/config"    class="${activeTab === "config"    ? "active" : ""}">Config</a>
+      <a href="/architect">Architect</a>
+      <a href="/explorer/">Explorer</a>
       <a href="/docs"      class="${activeTab === "docs"      ? "active" : ""}">Docs</a>
       <a href="/health"    class="${activeTab === "health"    ? "active" : ""}">Health</a>
     </div>
@@ -193,7 +225,7 @@ function html(res: ServerResponse, statusCode: number, body: string): void {
 }
 
 function json(res: ServerResponse, statusCode: number, payload: unknown): void {
-  res.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8" });
+  res.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
   res.end(JSON.stringify(payload));
 }
 
@@ -203,47 +235,47 @@ function json(res: ServerResponse, statusCode: number, payload: unknown): void {
 
 const CSS = `
   :root {
-    --bg: #0d1117; --surface: #161b22; --border: #30363d;
-    --text: #e6edf3; --text-dim: #8b949e; --accent: #58a6ff;
-    --green: #3fb950; --yellow: #d29922; --red: #f85149; --purple: #bc8cff;
+    --bg: #111111; --surface: #1b1b1b; --border: #383838;
+    --text: #dedede; --text-dim: #999999; --accent: #8ab4e8;
+    --green: #80c59b; --yellow: #d8bb77; --red: #eb9292; --purple: #bb9ede;
     --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13px; line-height: 1.45; }
   a { color: var(--accent); text-decoration: none; }
   a:hover { text-decoration: underline; }
 
   .topbar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 24px; background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 8px 14px; gap: 10px; flex-wrap: wrap; background: var(--surface); border-bottom: 1px solid var(--border);
     position: sticky; top: 0; z-index: 10;
   }
-  .brand { font-size: 18px; font-weight: 700; color: var(--text); }
+  .brand { font-size: 14px; font-weight: 700; color: var(--text); }
   .brand:hover { text-decoration: none; }
   .brand .version { font-weight: 400; color: var(--text-dim); font-size: 13px; }
-  .nav-links { display: flex; gap: 16px; }
+  .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
   .nav-links a { color: var(--text-dim); font-weight: 500; padding: 4px 8px; border-radius: 6px; transition: all .15s; }
   .nav-links a:hover { color: var(--text); background: var(--border); text-decoration: none; }
   .nav-links a.active { color: var(--accent); background: rgba(88,166,255,.1); }
 
-  main { max-width: 1100px; margin: 24px auto; padding: 0 24px; }
+  main { max-width: 1440px; margin: 14px auto; padding: 0 14px; }
   footer {
-    display: flex; justify-content: center; gap: 24px; padding: 16px;
-    color: var(--text-dim); font-size: 12px; border-top: 1px solid var(--border); margin-top: 48px;
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; padding: 10px;
+    color: var(--text-dim); font-size: 11px; border-top: 1px solid var(--border); margin-top: 18px;
   }
 
-  h1 { font-size: 24px; margin-bottom: 16px; }
-  h2 { font-size: 18px; margin: 32px 0 12px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-  h3 { font-size: 15px; margin: 20px 0 8px; color: var(--text-dim); }
+  h1 { font-size: 22px; margin-bottom: 10px; }
+  h2 { font-size: 16px; margin: 18px 0 8px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  h3 { font-size: 14px; margin: 12px 0 6px; color: var(--text-dim); }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 16px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin: 10px 0; }
 
   .card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 12px;
   }
   .card-title { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-dim); margin-bottom: 8px; }
-  .card-value { font-size: 28px; font-weight: 700; font-family: var(--mono); }
+  .card-value { font-size: 23px; font-weight: 600; font-family: var(--mono); }
   .card-sub { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
 
   .badge {
@@ -274,15 +306,15 @@ const CSS = `
   .state-normalizing { color: var(--yellow); }
   .state-nightmare   { color: var(--red); }
 
-  .index-hero { text-align: center; padding: 48px 0 32px; }
-  .index-hero h1 { font-size: 32px; }
-  .index-hero p { color: var(--text-dim); font-size: 16px; margin-top: 8px; }
-  .index-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 32px; }
-  .index-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; transition: border-color .15s; }
+  .index-hero { text-align: left; padding: 8px 0 16px; }
+  .index-hero h1 { font-size: 26px; }
+  .index-hero p { color: var(--text-dim); font-size: 13px; margin-top: 4px; }
+  .index-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-top: 14px; }
+  .index-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 14px; transition: border-color .15s; }
   .index-card:hover { border-color: var(--accent); text-decoration: none; }
   .index-card h3 { color: var(--text); margin: 0 0 8px; font-size: 18px; }
   .index-card p { color: var(--text-dim); font-size: 13px; margin: 0; }
-  .start-here { border: 1px solid rgba(88,166,255,.55); background: linear-gradient(135deg, rgba(88,166,255,.12), var(--surface) 42%); border-radius: 10px; padding: 24px; }
+  .start-here { border: 1px solid var(--border); background: var(--surface); border-radius: 4px; padding: 14px; }
   .start-here-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
   .start-here-header h2 { border: 0; color: var(--text); font-size: 22px; margin: 0 0 6px; padding: 0; }
   .start-here-header p, .readiness-detail, .readiness-repos { color: var(--text-dim); font-size: 13px; }
@@ -319,8 +351,8 @@ const CSS = `
     padding: 6px 16px; border: 1px solid var(--border); border-radius: 6px;
     font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s;
   }
-  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .btn-primary:hover { background: #4090e0; }
+  .btn-primary { background: #365874; border-color: #7798b8; color: #f2f5f8; }
+  .btn-primary:hover { background: #456b8b; }
   .toast {
     background: rgba(63,185,80,.15); color: var(--green); border: 1px solid var(--green);
     border-radius: 6px; padding: 8px 16px; margin-bottom: 16px; font-size: 13px;
@@ -413,18 +445,21 @@ async function renderIndex(): Promise<string> {
       <p style="margin-top:12px"><strong>Recommended next action:</strong> ${esc(readiness.suggested_next_action.label)}</p>
       <div class="start-here-actions">
         <a class="btn btn-primary" href="/architect">Open Architect</a>
+        <a class="btn btn-secondary" href="/explorer/">Open Explorer</a>
         <a class="btn btn-secondary" href="#setup-details">View setup details</a>
         <a class="btn btn-secondary" href="/architect-guide">Architect beginner guide</a>
         ${readiness.suggested_next_action.id === "open_architect" ? "" : `<a class="btn btn-secondary" href="${escAttr(actionHref(readiness.suggested_next_action))}">${esc(readiness.suggested_next_action.label)}</a>`}
       </div>
-      <div id="setup-details">
+      <details id="setup-details"><summary>Setup details</summary>
         <h3>Required to start</h3>
         <div class="readiness-checks">${readiness.required_to_start.map(renderCheck).join("")}</div>
         <h3>Useful later</h3>
         <div class="readiness-checks">${readiness.useful_later.map(renderCheck).join("")}</div>
-      </div>
+      </details>
     </section>
     <div class="index-cards">
+      <a class="index-card" href="/explorer/"><h3>Explorer</h3><p>Navigate the 2D or 3D graph, inspect evidence and provenance, and review candidates and tensions.</p></a>
+      <a class="index-card" href="/architect"><h3>Architect</h3><p>Graph-grounded execution, plans, slices, decisions and reviewed changes.</p></a>
       <a class="index-card" href="/status">
         <h3>📊 Status</h3>
         <p>Cognitive state, dream cycles, graph stats, tensions, active schedules, LLM provider health.</p>
@@ -435,7 +470,7 @@ async function renderIndex(): Promise<string> {
       </a>
       <a class="index-card" href="/config">
         <h3>⚙️ Config</h3>
-        <p>Active configuration with live editing — LLM (dreamer + normalizer), scheduler, events, narrative.</p>
+        <p>Searchable settings, effective model roles, bounded budgets, protected templates and saved/runtime readback.</p>
       </a>
       <a class="index-card" href="/docs">
         <h3>📖 Docs</h3>
@@ -449,7 +484,7 @@ async function renderIndex(): Promise<string> {
         <h3>💚 Health</h3>
         <p>Liveness and readiness status for monitoring and load balancers.</p>
       </a>
-    </div>`;
+    </div>${renderRuntimeWorkspace()}`;
 
   return await shell("Dashboard", body, "");
 }
@@ -465,7 +500,7 @@ async function renderStatus(): Promise<string> {
   const stateClass = `state-${status.current_state}`;
 
   // ---- Hero cards ----
-  let body = `<h1>Server Status</h1>
+  let body = `<h1>Server Status</h1>${renderRuntimeWorkspace()}
   <div class="grid">
     <div class="card">
       <div class="card-title">Cognitive State</div>
@@ -675,1263 +710,125 @@ async function renderHealth(): Promise<string> {
 /*  Route: GET /schedules                                             */
 /* ------------------------------------------------------------------ */
 
-const SCHEDULE_ACTIONS: ScheduleAction[] = [
-  "dream_cycle", "nightmare_cycle", "metacognitive_analysis",
-  "dispatch_cognitive_event", "narrative_chapter", "federation_export",
-  "graph_maintenance",
-];
-
-const TRIGGER_TYPES: ScheduleTriggerType[] = [
-  "interval", "cron_like", "after_cycles", "on_idle",
-];
-
-/** Selectable dream strategies (used for dream_cycle) */
-const DREAM_STRATEGIES: string[] = [
-  "all",
-  "gap_detection",
-  "weak_reinforcement",
-  "cross_domain",
-  "missing_abstraction",
-  "symmetry_completion",
-  "tension_directed",
-  "reflective",
-  "causal_replay",
-  "pgo_wave",
-  "llm_dream",
-  "orphan_bridging",
-  "schema_grounding",
-];
-
-/** Selectable adversarial (nightmare) strategies */
-const ADVERSARIAL_STRATEGIES: string[] = [
-  "all_threats",
-  "privilege_escalation",
-  "data_leak_path",
-  "injection_surface",
-  "missing_validation",
-  "broken_access_control",
-];
-
-/** Cognitive event sources */
-const EVENT_SOURCES: string[] = [
-  "manual",
-  "git_webhook",
-  "ci_cd",
-  "runtime_anomaly",
-  "tension_threshold",
-  "federation_import",
-];
-
-/** Cognitive event severities */
-const EVENT_SEVERITIES: string[] = [
-  "info",
-  "low",
-  "medium",
-  "high",
-  "critical",
-];
-
-/**
- * Build the `parameters` object for a new schedule based on the selected
- * action. Each branch reads only the fields rendered by the matching
- * panel in {@link renderActionParamPanels} and produces a shape that
- * matches the corresponding zod schema in `cognitive/scheduler.ts`.
- *
- * Unknown / unsupported actions fall back to an empty object — the
- * scheduler's `parseScheduleParams` will then apply schema defaults.
- */
-function buildScheduleParameters(
-  action: ScheduleAction,
-  body: Record<string, string>,
-): Record<string, unknown> {
-  switch (action) {
-    case "dream_cycle": {
-      const maxDreams = parseInt(body.dream_max_dreams ?? "100", 10);
-      return {
-        strategy: body.dream_strategy ?? "all",
-        max_dreams: Number.isFinite(maxDreams) && maxDreams > 0 ? maxDreams : 100,
-      };
-    }
-    case "nightmare_cycle":
-      return { strategy: body.nightmare_strategy ?? "all_threats" };
-    case "metacognitive_analysis": {
-      const windowSize = parseInt(body.meta_window_size ?? "50", 10);
-      return {
-        window_size: Number.isFinite(windowSize) && windowSize > 0 ? windowSize : 50,
-        auto_apply: body.meta_auto_apply === "on" || body.meta_auto_apply === "true",
-      };
-    }
-    case "dispatch_cognitive_event": {
-      const affected = (body.evt_affected_entities ?? "")
-        .split(",")
-        .map(s => s.trim())
-        .filter(Boolean);
-      let payload: Record<string, unknown> = {};
-      const raw = (body.evt_payload ?? "").trim();
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-            payload = parsed as Record<string, unknown>;
-          }
-        } catch {
-          // Invalid JSON falls back to empty payload; scheduler validation
-          // will still allow the event to fire with the other fields.
-        }
-      }
-      return {
-        source: body.evt_source ?? "manual",
-        severity: body.evt_severity ?? "info",
-        description: body.evt_description ?? "",
-        affected_entities: affected,
-        payload,
-      };
-    }
-    case "federation_export": {
-      const exportPath = (body.export_path ?? "").trim();
-      return exportPath ? { export_path: exportPath } : {};
-    }
-    case "narrative_chapter":
-    case "graph_maintenance":
-    default:
-      return {};
-  }
-}
-
-/**
- * Render per-action parameter panels for the Create Schedule form.
- * Each panel uses unique input names (prefixed by action) so all fields
- * round-trip through the form regardless of which panel is visible; the
- * POST handler branches on `action` to pick the right set.
- *
- * Only the `dream_cycle` panel is visible initially; the action <select>
- * `onchange` handler toggles `display` per panel.
- */
-function renderActionParamPanels(): string {
-  return `
-    <div id="params_dream_cycle" class="action-params">
-      <div class="form-row">
-        <label>Strategy</label>
-        <select name="dream_strategy">
-          ${DREAM_STRATEGIES.map(s =>
-            `<option value="${s}" ${s === "all" ? "selected" : ""}>${s.replace(/_/g, " ")}</option>`
-          ).join("")}
-        </select>
-      </div>
-      <div class="form-row">
-        <label>Max Dreams</label>
-        <input name="dream_max_dreams" type="number" min="1" value="100">
-      </div>
-    </div>
-    <div id="params_nightmare_cycle" class="action-params" style="display:none">
-      <div class="form-row">
-        <label>Adversarial Strategy</label>
-        <select name="nightmare_strategy">
-          ${ADVERSARIAL_STRATEGIES.map(s =>
-            `<option value="${s}" ${s === "all_threats" ? "selected" : ""}>${s.replace(/_/g, " ")}</option>`
-          ).join("")}
-        </select>
-      </div>
-    </div>
-    <div id="params_metacognitive_analysis" class="action-params" style="display:none">
-      <div class="form-row">
-        <label>Window Size</label>
-        <input name="meta_window_size" type="number" min="5" max="500" value="50">
-      </div>
-      <div class="form-row">
-        <label>Auto-apply</label>
-        <input name="meta_auto_apply" type="checkbox">
-        <span class="unit">apply recommendations automatically</span>
-      </div>
-    </div>
-    <div id="params_dispatch_cognitive_event" class="action-params" style="display:none">
-      <div class="form-row">
-        <label>Source</label>
-        <select name="evt_source">
-          ${EVENT_SOURCES.map(s =>
-            `<option value="${s}" ${s === "manual" ? "selected" : ""}>${s.replace(/_/g, " ")}</option>`
-          ).join("")}
-        </select>
-      </div>
-      <div class="form-row">
-        <label>Severity</label>
-        <select name="evt_severity">
-          ${EVENT_SEVERITIES.map(s =>
-            `<option value="${s}" ${s === "info" ? "selected" : ""}>${s}</option>`
-          ).join("")}
-        </select>
-      </div>
-      <div class="form-row">
-        <label>Description</label>
-        <input name="evt_description" placeholder="Optional human-readable description">
-      </div>
-      <div class="form-row">
-        <label>Affected Entities</label>
-        <input name="evt_affected_entities" placeholder="comma-separated ids (e.g. feature_a, workflow_b)">
-      </div>
-      <div class="form-row">
-        <label>Payload (JSON)</label>
-        <textarea name="evt_payload" rows="4" placeholder='{"reason":"..."}' style="font-family:monospace"></textarea>
-      </div>
-    </div>
-    <div id="params_narrative_chapter" class="action-params" style="display:none">
-      <div class="form-row">
-        <label></label>
-        <span class="unit">No parameters — generates a diff chapter from recent changes.</span>
-      </div>
-    </div>
-    <div id="params_federation_export" class="action-params" style="display:none">
-      <div class="form-row">
-        <label>Export Path</label>
-        <input name="export_path" placeholder="e.g. exports/archetypes-nightly.json">
-        <span class="unit">absolute or relative to data dir; blank = default dream_archetypes.json</span>
-      </div>
-    </div>
-    <div id="params_graph_maintenance" class="action-params" style="display:none">
-      <div class="form-row">
-        <label></label>
-        <span class="unit">No parameters — runs decay + tension decay pass.</span>
-      </div>
-    </div>`;
-}
-
-async function renderSchedules(toast?: string): Promise<string> {
-  const schedules = await safeAsync(() => getSchedules(), []);
-  const recentExecs = await safeAsync(() => getScheduleHistory(undefined, 20), []);
-  const schedCfg = getSchedulerConfig();
-
-  let body = `<h1>Schedules</h1>`;
-
-  // Toast message
-  if (toast) {
-    body += `<div class="toast">✓ ${esc(toast)}</div>`;
-  }
-
-  // Scheduler status card
-  const activeCount = schedules.filter(s => s.enabled && s.status === "active").length;
-  const errorCount = schedules.filter(s => s.status === "error").length;
-  body += `<div class="grid">
-    <div class="card">
-      <div class="card-title">Total Schedules</div>
-      <div class="card-value">${schedules.length}</div>
-      <div class="card-sub">${activeCount} active, ${errorCount} in error</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Scheduler</div>
-      <div class="card-value" style="color:var(--${schedCfg.enabled ? "green" : "red"})">${schedCfg.enabled ? "RUNNING" : "STOPPED"}</div>
-      <div class="card-sub">Tick: ${fmtMs(schedCfg.tick_interval_ms)} · Max ${schedCfg.max_runs_per_hour}/hr</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Recent Executions</div>
-      <div class="card-value">${recentExecs.length}</div>
-      <div class="card-sub">${recentExecs.filter(e => !e.success).length} failures in last 20</div>
-    </div>
-  </div>`;
-
-  // ---- Active Schedules Table ----
-  body += `<h2>Active Schedules</h2>`;
-  if (schedules.length === 0) {
-    body += `<p class="empty">No schedules configured. Create one below.</p>`;
-  } else {
-    body += `<table>
-      <tr>
-        <th>Name</th><th>Action</th><th>Trigger</th><th>Status</th>
-        <th>Runs</th><th>Next Run</th><th>Last Run</th><th>Actions</th>
-      </tr>
-      ${schedules.map(s => {
-        const statusColor = s.status === "active" ? "green" :
-          s.status === "paused" ? "yellow" :
-          s.status === "error" ? "red" : "blue";
-        const triggerDesc = s.trigger_type === "interval" && s.interval_ms
-          ? `every ${fmtMs(s.interval_ms)}`
-          : s.trigger_type === "after_cycles" && s.cycle_interval
-          ? `every ${s.cycle_interval} cycles`
-          : s.trigger_type === "on_idle" && s.idle_ms
-          ? `after ${fmtMs(s.idle_ms)} idle`
-          : s.trigger_type === "cron_like" && s.cron
-          ? `cron: ${esc(s.cron)}`
-          : esc(s.trigger_type);
-        return `<tr>
-          <td><strong>${esc(s.name)}</strong></td>
-          <td><code>${esc(s.action)}</code></td>
-          <td class="mono">${triggerDesc}</td>
-          <td><span class="badge badge-${statusColor}">${esc(s.status)}</span></td>
-          <td>${s.run_count}${s.max_runs !== null ? ` / ${s.max_runs}` : ""}</td>
-          <td>${fmtTime(s.next_run_at)}</td>
-          <td>${fmtTime(s.last_run_at)}</td>
-          <td style="white-space:nowrap">
-            <form method="POST" action="/schedules" style="display:inline">
-              <input type="hidden" name="_action" value="toggle">
-              <input type="hidden" name="id" value="${escAttr(s.id)}">
-              <button type="submit" class="btn" style="padding:2px 8px;font-size:11px">${s.enabled ? "⏸ Pause" : "▶ Resume"}</button>
-            </form>
-            <form method="POST" action="/schedules" style="display:inline">
-              <input type="hidden" name="_action" value="run_now">
-              <input type="hidden" name="id" value="${escAttr(s.id)}">
-              <button type="submit" class="btn" style="padding:2px 8px;font-size:11px">⚡ Run</button>
-            </form>
-            <form method="POST" action="/schedules" style="display:inline">
-              <input type="hidden" name="_action" value="delete">
-              <input type="hidden" name="id" value="${escAttr(s.id)}">
-              <button type="submit" class="btn" style="padding:2px 8px;font-size:11px;color:var(--red)">✕</button>
-            </form>
-          </td>
-        </tr>
-        ${s.last_error ? `<tr><td colspan="8" style="color:var(--red);font-size:12px;padding:2px 10px 8px">⚠ ${esc(s.last_error)} (errors: ${s.error_count})</td></tr>` : ""}`;
-      }).join("")}
-    </table>`;
-  }
-
-  // ---- Create New Schedule ----
-  body += `<h2>Create Schedule</h2>
-  <div class="card">
-    <form method="POST" action="/schedules" class="config-form">
-      <input type="hidden" name="_action" value="create">
-      <div class="form-row">
-        <label>Name</label>
-        <input name="name" required placeholder="e.g. Hourly Dream Cycle">
-      </div>
-      <div class="form-row">
-        <label>Action</label>
-        <select name="action" id="schedule_action" onchange="
-          var sel = this.value;
-          ['dream_cycle','nightmare_cycle','metacognitive_analysis','dispatch_cognitive_event','narrative_chapter','federation_export','graph_maintenance'].forEach(function(a){
-            var el = document.getElementById('params_' + a);
-            if (el) el.style.display = (a === sel) ? '' : 'none';
-          });
-        ">
-          ${SCHEDULE_ACTIONS.map(a =>
-            `<option value="${a}">${a}</option>`
-          ).join("")}
-        </select>
-      </div>
-      <div class="form-row">
-        <label>Trigger Type</label>
-        <select name="trigger_type" id="trigger_type" onchange="
-          document.getElementById('interval_row').style.display = this.value === 'interval' ? 'flex' : 'none';
-          document.getElementById('cron_row').style.display = this.value === 'cron_like' ? 'flex' : 'none';
-          document.getElementById('cycles_row').style.display = this.value === 'after_cycles' ? 'flex' : 'none';
-          document.getElementById('idle_row').style.display = this.value === 'on_idle' ? 'flex' : 'none';
-        ">
-          ${TRIGGER_TYPES.map(t =>
-            `<option value="${t}">${t === "cron_like" ? "cron-like" : t.replace("_", " ")}</option>`
-          ).join("")}
-        </select>
-      </div>
-      <div class="form-row" id="interval_row">
-        <label>Interval</label>
-        <input name="interval_ms" type="number" min="5000" value="3600000" placeholder="ms">
-        <span class="unit">ms</span>
-      </div>
-      <div class="form-row" id="cron_row" style="display:none">
-        <label>Cron Expression (UTC)</label>
-        <input name="cron" placeholder="0 6 * * *">
-      </div>
-      <div class="form-row" id="cycles_row" style="display:none">
-        <label>Every N Cycles</label>
-        <input name="cycle_interval" type="number" min="1" value="10">
-      </div>
-      <div class="form-row" id="idle_row" style="display:none">
-        <label>Idle Timeout</label>
-        <input name="idle_ms" type="number" min="10000" value="120000" placeholder="ms">
-        <span class="unit">ms</span>
-      </div>
-      ${renderActionParamPanels()}
-      <div class="form-row">
-        <label>Max Runs</label>
-        <input name="max_runs" type="number" min="0" value="0" placeholder="0 = unlimited">
-        <span class="unit">0 = ∞</span>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Create Schedule</button>
-      </div>
-    </form>
-  </div>`;
-
-  // ---- Recent Execution History ----
-  body += `<h2>Recent Executions</h2>`;
-  if (recentExecs.length === 0) {
-    body += `<p class="empty">No executions recorded yet.</p>`;
-  } else {
-    // Build a schedule-id → strategy lookup for the executions table
-    const strategyMap = new Map<string, string>();
-    for (const s of schedules) {
-      strategyMap.set(s.id, (s.parameters?.strategy as string) ?? "all");
-    }
-
-    body += `<table>
-      <tr><th>Schedule</th><th>Action</th><th>Strategy</th><th>Triggered</th><th>Duration</th><th>Result</th><th>Summary</th></tr>
-      ${recentExecs.slice().reverse().map(e => {
-        const strat = strategyMap.get(e.schedule_id) ?? "—";
-        return `<tr>
-        <td>${esc(e.schedule_name)}</td>
-        <td><code>${esc(e.action)}</code></td>
-        <td><code>${esc(strat)}</code></td>
-        <td>${fmtTime(e.triggered_at)}</td>
-        <td class="mono">${fmtMs(e.duration_ms)}</td>
-        <td>${e.success
-          ? '<span class="badge badge-green">ok</span>'
-          : '<span class="badge badge-red">fail</span>'
-        }</td>
-        <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escAttr(e.result_summary)}">${esc(truncate(e.result_summary, 80))}</td>
-      </tr>`;
-      }).join("")}
-    </table>`;
-  }
-
-  return await shell("Schedules", body, "schedules");
-}
+async function renderSchedules(_toast?:string):Promise<string>{return shell("Schedules",renderScheduleWorkspace(),"schedules");}
 
 /* ------------------------------------------------------------------ */
 /*  Route: POST /schedules                                            */
 /* ------------------------------------------------------------------ */
 
-async function handleSchedulePost(
-  req: IncomingMessage,
-  res: ServerResponse,
-): Promise<void> {
-  const body = await parseFormBody(req);
-  const action = body._action;
-  let toast = "";
-
-  try {
-    switch (action) {
-      case "toggle": {
-        const id = body.id;
-        const schedules = await getSchedules();
-        const sched = schedules.find(s => s.id === id);
-        if (sched) {
-          await updateSchedule(id, { enabled: !sched.enabled });
-          toast = `${sched.name} ${sched.enabled ? "paused" : "resumed"}`;
-        }
-        break;
-      }
-      case "run_now": {
-        const id = body.id;
-        const exec = await runScheduleNow(id);
-        toast = `${exec.schedule_name} executed (${exec.success ? "success" : "failed"}, ${fmtMs(exec.duration_ms)})`;
-        break;
-      }
-      case "delete": {
-        const id = body.id;
-        const schedules = await getSchedules();
-        const sched = schedules.find(s => s.id === id);
-        const deleted = await deleteSchedule(id);
-        toast = deleted ? `Schedule "${sched?.name ?? id}" deleted` : `Schedule not found`;
-        break;
-      }
-      case "create": {
-        const triggerType = (body.trigger_type ?? "interval") as ScheduleTriggerType;
-        const maxRuns = parseInt(body.max_runs ?? "0", 10);
-        const actionType = (body.action ?? "dream_cycle") as ScheduleAction;
-        const parameters = buildScheduleParameters(actionType, body);
-        const created = await createSchedule({
-          name: body.name ?? "Untitled",
-          action: actionType,
-          parameters,
-          trigger_type: triggerType,
-          interval_ms: triggerType === "interval" ? parseInt(body.interval_ms ?? "3600000", 10) : undefined,
-          cron: triggerType === "cron_like" ? body.cron : undefined,
-          cycle_interval: triggerType === "after_cycles" ? parseInt(body.cycle_interval ?? "10", 10) : undefined,
-          idle_ms: triggerType === "on_idle" ? parseInt(body.idle_ms ?? "120000", 10) : undefined,
-          max_runs: maxRuns > 0 ? maxRuns : null,
-          enabled: true,
-        });
-        toast = `Schedule "${created.name}" created`;
-        break;
-      }
-      default:
-        logger.warn(`Dashboard: Unknown schedule action "${action}"`);
-    }
-  } catch (err) {
-    logger.error(`Dashboard: Schedule action "${action}" failed:`, err);
-    toast = `Error: ${err instanceof Error ? err.message : String(err)}`;
-  }
-
-  res.writeHead(303, {
-    Location: `/schedules${toast ? `?toast=${encodeURIComponent(toast)}` : ""}`,
-  });
-  res.end();
-}
-
 /* ------------------------------------------------------------------ */
 /*  Route: GET /config                                                */
 /* ------------------------------------------------------------------ */
 
-async function renderConfig(savedSection?: string): Promise<string> {
-  const scope = getActiveScope();
-  const llmCfg = getLlmConfig();
-  const dreamerCfg = getDreamerLlmConfig();
-  const normalizerCfg = getNormalizerLlmConfig();
-  const schedCfg = getSchedulerConfig();
-  const eventCfg = getEventConfig();
-  const narrCfg = getNarrativeConfig();
-
-  let body = `<h1>Configuration</h1>`;
-
-  if (savedSection) {
-    body += `<div class="toast">✓ ${esc(savedSection)} configuration saved successfully.</div>`;
-  }
-
-  body += `<div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-    <div>
-      <strong>Server Control</strong>
-      <p style="color:var(--text-dim);margin:4px 0 0 0;font-size:0.85rem">
-        All configuration changes are applied immediately (hot-reload). Use restart only if needed.
-      </p>
-    </div>
-    <button type="button" class="btn btn-secondary" id="btn-restart" style="white-space:nowrap">Restart Server</button>
-  </div>
-  <script>
-    document.getElementById('btn-restart').addEventListener('click', async function() {
-      const btn = this;
-      btn.disabled = true;
-      btn.textContent = 'Restarting…';
-      try {
-        await fetch('/restart', { method: 'POST' });
-      } catch(e) { /* connection will drop */ }
-      let attempts = 0;
-      const poll = setInterval(async () => {
-        attempts++;
-        try {
-          const r = await fetch('/health');
-          if (r.ok) { clearInterval(poll); location.reload(); }
-        } catch(e) { /* still restarting */ }
-        if (attempts > 45) { clearInterval(poll); btn.textContent = 'Restart sent — refresh manually'; }
-      }, 1000);
-    });
-  </script>`;
-
-  body += `<h2>Instance</h2>
-  <div class="card">
-    <div class="kv"><span class="kv-key">Mode</span><span class="kv-val">${isInstanceMode() ? "UUID-scoped" : "Legacy (flat)"}</span></div>
-    ${scope ? `
-    <div class="kv"><span class="kv-key">UUID</span><span class="kv-val mono">${scope.uuid}</span></div>
-    <div class="kv"><span class="kv-key">Project Root</span><span class="kv-val mono">${esc(scope.projectRoot ?? "—")}</span></div>
-    <div class="kv"><span class="kv-key">Data Dir</span><span class="kv-val mono">${esc(scope.dataDir)}</span></div>
-    <div class="kv"><span class="kv-key">Config Dir</span><span class="kv-val mono">${esc(scope.configDir)}</span></div>
-    <div class="kv"><span class="kv-key">Logs Dir</span><span class="kv-val mono">${esc(scope.logsDir)}</span></div>
-    ` : `
-    <div class="kv"><span class="kv-key">Data Dir</span><span class="kv-val mono">${esc(config.dataDir)}</span></div>
-    `}
-  </div>`;
-
-  body += `<h2>Server</h2>
-  <div class="card">
-    <div class="kv"><span class="kv-key">Name</span><span class="kv-val">${config.server.name}</span></div>
-    <div class="kv"><span class="kv-key">Version</span><span class="kv-val">${config.server.version}</span></div>
-    <div class="kv"><span class="kv-key">Debug</span><span class="kv-val">${config.env.debug ? "true" : "false"}</span></div>
-  </div>`;
-
-  const repos = scope?.repos ?? config.repos;
-  body += `<h2>Repos</h2>`;
-  if (Object.keys(repos).length === 0) {
-    body += `<p class="empty">No repositories configured.</p>`;
-  } else {
-    body += `<table>
-      <tr><th>Alias</th><th>Path</th></tr>
-      ${Object.entries(repos).map(([k, v]) =>
-        `<tr><td><code>${esc(k)}</code></td><td class="mono">${esc(String(v))}</td></tr>`
-      ).join("")}
-    </table>`;
-  }
-
-  const effectiveApiKey = llmCfg.apiKey || process.env.DREAMGRAPH_LLM_API_KEY || "";
-  const hasApiKey = effectiveApiKey.length > 0;
-  const maskedApiKey = effectiveApiKey
-    ? effectiveApiKey.length > 8
-      ? effectiveApiKey.slice(0, 5) + "\u2022\u2022\u2022" + effectiveApiKey.slice(-4)
-      : "\u2022\u2022\u2022\u2022" + effectiveApiKey.slice(-4)
-    : "";
-  const apiKeyBadge = hasApiKey
-    ? '<span class="badge badge-green" style="margin-left:8px">set</span>'
-      + '<span class="api-key-mask">' + esc(maskedApiKey) + '</span>'
-    : '<span class="badge badge-red" style="margin-left:8px">not set</span>';
-  const apiKeyPlaceholder = hasApiKey ? "(set — leave blank to keep)" : "sk-...****** or API key";
-
-  body += `<h2>LLM</h2>`;
-
-  if (llmCfg.provider === "none" || !llmCfg.provider) {
-    body += `<div class="card" style="border-left:4px solid var(--accent);margin-bottom:16px;background:var(--card-bg)">
-      <strong style="color:var(--accent)">LLM Not Configured</strong>
-      <p style="color:var(--text-dim);margin:6px 0 0 0;font-size:0.9rem;line-height:1.5">
-        DreamGraph works without LLM using 8 structural heuristic strategies, but configuring a model
-        unlocks <strong>creative dreaming</strong> (novel edge discovery) and <strong>semantic validation</strong>
-        (LLM-assisted normalization). Select a provider below and save to get started.
-        For local inference, <strong>Ollama</strong> with a small model works well.
-        The normalizer uses low temperature (0.1) by default for precise, consistent validation.
-      </p>
-    </div>`;
-  }
-
-  body += `
-  <div class="section-group">
-
-    <div class="sub-section">
-      <h3>Provider</h3>
-      <form method="POST" action="/config" class="config-form">
-        <input type="hidden" name="_section" value="llm">
-        <div class="form-row">
-          <label>Provider</label>
-          <select name="provider" id="llm-provider" onchange="window.__dgUpdateProviderUrl()">
-            ${(["ollama", "lmstudio", "openai", "anthropic", "sampling", "none"] as const).map(p =>
-              `<option value="${p}" ${llmCfg.provider === p ? "selected" : ""}>${p}</option>`
-            ).join("")}
-          </select>
-        </div>
-        <div class="form-row">
-          <label>Base URL</label>
-          <input id="llm-baseUrl" name="baseUrl" value="${escAttr(llmCfg.baseUrl)}" placeholder="e.g. http://localhost:11434">
-        </div>
-        <div class="form-row">
-          <label>API Key</label>
-          <div class="api-key-wrap">
-            <input id="apiKeyInput" name="apiKey" type="password" value="" placeholder="${escAttr(apiKeyPlaceholder)}">
-            <button type="button" class="api-key-toggle" onclick="var i=document.getElementById('apiKeyInput');if(i.type==='password'){i.type='text';this.textContent='Hide'}else{i.type='password';this.textContent='Show'}">Show</button>
-          </div>
-          ${apiKeyBadge}
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Save Provider</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="sub-section">
-      <h3>Dreamer</h3>
-      <p class="sub-desc">Creative settings for dream cycle generation.</p>
-      <form method="POST" action="/config" class="config-form">
-        <input type="hidden" name="_section" value="dreamer">
-        <div class="form-row">
-          <label>Model</label>
-          <div style="display:flex;gap:8px;flex:1;align-items:center">
-            <select id="dreamer-select" style="flex:0 0 auto;min-width:180px"
-              onchange="window.__dgModelSelect('dreamer')">
-            </select>
-            <input id="dreamer-model" name="model" value="${escAttr(dreamerCfg.model)}" placeholder="type custom model name" style="flex:1">
-          </div>
-        </div>
-        <div class="form-row">
-          <label>Temperature</label>
-          <input name="temperature" type="number" step="0.1" min="0" max="2" value="${dreamerCfg.temperature}">
-        </div>
-        <div class="form-row">
-          <label>Max Tokens</label>
-          <input name="maxTokens" type="number" min="256" max="65536" value="${dreamerCfg.maxTokens}">
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Save Dreamer</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="sub-section">
-      <h3>Normalizer</h3>
-      <p class="sub-desc">Precise settings for validation / truth-filter pass.</p>
-      <form method="POST" action="/config" class="config-form">
-        <input type="hidden" name="_section" value="normalizer">
-        <div class="form-row">
-          <label>Model</label>
-          <div style="display:flex;gap:8px;flex:1;align-items:center">
-            <select id="normalizer-select" style="flex:0 0 auto;min-width:180px"
-              onchange="window.__dgModelSelect('normalizer')">
-            </select>
-            <input id="normalizer-model" name="model" value="${escAttr(normalizerCfg.model)}" placeholder="type custom model name" style="flex:1">
-          </div>
-        </div>
-        <div class="form-row">
-          <label>Temperature</label>
-          <input name="temperature" type="number" step="0.1" min="0" max="2" value="${normalizerCfg.temperature}">
-        </div>
-        <div class="form-row">
-          <label>Max Tokens</label>
-          <input name="maxTokens" type="number" min="256" max="65536" value="${normalizerCfg.maxTokens}">
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Save Normalizer</button>
-        </div>
-      </form>
-    </div>
-
-    <script>
-    (function() {
-      var PROVIDER_URLS = {
-        ollama:    'http://localhost:11434',
-        lmstudio:  'http://localhost:1234/v1',
-        openai:    'https://api.openai.com/v1',
-        anthropic: 'https://api.anthropic.com/v1',
-        sampling:  '',
-        none:      '',
-      };
-
-      var MODEL_PRESETS = {
-        openai: [
-          'gpt-6.1-sol', 'gpt-6-astra', 'gpt-6-sol', 'gpt-6-luna', 'gpt-5.6', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-4o', 'gpt-4o-mini', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano',
-          'gpt-5.4-nano',
-          'o4-mini', 'o3', 'o3-mini', 'o1', 'o1-mini',
-        ],
-        anthropic: [
-          'claude-opus-5-5', 'claude-sonnet-5-5', 'claude-fable-5-1', 'claude-mythos-5-1', 'claude-opus-5', 'claude-sonnet-5', 'claude-sonnet-4-6', 'claude-opus-4-8', 'claude-opus-4-7', 'claude-haiku-4-5',
-        ],
-        ollama: [
-          'qwen3:8b', 'qwen3:4b', 'qwen3:1.7b', 'qwen3:32b',
-          'llama3.1:8b', 'llama3.3:70b', 'mistral:7b',
-          'deepseek-r1:8b', 'deepseek-r1:32b', 'gemma3:12b',
-          'phi4:14b', 'codellama:13b',
-        ],
-        // LM Studio model ids depend on what the user has loaded;
-        // leave empty so the UI defaults to the custom-name input.
-        lmstudio: [],
-        sampling: [],
-        none: [],
-      };
-
-      var CUSTOM_VALUE = '__custom__';
-
-      window.__dgUpdateProviderUrl = function() {
-        var prov = document.getElementById('llm-provider').value;
-        var urlInput = document.getElementById('llm-baseUrl');
-        if (PROVIDER_URLS[prov] !== undefined) {
-          urlInput.value = PROVIDER_URLS[prov];
-        }
-        buildModelSelect('dreamer');
-        buildModelSelect('normalizer');
-      };
-
-      function buildModelSelect(role) {
-        var sel = document.getElementById(role + '-select');
-        var input = document.getElementById(role + '-model');
-        if (!sel || !input) return;
-
-        var prov = document.getElementById('llm-provider').value;
-        var models = MODEL_PRESETS[prov] || [];
-        var current = input.value;
-
-        sel.innerHTML = '';
-
-        models.forEach(function(m) {
-          var opt = document.createElement('option');
-          opt.value = m;
-          opt.textContent = m;
-          sel.appendChild(opt);
-        });
-
-        var customOpt = document.createElement('option');
-        customOpt.value = CUSTOM_VALUE;
-        customOpt.textContent = 'Custom\u2026';
-        sel.appendChild(customOpt);
-
-        if (current && models.indexOf(current) !== -1) {
-          sel.value = current;
-          input.style.display = 'none';
-        } else {
-          sel.value = CUSTOM_VALUE;
-          input.style.display = '';
-        }
-      }
-
-      window.__dgModelSelect = function(role) {
-        var sel = document.getElementById(role + '-select');
-        var input = document.getElementById(role + '-model');
-        if (!sel || !input) return;
-
-        if (sel.value === CUSTOM_VALUE) {
-          input.style.display = '';
-          input.focus();
-        } else {
-          input.value = sel.value;
-          input.style.display = 'none';
-        }
-      };
-
-      buildModelSelect('dreamer');
-      buildModelSelect('normalizer');
-    })();
-    </script>
-
-  </div>`;
-
-  const effectiveDbConnectionString = config.database.connectionString || process.env.DATABASE_URL || "";
-  const hasDbConnectionString = effectiveDbConnectionString.length > 0;
-  const dbConnMasked = effectiveDbConnectionString
-    ? effectiveDbConnectionString.replace(/\/\/([^:]+):([^@]+)@/, "//****:****@")
-    : "";
-  const dbConnectionPlaceholder = hasDbConnectionString
-    ? "saved in engine.env — leave blank to keep existing"
-    : "postgresql://user:password@host:5432/dbname";
-  const dbSavedBadge = hasDbConnectionString
-    ? '<span class="badge badge-green" style="margin-left:8px">set</span>'
-    : '<span class="badge badge-red" style="margin-left:8px">not set</span>';
-
-  body += `<h2>Database</h2>
-  <div class="card">
-    <form method="POST" action="/config" class="config-form" id="db-form">
-      <input type="hidden" name="_section" value="database">
-      <div class="form-row">
-        <label>Connection String</label>
-        <div class="api-key-wrap" style="max-width:480px">
-          <input id="dbConnectionInput" name="connectionString" type="password" value="" placeholder="${escAttr(dbConnectionPlaceholder)}" style="max-width:none">
-          <button type="button" class="api-key-toggle" onclick="var i=document.getElementById('dbConnectionInput');if(i.type==='password'){i.type='text';this.textContent='Hide'}else{i.type='password';this.textContent='Show'}">Show</button>
-        </div>
-        ${dbSavedBadge}
-      </div>
-      <div class="kv" style="padding:6px 0"><span class="kv-key">Saved Value</span><span class="kv-val">${dbConnMasked ? esc(dbConnMasked) : '<span class="badge badge-yellow">not set</span>'}</span></div>
-      <div class="kv" style="padding:6px 0"><span class="kv-key">Max Connections</span><span class="kv-val">${config.database.maxConnections}</span></div>
-      <div class="kv" style="padding:6px 0"><span class="kv-key">Statement Timeout</span><span class="kv-val">${fmtMs(config.database.statementTimeoutMs)}</span></div>
-      <div class="kv" style="padding:6px 0;border-bottom:none"><span class="kv-key">Operation Timeout</span><span class="kv-val">${fmtMs(config.database.operationTimeoutMs)}</span></div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" class="btn btn-secondary" id="btn-test-db">Test Connection</button>
-        <button type="button" class="btn btn-secondary" id="btn-clear-db" ${hasDbConnectionString ? "" : "disabled"}>Clear Saved Connection</button>
-      </div>
-    </form>
-    <div id="db-test-result" class="db-test-result"></div>
-  </div>
-  <script>
-    document.getElementById('btn-test-db').addEventListener('click', async function() {
-      const btn = this;
-      const res_el = document.getElementById('db-test-result');
-      const connInput = document.getElementById('dbConnectionInput');
-      btn.disabled = true;
-      btn.textContent = 'Testing…';
-      res_el.className = 'db-test-result';
-      res_el.textContent = '';
-      res_el.style.display = 'none';
-      try {
-        const r = await fetch('/config/test-db', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ connectionString: connInput.value })
-        });
-        const j = await r.json();
-        res_el.textContent = j.ok
-          ? '✓ ' + j.message + ' (' + j.latencyMs + 'ms)'
-          : '✗ ' + j.message + (j.latencyMs ? ' (' + j.latencyMs + 'ms)' : '');
-        res_el.className = 'db-test-result ' + (j.ok ? 'ok' : 'fail');
-        res_el.style.display = 'block';
-      } catch(e) {
-        res_el.textContent = '✗ Request failed: ' + e.message;
-        res_el.className = 'db-test-result fail';
-        res_el.style.display = 'block';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Test Connection';
-      }
-    });
-
-    document.getElementById('btn-clear-db').addEventListener('click', async function() {
-      const btn = this;
-      btn.disabled = true;
-      btn.textContent = 'Clearing…';
-      try {
-        const r = await fetch('/config/clear-db', { method: 'POST' });
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        window.location.href = '/config?saved=database';
-      } catch(e) {
-        alert('Failed to clear saved DB connection string: ' + e.message);
-        btn.disabled = false;
-        btn.textContent = 'Clear Saved Connection';
-      }
-    });
-  </script>`;
-
-  // -------------------------------------------------------------------
-  // Datastores card (per plans/DATASTORE_AS_HUB.md, Slice 1).
-  // Always rendered — mirrors the Database card's NOT SET pill UX so
-  // users know the feature exists whether or not they've enabled it.
-  // Three render branches: configured+scanned / configured / not configured.
-  // -------------------------------------------------------------------
-  let datastoresRaw: unknown[] = [];
-  try {
-    datastoresRaw = await loadJsonArray<unknown>("datastores.json");
-  } catch {
-    datastoresRaw = [];
-  }
-  const datastores: Datastore[] = (datastoresRaw as Array<Record<string, unknown>>)
-    .filter((d) => d._schema === undefined && d._note === undefined)
-    .map((d) => d as unknown as Datastore);
-
-  body += `<h2>Datastores</h2>
-  <div class="card">`;
-
-  if (datastores.length === 0) {
-    body += `
-    <div class="kv" style="padding:6px 0;border-bottom:none">
-      <span class="kv-key">Status</span>
-      <span class="kv-val"><span class="badge badge-red">not configured</span></span>
-    </div>
-    <p class="hint" style="margin:8px 0 0 0;color:#888">
-      Set <code>DATABASE_URL</code> in <code>config/engine.env</code> to register a shared datastore.
-      Once configured, the next instance restart auto-seeds <code>datastore:primary</code> and
-      <code>data_model</code> entities will anchor to it as a graph hub.
-    </p>`;
-  } else {
-    body += `<div class="table-wrap"><table class="table">
-      <thead><tr><th>ID</th><th>Kind</th><th>Repos</th><th>Tables</th><th>Last Scanned</th><th>Actions</th></tr></thead>
-      <tbody>`;
-    for (const d of datastores) {
-      const kindBadge = `<span class="badge">${esc(d.kind ?? "other")}</span>`;
-      const reposStr = (d.repos ?? []).length > 0
-        ? esc((d.repos ?? []).join(", "))
-        : `<span class="badge badge-yellow">none</span>`;
-      const tableCount = (d.tables ?? []).length;
-      const tablesCell = tableCount > 0
-        ? `${tableCount}`
-        : `<span class="badge badge-yellow">unscanned</span>`;
-      const lastScanned = d.last_scanned_at
-        ? esc(d.last_scanned_at)
-        : `<span class="badge badge-yellow">never</span>`;
-      const escId = esc(d.id);
-      body += `<tr>
-        <td><code>${escId}</code></td>
-        <td>${kindBadge}</td>
-        <td>${reposStr}</td>
-        <td>${tablesCell}</td>
-        <td>${lastScanned}</td>
-        <td style="white-space:nowrap"><button class="btn btn-secondary" data-scan-id="${escId}">Sync schema</button></td>
-      </tr>`;
-    }
-    body += `</tbody></table></div>
-    <p class="hint" id="datastore-scan-result" style="margin:8px 0 0 0;color:#888">
-      Click <strong>Sync schema</strong> to introspect tables via <code>scan_database</code>.
-      Datastore records anchor <code>data_model</code> entities via implicit
-      <code>stored_in</code> edges.
-    </p>
-    <script>
-      (function () {
-        const out = document.getElementById('datastore-scan-result');
-        document.querySelectorAll('button[data-scan-id]').forEach((btn) => {
-          btn.addEventListener('click', async () => {
-            const id = btn.getAttribute('data-scan-id');
-            const original = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = 'Scanning\u2026';
-            if (out) out.textContent = 'Scanning ' + id + '\u2026';
-            try {
-              const r = await fetch('/datastores/scan', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ datastore_id: id }),
-              });
-              const j = await r.json();
-              if (j && j.success && j.data) {
-                if (out) {
-                  out.textContent =
-                    'Scanned ' + j.data.datastore_id + ': ' +
-                    j.data.tables_kept + ' kept, ' +
-                    j.data.tables_skipped + ' skipped (of ' +
-                    j.data.tables_found + ' total). Reload to see updated counts.';
-                }
-              } else {
-                const msg = (j && j.error && (j.error.message || j.error.code)) || 'Scan failed.';
-                if (out) out.textContent = 'Error: ' + msg;
-              }
-            } catch (e) {
-              if (out) out.textContent = 'Network error: ' + (e && e.message ? e.message : String(e));
-            } finally {
-              btn.disabled = false;
-              btn.textContent = original || 'Sync schema';
-            }
-          });
-        });
-      })();
-    </script>`;
-  }
-
-  body += `</div>`;
-
-  const activePolicyProfile = await getActiveProfileName();
-  body += `<h2>Policy</h2>
-  <div class="card">
-    <form method="POST" action="/config" class="config-form">
-      <input type="hidden" name="_section" value="policy">
-      <div class="form-row">
-        <label>Active Profile</label>
-        <select name="profile">
-          ${(["strict", "balanced", "creative"] as const).map(profile =>
-            `<option value="${profile}" ${activePolicyProfile === profile ? "selected" : ""}>${profile}</option>`
-          ).join("")}
-        </select>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save Policy</button>
-      </div>
-    </form>
-  </div>`;
-
-  body += `<h2>Scheduler</h2>
-  <div class="card">
-    <form method="POST" action="/config" class="config-form">
-      <input type="hidden" name="_section" value="scheduler">
-      <div class="form-row">
-        <label>Enabled</label>
-        <select name="enabled">
-          <option value="true" ${schedCfg.enabled ? "selected" : ""}>true</option>
-          <option value="false" ${!schedCfg.enabled ? "selected" : ""}>false</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <label>Tick Interval</label>
-        <input name="tick_interval_ms" type="number" min="1000" value="${schedCfg.tick_interval_ms}">
-        <span class="unit">ms</span>
-      </div>
-      <div class="form-row">
-        <label>Max Runs / Hour</label>
-        <input name="max_runs_per_hour" type="number" min="1" max="1000" value="${schedCfg.max_runs_per_hour}">
-      </div>
-      <div class="form-row">
-        <label>Global Cooldown</label>
-        <input name="global_cooldown_ms" type="number" min="0" value="${schedCfg.global_cooldown_ms}">
-        <span class="unit">ms</span>
-      </div>
-      <div class="form-row">
-        <label>Nightmare Cooldown</label>
-        <input name="nightmare_cooldown_ms" type="number" min="0" value="${schedCfg.nightmare_cooldown_ms}">
-        <span class="unit">ms</span>
-      </div>
-      <div class="form-row">
-        <label>Max Error Streak</label>
-        <input name="max_error_streak" type="number" min="1" max="100" value="${schedCfg.max_error_streak}">
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save Scheduler</button>
-      </div>
-    </form>
-  </div>`;
-
-  body += `<h2>Event Router</h2>
-  <div class="card">
-    <form method="POST" action="/config" class="config-form">
-      <input type="hidden" name="_section" value="events">
-      <div class="form-row">
-        <label>Tension Threshold</label>
-        <input name="tension_threshold" type="number" step="0.05" min="0" max="1" value="${eventCfg.tension_threshold}">
-      </div>
-      <div class="form-row">
-        <label>Runtime Error Threshold</label>
-        <input name="runtime_error_threshold" type="number" step="0.01" min="0" max="1" value="${eventCfg.runtime_error_threshold}">
-      </div>
-      <div class="form-row">
-        <label>Cooldown</label>
-        <input name="cooldown_ms" type="number" min="0" value="${eventCfg.cooldown_ms}">
-        <span class="unit">ms</span>
-      </div>
-      <div class="form-row">
-        <label>Max Auto Cycles / Hour</label>
-        <input name="max_auto_cycles_per_hour" type="number" min="1" max="100" value="${eventCfg.max_auto_cycles_per_hour}">
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save Events</button>
-      </div>
-    </form>
-  </div>`;
-
-  body += `<h2>Narrative</h2>
-  <div class="card">
-    <form method="POST" action="/config" class="config-form">
-      <input type="hidden" name="_section" value="narrative">
-      <div class="form-row">
-        <label>Auto Narrate</label>
-        <select name="auto_narrate">
-          <option value="true" ${narrCfg.auto_narrate ? "selected" : ""}>true</option>
-          <option value="false" ${!narrCfg.auto_narrate ? "selected" : ""}>false</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <label>Narrative Interval</label>
-        <input name="narrative_interval" type="number" min="1" value="${narrCfg.narrative_interval}">
-        <span class="unit">cycles</span>
-      </div>
-      <div class="form-row">
-        <label>Digest Interval</label>
-        <input name="digest_interval" type="number" min="1" value="${narrCfg.digest_interval}">
-        <span class="unit">cycles</span>
-      </div>
-      <div class="form-row">
-        <label>Max Chapters</label>
-        <input name="max_chapters" type="number" min="10" value="${narrCfg.max_chapters}">
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save Narrative</button>
-      </div>
-    </form>
-  </div>`;
-
-  const scope2 = getActiveScope();
-  const envPath = scope2
-    ? `<code>${esc(scope2.configDir.replace(/\\/g, "/"))}/engine.env</code>`
-    : `<code>~/.dreamgraph/&lt;instance-uuid&gt;/config/engine.env</code>`;
-  body += `<h2>Advanced Tuning</h2>
-  <div class="card">
-    <p style="margin:0;color:var(--text-dim);font-size:0.9rem;line-height:1.6">
-      Promotion thresholds, decay rates, dream strategy budgets, normalizer batch sizes,
-      memory TTL, and other cognitive engine internals can be tuned via environment
-      variables in ${envPath}.<br>
-      Open the file to see all available <code>DG_*</code> keys with their defaults
-      (commented out). Changes take effect on server restart.
-    </p>
-  </div>`;
-
-  return await shell("Config", body, "config");
+async function renderConfig(_savedSection?: string): Promise<string> {
+  const snapshot = await inspectEngineConfiguration(configurationPath());
+  const instance = getActiveScope()?.uuid;
+  return shell("Configuration", renderConfigurationWorkspace(snapshot.revision, instance ? `dg restart ${instance}` : "Restart the supervising DreamGraph process"), "config");
 }
 
-/* ------------------------------------------------------------------ */
-/*  Route: POST /config                                               */
-/* ------------------------------------------------------------------ */
-
-async function handleConfigPost(
-  req: IncomingMessage,
-  res: ServerResponse,
-): Promise<void> {
-  const body = await parseFormBody(req);
-  const section = body._section;
-
+const ConfigurationRequest = z.object({ expected_revision: z.string().min(1), operation_id: z.string().min(1).max(256) });
+async function readConfigurationRequest(req: IncomingMessage): Promise<unknown> {
+  const chunks: Buffer[] = []; let bytes = 0;
+  for await (const chunk of req) { const buffer = Buffer.from(chunk); bytes += buffer.length; if (bytes > 1024 * 1024) throw new Error("CONFIG_BODY_TOO_LARGE"); chunks.push(buffer); }
+  let text: string; try { text = new TextDecoder("utf-8", { fatal: true }).decode(Buffer.concat(chunks)); } catch { throw new Error("CONFIG_INVALID_ENCODING"); }
+  try { return JSON.parse(text); } catch { throw new Error("CONFIG_INVALID_JSON"); }
+}
+async function handleConfigurationApi(req: IncomingMessage, res: ServerResponse, path: string): Promise<void> {
   try {
-    switch (section) {
-      case "llm": {
-        // Resolve API key: if user sent a real value use it, otherwise preserve existing.
-        // Check BOTH in-memory config and process.env — the latter survives provider switches
-        // (ollama→openai) where the in-memory LlmConfig.apiKey was "" for ollama.
-        const sentKey = body.apiKey ?? "";
-        const isPlaceholder = sentKey === "" || sentKey === "••••••••";
-        const resolvedKey = isPlaceholder
-          ? (getLlmConfig().apiKey || process.env.DREAMGRAPH_LLM_API_KEY || "")
-          : sentKey;
-
-        // Persist to process.env so the key survives in-memory config switches
-        if (resolvedKey) {
-          process.env.DREAMGRAPH_LLM_API_KEY = resolvedKey;
-        }
-
-        const newProvider = (body.provider ?? "none") as LlmConfig["provider"];
-
-        const newCfg: LlmConfig = {
-          provider: newProvider,
-          model: getDreamerLlmConfig().model, // base model follows dreamer
-          baseUrl: body.baseUrl ?? getLlmConfig().baseUrl,
-          apiKey: resolvedKey,
-          temperature: getDreamerLlmConfig().temperature,
-          maxTokens: getDreamerLlmConfig().maxTokens,
-          timeoutMs: getLlmConfig().timeoutMs,
-        };
-        initLlmProvider(newCfg);
-        logger.info(`Dashboard: LLM provider config updated via web UI (provider=${newCfg.provider}, apiKey=${resolvedKey ? "set" : "NOT SET"})`);
-        persistLlmEngineEnv();
-        break;
-      }
-      case "dreamer": {
-        updateDreamerLlmConfig({
-          model: body.model ?? getDreamerLlmConfig().model,
-          temperature: parseFloat(body.temperature ?? "0.9"),
-          maxTokens: parseInt(body.maxTokens ?? "4096", 10),
-        });
-        logger.info("Dashboard: Dreamer LLM config updated via web UI");
-        persistLlmEngineEnv();
-        break;
-      }
-      case "normalizer": {
-        updateNormalizerLlmConfig({
-          model: body.model ?? getNormalizerLlmConfig().model,
-          temperature: parseFloat(body.temperature ?? "0.1"),
-          maxTokens: parseInt(body.maxTokens ?? "1024", 10),
-        });
-        logger.info("Dashboard: Normalizer LLM config updated via web UI");
-        persistLlmEngineEnv();
-        break;
-      }
-      case "scheduler": {
-        updateSchedulerConfig({
-          enabled: body.enabled === "true",
-          tick_interval_ms: parseInt(body.tick_interval_ms ?? "30000", 10),
-          max_runs_per_hour: parseInt(body.max_runs_per_hour ?? "30", 10),
-          global_cooldown_ms: parseInt(body.global_cooldown_ms ?? "10000", 10),
-          nightmare_cooldown_ms: parseInt(body.nightmare_cooldown_ms ?? "300000", 10),
-          max_error_streak: parseInt(body.max_error_streak ?? "3", 10),
-        });
-        logger.info("Dashboard: Scheduler config updated via web UI");
-        break;
-      }
-      case "policy": {
-        const profile = (body.profile ?? "balanced") as "strict" | "balanced" | "creative";
-        await switchProfile(profile);
-        logger.info(`Dashboard: Policy profile updated via web UI (${profile})`);
-        break;
-      }
-      case "events": {
-        updateEventConfig({
-          tension_threshold: parseFloat(body.tension_threshold ?? "0.8"),
-          runtime_error_threshold: parseFloat(body.runtime_error_threshold ?? "0.05"),
-          cooldown_ms: parseInt(body.cooldown_ms ?? "60000", 10),
-          max_auto_cycles_per_hour: parseInt(body.max_auto_cycles_per_hour ?? "10", 10),
-        });
-        logger.info("Dashboard: Event router config updated via web UI");
-        break;
-      }
-      case "narrative": {
-        updateNarrativeConfig({
-          auto_narrate: body.auto_narrate === "true",
-          narrative_interval: parseInt(body.narrative_interval ?? "10", 10),
-          digest_interval: parseInt(body.digest_interval ?? "50", 10),
-          max_chapters: parseInt(body.max_chapters ?? "100", 10),
-        });
-        logger.info("Dashboard: Narrative config updated via web UI");
-        break;
-      }
-      case "database": {
-        const sentConnectionString = body.connectionString ?? "";
-        const resolvedConnectionString = sentConnectionString.trim().length > 0
-          ? sentConnectionString.trim()
-          : (config.database.connectionString || process.env.DATABASE_URL || "");
-
-        updateDatabaseConnectionString(resolvedConnectionString);
-        if (resolvedConnectionString) {
-          process.env.DATABASE_URL = resolvedConnectionString;
-        }
-
-        const scope = getActiveScope();
-        if (scope) {
-          const llmBase = getLlmConfig();
-          const dreamer = getDreamerLlmConfig();
-          const normalizer = getNormalizerLlmConfig();
-          const architect = getArchitectLlmConfig();
-          const effectiveApiKey = llmBase.apiKey || process.env.DREAMGRAPH_LLM_API_KEY || "";
-          writeEngineEnv(scope.engineEnvPath, {
-            DREAMGRAPH_LLM_PROVIDER: llmBase.provider,
-            DREAMGRAPH_LLM_URL: llmBase.baseUrl,
-            DREAMGRAPH_LLM_API_KEY: effectiveApiKey,
-            DREAMGRAPH_LLM_ARCHITECT_PROVIDER: architect.provider,
-            DREAMGRAPH_LLM_ARCHITECT_MODEL: architect.model,
-            DREAMGRAPH_LLM_ARCHITECT_TEMPERATURE: String(architect.temperature),
-            DREAMGRAPH_LLM_ARCHITECT_MAX_TOKENS: String(architect.maxTokens),
-            DREAMGRAPH_LLM_DREAMER_MODEL: dreamer.model,
-            DREAMGRAPH_LLM_DREAMER_TEMPERATURE: String(dreamer.temperature),
-            DREAMGRAPH_LLM_DREAMER_MAX_TOKENS: String(dreamer.maxTokens),
-            DREAMGRAPH_LLM_NORMALIZER_MODEL: normalizer.model,
-            DREAMGRAPH_LLM_NORMALIZER_TEMPERATURE: String(normalizer.temperature),
-            DREAMGRAPH_LLM_NORMALIZER_MAX_TOKENS: String(normalizer.maxTokens),
-            DATABASE_URL: resolvedConnectionString,
-          });
-        } else {
-          logger.warn("Dashboard: No active scope — database connection string updated in memory only");
-        }
-
-        // Reset pool so next DB query uses the new connection string
-        await resetDbPool();
-        logger.info("Dashboard: Database connection string updated via web UI and persisted to engine.env");
-        break;
-      }
-      default:
-        logger.warn(`Dashboard: Unknown config section "${section}"`);
+    if (req.method === "GET" && path === "/api/config/v1") { json(res, 200, { ok: true, result: await configurationView() }); return; }
+    if (req.method === "GET" && path === "/api/config/v1/catalogue") {
+      const defaults = parseEngineEnvDocument(await readEngineTemplateSource("default", PACKAGE_ROOT, templateMasterDir()));
+      json(res, 200, { ok: true, result: engineSettingCatalogue().map(({ schema, decode, ...field }) => ({ ...field, category: configurationTab(field),
+        template_default: field.secret ? null : defaults[field.key] ?? null, alias_for: componentSettingAlias(field.key),
+        ...(field.key.endsWith("_MODEL") ? {model_choices:configurationModelChoices()} : {}), constraints: settingSchema(schema) })) }); return;
     }
-  } catch (err) {
-    logger.error(`Dashboard: Config update failed for section "${section}":`, err);
+    if (req.method === "GET" && path === "/api/config/v1/roles") {
+      const result = await withoutSessionContext(() => withGraphRead(async () => {
+        const env = { ...process.env }, legacy = { ...getLlmConfig() }, profiles = await readRoleProfiles();
+        return MODEL_ROLES.map(role => { const policy = resolveRolePolicy({ role, env, legacy, saved: profiles.roles[role], revision: profiles.revision });
+          return { role, revision: profiles.revision, requested: policy.requested, effective: policy.effective, status: policy.status,
+            diagnostics: policy.diagnostics, fingerprint: policy.fingerprint, origins: policy.origins, budget: policy.policy.budget, billing: policy.billing }; });
+      }));
+      json(res, 200, { ok: true, result }); return;
+    }
+    if (req.method !== "POST") { json(res, 404, { ok: false, error: "CONFIG_ROUTE_NOT_FOUND" }); return; }
+    const raw = await readConfigurationRequest(req);
+    if (path === "/api/config/v1/apply") {
+      const input = ConfigurationRequest.extend({ updates: z.record(z.string().max(16384).nullable()) }).strict().parse(raw);
+      const receipt = await applyEngineConfiguration(configurationPath(), input);
+      const activation = receipt.status === "committed" && !receipt.replayed ? await activateConfiguration(input.updates)
+        : { status: "readback_required", message: "Original receipt recovered; no runtime activation was repeated. Inspect saved and effective values." };
+      json(res, 200, { ok: receipt.status === "committed", receipt, activation, result: await configurationView() }); return;
+    }
+    if (path === "/api/config/v1/template/preview" || path === "/api/config/v1/template/apply") {
+      const previewing = path.endsWith("preview");
+      const base = z.object({ template: z.enum(["default", "ollama", "lmstudio"]), keys: z.array(z.string()).max(1024).optional() });
+      const input = (previewing ? base.strict() : base.merge(ConfigurationRequest).extend({ expected_template_hash: z.string().min(1) }).strict()).parse(raw);
+      const template = await readEngineTemplateSource(input.template, PACKAGE_ROOT, templateMasterDir());
+      if (previewing) { json(res, 200, { ok: true, result: await previewEngineTemplate(configurationPath(), template, input.keys) }); return; }
+      const apply = base.merge(ConfigurationRequest).extend({ expected_template_hash: z.string().min(1) }).strict().parse(raw);
+      const receipt = await applyEngineTemplate(configurationPath(), { ...apply, template });
+      // Templates stage future/restart policy. Explicit apply endpoint can hot-apply ordinary fields separately.
+      json(res, 200, { ok: receipt.status === "committed", receipt, effective_state: "saved; reload or restart to activate staged template fields", result: await configurationView() }); return;
+    }
+    if (path === "/api/config/v1/undo") {
+      const input = ConfigurationRequest.extend({ undo_operation_id: z.string().min(1).max(256) }).strict().parse(raw);
+      const receipt = await undoEngineConfiguration(configurationPath(), input);
+      json(res, 200, { ok: receipt.status === "committed", receipt, effective_state: "saved; reload or restart to activate restored fields", result: await configurationView() }); return;
+    }
+    json(res, 404, { ok: false, error: "CONFIG_ROUTE_NOT_FOUND" });
+  } catch (error) {
+    const message = error instanceof z.ZodError ? "CONFIG_INVALID_REQUEST" : error instanceof Error ? error.message : "CONFIG_REQUEST_FAILED";
+    json(res, message.includes("CONFLICT") ? 409 : 400, { ok: false, error: message,
+      fields: error instanceof z.ZodError ? error.issues.map(issue => ({ field: issue.path.join("."), message: issue.message })) : [] });
   }
+}
 
-  // PRG — redirect back to config with a success indicator
-  res.writeHead(303, {
-    Location: `/config?saved=${encodeURIComponent(section ?? "")}`,
-  });
-  res.end();
+async function handleConfigPost(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  try {
+    const body = await parseFormBody(req), section = body._section;
+    if (section === "policy") {
+      if (!["strict", "balanced", "creative"].includes(body.profile)) throw new Error("CONFIG_INVALID_PROFILE");
+      await switchProfile(body.profile as "strict" | "balanced" | "creative");
+    } else {
+      if (!body._config_revision || !body._operation_id) throw new Error("CONFIG_REVISION_REQUIRED: refresh configuration before saving");
+      const updates: Record<string, string | null> = {};
+      if (section === "llm") {
+        updates.DREAMGRAPH_LLM_PROVIDER = body.provider ?? "none"; updates.DREAMGRAPH_LLM_URL = body.baseUrl ?? getLlmConfig().baseUrl;
+        if (body.apiKey && body.apiKey !== "••••••••") updates.DREAMGRAPH_LLM_API_KEY = body.apiKey;
+      } else if (section === "dreamer" || section === "normalizer") {
+        const role = section.toUpperCase();
+        updates[`DREAMGRAPH_LLM_${role}_MODEL`] = body.model ?? "";
+        updates[`DREAMGRAPH_LLM_${role}_TEMPERATURE`] = body.temperature ?? "";
+        updates[`DREAMGRAPH_LLM_${role}_MAX_TOKENS`] = body.maxTokens ?? "";
+      } else if (["scheduler", "events", "narrative"].includes(section)) {
+        const names = section === "scheduler" ? ["enabled", "tick_interval_ms", "max_runs_per_hour", "global_cooldown_ms", "nightmare_cooldown_ms", "max_error_streak"]
+          : section === "events" ? ["tension_threshold", "runtime_error_threshold", "cooldown_ms", "max_auto_cycles_per_hour"] : ["auto_narrate", "narrative_interval", "digest_interval", "max_chapters"];
+        const current = section === "scheduler" ? getSchedulerConfig() : section === "events" ? getEventConfig() : getNarrativeConfig();
+        const candidate: Record<string, unknown> = { ...current };
+        for (const name of names) candidate[name] = ["enabled", "auto_narrate"].includes(name) ? body[name] === "true" : Number(body[name]);
+        updates[`DREAMGRAPH_${section.toUpperCase()}`] = JSON.stringify(candidate);
+        // Remove old instance aliases so they cannot shadow the new object on restart.
+        for (const field of engineSettingCatalogue()) if (field.owner === section && field.key.startsWith("DG_")) updates[field.key] = null;
+      } else if (section === "database") {
+        if (body.connectionString?.trim()) updates.DATABASE_URL = body.connectionString.trim();
+      } else throw new Error("CONFIG_UNKNOWN_SECTION");
+      const receipt = await applyEngineConfiguration(configurationPath(), { expected_revision: body._config_revision, operation_id: body._operation_id, updates });
+      if (receipt.status !== "committed") throw new Error("CONFIG_APPLY_ABORTED: refresh and retry with a new operation");
+      if (!receipt.replayed) {
+      applyEffectiveEnvironment(updates);
+      if (["scheduler", "events", "narrative"].includes(section)) applyComponentSettings();
+      if (section === "llm") initLlmProvider({ ...getLlmConfig(), provider: process.env.DREAMGRAPH_LLM_PROVIDER as LlmConfig["provider"], baseUrl: process.env.DREAMGRAPH_LLM_URL ?? getLlmConfig().baseUrl, apiKey: process.env.DREAMGRAPH_LLM_API_KEY ?? "" });
+      if (section === "dreamer") updateDreamerLlmConfig({ model: process.env.DREAMGRAPH_LLM_DREAMER_MODEL, temperature: Number(process.env.DREAMGRAPH_LLM_DREAMER_TEMPERATURE), maxTokens: Number(process.env.DREAMGRAPH_LLM_DREAMER_MAX_TOKENS) });
+      if (section === "normalizer") updateNormalizerLlmConfig({ model: process.env.DREAMGRAPH_LLM_NORMALIZER_MODEL, temperature: Number(process.env.DREAMGRAPH_LLM_NORMALIZER_TEMPERATURE), maxTokens: Number(process.env.DREAMGRAPH_LLM_NORMALIZER_MAX_TOKENS) });
+      if (section === "database") { updateDatabaseConnectionString(process.env.DATABASE_URL ?? ""); await resetDbPool(); }
+      }
+    }
+    res.writeHead(303, { Location: `/config?saved=${encodeURIComponent(section ?? "")}` }); res.end();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "CONFIG_SAVE_FAILED";
+    html(res, message.includes("CONFLICT") ? 409 : 400, await shell("Configuration error", `<h1>Configuration was not fully applied</h1><p>${esc(message)}</p><p>Refresh to inspect saved and effective values before retrying.</p><a href="/config">Return to configuration</a>`, "config"));
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -1947,7 +844,7 @@ async function handleTestDbPost(
   try {
     const raw = await new Promise<string>((resolve, reject) => {
       let data = "";
-      req.on("data", (chunk: Buffer) => { data += chunk.toString(); });
+      req.on("data", (chunk: Buffer) => { data += chunk.toString(); if (Buffer.byteLength(data) > 1024 * 1024) { reject(new Error("CONFIG_BODY_TOO_LARGE")); req.destroy(); } });
       req.on("end", () => resolve(data));
       req.on("error", reject);
     });
@@ -1968,41 +865,15 @@ async function handleTestDbPost(
   res.end(JSON.stringify(result));
 }
 
-async function handleClearDbPost(
-  res: ServerResponse,
-): Promise<void> {
-  updateDatabaseConnectionString("");
-  delete process.env.DATABASE_URL;
-
-  const scope = getActiveScope();
-  if (scope) {
-    const llmBase = getLlmConfig();
-    const dreamer = getDreamerLlmConfig();
-    const normalizer = getNormalizerLlmConfig();
-    const architect = getArchitectLlmConfig();
-    const effectiveApiKey = getLlmConfig().apiKey || process.env.DREAMGRAPH_LLM_API_KEY || "";
-    writeEngineEnv(scope.engineEnvPath, {
-      DREAMGRAPH_LLM_PROVIDER: llmBase.provider,
-      DREAMGRAPH_LLM_URL: llmBase.baseUrl,
-      DREAMGRAPH_LLM_API_KEY: effectiveApiKey,
-      DREAMGRAPH_LLM_ARCHITECT_PROVIDER: architect.provider,
-      DREAMGRAPH_LLM_ARCHITECT_MODEL: architect.model,
-      DREAMGRAPH_LLM_ARCHITECT_TEMPERATURE: String(architect.temperature),
-      DREAMGRAPH_LLM_ARCHITECT_MAX_TOKENS: String(architect.maxTokens),
-      DREAMGRAPH_LLM_DREAMER_MODEL: dreamer.model,
-      DREAMGRAPH_LLM_DREAMER_TEMPERATURE: String(dreamer.temperature),
-      DREAMGRAPH_LLM_DREAMER_MAX_TOKENS: String(dreamer.maxTokens),
-      DREAMGRAPH_LLM_NORMALIZER_MODEL: normalizer.model,
-      DREAMGRAPH_LLM_NORMALIZER_TEMPERATURE: String(normalizer.temperature),
-      DREAMGRAPH_LLM_NORMALIZER_MAX_TOKENS: String(normalizer.maxTokens),
-      DATABASE_URL: "",
-    });
-  } else {
-    logger.warn("Dashboard: No active scope — database connection string cleared in memory only");
-  }
-
-  await resetDbPool();
-  json(res, 200, { ok: true });
+async function handleClearDbPost(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  try {
+    const body = await parseFormBody(req);
+    if (!body._config_revision || !body._operation_id) throw new Error("CONFIG_REVISION_REQUIRED");
+    const receipt = await applyEngineConfiguration(configurationPath(), { expected_revision: body._config_revision, operation_id: body._operation_id, updates: { DATABASE_URL: "" } });
+    if (receipt.status !== "committed") throw new Error("CONFIG_APPLY_ABORTED");
+    if (!receipt.replayed) { applyEffectiveEnvironment({ DATABASE_URL: "" }); updateDatabaseConnectionString(process.env.DATABASE_URL ?? ""); await resetDbPool(); }
+    json(res, 200, { ok: true, receipt, deployment_override: ENGINE_DEPLOYMENT_OVERRIDES.DATABASE_URL !== undefined });
+  } catch (error) { json(res, 409, { ok: false, error: error instanceof Error ? error.message : "CONFIG_SAVE_FAILED" }); }
 }
 
 /* ------------------------------------------------------------------ */
@@ -2452,6 +1323,29 @@ export async function handleDashboardRoute(
   res: ServerResponse,
   pathname: string,
 ): Promise<boolean> {
+  if(req.method==="GET"&&pathname==="/schedules/workspace.js"){res.writeHead(200,{"Content-Type":"application/javascript; charset=utf-8","Cache-Control":"no-store"});res.end(SCHEDULE_WORKSPACE_SCRIPT);return true;}
+  if(req.method==="GET"&&pathname==="/config/workspace.js"){res.writeHead(200,{"Content-Type":"application/javascript; charset=utf-8","Cache-Control":"no-store"});res.end(CONFIGURATION_WORKSPACE_SCRIPT);return true;}
+  if(req.method==="GET"&&pathname==="/status/workspace.js"){res.writeHead(200,{"Content-Type":"application/javascript; charset=utf-8","Cache-Control":"no-store"});res.end(RUNTIME_WORKSPACE_SCRIPT);return true;}
+  if(req.method==="GET"&&pathname==="/api/dashboard/v1"){
+    try { const result=await withGraphRead(async()=>{const graph=await loadCanonicalGraph(getActiveScope()?.uuid??"legacy"),dirty=await readDirtyPartitions();
+      return {schema:"dreamgraph.dashboard_state.v1",observed_at:new Date().toISOString(),graph:{revision:graph.revision,currency:graph.currency,state:graph.state},
+        dirty_total:dirty.partitions.length,dirty_regions:dirty.partitions.slice(0,100)};});json(res,200,result); }
+    catch{json(res,503,{ok:false,error:"DASHBOARD_CANONICAL_READ_UNAVAILABLE"});}return true;
+  }
+  if(await handleScheduleApi(req,res,pathname))return true;
+  if (pathname.startsWith("/api/config/v1")) { await handleConfigurationApi(req, res, pathname); return true; }
+
+  if (req.method === "GET" && new URL(req.url ?? "/", "http://localhost").searchParams.get("embed") === "architect") {
+    const workspace = pathname === "/config" ? "config" : pathname === "/schedules" ? "schedules"
+      : pathname === "/status" ? "status" : pathname === "/health" ? "health" : null;
+    if (workspace) {
+      const page = workspace === "config" ? await renderConfig() : workspace === "schedules" ? await renderSchedules()
+        : workspace === "status" ? await renderStatus() : await renderHealth();
+      html(res, 200, embedArchitectWorkspace(page, workspace));
+      return true;
+    }
+  }
+
   if (req.method === "POST" && pathname === "/config") {
     await handleConfigPost(req, res);
     return true;
@@ -2461,7 +1355,7 @@ export async function handleDashboardRoute(
     return true;
   }
   if (req.method === "POST" && pathname === "/config/clear-db") {
-    await handleClearDbPost(res);
+    await handleClearDbPost(req, res);
     return true;
   }
   if (req.method === "POST" && pathname === "/datastores/scan") {
@@ -2469,7 +1363,7 @@ export async function handleDashboardRoute(
     return true;
   }
   if (req.method === "POST" && pathname === "/schedules") {
-    await handleSchedulePost(req, res);
+    json(res, 410, {ok:false,error:"LEGACY_SCHEDULE_FORM_RETIRED",workspace:"/schedules",api:"/api/schedules/v2"});
     return true;
   }
   if (req.method === "POST" && pathname === "/restart") {

@@ -204,7 +204,7 @@ describe("cognitive producers — bus emissions", () => {
     });
 
     const { result, events } = await captureWhile(() =>
-      engine.resolveTension(signal.id, "system", "confirmed_fixed"),
+      engine.resolveTension(signal.id,"human","false_positive","Operator reviewed the test concern"),
     );
 
     expect(result).not.toBeNull();
@@ -214,7 +214,7 @@ describe("cognitive producers — bus emissions", () => {
     expect(resolved[0].affected_ids).toContain("node_p");
     expect(resolved[0].payload).toMatchObject({
       tension_id: signal.id,
-      resolved_by: "system",
+      resolved_by: "human",
     });
   });
 
@@ -247,23 +247,12 @@ describe("cognitive producers — bus emissions", () => {
     engine.wake();
   });
 
-  it("promoteEdges emits candidate.promoted per edge with from/to as affected_ids", async () => {
-    engine.enterRem();
-    engine.enterNormalizing();
-
-    const edges: ValidatedEdge[] = [
-      { id: "ve_1", from: "n_a", to: "n_b", relation: "depends_on", confidence: 0.9, evidence_count: 3, promoted_at: new Date().toISOString(), origin_dream_id: "d_1" } as ValidatedEdge,
-      { id: "ve_2", from: "n_c", to: "n_d", relation: "uses", confidence: 0.85, evidence_count: 2, promoted_at: new Date().toISOString(), origin_dream_id: "d_2" } as ValidatedEdge,
-    ];
-
-    const { events } = await captureWhile(() => engine.promoteEdges(edges));
-
-    const promoted = events.filter((e) => e.kind === "candidate.promoted");
-    expect(promoted).toHaveLength(2);
-    expect(promoted[0].affected_ids).toEqual(["n_a", "n_b"]);
-    expect(promoted[1].affected_ids).toEqual(["n_c", "n_d"]);
-
-    engine.wake();
+  it("rejects direct promotion without an authoritative claim transaction and emits no success pulse", async () => {
+    engine.enterRem(); engine.enterNormalizing();
+    const events: GraphEvent[] = []; const off = graphEventBus.subscribe(e => events.push(e));
+    try { await expect(engine.promoteEdges([{ id: "invented", from: "a", to: "b", evidence_count: 100 } as ValidatedEdge])).rejects.toThrow("NORMALIZATION_PUBLICATION_REQUIRED"); }
+    finally { off(); engine.wake(); }
+    expect(events.filter(e => e.kind === "candidate.promoted")).toEqual([]);
   });
 
   it("appendHistoryEntry emits dream.cycle.completed", async () => {
@@ -298,7 +287,7 @@ describe("cognitive producers — MCP behavior unchanged", () => {
     const noSub = await engine.recordTension(args);
 
     // Reset state by resolving the first one so the next call creates a new tension
-    await engine.resolveTension(noSub.id, "system", "confirmed_fixed");
+    await engine.resolveTension(noSub.id,"human","wont_fix","Operator accepts this scoped test concern");
 
     // With subscribers
     const captured: GraphEvent[] = [];
@@ -374,8 +363,9 @@ describe("envoy review fix regressions", () => {
     expect(result.receipt.effective_strict).toBe(true);
     expect(result.receipt.bootstrap.active).toBe(true);
     expect(result.receipt.base_promotion_config.promotion_evidence_count).toBe(2);
-    expect(result.receipt.applied_promotion_config.promotion_evidence_count).toBe(1);
-    expect(result.receipt.bootstrap.relaxed_fields).toContain("promotion_evidence_count");
+    expect(result.receipt.applied_promotion_config.promotion_evidence_count).toBe(2);
+    expect(result.receipt.bootstrap.relaxed_fields).not.toContain("promotion_evidence_count");
+    expect(result.receipt.bootstrap.relaxed_fields).toContain("retention_plausibility");
     expect(result.latent).toBe(0);
     expect(result.rejected).toBe(1);
   });

@@ -10,6 +10,7 @@ import type {
   ResourceDefinition,
   ToolDefinition,
   UiElementDefinition,
+  GraphContextPort,
 } from "@dreamgraph/sdk";
 
 /**
@@ -147,6 +148,7 @@ export interface PluginContext {
   readonly archetypes: PluginArchetypesSurface;
   readonly markdownFences: PluginMarkdownFencesSurface;
   readonly architect: PluginArchitectSurface;
+  readonly graph: GraphContextPort;
   readonly signal: AbortSignal;
 }
 
@@ -162,6 +164,7 @@ export interface PluginContextDependencies {
   archetypes: PluginArchetypesSurface;
   markdownFences: PluginMarkdownFencesSurface;
   architect: PluginArchitectSurface;
+  graph?: GraphContextPort;
   signal: AbortSignal;
 }
 
@@ -180,6 +183,8 @@ export function createPluginContext(
     archetypes: deps.archetypes,
     markdownFences: deps.markdownFences,
     architect: deps.architect,
+    graph: deps.graph ?? { availability: "unavailable", reasons: ["GRAPH_CONTEXT_PORT_UNAVAILABLE"],
+      retrieve: async () => { throw new Error("GRAPH_CONTEXT_PORT_UNAVAILABLE"); } },
     signal: deps.signal,
   };
 }

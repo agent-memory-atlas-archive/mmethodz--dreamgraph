@@ -1,0 +1,75 @@
+{
+  "observed_at": "2026-09-30",
+  "route": "DreamGraph own-instance MCP",
+  "query": "Architect CLI adapters native API authority session cancellation graph reconciliation",
+  "requested_tokens": 900,
+  "returned_tokens": 930,
+  "entities": [
+    "dreamgraph_extensions_vscode_src",
+    "dreamgraph_extensions_vscode_src_context_fetchers",
+    "dreamgraph_extensions_vscode_src_prompts",
+    "dreamgraph_scripts",
+    "dreamgraph_src_cli",
+    "cli_tool",
+    "feature-copilot-cli-adapter"
+  ],
+  "evidence_level": "read-only retrieval; provisional parser summaries, not implementation proof",
+  "context": "# DreamGraph Knowledge Context\n\n## Entities (23)\n- **Src** (dreamgraph_extensions_vscode_src): Src is a parser-node evidenced from extensions/vscode/src/chat-panel.ts, extensions/vscode/src/context-builder.instrumentation.ts. Its declared fields, source provenance, and explicit links define how it participates in the project while semantic model output is unavailable. This evidence-only account is intentionally provisional and will be replaced by the next successful LLM enrichment pass.\n- **Context Fetchers** (dreamgraph_extensions_vscode_src_context_fetchers): Context Fetchers is a parser-node evidenced from extensions/vscode/src/context-fetchers/deep-insights.ts. Its declared fields, source provenance, and explicit links define how it participates in the project while semantic model output is unavailable. This evidence-only account is intentionally provisional and will be replaced by the next successful LLM enrichment pass.\n- **Prompts** (dreamgraph_extensions_vscode_src_prompts): Prompts is a parser-node evidenced from extensions/vscode/src/prompts/architect-core.ts, extensions/vscode/src/prompts/architect-explain.ts. Its declared fields, source provenance, and explicit links define how it participates in the project while semantic model output is unavailable. This evidence-only account is intentionally provisional and will be replaced by the next successful LLM enrichment pass.\n- **Scripts** (dreamgraph_scripts): Scripts is a parser-node evidenced from scripts/add-backlinks.mjs, scripts/audit-nodes.mjs. Its declared fields, source provenance, and explicit links define how it participates in the project while semantic model output is unavailable. This evidence-only account is intentionally provisional and will be replaced by the next successful LLM enrichment pass.\n- **Cli** (dreamgraph_src_cli): Cli is a parser-node evidenced from src/cli/dg.ts. Its declared fields, source provenance, and explicit links define how it participates in the project while semantic model output is unavailable. This evidence-only account is intentionally provisional and will be replaced by the next successful LLM enrichment pass.\n- **CLI Tool** (cli_tool): CLI Tool is a parser-node evidenced from src/cli/dg.ts. Its declared fields, source provenance, and explicit links define how it participates in the project while semantic model output is unavailable. This evidence-only account is intentionally provisional and will be replaced by the next successful LLM enrichment pass.\n- **Copilot CLI Architect Adapter** (feature-copilot-cli-adapter): Copilot CLI Architect Adapter is a parser-node evidenced from extensions/vscode/src/architect-core/adapters/copilot-cli/types.ts, extensions/vscode/src/architect-core/adapters/copilot-cli/allowlist.ts. Its declared fields, source provenance, and explicit links define how it participates in the project while semantic model output is unavailable. This evidence-only account is intentionally provisional and will be replaced by the next successful LLM enrichment pass.\n\n[Context note: Entities truncated due to token budget]\n\n## Relationships (48)\n- vscode-architect-codex-cli-adapter â†’ dreamgraph_extensions_vscode_src: reverse_of_supports (confidence: 0.63)\n- standalone-architect-cli-bridge â†’ workflow_incremental_evidence_lifecycle: potential_feature_workflow_connection (confidence: 0.63)\n- copilot_cli_authority_routing â†’ feature-copilot-cli-adapter: related_feature (confidence: 0.64)\n- feature_codex_cli_native_adapter â†’ dreamgraph_extensions_vscode_src: emergent_pattern (confidence: 0.63)\n\n[Context note: Relationships truncated due to token budget]\n\n[Context note: Recent Narrative truncated due to token budget]",
+  "accepted_decisions_read": [
+    {
+      "id": "ADR-198",
+      "title": "Copilot CLI adapter uses bounded prompt-file context injection",
+      "decision": {
+        "chosen": "Keep Copilot CLI prompt composition inside the Copilot adapter/provider boundary, build the Architect envelope with context-economy controls, retain a bounded history window, mark the current turn explicitly, and fall back to a temporary prompt.md file when the serialized prompt exceeds the safe argv byte budget. Surface prompt byte count, history count, advertised MCP server/tool count, current-turn marker status, and model selection to the Context Inspector.",
+        "alternatives": [
+          {
+            "option": "Pass the full prompt exclusively through argv",
+            "rejected_because": "Large Architect prompts can exceed shell or process argument limits, especially on Windows, and fail before Copilot CLI starts."
+          },
+          {
+            "option": "Move Copilot prompt serialization into Architect core",
+            "rejected_because": "That would contaminate provider-neutral core contracts with a provider-specific CLI transport concern."
+          },
+          {
+            "option": "Rely only on MCP tools and omit serialized task/history context",
+            "rejected_because": "The CLI still needs the concrete current turn, autonomy/reporting contracts, and bounded conversation context before it can decide which MCP tools to call."
+          }
+        ]
+      },
+      "guard_rails": [
+        "Do not move Copilot CLI prompt serialization or prompt.md fallback into provider-neutral Architect core.",
+        "Do not remove the explicit current-turn marker from Copilot CLI prompts without replacing it with an equally strong active-turn isolation mechanism.",
+        "Do not disable bounded history or argv byte budgeting for Copilot CLI runs.",
+        "Do not treat serialized prompt context as authoritative graph truth; repository facts still require DreamGraph MCP grounding."
+      ]
+    },
+    {
+      "id": "ADR-217",
+      "title": "Standalone Architect CLI adapters execute through a daemon MCP bridge",
+      "decision": {
+        "chosen": "Standalone Architect chat requests with adapter codex-cli or copilot-cli now invoke a daemon-owned CLI bridge. The bridge materializes per-run CLI home/config files, exposes the active daemon MCP endpoint to the selected CLI through a stdio MCP proxy, audits tool calls, and returns normalized content, route, provenance, and tool trace metadata. Metadata-only fallback is no longer used for selected CLI chat execution.",
+        "alternatives": [
+          {
+            "option": "Keep codex-cli and copilot-cli selector values as metadata-only deterministic fallbacks.",
+            "rejected_because": "That was the reported bug and made UI/runtime/provenance metadata claim an adapter path that was not actually used."
+          },
+          {
+            "option": "Spawn a fresh DreamGraph stdio server directly for each CLI run.",
+            "rejected_because": "That can create a second graph/session boundary instead of using the active daemon session."
+          },
+          {
+            "option": "Let CLI adapters use provider-native filesystem and shell tools for repository operations.",
+            "rejected_because": "That bypasses DreamGraph MCP authority and weakens auditability."
+          }
+        ]
+      },
+      "guard_rails": [
+        "Do not reintroduce metadata-only fallback for selected codex-cli or copilot-cli chat execution.",
+        "Do not let standalone CLI adapters answer repository questions without a reachable DreamGraph MCP bridge or an explicit fail-closed error.",
+        "Do not route CLI repository mutations through provider-native shell/write/read surfaces when DreamGraph MCP tools are available.",
+        "Do not spawn a separate graph-authority session for CLI runs without a new ADR that addresses active daemon runtime identity.",
+        "Keep CLI adapter route, runtime, provenance, and tool trace metadata synchronized with ADR-216."
+      ]
+    }
+  ]
+}

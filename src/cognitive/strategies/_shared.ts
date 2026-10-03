@@ -55,6 +55,8 @@ export interface FactEntity {
 }
 
 export interface FactSnapshot {
+  /** This strategy view covers these four families, never all canonical graph families. */
+  scope?: { families: readonly string[]; omitted_external_links: number };
   entities: Map<string, FactEntity>;
   /** Set of "from|to" strings for fast edge existence checks */
   edgeSet: Set<string>;
@@ -76,8 +78,9 @@ export function focusFactSnapshot(
   entityIds: readonly string[],
   hops = 2,
 ): FactSnapshot {
-  const roots = entityIds.filter((id) => snapshot.entities.has(id));
-  if (roots.length === 0) return snapshot;
+  const roots = [...new Set(entityIds)].filter((id) => snapshot.entities.has(id));
+  if (!Number.isInteger(hops) || hops < 0 || hops > 4) throw new Error("DREAM_FOCUS_HOPS_INVALID");
+  if (entityIds.length && roots.length !== new Set(entityIds).size) throw new Error("DREAM_FOCUS_UNKNOWN; targeted scope was not broadened");
   const adjacency = new Map<string, Set<string>>();
   const connect = (left: string, right: string): void => {
     if (!snapshot.entities.has(left) || !snapshot.entities.has(right)) return;
@@ -89,7 +92,7 @@ export function focusFactSnapshot(
   }
   const selected = new Set(roots);
   let frontier = roots;
-  for (let hop = 0; hop < Math.max(1, Math.min(4, hops)); hop++) {
+  for (let hop = 0; hop < hops; hop++) {
     const next: string[] = [];
     for (const current of frontier) {
       for (const neighbor of adjacency.get(current) ?? []) {
@@ -208,6 +211,12 @@ export async function buildFactSnapshot(): Promise<FactSnapshot> {
   const datastores = (datastoresMaybe as unknown as Array<Record<string, unknown>>)
     .filter((d) => d._schema === undefined && d._note === undefined)
     .map((d) => d as unknown as Datastore);
+
+  const identities = new Set<string>();
+  for (const entity of [...features, ...workflows, ...dataModel, ...datastores]) {
+    if (!entity.id || entity.id.includes("|") || identities.has(entity.id)) throw new Error("STRATEGY_SNAPSHOT_IDENTITY_AMBIGUOUS; use canonical typed identity reconciliation");
+    identities.add(entity.id);
+  }
 
   const entities = new Map<string, FactEntity>();
   const edgeSet = new Set<string>();
@@ -394,6 +403,13 @@ export async function buildFactSnapshot(): Promise<FactSnapshot> {
     }
   }
 
+  // References outside this declared four-family view are not evidence of
+  // shared internal neighbors. Keep omissions explicit instead of guessing.
+  let omittedExternalLinks = 0;
+  for (const entity of entities.values()) entity.links = entity.links.filter(link => {
+    if (entities.has(link.target)) return true;
+    omittedExternalLinks++; edgeSet.delete(`${entity.id}|${link.target}`); return false;
+  });
   // Compute per-entity degree (outgoing + incoming) from the assembled edge set.
   const degree = new Map<string, number>();
   for (const id of entities.keys()) degree.set(id, 0);
@@ -403,5 +419,6 @@ export async function buildFactSnapshot(): Promise<FactSnapshot> {
     if (entities.has(to) && to !== from) degree.set(to, (degree.get(to) ?? 0) + 1);
   }
 
-  return { entities, edgeSet, domains, sourceFileIndex, degree };
+  return { entities, edgeSet, domains, sourceFileIndex, degree,
+    scope: { families: ["feature", "workflow", "data_model", "datastore"], omitted_external_links: omittedExternalLinks } };
 }

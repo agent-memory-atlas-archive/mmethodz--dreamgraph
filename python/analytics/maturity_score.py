@@ -5,7 +5,8 @@ maturity = validated_edges_ratio
          - orphan_ratio
          - reappearance_penalty
 
-Bounded to [0, 1]. Higher is healthier.
+Legacy heuristic diagnostic only. Canonical measurement reports evidence coverage
+and visible defects separately; neither this score nor graph volume proves maturity.
 """
 from __future__ import annotations
 
@@ -19,9 +20,11 @@ from . import (
     promotion_funnel,
     reappearance_rate,
 )
+from .definitions import qualified
 from ._common import add_common_args, emit, resolve_data_dir_from_args
 
 
+@qualified("maturity_score")
 def analyze(data_dir: Path) -> dict:
     cand = loader.candidate_edges(data_dir)
     val = loader.validated_edges(data_dir)
@@ -75,7 +78,7 @@ def analyze(data_dir: Path) -> dict:
 def render(result: dict) -> None:
     s = result["score"]
     bar = int(s * 30)
-    print(f"DreamGraph maturity: {s:.4f}  [{'#' * bar}{'.' * (30 - bar)}]")
+    print(f"Legacy heuristic diagnostic: {s:.4f}  [{'#' * bar}{'.' * (30 - bar)}] (not measured project maturity)")
     print("\nComponents:")
     for k, v in result["components"].items():
         sign = "+" if k.endswith("_ratio") and not k.startswith("active") and not k.startswith("orphan") else "-"

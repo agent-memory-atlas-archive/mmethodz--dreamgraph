@@ -1,0 +1,74 @@
+import {beforeEach,afterEach,it,expect,vi} from "vitest";
+import {mkdtemp,rm,readFile,writeFile} from "node:fs/promises";
+import {tmpdir} from "node:os";
+import {join} from "node:path";
+import {setDataDirOverride} from "../src/utils/paths.js";
+import {releaseGraphWriter} from "../src/graph/writer-lease.js";
+import {commitGraphWrites,loadPublicationState} from "../src/graph/publication.js";
+import {loadCanonicalGraph} from "../src/graph/read-model.js";
+import {engine} from "../src/cognitive/engine.js";
+import {EngineJobs} from "../src/cognitive/jobs.js";
+import {startLucidDream,handleLucidAction,wakeFromLucid,getLucidLog,cancelLucidSession,recoverLucidSession} from "../src/cognitive/lucid.js";
+import {generateNarrative,generateDiffChapter,appendToStory,getSystemStory,updateNarrativeConfig} from "../src/cognitive/narrator.js";
+import {captureCognitiveProjection,projectionCurrentness} from "../src/cognitive/projection-context.js";
+import {withSessionContext,type SessionContext} from "../src/server/session-context.js";
+import type {DreamEdge,StoryChapter} from "../src/cognitive/types.js";
+let root:string;let a:SessionContext,b:SessionContext;
+const as=<T>(ctx:SessionContext,work:()=>T)=>withSessionContext(ctx,work);
+const edge:DreamEdge={id:"edge-ab",from:"alpha",to:"beta",type:"feature",relation:"depends_on",reason:"Explore a possible dependency",confidence:.42,origin:"rem",created_at:"2026-01-01T00:00:00.000Z",dream_cycle:1,strategy:"gap_detection",ttl:5,decay_rate:.05,reinforcement_count:20,last_reinforced_cycle:1,status:"candidate",activation_score:0,plausibility:.6,evidence_score:0,contradiction_score:0};
+beforeEach(async()=>{root=await mkdtemp(join(tmpdir(),"dg-lucid-"));setDataDirOverride(root);
+ a={principal:"operator",session_id:"a",directory:root,channel:"mcp",environment:{},continuation_key:"fixture"};b={...a,session_id:"b"};
+ await commitGraphWrites({actor:"fixture",writes:[{file:"features.json",content:JSON.stringify([{id:"alpha",name:"Alpha",description:"First",source_repo:"fixture",links:[]},{id:"beta",name:"Beta",description:"Second",source_repo:"fixture",links:[]}])}]});
+ const dream=await engine.loadDreamGraph();dream.edges=[structuredClone(edge)];await engine.saveDreamGraph(dream);
+});
+afterEach(async()=>{await as(a,()=>cancelLucidSession()).catch(()=>undefined);await new EngineJobs().cancelOwnedRunning();await vi.waitFor(()=>expect(engine.getState()).toBe("awake"));
+ await vi.waitFor(async()=>expect((await new EngineJobs().inspect()).records.filter(r=>r.action==="lucid_session").every(r=>r.lease===null)).toBe(true));
+ updateNarrativeConfig({max_chapters:100,auto_narrate:true,narrative_interval:10,digest_interval:50});await releaseGraphWriter(root);setDataDirOverride(undefined);await rm(root,{recursive:true,force:true});});
+it("human acceptance atomically retains rationale/action/typed assertion and cannot become independent proof",async()=>{
+ const findings=await as(a,()=>startLucidDream("Alpha depends on Beta"));expect(findings.suggested_connections[0].id).toBe(edge.id);
+ await expect(as(b,()=>handleLucidAction({type:"accept",target_id:edge.id,reason:"Other client"}))).rejects.toThrow("OWNER_REJECTED");
+ await expect(as(a,()=>handleLucidAction({type:"accept",target_id:edge.id}))).rejects.toThrow("HUMAN_REASON");
+ const action={type:"accept" as const,target_id:edge.id,reason:"My explicit architecture assertion",operation_id:"assert-alpha",expected_revision:0};
+ const accepted=await as(a,()=>handleLucidAction(action));expect(await as(a,()=>handleLucidAction(action))).toEqual(accepted);
+ const log=await as(a,()=>getLucidLog());expect(log.active?.actions).toHaveLength(1);expect(log.active?.accepted[0]).toMatchObject({human_asserted:true,evidence_count:0,evidence_score:0,confidence:.42,reinforcement_count:0,human_reason:action.reason});
+ const graph=await loadCanonicalGraph("legacy");expect(graph.entities.find(e=>e.identity.kind==="validated")?.assertion_class).toBe("human_assertion");
+ expect((await loadPublicationState()).stores["validated_edges.json"]).toBeDefined();
+ const result=await as(a,()=>wakeFromLucid());expect(result.termination).toBe("completed");expect(result.actions_taken).toHaveLength(1);expect(engine.getState()).toBe("awake");
+});
+it("changed source findings reject acceptance; explicit refresh retains original contribution and CAS rejects stale commands",async()=>{
+ await as(a,()=>startLucidDream("Alpha depends on Beta"));const body=JSON.parse(await readFile(join(root,"features.json"),"utf8"));body[0].description="Material changed";
+ await commitGraphWrites({actor:"fixture",writes:[{file:"features.json",content:JSON.stringify(body)}]});
+ await expect(as(a,()=>handleLucidAction({type:"accept",target_id:edge.id,reason:"Old view"}))).rejects.toThrow("SUPERSEDED");
+ await as(a,()=>handleLucidAction({type:"refine",target_id:"hypothesis",refinement:"Alpha depends on Beta",expected_revision:0}));
+ await expect(as(a,()=>handleLucidAction({type:"accept",target_id:edge.id,reason:"Stale revision",expected_revision:0}))).rejects.toThrow("REVISION_CONFLICT");
+ await as(a,()=>handleLucidAction({type:"accept",target_id:edge.id,reason:"Current human assertion",expected_revision:1}));
+ await as(a,()=>cancelLucidSession());
+ await vi.waitFor(()=>expect(engine.getState()).toBe("awake"));
+ expect((await new EngineJobs().inspect()).records[0].work_settled).toBe(true);
+});
+it("simultaneous exploration cannot steal the engine lease; disconnect retains outcomes and restores ownership",async()=>{
+ const started=await Promise.allSettled([as(a,()=>startLucidDream("Alpha depends on Beta")),as(b,()=>startLucidDream("Alpha depends on Beta"))]);expect(started.filter(s=>s.status==="fulfilled")).toHaveLength(1);
+ const owner=started[0].status==="fulfilled"?a:b;const log=await as(owner,()=>getLucidLog());expect(log.active).toBeTruthy();
+ await as(owner,()=>cancelLucidSession());await vi.waitFor(()=>expect(engine.getState()).toBe("awake"));
+ const ended=await as(owner,()=>getLucidLog());expect(ended.active).toBeNull();expect(ended.sessions[0].termination).toBe("cancelled");
+ await vi.waitFor(async()=>expect((await new EngineJobs().inspect()).records.every(r=>r.job.state==="cancelled")).toBe(true));
+});
+it("restart recovery archives exact human intent without action redispatch",async()=>{
+ await as(a,()=>startLucidDream("Alpha depends on Beta"));const log=await as(a,()=>getLucidLog());log.active!.process_id="prior-process";
+ await commitGraphWrites({actor:"fixture_restart",writes:[{file:"lucid_log.json",content:JSON.stringify(log)}]});
+ expect(await recoverLucidSession()).toBe(true);const ended=await as(a,()=>getLucidLog());expect(ended.sessions[0]).toMatchObject({termination:"restart_recovery",hypothesis:{raw_text:"Alpha depends on Beta"}});expect(ended.active).toBeNull();
+});
+it("narrative is revision-bound derived context, and scan age/unrelated bookkeeping cannot manufacture staleness",async()=>{
+ const snapshot=(await captureCognitiveProjection()).context;
+ await commitGraphWrites({actor:"bookkeeping",writes:[{file:"schedules.json",content:"{}"}]});expect(await projectionCurrentness(snapshot)).toBe("current");
+ const narrative=await generateNarrative();expect(narrative.projection).toMatchObject({derived:true,assertion_class:"historical"});expect(narrative.epilogue).toContain("does not establish graph integrity");
+ const chapter=await generateDiffChapter();await appendToStory(chapter);expect((await getSystemStory()).chapters[0].currentness).toBe("current");
+ await engine.recordTension({type:"weak_connection",entities:["alpha","beta"],description:"Changed evidence context",urgency:.8});expect((await getSystemStory()).chapters[0].currentness).toBe("superseded");
+ await expect(appendToStory({...chapter,id:"attempt-new-view"})).rejects.toThrow("SOURCE_REVISION_CONFLICT");
+});
+it("concurrent story append/replay preserves every chapter/archive and corrupt history is never replaced by empty success",async()=>{
+ updateNarrativeConfig({max_chapters:2});const chapter=(n:number):StoryChapter=>({id:`chapter-${n}`,title:`Chapter ${n}`,chapter_number:n,generated_at:new Date().toISOString(),cycle_range:[n,n],key_discoveries:[],tensions_addressed:[],narrative_text:`Recorded outcome ${n}`,diff:{new_validated_edges:0,tensions_created:0,tensions_resolved:0,threats_discovered:0,archetypes_exchanged:0}});
+ await Promise.all([1,2,3,4,5,6].map(n=>appendToStory(chapter(n))));await appendToStory(chapter(6));const story=await getSystemStory();expect(story.metadata.total_chapters).toBe(6);expect(story.chapters).toHaveLength(2);expect(story.archived_chapters).toHaveLength(4);
+ expect(new Set([...story.chapters,...story.archived_chapters!].map(c=>c.chapter_number)).size).toBe(6);
+ await writeFile(join(root,"system_story.json"),"{broken");await expect(getSystemStory()).rejects.toThrow();await expect(appendToStory(chapter(7))).rejects.toThrow();expect(await readFile(join(root,"system_story.json"),"utf8")).toBe("{broken");
+});

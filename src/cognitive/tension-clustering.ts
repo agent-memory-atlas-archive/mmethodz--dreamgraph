@@ -15,6 +15,7 @@ export type TensionReasonCategory =
   | "actionable_architecture_gap";
 
 export interface TensionCluster {
+  assertion_class: "advisory";
   id: string;
   cause: TensionClusterCause;
   reason_category: TensionReasonCategory;
@@ -87,7 +88,9 @@ const CLUSTER_GUIDANCE: Record<TensionClusterCause, Pick<TensionCluster, "interp
 
 export function buildTensionClusters(tensions: TensionSignal[]): TensionCluster[] {
   const grouped = new Map<string, { cause: TensionClusterCause; category: TensionReasonCategory; signals: TensionSignal[] }>();
-  for (const tension of tensions.filter((candidate) => !candidate.resolved)) {
+  const unique=new Map<string,TensionSignal>();
+  for(const signal of tensions){const prior=unique.get(signal.id);if(!prior||(signal.revision??0)>(prior.revision??0))unique.set(signal.id,signal);}
+  for (const tension of [...unique.values()].filter((candidate) => !candidate.resolved)) {
     const cause = clusterCause(tension);
     const category = reasonCategory(tension, cause);
     const key = `${cause}:${category}`;
@@ -100,6 +103,7 @@ export function buildTensionClusters(tensions: TensionSignal[]): TensionCluster[
       const urgencies = signals.map((signal) => signal.urgency);
       const guidance = CLUSTER_GUIDANCE[cause];
       return {
+        assertion_class: "advisory" as const,
         id: `tension-cluster:${cause}:${category}`,
         cause,
         reason_category: category,

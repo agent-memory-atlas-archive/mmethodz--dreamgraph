@@ -234,6 +234,9 @@ Options:
         logErr(tail);
       }
       // Don't clean up — leave server.json so dg status can diagnose
+      if (jsonOutput) process.stdout.write(JSON.stringify({ status: "unhealthy", pid, uuid: entry.uuid, name: entry.name,
+        port: actualPort, bin_path: binPath, diagnostic: "Health check failed; inspect the original process and logs before retrying." }) + "\n");
+      throw new Error(`Daemon startup was not confirmed for '${entry.name}' (PID ${pid}, HTTP :${actualPort}). See dg status and instance logs.`);
     }
 
     // 15. Update registry timestamps

@@ -1,3 +1,14 @@
+import { createHash, randomUUID } from "node:crypto";
+import { withGraphRead, withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
+import { commitGraphWrites, recoverGraphPublication, loadPublicationState, publicationContentHash } from "../graph/publication.js";
+import { ScheduleOccurrenceSchema } from "../graph/contracts.js";
+import { getDataDir, withDataDirectory } from "../utils/paths.js";
+import { stripBom } from "../utils/read-json.js";
+import { EngineJobs } from "./jobs.js";
+import { currentJob, withoutJobContext, assertJobCurrent } from "./job-context.js";
+import { SCHEDULE_ACTION_VERSION, SchedulePolicySchema, validateScheduleTiming, evaluateSchedule, previewSchedule, emptyScheduleDocument } from "./schedule-definition.js";
+export { previewSchedule } from "./schedule-definition.js";
+import { SchedulerSettingsSchema, mergeEngineSettings } from "../config/engine-settings.js";
 /**
  * DreamGraph v5.2 — Dream Scheduler
  *
@@ -40,7 +51,7 @@ import { maybeAutoNarrate, generateDiffChapter } from "./narrator.js";
 import { graphEventBus } from "../graph/events.js";
 import { logger } from "../utils/logger.js";
 import { getLlmReadinessStatus } from "./llm-readiness.js";
-import { getLlmProvider, getNormalizerLlmConfig } from "./llm.js";
+import { getRoleLlmProvider } from "./llm.js";
 import type { LlmMessage } from "./llm.js";
 import type { TensionResolutionCandidate, TensionResolutionStrategy, TensionSignal } from "./types.js";
 import { withFileLock } from "../utils/mutex.js";
@@ -93,25 +104,27 @@ const ADVERSARIAL_STRATEGIES = [
 
 const DreamCycleParamsSchema = z.object({
   strategy: z.enum(DREAM_STRATEGIES).default("all"),
-  max_dreams: z.number().int().positive().default(100),
+  max_dreams: z.number().int().min(0).max(1000).default(100),
   focus_entities: z.array(z.string().min(1)).max(100).default([]),
-  focus_hops: z.number().int().min(1).max(4).default(2),
+  focus_hops: z.number().int().min(0).max(4).default(2),
   focus_reason: z.string().max(500).optional(),
-});
+  maintenance_fingerprint: z.string().min(1).max(256).optional(),
+  maintenance_origin: z.literal("major_graph_change").optional(),
+}).strict();
 
 const NightmareCycleParamsSchema = z.object({
   strategy: z.enum(ADVERSARIAL_STRATEGIES).default("all_threats"),
-});
+}).strict();
 
 const MetacognitiveParamsSchema = z.object({
   window_size: z.number().int().min(5).max(500).default(50),
   auto_apply: z.boolean().default(false),
-});
+}).strict();
 
 const FederationExportParamsSchema = z.object({
   /** Optional destination override. Absolute or relative to the instance data dir. */
   export_path: z.string().trim().min(1).optional(),
-});
+}).strict();
 
 const DispatchEventParamsSchema = z.object({
   source: z
@@ -128,259 +141,31 @@ const DispatchEventParamsSchema = z.object({
   description: z.string().optional(),
   affected_entities: z.array(z.string()).default([]),
   payload: z.record(z.string(), z.unknown()).default({}),
-});
+}).strict();
 
-/**
- * Parse `schedule.parameters` against a per-action schema. On failure we log a
- * warning and fall back to the schema defaults — schedules should be resilient
- * (a malformed param shouldn't kill the daemon's tick loop), but the warning
- * makes drift visible.
- */
-function parseScheduleParams<S extends z.ZodTypeAny>(
-  schedule: DreamSchedule,
-  schema: S,
-): z.infer<S> {
-  const parsed = schema.safeParse(schedule.parameters ?? {});
-  if (parsed.success) {
-    return parsed.data;
-  }
-  logger.warn(
-    `[scheduler] Schedule '${schedule.id}' (${schedule.action}) has invalid parameters: ` +
-      parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; "),
-  );
-  // Fall back to schema defaults by parsing an empty object.
-  return schema.parse({}) as z.infer<S>;
+export const ScheduleActionParameterSchemas={dream_cycle:DreamCycleParamsSchema,nightmare_cycle:NightmareCycleParamsSchema,metacognitive_analysis:MetacognitiveParamsSchema,
+ dispatch_cognitive_event:DispatchEventParamsSchema,federation_export:FederationExportParamsSchema,narrative_chapter:z.object({}).strict(),graph_maintenance:z.object({}).strict()} as const;
+export function scheduleRoles(action:ScheduleAction):Array<"dreamer"|"normalizer">{
+ return ["dream_cycle","nightmare_cycle","dispatch_cognitive_event"].includes(action)?["dreamer","normalizer"]:["normalizer"];
+}
+export function schedulePolicyDigest(schedule:DreamSchedule,fingerprints:string[]):string{
+ const fields=["name","action","parameters","trigger_type","interval_ms","cron","cycle_interval","idle_ms","max_runs","timezone","fold_policy","missed_policy","overlap_policy"];
+ return createHash("sha256").update(JSON.stringify({definition:Object.fromEntries(fields.filter(key=>(schedule as unknown as Record<string,unknown>)[key]!==undefined).map(key=>[key,(schedule as unknown as Record<string,unknown>)[key]])),policies:fingerprints})).digest("hex");
+}
+async function scheduledRolePolicies(schedule:DreamSchedule){
+ const {getRoleModelPolicy}=await import("./llm.js");const pairs=await Promise.all(scheduleRoles(schedule.action).map(async role=>[role,await getRoleModelPolicy(role)] as const));
+ return Object.fromEntries(pairs);
 }
 
-// ---------------------------------------------------------------------------
-// Paths
-// ---------------------------------------------------------------------------
-
-const schedulesPath = () => dataPath("schedules.json");
-
-// ---------------------------------------------------------------------------
-// State
-// ---------------------------------------------------------------------------
-
+/** Invalid parameters block the occurrence; resilience never means broader defaults. */
+function parseScheduleParams<S extends z.ZodTypeAny>(schedule: DreamSchedule, schema: S): z.infer<S> {
+  return schema.parse(schedule.parameters ?? {});
+}
+// Scheduling state is persisted below; engine effects run only through EngineJobs.
 let config: SchedulerConfig = { ...DEFAULT_SCHEDULER_CONFIG };
 let tickTimer: ReturnType<typeof setInterval> | null = null;
-let runsThisHour = 0;
-let hourWindowStart = Date.now();
-let lastRunTimestamp = 0;
-let lastActivityTimestamp = Date.now();
-
-// Schedules currently being executed (outside the file lock). Prevents the
-// next tick from re-claiming a schedule whose long-running action has not yet
-// finished writing back its results. Keyed by schedule.id.
-const inFlightSchedules = new Set<string>();
-
-// Separate mutex key used to serialise cognitive `executeAction` runs.
-// Held independently from the `schedules.json` file lock so that UI calls
-// (updateSchedule / getSchedules / deleteSchedule) are never blocked while
-// an LLM-bound action is in flight. See the lifecycle comment on `tick()`
-// for the full rationale.
-const SCHEDULER_EXEC_LOCK = "scheduler.execution";
-
-/**
- * Run `executeAction` with a hard wall-clock timeout.
- *
- * A misbehaving LLM client or hung HTTP socket can leave a `dream_cycle`
- * (or any other action) waiting forever. Without this guard, a single hang
- * silently freezes the scheduler: the cognitive-execution mutex is never
- * released, every following tick finds it locked, and the next manual
- * `Run`/`Resume` button waits indefinitely too. The dashboard symptom is
- * "schedule active, 0 runs, never advances" — exactly what triggered the
- * bug report.
- *
- * On timeout we reject with a descriptive error so the surrounding
- * try/catch records a failed execution and bumps `error_count`. The
- * underlying action promise is left to settle on its own; we cannot truly
- * cancel a Node Promise, but we no longer wait for it.
- */
-async function executeActionWithTimeout(schedule: DreamSchedule): Promise<string> {
-  const timeoutMs = Math.max(1_000, config.execution_timeout_ms);
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => {
-      reject(new Error(
-        `executeAction timeout after ${timeoutMs}ms ` +
-        `(schedule="${schedule.name}", action=${schedule.action})`
-      ));
-    }, timeoutMs);
-    if (timer && typeof timer === "object" && "unref" in timer) timer.unref();
-  });
-  try {
-    return await Promise.race([executeAction(schedule), timeoutPromise]);
-  } finally {
-    if (timer) clearTimeout(timer);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Schedule File I/O
-// ---------------------------------------------------------------------------
-
-function emptyScheduleFile(): ScheduleFile {
-  return {
-    metadata: {
-      description: "Dream Scheduler — persistent schedule registry and execution log.",
-      schema_version: "1.0.0",
-      total_schedules: 0,
-      total_executions: 0,
-      last_tick: null,
-    },
-    schedules: [],
-    executions: [],
-  };
-}
-
-async function loadScheduleFile(): Promise<ScheduleFile> {
-  try {
-    if (!existsSync(schedulesPath())) return emptyScheduleFile();
-    const raw = await readFile(schedulesPath(), "utf-8");
-    const p = JSON.parse(raw);
-    const e = emptyScheduleFile();
-    return {
-      metadata: { ...e.metadata, ...(p.metadata && typeof p.metadata === "object" ? p.metadata : {}) },
-      schedules: Array.isArray(p.schedules) ? p.schedules : [],
-      executions: Array.isArray(p.executions) ? p.executions : [],
-    };
-  } catch {
-    return emptyScheduleFile();
-  }
-}
-
-async function saveScheduleFile(file: ScheduleFile): Promise<void> {
-  file.metadata.total_schedules = file.schedules.length;
-  file.metadata.total_executions = file.executions.length;
-  // Stamp instance UUID when running in instance mode
-  const scope = getActiveScope();
-  if (scope) file.metadata.instance_uuid = scope.uuid;
-  await atomicWriteFile(schedulesPath(), JSON.stringify(file, null, 2));
-}
-
-// ---------------------------------------------------------------------------
-// Safety Guards
-// ---------------------------------------------------------------------------
-
-function resetHourWindowIfNeeded(): void {
-  const now = Date.now();
-  if (now - hourWindowStart > 3_600_000) {
-    hourWindowStart = now;
-    runsThisHour = 0;
-  }
-}
-
-function getScheduleSkipReason(schedule: DreamSchedule, now = Date.now()): string | null {
-  resetHourWindowIfNeeded();
-
-  if (!config.enabled) return "scheduler_disabled";
-  if (!schedule.enabled) return "schedule_disabled";
-  if (schedule.status !== "active") return `status_${schedule.status}`;
-  if (runsThisHour >= config.max_runs_per_hour) return "rate_limit";
-  if (now - lastRunTimestamp < config.global_cooldown_ms) return "global_cooldown";
-  if (schedule.action === "nightmare_cycle" && now - lastRunTimestamp < config.nightmare_cooldown_ms) {
-    return "nightmare_cooldown";
-  }
-  if (schedule.max_runs !== null && schedule.run_count >= schedule.max_runs) return "max_runs";
-  if (schedule.error_count >= config.max_error_streak) return "error_streak";
-  return null;
-}
-
-function canRunSchedule(schedule: DreamSchedule, now = Date.now()): boolean {
-  const reason = getScheduleSkipReason(schedule, now);
-  if (reason === "rate_limit") {
-    logger.warn(`Scheduler: rate limit reached (${config.max_runs_per_hour}/hr)`);
-  }
-  return reason === null;
-}
-
-// ---------------------------------------------------------------------------
-// Due Evaluation
-// ---------------------------------------------------------------------------
-
-function isDue(schedule: DreamSchedule, now: number): boolean {
-  if (!schedule.enabled || schedule.status !== "active") return false;
-
-  switch (schedule.trigger_type) {
-    case "interval": {
-      if (!schedule.interval_ms) return false;
-      if (!schedule.last_run_at) return true; // never run — due immediately
-      const elapsed = now - new Date(schedule.last_run_at).getTime();
-      return elapsed >= schedule.interval_ms;
-    }
-
-    case "cron_like": {
-      if (!schedule.cron) return false;
-      return isCronDue(schedule.cron, schedule.last_run_at, now);
-    }
-
-    case "after_cycles": {
-      // Evaluated separately via notifyCycleComplete — not in tick loop
-      return false;
-    }
-
-    case "on_idle": {
-      if (!schedule.idle_ms) return false;
-      const idleDuration = now - lastActivityTimestamp;
-      if (idleDuration < schedule.idle_ms) return false;
-      // Don't re-fire if already ran during this idle period
-      if (schedule.last_run_at) {
-        const lastRun = new Date(schedule.last_run_at).getTime();
-        if (lastRun > lastActivityTimestamp) return false;
-      }
-      return true;
-    }
-
-    default:
-      return false;
-  }
-}
-
-/**
- * Simple cron-like evaluator. Supports: "minute hour day-of-month month day-of-week"
- * Uses "*" for any. Only checks if the CURRENT UTC time matches and not already run this period.
- * All comparisons use UTC methods to stay consistent with ISO-string timestamps.
- */
-function isCronDue(cron: string, lastRun: string | null, now: number): boolean {
-  const parts = cron.trim().split(/\s+/);
-  if (parts.length < 5) return false;
-
-  const date = new Date(now);
-  const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
-
-  const matches = (field: string, value: number): boolean => {
-    if (field === "*") return true;
-    // Support comma-separated values
-    return field.split(",").some((v) => parseInt(v, 10) === value);
-  };
-
-  if (!matches(minute, date.getUTCMinutes())) return false;
-  if (!matches(hour, date.getUTCHours())) return false;
-  if (!matches(dayOfMonth, date.getUTCDate())) return false;
-  if (!matches(month, date.getUTCMonth() + 1)) return false;
-  if (!matches(dayOfWeek, date.getUTCDay())) return false;
-
-  // Check we haven't already run in this matching window (same UTC minute)
-  if (lastRun) {
-    const lastDate = new Date(lastRun);
-    if (
-      lastDate.getUTCFullYear() === date.getUTCFullYear() &&
-      lastDate.getUTCMonth() === date.getUTCMonth() &&
-      lastDate.getUTCDate() === date.getUTCDate() &&
-      lastDate.getUTCHours() === date.getUTCHours() &&
-      lastDate.getUTCMinutes() === date.getUTCMinutes()
-    ) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-// ---------------------------------------------------------------------------
-// Action Execution
-// ---------------------------------------------------------------------------
+let automaticTick: Promise<void> | null = null;
+let schedulerGeneration = 0;
 
 async function executeAction(schedule: DreamSchedule): Promise<string> {
   switch (schedule.action) {
@@ -389,8 +174,8 @@ async function executeAction(schedule: DreamSchedule): Promise<string> {
       const strategy = params.strategy;
       const maxDreams = params.max_dreams;
 
-      // Execute a full dream cycle internally
-      if (engine.getState() !== "awake") await engine.interrupt();
+      if (maxDreams === 0) return "dream cycle skipped: zero allocation";
+      if (engine.getState() !== "awake") throw new Error("ENGINE_CONFLICT");
       engine.enterRem();
       const decayResult = await engine.applyDecay();
       const tensionDecay = await engine.applyTensionDecay();
@@ -485,8 +270,7 @@ async function executeAction(schedule: DreamSchedule): Promise<string> {
         const proposer = llmReady
           ? async (sig: TensionSignal) => {
               try {
-                const llm = getLlmProvider();
-                const cfg = getNormalizerLlmConfig();
+                const { provider: llm, config: cfg } = await getRoleLlmProvider("normalizer");
                 const messages: LlmMessage[] = [
                   {
                     role: "system",
@@ -504,6 +288,8 @@ async function executeAction(schedule: DreamSchedule): Promise<string> {
                   },
                 ];
                 const resp = await llm.complete(messages, {
+                  cognitiveRole: "normalizer",
+                  ...(cfg.reasoningEffort ? { reasoningEffort: cfg.reasoningEffort } : {}),
                   model: cfg.model,
                   temperature: cfg.temperature,
                   maxTokens: 400,
@@ -551,7 +337,7 @@ async function executeAction(schedule: DreamSchedule): Promise<string> {
         );
       }
 
-      if (engine.getState() !== "awake") await engine.interrupt();
+      if (engine.getState() !== "awake") throw new Error("ENGINE_CONFLICT");
 
       return `dream_cycle(${strategy}${dreamResult.focus_entities.length > 0 ? `, focus=${dreamResult.focus_entities.length}` : ""}): ${dreamResult.edges.length} edges, ${normResult.promotedEdges.length} promoted, ${normResult.rejected} rejected${resolverSummary}`;
     }
@@ -560,12 +346,12 @@ async function executeAction(schedule: DreamSchedule): Promise<string> {
       const params = parseScheduleParams(schedule, NightmareCycleParamsSchema);
       const strategy = params.strategy;
 
-      if (engine.getState() !== "awake") await engine.interrupt();
+      if (engine.getState() !== "awake") throw new Error("ENGINE_CONFLICT");
       engine.enterNightmare();
       const result = await nightmare(strategy);
       engine.wakeFromNightmare();
 
-      if (engine.getState() !== "awake") await engine.interrupt();
+      if (engine.getState() !== "awake") throw new Error("ENGINE_CONFLICT");
 
       return `nightmare_cycle(${strategy}): ${result.threats_found} threats found`;
     }
@@ -607,7 +393,7 @@ async function executeAction(schedule: DreamSchedule): Promise<string> {
 
     case "graph_maintenance": {
       // Decay pass + tension decay without new dreaming
-      if (engine.getState() !== "awake") await engine.interrupt();
+      if (engine.getState() !== "awake") throw new Error("ENGINE_CONFLICT");
       engine.enterRem();
       const decayResult = await engine.applyDecay();
       const tensionDecay = await engine.applyTensionDecay();
@@ -621,664 +407,269 @@ async function executeAction(schedule: DreamSchedule): Promise<string> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Tick Loop
-//
-// The scheduler must remain UI-responsive even while a long-running cognitive
-// action (dream_cycle, nightmare_cycle, metacognitive_analysis, …) is
-// executing. Many actions make LLM calls that take tens of seconds.
-//
-// Lock discipline:
-//   1. Phase 1 — short `schedules.json` lock to read the file, pick due
-//      schedules, mark them as "claimed" (advance last_run_at + run_count,
-//      add to in-flight set), and write the file back. The lock is released
-//      before any cognitive work starts.
-//   2. Phase 2 — `executeAction` runs without the file lock, serialised by
-//      a separate `scheduler.execution` mutex so that two cognitive actions
-//      do not race on shared engine state.
-//   3. Phase 3 — short `schedules.json` lock to write back the execution
-//      result (success/error, summary, error streak, history append).
-//
-// This means UI calls that only touch the JSON (`updateSchedule`,
-// `deleteSchedule`, `getSchedules`) acquire the file lock for milliseconds
-// even while a 30 s LLM call is in flight.
-// ---------------------------------------------------------------------------
 
-/** Snapshot of a schedule claimed by phase 1, used by phase 2/3. */
-interface ScheduleClaim {
-  scheduleId: string;
-  scheduleName: string;
-  action: ScheduleAction;
-  startTime: number;
-  /** Frozen copy used by executeAction so it sees stable parameters. */
-  schedule: DreamSchedule;
+const FILE = "schedules.json";
+const count = z.number().int().nonnegative(), utc = z.string().datetime({ offset: true });
+const ScheduleSchema = z.object({ id: z.string().min(1), name: z.string(), action: z.enum(["dream_cycle","nightmare_cycle","metacognitive_analysis","dispatch_cognitive_event","narrative_chapter","federation_export","graph_maintenance"]),
+ parameters: z.record(z.unknown()), trigger_type: z.enum(["interval","cron_like","after_cycles","on_idle"]), interval_ms: z.number().optional(), cron: z.string().optional(),
+ cycle_interval: z.number().optional(), idle_ms: z.number().optional(), enabled: z.boolean(), status: z.enum(["active","paused","exhausted","error"]),
+ last_run_at: utc.nullable(), next_run_at: utc.nullable(), run_count: count, max_runs: count.nullable(), last_cycle_checked: count, error_count: count,
+ last_error: z.string().nullable(), last_skip_reason: z.string().nullable().optional(), created_at: utc, updated_at: utc,
+ definition_revision: count.default(1), action_version: z.string().default(SCHEDULE_ACTION_VERSION),
+ ...SchedulePolicySchema.shape, archived_at: utc.nullable().default(null) }).passthrough();
+const ExecutionSchema = z.object({ id: z.string(), schedule_id: z.string(), schedule_name: z.string(), action: z.string(),
+ triggered_at: utc, completed_at: utc, duration_ms: z.number().nonnegative(), success: z.boolean(), result_summary: z.string(), error: z.string().optional() }).passthrough();
+const OccurrenceRecordSchema = z.object({ occurrence: ScheduleOccurrenceSchema, definition: ScheduleSchema,
+ claimed_at: utc, reason: z.string().nullable(), completed_at: utc.nullable() }).strict();
+const ScheduleFileSchema = z.object({ metadata: z.object({ description: z.string(), schema_version: z.string(), total_schedules: count,
+ total_executions: count, last_tick: utc.nullable(), instance_uuid: z.string().optional(), revision: count.default(0),
+ last_activity_at: utc.default(() => new Date().toISOString()) }).passthrough(), schedules: z.array(ScheduleSchema), executions: z.array(ExecutionSchema),
+ occurrences: z.array(OccurrenceRecordSchema).default([]), definition_history: z.array(ScheduleSchema).default([]),
+ operation_receipts: z.record(z.object({ intent_hash: z.string(), result: z.unknown() }).strict()).default({}) }).passthrough();
+type DurableSchedules = z.infer<typeof ScheduleFileSchema>;
+const digest = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
+function emptyFile(): DurableSchedules { return ScheduleFileSchema.parse(emptyScheduleDocument()); }
+async function loadScheduleFile(): Promise<DurableSchedules> {
+ const publication = await loadPublicationState();
+ try {
+  const body = await readFile(dataPath(FILE),"utf8");
+  if (publication.stores[FILE] && publication.stores[FILE].hash !== publicationContentHash(body)) throw new Error("UNPUBLISHED_SCHEDULE_CHANGE");
+  return ScheduleFileSchema.parse(JSON.parse(stripBom(body)));
+ } catch(error) {
+  if ((error as NodeJS.ErrnoException).code === "ENOENT" && !publication.stores[FILE]) return emptyFile();
+  throw new Error(`SCHEDULE_STORE_UNAVAILABLE: ${String(error)}`);
+ }
+}
+async function saveScheduleFile(file: DurableSchedules): Promise<void> {
+ file.metadata.revision++; file.metadata.schema_version="2.0.0";
+ file.metadata.total_schedules=file.schedules.filter(s=>!s.archived_at).length; file.metadata.total_executions=file.executions.length;
+ const body=JSON.stringify(ScheduleFileSchema.parse(file));
+ if (Buffer.byteLength(body)>16*1024*1024 || file.occurrences.length>20000 || file.definition_history.length>10000) throw new Error("SCHEDULE_CAPACITY_REQUIRES_ARCHIVE");
+ await commitGraphWrites({ actor:"scheduler", scope:[FILE], cause:"schedule_state", writes:[{file:FILE,content:body}] });
+}
+function mutateSchedules<T>(work:(file:DurableSchedules)=>Promise<T>):Promise<T> {
+ return withoutJobContext(()=>withGraphReconciliation(async()=>{ await recoverGraphPublication();const file=await loadScheduleFile(),before=JSON.stringify(file);const result=await work(file);
+  // A rejected/replayed occurrence is not a new state transition. Publishing
+  // unchanged polling results grows the receipt ledger and blocks every reader.
+  if(JSON.stringify(file)!==before)await saveScheduleFile(file);return result;
+ }));
+}
+export function validateSchedule(schedule: DreamSchedule): DreamSchedule {
+ const candidate = ScheduleSchema.parse(schedule) as DreamSchedule;
+ validateScheduleTiming(candidate);
+ if (candidate.action_version !== SCHEDULE_ACTION_VERSION) throw new Error("SCHEDULE_ACTION_VERSION_UNAVAILABLE");
+ try { candidate.parameters=ScheduleActionParameterSchemas[candidate.action].parse(candidate.parameters); }
+ catch(error){if(error instanceof z.ZodError)throw new z.ZodError(error.issues.map(issue=>({...issue,path:["parameters",...issue.path]})));throw error;}
+ if (candidate.parameters.strategy === "reflective") throw new Error("SCHEDULE_RETIRED_STRATEGY");
+ return candidate;
+}
+function guard(file:DurableSchedules,schedule:DreamSchedule,now:number,manual=false):string|null {
+ try { validateSchedule(schedule); } catch(error) { return `invalid_definition:${String(error)}`; }
+ if (schedule.archived_at) return "archived";
+ if (!manual && (!config.enabled || !schedule.enabled || schedule.status!=="active")) return "paused";
+ if (schedule.max_runs!==null && schedule.run_count>=schedule.max_runs) return "max_runs";
+ if (schedule.error_count>=config.max_error_streak) return "error_streak";
+ const claimed=file.occurrences.filter(o=>o.occurrence.job_id && Date.parse(o.claimed_at)>now-3600000);
+ if (claimed.length>=config.max_runs_per_hour) return "rate_limit";
+ const last=claimed.reduce((n,o)=>Math.max(n,Date.parse(o.claimed_at)),0);
+ if (last && now-last<config.global_cooldown_ms) return "global_cooldown";
+ const nightmare=claimed.filter(o=>o.occurrence.action==="nightmare_cycle").reduce((n,o)=>Math.max(n,Date.parse(o.claimed_at)),0);
+ if (schedule.action==="nightmare_cycle" && nightmare && now-nightmare<config.nightmare_cooldown_ms) return "nightmare_cooldown";
+ return null;
+}
+export async function getScheduleSnapshot(now=Date.now()) {
+ return withGraphRead(async()=>{const file=await loadScheduleFile();const jobs=await new EngineJobs().inspect();return {
+  schema:"dreamgraph.schedule_snapshot.v2", revision:file.metadata.revision, config:structuredClone(config), last_activity_at:file.metadata.last_activity_at,
+  schedules:file.schedules.filter(s=>!s.archived_at).map(s=>{const reason=guard(file,s as DreamSchedule,now);return {...s,diagnostics:reason?[reason]:[],
+    preview_available:!reason?.startsWith("invalid_definition"),preview_search_horizon_days:32,
+    jobs:jobs.records.filter(j=>j.job.scope.includes(`schedule:${s.id}`)).map(j=>j.job)};}),
+  occurrences:structuredClone(file.occurrences), history:structuredClone(file.executions.slice(-config.max_history)),
+ };});
+}
+export async function createSchedule(opts: { name:string;action:ScheduleAction;parameters?:Record<string,unknown>;trigger_type:ScheduleTriggerType;
+ interval_ms?:number;cron?:string;cycle_interval?:number;idle_ms?:number;enabled?:boolean;max_runs?:number|null;
+ timezone?:string;fold_policy?:"once"|"both";missed_policy?:"skip"|"catch_up_once";operation_id?:string }):Promise<DreamSchedule> {
+ const now=new Date().toISOString();
+ const candidate=validateSchedule({id:`sched_${randomUUID()}`,name:opts.name,action:opts.action,parameters:opts.parameters??{},trigger_type:opts.trigger_type,
+  ...(opts.interval_ms!==undefined?{interval_ms:opts.interval_ms}:{}),...(opts.cron!==undefined?{cron:opts.cron}:{}),
+  ...(opts.cycle_interval!==undefined?{cycle_interval:opts.cycle_interval}:{}),...(opts.idle_ms!==undefined?{idle_ms:opts.idle_ms}:{}),
+  enabled:opts.enabled??false,status:opts.enabled?"active":"paused",last_run_at:null,next_run_at:null,run_count:0,max_runs:opts.max_runs??null,
+  last_cycle_checked:0,error_count:0,last_error:null,created_at:now,updated_at:now,definition_revision:1,action_version:SCHEDULE_ACTION_VERSION,
+  timezone:opts.timezone??"UTC",fold_policy:opts.fold_policy??"once",missed_policy:opts.missed_policy??"skip",overlap_policy:"queue_one",archived_at:null});
+ return mutateSchedules(async file=>{const key=opts.operation_id?`create:${opts.operation_id}`:null,intent=digest(opts);
+  if(key&&file.operation_receipts[key]){if(file.operation_receipts[key].intent_hash!==intent)throw new Error("SCHEDULE_OPERATION_CONFLICT");return structuredClone(file.operation_receipts[key].result) as DreamSchedule;}
+  file.schedules.push(candidate as z.infer<typeof ScheduleSchema>); if(key)file.operation_receipts[key]={intent_hash:intent,result:candidate}; return structuredClone(candidate);});
+}
+export async function updateSchedule(scheduleId:string, updates:Partial<DreamSchedule>, controls?:{expected_revision:number;operation_id?:string;reviewed_policy_digest?:string}):Promise<DreamSchedule|null> {
+ updates=Object.fromEntries(Object.entries(updates).filter(([,value])=>value!==undefined));
+ const allowed=new Set(["name","enabled","parameters","interval_ms","cron","cycle_interval","idle_ms","max_runs","trigger_type","action","timezone","fold_policy","missed_policy","overlap_policy"]);
+ if(Object.keys(updates).some(key=>!allowed.has(key)))throw new Error("SCHEDULE_IMMUTABLE_FIELD");
+ if(!controls||!Number.isSafeInteger(controls.expected_revision))throw new Error("SCHEDULE_REVISION_REQUIRED");
+ return mutateSchedules(async file=>{
+  const key=controls.operation_id?`update:${scheduleId}:${controls.operation_id}`:null,intent=digest({updates,expected_revision:controls.expected_revision});
+  if(key&&file.operation_receipts[key]){if(file.operation_receipts[key].intent_hash!==intent)throw new Error("SCHEDULE_OPERATION_CONFLICT");return structuredClone(file.operation_receipts[key].result) as DreamSchedule;}
+  const index=file.schedules.findIndex(s=>s.id===scheduleId&&!s.archived_at); if(index<0)return null; const old=file.schedules[index];
+  if(old.definition_revision!==controls.expected_revision)throw new Error("SCHEDULE_REVISION_CONFLICT");
+  const enabled=updates.enabled??old.enabled;
+  const next=validateSchedule({...old,...structuredClone(updates),enabled,status:enabled?"active":"paused",definition_revision:old.definition_revision+1,updated_at:new Date().toISOString(),
+   ...(updates.enabled===true?{last_error:null,error_count:0}: {})} as DreamSchedule);
+  if(controls.reviewed_policy_digest!==undefined){const policies=await scheduledRolePolicies(next);
+   if(schedulePolicyDigest(next,Object.values(policies).map(policy=>policy.fingerprint))!==controls.reviewed_policy_digest)throw new Error("SCHEDULE_POLICY_PREVIEW_CONFLICT");}
+  file.definition_history.push(structuredClone(old));file.schedules[index]=next as z.infer<typeof ScheduleSchema>;
+  if(key)file.operation_receipts[key]={intent_hash:intent,result:next};return structuredClone(next);
+ });
+}
+export async function deleteSchedule(scheduleId:string,controls?:{expected_revision:number;operation_id?:string}):Promise<boolean> {
+ if(!controls||!Number.isSafeInteger(controls.expected_revision))throw new Error("SCHEDULE_REVISION_REQUIRED");
+ return mutateSchedules(async file=>{
+  const key=controls.operation_id?`archive:${scheduleId}:${controls.operation_id}`:null,intent=digest({scheduleId,expected_revision:controls.expected_revision});
+  if(key&&file.operation_receipts[key]){if(file.operation_receipts[key].intent_hash!==intent)throw new Error("SCHEDULE_OPERATION_CONFLICT");return file.operation_receipts[key].result as boolean;}
+  const schedule=file.schedules.find(s=>s.id===scheduleId);if(!schedule)return false;
+  if(schedule.definition_revision!==controls.expected_revision)throw new Error("SCHEDULE_REVISION_CONFLICT");
+  if(!schedule.archived_at){file.definition_history.push(structuredClone(schedule));schedule.definition_revision++;schedule.archived_at=new Date().toISOString();schedule.enabled=false;schedule.status="paused";}
+  if(key)file.operation_receipts[key]={intent_hash:intent,result:true};return true;});
 }
 
-async function tick(): Promise<void> {
-  // -------- Phase 1: claim due schedules under the file lock --------
-  const claims = await withFileLock("schedules.json", async () => {
-    const now = Date.now();
-    const file = await loadScheduleFile();
-    const out: ScheduleClaim[] = [];
-
-    for (const schedule of file.schedules) {
-      let skipReason: string | null = null;
-      if (inFlightSchedules.has(schedule.id)) skipReason = "in_flight";
-      else if (!isDue(schedule, now)) skipReason = getScheduleSkipReason(schedule, now) ?? "not_due";
-      else skipReason = getScheduleSkipReason(schedule, now);
-
-      if (skipReason) {
-        if (schedule.last_skip_reason !== skipReason) {
-          schedule.last_skip_reason = skipReason;
-          schedule.updated_at = new Date(now).toISOString();
-        }
-        graphEventBus.emit("schedule.skipped", {
-          affected_ids: [schedule.id],
-          payload: {
-            schedule_id: schedule.id,
-            schedule_name: schedule.name,
-            action: schedule.action,
-            reason: skipReason,
-          },
-        });
-        continue;
-      }
-
-      // Reserve the schedule: advance last_run_at so subsequent ticks see it
-      // as not-due, bump the in-flight set so even an interval shorter than
-      // the action duration cannot re-claim it. The actual run_count and
-      // execution record are written back in phase 3.
-      schedule.last_run_at = new Date(now).toISOString();
-      schedule.updated_at = schedule.last_run_at;
-      schedule.last_skip_reason = null;
-      computeNextRun(schedule);
-      inFlightSchedules.add(schedule.id);
-
-      runsThisHour++;
-      lastRunTimestamp = now;
-      graphEventBus.emit("schedule.claimed", {
-        affected_ids: [schedule.id],
-        payload: {
-          schedule_id: schedule.id,
-          schedule_name: schedule.name,
-          action: schedule.action,
-          triggered_at: schedule.last_run_at,
-        },
-      });
-
-      out.push({
-        scheduleId: schedule.id,
-        scheduleName: schedule.name,
-        action: schedule.action,
-        startTime: now,
-        schedule: { ...schedule },
-      });
-    }
-
-    file.metadata.last_tick = new Date().toISOString();
-    await saveScheduleFile(file);
-    return out;
-  });
-
-  if (claims.length === 0) return;
-
-  // -------- Phase 2 + 3: execute outside the file lock --------
-  await Promise.all(
-    claims.map((claim) =>
-      runClaimedSchedule(claim, "exec").catch((err) => {
-        logger.error(`Scheduler runClaimedSchedule unexpected failure: ${err}`);
-      }),
-    ),
-  );
+/** Duplicate under the existing writer; source revision and disabled new intent commit together. */
+export async function duplicateSchedule(scheduleId:string,controls:{expected_revision:number;operation_id:string}):Promise<DreamSchedule>{
+ return mutateSchedules(async file=>{
+  const key=`duplicate:${scheduleId}:${controls.operation_id}`,intent=digest({scheduleId,expected_revision:controls.expected_revision});
+  const prior=file.operation_receipts[key];if(prior){if(prior.intent_hash!==intent)throw new Error("SCHEDULE_OPERATION_CONFLICT");return structuredClone(prior.result) as DreamSchedule;}
+  const original=file.schedules.find(s=>s.id===scheduleId&&!s.archived_at);if(!original)throw new Error("SCHEDULE_NOT_FOUND");
+  if(original.definition_revision!==controls.expected_revision)throw new Error("SCHEDULE_REVISION_CONFLICT");
+  const now=new Date().toISOString(),copy=validateSchedule({...structuredClone(original),id:`sched_${randomUUID()}`,name:`${original.name} copy`,enabled:false,status:"paused",
+   definition_revision:1,last_run_at:null,next_run_at:null,run_count:0,last_cycle_checked:0,error_count:0,last_error:null,last_skip_reason:null,created_at:now,updated_at:now,archived_at:null} as DreamSchedule);
+  file.schedules.push(copy as z.infer<typeof ScheduleSchema>);file.operation_receipts[key]={intent_hash:intent,result:copy};return structuredClone(copy);
+ });
 }
 
-/**
- * Run a claimed schedule outside the `schedules.json` lock.
- *
- * Cognitive actions are serialised globally by SCHEDULER_EXEC_LOCK so they
- * cannot trample shared engine state. Result write-back briefly re-acquires
- * the file lock.
- */
-async function runClaimedSchedule(
-  claim: ScheduleClaim,
-  idPrefix: "exec" | "exec_cycle"
-): Promise<void> {
-  let resultSummary = "";
-  let success = true;
-  let errorMsg: string | undefined;
-
-  try {
-    await withFileLock(SCHEDULER_EXEC_LOCK, async () => {
-      try {
-        logger.info(`Scheduler executing: ${claim.scheduleName} (${claim.action})`);
-        resultSummary = await executeActionWithTimeout(claim.schedule);
-      } catch (err) {
-        success = false;
-        errorMsg = err instanceof Error ? err.message : String(err);
-        resultSummary = `Error: ${errorMsg}`;
-        logger.error(`Scheduler error for ${claim.scheduleName}: ${errorMsg}`);
-      }
-    });
-  } finally {
-    // Always run phase 3, even if executeAction threw before completing.
-    try {
-      await writeBackExecution(claim, idPrefix, success, resultSummary, errorMsg);
-    } finally {
-      inFlightSchedules.delete(claim.scheduleId);
-    }
+/** Validation is pure and uses precisely the definition accepted by the writer. */
+export function validateScheduleDraft(input:Record<string,unknown>,now=new Date()):DreamSchedule{
+ return validateSchedule({id:"preview-only",name:"",parameters:{},trigger_type:"interval",last_run_at:null,next_run_at:null,
+  run_count:0,max_runs:null,last_cycle_checked:0,error_count:0,last_error:null,created_at:now.toISOString(),updated_at:now.toISOString(),
+  definition_revision:1,action_version:SCHEDULE_ACTION_VERSION,timezone:"UTC",fold_policy:"once",missed_policy:"skip",overlap_policy:"queue_one",archived_at:null,...input,
+  enabled:false,status:"paused"} as DreamSchedule);
+}
+async function claim(scheduleId:string,cursor:string,planned_at:string|null,now:number,manual:boolean,missed=false,expected_revision?:number,reviewed_policy_digest?:string):Promise<string|null> {
+ return mutateSchedules(async file=>{
+  const manualKey=manual?`manual:${scheduleId}:${cursor}`:null;
+  if(manualKey&&file.operation_receipts[manualKey]) {
+   if(file.operation_receipts[manualKey].intent_hash!==digest({scheduleId,expected_revision}))throw new Error("SCHEDULE_OPERATION_CONFLICT");
+   return file.operation_receipts[manualKey].result as string;
   }
+  const schedule=file.schedules.find(s=>s.id===scheduleId&&!s.archived_at);if(!schedule)throw new Error("SCHEDULE_NOT_FOUND");
+  if(expected_revision!==undefined&&schedule.definition_revision!==expected_revision)throw new Error("SCHEDULE_REVISION_CONFLICT");
+  const occurrenceId=digest({scheduleId,revision:schedule.definition_revision,cursor});
+  const previous=file.occurrences.find(o=>o.occurrence.id===occurrenceId);if(previous)return previous.occurrence.job_id;
+  const reason=guard(file,schedule as DreamSchedule,now,manual);
+  if(reason){schedule.last_skip_reason=reason; if(manual)throw new Error(`SCHEDULE_BLOCKED:${reason}`);return null;}
+  // One accepted occurrence per definition waits behind the engine lane; no unbounded overlap queue.
+  if(file.occurrences.some(o=>o.occurrence.schedule_id===scheduleId&&!["finished","skipped","blocked"].includes(o.occurrence.state))){schedule.last_skip_reason="overlap_queue_one";return null;}
+  const definition=validateSchedule(schedule as DreamSchedule) as z.infer<typeof ScheduleSchema>;
+  const policies=await scheduledRolePolicies(definition as DreamSchedule);
+  if(reviewed_policy_digest!==undefined&&schedulePolicyDigest(definition as DreamSchedule,Object.values(policies).map(policy=>policy.fingerprint))!==reviewed_policy_digest)throw new Error("SCHEDULE_POLICY_PREVIEW_CONFLICT");
+  const skipped=missed&&definition.missed_policy==="skip";
+  const job=skipped?null:await new EngineJobs().accept({operation_id:`occurrence:${occurrenceId}`,owner:"scheduler",action:definition.action,action_version:definition.action_version,
+   parameters:definition.parameters,scope:[`schedule:${scheduleId}`],timeout_ms:config.execution_timeout_ms,roles:scheduleRoles(definition.action),role_policies:policies});
+  file.occurrences.push({occurrence:{schema:"dreamgraph.schedule_occurrence.v1",id:occurrenceId,schedule_id:scheduleId,definition_revision:definition.definition_revision,
+   planned_at,trigger_cursor:cursor,timezone:definition.timezone,fold_policy:definition.fold_policy,job_id:job?.job.id??null,
+   action:definition.action,action_version:definition.action_version,parameters:structuredClone(definition.parameters),state:skipped?"skipped":"queued"},
+   definition,claimed_at:new Date(now).toISOString(),reason:skipped?"missed_skip":null,completed_at:skipped?new Date(now).toISOString():null});
+  if(manualKey&&job)file.operation_receipts[manualKey]={intent_hash:digest({scheduleId,expected_revision}),result:job.job.id};
+  schedule.last_run_at=new Date(now).toISOString();schedule.last_skip_reason=skipped?"missed_skip":null;return job?.job.id??null;
+ });
+}
+async function finishOccurrence(jobId:string):Promise<ScheduleExecution|null>{
+ return mutateSchedules(async file=>{
+  const item=file.occurrences.find(o=>o.occurrence.job_id===jobId);if(!item)return null;
+  const prior=file.executions.find(e=>e.job_id===jobId);if(prior)return prior as unknown as ScheduleExecution;
+  const record=(await new EngineJobs().inspect()).records.find(r=>r.job.id===jobId)!;
+  if(!["succeeded","failed","cancelled","partial"].includes(record.job.state))return null;
+  const completed=new Date().toISOString(),success=record.job.state==="succeeded";
+  const execution:ScheduleExecution={id:`exec_${item.occurrence.id}`,schedule_id:item.definition.id,schedule_name:item.definition.name,action:item.definition.action,
+   triggered_at:item.claimed_at,completed_at:completed,duration_ms:Math.max(0,Date.parse(completed)-Date.parse(item.claimed_at)),success,
+   result_summary:typeof record.result==="string"?record.result:record.error??record.job.terminal_cause??record.job.state,
+   ...(record.error?{error:record.error}:{}),occurrence_id:item.occurrence.id,job_id:jobId,definition_revision:item.occurrence.definition_revision,
+   action_version:item.occurrence.action_version,parameters:structuredClone(item.occurrence.parameters)};
+  file.executions.push(ExecutionSchema.parse(execution));item.occurrence.state="finished";item.completed_at=completed;
+  const schedule=file.schedules.find(s=>s.id===item.definition.id);
+  if(schedule){schedule.run_count++;
+   // Old-definition results do not overwrite a newer client's status or error policy.
+   if(schedule.definition_revision===item.occurrence.definition_revision){schedule.error_count=success?0:schedule.error_count+1;schedule.last_error=success?null:execution.result_summary;
+    if(schedule.error_count>=config.max_error_streak){schedule.enabled=false;schedule.status="error";}}
+   if(schedule.max_runs!==null&&schedule.run_count>=schedule.max_runs){schedule.enabled=false;schedule.status="exhausted";}}
+  return execution;
+ });
+}
+async function runOccurrence(jobId:string,signal?:AbortSignal):Promise<ScheduleExecution|null>{
+ const jobs=new EngineJobs(),record=(await jobs.inspect()).records.find(r=>r.job.id===jobId)!;
+ if(["succeeded","failed","cancelled","partial"].includes(record.job.state))return finishOccurrence(jobId);
+ if(!["queued","blocked"].includes(record.job.state))return null;
+ const item=await withGraphRead(async()=>(await loadScheduleFile()).occurrences.find(o=>o.occurrence.job_id===jobId));if(!item)throw new Error("SCHEDULE_OCCURRENCE_MISSING");
+ try {await jobs.run(jobId,async()=>{
+  const definition=validateSchedule(item.definition as DreamSchedule);
+  try {await assertJobCurrent();return await executeAction(definition);}
+  finally {if(engine.getState()!=="awake")await withoutJobContext(()=>engine.interrupt());}
+ },signal);}catch(error){if(!(error instanceof Error))throw error;logger.warn(`Scheduled job ${jobId}: ${error.message}`);}
+ return finishOccurrence(jobId);
+}
+export async function runScheduleNow(scheduleId:string,controls?:{operation_id:string;expected_revision:number;signal?:AbortSignal}):Promise<ScheduleExecution>{
+ if(!controls?.operation_id)throw new Error("SCHEDULE_OPERATION_ID_REQUIRED");
+ if(!Number.isSafeInteger(controls.expected_revision))throw new Error("SCHEDULE_REVISION_REQUIRED");
+ const id=await claim(scheduleId,`manual:${controls.operation_id}`,null,Date.now(),true,false,controls.expected_revision);if(!id)throw new Error("SCHEDULE_NOT_CLAIMED");
+ const result=await runOccurrence(id,controls.signal);if(!result){const state=(await new EngineJobs().inspect()).records.find(r=>r.job.id===id)!.job.state;throw new Error(`SCHEDULE_JOB_PENDING:${id}:${state}`);}return result;
 }
 
-async function writeBackExecution(
-  claim: ScheduleClaim,
-  idPrefix: "exec" | "exec_cycle",
-  success: boolean,
-  resultSummary: string,
-  errorMsg: string | undefined
-): Promise<void> {
-  await withFileLock("schedules.json", async () => {
-    const file = await loadScheduleFile();
-    const schedule = file.schedules.find((s) => s.id === claim.scheduleId);
-    const completedAt = new Date();
-    const duration = completedAt.getTime() - claim.startTime;
-    const executionId = `${idPrefix}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-
-    if (schedule) {
-      if (success) {
-        schedule.error_count = 0;
-        schedule.last_error = null;
-      } else {
-        schedule.error_count++;
-        schedule.last_error = errorMsg ?? "unknown error";
-        if (errorMsg?.includes("executeAction timeout after")) {
-          graphEventBus.emit("schedule.timed_out", {
-            affected_ids: [schedule.id],
-            payload: {
-              schedule_id: schedule.id,
-              schedule_name: schedule.name,
-              action: schedule.action,
-              error: errorMsg,
-            },
-          });
-        }
-        if (schedule.error_count >= config.max_error_streak) {
-          schedule.status = "error";
-          schedule.enabled = false;
-          graphEventBus.emit("schedule.paused", {
-            affected_ids: [schedule.id],
-            payload: {
-              schedule_id: schedule.id,
-              schedule_name: schedule.name,
-              action: schedule.action,
-              reason: "error_streak",
-              error_count: schedule.error_count,
-            },
-          });
-          logger.warn(
-            `Schedule "${schedule.name}" paused after ${schedule.error_count} consecutive errors`
-          );
-        }
-      }
-      schedule.run_count++;
-      schedule.updated_at = completedAt.toISOString();
-      computeNextRun(schedule);
-
-      if (schedule.max_runs !== null && schedule.run_count >= schedule.max_runs) {
-        schedule.status = "exhausted";
-        schedule.enabled = false;
-      }
-
-      graphEventBus.emit("schedule.executed", {
-        affected_ids: [schedule.id],
-        payload: {
-          schedule_id: schedule.id,
-          schedule_name: schedule.name,
-          action: schedule.action,
-          execution_id: executionId,
-          success,
-          duration_ms: duration,
-          status: schedule.status,
-          error: errorMsg ?? null,
-        },
-      });
-    }
-
-    const execution: ScheduleExecution = {
-      id: executionId,
-      schedule_id: claim.scheduleId,
-      schedule_name: claim.scheduleName,
-      action: claim.action,
-      triggered_at: new Date(claim.startTime).toISOString(),
-      completed_at: completedAt.toISOString(),
-      duration_ms: duration,
-      success,
-      result_summary: resultSummary,
-      error: errorMsg,
-      ...(getActiveScope() && { instance_uuid: getActiveScope()!.uuid }),
-    };
-    file.executions.push(execution);
-
-    if (file.executions.length > config.max_history) {
-      file.executions = file.executions.slice(-config.max_history);
-    }
-
-    await saveScheduleFile(file);
-  });
+/** Durable admission finishes before replying; transport lifetime never owns this daemon job. */
+export async function enqueueScheduleNow(scheduleId:string,controls:{operation_id:string;expected_revision:number;reviewed_policy_digest?:string}){
+ if(!controls.operation_id||!Number.isSafeInteger(controls.expected_revision))throw new Error("SCHEDULE_OPERATION_ID_REQUIRED");
+ const jobId=await claim(scheduleId,`manual:${controls.operation_id}`,null,Date.now(),true,false,controls.expected_revision,controls.reviewed_policy_digest);
+ if(!jobId)throw new Error("SCHEDULE_NOT_CLAIMED");
+ const directory=getDataDir();void withDataDirectory(directory,()=>runOccurrence(jobId)).catch(error=>logger.error(`Scheduled background job ${jobId}: ${String(error)}`));
+ return (await new EngineJobs(directory).inspect()).records.find(record=>record.job.id===jobId)!;
 }
-
-function computeNextRun(schedule: DreamSchedule): void {
-  if (!schedule.enabled || schedule.status !== "active") {
-    schedule.next_run_at = null;
-    return;
+export async function tickSchedules(now=Date.now(),cycle?:number):Promise<void>{
+ const directory=getDataDir(); await withDataDirectory(directory,async()=>{
+  const file=await withGraphRead(()=>loadScheduleFile());
+  const queued=new Set(file.occurrences.filter(o=>o.occurrence.job_id&&o.occurrence.state!=="finished").map(o=>o.occurrence.job_id!));
+  // Admit every proposal before advancing the durable cursor or executing a slow action.
+  for(const schedule of file.schedules.filter(s=>config.enabled&&!s.archived_at&&s.enabled&&s.status==="active")){
+   try {const proposal=evaluateSchedule(schedule as DreamSchedule,now,{cycle,last_activity_at:file.metadata.last_activity_at,last_tick:file.metadata.last_tick});if(!proposal)continue;
+    const id=await claim(schedule.id,proposal.trigger_cursor,proposal.planned_at,now,false,proposal.missed,schedule.definition_revision);if(id)queued.add(id);
+   }catch(error){logger.warn(`Schedule ${schedule.id} blocked: ${String(error)}`);}
   }
-
-  const now = Date.now();
-
-  switch (schedule.trigger_type) {
-    case "interval":
-      schedule.next_run_at = schedule.interval_ms
-        ? new Date(now + schedule.interval_ms).toISOString()
-        : null;
-      break;
-
-    case "after_cycles":
-      schedule.next_run_at = null; // cycle-triggered, not time-based
-      break;
-
-    case "on_idle":
-      schedule.next_run_at = null; // idle-triggered, not predictable
-      break;
-
-    case "cron_like":
-      // Approximate next run — just mark as "scheduled"
-      schedule.next_run_at = null; // cron evaluated at tick time
-      break;
-  }
+  await mutateSchedules(async current=>{if(!current.metadata.last_tick||Date.parse(current.metadata.last_tick)<now)current.metadata.last_tick=new Date(now).toISOString();});
+  for(const id of queued)await runOccurrence(id);
+  if(config.enabled&&!(await import("./job-context.js")).currentJob())await (await import("./digestion.js")).runDirtyDigestion({now});
+ });
 }
-
-// ---------------------------------------------------------------------------
-// Cycle-Based Trigger Hook
-// ---------------------------------------------------------------------------
-
-/**
- * Called after each dream_cycle completion.
- * Evaluates "after_cycles" schedules.
- */
-export async function notifyCycleComplete(cycleNumber: number): Promise<void> {
-  // Same lock discipline as `tick()`: claim cycle-triggered schedules under
-  // the file lock, then run them outside it. See the lifecycle comment on
-  // `tick()` for the rationale.
-  const claims = await withFileLock("schedules.json", async () => {
-    const file = await loadScheduleFile();
-    const out: ScheduleClaim[] = [];
-    const now = Date.now();
-
-    for (const schedule of file.schedules) {
-      if (inFlightSchedules.has(schedule.id)) continue;
-      if (!schedule.enabled || schedule.status !== "active") continue;
-      if (schedule.trigger_type !== "after_cycles") continue;
-      if (!schedule.cycle_interval) continue;
-      if (!canRunSchedule(schedule)) continue;
-
-      const cyclesSinceLast = cycleNumber - schedule.last_cycle_checked;
-      if (cyclesSinceLast < schedule.cycle_interval) continue;
-
-      schedule.last_cycle_checked = cycleNumber;
-      schedule.last_run_at = new Date(now).toISOString();
-      schedule.updated_at = schedule.last_run_at;
-      inFlightSchedules.add(schedule.id);
-
-      runsThisHour++;
-      lastRunTimestamp = now;
-
-      out.push({
-        scheduleId: schedule.id,
-        scheduleName: schedule.name,
-        action: schedule.action,
-        startTime: now,
-        schedule: { ...schedule },
-      });
-    }
-
-    if (out.length > 0) {
-      await saveScheduleFile(file);
-    }
-    return out;
-  });
-
-  for (const claim of claims) {
-    runClaimedSchedule(claim, "exec_cycle").catch((err) => {
-      logger.error(`Scheduler runClaimedSchedule (cycle) unexpected failure: ${err}`);
-    });
-  }
+export async function notifyCycleComplete(cycleNumber:number):Promise<void>{await tickSchedules(Date.now(),cycleNumber);}
+export function recordActivity():void{
+ const directory=getDataDir(),now=new Date().toISOString();
+ void withDataDirectory(directory,()=>mutateSchedules(async file=>{file.metadata.last_activity_at=now;})).catch(error=>logger.warn(`Schedule activity unavailable: ${String(error)}`));
 }
-
-// ---------------------------------------------------------------------------
-// Activity Tracking (for idle triggers)
-// ---------------------------------------------------------------------------
-
-/** Call this whenever manual MCP tool activity occurs */
-export function recordActivity(): void {
-  lastActivityTimestamp = Date.now();
+export async function getSchedules():Promise<DreamSchedule[]>{return withGraphRead(async()=>(await loadScheduleFile()).schedules.filter(s=>!s.archived_at) as DreamSchedule[]);}
+export async function getScheduleHistory(scheduleId?:string,limit?:number):Promise<ScheduleExecution[]>{
+ if(limit!==undefined&&(!Number.isSafeInteger(limit)||limit<1||limit>10000))throw new Error("SCHEDULE_HISTORY_LIMIT");
+ return withGraphRead(async()=>{let entries=(await loadScheduleFile()).executions;if(scheduleId)entries=entries.filter(e=>e.schedule_id===scheduleId);return (limit?entries.slice(-limit):entries) as unknown as ScheduleExecution[];});
 }
-
-// ---------------------------------------------------------------------------
-// CRUD Operations
-// ---------------------------------------------------------------------------
-
-export async function createSchedule(opts: {
-  name: string;
-  action: ScheduleAction;
-  parameters?: Record<string, unknown>;
-  trigger_type: ScheduleTriggerType;
-  interval_ms?: number;
-  cron?: string;
-  cycle_interval?: number;
-  idle_ms?: number;
-  enabled?: boolean;
-  max_runs?: number | null;
-}): Promise<DreamSchedule> {
-  return withFileLock("schedules.json", async () => {
-    const file = await loadScheduleFile();
-    const now = new Date().toISOString();
-
-    const schedule: DreamSchedule = {
-      id: `sched_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      name: opts.name,
-      action: opts.action,
-      parameters: opts.parameters ?? {},
-      trigger_type: opts.trigger_type,
-      interval_ms: opts.interval_ms,
-      cron: opts.cron,
-      cycle_interval: opts.cycle_interval,
-      idle_ms: opts.idle_ms,
-      enabled: opts.enabled ?? true,
-      status: "active",
-      last_run_at: null,
-      next_run_at: null,
-      run_count: 0,
-      max_runs: opts.max_runs ?? null,
-      last_cycle_checked: engine.getCurrentDreamCycle(),
-      error_count: 0,
-      last_error: null,
-      last_skip_reason: null,
-      created_at: now,
-      updated_at: now,
-    };
-
-    computeNextRun(schedule);
-    file.schedules.push(schedule);
-    await saveScheduleFile(file);
-
-    logger.info(`Schedule created: "${schedule.name}" (${schedule.action}, ${schedule.trigger_type})`);
-    return schedule;
-  });
+export async function getScheduleFile():Promise<ScheduleFile>{return withGraphRead(()=>loadScheduleFile()) as unknown as Promise<ScheduleFile>;}
+export function startScheduler(cfg?:Partial<SchedulerConfig>):void{
+ if(cfg)config=mergeEngineSettings(SchedulerSettingsSchema,config,cfg);stopScheduler();if(!config.enabled)return;
+ const directory=getDataDir(),generation=schedulerGeneration;
+ const tick=()=>{
+  // Timer callbacks are wake-ups, not durable occurrences. Never queue an
+  // unbounded backlog while one tick is waiting for a writer or engine job.
+  // Keep the active pass across config restarts; accepted work retains its owner.
+  if(generation!==schedulerGeneration||automaticTick)return;
+  automaticTick=withDataDirectory(directory,()=>tickSchedules()).catch(error=>logger.error(`Scheduler tick: ${String(error)}`)).finally(()=>{automaticTick=null;});
+  return automaticTick;
+ };
+ // Recovery is serialized before all ticks; old running effects are never replayed.
+ const recovered=withDataDirectory(directory,()=>new EngineJobs(directory).recover());
+ tickTimer=setInterval(()=>{void recovered.then(tick).catch(error=>logger.error(`Scheduler recovery: ${String(error)}`));},config.tick_interval_ms);tickTimer.unref();
+ void recovered.then(tick).catch(error=>logger.error(`Scheduler recovery: ${String(error)}`));
 }
-
-export async function updateSchedule(
-  scheduleId: string,
-  updates: Partial<Pick<DreamSchedule,
-    "name" | "enabled" | "parameters" | "interval_ms" | "cron" |
-    "cycle_interval" | "idle_ms" | "max_runs"
-  >>
-): Promise<DreamSchedule | null> {
-  return withFileLock("schedules.json", async () => {
-    const file = await loadScheduleFile();
-    const schedule = file.schedules.find((s) => s.id === scheduleId);
-    if (!schedule) return null;
-
-    if (updates.name !== undefined) schedule.name = updates.name;
-    if (updates.enabled !== undefined) {
-      schedule.enabled = updates.enabled;
-      // Re-enable resets error state
-      if (updates.enabled && schedule.status === "error") {
-        schedule.status = "active";
-        schedule.error_count = 0;
-        schedule.last_error = null;
-      }
-      if (!updates.enabled && schedule.status === "active") {
-        schedule.status = "paused";
-      }
-      if (updates.enabled && schedule.status === "paused") {
-        schedule.status = "active";
-      }
-    }
-    if (updates.parameters !== undefined) schedule.parameters = updates.parameters;
-    if (updates.interval_ms !== undefined) schedule.interval_ms = updates.interval_ms;
-    if (updates.cron !== undefined) schedule.cron = updates.cron;
-    if (updates.cycle_interval !== undefined) schedule.cycle_interval = updates.cycle_interval;
-    if (updates.idle_ms !== undefined) schedule.idle_ms = updates.idle_ms;
-    if (updates.max_runs !== undefined) schedule.max_runs = updates.max_runs;
-
-    schedule.updated_at = new Date().toISOString();
-    computeNextRun(schedule);
-    await saveScheduleFile(file);
-
-    logger.info(`Schedule updated: "${schedule.name}" (${schedule.id})`);
-    return schedule;
-  });
-}
-
-export async function deleteSchedule(scheduleId: string): Promise<boolean> {
-  return withFileLock("schedules.json", async () => {
-    const file = await loadScheduleFile();
-    const idx = file.schedules.findIndex((s) => s.id === scheduleId);
-    if (idx === -1) return false;
-
-    const removed = file.schedules.splice(idx, 1)[0];
-    await saveScheduleFile(file);
-
-    logger.info(`Schedule deleted: "${removed.name}" (${removed.id})`);
-    return true;
-  });
-}
-
-export async function runScheduleNow(scheduleId: string): Promise<ScheduleExecution> {
-  // Phase 1: snapshot the schedule under the file lock and stamp it as
-  // in-flight so a concurrent tick cannot also pick it up. Released before
-  // executeAction starts so UI calls remain responsive even if the action
-  // takes 30+ seconds (LLM round-trip).
-  const snapshot = await withFileLock("schedules.json", async () => {
-    const file = await loadScheduleFile();
-    const schedule = file.schedules.find((s) => s.id === scheduleId);
-    if (!schedule) {
-      throw new Error(`Schedule not found: ${scheduleId}`);
-    }
-    if (inFlightSchedules.has(scheduleId)) {
-      throw new Error(`Schedule already running: ${schedule.name}`);
-    }
-    inFlightSchedules.add(scheduleId);
-    const claim: ScheduleClaim = {
-      scheduleId: schedule.id,
-      scheduleName: schedule.name,
-      action: schedule.action,
-      startTime: Date.now(),
-      schedule: { ...schedule },
-    };
-    return claim;
-  });
-
-  // Phase 2: execute under the cognitive-execution mutex (no file lock).
-  let resultSummary = "";
-  let success = true;
-  let errorMsg: string | undefined;
-
-  try {
-    await withFileLock(SCHEDULER_EXEC_LOCK, async () => {
-      try {
-        logger.info(`Scheduler (forced): ${snapshot.scheduleName} (${snapshot.action})`);
-        resultSummary = await executeActionWithTimeout(snapshot.schedule);
-      } catch (err) {
-        success = false;
-        errorMsg = err instanceof Error ? err.message : String(err);
-        resultSummary = `Error: ${errorMsg}`;
-      }
-    });
-  } finally {
-    inFlightSchedules.delete(scheduleId);
-  }
-
-  // Phase 3: write the execution record back. We rebuild the execution
-  // object here (rather than relying on writeBackExecution) so we can return
-  // the manual-execution id with its `_manual_` infix, preserving the
-  // public surface of this function.
-  return withFileLock("schedules.json", async () => {
-    const file = await loadScheduleFile();
-    const schedule = file.schedules.find((s) => s.id === scheduleId);
-    const completedAt = new Date();
-    const duration = completedAt.getTime() - snapshot.startTime;
-
-    if (schedule) {
-      if (success) {
-        schedule.error_count = 0;
-        schedule.last_error = null;
-      } else {
-        schedule.error_count++;
-        schedule.last_error = errorMsg ?? "unknown error";
-      }
-      schedule.last_run_at = completedAt.toISOString();
-      schedule.run_count++;
-      schedule.updated_at = completedAt.toISOString();
-      computeNextRun(schedule);
-    }
-
-    const execution: ScheduleExecution = {
-      id: `exec_manual_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-      schedule_id: snapshot.scheduleId,
-      schedule_name: snapshot.scheduleName,
-      action: snapshot.action,
-      triggered_at: new Date(snapshot.startTime).toISOString(),
-      completed_at: completedAt.toISOString(),
-      duration_ms: duration,
-      success,
-      result_summary: resultSummary,
-      error: errorMsg,
-      ...(getActiveScope() && { instance_uuid: getActiveScope()!.uuid }),
-    };
-    file.executions.push(execution);
-
-    if (file.executions.length > config.max_history) {
-      file.executions = file.executions.slice(-config.max_history);
-    }
-    await saveScheduleFile(file);
-
-    return execution;
-  });
-}
-
-// ---------------------------------------------------------------------------
-// Query Operations
-// ---------------------------------------------------------------------------
-
-export async function getSchedules(): Promise<DreamSchedule[]> {
-  const file = await loadScheduleFile();
-  return file.schedules;
-}
-
-export async function getScheduleHistory(
-  scheduleId?: string,
-  limit?: number
-): Promise<ScheduleExecution[]> {
-  const file = await loadScheduleFile();
-  let executions = file.executions;
-  if (scheduleId) {
-    executions = executions.filter((e) => e.schedule_id === scheduleId);
-  }
-  if (limit) {
-    executions = executions.slice(-limit);
-  }
-  return executions;
-}
-
-export async function getScheduleFile(): Promise<ScheduleFile> {
-  return loadScheduleFile();
-}
-
-// ---------------------------------------------------------------------------
-// Lifecycle
-// ---------------------------------------------------------------------------
-
-/**
- * Start the scheduler tick loop.
- * Called once during server initialization.
- */
-export function startScheduler(cfg?: Partial<SchedulerConfig>): void {
-  if (cfg) {
-    config = { ...config, ...cfg };
-  }
-
-  if (!config.enabled) {
-    logger.info("Dream Scheduler: disabled by configuration");
-    return;
-  }
-
-  if (tickTimer) {
-    logger.warn("Dream Scheduler: already running, stopping first");
-    stopScheduler();
-  }
-
-  tickTimer = setInterval(() => {
-    tick().catch((err) => {
-      logger.error(`Scheduler tick error: ${err}`);
-    });
-  }, config.tick_interval_ms);
-
-  // Don't block Node exit
-  if (tickTimer && typeof tickTimer === "object" && "unref" in tickTimer) {
-    tickTimer.unref();
-  }
-
-  // Fire an immediate tick on startup so overdue schedules pick up promptly
-  // after a daemon restart (otherwise they would idle for up to one full
-  // tick_interval_ms before evaluation). Queued, not awaited — startScheduler
-  // must remain synchronous from the caller's perspective.
-  setImmediate(() => {
-    tick().catch((err) => {
-      logger.error(`Scheduler initial tick error: ${err}`);
-    });
-  });
-
-  const instanceTag = getActiveScope() ? ` [${getActiveScope()!.uuid.slice(0, 8)}]` : "";
-  logger.info(
-    `Dream Scheduler started${instanceTag}: tick=${config.tick_interval_ms}ms, ` +
-    `max_runs/hr=${config.max_runs_per_hour}, cooldown=${config.global_cooldown_ms}ms`
-  );
-}
-
-/**
- * Stop the scheduler tick loop.
- */
-export function stopScheduler(): void {
-  if (tickTimer) {
-    clearInterval(tickTimer);
-    tickTimer = null;
-    logger.info("Dream Scheduler stopped");
-  }
-}
-
-/**
- * Update scheduler configuration at runtime.
- */
-export function updateSchedulerConfig(newConfig: Partial<SchedulerConfig>): void {
-  const wasEnabled = config.enabled;
-  config = { ...config, ...newConfig };
-
-  // Restart tick loop if interval changed or enabled/disabled
-  if (tickTimer && (newConfig.tick_interval_ms || newConfig.enabled === false)) {
-    stopScheduler();
-    if (config.enabled) {
-      startScheduler();
-    }
-  } else if (!wasEnabled && config.enabled) {
-    startScheduler();
-  }
-
-  logger.info(`Scheduler config updated: ${JSON.stringify(config)}`);
-}
-
-/**
- * Get current scheduler config (for diagnostics).
- */
-export function getSchedulerConfig(): SchedulerConfig {
-  return { ...config };
-}
+export function stopScheduler():void{schedulerGeneration++;if(tickTimer){clearInterval(tickTimer);tickTimer=null;}}
+export function updateSchedulerConfig(next:Partial<SchedulerConfig>):void{config=mergeEngineSettings(SchedulerSettingsSchema,config,next);if(tickTimer||next.enabled===true)startScheduler();}
+export function getSchedulerConfig():SchedulerConfig{return structuredClone(config);}

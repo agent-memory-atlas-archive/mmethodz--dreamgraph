@@ -1,17 +1,19 @@
 """Tension flow over time — derived from dream_history sessions.
 
 Per cycle: created, resolved, expired, decayed, net delta.
-Cumulative active = running net (created - resolved - expired - decayed).
+Recorded net change = created - resolved - expired; decay does not close a risk.
 """
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
 
+from .definitions import qualified
 from . import loader
 from ._common import add_common_args, emit, fmt_table, resolve_data_dir_from_args
 
 
+@qualified("tension_flow")
 def analyze(data_dir: Path) -> dict:
     sessions = loader.dream_history(data_dir)
     sessions = sorted(sessions, key=lambda s: (s.get("cycle_number") or 0, s.get("timestamp") or ""))
@@ -24,7 +26,7 @@ def analyze(data_dir: Path) -> dict:
         r = int(s.get("tension_signals_resolved") or 0)
         e = int(s.get("tensions_expired") or 0)
         d = int(s.get("tensions_decayed") or 0)
-        delta = c - r - e - d
+        delta = c - r - e
         cum_active = max(0, cum_active + delta)
         totals["created"] += c
         totals["resolved"] += r
@@ -38,7 +40,8 @@ def analyze(data_dir: Path) -> dict:
             "expired": e,
             "decayed": d,
             "net_delta": delta,
-            "cum_active_estimate": cum_active,
+            "cum_active_estimate": None,
+            "recorded_net_change": cum_active,
         })
 
     # ground truth from current tension_log

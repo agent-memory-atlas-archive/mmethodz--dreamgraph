@@ -1,0 +1,1270 @@
+{
+  "name": "discipline_record_delta",
+  "arguments": {
+    "entries": [
+      {
+        "id": "F01",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F01",
+          "tool_call_id": "tc_1790768524223_e4uvli",
+          "excerpt": "Reproduced: system://features and query_resource returned clipped, invalid JSON. The resource still advertises application/json and the tool reports isError=false. Raw head/tail clipping discards the middle without a cursor. Agents cannot reliably reconstruct the graph or distinguish a complete response."
+        },
+        "target_ref": null,
+        "status": "confirmed_gap",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Large graph resources cease to be JSON — system://features and query_resource returned clipped, invalid JSON. The resource still advertises application/json and the tool reports isError=false. Raw head/tail clipping discards the middle without a cursor. Agents cannot reliably reconstruct the graph or distinguish a complete response.",
+        "severity": "major",
+        "discrepancies": [
+          "Replace JSON clipping with bounded structured pages, continuation cursors, stable ordering and explicit completeness. Keep optional human previews separate from machine data.",
+          "Evidence level: Reproduced; implementation acceptance remains pending. Source anchors: src/utils/tool-output.ts; src/resources/register.ts; src/tools/query-resource.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524223_e4uvli",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F01",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F02",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F02",
+          "tool_call_id": "tc_1790768524246_k8wc93",
+          "excerpt": "Reproduced: Reading system://capabilities returns the runtime capability summary; query_resource maps it to capability entities in capabilities.json. An advertised dream://status resource is rejected by query_resource with INVALID_URI, again without MCP isError=true. The generic query surface does not implement the advertised resource contract."
+        },
+        "target_ref": null,
+        "status": "confirmed_gap",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): The same resource URI has two meanings — Reading system://capabilities returns the runtime capability summary; query_resource maps it to capability entities in capabilities.json. An advertised dream://status resource is rejected by query_resource with INVALID_URI, again without MCP isError=true. The generic query surface does not implement the advertised resource contract.",
+        "severity": "major",
+        "discrepancies": [
+          "Use one URI resolver/catalog for resources, tools and client help. Version or alias the conflicting capability URI and distinguish invalid requests from a valid empty result.",
+          "Evidence level: Reproduced; implementation acceptance remains pending. Source anchors: src/resources/register.ts; src/tools/query-resource.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524246_k8wc93",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F02",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F03",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F03",
+          "tool_call_id": "tc_1790768524272_atm1u6",
+          "excerpt": "Reproduced + source: graph-rag loads features, workflows and data_model; it does not index capabilities, datastores, UI or auxiliary entities as first-class retrieval targets. Traversal uses validated_edges rather than the complete set of source-backed inline links. On the stored DreamGraph graph an exact feature ID was retrieved; existing capability_codebase_architecture_memory and dashboard_view IDs returned no entities. A richer Explorer does not establish richer agent access."
+        },
+        "target_ref": null,
+        "status": "confirmed_gap",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Agent retrieval sees only part of the graph — graph-rag loads features, workflows and data_model; it does not index capabilities, datastores, UI or auxiliary entities as first-class retrieval targets. Traversal uses validated_edges rather than the complete set of source-backed inline links. On the stored DreamGraph graph an exact feature ID was retrieved; existing capability_codebase_architecture_memory and dashboard_view IDs returned no entities. A richer Explorer does not establish richer agent access.",
+        "severity": "major",
+        "discrepancies": [
+          "Introduce a shared typed, revisioned graph read model with all canonical entity families, fact links, separately labeled validated insights, ADR bindings and provenance. Migrate consumers through adapters rather than rewriting the entire engine.",
+          "Evidence level: Reproduced + source; implementation acceptance remains pending. Source anchors: src/cognitive/graph-rag.ts; src/cognitive/strategies/_shared.ts; src/explorer"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524272_atm1u6",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F03",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F04",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F04",
+          "tool_call_id": "tc_1790768524294_oc7t9z",
+          "excerpt": "Reproduced + source: Requested context budgets of 100, 500 and 2000 returned reported token counts of 132, 535 and 2039 on the live graph. Headers, separators and truncation notices are added outside section allocations; partial-section counts can count a header as an edge. The full result envelope is larger again."
+        },
+        "target_ref": null,
+        "status": "confirmed_gap",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Retrieval exceeds its stated budget — Requested context budgets of 100, 500 and 2000 returned reported token counts of 132, 535 and 2039 on the live graph. Headers, separators and truncation notices are added outside section allocations; partial-section counts can count a header as an edge. The full result envelope is larger again.",
+        "severity": "major",
+        "discrepancies": [
+          "Define context-versus-envelope budgeting explicitly, account for every emitted field and report omitted counts accurately. Never slice a fact or provenance record into an unidentifiable fragment.",
+          "Evidence level: Reproduced + source; implementation acceptance remains pending. Source anchors: src/cognitive/graph-rag.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524294_oc7t9z",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F04",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F05",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F05",
+          "tool_call_id": "tc_1790768524316_m6vkfr",
+          "excerpt": "Measured + source: Three live retrievals took approximately 2.9–3.1 seconds; offline exact-ID probes took 2.4–2.9 seconds. These are single-machine observations, not latency percentiles. queryTfIdf repeatedly computes document frequency and builds the index per request; tokenization removes non-ASCII text. No grounded recall/answer-quality score was established by this audit."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Retrieval needs an index and a quality oracle — Three live retrievals took approximately 2.9–3.1 seconds; offline exact-ID probes took 2.4–2.9 seconds. These are single-machine observations, not latency percentiles. queryTfIdf repeatedly computes document frequency and builds the index per request; tokenization removes non-ASCII text. No grounded recall/answer-quality score was established by this audit.",
+        "severity": "minor",
+        "discrepancies": [
+          "Cache indexes by graph revision, precompute document frequencies, preserve Unicode/symbol lookup and evaluate relevant evidence recall, abstention, provenance, latency and tokens on a labeled task set.",
+          "Evidence level: Measured + source; implementation acceptance remains pending. Source anchors: src/cognitive/graph-rag.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524316_m6vkfr",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F05",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F06",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F06",
+          "tool_call_id": "tc_1790768524341_b6no2p",
+          "excerpt": "Source-confirmed ordering; concurrency risk untested: recordEnrichmentOutcome and total_enriched advance before batch store writes. Store-write exceptions append errors, but execution proceeds to checkpoint persistence and a progress message saying persisted. An interruption can therefore leave enriched checkpoint entries without their graph update. Full-store replacement from an earlier snapshot also creates a lost-update risk with intervening curation; atomic file replacement alone does not protect the entire read/modify/write operation."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Enrichment completion is ahead of durable graph success — recordEnrichmentOutcome and total_enriched advance before batch store writes. Store-write exceptions append errors, but execution proceeds to checkpoint persistence and a progress message saying persisted. An interruption can therefore leave enriched checkpoint entries without their graph update. Full-store replacement from an earlier snapshot also creates a lost-update risk with intervening curation; atomic file replacement alone does not protect the entire read/modify/write operation.",
+        "severity": "major",
+        "discrepancies": [
+          "Commit entity deltas against a graph revision, advance checkpoint success only after durable commit, and fault-inject write failure, cancellation, restart and concurrent curation. Distinguish attempted, generated, committed, fallback and failed counts.",
+          "Evidence level: Source-confirmed ordering; concurrency risk untested; implementation acceptance remains pending. Source anchors: src/tools/enrich-parser-nodes.ts; src/tools/enrichment-state.ts; src/utils/atomic-write.ts; src/graph"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524341_b6no2p",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F06",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F07",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F07",
+          "tool_call_id": "tc_1790768524367_ksnj6g",
+          "excerpt": "Gap; existing protections acknowledged: Max hops, node/batch limits, caches, typed failure states and retryable fallback handling already exist. They do not establish a job-wide spend ceiling or make fallback quality and cumulative consumption clear to the operator. Reducing hops controls context breadth but does not guarantee bounded calls, reasoning or recovery cost. This audit did not run another paid scan."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Enrichment cost is not an end-to-end job contract — Max hops, node/batch limits, caches, typed failure states and retryable fallback handling already exist. They do not establish a job-wide spend ceiling or make fallback quality and cumulative consumption clear to the operator. Reducing hops controls context breadth but does not guarantee bounded calls, reasoning or recovery cost. This audit did not run another paid scan.",
+        "severity": "major",
+        "discrepancies": [
+          "Add preflight estimates, input/output/reasoning limits, call/retry and job caps, effective route disclosure, cancellation/resume, cause-grouped fallback reporting and budget-aware escalation. Unknown pricing must remain unknown rather than zero.",
+          "Evidence level: Gap; existing protections acknowledged; implementation acceptance remains pending. Source anchors: src/tools/enrich-parser-nodes.ts; src/tools/enrichment-state.ts; src/tools/scan-project.ts; src/cognitive/llm.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524367_ksnj6g",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F07",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F08",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F08",
+          "tool_call_id": "tc_1790768524388_bitn9p",
+          "excerpt": "Source-confirmed: The dream_cycle strategy schema accepts reflective. dreamer has no corresponding execution branch and excludes it from allStrategies. Selecting a documented strategy should not silently produce an empty strategy run while appearing successful."
+        },
+        "target_ref": null,
+        "status": "confirmed_gap",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): reflective is accepted but has no dream execution branch — The dream_cycle strategy schema accepts reflective. dreamer has no corresponding execution branch and excludes it from allStrategies. Selecting a documented strategy should not silently produce an empty strategy run while appearing successful.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement a bounded, evidence-backed reflective strategy or reject/retire it explicitly. Derive advertised strategy choices and execution dispatch from one registry.",
+          "Evidence level: Source-confirmed; implementation acceptance remains pending. Source anchors: src/cognitive/register.ts; src/cognitive/dreamer.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524388_bitn9p",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F08",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F09",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F09",
+          "tool_call_id": "tc_1790768524409_ek978y",
+          "excerpt": "Source-confirmed: Strategy history lives in a process-local Map; yield is recorded before deduplication. This can reward repeated candidates instead of novel, validated and useful evidence, and resets across restart. Number(env) || default prevents explicit zero budget fractions. Per-kind node/edge limits and rounding also need a documented total-budget contract."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Strategy adaptation rewards generation before usefulness — Strategy history lives in a process-local Map; yield is recorded before deduplication. This can reward repeated candidates instead of novel, validated and useful evidence, and resets across restart. Number(env) || default prevents explicit zero budget fractions. Per-kind node/edge limits and rounding also need a documented total-budget contract.",
+        "severity": "minor",
+        "discrepancies": [
+          "Persist per-strategy observations after deduplication, measure novelty, cost, independent validation and downstream utility, reserve bounded exploration, and enforce deterministic allocation including zero and tiny budgets.",
+          "Evidence level: Source-confirmed; implementation acceptance remains pending. Source anchors: src/cognitive/dreamer.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524409_ek978y",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F09",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F10",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F10",
+          "tool_call_id": "tc_1790768524431_453ckf",
+          "excerpt": "Design/evaluation gap: The normalizer already has evidence-count gates, endpoint checks and provenance protections; these must be retained. Structural similarity, shared repository, recurrence and keywords can nevertheless be correlated signals rather than independent truth. Metacognition names operational ratios precision/recall without a labeled factual ground truth. Existing trust-state and evidence-ledger modules are useful foundations, not missing features."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Promotion confidence is not measured factual accuracy — The normalizer already has evidence-count gates, endpoint checks and provenance protections; these must be retained. Structural similarity, shared repository, recurrence and keywords can nevertheless be correlated signals rather than independent truth. Metacognition names operational ratios precision/recall without a labeled factual ground truth. Existing trust-state and evidence-ledger modules are useful foundations, not missing features.",
+        "severity": "major",
+        "discrepancies": [
+          "Separate operational yield from evaluated accuracy, track evidence independence and source freshness, calibrate on labeled positive/negative cases, and preserve uncertainty and explicit human review across every projection.",
+          "Evidence level: Design/evaluation gap; implementation acceptance remains pending. Source anchors: src/cognitive/normalizer.ts; src/cognitive/metacognition.ts; src/cognitive/evidence-ledger.ts; src/cognitive/trust-state.ts; src/cognitive/calibration-evaluation.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524431_453ckf",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F10",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F11",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F11",
+          "tool_call_id": "tc_1790768524494_jn90so",
+          "excerpt": "Reproduced: The live health result reported healthy (0.7115) while listing critical unenriched debt: 132 of 413 eligible entities remained unenriched. It also reported 156 orphan features, 169 disconnected clusters and 663 machine-name leakage observations. Historical DreamGraph analytics called cognitive load calm despite 18,680 pending candidates. A status must explain workload, freshness and usefulness separately."
+        },
+        "target_ref": null,
+        "status": "confirmed_gap",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Healthy can conceal critical graph debt — The live health result reported healthy (0.7115) while listing critical unenriched debt: 132 of 413 eligible entities remained unenriched. It also reported 156 orphan features, 169 disconnected clusters and 663 machine-name leakage observations. Historical DreamGraph analytics called cognitive load calm despite 18,680 pending candidates. A status must explain workload, freshness and usefulness separately.",
+        "severity": "major",
+        "discrepancies": [
+          "Make critical integrity/readiness failures visible independently of a weighted score. Use common, revision-bound denominators and explicit stale/unknown states throughout CLI, analytics, dashboard and Architect.",
+          "Evidence level: Reproduced; implementation acceptance remains pending. Source anchors: src/tools/graph-health.ts; python/analytics/cognitive_load.py; src/server/dashboard.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524494_jn90so",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F11",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F12",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F12",
+          "tool_call_id": "tc_1790768524556_vbbe34",
+          "excerpt": "Reproduced in isolated process: Submitting a nonnumeric tension threshold and negative rate/cooldown values returned HTTP 303 to /config?saved=events. The in-memory threshold became NaN; negative values were retained. This was reproduced in an isolated server, not the user daemon."
+        },
+        "target_ref": null,
+        "status": "confirmed_gap",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Dashboard accepts invalid event settings — Submitting a nonnumeric tension threshold and negative rate/cooldown values returned HTTP 303 to /config?saved=events. The in-memory threshold became NaN; negative values were retained. This was reproduced in an isolated server, not the user daemon.",
+        "severity": "major",
+        "discrepancies": [
+          "Validate a complete candidate configuration against a shared finite/range/cross-field schema, reject atomically with field errors, and never display saved after invalid input.",
+          "Evidence level: Reproduced in isolated process; implementation acceptance remains pending. Source anchors: src/server/dashboard.ts; src/cognitive/event-router.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524556_vbbe34",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F12",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F13",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F13",
+          "tool_call_id": "tc_1790768524585_7em16v",
+          "excerpt": "Source-confirmed: Dashboard LLM changes have an environment persistence path, while scheduler/event/narrative update functions merge process-local values. A common saved UI does not communicate the difference or establish restart durability."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Configuration persistence differs by section — Dashboard LLM changes have an environment persistence path, while scheduler/event/narrative update functions merge process-local values. A common saved UI does not communicate the difference or establish restart durability.",
+        "severity": "major",
+        "discrepancies": [
+          "Define authoritative persisted configuration with precedence, revisions and restart behavior. Show requested/effective/source values and verify save/restart/readback across every section and client.",
+          "Evidence level: Source-confirmed; implementation acceptance remains pending. Source anchors: src/server/dashboard.ts; src/cognitive/scheduler.ts; src/cognitive/event-router.ts; src/cognitive/narrator.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524585_7em16v",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F13",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F14",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F14",
+          "tool_call_id": "tc_1790768524611_akt7ro",
+          "excerpt": "Source-confirmed shared state; overlap not exercised: The daemon supports multiple MCP clients, each with its own server/transport. Browser Architect nevertheless has a module-global active session ID and active execution control; selected-plan state also uses process environment. Chat can replace the active control used by stop. Concurrent browser/chat ownership needs explicit testing and isolation; this is not a claim that the daemon only supports one connection."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Architect execution ownership is broader than an MCP session — The daemon supports multiple MCP clients, each with its own server/transport. Browser Architect nevertheless has a module-global active session ID and active execution control; selected-plan state also uses process environment. Chat can replace the active control used by stop. Concurrent browser/chat ownership needs explicit testing and isolation; this is not a claim that the daemon only supports one connection.",
+        "severity": "major",
+        "discrepancies": [
+          "Bind plan selection, history, cancellation, tool continuation and provider state to session and execution IDs. Test two overlapping clients, reconnect and cancellation without paying for models.",
+          "Evidence level: Source-confirmed shared state; overlap not exercised; implementation acceptance remains pending. Source anchors: src/index.ts; src/architect/routes.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524611_akt7ro",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F14",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F15",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F15",
+          "tool_call_id": "tc_1790768524633_yvnixh",
+          "excerpt": "Source-confirmed: derivePlanLifecycle handles archived, superseded, completed and several ready/draft states, but does not preserve blocked or verifying. Once an implementation checkpoint exists, incomplete work projects as implementing. Audit entries with generic recorded status also count as implementation checkpoints."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Plan projection can lose blocked/verifying intent — derivePlanLifecycle handles archived, superseded, completed and several ready/draft states, but does not preserve blocked or verifying. Once an implementation checkpoint exists, incomplete work projects as implementing. Audit entries with generic recorded status also count as implementation checkpoints. Revision 3 adds a reproduced draft/idle phantom active Slice 0, raw sidebar versus operational state and independent future-review inference; implement C14 in existing Slice 21.",
+        "severity": "major",
+        "discrepancies": [
+          "Define and test legal lifecycle transitions and audit-only checkpoints. Preserve blocked/verification gates across browser, extension, daemon actions and restart; do not infer completion solely from optimistic prose.",
+          "Evidence level: Source-confirmed; implementation acceptance remains pending. Source anchors: src/architect/plan-registry.ts",
+          "Current/active/next and per-slice status diverge; replace inference with a shared typed revisioned lifecycle projection and prove PL01–PL16."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524633_yvnixh",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F15",
+            "supports": "partial"
+          },
+          {
+            "tool_call_id": "tc_1790773106623_teta3g",
+            "tool_name": "read_source_code",
+            "summary": "Read lifecycle follow-up evidence; original F15 source finding is retained and extended, not duplicated.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F16",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F16",
+          "tool_call_id": "tc_1790768524655_b1yqpq",
+          "excerpt": "Inventory + reproduced error contract: All 93 live tools were located in source; none advertises MCP annotations. Error bodies and resource semantics vary. There are 52 tool names with no literal references in the inspected test files, which is a discovery signal only and not proof of no indirect testing."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): MCP contracts lack consistent machine guidance — All 93 live tools were located in source; none advertises MCP annotations. Error bodies and resource semantics vary. There are 52 tool names with no literal references in the inspected test files, which is a discovery signal only and not proof of no indirect testing.",
+        "severity": "minor",
+        "discrepancies": [
+          "Generate a versioned catalog with schemas, side effects, read/write and idempotency hints, budgets and error taxonomy. Test every registered callback through transport with isolated fixtures and require discipline-manifest parity.",
+          "Evidence level: Inventory + reproduced error contract; implementation acceptance remains pending. Source anchors: src/tools; src/cognitive/register.ts; src/discipline; src/resources/register.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524655_b1yqpq",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F16",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F17",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F17",
+          "tool_call_id": "tc_1790768524679_lmoro0",
+          "excerpt": "Historical data reproduced: The DreamGraph instance was offline, with canonical stores last modified August 21, about 39 days before this audit. Its analytics found 615 degree-zero entities among 1,076 unique IDs and 237 dangling links. Twenty-three IDs collide across canonical stores. scan_state.json and enrichment_state.json were absent. These observations describe this legacy snapshot, not the current scanner output or every managed project."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): DreamGraph own graph needs a governed integrity refresh — The DreamGraph instance was offline, with canonical stores last modified August 21, about 39 days before this audit. Its analytics found 615 degree-zero entities among 1,076 unique IDs and 237 dangling links. Twenty-three IDs collide across canonical stores. scan_state.json and enrichment_state.json were absent. These observations describe this legacy snapshot, not the current scanner output or every managed project.",
+        "severity": "major",
+        "discrepancies": [
+          "Create a backup and dry-run repair/migration report, disambiguate typed identities, preserve curation and provenance, establish a baseline, and reconcile incrementally with rollback and explicit cost approval before paid enrichment.",
+          "Evidence level: Historical data reproduced; implementation acceptance remains pending. Source anchors: python/analytics/orphan_pressure.py; src/tools/scan-state.ts; src/graph; src/tools/graph-health.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524679_lmoro0",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F17",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F18",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F18",
+          "tool_call_id": "tc_1790768524699_fh6gl8",
+          "excerpt": "Measured coverage limitation: Root coverage reports zero executed strategy functions in all ten strategy implementation modules, zero query-resource source coverage and zero cognitive registration source coverage. Supplemental strategy probes help only with boundary invariants. The repository has CodeQL but no ordinary build/test workflow. Browser interaction, multi-session races and provider-backed quality were not comprehensively exercised."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Passing tests leave important execution paths uncovered — Root coverage reports zero executed strategy functions in all ten strategy implementation modules, zero query-resource source coverage and zero cognitive registration source coverage. Supplemental strategy probes help only with boundary invariants. The repository has CodeQL but no ordinary build/test workflow. Browser interaction, multi-session races and provider-backed quality were not comprehensively exercised.",
+        "severity": "major",
+        "discrepancies": [
+          "Establish meaningful contract, state-machine, fault-injection, provider, transport and browser coverage with explicit exclusions and per-area gates. Preserve fast deterministic tests; do not make a global percentage a substitute for behavior.",
+          "Evidence level: Measured coverage limitation; implementation acceptance remains pending. Source anchors: vitest.config.ts; .github/workflows/codeql.yml; tests; extensions/vscode/src/test"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524699_fh6gl8",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F18",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F19",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F19",
+          "tool_call_id": "tc_1790768524722_laiw4k",
+          "excerpt": "Source-confirmed benchmark limitation: benchmark-scan-mcp measures synthetic stringify/hash work under transport labels rather than actual MCP transports. The token-economy benchmark simulates tokens, duration and outputs by default; dryRun=false does not establish a real provider run. These fixtures can test reporting but cannot substantiate real transport speed or credit savings."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Benchmark labels exceed what the default workload measures — benchmark-scan-mcp measures synthetic stringify/hash work under transport labels rather than actual MCP transports. The token-economy benchmark simulates tokens, duration and outputs by default; dryRun=false does not establish a real provider run. These fixtures can test reporting but cannot substantiate real transport speed or credit savings.",
+        "severity": "major",
+        "discrepancies": [
+          "Label synthetic fixtures explicitly; add real isolated transport and opt-in provider runners, measured usage, task-quality checks, environment manifests and uncertainty. Prohibit release claims drawn from simulated results.",
+          "Evidence level: Source-confirmed benchmark limitation; implementation acceptance remains pending. Source anchors: scripts/benchmark-scan-mcp.mjs; scripts/benchmark-token-economy.mjs"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524722_laiw4k",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F19",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F20",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F20",
+          "tool_call_id": "tc_1790768524743_oom66l",
+          "excerpt": "Source-confirmed exposure; exploit not attempted: The daemon listens without an explicit bind host and applies wildcard CORS to MCP routes. Mutable dashboard routes do not establish a common authentication/origin boundary. A localhost URL in logs does not itself restrict network binding. Actual reachability depends on the host firewall and environment; no exploit or external access was attempted."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): HTTP trust boundaries need an explicit local/remote policy — The daemon listens without an explicit bind host and applies wildcard CORS to MCP routes. Mutable dashboard routes do not establish a common authentication/origin boundary. A localhost URL in logs does not itself restrict network binding. Actual reachability depends on the host firewall and environment; no exploit or external access was attempted.",
+        "severity": "major",
+        "discrepancies": [
+          "Specify loopback defaults and opt-in authenticated remote access, trusted hosts/origins, session ownership, CSRF protection for browser mutations and permission parity across transports.",
+          "Evidence level: Source-confirmed exposure; exploit not attempted; implementation acceptance remains pending. Source anchors: src/index.ts; src/server/dashboard.ts; src/architect/routes.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524743_oom66l",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F20",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F21",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "tool_call_id": "tc_1790768524770_w86p1s",
+          "excerpt": "Alignment gap; foundations exist: Graph RAG, strategy snapshots, Explorer, analytics, health, narrative, lifecycle visibility, evidence ledger, calibration and remediation all reconstruct different views. Existing trust and lifecycle modules already solve parts of this; duplicating them would increase divergence. Counting candidates, historical transitions, unique entities and review outcomes interchangeably obscures what the engine actually knows."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Subsystem projections need a shared semantic contract — Graph RAG, strategy snapshots, Explorer, analytics, health, narrative, lifecycle visibility, evidence ledger, calibration and remediation all reconstruct different views. Existing trust and lifecycle modules already solve parts of this; duplicating them would increase divergence. Counting candidates, historical transitions, unique entities and review outcomes interchangeably obscures what the engine actually knows.",
+        "severity": "major",
+        "discrepancies": [
+          "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior.",
+          "Evidence level: Alignment gap; foundations exist; implementation acceptance remains pending. Source anchors: src/cognitive; src/graph; src/explorer; python/analytics; src/architect"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524770_w86p1s",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F21",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F22",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F22",
+          "tool_call_id": "tc_1790768524792_lvcpnr",
+          "excerpt": "Source-confirmed; request added by user: llm.ts already routes GPT-5.5/5.6/6/6.1 patterns to Responses. The next broad GPT decimal rule matches gpt-5.4 as chat-completions with supportsReasoningEffort=false. LlmCompletionOptions has no reasoning effort or explicit API override, and the shared Responses completion request sends no reasoning configuration and records only output token usage. This limits dreamer/normalizer control and spend accounting even when the model is selectable."
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Modern-model support exists but is not a complete role policy — llm.ts already routes GPT-5.5/5.6/6/6.1 patterns to Responses. The next broad GPT decimal rule matches gpt-5.4 as chat-completions with supportsReasoningEffort=false. LlmCompletionOptions has no reasoning effort or explicit API override, and the shared Responses completion request sends no reasoning configuration and records only output token usage. This limits dreamer/normalizer control and spend accounting even when the model is selectable.",
+        "severity": "major",
+        "discrepancies": [
+          "Extend existing adapters with explicit per-role API/model/reasoning/storage/budget configuration, a capability registry and controlled unknown-model overrides. Keep initial-scan and mature-graph policies separate; verify GPT-4.1, GPT-5.4 and user-selected newer models without a hardcoded frontier ceiling.",
+          "Evidence level: Source-confirmed; request added by user; implementation acceptance remains pending. Source anchors: src/cognitive/llm.ts; src/cognitive/strategies/llm-dream.ts; src/cognitive/normalizer.ts; src/server/dashboard.ts"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524792_lvcpnr",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F22",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F23",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F23",
+          "tool_call_id": "tc_1790768524814_2jgp6h",
+          "excerpt": "Source and live landing-page confirmation; requested expansion: The root page links to Architect, status, schedules, config, docs and health but contains no Explorer entry. Configuration exposes selected controls rather than a systematic engine.env editor/template workflow. The user explicitly requests more complete settings, minimal manual editing, tabs, template reset and a refreshed landing page."
+        },
+        "target_ref": null,
+        "status": "confirmed_gap",
+        "description": "Historical revision-1 evidence retained (not rerun by refinement): Dashboard navigation and engine.env coverage need expansion — The root page links to Architect, status, schedules, config, docs and health but contains no Explorer entry. Configuration exposes selected controls rather than a systematic engine.env editor/template workflow. The user explicitly requests more complete settings, minimal manual editing, tabs, template reset and a refreshed landing page.",
+        "severity": "minor",
+        "discrepancies": [
+          "Inventory every supported environment setting against a typed UI control or an explicit advanced/read-only reason. Add grouped tabs, search, template preview/diff/apply, secret-preserving reset, backup/undo, restart indicators and an Explorer entry on the root page.",
+          "Evidence level: Source and live landing-page confirmation; requested expansion; implementation acceptance remains pending. Source anchors: src/server/dashboard.ts; src/utils/engine-env.ts; templates/default/config/engine.env; templates/ollama/config/engine.env; templates/lmstudio/config/engine.env"
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790768524814_2jgp6h",
+            "tool_name": "read_source_code",
+            "summary": "Completed audit packet with source/reproduction evidence and explicit limits: F23",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F24",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F24",
+          "tool_call_id": "tc_1790773106578_h5bslt",
+          "excerpt": "### F24 — Schedule management needs a complete workflow rebuild\r\n\r\n**P1 · Owner requirement and source-confirmed workflow gaps.** `renderSchedules`/`handleSchedulePost` in `src/server/dashboard.ts` provide create/toggle/run/delete but no schedule editing flow, expose raw millisecond inputs and derive historical strategy labels from the current schedule. `src/cognitive/scheduler.ts` leaves cron next-run projection null and `parseScheduleParams` falls back to defaults for invalid action parameters. No live schedule was modified or run to make these observations. Refactoring these behaviors requires named semantics and migration, not an assertion that the UI alone is broken.\r\n\r\nSlice 17 owns scheduler admission, validation, occurrence/recovery semantics; new Slice 29 owns the complete dashboard workflow. C11 defines editing/duplication, previews, timezone/DST, missed/overlap policies, run snapshots, cancellation, budgets, history and browser acceptance. Final system verification depends on both. The original 23-finding native audit remains historical; revision-2 registration includes F24 and the resolved policy evidence separately.\r\n\r"
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "F24 — Schedule management needs a complete workflow rebuild\r — future implementation acceptance remains pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Rebuild the schedule workflow and shared scheduler contracts per C11."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106578_h5bslt",
+            "tool_name": "read_source_code",
+            "summary": "Read source-reviewed refinement packet and explicit evidence limitations.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "F25",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/report.md#F25",
+          "tool_call_id": "tc_1790773106600_c0h8aw",
+          "excerpt": "### F25 — CLI Autonomy and Verbosity need behavioral investigation and repair\r\n\r\n**P1 · User-reported behavior, partial source evidence; root cause not yet reproduced.** The shared route already uses autonomy for continuation, and the bridge carries verbosity through prompt/environment and Codex configuration. `RunArchitectCliBridgeInput` lacks an explicit autonomy parameter, and child launch/approval setup does not visibly distinguish modes. These facts do not prove all settings are ignored. Trace and test browser selection, effective runtime, prompt/arguments/configuration, tool authority, continuation and rendered output separately for Codex and Copilot. New Slice 30 and C13 specify diagnosis, host-enforced autonomy semantics, honest support levels and evidence-preserving verbosity behavior. The refined plan now has 31 slices; the original audit snapshot and measurements remain unchanged.\r\n\r"
+        },
+        "target_ref": null,
+        "status": "partial_match",
+        "description": "F25 — CLI Autonomy and Verbosity need behavioral investigation and repair\r — future implementation acceptance remains pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Trace and repair real Autonomy/Verbosity behavior per C13; existing partial wiring is acknowledged."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106600_c0h8aw",
+            "tool_name": "read_source_code",
+            "summary": "Read source-reviewed refinement packet and explicit evidence limitations.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C01",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C01",
+          "tool_call_id": "tc_1790773106732_x7bn6c",
+          "excerpt": "## C01 — One canonical contract with explicit owners\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C01 — One canonical contract with explicit owners\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106732_x7bn6c",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C02",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C02",
+          "tool_call_id": "tc_1790773106755_qhkiwd",
+          "excerpt": "## C02 — Bounded compatibility, forward migrations and retirement\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C02 — Bounded compatibility, forward migrations and retirement\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106755_qhkiwd",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C03",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C03",
+          "tool_call_id": "tc_1790773106779_71z7q2",
+          "excerpt": "## C03 — Honest bounded retrieval\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C03 — Honest bounded retrieval\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106779_71z7q2",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C04",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C04",
+          "tool_call_id": "tc_1790773106802_7gs6fm",
+          "excerpt": "## C04 — Commit receipts, idempotency and recovery\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C04 — Commit receipts, idempotency and recovery\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106802_7gs6fm",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C05",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C05",
+          "tool_call_id": "tc_1790773106827_tqdm61",
+          "excerpt": "## C05 — Job ownership, reservations and hard admission limits\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C05 — Job ownership, reservations and hard admission limits\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106827_tqdm61",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C06",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C06",
+          "tool_call_id": "tc_1790773106852_03kqt2",
+          "excerpt": "## C06 — Role policies, API/CLI capabilities and retention\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C06 — Role policies, API/CLI capabilities and retention\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106852_03kqt2",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C07",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C07",
+          "tool_call_id": "tc_1790773106879_nldynx",
+          "excerpt": "## C07 — Configuration and template authority\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C07 — Configuration and template authority\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106879_nldynx",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C08",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C08",
+          "tool_call_id": "tc_1790773106903_tc5rig",
+          "excerpt": "## C08 — Agent usefulness is task success, not retrieval percentage\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C08 — Agent usefulness is task success, not retrieval percentage\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106903_tc5rig",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C09",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C09",
+          "tool_call_id": "tc_1790773106929_2crveb",
+          "excerpt": "## C09 — Local authority and scoped full-access mode\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C09 — Local authority and scoped full-access mode\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106929_2crveb",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C10",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C10",
+          "tool_call_id": "tc_1790773106952_dzzofc",
+          "excerpt": "## C10 — Legacy repair and controlled cutover\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C10 — Legacy repair and controlled cutover\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106952_dzzofc",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C11",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C11",
+          "tool_call_id": "tc_1790773106974_22u8oz",
+          "excerpt": "## C11 — Rebuild schedule management around the existing scheduler\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C11 — Rebuild schedule management around the existing scheduler\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106974_22u8oz",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C12",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C12",
+          "tool_call_id": "tc_1790773106998_lfz4lz",
+          "excerpt": "## C12 — Compact surfaces and explainable state\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C12 — Compact surfaces and explainable state\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773106998_lfz4lz",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C13",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C13",
+          "tool_call_id": "tc_1790773107022_2duil9",
+          "excerpt": "## C13 — Autonomy and Verbosity must produce observable CLI behavior\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C13 — Autonomy and Verbosity must produce observable CLI behavior\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773107022_2duil9",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          }
+        ]
+      },
+      {
+        "id": "R3-C14",
+        "source_ref": {
+          "type": "source_file",
+          "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C14",
+          "tool_call_id": "tc_1790773107047_zju6v8",
+          "excerpt": "## C14 — Coherent plan lifecycle, implementation status and slice presentation\r"
+        },
+        "target_ref": {
+          "file_path": "plans/graph-trust-and-agent-effectiveness.md",
+          "tool_call_id": "tc_1790773106411_t811md"
+        },
+        "status": "partial_match",
+        "description": "C14 — Coherent plan lifecycle, implementation status and slice presentation\r — policy resolved; implementation and behavioral verification pending.",
+        "severity": "major",
+        "discrepancies": [
+          "Implement the owning slices and produce the contract-specific acceptance evidence; do not confuse reviewed policy with verified runtime behavior."
+        ],
+        "evidence": [
+          {
+            "tool_call_id": "tc_1790773107047_zju6v8",
+            "tool_name": "read_source_code",
+            "summary": "Owner resolution incorporated as explicit future contract with acceptance tests.",
+            "supports": "partial"
+          },
+          {
+            "tool_call_id": "tc_1790773106651_g07s9h",
+            "tool_name": "read_source_code",
+            "summary": "Read detailed lifecycle/status contract and PL01–PL16 future evidence requirements.",
+            "supports": "partial"
+          },
+          {
+            "tool_call_id": "tc_1790773106675_8lirrc",
+            "tool_name": "read_source_code",
+            "summary": "Read detailed lifecycle/status contract and PL01–PL16 future evidence requirements.",
+            "supports": "partial"
+          },
+          {
+            "tool_call_id": "tc_1790773106697_dqqrm6",
+            "tool_name": "read_source_code",
+            "summary": "Read detailed lifecycle/status contract and PL01–PL16 future evidence requirements.",
+            "supports": "partial"
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F01",
+        "tool_call_id": "tc_1790768524223_e4uvli",
+        "excerpt": "Reproduced: system://features and query_resource returned clipped, invalid JSON. The resource still advertises application/json and the tool reports isError=false. Raw head/tail clipping discards the middle without a cursor. Agents cannot reliably reconstruct the graph or distinguish a complete response."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F02",
+        "tool_call_id": "tc_1790768524246_k8wc93",
+        "excerpt": "Reproduced: Reading system://capabilities returns the runtime capability summary; query_resource maps it to capability entities in capabilities.json. An advertised dream://status resource is rejected by query_resource with INVALID_URI, again without MCP isError=true. The generic query surface does not implement the advertised resource contract."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F03",
+        "tool_call_id": "tc_1790768524272_atm1u6",
+        "excerpt": "Reproduced + source: graph-rag loads features, workflows and data_model; it does not index capabilities, datastores, UI or auxiliary entities as first-class retrieval targets. Traversal uses validated_edges rather than the complete set of source-backed inline links. On the stored DreamGraph graph an exact feature ID was retrieved; existing capability_codebase_architecture_memory and dashboard_view IDs returned no entities. A richer Explorer does not establish richer agent access."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F04",
+        "tool_call_id": "tc_1790768524294_oc7t9z",
+        "excerpt": "Reproduced + source: Requested context budgets of 100, 500 and 2000 returned reported token counts of 132, 535 and 2039 on the live graph. Headers, separators and truncation notices are added outside section allocations; partial-section counts can count a header as an edge. The full result envelope is larger again."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F05",
+        "tool_call_id": "tc_1790768524316_m6vkfr",
+        "excerpt": "Measured + source: Three live retrievals took approximately 2.9–3.1 seconds; offline exact-ID probes took 2.4–2.9 seconds. These are single-machine observations, not latency percentiles. queryTfIdf repeatedly computes document frequency and builds the index per request; tokenization removes non-ASCII text. No grounded recall/answer-quality score was established by this audit."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F06",
+        "tool_call_id": "tc_1790768524341_b6no2p",
+        "excerpt": "Source-confirmed ordering; concurrency risk untested: recordEnrichmentOutcome and total_enriched advance before batch store writes. Store-write exceptions append errors, but execution proceeds to checkpoint persistence and a progress message saying persisted. An interruption can therefore leave enriched checkpoint entries without their graph update. Full-store replacement from an earlier snapshot also creates a lost-update risk with intervening curation; atomic file replacement alone does not protect the entire read/modify/write operation."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F07",
+        "tool_call_id": "tc_1790768524367_ksnj6g",
+        "excerpt": "Gap; existing protections acknowledged: Max hops, node/batch limits, caches, typed failure states and retryable fallback handling already exist. They do not establish a job-wide spend ceiling or make fallback quality and cumulative consumption clear to the operator. Reducing hops controls context breadth but does not guarantee bounded calls, reasoning or recovery cost. This audit did not run another paid scan."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F08",
+        "tool_call_id": "tc_1790768524388_bitn9p",
+        "excerpt": "Source-confirmed: The dream_cycle strategy schema accepts reflective. dreamer has no corresponding execution branch and excludes it from allStrategies. Selecting a documented strategy should not silently produce an empty strategy run while appearing successful."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F09",
+        "tool_call_id": "tc_1790768524409_ek978y",
+        "excerpt": "Source-confirmed: Strategy history lives in a process-local Map; yield is recorded before deduplication. This can reward repeated candidates instead of novel, validated and useful evidence, and resets across restart. Number(env) || default prevents explicit zero budget fractions. Per-kind node/edge limits and rounding also need a documented total-budget contract."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F10",
+        "tool_call_id": "tc_1790768524431_453ckf",
+        "excerpt": "Design/evaluation gap: The normalizer already has evidence-count gates, endpoint checks and provenance protections; these must be retained. Structural similarity, shared repository, recurrence and keywords can nevertheless be correlated signals rather than independent truth. Metacognition names operational ratios precision/recall without a labeled factual ground truth. Existing trust-state and evidence-ledger modules are useful foundations, not missing features."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F11",
+        "tool_call_id": "tc_1790768524494_jn90so",
+        "excerpt": "Reproduced: The live health result reported healthy (0.7115) while listing critical unenriched debt: 132 of 413 eligible entities remained unenriched. It also reported 156 orphan features, 169 disconnected clusters and 663 machine-name leakage observations. Historical DreamGraph analytics called cognitive load calm despite 18,680 pending candidates. A status must explain workload, freshness and usefulness separately."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F12",
+        "tool_call_id": "tc_1790768524556_vbbe34",
+        "excerpt": "Reproduced in isolated process: Submitting a nonnumeric tension threshold and negative rate/cooldown values returned HTTP 303 to /config?saved=events. The in-memory threshold became NaN; negative values were retained. This was reproduced in an isolated server, not the user daemon."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F13",
+        "tool_call_id": "tc_1790768524585_7em16v",
+        "excerpt": "Source-confirmed: Dashboard LLM changes have an environment persistence path, while scheduler/event/narrative update functions merge process-local values. A common saved UI does not communicate the difference or establish restart durability."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F14",
+        "tool_call_id": "tc_1790768524611_akt7ro",
+        "excerpt": "Source-confirmed shared state; overlap not exercised: The daemon supports multiple MCP clients, each with its own server/transport. Browser Architect nevertheless has a module-global active session ID and active execution control; selected-plan state also uses process environment. Chat can replace the active control used by stop. Concurrent browser/chat ownership needs explicit testing and isolation; this is not a claim that the daemon only supports one connection."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F15",
+        "tool_call_id": "tc_1790768524633_yvnixh",
+        "excerpt": "Source-confirmed: derivePlanLifecycle handles archived, superseded, completed and several ready/draft states, but does not preserve blocked or verifying. Once an implementation checkpoint exists, incomplete work projects as implementing. Audit entries with generic recorded status also count as implementation checkpoints."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F16",
+        "tool_call_id": "tc_1790768524655_b1yqpq",
+        "excerpt": "Inventory + reproduced error contract: All 93 live tools were located in source; none advertises MCP annotations. Error bodies and resource semantics vary. There are 52 tool names with no literal references in the inspected test files, which is a discovery signal only and not proof of no indirect testing."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F17",
+        "tool_call_id": "tc_1790768524679_lmoro0",
+        "excerpt": "Historical data reproduced: The DreamGraph instance was offline, with canonical stores last modified August 21, about 39 days before this audit. Its analytics found 615 degree-zero entities among 1,076 unique IDs and 237 dangling links. Twenty-three IDs collide across canonical stores. scan_state.json and enrichment_state.json were absent. These observations describe this legacy snapshot, not the current scanner output or every managed project."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F18",
+        "tool_call_id": "tc_1790768524699_fh6gl8",
+        "excerpt": "Measured coverage limitation: Root coverage reports zero executed strategy functions in all ten strategy implementation modules, zero query-resource source coverage and zero cognitive registration source coverage. Supplemental strategy probes help only with boundary invariants. The repository has CodeQL but no ordinary build/test workflow. Browser interaction, multi-session races and provider-backed quality were not comprehensively exercised."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F19",
+        "tool_call_id": "tc_1790768524722_laiw4k",
+        "excerpt": "Source-confirmed benchmark limitation: benchmark-scan-mcp measures synthetic stringify/hash work under transport labels rather than actual MCP transports. The token-economy benchmark simulates tokens, duration and outputs by default; dryRun=false does not establish a real provider run. These fixtures can test reporting but cannot substantiate real transport speed or credit savings."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F20",
+        "tool_call_id": "tc_1790768524743_oom66l",
+        "excerpt": "Source-confirmed exposure; exploit not attempted: The daemon listens without an explicit bind host and applies wildcard CORS to MCP routes. Mutable dashboard routes do not establish a common authentication/origin boundary. A localhost URL in logs does not itself restrict network binding. Actual reachability depends on the host firewall and environment; no exploit or external access was attempted."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+        "tool_call_id": "tc_1790768524770_w86p1s",
+        "excerpt": "Alignment gap; foundations exist: Graph RAG, strategy snapshots, Explorer, analytics, health, narrative, lifecycle visibility, evidence ledger, calibration and remediation all reconstruct different views. Existing trust and lifecycle modules already solve parts of this; duplicating them would increase divergence. Counting candidates, historical transitions, unique entities and review outcomes interchangeably obscures what the engine actually knows."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F22",
+        "tool_call_id": "tc_1790768524792_lvcpnr",
+        "excerpt": "Source-confirmed; request added by user: llm.ts already routes GPT-5.5/5.6/6/6.1 patterns to Responses. The next broad GPT decimal rule matches gpt-5.4 as chat-completions with supportsReasoningEffort=false. LlmCompletionOptions has no reasoning effort or explicit API override, and the shared Responses completion request sends no reasoning configuration and records only output token usage. This limits dreamer/normalizer control and spend accounting even when the model is selectable."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F23",
+        "tool_call_id": "tc_1790768524814_2jgp6h",
+        "excerpt": "Source and live landing-page confirmation; requested expansion: The root page links to Architect, status, schedules, config, docs and health but contains no Explorer entry. Configuration exposes selected controls rather than a systematic engine.env editor/template workflow. The user explicitly requests more complete settings, minimal manual editing, tabs, template reset and a refreshed landing page."
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F24",
+        "tool_call_id": "tc_1790773106578_h5bslt",
+        "excerpt": "### F24 — Schedule management needs a complete workflow rebuild\r\n\r\n**P1 · Owner requirement and source-confirmed workflow gaps.** `renderSchedules`/`handleSchedulePost` in `src/server/dashboard.ts` provide create/toggle/run/delete but no schedule editing flow, expose raw millisecond inputs and derive historical strategy labels from the current schedule. `src/cognitive/scheduler.ts` leaves cron next-run projection null and `parseScheduleParams` falls back to defaults for invalid action parameters. No live schedule was modified or run to make these observations. Refactoring these behaviors requires named semantics and migration, not an assertion that the UI alone is broken.\r\n\r\nSlice 17 owns scheduler admission, validation, occurrence/recovery semantics; new Slice 29 owns the complete dashboard workflow. C11 defines editing/duplication, previews, timezone/DST, missed/overlap policies, run snapshots, cancellation, budgets, history and browser acceptance. Final system verification depends on both. The original 23-finding native audit remains historical; revision-2 registration includes F24 and the resolved policy evidence separately.\r\n\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/report.md#F25",
+        "tool_call_id": "tc_1790773106600_c0h8aw",
+        "excerpt": "### F25 — CLI Autonomy and Verbosity need behavioral investigation and repair\r\n\r\n**P1 · User-reported behavior, partial source evidence; root cause not yet reproduced.** The shared route already uses autonomy for continuation, and the bridge carries verbosity through prompt/environment and Codex configuration. `RunArchitectCliBridgeInput` lacks an explicit autonomy parameter, and child launch/approval setup does not visibly distinguish modes. These facts do not prove all settings are ignored. Trace and test browser selection, effective runtime, prompt/arguments/configuration, tool authority, continuation and rendered output separately for Codex and Copilot. New Slice 30 and C13 specify diagnosis, host-enforced autonomy semantics, honest support levels and evidence-preserving verbosity behavior. The refined plan now has 31 slices; the original audit snapshot and measurements remain unchanged.\r\n\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C01",
+        "tool_call_id": "tc_1790773106732_x7bn6c",
+        "excerpt": "## C01 — One canonical contract with explicit owners\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C02",
+        "tool_call_id": "tc_1790773106755_qhkiwd",
+        "excerpt": "## C02 — Bounded compatibility, forward migrations and retirement\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C03",
+        "tool_call_id": "tc_1790773106779_71z7q2",
+        "excerpt": "## C03 — Honest bounded retrieval\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C04",
+        "tool_call_id": "tc_1790773106802_7gs6fm",
+        "excerpt": "## C04 — Commit receipts, idempotency and recovery\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C05",
+        "tool_call_id": "tc_1790773106827_tqdm61",
+        "excerpt": "## C05 — Job ownership, reservations and hard admission limits\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C06",
+        "tool_call_id": "tc_1790773106852_03kqt2",
+        "excerpt": "## C06 — Role policies, API/CLI capabilities and retention\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C07",
+        "tool_call_id": "tc_1790773106879_nldynx",
+        "excerpt": "## C07 — Configuration and template authority\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C08",
+        "tool_call_id": "tc_1790773106903_tc5rig",
+        "excerpt": "## C08 — Agent usefulness is task success, not retrieval percentage\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C09",
+        "tool_call_id": "tc_1790773106929_2crveb",
+        "excerpt": "## C09 — Local authority and scoped full-access mode\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C10",
+        "tool_call_id": "tc_1790773106952_dzzofc",
+        "excerpt": "## C10 — Legacy repair and controlled cutover\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C11",
+        "tool_call_id": "tc_1790773106974_22u8oz",
+        "excerpt": "## C11 — Rebuild schedule management around the existing scheduler\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C12",
+        "tool_call_id": "tc_1790773106998_lfz4lz",
+        "excerpt": "## C12 — Compact surfaces and explainable state\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C13",
+        "tool_call_id": "tc_1790773107022_2duil9",
+        "excerpt": "## C13 — Autonomy and Verbosity must produce observable CLI behavior\r"
+      },
+      {
+        "type": "source_file",
+        "identifier": "docs/audits/2026-09-30-coverage/plan-refinement.md#C14",
+        "tool_call_id": "tc_1790773107047_zju6v8",
+        "excerpt": "## C14 — Coherent plan lifecycle, implementation status and slice presentation\r"
+      }
+    ],
+    "phase": "audit"
+  }
+}

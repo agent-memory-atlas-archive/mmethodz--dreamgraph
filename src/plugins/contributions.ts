@@ -17,6 +17,7 @@
  */
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { CallToolResultSchema, ReadResourceResultSchema } from '@modelcontextprotocol/sdk/types.js';
 import { z, type ZodRawShape, type ZodTypeAny } from "zod";
 import {
   buildHandlerCompleted,
@@ -31,6 +32,15 @@ import {
   type ContributedTool,
 } from "./manager.js";
 import { logger } from "../utils/logger.js";
+import { normalizeToolResult, toolBoundaryError } from '../server/tool-boundary.js';
+import { getSessionContext } from '../server/session-context.js';
+
+/** Forward cancellation without racing away from an unconfirmed private handler. */
+function contributionSignal(unload?:AbortSignal,request?:AbortSignal) {
+  const policy=getSessionContext()?.execution_policy?.signal;
+  const signals=[unload,request,policy].filter((signal):signal is AbortSignal=>!!signal);
+  return signals.length?AbortSignal.any(signals):new AbortController().signal;
+}
 
 function correlationFor(pluginId: string, target: string): string {
   return `${pluginId}:${target}:${Date.now().toString(36)}`;
@@ -134,6 +144,8 @@ function bindTool(
         ],
       };
     }
+    const signal=contributionSignal(c.signal,_extra?.signal);
+    if(signal.aborted)return toolBoundaryError(definition.name,'PLUGIN_REQUEST_CANCELLED_BEFORE_DISPATCH','Plugin handler did not run.');
     const correlation_id = correlationFor(c.pluginId, definition.name);
     telemetry.emit(
       "plugin.handler.started",
@@ -149,10 +161,22 @@ function bindTool(
     try {
       const result = await definition.handler(args, {
         pluginId: c.pluginId,
+        signal,
       });
-      const text =
-        typeof result === "string" ? result : JSON.stringify(result, null, 2);
-      return { content: [{ type: "text" as const, text }] };
+      const object=result&&typeof result==='object'?result as Record<string,unknown>:undefined;
+      let owner;
+      if(object&&Array.isArray(object.content)){
+        if(!CallToolResultSchema.safeParse(object).success)throw new Error('PLUGIN_TOOL_RESULT_INVALID');
+        owner=object;
+      }else{
+        const text=typeof result==='string'?result:JSON.stringify(result,null,2);
+        if(typeof text!=='string')throw new Error('PLUGIN_TOOL_RESULT_UNSERIALIZABLE');
+        owner={content:[{type:'text' as const,text}],...(object?.isError===true||object?.success===false?{isError:true}:{})};
+      }
+      const normalized=normalizeToolResult(definition.name,owner);
+      ok=normalized.isError!==true;
+      return {...normalized,_meta:{...normalized._meta,plugin_handler:{plugin_id:c.pluginId,
+        callback_settled:true,cancellation_requested:signal.aborted,private_effects:'unattested; consult owner receipts'}}};
     } catch (err) {
       ok = false;
       const msg = err instanceof Error ? err.message : String(err);
@@ -164,7 +188,8 @@ function bindTool(
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify({ error: "handler_threw", message: msg }),
+            text: JSON.stringify({ error: "handler_threw", message: msg,
+              ...(signal.aborted?{cancellation_requested:true,effect_status:'unconfirmed; consult owner receipts'}:{}) }),
           },
         ],
       };
@@ -206,7 +231,7 @@ function bindResource(
         `Plugin resource '${definition.uriNamespace}' contributed by ${c.pluginId}@${c.pluginVersion}`,
       mimeType: "application/json",
     },
-    async (uri) => {
+    async (uri,extra) => {
       if (!c.active) {
         return {
           contents: [
@@ -221,6 +246,8 @@ function bindResource(
           ],
         };
       }
+      const signal=contributionSignal(c.signal,extra?.signal);
+      if(signal.aborted)return {contents:[{uri:uri.href,mimeType:'application/json',text:JSON.stringify({error:'request_cancelled_before_dispatch',handler_ran:false})}]};
       const correlation_id = correlationFor(c.pluginId, definition.uriNamespace);
       telemetry.emit(
         "plugin.handler.started",
@@ -236,15 +263,14 @@ function bindResource(
       try {
         const result = await definition.handler(
           { uri: uri.href },
-          { pluginId: c.pluginId },
+          { pluginId: c.pluginId,signal },
         );
-        const text =
-          typeof result === "string" ? result : JSON.stringify(result, null, 2);
-        return {
-          contents: [
-            { uri: uri.href, mimeType: "application/json", text },
-          ],
-        };
+        const object=result&&typeof result==='object'?result as Record<string,unknown>:undefined;
+        const owner=object&&Array.isArray(object.contents)?object:{contents:[{uri:uri.href,mimeType:'application/json',text:typeof result==='string'?result:JSON.stringify(result,null,2)}]};
+        if(Buffer.byteLength(JSON.stringify(owner),'utf8')>8*1024*1024)throw new Error('PLUGIN_RESOURCE_BYTE_BOUND: whole result refused, no clipping');
+        const parsed=ReadResourceResultSchema.safeParse(owner);if(!parsed.success)throw new Error('PLUGIN_RESOURCE_RESULT_INVALID');
+        return {...parsed.data,...owner,_meta:{...(object?._meta as object??{}),plugin_handler:{plugin_id:c.pluginId,
+          callback_settled:true,cancellation_requested:signal.aborted,private_effects:'unattested; consult owner receipts'}}};
       } catch (err) {
         ok = false;
         const msg = err instanceof Error ? err.message : String(err);
@@ -256,7 +282,7 @@ function bindResource(
             {
               uri: uri.href,
               mimeType: "application/json",
-              text: JSON.stringify({ error: "handler_threw", message: msg }),
+              text: JSON.stringify({ error: "handler_threw", message: msg,...(signal.aborted?{cancellation_requested:true,effect_status:'unconfirmed'}:{}) }),
             },
           ],
         };

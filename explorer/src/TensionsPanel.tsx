@@ -27,7 +27,8 @@ export function TensionsPanel({ instanceUuid, etag, onConflict, onApplied, onIns
   useEffect(() => {
     let cancelled = false;
     setError(null);
-    fetchTensions("active")
+    setView(null);
+    fetchTensions("active",etag)
       .then((v) => {
         if (!cancelled) setView(v);
       })
@@ -42,10 +43,11 @@ export function TensionsPanel({ instanceUuid, etag, onConflict, onApplied, onIns
   if (error) return <div className="panel-error">{error}</div>;
   if (!view) return <div className="panel-empty">Loading tensions…</div>;
   if (view.active.length === 0)
-    return <div className="panel-empty">No active tensions. Graph is calm.</div>;
+    return <div className="panel-empty">No active tensions recorded in this view. This does not prove correctness.</div>;
 
   return (
     <div className="muts-list">
+      {view.omitted?<p className="muts-stale-banner">{view.omitted} records outside this bounded view. Use a focused agent query to inspect the rest.</p>:null}
       {view.active.map((t) => (
         <TensionRow
           key={t.id}

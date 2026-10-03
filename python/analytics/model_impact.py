@@ -12,10 +12,12 @@ import argparse
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from .definitions import qualified
 from . import loader
 from ._common import add_common_args, emit, fmt_table, resolve_data_dir_from_args
 
 
+@qualified("model_impact")
 def analyze(data_dir: Path) -> dict:
     sessions = loader.dream_history(data_dir)
     meta = loader.meta_log(data_dir)
@@ -43,7 +45,7 @@ def analyze(data_dir: Path) -> dict:
             "strategy": strat,
             **rec,
             "promoted_per_cycle": prom_per_cycle,
-            "llm_driven": strat in ("llm_dream", "all"),
+            "llm_driven": None,
         })
 
     # Per-strategy precision from meta_log (last entry wins)
@@ -76,7 +78,7 @@ def analyze(data_dir: Path) -> dict:
         ],
         "notes": [
             "dream_history does not log per-cycle model identity; this report attributes work to strategy names.",
-            "LLM-driven strategies: 'llm_dream' and 'all' (which includes llm_dream alongside structural strategies).",
+            "Strategy names do not establish LLM/model attribution; use the canonical measurement's explicit provenance and unknown count.",
         ],
     }
 

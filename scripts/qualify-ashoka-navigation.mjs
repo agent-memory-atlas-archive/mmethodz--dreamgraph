@@ -1,0 +1,74 @@
+/** Real compiled Architect/CLI + Windows Chrome; copied navigation metadata, isolated authority. */
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {tmpdir} from 'node:os';
+import {performance} from 'node:perf_hooks';
+import {pathToFileURL} from 'node:url';
+import {spawn,execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+import {once} from 'node:events';
+import {createServer} from 'node:net';
+import {createHash} from 'node:crypto';
+import {createInstance} from '../dist/instance/lifecycle.js';
+import {CANONICAL_FAMILIES} from '../dist/graph/read-model.js';
+const input=process.env.ASHOKA_NAVIGATION_DATA,module=process.env.ASHOKA_PLAYWRIGHT_MODULE,exe=process.env.ASHOKA_BROWSER_EXECUTABLE;
+if(!input||!module||!exe)throw Error('Supply existing read-only input, Playwright and Chrome paths.');
+const {chromium}=await import(pathToFileURL(module).href),execute=promisify(execFile),root=path.resolve('.');
+const directory=await fs.mkdtemp(path.join(tmpdir(),'dg-navigation-browser-')),out=path.resolve(process.env.ASHOKA_NAVIGATION_OUT||'docs/ashoka/browser-26-first');await fs.mkdir(out,{recursive:true});
+const checks=[],errors=[],report={scope:'Actual compiled Windows daemon/Architect, CLI and Chrome. Read-only graph-family copy plus original receipt history for navigation scale; publication store dependencies narrowed to copied files and fresh disposable authority. No live mutation, scan, paid inference or production migration claimed.',checks,errors};
+let daemon,browser,page,stderr='';const check=(name,detail)=>{checks.push({name,detail});console.log(name);};
+try {
+ const master=path.join(directory,'master'),created=await createInstance({name:'navigation-replica',projectRoot:root,masterDir:master,repos:{fixture:directory}}),{scope,instance}=created;
+ const journal=path.join(input,'reconciliation_journal.json'),journalPresent=()=>fs.stat(journal).then(()=>true,error=>{if(error.code==='ENOENT')return false;throw error;});
+ assert.equal(await journalPresent(),false,'Do not capture an interrupted/in-flight publication.');
+ const originalPublication=await fs.readFile(path.join(input,'publication_state.json'));
+ const copied=[];for(const family of CANONICAL_FAMILIES){if(['plan','slice'].includes(family.kind))continue;
+   try{await fs.copyFile(path.join(input,family.file),path.join(scope.dataDir,family.file));copied.push(family.file);}catch(error){if(error.code!=='ENOENT')throw error;}}
+ if(copied.includes('dream_graph.json'))await fs.utimes(path.join(scope.dataDir,'dream_graph.json'),new Date('2001-01-01'),new Date('2001-01-01'));
+ assert.equal(await journalPresent(),false,'Publication must remain settled through the read-only copy.');
+ assert((await fs.readFile(path.join(input,'publication_state.json'))).equals(originalPublication),'Publication changed during the read-only navigation copy.');
+ const publication=JSON.parse(originalPublication.toString('utf8').replace(/^\uFEFF/,''));
+ report.input_snapshot={publication_sha256:createHash('sha256').update(originalPublication).digest('hex'),epoch:publication.epoch,revision:publication.revision,
+  boundary:'Original publication bytes remained identical and no journal was present across the read-only family copy. This fixture is not a live cutover approval.'};
+ publication.stores=Object.fromEntries(Object.entries(publication.stores).filter(([file])=>copied.includes(file)));publication.outbox=[];
+ await fs.writeFile(path.join(scope.dataDir,'publication_state.json'),JSON.stringify(publication));report.publication_bytes=(await fs.stat(path.join(scope.dataDir,'publication_state.json'))).size;report.copied_graph_files=copied;
+ const values={DREAMGRAPH_LLM_PROVIDER:'none',DG_SCHEDULER_ENABLED:'false',DREAMGRAPH_SCHEDULER:'{"enabled":false}',DREAMGRAPH_EVENTS:'{"max_auto_cycles_per_hour":0}',DREAMGRAPH_NARRATIVE:'{"auto_narrate":false}',DREAMGRAPH_REPOS:JSON.stringify({fixture:directory})};
+ for(const role of ['INITIAL_SCAN','ENRICHMENT','DREAMER','NORMALIZER','ARCHITECT','COMPUTER_USE'])for(const suffix of ['RUN_BUDGET','DAY_BUDGET','MAX_CALLS'])values['DREAMGRAPH_LLM_'+role+'_'+suffix]='0';
+ await fs.writeFile(scope.engineEnvPath,Object.entries(values).map(([key,value])=>key+'='+value).join('\n')+'\n');
+ const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!key.startsWith('DREAMGRAPH_')&&!key.startsWith('DG_')&&key!=='DATABASE_URL'&&!/API_KEY|ACCESS_TOKEN|BEARER|SECRET|CREDENTIAL/i.test(key)));
+ Object.assign(env,{DREAMGRAPH_INSTANCE_UUID:instance.uuid,DREAMGRAPH_MASTER_DIR:master,DREAMGRAPH_DATA_DIR:scope.dataDir});
+ const reservation=createServer();await new Promise(done=>reservation.listen(0,'127.0.0.1',done));const port=reservation.address().port;await new Promise(done=>reservation.close(done));const base='http://127.0.0.1:'+port;
+ daemon=spawn(process.execPath,[path.join(root,'dist/index.js'),'--transport','http','--port',String(port)],{cwd:directory,env,stdio:['ignore','pipe','pipe'],windowsHide:true});
+ await new Promise((done,reject)=>{const timer=setTimeout(()=>reject(Error('Startup: '+stderr)),30000);daemon.stderr.on('data',chunk=>{stderr=(stderr+chunk).slice(-16000);if(String(chunk).includes('Server running on')){clearTimeout(timer);done();}});daemon.once('error',reject);daemon.once('exit',code=>{clearTimeout(timer);reject(Error('Daemon exited '+code+': '+stderr));});});
+ const optional=async file=>fs.readFile(path.join(scope.dataDir,file)).catch(error=>{if(error.code==='ENOENT')return null;throw error;}),same=(left,right)=>left===null?right===null:right!==null&&left.equals(right);
+ const authorityBefore=await optional('session_authority.json'),publicationBefore=await optional('publication_state.json'),health=[];
+ for(let batch=0;batch<33;batch++)await Promise.all(Array.from({length:16},async()=>{const started=performance.now(),response=await fetch(base+'/health',{signal:AbortSignal.timeout(5000)});
+  assert.equal(response.status,200);assert.equal(response.headers.get('set-cookie'),null);assert.equal(response.headers.get('x-dreamgraph-session'),null);assert.equal((await response.json()).status,'ok');health.push(performance.now()-started);}));
+ assert(same(authorityBefore,await optional('session_authority.json')),'Health probes must not mint or update private sessions.');
+ assert(same(publicationBefore,await optional('publication_state.json')),'Health probes must not publish graph state.');
+ health.sort((a,b)=>a-b);report.health_probes={count:health.length,p95_ms:Math.round(health[Math.ceil(health.length*.95)-1]),max_ms:Math.round(health.at(-1)),unchanged_authority:true,unchanged_publication:true};
+ check('NAV08','528 real compiled daemon health probes create no sessions, cookies, grants or publication writes before actual browser navigation.');
+ browser=await chromium.launch({executablePath:exe,headless:true});report.browser=await browser.version();const context=await browser.newContext({viewport:{width:1440,height:1000}});page=await context.newPage();page.on('pageerror',error=>errors.push(String(error)));
+ const start=performance.now();await page.goto(base+'/architect',{waitUntil:'domcontentloaded'});report.shell_ms=Math.round(performance.now()-start);await page.locator('button.plan-item').first().waitFor({timeout:20000});report.plans_visible_ms=Math.round(performance.now()-start);
+ assert(report.plans_visible_ms<20000);assert((await page.locator('button.plan-item').count())>=90);check('NAV01','Actual shell/list load at original receipt and graph-family scale; no mocked plan-index route.');
+ await page.locator('#plan-search-input').fill('Ashoka');const plan=page.locator('button.plan-item').filter({hasText:'DreamGraph v14.0.0 - Ashoka'});assert.equal(await plan.count(),1);
+ const current=page.locator('[data-slice-id="slice-26-refresh-the-legacy-dreamgraph-graph-safely"].slice-current');
+ const select=performance.now();await plan.click();await current.waitFor({state:'attached',timeout:15000});report.selected_plan_data_ms=Math.round(performance.now()-select);
+ const disclosure=page.locator('details').filter({has:page.locator('#slice-list')}),summary=disclosure.locator('summary').first();
+ if(!await disclosure.evaluate(node=>node.open))await summary.click();await current.waitFor({timeout:5000});report.selected_plan_visible_ms=Math.round(performance.now()-select);
+ assert((await page.locator('[data-slice-id].slice-completed').count())>=28);assert((await current.innerText()).includes('Slice 26'));assert((await page.locator('[data-slice-id].slice-running').count())===0);check('NAV02','Actual source plan/log progress appears with completed cards dimmed and current ownership visible; no running lease invented.');
+ await page.locator('#graph-upgrade-notice').waitFor({state:'visible'});await page.locator('#graph-upgrade-notice-title').click();assert((await page.locator('#graph-upgrade-notice-command').innerText()).includes(instance.uuid));check('NAV03','Bounded format notice offers the exact instance preview command without a full migration analysis or automatic migration.');
+ const readiness=await (await fetch(base+'/api/architect/v1')).json();assert.equal(readiness.onboarding_readiness.project_map.status,'ready');assert.equal(readiness.onboarding_readiness.project_map.last_refreshed_at,'2001-01-01T00:00:00.000Z');check('NAV07','Actual daemon preserves a deliberately old map timestamp without an age-only stale verdict. Scope currency remains separately owned.');
+ await page.screenshot({path:path.join(out,'architect.png'),fullPage:true});
+ const replicas=await createInstance({name:'migration-cli-fixture',projectRoot:directory,masterDir:master,repos:{fixture:directory}}),migration=replicas.scope;
+ await fs.writeFile(path.join(migration.dataDir,'features.json'),'[{"name":"Legacy fixture","origin":"lucid"}]');
+ const run=async(args)=>execute(process.execPath,[path.join(root,'dist/cli/dg.js'),'graph-upgrade',replicas.instance.uuid,...args,'--master-dir',master],{env,cwd:directory,timeout:30000,maxBuffer:1024*1024});
+ const previewFile=path.join(directory,'review.json'),original=await fs.readFile(path.join(migration.dataDir,'features.json'),'utf8');await run(['preview','--out',previewFile]);assert.equal(await fs.readFile(path.join(migration.dataDir,'features.json'),'utf8'),original);const preview=JSON.parse(await fs.readFile(previewFile,'utf8'));assert.equal(preview.blockers.length,0);
+ const args=['apply','--preview',previewFile,'--reviewed-digest',preview.digest,'--review-id','operator-fixture','--operation-id','migration-fixture'];const result=JSON.parse((await run(args)).stdout);assert.equal(result.replayed,false);assert.equal(JSON.parse((await run(args)).stdout).replayed,true);check('NAV04','Actual compiled CLI previews without writes, applies a reviewed backup/publication and replays one lost acknowledgement identity.');
+ const restoreFile=path.join(directory,'restore.json');await run(['restore-preview','--original-operation','migration-fixture','--out',restoreFile]);const restore=JSON.parse(await fs.readFile(restoreFile,'utf8'));
+ await run(['restore','--preview',restoreFile,'--reviewed-digest',restore.digest,'--review-id','operator-restore','--operation-id','restore-fixture']);assert.equal(await fs.readFile(path.join(migration.dataDir,'features.json'),'utf8'),original);check('NAV05','Actual compiled CLI restore uses a separately reviewed current snapshot and returns original bytes through a new publication.');
+ await assert.rejects(run(['preview','--out',path.join(migration.dataDir,'must-not-write.json')]));await assert.rejects(fs.stat(path.join(migration.dataDir,'must-not-write.json')));check('NAV06','Preview output cannot write inside instance storage; existing files and private authority remain protected.');
+ assert.deepEqual(errors,[]);report.success=true;
+}catch(error){report.success=false;report.failure=String(error.stack??error);console.error(report.failure);if(page)await page.screenshot({path:path.join(out,'failure.png'),fullPage:true}).catch(()=>{});report.daemon_diagnostic=stderr.slice(-16000);process.exitCode=1;}
+finally {await fs.writeFile(path.join(out,'qualification.json'),JSON.stringify(report,null,2)+'\n');await browser?.close();if(daemon&&daemon.exitCode===null&&daemon.signalCode===null){const exited=once(daemon,'exit');daemon.kill('SIGTERM');await exited;}if(path.dirname(directory)!==path.resolve(tmpdir())||!path.basename(directory).startsWith('dg-navigation-browser-'))throw Error('Cleanup scope rejected');await fs.rm(directory,{recursive:true,force:true});}

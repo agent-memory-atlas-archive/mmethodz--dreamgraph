@@ -1,4 +1,9 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { getDataDir, setDataDirOverride } from "../src/utils/paths.js";
+import { releaseGraphWriter } from "../src/graph/writer-lease.js";
 import {
   getModelCapabilities,
   initLlmProvider,
@@ -27,15 +32,17 @@ describe("getModelCapabilities", () => {
     });
   });
 
-  it("keeps GPT-5.4 on Chat Completions with temperature support", () => {
+  it("conditions GPT-5.4 temperature on explicit non-reasoning mode", () => {
     expect(getModelCapabilities("openai", "gpt-5.4")).toEqual({
       model: "gpt-5.4",
       api: "chat-completions",
-      supportsTemperature: true,
-      supportsReasoningEffort: false,
+      supportsTemperature: false,
+      supportsReasoningEffort: true,
       supportsStructuredOutputs: true,
       supportsJsonSchema: true,
     });
+    expect(getModelCapabilities("openai", "gpt-5.4", "none").supportsTemperature).toBe(true);
+    expect(getModelCapabilities("openai", "gpt-5.4", "high").supportsTemperature).toBe(false);
   });
 });
 
@@ -58,7 +65,11 @@ async function withEnv(overrides: Record<string, string | undefined>, fn: () => 
 }
 
 describe("selectLlmRoute", () => {
-  afterEach(() => {
+  let directory: string, previousDirectory: string;
+  beforeEach(async () => {
+    previousDirectory = getDataDir(); directory = await mkdtemp(join(tmpdir(), "dg-llm-routing-")); setDataDirOverride(directory);
+  });
+  afterEach(async () => {
     vi.unstubAllGlobals();
     initLlmProvider({
       provider: "none",
@@ -69,6 +80,7 @@ describe("selectLlmRoute", () => {
       maxTokens: 2048,
       timeoutMs: 120_000,
     });
+    await releaseGraphWriter(directory); setDataDirOverride(previousDirectory); await rm(directory, { recursive: true, force: true });
   });
 
   it("prefers an available connected caller model without probing daemon config", async () => {
@@ -130,17 +142,19 @@ describe("selectLlmRoute", () => {
         expect(route.provider?.name).toBe("openai");
         expect(route.model).toBe("daemon-dreamer");
         expect(route.options).toEqual({
+          api: "responses",
           model: "daemon-dreamer",
-          temperature: 0.3,
+          cognitiveRole: "dreamer",
           maxTokens: 4096,
         });
-        expect(route.provenance).toEqual({
+        expect(route.provenance).toMatchObject({
           task: "remediation_drafting",
           layer: "daemon",
           provider: "openai",
           model: "daemon-dreamer",
           source: "daemon",
-          temperature: 0.3,
+          cognitive_role: "dreamer",
+          temperature_omitted: "Temperature support is unqualified for this provider/model. Omit it without changing model, reasoning or cognitive role.",
         });
       },
     );
@@ -172,8 +186,9 @@ describe("selectLlmRoute", () => {
         expect(route.layer).toBe("daemon");
         expect(route.model).toBe("daemon-normalizer");
         expect(route.options).toEqual({
+          api: "responses",
           model: "daemon-normalizer",
-          temperature: 0.1,
+          cognitiveRole: "normalizer",
           maxTokens: 256,
         });
       },

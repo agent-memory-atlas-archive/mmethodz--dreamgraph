@@ -22,6 +22,7 @@
 import { logger } from "../utils/logger.js";
 
 export type GraphEventKind =
+  | "config.changed"
   | "snapshot.changed"
   | "cache.invalidated"
   | "dream.cycle.completed"

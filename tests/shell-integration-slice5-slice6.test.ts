@@ -88,7 +88,7 @@ describe("shell integration slices 5 and 6", () => {
     expect(source).toContain("item.appendChild(close);");
     expect(source).not.toContain("close.setAttribute('role', 'button');");
     expect(source).toContain(".plan-filter-field select option {");
-    expect(source).toContain("background: #111815;");
+    expect(source).toMatch(/\.plan-filter-field select option\s*\{\s*background: #121212;/);
   });
 
   it("treats terminal close requests as idempotent after shell exit", () => {

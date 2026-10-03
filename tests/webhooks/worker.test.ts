@@ -14,6 +14,7 @@ import { setDataDirOverride } from "../../src/utils/paths.js";
 import { registerSubscription, listSubscriptions, listDeadLetter } from "../../src/webhooks/store.js";
 import { deliver } from "../../src/webhooks/worker.js";
 import type { GraphEvent } from "../../src/graph/events.js";
+import { EngineJobs } from "../../src/cognitive/jobs.js";
 
 let dataDir: string;
 
@@ -105,5 +106,29 @@ describe("deliver()", () => {
     expect(body).toHaveProperty("payload");
     expect(body).not.toHaveProperty("subscription_id");
     expect(body).not.toHaveProperty("delivery_id");
+  });
+
+  it("persists send intent before fetch and exact envelope replay returns one delivery",async()=>{
+    const jobs=new EngineJobs();let observedId="";
+    const fetchMock=vi.fn().mockImplementation(async(_url:string,init:RequestInit)=>{
+      const record=(await jobs.inspect()).records[0];observedId=record.job.id;
+      expect(record.external_effects[0]).toMatchObject({state:"dispatched",kind:"http_webhook"});
+      expect(record.parameters.body).toBe(init.body);expect(record.parameters).not.toHaveProperty("secret");
+      return {status:204} as Response;
+    });vi.stubGlobal("fetch",fetchMock);
+    const sub=await registerSubscription({url:"https://example.test/hook",secret:"topsecrettopsecret",events:["*"]});const event=makeEvent();
+    const result=await deliver(sub,event);expect(await deliver(sub,event)).toEqual(result);
+    expect(result.delivery_id).toBe(observedId);expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect((await jobs.inspect()).records[0]).toMatchObject({work_settled:true,job:{state:"succeeded"},external_effects:[{state:"acknowledged"}]});
+  });
+
+  it("uncertain transport is preserved without automatically resending or erasing delivery intent",async()=>{
+    const fetchMock=vi.fn().mockRejectedValue(new Error("socket lost after send"));vi.stubGlobal("fetch",fetchMock);
+    const sub=await registerSubscription({url:"https://example.test/hook",secret:"topsecrettopsecret",events:["*"]});const event=makeEvent();
+    await expect(deliver(sub,event)).rejects.toThrow("WEBHOOK_DELIVERY_UNCONFIRMED");
+    const record=(await new EngineJobs().inspect()).records[0];expect(record.job.state).toBe("recovery_required");
+    expect(record.job.unknown_effects).toEqual([`${record.job.id}:attempt:1`]);
+    await expect(deliver(sub,event)).rejects.toThrow("JOB_NOT_DISPATCHABLE");expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect((await listSubscriptions())[0].stats.delivered).toBe(0);
   });
 }, 30_000);

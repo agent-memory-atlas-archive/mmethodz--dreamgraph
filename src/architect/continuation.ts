@@ -1,3 +1,4 @@
+import { sealSessionContinuation, openSessionContinuation } from "../server/session-context.js";
 import { createHash } from "node:crypto";
 import { buildArchitectToolManifestFromText, normalizeArchitectToolName } from "./tool-selection.js";
 
@@ -781,7 +782,7 @@ export function inferArchitectContinuationToolManifest(parts: readonly string[])
 }
 
 export function encodeArchitectContinuationToken(state: ArchitectContinuationState): string {
-  return Buffer.from(JSON.stringify(state), "utf8").toString("base64url");
+  return sealSessionContinuation(Buffer.from(JSON.stringify(state), "utf8").toString("base64url"));
 }
 
 export function decodeArchitectContinuationToken(
@@ -790,7 +791,7 @@ export function decodeArchitectContinuationToken(
 ): { ok: true; state: ArchitectContinuationState } | { ok: false; reason: string } {
   let parsed: unknown;
   try {
-    parsed = JSON.parse(Buffer.from(token, "base64url").toString("utf8"));
+    parsed = JSON.parse(Buffer.from(openSessionContinuation(token), "base64url").toString("utf8"));
   } catch {
     return { ok: false, reason: "invalid_continuation_token_encoding" };
   }

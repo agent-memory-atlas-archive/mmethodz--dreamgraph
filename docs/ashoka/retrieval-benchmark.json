@@ -1,0 +1,83 @@
+{
+  "schema": "dreamgraph.retrieval_benchmark.v1",
+  "measured_at": "2026-10-01T00:07:41.487Z",
+  "protocol_sha256": "838fed9aeb6b263f27370e44b89347b17d843948f878d89efd399d1fc137a22c",
+  "baseline_sha256": "d8acba015369963165acef92ad8933a02608efeb8fbde036a10d32857fec3521",
+  "repetitions": 50,
+  "platform": "win32",
+  "node": "v25.2.1",
+  "cases": [
+    {
+      "id": "dreamgraph:AT02",
+      "query": "Explain scan-to-publication-to-agent retrieval, distinguishing scan and graph revisions.",
+      "snapshot_kind": "frozen_source_with_synthetic_distractors",
+      "records": 304,
+      "reference": {
+        "p50_ms": 10.542400000000043,
+        "p95_ms": 14.640699999999924
+      },
+      "indexed": {
+        "p50_ms": 6.248699999999872,
+        "p95_ms": 10.108900000000176
+      },
+      "context_differences": 0,
+      "latency_tolerance_pass": true
+    },
+    {
+      "id": "dreamgraph:AT04",
+      "query": "Retrieve DreamGraph schedule dispatch/ownership without dashboard styling noise.",
+      "snapshot_kind": "frozen_source_with_synthetic_distractors",
+      "records": 304,
+      "reference": {
+        "p50_ms": 10.22440000000006,
+        "p95_ms": 15.744499999999789
+      },
+      "indexed": {
+        "p50_ms": 6.084500000000389,
+        "p95_ms": 7.226900000000114
+      },
+      "context_differences": 0,
+      "latency_tolerance_pass": true
+    },
+    {
+      "id": "web64-react:AT02",
+      "query": "Explain the Web64 compiler/runtime boundary: compileWeb64IdeProject produces program artifacts; handoffProgram passes program bytes to runtime.loadMedia after readiness.",
+      "snapshot_kind": "frozen_source_with_synthetic_distractors",
+      "records": 304,
+      "reference": {
+        "p50_ms": 8.115999999999985,
+        "p95_ms": 9.09940000000006
+      },
+      "indexed": {
+        "p50_ms": 5.078599999999824,
+        "p95_ms": 9.334899999999834
+      },
+      "context_differences": 0,
+      "latency_tolerance_pass": true
+    },
+    {
+      "id": "web64-react:AT04",
+      "query": "Retrieve Web64 emulator speed policy without compiler or color-picker noise.",
+      "snapshot_kind": "frozen_source_with_synthetic_distractors",
+      "records": 304,
+      "reference": {
+        "p50_ms": 7.981699999999819,
+        "p95_ms": 13.624399999999696
+      },
+      "indexed": {
+        "p50_ms": 4.851600000000872,
+        "p95_ms": 5.457699999999932
+      },
+      "context_differences": 0,
+      "latency_tolerance_pass": true
+    }
+  ],
+  "success": true,
+  "limitations": [
+    "Existing source-reviewed labels are retained verbatim, not reclassified after measurements.",
+    "Offline fixtures prove mechanisms and rubric; final established-instance paired agent gains are still unmeasured.",
+    "Cross-platform latency and real provider/CLI behavior require later explicit qualification."
+  ],
+  "provider_calls": 0,
+  "agent_understanding_gain": null
+}

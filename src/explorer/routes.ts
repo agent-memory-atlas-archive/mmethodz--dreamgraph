@@ -31,6 +31,8 @@ import { loadExplorerPrefs, patchExplorerPrefs } from "./prefs.js";
 import { coerceWindowSeconds, getHeatmap } from "./heatmap.js";
 import {
   getNeighborhood,
+  getExplorerContext,
+  getCandidateView,
   getNodeRecord,
   getStats,
   getTensionView,
@@ -138,14 +140,17 @@ function parseFloat01(value: string | null, fallback: number): number {
 }
 
 async function handleNode(
+  req: IncomingMessage,
   res: ServerResponse,
   id: string,
 ): Promise<void> {
-  const record = await timeRoute("node", () => getNodeRecord(id));
+  const qs=parseQuery(req.url??"");
+  const record = await timeRoute("node", () => getNodeRecord(id,qs.get("etag")??undefined,Number(qs.get("offset")??0),Number(qs.get("limit")??50)));
   if (!record) {
     jsonError(res, 404, "not_found", `No node with id: ${id}`);
     return;
   }
+  if(Buffer.byteLength(JSON.stringify(record),"utf8")>4*1024*1024)throw new Error("EXPLORER_DETAIL_BYTE_LIMIT: use bounded agent context or canonical resource pages");
   json(res, 200, record);
 }
 
@@ -203,90 +208,19 @@ async function handleTensions(
     status === "resolved" ? "resolved"
     : status === "all" ? "all"
     : "active";
-  const view = await timeRoute("tensions", () => getTensionView(filter));
+  const view = await timeRoute("tensions", () => getTensionView(filter,qs.get("etag")??undefined));
+  if(qs.get("etag")&&qs.get("etag")!==view.etag)throw new Error("EXPLORER_REVISION_CONFLICT");
   json(res, 200, view);
 }
 
-async function handleStatsRoute(res: ServerResponse): Promise<void> {
-  const stats = await timeRoute("stats", () => getStats());
+async function handleStatsRoute(req:IncomingMessage,res: ServerResponse): Promise<void> {
+  const expected=parseQuery(req.url??"").get("etag");
+  const stats = await timeRoute("stats", () => getStats(expected??undefined));
+  if(expected&&expected!==stats.etag)throw new Error("EXPLORER_REVISION_CONFLICT");
   json(res, 200, stats);
 }
 
-async function handleCandidates(res: ServerResponse): Promise<void> {
-  // Slim wrapper around the cognitive engine's candidate file. We only
-  // expose entries the user can act on (latent — neither auto-validated
-  // nor auto-rejected). The mutation endpoints find the entry by
-  // dream_id, so we surface that as the row key.
-  //
-  // We also enrich each row with the underlying dream node/edge so the
-  // Explorer Candidates panel can show meaningful endpoints (from → to,
-  // relation, name) and let the user inspect either side. Without this
-  // the UI only had `dream_id`, which is opaque.
-  const { engine } = await import("../cognitive/engine.js");
-  const file = await timeRoute("candidates", () => engine.loadCandidateEdges());
-  const dreamGraph = await engine.loadDreamGraph();
-  const dreamNodes = new Map(dreamGraph.nodes.map((n) => [n.id, n]));
-  const dreamEdges = new Map(dreamGraph.edges.map((e) => [e.id, e]));
-  // Orphaned candidates (their underlying dream node/edge has been pruned
-  // from dream_graph.json) cannot be acted on meaningfully — promote/reject
-  // would either fail or operate on missing data, and the row would render
-  // as "? → ?". Surface them in a separate count so the operator knows the
-  // pool isn't lying, but exclude them from the actionable list.
-  const allLatent = file.results.filter((r) => r.status === "latent");
-  const latent = allLatent.filter((r) =>
-    r.dream_type === "edge" ? dreamEdges.has(r.dream_id) : dreamNodes.has(r.dream_id),
-  );
-  const orphaned = allLatent.length - latent.length;
-  json(res, 200, {
-    total: file.results.length,
-    pending: latent.length,
-    orphaned,
-    last_normalization: file.metadata.last_normalization,
-    candidates: latent.map((r) => {
-      const base = {
-        dream_id: r.dream_id,
-        dream_type: r.dream_type,
-        confidence: r.confidence,
-        plausibility: r.plausibility,
-        evidence_score: r.evidence_score,
-        contradiction_score: r.contradiction_score,
-        evidence_count: r.evidence_count,
-        reason_code: r.reason_code,
-        reason: r.reason,
-        validated_at: r.validated_at,
-      };
-      if (r.dream_type === "edge") {
-        const e = dreamEdges.get(r.dream_id);
-        if (e) {
-          return {
-            ...base,
-            from: e.from,
-            to: e.to,
-            relation: e.relation,
-            edge_kind: e.type,
-            strategy: e.strategy,
-            dream_cycle: e.dream_cycle,
-            dream_reason: e.reason,
-          };
-        }
-      } else {
-        const n = dreamNodes.get(r.dream_id);
-        if (n) {
-          return {
-            ...base,
-            name: n.name,
-            description: n.description,
-            entity_type: n.type,
-            inspiration: n.inspiration,
-            dream_cycle: n.dream_cycle,
-            intent: n.intent,
-          };
-        }
-      }
-      return base;
-    }),
-  });
-}
+async function handleCandidates(req:IncomingMessage,res:ServerResponse):Promise<void>{const expected=parseQuery(req.url??"").get("etag");const view=await getCandidateView(expected??undefined);if(expected&&expected!==view.etag)throw new Error("EXPLORER_REVISION_CONFLICT");json(res,200,view);}
 
 /* ------------------------------------------------------------------ */
 /*  Dispatcher                                                        */
@@ -320,13 +254,17 @@ export async function handleExplorerRoute(
     }
 
     // Phase 2 read-only queries.
+    if(req.method==="GET"&&pathname.startsWith("/explorer/api/context/")){
+      const id=decodeURIComponent(pathname.slice("/explorer/api/context/".length)),qs=parseQuery(req.url??"");
+      json(res,200,await getExplorerContext(id,qs.get("etag")??undefined));return true;
+    }
     if (req.method === "GET" && pathname.startsWith("/explorer/api/node/")) {
       const id = decodeURIComponent(pathname.slice("/explorer/api/node/".length));
       if (!id) {
         jsonError(res, 400, "bad_request", "Missing node id");
         return true;
       }
-      await handleNode(res, id);
+      await handleNode(req,res,id);
       return true;
     }
 
@@ -361,7 +299,7 @@ export async function handleExplorerRoute(
     }
 
     if (req.method === "GET" && pathname === "/explorer/api/stats") {
-      await handleStatsRoute(res);
+      await handleStatsRoute(req,res);
       return true;
     }
 
@@ -379,7 +317,7 @@ export async function handleExplorerRoute(
     // promote/reject decision. Returns the latent (= not-yet-decided)
     // entries from candidate_edges.json.
     if (req.method === "GET" && pathname === "/explorer/api/candidates") {
-      await handleCandidates(res);
+      await handleCandidates(req,res);
       return true;
     }
 
@@ -442,7 +380,8 @@ export async function handleExplorerRoute(
     return handleSpaRequest(req, res, pathname);
   } catch (err) {
     logger.error(`/explorer route error (${pathname}):`, err);
-    jsonError(res, 500, "internal_error", (err as Error).message);
+    const message=(err as Error).message;
+    jsonError(res,message==="EXPLORER_REVISION_CONFLICT"||message==="EXPLORER_AMBIGUOUS_ID"?409:500,message.startsWith("EXPLORER_")?message:"internal_error",message);
     return true;
   }
 }

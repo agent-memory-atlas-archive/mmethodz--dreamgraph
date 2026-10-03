@@ -1,0 +1,32 @@
+import { beforeEach,afterEach,expect,it } from "vitest";
+import { mkdtemp,rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { dispatchEvent,getEventLog } from "../src/cognitive/event-router.js";
+import { EngineJobs } from "../src/cognitive/jobs.js";
+import { ModelAdmission } from "../src/cognitive/model-admission.js";
+import { getDataDir,setDataDirOverride } from "../src/utils/paths.js";
+import { releaseGraphWriter } from "../src/graph/writer-lease.js";
+import { commitGraphWrites } from "../src/graph/publication.js";
+import { engine } from "../src/cognitive/engine.js";
+import type { CognitiveEvent } from "../src/cognitive/types.js";
+let directory:string,previous:string;
+beforeEach(async()=>{previous=getDataDir();directory=await mkdtemp(join(tmpdir(),"dg-event-job-"));setDataDirOverride(directory);});
+afterEach(async()=>{await releaseGraphWriter(directory);setDataDirOverride(previous);await rm(directory,{recursive:true,force:true});});
+const event=(id:string):CognitiveEvent=>({id,source:"manual",severity:"info",timestamp:"2026-10-01T00:00:00Z",affected_entities:[],payload:{},description:"Unmapped event"});
+it("duplicate storm creates one durable intake and replays its original advisory without cognition",async()=>{
+ const outcomes=await Promise.allSettled(Array.from({length:12},()=>dispatchEvent(event("same"))));
+ expect(outcomes.some(outcome=>outcome.status==="fulfilled")).toBe(true);
+ const result=await dispatchEvent(event("same"));expect(result.result).toMatchObject({execution_status:"advisory"});
+ expect(result.result.outcome_summary).toContain("scope unavailable");
+ expect((await getEventLog()).events).toEqual([result]);
+ const jobs=new EngineJobs();expect((await jobs.inspect()).records).toHaveLength(1);
+ expect(Object.keys((await new ModelAdmission(jobs.instance_id,directory).inspect()).attempts)).toEqual([]);
+ expect(engine.getState()).toBe("awake");
+ await expect(dispatchEvent({...event("same"),description:"Different cause"})).rejects.toThrow("JOB_OPERATION_CONFLICT");
+});
+it("unavailable published event history is not an empty successful intake",async()=>{
+ await commitGraphWrites({actor:"fixture",writes:[{file:"event_log.json",content:'{"metadata":{},"events":"invalid"}'}]});
+ await expect(dispatchEvent(event("new"))).rejects.toThrow("EVENT_LOG_UNAVAILABLE");
+ expect((await new EngineJobs().inspect()).records[0].job.state).toBe("failed");
+});

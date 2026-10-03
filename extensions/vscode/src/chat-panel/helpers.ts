@@ -67,6 +67,26 @@ export function stringifyToolResult(result: unknown): string {
   }
 }
 
+/** A daemon-reported error still owns its complete result and any committed effects. */
+export class ToolOwnerResultError extends Error {
+  constructor(readonly ownerResult: unknown) {
+    super('MCP_TOOL_ERROR: consult the complete owner result and receipts');
+    this.name = 'ToolOwnerResultError';
+  }
+}
+
+/** Local review/compression failure cannot turn an acknowledged effect into a rollback. */
+export function stringifyToolFailure(error: unknown, ownerResult: unknown, receivedResult: boolean): string {
+  if (error instanceof ToolOwnerResultError) return stringifyToolResult(error.ownerResult);
+  const message = error instanceof Error ? error.message : String(error);
+  if (!receivedResult) return message;
+  return stringifyToolResult({
+    host_error: { message },
+    owner_result: ownerResult,
+    effect_status: 'consult_original_owner_receipt; host_failure_is_not_failure_or_rollback',
+  });
+}
+
 /**
  * Patch #1 (renderer invariant): payload-safe stringifier for OutcomeCards.
  * Same shape as stringifyToolResult but with a hard length ceiling so a

@@ -1,0 +1,183 @@
+So for DreamGraph, I would think of the daemon as the authority/control plane, not necessarily the process that physically wiggles the mouse.
+A realistic architecture is:
+```
+DreamGraph daemon
+    authority / lifecycle / graph / permissions / budgets
+                |
+                v
+      ComputerUseSession
+                |
+        +-------+--------+
+        |                |
+ Browser worker      Desktop worker
+ Node/Playwright     interactive-user helper
+ CDP/DOM             UIA + screenshot/input
+        |                |
+        +-------+--------+
+                |
+        observations/results
+                |
+                v
+       DreamGraph authority
+```
+A Node daemon is a very natural host for Playwright/CDP. It can launch an isolated Chromium profile, keep the browser session alive, inspect DOM/accessibility state, execute actions, and return screenshots.
+That is also close to OpenAI’s recommended Astra integration: their JavaScript example uses Playwright and expects the execution environment to remain alive across calls. 
+For Architect itself, this could be especially clean because it is already a local browser application. You could have:
+-  isolated browser sessions for arbitrary sites; 
+-  attach-to-existing-browser as a separately privileged capability; 
+-  DOM/Playwright interaction first; 
+-  screenshot vision only when visual interpretation is actually needed. 
+That last point matters enormously for cost and reliability. Clicking a known DOM element is much better than visually finding coordinates every time.
+On Windows, an ordinary interactive user process can capture the desktop and inject input into normal applications. But there are important limits.
+The daemon cannot be a normal Windows service and expect to control the logged-in desktop. Windows services run in Session 0 and modern Windows explicitly prevents services from directly interacting with the user desktop. Microsoft recommends a separate process running in the interactive user's session when interaction is required. 
+So if DreamGraph ever becomes a background service, you would want:
+daemon/service → authenticated per-user Computer Use worker
+rather than trying to make the service itself interactive.
+Right now, when you launch DreamGraph normally under your own account, this is much less of a problem.
+Windows UIPI prevents ordinary processes from injecting input into applications running at a higher integrity level. Microsoft’s SendInput documentation explicitly says input injection is permitted only into equal-or-lower integrity processes. 
+Practically:
+-  normal DreamGraph → normal Notepad/Chrome/VS Code: fine 
+-  normal DreamGraph → elevated Administrator application: potentially blocked 
+-  normal DreamGraph → UAC secure desktop: no 
+-  Ctrl+Alt+Del secure-attention screen: no 
+I would make this an explicit v1 limitation, not attempt heroic privilege tricks.
+DreamGraph should say:
+blocked: target is elevated / secure desktop requires user interaction
+and hand control to the human.
+That is much safer than trying to turn Ashoka into malware-grade desktop automation. 😂
+OS-level mouse/key injection generally needs an unlocked interactive desktop. Microsoft’s current UI automation guidance distinguishes input-injecting operations from UI Automation patterns; injected click/drag/key operations fail on locked or secure desktops, while some structured UIA operations can still work. 
+So Computer Use should know the difference between:
+visual interactive session available
+ and
+ structured automation may still be possible, but visual input is unavailable
+That probably deserves an explicit capability state rather than a generic tool failure.
+If DreamGraph is controlling the actual desktop you're using, you and the agent can fight each other.
+You’ll probably want something like an interaction lease:
+```
+observe
+take-control
+agent-interacting
+human-input-detected → pause
+release
+```
+I would strongly consider pause on real human mouse/keyboard input. That makes it possible to reclaim the machine instantly without a modal confirmation.
+Raw visual Computer Use has several nasty realities:
+-  DPI scaling; 
+-  multiple monitors; 
+-  windows moving; 
+-  display topology changing; 
+-  app animations; 
+-  scrolling; 
+-  stale screenshots; 
+-  another window stealing focus. 
+Windows desktop capture itself is monitor-oriented, and Microsoft explicitly calls out DPI awareness for desktop-sharing/control applications. 
+So never make:
+screenshot → (x=734,y=511) → click
+a timeless command.
+The action should really be bound to something closer to:
+```
+observation_id
+display topology
+target window
+window bounds
+screenshot dimensions
+coordinate transform
+timestamp
+```
+and rejected/refreshed if the environment has materially changed.
+OpenAI similarly recommends inspecting the current screen before acting and checking it again after short action groups. 
+A local daemon does not mean local Computer Use if Astra is doing the reasoning.
+If DreamGraph sends a screenshot to OpenAI, whatever is visible in that screenshot is being sent to the provider.
+That can include:
+-  email; 
+-  passwords; 
+-  notifications; 
+-  another monitor; 
+-  API keys; 
+-  private chats; 
+-  browser sessions; 
+-  customer information. 
+OpenAI specifically warns that screenshots may contain sensitive account/page data and recommends restricted environments and explicit controls for consequential actions. 
+I would therefore start with scopes like:
+```
+browser-tab
+browser-window
+specific-native-window
+single-monitor
+full-desktop
+```
+with full desktop being the highest privilege, not the default.
+And I would not automatically persist screenshots into the graph. Store observations/provenance and perhaps short-lived image artifacts unless there is an explicit reason to retain the image.
+OpenAI recommends code execution for Astra, because it can perform multiple UI operations efficiently in one model turn. 
+But DreamGraph has a competing concern: governance.
+Structured actions:
+```
+click
+type
+scroll
+screenshot
+```
+are extremely easy to audit and permission-check.
+Generated Python/JS is much more powerful but potentially much harder to constrain.
+So I think the right compromise is:
+Astra may generate code, but only inside a dedicated Computer Use runtime with a deliberately tiny API surface.
+For example, browser code gets Playwright objects but no arbitrary filesystem/network/shell unless separately authorized.
+Desktop code gets approved screenshot/UI/input helpers, not unrestricted Python on the host.
+That gives Astra the efficiency benefit without converting Computer Use into:
+“Here, model, execute arbitrary code as Mika.” 😄
+I’d make this hierarchy fundamental:
+```
+native DreamGraph/MCP/tool API
+        ↓
+application API
+        ↓
+DOM / CDP / Playwright
+        ↓
+Windows UI Automation / accessibility
+        ↓
+visual Computer Use
+```
+Pixels are the fallback, not the universal interface.
+That gives you better precision, less screenshot cost, less latency, and more reliable verification.
+Because Architect is served locally, you're mostly in a good position. But if you later have a public HTTPS Architect page talking to a loopback daemon, modern browsers increasingly gate local/loopback requests behind Local Network Access permissions, including fetch/WebSocket traffic. 
+Your current:
+local Architect → local daemon
+avoids much of that complexity.
+I would preserve that topology for local Computer Use.
+Computer Use is inherently iterative:
+```
+screenshot
+model
+action
+screenshot
+model
+action
+...
+```
+Images and repeated model calls can become expensive quickly.
+So Computer Use needs the same Ashoka thinking you just applied to enrichment:
+-  maximum turns; 
+-  maximum screenshots; 
+-  maximum wall-clock time; 
+-  maximum API spend; 
+-  per-action timeout; 
+-  cancellation; 
+-  screenshot reuse; 
+-  structured observations where possible; 
+-  no automatic escalation to Astra if the selected model cannot do it. 
+OpenAI itself recommends hard step/time/cost bounds and verifying the actual result rather than trusting the model's completion statement. 
+I would not write:
+“Architect can control the user's computer.”
+I'd define it as:
+Architect can operate an explicitly granted interactive environment through a capability-negotiated local Computer Use worker.
+That wording leaves room for reality:
+-  browser only; 
+-  particular application only; 
+-  unlocked desktop required; 
+-  elevated target unsupported; 
+-  platform backend unavailable; 
+-  visual observation disabled; 
+-  user reclaimed input; 
+-  provider/model lacks capability. 
+And it fits DreamGraph's architecture much better.
+So yes: very feasible, especially on your Windows setup, but I'd have Astra design around the reality that the Node daemon is the brain and governor, while browser/desktop interaction is a local execution capability with OS-specific workers and explicit limits.

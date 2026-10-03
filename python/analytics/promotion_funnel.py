@@ -5,10 +5,12 @@ import argparse
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from .definitions import qualified
 from . import loader
 from ._common import add_common_args, emit, fmt_table, resolve_data_dir_from_args
 
 
+@qualified("promotion_funnel")
 def analyze(data_dir: Path) -> dict:
     cand = loader.candidate_edges(data_dir)
     val = loader.validated_edges(data_dir)
@@ -23,9 +25,7 @@ def analyze(data_dir: Path) -> dict:
     # Per-strategy promotion data via dream_id prefix in candidate_edges
     by_strategy: dict[str, Counter] = defaultdict(Counter)
     for c in cand:
-        did = (c.get("dream_id") or "").split("_")
-        # dream ids look like dream_<strategy>_<ts>_<n>
-        strat = did[1] if len(did) > 1 else "unknown"
+        strat = c.get("strategy") or "unknown"
         by_strategy[strat][c.get("status") or "unknown"] += 1
 
     strategy_rows = []

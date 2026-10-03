@@ -59,5 +59,13 @@ export function formatJsonToolOutput(
   value: unknown,
   options: ClipLargeTextOutputOptions = {}
 ): string {
-  return clipLargeTextOutput(JSON.stringify(value, null, 2), options);
+  const serialized = JSON.stringify(value, null, 2);
+  const maxChars = options.maxChars ?? DEFAULT_MAX_OUTPUT_CHARS;
+  if (serialized.length <= maxChars) return serialized;
+  // Machine output must remain parseable. Human/plain-text clipping is a separate API.
+  return JSON.stringify({ success: false, schema: "dreamgraph.output_limit.v1",
+    error: { code: "OUTPUT_LIMIT_EXCEEDED", message: "The complete JSON result exceeds this output limit. Narrow the query or use record paging; no data was clipped." },
+    actual_chars: serialized.length, max_chars: maxChars,
+    continuation_guidance: options.continuationGuidance ?? ["Use query_resource with contract_version=v1 and follow continuation for collections.", "Use an entity-specific query or a narrower filter/range."],
+  }, null, 2);
 }

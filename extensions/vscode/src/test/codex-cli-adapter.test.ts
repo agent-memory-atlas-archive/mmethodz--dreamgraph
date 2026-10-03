@@ -224,6 +224,8 @@ test("mcp-config: builds deterministic Codex config.toml artifact", () => {
     allowlist: ["query_resource", "read_source_code"],
   });
   assert.deepEqual([...overrides], [
+    { key: "computer_use.default_app_access", value: '"deny"' },
+    ...["computer_use", "browser_use", "browser_use_external", "browser_use_full_cdp_access", "in_app_browser"].map(feature=>({key:`features.${feature}`,value:"false"})),
     { key: "mcp_servers.dreamgraph.command", value: "\"node\"" },
     { key: "mcp_servers.dreamgraph.args", value: "[\"./codex-cli-bridge.js\", \"--mode\", \"authoritative\"]" },
     { key: "mcp_servers.dreamgraph.env", value: "{ DEBUG = \"dreamgraph:*\", DREAMGRAPH_MCP_TOKEN = \"tok-xyz\", DREAMGRAPH_RUN_ID = \"run-abc\" }" },
@@ -302,6 +304,12 @@ test("mcp-bridge: validates live registry before building isolated config", () =
   assert.deepEqual(
     bridge.configOverrides.map((override) => override.key),
     [
+      "computer_use.default_app_access",
+      "features.computer_use",
+      "features.browser_use",
+      "features.browser_use_external",
+      "features.browser_use_full_cdp_access",
+      "features.in_app_browser",
       "mcp_servers.dreamgraph.command",
       "mcp_servers.dreamgraph.args",
       "mcp_servers.dreamgraph.env",
@@ -421,6 +429,17 @@ test("argv: never emits elevated sandbox or approval from config overrides", () 
       }),
     /cannot weaken authoritative sandbox\/approval policy/,
   );
+});
+
+test("argv: ordinary native CLI passes cannot gain computer access through an override",()=>{
+  for(const override of [
+    {key:"features.computer_use",value:true},{key:"features.browser_use",value:"true"},
+    {key:"features",value:'{ computer_use = true }'},{key:"computer_use.default_app_access",value:'"allow"'},
+    {key:"computer_use.windows.aumids",value:'{ "UnapprovedApp" = "allow" }'},
+  ])assert.throws(()=>buildCodexArgv({workspace:"C:\\repo",configOverrides:[override],helpSurface:FULL_SURFACE}),/qualified C17 route/);
+  for(const key of ['features."computer_use"','"features".computer_use'])assert.throws(()=>buildCodexArgv({workspace:"C:\\repo",configOverrides:[{key,value:true}],helpSurface:FULL_SURFACE}),/canonical unquoted key/);
+  const plan=buildCodexArgv({workspace:"C:\\repo",configOverrides:[{key:"features.computer_use",value:false},{key:"computer_use.default_app_access",value:'"deny"'}],helpSurface:FULL_SURFACE});
+  assert(plan.args.includes('features.computer_use=false'));assert(plan.args.includes('computer_use.default_app_access="deny"'));
 });
 
 test("argv: rejects missing workspace and missing required help support", () => {

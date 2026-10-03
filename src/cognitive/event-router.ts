@@ -1,3 +1,8 @@
+import { withGraphRead, withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
+import { commitGraphWrites,loadPublicationState,publicationContentHash,recoverGraphPublication } from "../graph/publication.js";
+import { withEngineJob } from "./jobs.js";
+import { stripBom } from "../utils/read-json.js";
+import { EventSettingsSchema, mergeEngineSettings } from "../config/engine-settings.js";
 /**
  * DreamGraph v5.1 — Event-Driven Dreaming
  *
@@ -19,9 +24,7 @@
  */
 
 import { readFile } from "node:fs/promises";
-import { randomUUID } from "node:crypto";
-import { atomicWriteFile } from "../utils/atomic-write.js";
-import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { engine } from "./engine.js";
 import { logger } from "../utils/logger.js";
 import { dataPath } from "../utils/paths.js";
@@ -48,9 +51,6 @@ const eventLogPath = () => dataPath("event_log.json");
 // ---------------------------------------------------------------------------
 
 let config: EventRouterConfig = { ...DEFAULT_EVENT_ROUTER_CONFIG };
-let lastAutoTrigger = 0;
-let autoCyclesThisHour = 0;
-let hourWindowStart = Date.now();
 
 // ---------------------------------------------------------------------------
 // Event Log I/O
@@ -69,18 +69,12 @@ function emptyEventLog(): EventLogFile {
 }
 
 async function loadEventLog(): Promise<EventLogFile> {
-  try {
-    if (!existsSync(eventLogPath())) return emptyEventLog();
-    const raw = await readFile(eventLogPath(), "utf-8");
-    const p = JSON.parse(raw);
-    const e = emptyEventLog();
-    return {
-      metadata: { ...e.metadata, ...(p.metadata && typeof p.metadata === "object" ? p.metadata : {}) },
-      events: Array.isArray(p.events) ? p.events : [],
-    };
-  } catch {
-    return emptyEventLog();
-  }
+ return withGraphRead(async()=>{
+  const publication=await loadPublicationState();
+  try{const body=await readFile(eventLogPath(),"utf8");if(publication.stores["event_log.json"]&&publication.stores["event_log.json"].hash!==publicationContentHash(body))throw new Error("UNPUBLISHED_EVENT_CHANGE");
+   const log=JSON.parse(stripBom(body));if(!log||typeof log!=="object"||!log.metadata||!Array.isArray(log.events)||log.events.some((entry:EventLogEntry)=>!entry?.event?.id))throw new Error("EVENT_LOG_INVALID");return log;
+  }catch(error){if((error as NodeJS.ErrnoException).code==="ENOENT"&&!publication.stores["event_log.json"])return emptyEventLog();throw new Error(`EVENT_LOG_UNAVAILABLE: ${String(error)}`);}
+ });
 }
 
 async function saveEventLog(log: EventLogFile): Promise<void> {
@@ -89,7 +83,8 @@ async function saveEventLog(log: EventLogFile): Promise<void> {
     log.events.length > 0
       ? log.events[log.events.length - 1].timestamp
       : null;
-  await atomicWriteFile(eventLogPath(), JSON.stringify(log, null, 2));
+  const body=JSON.stringify(log);if(log.events.length>20000||Buffer.byteLength(body)>16*1024*1024)throw new Error("EVENT_CAPACITY_REQUIRES_ARCHIVE");
+  await commitGraphWrites({actor:"event_router",scope:["event_log.json"],cause:"event_intake",writes:[{file:"event_log.json",content:body}]});
 }
 
 // ---------------------------------------------------------------------------
@@ -121,7 +116,7 @@ async function resolveEntityScope(
     }
   }
 
-  const secondaryArr = [...secondary];
+  const secondaryArr = [...secondary].slice(0,100);
   return {
     primary,
     secondary: secondaryArr,
@@ -205,37 +200,10 @@ async function classifyEvent(
 /**
  * Check whether an auto-triggered cycle is allowed under cooldown rules.
  */
-function canAutoTrigger(): boolean {
-  const now = Date.now();
-
-  // Reset hourly window
-  if (now - hourWindowStart > 3_600_000) {
-    hourWindowStart = now;
-    autoCyclesThisHour = 0;
-  }
-
-  // Check cooldown
-  if (now - lastAutoTrigger < config.cooldown_ms) {
-    logger.debug(
-      `Event router: cooldown active (${config.cooldown_ms - (now - lastAutoTrigger)}ms remaining)`
-    );
-    return false;
-  }
-
-  // Check hourly cap
-  if (autoCyclesThisHour >= config.max_auto_cycles_per_hour) {
-    logger.debug(
-      `Event router: hourly cap reached (${autoCyclesThisHour}/${config.max_auto_cycles_per_hour})`
-    );
-    return false;
-  }
-
-  return true;
-}
-
-function recordAutoTrigger(): void {
-  lastAutoTrigger = Date.now();
-  autoCyclesThisHour++;
+async function canAutoTrigger():Promise<boolean>{
+ const now=Date.now(),automatic=(await loadEventLog()).events.filter(e=>e.event.source==="tension_threshold"&&e.event.id.startsWith("auto_tension_"));
+ const recent=automatic.filter(e=>Date.parse(e.timestamp)>now-3600000),last=automatic.reduce((at,e)=>Math.max(at,Date.parse(e.timestamp)),0);
+ return (!last||now-last>=config.cooldown_ms)&&recent.length<config.max_auto_cycles_per_hour;
 }
 
 // ---------------------------------------------------------------------------
@@ -254,7 +222,7 @@ function describeAction(classification: EventClassification): string {
   const scope = classification.entity_scope;
   const entities = scope.primary.length > 0
     ? scope.primary.slice(0, 5).join(", ")
-    : "all entities";
+    : "scope unavailable; no whole-graph execution authorized";
 
   switch (classification.response_type) {
     case "scoped_dream_cycle":
@@ -275,9 +243,12 @@ function describeAction(classification: EventClassification): string {
 /**
  * Dispatch a cognitive event — classify, scope, log, and return recommendation.
  */
-export async function dispatchEvent(
-  event: CognitiveEvent
-): Promise<EventLogEntry> {
+export async function dispatchEvent(event:CognitiveEvent):Promise<EventLogEntry>{
+ if(!event.id||!Array.isArray(event.affected_entities)||event.affected_entities.length>100||Buffer.byteLength(JSON.stringify(event))>65536)throw new Error("EVENT_INPUT_BOUND_EXCEEDED");
+ const snapshot=structuredClone(event);
+ return withEngineJob({operation_id:`event:${event.id}`,owner:"event_router",action:"event_intake",scope:event.affected_entities,lanes:["event_intake"],parameters:snapshot as unknown as Record<string,unknown>,roles:["normalizer"]},()=>executeDispatchEvent(snapshot));
+}
+async function executeDispatchEvent(event:CognitiveEvent):Promise<EventLogEntry>{
   logger.info(
     `Event dispatch: source=${event.source}, severity=${event.severity}, ` +
     `entities=${event.affected_entities.length}`
@@ -296,25 +267,19 @@ export async function dispatchEvent(
       strategy: classification.strategy,
     },
     result: {
-      action_taken: actionDescription,
+      action_taken: `Advisory: ${actionDescription}`,
+      execution_status: "advisory",
       duration_ms: durationMs,
       outcome_summary: actionDescription,
     },
     timestamp: new Date().toISOString(),
   };
 
-  // Persist
-  const log = await loadEventLog();
-  log.events.push(entry);
-
-  // Trim to last 500 events
-  if (log.events.length > 500) {
-    log.events = log.events.slice(-500);
-  }
-  await saveEventLog(log);
-
-  logger.info(`Event dispatched: ${actionDescription}`);
-  return entry;
+  return withGraphReconciliation(async()=>{
+   await recoverGraphPublication();const log=await loadEventLog();const prior=log.events.find(old=>old.event.id===event.id);
+   if(prior){if(JSON.stringify(prior.event)!==JSON.stringify(event))throw new Error("EVENT_IDENTITY_CONFLICT");return prior;}
+   log.events.push(entry);await saveEventLog(log);return entry;
+  });
 }
 
 /**
@@ -322,7 +287,8 @@ export async function dispatchEvent(
  * Called after each dream_cycle completion.
  */
 export async function checkTensionThresholds(): Promise<EventLogEntry | null> {
-  if (!canAutoTrigger()) return null;
+ return withGraphReconciliation(async()=>{
+  await recoverGraphPublication();if (!await canAutoTrigger()) return null;
 
   const tensionFile = await engine.loadTensions();
   const criticalTensions = tensionFile.signals.filter(
@@ -336,10 +302,12 @@ export async function checkTensionThresholds(): Promise<EventLogEntry | null> {
     (a, b) => b.urgency - a.urgency
   )[0];
 
-  recordAutoTrigger();
+  const eventId=`auto_tension_${createHash("sha256").update(JSON.stringify({id:mostUrgent.id,urgency:mostUrgent.urgency,entities:mostUrgent.entities})).digest("hex")}`;
+  const prior=(await loadEventLog()).events.find(entry=>entry.event.id===eventId);
+  if(prior)return prior;
 
   const event: CognitiveEvent = {
-    id: `auto_tension_${randomUUID()}`,
+    id: eventId,
     source: "tension_threshold",
     severity: mostUrgent.urgency > 0.9 ? "critical" : "high",
     timestamp: new Date().toISOString(),
@@ -357,13 +325,14 @@ export async function checkTensionThresholds(): Promise<EventLogEntry | null> {
   );
 
   return dispatchEvent(event);
+ });
 }
 
 /**
  * Update the event router configuration at runtime.
  */
 export function updateConfig(newConfig: Partial<EventRouterConfig>): void {
-  config = { ...config, ...newConfig };
+  config = mergeEngineSettings(EventSettingsSchema, config, newConfig);
   logger.info(`Event router config updated: ${JSON.stringify(config)}`);
 }
 

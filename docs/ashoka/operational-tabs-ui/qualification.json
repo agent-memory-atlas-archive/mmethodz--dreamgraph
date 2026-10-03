@@ -1,0 +1,217 @@
+{
+  "scope": "Disposable compiled daemon and Windows Chromium. No installed instance, installer, paid call or persistent user data.",
+  "checks": [
+    {
+      "name": "Config readback and layout 1440x900",
+      "value": {
+        "message": "Saved and effective configuration loaded.",
+        "geometry": {
+          "root": {
+            "x": 8,
+            "y": 8,
+            "width": 762,
+            "height": 584
+          },
+          "layout": {
+            "x": 8,
+            "y": 205.140625,
+            "width": 762,
+            "height": 339.671875
+          },
+          "panel": {
+            "x": 8,
+            "y": 205.140625,
+            "width": 529.03125,
+            "height": 339.671875
+          },
+          "inspector": {
+            "x": 549.03125,
+            "y": 205.140625,
+            "width": 220.96875,
+            "height": 279.703125
+          },
+          "inspectorPosition": "static",
+          "savebar": {
+            "x": 8,
+            "y": 550.8125,
+            "width": 762,
+            "height": 41.1875
+          },
+          "bodyScrollWidth": 778,
+          "bodyWidth": 778
+        }
+      }
+    },
+    {
+      "name": "Schedules row layout 1440x900",
+      "value": {
+        "width": 746,
+        "columns": "607.875px 81.125px 27px",
+        "children": [
+          {
+            "text": "Stabilize additive scan Slice 1 — very long definition namedream_cycle · interva",
+            "x": 23,
+            "y": 187.953125,
+            "width": 607.875,
+            "height": 31.890625
+          },
+          {
+            "text": "Invalid definition",
+            "x": 638.875,
+            "y": 195.921875,
+            "width": 81.125,
+            "height": 15.9375
+          },
+          {
+            "text": "⋯",
+            "x": 728,
+            "y": 190.390625,
+            "width": 27,
+            "height": 27
+          }
+        ]
+      }
+    },
+    {
+      "name": "Invalid definition repair editor",
+      "value": {
+        "original_strategy": "associative"
+      }
+    },
+    {
+      "name": "Status and Health subviews",
+      "value": {
+        "url": "/status?embed=architect"
+      }
+    },
+    {
+      "name": "Schedule draft retained across tabs",
+      "value": true
+    },
+    {
+      "name": "Open Explorer separate tab",
+      "value": true
+    },
+    {
+      "name": "Schedules scale 1000x700",
+      "value": {
+        "iframe": {
+          "x": 251,
+          "y": 313.390625,
+          "width": 458,
+          "height": 376.609375
+        },
+        "pane": {
+          "width": 458,
+          "height": 376.609375
+        },
+        "workspace": {
+          "width": 442,
+          "height": 361,
+          "scrollWidth": 442,
+          "scrollHeight": 361
+        },
+        "listScroll": {
+          "clientHeight": 249,
+          "scrollHeight": 707
+        },
+        "row": {
+          "width": 426,
+          "nameWidth": 375,
+          "moreWidth": 27,
+          "nameY": 187.953125,
+          "moreY": 198.859375
+        },
+        "bodyScrollWidth": 458,
+        "bodyWidth": 458
+      }
+    },
+    {
+      "name": "Config inspector reachable 1000x700",
+      "value": {
+        "scrollTop": 3432,
+        "maximum": 3432,
+        "asideTop": 58.078125,
+        "layoutBottom": 321.8125
+      }
+    },
+    {
+      "name": "Config scale 1000x700",
+      "value": {
+        "frame": {
+          "width": 458,
+          "height": 376.609375
+        },
+        "pane": {
+          "width": 458,
+          "height": 376.609375
+        },
+        "inspectorPosition": "static",
+        "savebar": {
+          "top": 327.8125,
+          "bottom": 369
+        },
+        "bodyScrollWidth": 458,
+        "bodyWidth": 458
+      }
+    },
+    {
+      "name": "Schedules scale 760x700",
+      "value": {
+        "iframe": {
+          "x": 10,
+          "y": 289.59375,
+          "width": 740,
+          "height": 330.40625
+        },
+        "pane": {
+          "width": 740,
+          "height": 330.40625
+        },
+        "workspace": {
+          "width": 724,
+          "height": 314,
+          "scrollWidth": 724,
+          "scrollHeight": 314
+        },
+        "listScroll": {
+          "clientHeight": 202,
+          "scrollHeight": 606
+        },
+        "row": {
+          "width": 708,
+          "nameWidth": 567.875,
+          "moreWidth": 27,
+          "nameY": 187.953125,
+          "moreY": 190.390625
+        },
+        "bodyScrollWidth": 740,
+        "bodyWidth": 740
+      }
+    },
+    {
+      "name": "Config scale 760x700",
+      "value": {
+        "frame": {
+          "width": 740,
+          "height": 330.40625
+        },
+        "pane": {
+          "width": 740,
+          "height": 330.40625
+        },
+        "inspectorPosition": "static",
+        "savebar": {
+          "top": 280.8125,
+          "bottom": 322
+        },
+        "bodyScrollWidth": 740,
+        "bodyWidth": 740
+      }
+    }
+  ],
+  "errors": [],
+  "model_requests": 0,
+  "browser": "153.0.8010.50",
+  "success": true
+}

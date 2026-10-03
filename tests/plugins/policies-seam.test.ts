@@ -142,7 +142,7 @@ describe("plugin policy seam (M6 closure)", () => {
     const { events, off } = collect();
     try {
       await bootstrapPlugins();
-      await waitUntil(async () => (await readProposals()).length === 1);
+      await waitUntil(async () => (await readProposals()).length === 1 && events.some(event => event.kind === "plugin.output.accepted" && event.payload?.seam === "policy"));
       const proposals = await readProposals();
       expect(proposals.length).toBe(1);
       expect(proposals[0].proposal_id).toBe("examples.policy-ok:no-undeclared-write");

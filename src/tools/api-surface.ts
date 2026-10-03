@@ -22,6 +22,7 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { registerPagedResource } from "../resources/resolver.js";
 import { config } from "../config/config.js";
 import { dataPath } from "../utils/paths.js";
 import { invalidateCache, loadJsonData } from "../utils/cache.js";
@@ -2091,7 +2092,7 @@ export function registerApiSurfaceTools(server: McpServer): void {
   // ops://api-surface — Full cached surface resource (read-only)
   // =========================================================================
 
-  server.resource(
+  registerPagedResource(server,
     "ops-api-surface",
     "ops://api-surface",
     {

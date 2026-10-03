@@ -1,0 +1,2220 @@
+{
+  "name": "discipline_submit_plan",
+  "arguments": {
+    "description": "Graph trust and agent effectiveness: 29 pending Markdown slices, expanded into per-finding plan entries for native delta traceability. Draft only; no implementation approval. Canonical plan: plans/graph-trust-and-agent-effectiveness.md",
+    "items": [
+      {
+        "id": "slice-0-establish-the-engine-alignment-contract--f21",
+        "priority": 1,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 0: Establish the engine alignment contract. Assign an owner to every subsystem in the alignment map. Record current readers/writers and approved contracts for identity, revision, evidence, trust, job lifecycle, time, configuration and authority. Reuse existing trust/evidence/lifecycle modules. Establish a labeled task corpus and review the proposed design before changing persistence. Rollback: Documentation-only baseline; no migration.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": []
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "All 29 subsystem families have owners and producer/consumer obligations; disputed invariants are explicit; baseline fixtures and measurements are reproducible.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-0-establish-the-engine-alignment-contract--f18",
+        "priority": 1,
+        "delta_entry_id": "F18",
+        "action": "modify",
+        "target_file": "vitest.config.ts",
+        "change_description": "Slice 0: Establish the engine alignment contract. Assign an owner to every subsystem in the alignment map. Record current readers/writers and approved contracts for identity, revision, evidence, trust, job lifecycle, time, configuration and authority. Reuse existing trust/evidence/lifecycle modules. Establish a labeled task corpus and review the proposed design before changing persistence. Rollback: Documentation-only baseline; no migration.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F18",
+          "what_it_requires": "Establish meaningful contract, state-machine, fault-injection, provider, transport and browser coverage with explicit exclusions and per-area gates. Preserve fast deterministic tests; do not make a global percentage a substitute for behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": []
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "All 29 subsystem families have owners and producer/consumer obligations; disputed invariants are explicit; baseline fixtures and measurements are reproducible.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-1-make-graph-responses-structured-and-pageable--f01",
+        "priority": 1,
+        "delta_entry_id": "F01",
+        "action": "modify",
+        "target_file": "src/utils/tool-output.ts",
+        "change_description": "Slice 1: Make graph responses structured and pageable. Implement a shared URI resolver and versioned result/error envelope with schema, revision, completeness, omitted count and continuation cursor. Page collections and preserve machine-readable JSON; migrate capability URI semantics with a documented compatibility path. Rollback: Keep a documented legacy presentation adapter; never restore raw JSON clipping as the machine contract.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F01",
+          "what_it_requires": "Replace JSON clipping with bounded structured pages, continuation cursors, stable ordering and explicit completeness. Keep optional human previews separate from machine data."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "All 30 baseline resource URIs have defined query behavior; oversized results stay valid; paging yields exactly the requested revision without duplicates or missing middle records; invalid URI sets the agreed error signal.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-1-make-graph-responses-structured-and-pageable--f02",
+        "priority": 1,
+        "delta_entry_id": "F02",
+        "action": "modify",
+        "target_file": "src/resources/register.ts",
+        "change_description": "Slice 1: Make graph responses structured and pageable. Implement a shared URI resolver and versioned result/error envelope with schema, revision, completeness, omitted count and continuation cursor. Page collections and preserve machine-readable JSON; migrate capability URI semantics with a documented compatibility path. Rollback: Keep a documented legacy presentation adapter; never restore raw JSON clipping as the machine contract.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F02",
+          "what_it_requires": "Use one URI resolver/catalog for resources, tools and client help. Version or alias the conflicting capability URI and distinguish invalid requests from a valid empty result."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "All 30 baseline resource URIs have defined query behavior; oversized results stay valid; paging yields exactly the requested revision without duplicates or missing middle records; invalid URI sets the agreed error signal.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-1-make-graph-responses-structured-and-pageable--f16",
+        "priority": 1,
+        "delta_entry_id": "F16",
+        "action": "modify",
+        "target_file": "src/tools",
+        "change_description": "Slice 1: Make graph responses structured and pageable. Implement a shared URI resolver and versioned result/error envelope with schema, revision, completeness, omitted count and continuation cursor. Page collections and preserve machine-readable JSON; migrate capability URI semantics with a documented compatibility path. Rollback: Keep a documented legacy presentation adapter; never restore raw JSON clipping as the machine contract.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F16",
+          "what_it_requires": "Generate a versioned catalog with schemas, side effects, read/write and idempotency hints, budgets and error taxonomy. Test every registered callback through transport with isolated fixtures and require discipline-manifest parity."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "All 30 baseline resource URIs have defined query behavior; oversized results stay valid; paging yields exactly the requested revision without duplicates or missing middle records; invalid URI sets the agreed error signal.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-2-unify-graph-identity-and-read-snapshots--f03",
+        "priority": 1,
+        "delta_entry_id": "F03",
+        "action": "modify",
+        "target_file": "src/cognitive/graph-rag.ts",
+        "change_description": "Slice 2: Unify graph identity and read snapshots. Define typed stable entity identities and a coherent revisioned snapshot adapter for canonical entities, inline fact links, validated insights, ADRs, UI and auxiliary entities. Specify collision handling and stale references without auto-merging unrelated entities. Rollback: Dual-read comparison before switching; retain original stores and reversible ID mapping.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F03",
+          "what_it_requires": "Introduce a shared typed, revisioned graph read model with all canonical entity families, fact links, separately labeled validated insights, ADR bindings and provenance. Migrate consumers through adapters rather than rewriting the entire engine."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Exact-ID reads work for every canonical family; source facts remain distinct from dreams; snapshot consumers agree on identity and revision under concurrent updates.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-2-unify-graph-identity-and-read-snapshots--f17",
+        "priority": 1,
+        "delta_entry_id": "F17",
+        "action": "modify",
+        "target_file": "python/analytics/orphan_pressure.py",
+        "change_description": "Slice 2: Unify graph identity and read snapshots. Define typed stable entity identities and a coherent revisioned snapshot adapter for canonical entities, inline fact links, validated insights, ADRs, UI and auxiliary entities. Specify collision handling and stale references without auto-merging unrelated entities. Rollback: Dual-read comparison before switching; retain original stores and reversible ID mapping.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F17",
+          "what_it_requires": "Create a backup and dry-run repair/migration report, disambiguate typed identities, preserve curation and provenance, establish a baseline, and reconcile incrementally with rollback and explicit cost approval before paid enrichment."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Exact-ID reads work for every canonical family; source facts remain distinct from dreams; snapshot consumers agree on identity and revision under concurrent updates.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-2-unify-graph-identity-and-read-snapshots--f21",
+        "priority": 1,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 2: Unify graph identity and read snapshots. Define typed stable entity identities and a coherent revisioned snapshot adapter for canonical entities, inline fact links, validated insights, ADRs, UI and auxiliary entities. Specify collision handling and stale references without auto-merging unrelated entities. Rollback: Dual-read comparison before switching; retain original stores and reversible ID mapping.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Exact-ID reads work for every canonical family; source facts remain distinct from dreams; snapshot consumers agree on identity and revision under concurrent updates.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-3-provide-complete-bounded-agent-retrieval--f03",
+        "priority": 1,
+        "delta_entry_id": "F03",
+        "action": "modify",
+        "target_file": "src/cognitive/graph-rag.ts",
+        "change_description": "Slice 3: Provide complete bounded agent retrieval. Migrate RAG/preamble to the shared graph view. Preserve required ADR/evidence context, expose why entities were selected and what was omitted, and honor depth/type/domain/trust filters. Separate context and envelope budgets. Rollback: Feature-flag new retrieval and retain versioned old query API for comparison, with visible limitations.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F03",
+          "what_it_requires": "Introduce a shared typed, revisioned graph read model with all canonical entity families, fact links, separately labeled validated insights, ADR bindings and provenance. Migrate consumers through adapters rather than rewriting the entire engine."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-1-make-graph-responses-structured-and-pageable",
+            "slice-2-unify-graph-identity-and-read-snapshots"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Regression targets include the capability and dashboard UI misses; every fixture entity family and inline fact edge is retrievable; 100/500/2000 budgets do not overflow; metadata counts match emitted records.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-3-provide-complete-bounded-agent-retrieval--f04",
+        "priority": 1,
+        "delta_entry_id": "F04",
+        "action": "modify",
+        "target_file": "src/cognitive/graph-rag.ts",
+        "change_description": "Slice 3: Provide complete bounded agent retrieval. Migrate RAG/preamble to the shared graph view. Preserve required ADR/evidence context, expose why entities were selected and what was omitted, and honor depth/type/domain/trust filters. Separate context and envelope budgets. Rollback: Feature-flag new retrieval and retain versioned old query API for comparison, with visible limitations.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F04",
+          "what_it_requires": "Define context-versus-envelope budgeting explicitly, account for every emitted field and report omitted counts accurately. Never slice a fact or provenance record into an unidentifiable fragment."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-1-make-graph-responses-structured-and-pageable",
+            "slice-2-unify-graph-identity-and-read-snapshots"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Regression targets include the capability and dashboard UI misses; every fixture entity family and inline fact edge is retrievable; 100/500/2000 budgets do not overflow; metadata counts match emitted records.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-4-index-retrieval-and-evaluate-agent-usefulness--f05",
+        "priority": 1,
+        "delta_entry_id": "F05",
+        "action": "modify",
+        "target_file": "src/cognitive/graph-rag.ts",
+        "change_description": "Slice 4: Index retrieval and evaluate agent usefulness. Build revision-keyed indexes with precomputed statistics, Unicode and symbol support. Create evidence-labeled tasks for orientation, impact analysis, debugging, architecture decisions and unknown answers; compare CLI/API/Architect contexts. Rollback: Invalidate/rebuild index on revision mismatch; fall back to a correct bounded scan.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F05",
+          "what_it_requires": "Cache indexes by graph revision, precompute document frequencies, preserve Unicode/symbol lookup and evaluate relevant evidence recall, abstention, provenance, latency and tokens on a labeled task set."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-3-provide-complete-bounded-agent-retrieval"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Agree measurable latency and quality baselines before tuning; all mandatory-evidence fixtures pass, unsupported questions abstain, and no quality regression is hidden by shorter output. Report p50/p95 across repeated real queries.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-4-index-retrieval-and-evaluate-agent-usefulness--f19",
+        "priority": 1,
+        "delta_entry_id": "F19",
+        "action": "modify",
+        "target_file": "scripts/benchmark-scan-mcp.mjs",
+        "change_description": "Slice 4: Index retrieval and evaluate agent usefulness. Build revision-keyed indexes with precomputed statistics, Unicode and symbol support. Create evidence-labeled tasks for orientation, impact analysis, debugging, architecture decisions and unknown answers; compare CLI/API/Architect contexts. Rollback: Invalidate/rebuild index on revision mismatch; fall back to a correct bounded scan.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F19",
+          "what_it_requires": "Label synthetic fixtures explicitly; add real isolated transport and opt-in provider runners, measured usage, task-quality checks, environment manifests and uncertainty. Prohibit release claims drawn from simulated results."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-3-provide-complete-bounded-agent-retrieval"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Agree measurable latency and quality baselines before tuning; all mandatory-evidence fixtures pass, unsupported questions abstain, and no quality regression is hidden by shorter output. Report p50/p95 across repeated real queries.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-5-commit-enrichment-and-checkpoints-coherently--f06",
+        "priority": 1,
+        "delta_entry_id": "F06",
+        "action": "modify",
+        "target_file": "src/tools/enrich-parser-nodes.ts",
+        "change_description": "Slice 5: Commit enrichment and checkpoints coherently. Replace stale whole-store commits with revision-aware entity deltas; coordinate graph mutation and checkpoint acknowledgment. Expose attempted/generated/committed/fallback/failed counts with one job ID. Rollback: Backup manifests and journal replay; no destructive migration until recovery tests pass.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F06",
+          "what_it_requires": "Commit entity deltas against a graph revision, advance checkpoint success only after durable commit, and fault-inject write failure, cancellation, restart and concurrent curation. Distinguish attempted, generated, committed, fallback and failed counts."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-2-unify-graph-identity-and-read-snapshots"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Injected failure at each store/checkpoint boundary cannot mark uncommitted nodes enriched; concurrent human edits survive; restart/resume is idempotent and reports partial completion accurately.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-6-bound-scan-and-enrichment-cost-and-recovery--f07",
+        "priority": 1,
+        "delta_entry_id": "F07",
+        "action": "modify",
+        "target_file": "src/tools/enrich-parser-nodes.ts",
+        "change_description": "Slice 6: Bound scan and enrichment cost and recovery. Add estimates and max calls/input/output/reasoning/retries/job budget controls to scan and standalone enrichment. Classify fallback causes in progress and final reports, preserve resumability, and allow cancel without losing committed work. Rollback: Persist previous policy; stop safely when cost/pricing is unknown under a strict monetary cap.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F07",
+          "what_it_requires": "Add preflight estimates, input/output/reasoning limits, call/retry and job caps, effective route disclosure, cancellation/resume, cause-grouped fallback reporting and budget-aware escalation. Unknown pricing must remain unknown rather than zero."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-5-commit-enrichment-and-checkpoints-coherently"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Zero budget makes no provider request; retry/escalation counts remain within caps; max-hops 0/1/2/3 semantics are tested; UI/CLI agree on cumulative usage and remaining work.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-7-define-role-based-model-and-lifecycle-profiles--f22",
+        "priority": 1,
+        "delta_entry_id": "F22",
+        "action": "modify",
+        "target_file": "src/cognitive/llm.ts",
+        "change_description": "Slice 7: Define role-based model and lifecycle profiles. Define independent initial_scan, enrichment, dreamer, normalizer and architect profiles. Include provider, model, API mode, reasoning effort, output/context limits, timeout, storage policy, allowed fallbacks and spend ceiling. Preserve existing settings through explicit migration. Rollback: Retain prior per-role configuration; migration preview and revert are available.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F22",
+          "what_it_requires": "Extend existing adapters with explicit per-role API/model/reasoning/storage/budget configuration, a capability registry and controlled unknown-model overrides. Keep initial-scan and mature-graph policies separate; verify GPT-4.1, GPT-5.4 and user-selected newer models without a hardcoded frontier ceiling."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "User can choose GPT-4.1 for an initial scan and GPT-5.4 for dreamer/normalizer, then select a supported newer model without a code-imposed ceiling. Profiles are suggestions, never automatic model upgrades; effective role resolution is inspectable.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-7-define-role-based-model-and-lifecycle-profiles--f07",
+        "priority": 1,
+        "delta_entry_id": "F07",
+        "action": "modify",
+        "target_file": "src/tools/enrich-parser-nodes.ts",
+        "change_description": "Slice 7: Define role-based model and lifecycle profiles. Define independent initial_scan, enrichment, dreamer, normalizer and architect profiles. Include provider, model, API mode, reasoning effort, output/context limits, timeout, storage policy, allowed fallbacks and spend ceiling. Preserve existing settings through explicit migration. Rollback: Retain prior per-role configuration; migration preview and revert are available.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F07",
+          "what_it_requires": "Add preflight estimates, input/output/reasoning limits, call/retry and job caps, effective route disclosure, cancellation/resume, cause-grouped fallback reporting and budget-aware escalation. Unknown pricing must remain unknown rather than zero."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "User can choose GPT-4.1 for an initial scan and GPT-5.4 for dreamer/normalizer, then select a supported newer model without a code-imposed ceiling. Profiles are suggestions, never automatic model upgrades; effective role resolution is inspectable.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-7-define-role-based-model-and-lifecycle-profiles--f13",
+        "priority": 1,
+        "delta_entry_id": "F13",
+        "action": "modify",
+        "target_file": "src/server/dashboard.ts",
+        "change_description": "Slice 7: Define role-based model and lifecycle profiles. Define independent initial_scan, enrichment, dreamer, normalizer and architect profiles. Include provider, model, API mode, reasoning effort, output/context limits, timeout, storage policy, allowed fallbacks and spend ceiling. Preserve existing settings through explicit migration. Rollback: Retain prior per-role configuration; migration preview and revert are available.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F13",
+          "what_it_requires": "Define authoritative persisted configuration with precedence, revisions and restart behavior. Show requested/effective/source values and verify save/restart/readback across every section and client."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "User can choose GPT-4.1 for an initial scan and GPT-5.4 for dreamer/normalizer, then select a supported newer model without a code-imposed ceiling. Profiles are suggestions, never automatic model upgrades; effective role resolution is inspectable.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-8-complete-responses-and-provider-capability-contracts--f22",
+        "priority": 1,
+        "delta_entry_id": "F22",
+        "action": "modify",
+        "target_file": "src/cognitive/llm.ts",
+        "change_description": "Slice 8: Complete Responses and provider capability contracts. Extend existing adapters instead of duplicating them. Add explicit auto/responses/chat-completions policy, capability-sensitive reasoning/temperature/structured outputs, refusal/incomplete handling, abort propagation, usage accounting and state/storage controls. Validate OpenAI and Anthropic independently; keep Codex CLI model IDs separate from API capability assumptions. Rollback: Per-provider rollout switch with an explicit compatible fallback; never silently switch to a more expensive model or weaker output contract.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F22",
+          "what_it_requires": "Extend existing adapters with explicit per-role API/model/reasoning/storage/budget configuration, a capability registry and controlled unknown-model overrides. Keep initial-scan and mature-graph policies separate; verify GPT-4.1, GPT-5.4 and user-selected newer models without a hardcoded frontier ceiling."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-7-define-role-based-model-and-lifecycle-profiles"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Offline request/response fixtures cover GPT-4.1, GPT-5.4, known newer models and an unknown user override; requested reasoning arrives on the wire; malformed/refused/incomplete output never becomes validated graph data; input/cached/output/reasoning usage is reported where supplied.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-9-evaluate-mature-graph-model-policies--f10",
+        "priority": 1,
+        "delta_entry_id": "F10",
+        "action": "modify",
+        "target_file": "src/cognitive/normalizer.ts",
+        "change_description": "Slice 9: Evaluate mature-graph model policies. Use fixed source evidence to compare initial-scan economics and mature-graph dream/normalization quality. Separate creative candidate generation from skeptical evidence checking. Preserve route/prompt/model/schema versions on artifacts. Rollback: Pin the previous profile and prompt; canary candidates stay speculative until validated.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F10",
+          "what_it_requires": "Separate operational yield from evaluated accuracy, track evidence independence and source freshness, calibrate on labeled positive/negative cases, and preserve uncertainty and explicit human review across every projection."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-4-index-retrieval-and-evaluate-agent-usefulness",
+            "slice-6-bound-scan-and-enrichment-cost-and-recovery",
+            "slice-8-complete-responses-and-provider-capability-contracts"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Offline eval is mandatory; optional paid canaries require a stated cap. Report factual errors, useful novel candidates, independent validation, fallback/refusal, cost and latency. A frontier model cannot bypass truth gates.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-9-evaluate-mature-graph-model-policies--f19",
+        "priority": 1,
+        "delta_entry_id": "F19",
+        "action": "modify",
+        "target_file": "scripts/benchmark-scan-mcp.mjs",
+        "change_description": "Slice 9: Evaluate mature-graph model policies. Use fixed source evidence to compare initial-scan economics and mature-graph dream/normalization quality. Separate creative candidate generation from skeptical evidence checking. Preserve route/prompt/model/schema versions on artifacts. Rollback: Pin the previous profile and prompt; canary candidates stay speculative until validated.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F19",
+          "what_it_requires": "Label synthetic fixtures explicitly; add real isolated transport and opt-in provider runners, measured usage, task-quality checks, environment manifests and uncertainty. Prohibit release claims drawn from simulated results."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-4-index-retrieval-and-evaluate-agent-usefulness",
+            "slice-6-bound-scan-and-enrichment-cost-and-recovery",
+            "slice-8-complete-responses-and-provider-capability-contracts"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Offline eval is mandatory; optional paid canaries require a stated cap. Report factual errors, useful novel candidates, independent validation, fallback/refusal, cost and latency. A frontier model cannot bypass truth gates.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-9-evaluate-mature-graph-model-policies--f22",
+        "priority": 1,
+        "delta_entry_id": "F22",
+        "action": "modify",
+        "target_file": "src/cognitive/llm.ts",
+        "change_description": "Slice 9: Evaluate mature-graph model policies. Use fixed source evidence to compare initial-scan economics and mature-graph dream/normalization quality. Separate creative candidate generation from skeptical evidence checking. Preserve route/prompt/model/schema versions on artifacts. Rollback: Pin the previous profile and prompt; canary candidates stay speculative until validated.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F22",
+          "what_it_requires": "Extend existing adapters with explicit per-role API/model/reasoning/storage/budget configuration, a capability registry and controlled unknown-model overrides. Keep initial-scan and mature-graph policies separate; verify GPT-4.1, GPT-5.4 and user-selected newer models without a hardcoded frontier ceiling."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-4-index-retrieval-and-evaluate-agent-usefulness",
+            "slice-6-bound-scan-and-enrichment-cost-and-recovery",
+            "slice-8-complete-responses-and-provider-capability-contracts"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Offline eval is mandatory; optional paid canaries require a stated cap. Report factual errors, useful novel candidates, independent validation, fallback/refusal, cost and latency. A frontier model cannot bypass truth gates.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-10-validate-and-persist-all-configuration--f12",
+        "priority": 1,
+        "delta_entry_id": "F12",
+        "action": "modify",
+        "target_file": "src/server/dashboard.ts",
+        "change_description": "Slice 10: Validate and persist all configuration. Create shared schemas and an atomic persisted configuration authority for scheduler, events, narrative, model roles, retrieval and budgets. Define environment/instance/session precedence and redaction. Rollback: Version configuration and keep a last-known-good file with reversible migrations.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F12",
+          "what_it_requires": "Validate a complete candidate configuration against a shared finite/range/cross-field schema, reject atomically with field errors, and never display saved after invalid input."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract",
+            "slice-7-define-role-based-model-and-lifecycle-profiles"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "NaN, infinities, negative rates and cross-field contradictions fail without mutation; save/restart/readback preserves valid settings; each UI shows requested, effective and source values.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-10-validate-and-persist-all-configuration--f13",
+        "priority": 1,
+        "delta_entry_id": "F13",
+        "action": "modify",
+        "target_file": "src/server/dashboard.ts",
+        "change_description": "Slice 10: Validate and persist all configuration. Create shared schemas and an atomic persisted configuration authority for scheduler, events, narrative, model roles, retrieval and budgets. Define environment/instance/session precedence and redaction. Rollback: Version configuration and keep a last-known-good file with reversible migrations.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F13",
+          "what_it_requires": "Define authoritative persisted configuration with precedence, revisions and restart behavior. Show requested/effective/source values and verify save/restart/readback across every section and client."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract",
+            "slice-7-define-role-based-model-and-lifecycle-profiles"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "NaN, infinities, negative rates and cross-field contradictions fail without mutation; save/restart/readback preserves valid settings; each UI shows requested, effective and source values.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-11-isolate-sessions-and-harden-transport-authority--f14",
+        "priority": 1,
+        "delta_entry_id": "F14",
+        "action": "modify",
+        "target_file": "src/index.ts",
+        "change_description": "Slice 11: Isolate sessions and harden transport authority. Scope browser history, selected plan, provider continuations and cancellation by session/execution. Specify loopback binding and explicit authenticated remote mode; enforce origin/host and browser-mutation protections consistently. Rollback: Compatibility mode only with explicit documented trust boundaries; session migration is recoverable.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F14",
+          "what_it_requires": "Bind plan selection, history, cancellation, tool continuation and provider state to session and execution IDs. Test two overlapping clients, reconnect and cancellation without paying for models."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Two overlapping clients cannot stop, change or read each other’s private execution state; reconnect targets the right job; local legitimate workflows pass; untrusted origin and unauthorized remote mutations fail.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-11-isolate-sessions-and-harden-transport-authority--f20",
+        "priority": 1,
+        "delta_entry_id": "F20",
+        "action": "modify",
+        "target_file": "src/index.ts",
+        "change_description": "Slice 11: Isolate sessions and harden transport authority. Scope browser history, selected plan, provider continuations and cancellation by session/execution. Specify loopback binding and explicit authenticated remote mode; enforce origin/host and browser-mutation protections consistently. Rollback: Compatibility mode only with explicit documented trust boundaries; session migration is recoverable.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F20",
+          "what_it_requires": "Specify loopback defaults and opt-in authenticated remote access, trusted hosts/origins, session ownership, CSRF protection for browser mutations and permission parity across transports."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Two overlapping clients cannot stop, change or read each other’s private execution state; reconnect targets the right job; local legitimate workflows pass; untrusted origin and unauthorized remote mutations fail.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-12-align-the-complete-mcp-catalog-and-client-contracts--f16",
+        "priority": 1,
+        "delta_entry_id": "F16",
+        "action": "modify",
+        "target_file": "src/tools",
+        "change_description": "Slice 12: Align the complete MCP catalog and client contracts. Generate tool/resource manifests from registration, annotate effects and idempotency, normalize errors and cancellation, and enforce ADR-123 discipline parity. Exercise native HTTP/stdio where supported, daemon API and CLI bridges using isolated fixtures. Rollback: Version contracts and advertise capabilities so older clients fail clearly rather than corrupting state.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F16",
+          "what_it_requires": "Generate a versioned catalog with schemas, side effects, read/write and idempotency hints, budgets and error taxonomy. Test every registered callback through transport with isolated fixtures and require discipline-manifest parity."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-1-make-graph-responses-structured-and-pageable",
+            "slice-10-validate-and-persist-all-configuration",
+            "slice-11-isolate-sessions-and-harden-transport-authority"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Every baseline tool has success, invalid-input, unavailable-dependency and permission tests where applicable; writes use disposable data; schema/catalog/docs parity is automatic; structured results survive bridge conversion.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-12-align-the-complete-mcp-catalog-and-client-contracts--f18",
+        "priority": 1,
+        "delta_entry_id": "F18",
+        "action": "modify",
+        "target_file": "vitest.config.ts",
+        "change_description": "Slice 12: Align the complete MCP catalog and client contracts. Generate tool/resource manifests from registration, annotate effects and idempotency, normalize errors and cancellation, and enforce ADR-123 discipline parity. Exercise native HTTP/stdio where supported, daemon API and CLI bridges using isolated fixtures. Rollback: Version contracts and advertise capabilities so older clients fail clearly rather than corrupting state.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F18",
+          "what_it_requires": "Establish meaningful contract, state-machine, fault-injection, provider, transport and browser coverage with explicit exclusions and per-area gates. Preserve fast deterministic tests; do not make a global percentage a substitute for behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-1-make-graph-responses-structured-and-pageable",
+            "slice-10-validate-and-persist-all-configuration",
+            "slice-11-isolate-sessions-and-harden-transport-authority"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Every baseline tool has success, invalid-input, unavailable-dependency and permission tests where applicable; writes use disposable data; schema/catalog/docs parity is automatic; structured results survive bridge conversion.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-13-make-the-strategy-registry-executable-and-testable--f08",
+        "priority": 1,
+        "delta_entry_id": "F08",
+        "action": "modify",
+        "target_file": "src/cognitive/register.ts",
+        "change_description": "Slice 13: Make the strategy registry executable and testable. Unify strategy names, descriptions, dispatch, requirements and output budgets. Implement or explicitly retire reflective. Add seeded positive/negative fixtures for all structural strategies, LLM schema fixtures and causal replay. Rollback: Strategy-level feature flags preserve stable strategies while a failed one is disabled visibly.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F08",
+          "what_it_requires": "Implement a bounded, evidence-backed reflective strategy or reject/retire it explicitly. Derive advertised strategy choices and execution dispatch from one registry."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract",
+            "slice-2-unify-graph-identity-and-read-snapshots"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Every advertised choice produces an exercised execution path or explicit unsupported error; no input mutation, invalid endpoints, self-links or undocumented cap overflow; positive missing-abstraction and empty graphs are tested.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-13-make-the-strategy-registry-executable-and-testable--f09",
+        "priority": 1,
+        "delta_entry_id": "F09",
+        "action": "modify",
+        "target_file": "src/cognitive/dreamer.ts",
+        "change_description": "Slice 13: Make the strategy registry executable and testable. Unify strategy names, descriptions, dispatch, requirements and output budgets. Implement or explicitly retire reflective. Add seeded positive/negative fixtures for all structural strategies, LLM schema fixtures and causal replay. Rollback: Strategy-level feature flags preserve stable strategies while a failed one is disabled visibly.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F09",
+          "what_it_requires": "Persist per-strategy observations after deduplication, measure novelty, cost, independent validation and downstream utility, reserve bounded exploration, and enforce deterministic allocation including zero and tiny budgets."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract",
+            "slice-2-unify-graph-identity-and-read-snapshots"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Every advertised choice produces an exercised execution path or explicit unsupported error; no input mutation, invalid endpoints, self-links or undocumented cap overflow; positive missing-abstraction and empty graphs are tested.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-13-make-the-strategy-registry-executable-and-testable--f18",
+        "priority": 1,
+        "delta_entry_id": "F18",
+        "action": "modify",
+        "target_file": "vitest.config.ts",
+        "change_description": "Slice 13: Make the strategy registry executable and testable. Unify strategy names, descriptions, dispatch, requirements and output budgets. Implement or explicitly retire reflective. Add seeded positive/negative fixtures for all structural strategies, LLM schema fixtures and causal replay. Rollback: Strategy-level feature flags preserve stable strategies while a failed one is disabled visibly.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F18",
+          "what_it_requires": "Establish meaningful contract, state-machine, fault-injection, provider, transport and browser coverage with explicit exclusions and per-area gates. Preserve fast deterministic tests; do not make a global percentage a substitute for behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract",
+            "slice-2-unify-graph-identity-and-read-snapshots"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Every advertised choice produces an exercised execution path or explicit unsupported error; no input mutation, invalid endpoints, self-links or undocumented cap overflow; positive missing-abstraction and empty graphs are tested.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-14-measure-and-persist-useful-strategy-yield--f09",
+        "priority": 2,
+        "delta_entry_id": "F09",
+        "action": "modify",
+        "target_file": "src/cognitive/dreamer.ts",
+        "change_description": "Slice 14: Measure and persist useful strategy yield. Persist post-dedup novelty, evidence quality, validation outcomes, usefulness and cost by strategy/version. Bound exploration and eliminate zero-budget and rounding surprises. Rollback: Resettable versioned portfolio statistics and a deterministic fixed-allocation fallback.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F09",
+          "what_it_requires": "Persist per-strategy observations after deduplication, measure novelty, cost, independent validation and downstream utility, reserve bounded exploration, and enforce deterministic allocation including zero and tiny budgets."
+        },
+        "risk": {
+          "level": "medium",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-9-evaluate-mature-graph-model-policies",
+            "slice-13-make-the-strategy-registry-executable-and-testable"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Duplicate floods do not increase utility scores; restart preserves learning; zero/tiny budgets and unfair ordering are covered; compare adaptive allocation with a fixed baseline on labeled traces.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-14-measure-and-persist-useful-strategy-yield--f10",
+        "priority": 2,
+        "delta_entry_id": "F10",
+        "action": "modify",
+        "target_file": "src/cognitive/normalizer.ts",
+        "change_description": "Slice 14: Measure and persist useful strategy yield. Persist post-dedup novelty, evidence quality, validation outcomes, usefulness and cost by strategy/version. Bound exploration and eliminate zero-budget and rounding surprises. Rollback: Resettable versioned portfolio statistics and a deterministic fixed-allocation fallback.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F10",
+          "what_it_requires": "Separate operational yield from evaluated accuracy, track evidence independence and source freshness, calibrate on labeled positive/negative cases, and preserve uncertainty and explicit human review across every projection."
+        },
+        "risk": {
+          "level": "medium",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-9-evaluate-mature-graph-model-policies",
+            "slice-13-make-the-strategy-registry-executable-and-testable"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Duplicate floods do not increase utility scores; restart preserves learning; zero/tiny budgets and unfair ordering are covered; compare adaptive allocation with a fixed baseline on labeled traces.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-15-calibrate-normalization-and-evidence-independence--f10",
+        "priority": 1,
+        "delta_entry_id": "F10",
+        "action": "modify",
+        "target_file": "src/cognitive/normalizer.ts",
+        "change_description": "Slice 15: Calibrate normalization and evidence independence. Retain existing provenance gates while adding independent evidence attribution, contradiction handling and stale-source checks. Separate operational promotion rate from labeled precision/recall. Use model-assisted judgment as evidence, not authority. Rollback: Keep rejected/latent records reviewable; rollback thresholds without erasing evidence or undo history.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F10",
+          "what_it_requires": "Separate operational yield from evaluated accuracy, track evidence independence and source freshness, calibrate on labeled positive/negative cases, and preserve uncertainty and explicit human review across every projection."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-2-unify-graph-identity-and-read-snapshots",
+            "slice-9-evaluate-mature-graph-model-policies",
+            "slice-13-make-the-strategy-registry-executable-and-testable"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Correlated repeated suggestions cannot self-validate; fabricated clusters and stale references fail; positive supported relations pass; confidence calibration is measured and review decisions remain inspectable.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-16-align-decay-maintenance-and-human-curation--f17",
+        "priority": 1,
+        "delta_entry_id": "F17",
+        "action": "modify",
+        "target_file": "python/analytics/orphan_pressure.py",
+        "change_description": "Slice 16: Align decay maintenance and human curation. Define retention, TTL, reinforcement, tombstone and supersession behavior across candidates, validated insights, source facts and human decisions. Make maintenance jobs share revision/commit semantics. Rollback: Dry-run maintenance and reversible archive/tombstone operations before deletion.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F17",
+          "what_it_requires": "Create a backup and dry-run repair/migration report, disambiguate typed identities, preserve curation and provenance, establish a baseline, and reconcile incrementally with rollback and explicit cost approval before paid enrichment."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-5-commit-enrichment-and-checkpoints-coherently",
+            "slice-15-calibrate-normalization-and-evidence-independence"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Reject then rediscover, delete then rescan, source rename, decay and human correction traces converge without resurrection, dangling links or loss of reviewed facts.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-16-align-decay-maintenance-and-human-curation--f21",
+        "priority": 1,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 16: Align decay maintenance and human curation. Define retention, TTL, reinforcement, tombstone and supersession behavior across candidates, validated insights, source facts and human decisions. Make maintenance jobs share revision/commit semantics. Rollback: Dry-run maintenance and reversible archive/tombstone operations before deletion.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-5-commit-enrichment-and-checkpoints-coherently",
+            "slice-15-calibrate-normalization-and-evidence-independence"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Reject then rediscover, delete then rescan, source rename, decay and human correction traces converge without resurrection, dangling links or loss of reviewed facts.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-17-coordinate-engine-scheduling-events-and-bootstrap--f07",
+        "priority": 1,
+        "delta_entry_id": "F07",
+        "action": "modify",
+        "target_file": "src/tools/enrich-parser-nodes.ts",
+        "change_description": "Slice 17: Coordinate engine scheduling events and bootstrap. Integrate core cognitive states, manual jobs, scheduled dreams, targeted dreams, event routing and bootstrap under explicit ownership, concurrency, cancellation and budget rules. Define restart and event deduplication. Rollback: Pause background producers and drain committed jobs; resume from the journal with previous policy.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F07",
+          "what_it_requires": "Add preflight estimates, input/output/reasoning limits, call/retry and job caps, effective route disclosure, cancellation/resume, cause-grouped fallback reporting and budget-aware escalation. Unknown pricing must remain unknown rather than zero."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-6-bound-scan-and-enrichment-cost-and-recovery",
+            "slice-10-validate-and-persist-all-configuration",
+            "slice-13-make-the-strategy-registry-executable-and-testable",
+            "slice-16-align-decay-maintenance-and-human-curation"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Manual scan plus scheduled dream plus duplicate event storm stays within budget and concurrency limits; all errors restore a valid engine state; restart neither loses nor duplicates accepted work.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-17-coordinate-engine-scheduling-events-and-bootstrap--f21",
+        "priority": 1,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 17: Coordinate engine scheduling events and bootstrap. Integrate core cognitive states, manual jobs, scheduled dreams, targeted dreams, event routing and bootstrap under explicit ownership, concurrency, cancellation and budget rules. Define restart and event deduplication. Rollback: Pause background producers and drain committed jobs; resume from the journal with previous policy.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-6-bound-scan-and-enrichment-cost-and-recovery",
+            "slice-10-validate-and-persist-all-configuration",
+            "slice-13-make-the-strategy-registry-executable-and-testable",
+            "slice-16-align-decay-maintenance-and-human-curation"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Manual scan plus scheduled dream plus duplicate event storm stays within budget and concurrency limits; all errors restore a valid engine state; restart neither loses nor duplicates accepted work.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-18-align-temporal-causal-and-federated-evidence--f10",
+        "priority": 2,
+        "delta_entry_id": "F10",
+        "action": "modify",
+        "target_file": "src/cognitive/normalizer.ts",
+        "change_description": "Slice 18: Align temporal causal and federated evidence. Specify observation/event time, causal-hypothesis status, duplicate history and foreign-origin trust. Test federation schema compatibility, origin retention, redaction, import deduplication and local validation. Rollback: Quarantine imports and keep versioned export manifests; disable causal/federated promotion independently.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F10",
+          "what_it_requires": "Separate operational yield from evaluated accuracy, track evidence independence and source freshness, calibrate on labeled positive/negative cases, and preserve uncertainty and explicit human review across every projection."
+        },
+        "risk": {
+          "level": "medium",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-2-unify-graph-identity-and-read-snapshots",
+            "slice-15-calibrate-normalization-and-evidence-independence",
+            "slice-16-align-decay-maintenance-and-human-curation"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Out-of-order replay is stable; repeated imports do not inflate confidence; external hypotheses cannot enter local facts without evidence; correlation is labeled explicitly.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-18-align-temporal-causal-and-federated-evidence--f21",
+        "priority": 2,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 18: Align temporal causal and federated evidence. Specify observation/event time, causal-hypothesis status, duplicate history and foreign-origin trust. Test federation schema compatibility, origin retention, redaction, import deduplication and local validation. Rollback: Quarantine imports and keep versioned export manifests; disable causal/federated promotion independently.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "medium",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-2-unify-graph-identity-and-read-snapshots",
+            "slice-15-calibrate-normalization-and-evidence-independence",
+            "slice-16-align-decay-maintenance-and-human-curation"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Out-of-order replay is stable; repeated imports do not inflate confidence; external hypotheses cannot enter local facts without evidence; correlation is labeled explicitly.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-19-unify-tension-remediation-and-future-review--f11",
+        "priority": 1,
+        "delta_entry_id": "F11",
+        "action": "modify",
+        "target_file": "src/tools/graph-health.ts",
+        "change_description": "Slice 19: Unify tension remediation and future review. Connect adversarial detection, clustering/noise, resolution/reappearance, remediation candidates and adaptive future outcomes with stable IDs and explicit review/verification transitions. Rollback: Retain original risk and review history; supersede proposals instead of erasing them.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F11",
+          "what_it_requires": "Make critical integrity/readiness failures visible independently of a weighted score. Use common, revision-bound denominators and explicit stale/unknown states throughout CLI, analytics, dashboard and Architect."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-15-calibrate-normalization-and-evidence-independence",
+            "slice-17-coordinate-engine-scheduling-events-and-bootstrap",
+            "slice-18-align-temporal-causal-and-federated-evidence"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "One risk has consistent state across all views; evidence change can reopen it; suggested or executed remediation alone never proves resolution; branch outcomes and human overrides remain traceable.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-19-unify-tension-remediation-and-future-review--f21",
+        "priority": 1,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 19: Unify tension remediation and future review. Connect adversarial detection, clustering/noise, resolution/reappearance, remediation candidates and adaptive future outcomes with stable IDs and explicit review/verification transitions. Rollback: Retain original risk and review history; supersede proposals instead of erasing them.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-15-calibrate-normalization-and-evidence-independence",
+            "slice-17-coordinate-engine-scheduling-events-and-bootstrap",
+            "slice-18-align-temporal-causal-and-federated-evidence"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "One risk has consistent state across all views; evidence change can reopen it; suggested or executed remediation alone never proves resolution; branch outcomes and human overrides remain traceable.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-20-make-lifecycle-narrative-and-lucid-interaction-consistent--f21",
+        "priority": 2,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 20: Make lifecycle narrative and lucid interaction consistent. Reuse trust/evidence/lifecycle projections for narrator, story, playback and lucid mode. Bind summaries to a revision and preserve human intent and uncertainty. Rollback: Expose raw evidence alongside prior summary and rebuild projections from durable events.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "medium",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-11-isolate-sessions-and-harden-transport-authority",
+            "slice-16-align-decay-maintenance-and-human-curation",
+            "slice-19-unify-tension-remediation-and-future-review"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "The same candidate has the same trust and provenance in each surface; replay distinguishes history from current state; stale summaries warn; lucid session exit restores engine ownership correctly.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-21-repair-plan-and-discipline-lifecycle-projection--f15",
+        "priority": 1,
+        "delta_entry_id": "F15",
+        "action": "modify",
+        "target_file": "src/architect/plan-registry.ts",
+        "change_description": "Slice 21: Repair plan and discipline lifecycle projection. Define legal plan/slice/review/checkpoint transitions including blocked, verifying, cancelled and audit-only activity. Align browser, VS Code, daemon actions and discipline sessions without inventing approval from a progress message. Rollback: Version projection rules; preserve Markdown and logs verbatim and offer migration preview.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F15",
+          "what_it_requires": "Define and test legal lifecycle transitions and audit-only checkpoints. Preserve blocked/verification gates across browser, extension, daemon actions and restart; do not infer completion solely from optimistic prose."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract",
+            "slice-11-isolate-sessions-and-harden-transport-authority"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Parser fixtures round-trip each state; audit record does not mark implementation started; failed verification blocks completion; resume selects the correct unfinished slice and retains its reason.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-21-repair-plan-and-discipline-lifecycle-projection--f21",
+        "priority": 1,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 21: Repair plan and discipline lifecycle projection. Define legal plan/slice/review/checkpoint transitions including blocked, verifying, cancelled and audit-only activity. Align browser, VS Code, daemon actions and discipline sessions without inventing approval from a progress message. Rollback: Version projection rules; preserve Markdown and logs verbatim and offer migration preview.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-0-establish-the-engine-alignment-contract",
+            "slice-11-isolate-sessions-and-harden-transport-authority"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Parser fixtures round-trip each state; audit record does not mark implementation started; failed verification blocks completion; resume selects the correct unfinished slice and retains its reason.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-22-align-analytics-health-and-observability--f11",
+        "priority": 1,
+        "delta_entry_id": "F11",
+        "action": "modify",
+        "target_file": "src/tools/graph-health.ts",
+        "change_description": "Slice 22: Align analytics health and observability. Publish metric definitions and common revision/time/identity denominators for all 13 analytics modules, health, metacognition, lifecycle and dashboard. Separate integrity, freshness, coverage, readiness and workload. Trace job/model/graph revisions without secrets. Rollback: Keep versioned metric names and historical data; never compare incompatible denominators silently.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F11",
+          "what_it_requires": "Make critical integrity/readiness failures visible independently of a weighted score. Use common, revision-bound denominators and explicit stale/unknown states throughout CLI, analytics, dashboard and Architect."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-2-unify-graph-identity-and-read-snapshots",
+            "slice-5-commit-enrichment-and-checkpoints-coherently",
+            "slice-15-calibrate-normalization-and-evidence-independence",
+            "slice-19-unify-tension-remediation-and-future-review"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Critical defects cannot be averaged into healthy; stale snapshots are labeled; golden graphs have known counts; TypeScript/Python results agree where definitions match; synthetic benchmarks cannot be reported as real performance.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-22-align-analytics-health-and-observability--f19",
+        "priority": 1,
+        "delta_entry_id": "F19",
+        "action": "modify",
+        "target_file": "scripts/benchmark-scan-mcp.mjs",
+        "change_description": "Slice 22: Align analytics health and observability. Publish metric definitions and common revision/time/identity denominators for all 13 analytics modules, health, metacognition, lifecycle and dashboard. Separate integrity, freshness, coverage, readiness and workload. Trace job/model/graph revisions without secrets. Rollback: Keep versioned metric names and historical data; never compare incompatible denominators silently.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F19",
+          "what_it_requires": "Label synthetic fixtures explicitly; add real isolated transport and opt-in provider runners, measured usage, task-quality checks, environment manifests and uncertainty. Prohibit release claims drawn from simulated results."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-2-unify-graph-identity-and-read-snapshots",
+            "slice-5-commit-enrichment-and-checkpoints-coherently",
+            "slice-15-calibrate-normalization-and-evidence-independence",
+            "slice-19-unify-tension-remediation-and-future-review"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Critical defects cannot be averaged into healthy; stale snapshots are labeled; golden graphs have known counts; TypeScript/Python results agree where definitions match; synthetic benchmarks cannot be reported as real performance.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-22-align-analytics-health-and-observability--f21",
+        "priority": 1,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 22: Align analytics health and observability. Publish metric definitions and common revision/time/identity denominators for all 13 analytics modules, health, metacognition, lifecycle and dashboard. Separate integrity, freshness, coverage, readiness and workload. Trace job/model/graph revisions without secrets. Rollback: Keep versioned metric names and historical data; never compare incompatible denominators silently.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-2-unify-graph-identity-and-read-snapshots",
+            "slice-5-commit-enrichment-and-checkpoints-coherently",
+            "slice-15-calibrate-normalization-and-evidence-independence",
+            "slice-19-unify-tension-remediation-and-future-review"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Critical defects cannot be averaged into healthy; stale snapshots are labeled; golden graphs have known counts; TypeScript/Python results agree where definitions match; synthetic benchmarks cannot be reported as real performance.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-23-improve-dashboard-and-configuration-workflows--f07",
+        "priority": 1,
+        "delta_entry_id": "F07",
+        "action": "modify",
+        "target_file": "src/tools/enrich-parser-nodes.ts",
+        "change_description": "Slice 23: Improve dashboard and configuration workflows. Keep the current compact visual language while exposing effective role profiles, graph freshness, actionable debt, costs, job progress, fallback causes, cancellation and recovery. Add accessible field errors and saved/pending/restart-required distinctions. Expand configuration into compact, accessible tabs (models/roles, scanning/enrichment, cognition/truth, schedules/events, retrieval/budgets, repositories/integrations and advanced). Inventory all consumed/documented engine.env keys and expose each safely, with an explanation for intentionally read-only settings. Provide search, defaults, units, help and dependencies. Add reset/apply from the default, Ollama and LM Studio templates with a value diff, scope selection, preserved secrets/instance paths by default, atomic backup and undo. Refresh the daemon root page in the established visual language and add prominent Explorer navigation. Rollback: UI changes consume versioned endpoints and preserve working setup workflows. Keep a timestamped pre-template configuration backup and do not reset graph data when resetting configuration.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F07",
+          "what_it_requires": "Add preflight estimates, input/output/reasoning limits, call/retry and job caps, effective route disclosure, cancellation/resume, cause-grouped fallback reporting and budget-aware escalation. Unknown pricing must remain unknown rather than zero."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-10-validate-and-persist-all-configuration",
+            "slice-17-coordinate-engine-scheduling-events-and-bootstrap",
+            "slice-22-align-analytics-health-and-observability"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Keyboard/browser tests cover configure, save, restart-readback, scan progress, cancel, retry and stale/error states; no secrets leak; status matches CLI/API. Every supported setting is mapped to a control or justified exception; normal configuration requires no file editing; template preview has no writes, apply preserves protected values, undo restores the prior config; root-page Explorer link resolves; tabs work by keyboard and retain validation errors.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-23-improve-dashboard-and-configuration-workflows--f11",
+        "priority": 1,
+        "delta_entry_id": "F11",
+        "action": "modify",
+        "target_file": "src/tools/graph-health.ts",
+        "change_description": "Slice 23: Improve dashboard and configuration workflows. Keep the current compact visual language while exposing effective role profiles, graph freshness, actionable debt, costs, job progress, fallback causes, cancellation and recovery. Add accessible field errors and saved/pending/restart-required distinctions. Expand configuration into compact, accessible tabs (models/roles, scanning/enrichment, cognition/truth, schedules/events, retrieval/budgets, repositories/integrations and advanced). Inventory all consumed/documented engine.env keys and expose each safely, with an explanation for intentionally read-only settings. Provide search, defaults, units, help and dependencies. Add reset/apply from the default, Ollama and LM Studio templates with a value diff, scope selection, preserved secrets/instance paths by default, atomic backup and undo. Refresh the daemon root page in the established visual language and add prominent Explorer navigation. Rollback: UI changes consume versioned endpoints and preserve working setup workflows. Keep a timestamped pre-template configuration backup and do not reset graph data when resetting configuration.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F11",
+          "what_it_requires": "Make critical integrity/readiness failures visible independently of a weighted score. Use common, revision-bound denominators and explicit stale/unknown states throughout CLI, analytics, dashboard and Architect."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-10-validate-and-persist-all-configuration",
+            "slice-17-coordinate-engine-scheduling-events-and-bootstrap",
+            "slice-22-align-analytics-health-and-observability"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Keyboard/browser tests cover configure, save, restart-readback, scan progress, cancel, retry and stale/error states; no secrets leak; status matches CLI/API. Every supported setting is mapped to a control or justified exception; normal configuration requires no file editing; template preview has no writes, apply preserves protected values, undo restores the prior config; root-page Explorer link resolves; tabs work by keyboard and retain validation errors.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-23-improve-dashboard-and-configuration-workflows--f12",
+        "priority": 1,
+        "delta_entry_id": "F12",
+        "action": "modify",
+        "target_file": "src/server/dashboard.ts",
+        "change_description": "Slice 23: Improve dashboard and configuration workflows. Keep the current compact visual language while exposing effective role profiles, graph freshness, actionable debt, costs, job progress, fallback causes, cancellation and recovery. Add accessible field errors and saved/pending/restart-required distinctions. Expand configuration into compact, accessible tabs (models/roles, scanning/enrichment, cognition/truth, schedules/events, retrieval/budgets, repositories/integrations and advanced). Inventory all consumed/documented engine.env keys and expose each safely, with an explanation for intentionally read-only settings. Provide search, defaults, units, help and dependencies. Add reset/apply from the default, Ollama and LM Studio templates with a value diff, scope selection, preserved secrets/instance paths by default, atomic backup and undo. Refresh the daemon root page in the established visual language and add prominent Explorer navigation. Rollback: UI changes consume versioned endpoints and preserve working setup workflows. Keep a timestamped pre-template configuration backup and do not reset graph data when resetting configuration.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F12",
+          "what_it_requires": "Validate a complete candidate configuration against a shared finite/range/cross-field schema, reject atomically with field errors, and never display saved after invalid input."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-10-validate-and-persist-all-configuration",
+            "slice-17-coordinate-engine-scheduling-events-and-bootstrap",
+            "slice-22-align-analytics-health-and-observability"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Keyboard/browser tests cover configure, save, restart-readback, scan progress, cancel, retry and stale/error states; no secrets leak; status matches CLI/API. Every supported setting is mapped to a control or justified exception; normal configuration requires no file editing; template preview has no writes, apply preserves protected values, undo restores the prior config; root-page Explorer link resolves; tabs work by keyboard and retain validation errors.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-23-improve-dashboard-and-configuration-workflows--f13",
+        "priority": 1,
+        "delta_entry_id": "F13",
+        "action": "modify",
+        "target_file": "src/server/dashboard.ts",
+        "change_description": "Slice 23: Improve dashboard and configuration workflows. Keep the current compact visual language while exposing effective role profiles, graph freshness, actionable debt, costs, job progress, fallback causes, cancellation and recovery. Add accessible field errors and saved/pending/restart-required distinctions. Expand configuration into compact, accessible tabs (models/roles, scanning/enrichment, cognition/truth, schedules/events, retrieval/budgets, repositories/integrations and advanced). Inventory all consumed/documented engine.env keys and expose each safely, with an explanation for intentionally read-only settings. Provide search, defaults, units, help and dependencies. Add reset/apply from the default, Ollama and LM Studio templates with a value diff, scope selection, preserved secrets/instance paths by default, atomic backup and undo. Refresh the daemon root page in the established visual language and add prominent Explorer navigation. Rollback: UI changes consume versioned endpoints and preserve working setup workflows. Keep a timestamped pre-template configuration backup and do not reset graph data when resetting configuration.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F13",
+          "what_it_requires": "Define authoritative persisted configuration with precedence, revisions and restart behavior. Show requested/effective/source values and verify save/restart/readback across every section and client."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-10-validate-and-persist-all-configuration",
+            "slice-17-coordinate-engine-scheduling-events-and-bootstrap",
+            "slice-22-align-analytics-health-and-observability"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Keyboard/browser tests cover configure, save, restart-readback, scan progress, cancel, retry and stale/error states; no secrets leak; status matches CLI/API. Every supported setting is mapped to a control or justified exception; normal configuration requires no file editing; template preview has no writes, apply preserves protected values, undo restores the prior config; root-page Explorer link resolves; tabs work by keyboard and retain validation errors.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-23-improve-dashboard-and-configuration-workflows--f23",
+        "priority": 1,
+        "delta_entry_id": "F23",
+        "action": "modify",
+        "target_file": "src/server/dashboard.ts",
+        "change_description": "Slice 23: Improve dashboard and configuration workflows. Keep the current compact visual language while exposing effective role profiles, graph freshness, actionable debt, costs, job progress, fallback causes, cancellation and recovery. Add accessible field errors and saved/pending/restart-required distinctions. Expand configuration into compact, accessible tabs (models/roles, scanning/enrichment, cognition/truth, schedules/events, retrieval/budgets, repositories/integrations and advanced). Inventory all consumed/documented engine.env keys and expose each safely, with an explanation for intentionally read-only settings. Provide search, defaults, units, help and dependencies. Add reset/apply from the default, Ollama and LM Studio templates with a value diff, scope selection, preserved secrets/instance paths by default, atomic backup and undo. Refresh the daemon root page in the established visual language and add prominent Explorer navigation. Rollback: UI changes consume versioned endpoints and preserve working setup workflows. Keep a timestamped pre-template configuration backup and do not reset graph data when resetting configuration.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F23",
+          "what_it_requires": "Inventory every supported environment setting against a typed UI control or an explicit advanced/read-only reason. Add grouped tabs, search, template preview/diff/apply, secret-preserving reset, backup/undo, restart indicators and an Explorer entry on the root page."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-10-validate-and-persist-all-configuration",
+            "slice-17-coordinate-engine-scheduling-events-and-bootstrap",
+            "slice-22-align-analytics-health-and-observability"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Keyboard/browser tests cover configure, save, restart-readback, scan progress, cancel, retry and stale/error states; no secrets leak; status matches CLI/API. Every supported setting is mapped to a control or justified exception; normal configuration requires no file editing; template preview has no writes, apply preserves protected values, undo restores the prior config; root-page Explorer link resolves; tabs work by keyboard and retain validation errors.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-24-align-explorer-and-agent-evidence-navigation--f03",
+        "priority": 2,
+        "delta_entry_id": "F03",
+        "action": "modify",
+        "target_file": "src/cognitive/graph-rag.ts",
+        "change_description": "Slice 24: Align Explorer and agent evidence navigation. Make 2D/3D inspectors consume the shared trust/revision/evidence model. Keep dense labels navigable, preserve selected short names and reduced-motion behavior, and connect graph selection to useful agent context and source evidence. Rollback: Preserve existing visual controls and offer stable rendering fallback without changing graph semantics.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F03",
+          "what_it_requires": "Introduce a shared typed, revisioned graph read model with all canonical entity families, fact links, separately labeled validated insights, ADR bindings and provenance. Migrate consumers through adapters rather than rewriting the entire engine."
+        },
+        "risk": {
+          "level": "medium",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-3-provide-complete-bounded-agent-retrieval",
+            "slice-20-make-lifecycle-narrative-and-lucid-interaction-consistent",
+            "slice-22-align-analytics-health-and-observability"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "A selected entity has matching identity, links, provenance and freshness in Explorer and RAG; dense hubs remain usable at zoom extremes; accessibility and bounded render/update work are measured.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-24-align-explorer-and-agent-evidence-navigation--f21",
+        "priority": 2,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 24: Align Explorer and agent evidence navigation. Make 2D/3D inspectors consume the shared trust/revision/evidence model. Keep dense labels navigable, preserve selected short names and reduced-motion behavior, and connect graph selection to useful agent context and source evidence. Rollback: Preserve existing visual controls and offer stable rendering fallback without changing graph semantics.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "medium",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-3-provide-complete-bounded-agent-retrieval",
+            "slice-20-make-lifecycle-narrative-and-lucid-interaction-consistent",
+            "slice-22-align-analytics-health-and-observability"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "A selected entity has matching identity, links, provenance and freshness in Explorer and RAG; dense hubs remain usable at zoom extremes; accessibility and bounded render/update work are measured.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-25-align-architect-vs-code-cli-plugins-and-context-budgets--f04",
+        "priority": 1,
+        "delta_entry_id": "F04",
+        "action": "modify",
+        "target_file": "src/cognitive/graph-rag.ts",
+        "change_description": "Slice 25: Align Architect VS Code CLI plugins and context budgets. Run one governed task through browser Architect, VS Code, daemon tools, SDK/host plugins, native APIs and Codex CLI adapter. Preserve reserved graph evidence, source citations, tool call IDs, usage, stop/resume and role configuration. Rollback: Capability negotiation and adapter-specific rollout switches with explicit unsupported-feature messages.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F04",
+          "what_it_requires": "Define context-versus-envelope budgeting explicitly, account for every emitted field and report omitted counts accurately. Never slice a fact or provenance record into an unidentifiable fragment."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-3-provide-complete-bounded-agent-retrieval",
+            "slice-8-complete-responses-and-provider-capability-contracts",
+            "slice-12-align-the-complete-mcp-catalog-and-client-contracts",
+            "slice-21-repair-plan-and-discipline-lifecycle-projection"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Equivalent task/evidence/plan state across clients; tool errors are not converted to successful prose; compression preserves required ADR/graph anchors; plugin/provider failure is isolated; no hidden paid escalation.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-25-align-architect-vs-code-cli-plugins-and-context-budgets--f14",
+        "priority": 1,
+        "delta_entry_id": "F14",
+        "action": "modify",
+        "target_file": "src/index.ts",
+        "change_description": "Slice 25: Align Architect VS Code CLI plugins and context budgets. Run one governed task through browser Architect, VS Code, daemon tools, SDK/host plugins, native APIs and Codex CLI adapter. Preserve reserved graph evidence, source citations, tool call IDs, usage, stop/resume and role configuration. Rollback: Capability negotiation and adapter-specific rollout switches with explicit unsupported-feature messages.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F14",
+          "what_it_requires": "Bind plan selection, history, cancellation, tool continuation and provider state to session and execution IDs. Test two overlapping clients, reconnect and cancellation without paying for models."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-3-provide-complete-bounded-agent-retrieval",
+            "slice-8-complete-responses-and-provider-capability-contracts",
+            "slice-12-align-the-complete-mcp-catalog-and-client-contracts",
+            "slice-21-repair-plan-and-discipline-lifecycle-projection"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Equivalent task/evidence/plan state across clients; tool errors are not converted to successful prose; compression preserves required ADR/graph anchors; plugin/provider failure is isolated; no hidden paid escalation.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-25-align-architect-vs-code-cli-plugins-and-context-budgets--f16",
+        "priority": 1,
+        "delta_entry_id": "F16",
+        "action": "modify",
+        "target_file": "src/tools",
+        "change_description": "Slice 25: Align Architect VS Code CLI plugins and context budgets. Run one governed task through browser Architect, VS Code, daemon tools, SDK/host plugins, native APIs and Codex CLI adapter. Preserve reserved graph evidence, source citations, tool call IDs, usage, stop/resume and role configuration. Rollback: Capability negotiation and adapter-specific rollout switches with explicit unsupported-feature messages.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F16",
+          "what_it_requires": "Generate a versioned catalog with schemas, side effects, read/write and idempotency hints, budgets and error taxonomy. Test every registered callback through transport with isolated fixtures and require discipline-manifest parity."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-3-provide-complete-bounded-agent-retrieval",
+            "slice-8-complete-responses-and-provider-capability-contracts",
+            "slice-12-align-the-complete-mcp-catalog-and-client-contracts",
+            "slice-21-repair-plan-and-discipline-lifecycle-projection"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Equivalent task/evidence/plan state across clients; tool errors are not converted to successful prose; compression preserves required ADR/graph anchors; plugin/provider failure is isolated; no hidden paid escalation.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-25-align-architect-vs-code-cli-plugins-and-context-budgets--f21",
+        "priority": 1,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 25: Align Architect VS Code CLI plugins and context budgets. Run one governed task through browser Architect, VS Code, daemon tools, SDK/host plugins, native APIs and Codex CLI adapter. Preserve reserved graph evidence, source citations, tool call IDs, usage, stop/resume and role configuration. Rollback: Capability negotiation and adapter-specific rollout switches with explicit unsupported-feature messages.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-3-provide-complete-bounded-agent-retrieval",
+            "slice-8-complete-responses-and-provider-capability-contracts",
+            "slice-12-align-the-complete-mcp-catalog-and-client-contracts",
+            "slice-21-repair-plan-and-discipline-lifecycle-projection"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Equivalent task/evidence/plan state across clients; tool errors are not converted to successful prose; compression preserves required ADR/graph anchors; plugin/provider failure is isolated; no hidden paid escalation.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-25-align-architect-vs-code-cli-plugins-and-context-budgets--f22",
+        "priority": 1,
+        "delta_entry_id": "F22",
+        "action": "modify",
+        "target_file": "src/cognitive/llm.ts",
+        "change_description": "Slice 25: Align Architect VS Code CLI plugins and context budgets. Run one governed task through browser Architect, VS Code, daemon tools, SDK/host plugins, native APIs and Codex CLI adapter. Preserve reserved graph evidence, source citations, tool call IDs, usage, stop/resume and role configuration. Rollback: Capability negotiation and adapter-specific rollout switches with explicit unsupported-feature messages.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F22",
+          "what_it_requires": "Extend existing adapters with explicit per-role API/model/reasoning/storage/budget configuration, a capability registry and controlled unknown-model overrides. Keep initial-scan and mature-graph policies separate; verify GPT-4.1, GPT-5.4 and user-selected newer models without a hardcoded frontier ceiling."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-3-provide-complete-bounded-agent-retrieval",
+            "slice-8-complete-responses-and-provider-capability-contracts",
+            "slice-12-align-the-complete-mcp-catalog-and-client-contracts",
+            "slice-21-repair-plan-and-discipline-lifecycle-projection"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Equivalent task/evidence/plan state across clients; tool errors are not converted to successful prose; compression preserves required ADR/graph anchors; plugin/provider failure is isolated; no hidden paid escalation.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-26-refresh-the-legacy-dreamgraph-graph-safely--f17",
+        "priority": 1,
+        "delta_entry_id": "F17",
+        "action": "modify",
+        "target_file": "python/analytics/orphan_pressure.py",
+        "change_description": "Slice 26: Refresh the legacy DreamGraph graph safely. Back up the offline own-instance data, inventory collisions/dangling references and review a migration/delta preview. Repair identities with mappings, reconcile current repository evidence, preserve reviewed decisions and establish scan/enrichment ledgers. Rollback: Verified snapshot restore plus reversible identity/reconciliation manifests; never repair the unrelated web64-react graph by accident.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F17",
+          "what_it_requires": "Create a backup and dry-run repair/migration report, disambiguate typed identities, preserve curation and provenance, establish a baseline, and reconcile incrementally with rollback and explicit cost approval before paid enrichment."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-2-unify-graph-identity-and-read-snapshots",
+            "slice-5-commit-enrichment-and-checkpoints-coherently",
+            "slice-6-bound-scan-and-enrichment-cost-and-recovery",
+            "slice-16-align-decay-maintenance-and-human-curation",
+            "slice-22-align-analytics-health-and-observability"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Before/after counts are explainable; targeted IDs resolve; no reviewed provenance is lost; rollback restores a usable graph; paid enrichment is separately capped and approved before running.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-27-add-system-lifecycle-and-recovery-regression-gates--f18",
+        "priority": 1,
+        "delta_entry_id": "F18",
+        "action": "modify",
+        "target_file": "vitest.config.ts",
+        "change_description": "Slice 27: Add system lifecycle and recovery regression gates. Add CI for build/root/extension/analytics/contract/browser tests, a subsystem coverage map and whole-engine traces. Test source change through scan, enrichment, dream, normalize, retrieve, review, restart and repair; inject provider, disk, client and plugin faults. Rollback: Keep deterministic offline gates separate from opt-in paid canaries; quarantine flaky tests with tracked owner and expiry.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F18",
+          "what_it_requires": "Establish meaningful contract, state-machine, fault-injection, provider, transport and browser coverage with explicit exclusions and per-area gates. Preserve fast deterministic tests; do not make a global percentage a substitute for behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-12-align-the-complete-mcp-catalog-and-client-contracts",
+            "slice-17-coordinate-engine-scheduling-events-and-bootstrap",
+            "slice-18-align-temporal-causal-and-federated-evidence",
+            "slice-19-unify-tension-remediation-and-future-review",
+            "slice-20-make-lifecycle-narrative-and-lucid-interaction-consistent",
+            "slice-21-repair-plan-and-discipline-lifecycle-projection",
+            "slice-22-align-analytics-health-and-observability",
+            "slice-23-improve-dashboard-and-configuration-workflows",
+            "slice-24-align-explorer-and-agent-evidence-navigation",
+            "slice-25-align-architect-vs-code-cli-plugins-and-context-budgets",
+            "slice-26-refresh-the-legacy-dreamgraph-graph-safely"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Every subsystem family participates in at least one producer-consumer trace; no speculative fact promotion, lost update, budget overflow or cross-session control; coverage exclusions and skipped paid tests are explicit.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-27-add-system-lifecycle-and-recovery-regression-gates--f21",
+        "priority": 1,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 27: Add system lifecycle and recovery regression gates. Add CI for build/root/extension/analytics/contract/browser tests, a subsystem coverage map and whole-engine traces. Test source change through scan, enrichment, dream, normalize, retrieve, review, restart and repair; inject provider, disk, client and plugin faults. Rollback: Keep deterministic offline gates separate from opt-in paid canaries; quarantine flaky tests with tracked owner and expiry.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-12-align-the-complete-mcp-catalog-and-client-contracts",
+            "slice-17-coordinate-engine-scheduling-events-and-bootstrap",
+            "slice-18-align-temporal-causal-and-federated-evidence",
+            "slice-19-unify-tension-remediation-and-future-review",
+            "slice-20-make-lifecycle-narrative-and-lucid-interaction-consistent",
+            "slice-21-repair-plan-and-discipline-lifecycle-projection",
+            "slice-22-align-analytics-health-and-observability",
+            "slice-23-improve-dashboard-and-configuration-workflows",
+            "slice-24-align-explorer-and-agent-evidence-navigation",
+            "slice-25-align-architect-vs-code-cli-plugins-and-context-budgets",
+            "slice-26-refresh-the-legacy-dreamgraph-graph-safely"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Every subsystem family participates in at least one producer-consumer trace; no speculative fact promotion, lost update, budget overflow or cross-session control; coverage exclusions and skipped paid tests are explicit.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-28-publish-verified-contracts-and-synchronized-release--f18",
+        "priority": 1,
+        "delta_entry_id": "F18",
+        "action": "modify",
+        "target_file": "vitest.config.ts",
+        "change_description": "Slice 28: Publish verified contracts and synchronized release. Update vision/guide/API/config/model/strategy docs with verified behavior and limitations. Choose release version by compatibility impact and synchronize CLI, engine, daemon/MCP authority, Architect, VS Code, Explorer, dashboard, analytics, SDK/host packages and installers. Rollback: Package previous release and configuration/graph backups; document the tested downgrade limits.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F18",
+          "what_it_requires": "Establish meaningful contract, state-machine, fault-injection, provider, transport and browser coverage with explicit exclusions and per-area gates. Preserve fast deterministic tests; do not make a global percentage a substitute for behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-27-add-system-lifecycle-and-recovery-regression-gates"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Version and contract manifests agree; upgrade/restart existing sessions passes a disposable install test; documentation examples execute; all release claims link to real evidence; user-facing migration/rollback notes are complete.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-28-publish-verified-contracts-and-synchronized-release--f19",
+        "priority": 1,
+        "delta_entry_id": "F19",
+        "action": "modify",
+        "target_file": "scripts/benchmark-scan-mcp.mjs",
+        "change_description": "Slice 28: Publish verified contracts and synchronized release. Update vision/guide/API/config/model/strategy docs with verified behavior and limitations. Choose release version by compatibility impact and synchronize CLI, engine, daemon/MCP authority, Architect, VS Code, Explorer, dashboard, analytics, SDK/host packages and installers. Rollback: Package previous release and configuration/graph backups; document the tested downgrade limits.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F19",
+          "what_it_requires": "Label synthetic fixtures explicitly; add real isolated transport and opt-in provider runners, measured usage, task-quality checks, environment manifests and uncertainty. Prohibit release claims drawn from simulated results."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-27-add-system-lifecycle-and-recovery-regression-gates"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Version and contract manifests agree; upgrade/restart existing sessions passes a disposable install test; documentation examples execute; all release claims link to real evidence; user-facing migration/rollback notes are complete.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-28-publish-verified-contracts-and-synchronized-release--f21",
+        "priority": 1,
+        "delta_entry_id": "F21",
+        "action": "modify",
+        "target_file": "src/cognitive",
+        "change_description": "Slice 28: Publish verified contracts and synchronized release. Update vision/guide/API/config/model/strategy docs with verified behavior and limitations. Choose release version by compatibility impact and synchronize CLI, engine, daemon/MCP authority, Architect, VS Code, Explorer, dashboard, analytics, SDK/host packages and installers. Rollback: Package previous release and configuration/graph backups; document the tested downgrade limits.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F21",
+          "what_it_requires": "Adopt shared identity, revision, evidence, trust, time, configuration and job contracts, then test whole lifecycle traces across consumers. Add an ownership/transition matrix before more autonomous behavior."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-27-add-system-lifecycle-and-recovery-regression-gates"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Version and contract manifests agree; upgrade/restart existing sessions passes a disposable install test; documentation examples execute; all release claims link to real evidence; user-facing migration/rollback notes are complete.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      },
+      {
+        "id": "slice-28-publish-verified-contracts-and-synchronized-release--f22",
+        "priority": 1,
+        "delta_entry_id": "F22",
+        "action": "modify",
+        "target_file": "src/cognitive/llm.ts",
+        "change_description": "Slice 28: Publish verified contracts and synchronized release. Update vision/guide/API/config/model/strategy docs with verified behavior and limitations. Choose release version by compatibility impact and synchronize CLI, engine, daemon/MCP authority, Architect, VS Code, Explorer, dashboard, analytics, SDK/host packages and installers. Rollback: Package previous release and configuration/graph backups; document the tested downgrade limits.",
+        "source_truth_mapping": {
+          "source_type": "audit_report",
+          "source_identifier": "docs/audits/2026-09-30-coverage/report.md#F22",
+          "what_it_requires": "Extend existing adapters with explicit per-role API/model/reasoning/storage/budget configuration, a capability registry and controlled unknown-model overrides. Keep initial-scan and mature-graph policies separate; verify GPT-4.1, GPT-5.4 and user-selected newer models without a hardcoded frontier ceiling."
+        },
+        "risk": {
+          "level": "high",
+          "breaking_changes": [
+            "Review schema, persistence and client compatibility before execution; exact affected files are scoped at slice start."
+          ],
+          "regressions": [
+            "Cross-subsystem evidence, ownership, budget or revision divergence."
+          ],
+          "dependencies": [
+            "slice-27-add-system-lifecycle-and-recovery-regression-gates"
+          ]
+        },
+        "verification_criteria": [
+          {
+            "tool": "repository_verification",
+            "expected_result": "Version and contract manifests agree; upgrade/restart existing sessions passes a disposable install test; documentation examples execute; all release claims link to real evidence; user-facing migration/rollback notes are complete.",
+            "check_description": "Execute the slice-specific tests and whole-system trace; record exact commands and independently review evidence. This draft does not assert the checks already pass."
+          }
+        ]
+      }
+    ],
+    "auto_approve": false
+  }
+}

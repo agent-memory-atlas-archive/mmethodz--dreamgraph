@@ -1,47 +1,14 @@
-﻿/**
- * DreamGraph v8.3 â€” Metacognitive Self-Tuning Engine
- *
- * Closes the feedback loop: analyzes DreamGraph's own performance and
- * recommends (or auto-applies) threshold adjustments.
- *
- * Three analysis modes:
- * 1. Strategy Performance â€” precision, resolution-share, validation lag per strategy
- * 2. Promotion Calibration â€” actual validation rates per confidence bucket
- * 3. Domain Decay Profiles â€” per-domain optimal TTL and urgency decay
- *
- * Safety guarantees:
- * - Analysis is read-only against dream_history, tensions, candidates
- * - Auto-tuning is bounded (hard min/max guards)
- * - Auto-tuning is transparent (every action logged to meta_log.json)
- * - Auto-tuning never persists to disk â€” overrides are in-memory only and
- *   reset on restart. Policy-profile tuning remains the durable baseline.
- *
- * v8.3 fixes vs v5.1:
- * - Strategy list pulled from `ALL_DREAM_STRATEGIES_NON_ALL` (single source
- *   of truth) instead of a hardcoded subset.
- * - Sessions with `strategy === "all"` are decomposed via the
- *   `per_strategy_yields` breakdown when present, with a dream-graph
- *   fallback for legacy entries â€” no more silent collapse to gap_detection.
- * - Validated-edge attribution uses `edge.strategy` (recorded at promotion)
- *   with a dream-graph lookup fallback. The pre-v8.3 trick of reading
- *   `session.strategy` for the dream cycle gave wrong answers whenever
- *   that session ran "all".
- * - Calibration buckets honour the rolling window: candidates outside the
- *   selected cycle range are filtered out before bucketing.
- * - Domain decay's `avg_resolution_cycles` derives from the
- *   first_seen â†’ resolved_at timestamp delta instead of the broken
- *   `initialTtl - r.original.ttl` arithmetic that always produced 0.
- * - Threshold recommendations compare against the *effective* promotion
- *   config (policy + overrides), not the static `DEFAULT_PROMOTION`.
- * - `auto_apply: true` actually mutates engine state via
- *   `engine.setPromotionOverride(...)` and records before/after values.
- *
- * Design: "Think about how you think. Tune how you tune."
+/** Operational strategy diagnostics and versioned portfolio; promotion volume is not accuracy.
+ * The independent evaluation harness owns labeled calibration. Without its reviewed
+ * labels this analysis cannot weaken truth gates, even when auto_apply is requested.
  */
-
-import { readFile } from "node:fs/promises";
+import { readMetaDocument, emptyPortfolio, strategyScore, type StrategyPortfolio } from "./strategy-portfolio.js";
+import { ACTIVE_STRATEGY_NAMES } from "./strategy-catalog.js";
+import { nodeClaim } from "./normalization-publication.js";
+import { getActiveScope } from "../instance/index.js";
+import { loadCanonicalGraph, type CanonicalGraphRead } from "../graph/read-model.js";
+import { withGraphRead, withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
 import { atomicWriteFile } from "../utils/atomic-write.js";
-import { existsSync } from "node:fs";
 import { engine } from "./engine.js";
 import { logger } from "../utils/logger.js";
 import { dataPath } from "../utils/paths.js";
@@ -93,380 +60,30 @@ const DECAY_GUARDS = {
 /** Minimum confidence on a recommendation before auto_apply will act on it. */
 const AUTO_APPLY_MIN_CONFIDENCE = 0.6;
 
-// ---------------------------------------------------------------------------
-// Strategy Attribution Helpers
-// ---------------------------------------------------------------------------
-
-/** All concrete strategies (excluding "all") â€” single source of truth. */
-const ALL_STRATEGIES: ReadonlyArray<Exclude<DreamStrategy, "all">> =
-  ALL_DREAM_STRATEGIES_NON_ALL;
-
-/**
- * Compute generated edge+node yield per strategy across a window.
- *
- * For sessions whose `strategy !== "all"`, all generated artifacts are
- * credited to that strategy.
- *
- * For sessions where `strategy === "all"`, the per-strategy breakdown is
- * preferred (recorded in `per_strategy_yields` from v8.3+). When the
- * breakdown is missing (legacy entries), the cycle's total yield is
- * apportioned uniformly across `ALL_STRATEGIES` as a least-bad fallback â€”
- * this is documented in the meta-log basis text so consumers know the
- * numbers may be approximate for older windows.
- */
-function distributeYieldByStrategy(
-  sessions: DreamHistoryEntry[],
-): Map<Exclude<DreamStrategy, "all">, number> {
-  const out = new Map<Exclude<DreamStrategy, "all">, number>();
-  for (const s of ALL_STRATEGIES) out.set(s, 0);
-
-  for (const s of sessions) {
-    const total = s.generated_edges + s.generated_nodes;
-    if (total === 0) continue;
-
-    if (s.strategy !== "all") {
-      const key = s.strategy as Exclude<DreamStrategy, "all">;
-      out.set(key, (out.get(key) ?? 0) + total);
-      continue;
-    }
-
-    const breakdown = s.per_strategy_yields;
-    if (breakdown && Object.keys(breakdown).length > 0) {
-      for (const strat of ALL_STRATEGIES) {
-        const v = breakdown[strat];
-        if (typeof v === "number" && v > 0) {
-          out.set(strat, (out.get(strat) ?? 0) + v);
-        }
-      }
-    } else {
-      // Legacy fallback: distribute uniformly. Better than collapsing to one.
-      const share = total / ALL_STRATEGIES.length;
-      for (const strat of ALL_STRATEGIES) {
-        out.set(strat, (out.get(strat) ?? 0) + share);
-      }
+/** Independent labeled accuracy is not inferred from graph promotion volume. */
+export function computePortfolioMetrics(portfolio: StrategyPortfolio, graph: CanonicalGraphRead | null): StrategyMetrics[] {
+  const supported = new Set<string>();
+  if (graph) {
+    for (const edge of graph.relationships) if (edge.kind === "validated" && edge.assertion_class === "validated_insight") supported.add(`edge:${edge.payload.id}`);
+    for (const dream of graph.entities.filter(e => e.identity.kind === "dream_node")) {
+      const claim = nodeClaim(dream.payload as unknown as import("./types.js").DreamNode, graph.instance_id);
+      if (claim?.type !== "node") continue;
+      const identity = claim.identity;
+      if (graph.entities.some(node => node.identity.id === identity.id && node.identity.kind === identity.kind && node.identity.repository_id === identity.repository_id && node.payload.origin === "rem" && node.assertion_class === "validated_insight")) supported.add(`node:${dream.identity.id}`);
     }
   }
-  return out;
-}
-
-/**
- * Build a `dreamId -> strategy` lookup using:
- *  1. ValidationResult.strategy (when populated by the v8.3+ normalizer)
- *  2. ValidatedEdge.strategy (same)
- *  3. dreamGraphEdges (for items still in the dream graph)
- *
- * Returns a map keyed by dream artifact id.
- */
-function buildStrategyLookup(
-  candidates: ValidationResult[],
-  validatedEdges: ValidatedEdge[],
-  dreamGraphEdges: Array<{ id: string; strategy?: DreamStrategy }>,
-): Map<string, Exclude<DreamStrategy, "all">> {
-  const map = new Map<string, Exclude<DreamStrategy, "all">>();
-  const accept = (id: string, strat: DreamStrategy | undefined) => {
-    if (!strat || strat === "all") return;
-    if (!map.has(id)) map.set(id, strat as Exclude<DreamStrategy, "all">);
-  };
-  for (const c of candidates) accept(c.dream_id, c.strategy);
-  for (const v of validatedEdges) accept(v.id, v.strategy);
-  for (const e of dreamGraphEdges) accept(e.id, e.strategy);
-  return map;
-}
-
-// ---------------------------------------------------------------------------
-// Strategy Metrics
-// ---------------------------------------------------------------------------
-
-function computeStrategyMetrics(
-  sessions: DreamHistoryEntry[],
-  candidates: ValidationResult[],
-  validatedEdges: ValidatedEdge[],
-  resolvedTensions: ResolvedTension[],
-  strategyLookup: Map<string, Exclude<DreamStrategy, "all">>,
-): StrategyMetrics[] {
-  // Window time bounds for tension attribution
-  const windowStart =
-    sessions.length > 0 ? new Date(sessions[0].timestamp).getTime() : 0;
-  const windowEnd =
-    sessions.length > 0
-      ? new Date(sessions[sessions.length - 1].timestamp).getTime()
-      : Infinity;
-
-  // Generated yield per strategy
-  const generatedByStrategy = distributeYieldByStrategy(sessions);
-
-  // Validated yield per strategy (true attribution via lookup)
-  const validatedByStrategy = new Map<Exclude<DreamStrategy, "all">, number>();
-  for (const s of ALL_STRATEGIES) validatedByStrategy.set(s, 0);
-  for (const edge of validatedEdges) {
-    const strat =
-      (edge.strategy && edge.strategy !== "all"
-        ? (edge.strategy as Exclude<DreamStrategy, "all">)
-        : undefined) ?? strategyLookup.get(edge.id);
-    if (!strat) continue;
-    validatedByStrategy.set(strat, (validatedByStrategy.get(strat) ?? 0) + 1);
-  }
-
-  // Validation lag per strategy (avg cycles from generation to validation)
-  const lagByStrategy = new Map<Exclude<DreamStrategy, "all">, number[]>();
-  for (const s of ALL_STRATEGIES) lagByStrategy.set(s, []);
-  for (const edge of validatedEdges) {
-    const strat =
-      (edge.strategy && edge.strategy !== "all"
-        ? (edge.strategy as Exclude<DreamStrategy, "all">)
-        : undefined) ?? strategyLookup.get(edge.id);
-    if (!strat) continue;
-    const lag = edge.normalization_cycle - edge.dream_cycle;
-    if (Number.isFinite(lag) && lag >= 0) {
-      lagByStrategy.get(strat)!.push(lag);
-    }
-  }
-
-  // Tension-resolution share per strategy.
-  // We have no direct "which strategy produced the resolving edge" link in
-  // the historical data, so we apportion each session's
-  // `tension_signals_resolved` count by the session's per-strategy yield
-  // proportion. For non-"all" sessions this credits the single strategy.
-  const tensionsByStrategy = new Map<Exclude<DreamStrategy, "all">, number>();
-  for (const s of ALL_STRATEGIES) tensionsByStrategy.set(s, 0);
-  for (const sess of sessions) {
-    if (sess.tension_signals_resolved <= 0) continue;
-    if (sess.strategy !== "all") {
-      const key = sess.strategy as Exclude<DreamStrategy, "all">;
-      tensionsByStrategy.set(
-        key,
-        (tensionsByStrategy.get(key) ?? 0) + sess.tension_signals_resolved,
-      );
-      continue;
-    }
-    const breakdown = sess.per_strategy_yields;
-    if (breakdown) {
-      const total = Object.values(breakdown).reduce((a, b) => a + b, 0);
-      if (total > 0) {
-        for (const strat of ALL_STRATEGIES) {
-          const share = (breakdown[strat] ?? 0) / total;
-          if (share > 0) {
-            tensionsByStrategy.set(
-              strat,
-              (tensionsByStrategy.get(strat) ?? 0) +
-                sess.tension_signals_resolved * share,
-            );
-          }
-        }
-        continue;
-      }
-    }
-    // Uniform fallback for legacy "all" sessions
-    const share = sess.tension_signals_resolved / ALL_STRATEGIES.length;
-    for (const strat of ALL_STRATEGIES) {
-      tensionsByStrategy.set(strat, (tensionsByStrategy.get(strat) ?? 0) + share);
-    }
-  }
-
-  const totalTensionsInWindow = resolvedTensions.filter((r) => {
-    const ts = new Date(r.resolved_at).getTime();
-    return ts >= windowStart && ts <= windowEnd;
-  }).length;
-
-  // Consecutive zero-yield: walk sessions newest-first and count cycles
-  // that produced nothing for this strategy.
-  function consecutiveZero(strategy: Exclude<DreamStrategy, "all">): number {
-    let n = 0;
-    for (let i = sessions.length - 1; i >= 0; i--) {
-      const s = sessions[i];
-      let strategyYield = 0;
-      if (s.strategy === strategy) {
-        strategyYield = s.generated_edges + s.generated_nodes;
-      } else if (s.strategy === "all") {
-        const breakdown = s.per_strategy_yields;
-        if (breakdown) {
-          strategyYield = breakdown[strategy] ?? 0;
-        } else {
-          // Legacy "all" without breakdown: cannot tell â€” bail out so we
-          // don't penalise a strategy for missing instrumentation.
-          break;
-        }
-      } else {
-        // Different concrete strategy ran: doesn't count for this one
-        // either way; skip.
-        continue;
-      }
-      if (strategyYield === 0) n++;
-      else break;
-    }
-    return n;
-  }
-
-  // candidates parameter unused in this function but kept for API stability;
-  // bucket-level analysis happens in computeCalibrationBuckets.
-  void candidates;
-
-  return ALL_STRATEGIES.map((strategy): StrategyMetrics => {
-    const totalGenerated = Math.round(generatedByStrategy.get(strategy) ?? 0);
-    const totalValidated = validatedByStrategy.get(strategy) ?? 0;
-    const precision = totalGenerated > 0 ? totalValidated / totalGenerated : 0;
-
-    const lags = lagByStrategy.get(strategy) ?? [];
-    const avgLag =
-      lags.length > 0 ? lags.reduce((a, b) => a + b, 0) / lags.length : 0;
-
-    const tensionsResolved = Math.round(tensionsByStrategy.get(strategy) ?? 0);
-    const recall =
-      totalTensionsInWindow > 0
-        ? tensionsResolved / totalTensionsInWindow
-        : 0;
-
-    const cz = consecutiveZero(strategy);
-
-    let weight = 1.0;
-    if (precision > 0.5) weight += 0.3;
-    if (precision > 0.3) weight += 0.1;
-    if (cz >= 3) weight *= 0.5;
-    if (cz >= 5) weight *= 0.2;
-    if (totalGenerated === 0) weight = 0.3;
-    weight = Math.round(Math.max(0.1, Math.min(2.0, weight)) * 100) / 100;
-
-    return {
-      strategy,
-      total_generated: totalGenerated,
-      total_validated: totalValidated,
-      precision: Math.round(precision * 1000) / 1000,
-      tensions_resolved: tensionsResolved,
-      recall: Math.round(recall * 1000) / 1000,
-      avg_validation_lag: Math.round(avgLag * 10) / 10,
-      consecutive_zero_yield: cz,
-      recommended_weight: weight,
-    };
+  return ACTIVE_STRATEGY_NAMES.map(strategy => {
+    const runs = portfolio.observations.filter(o => o.strategy === strategy);
+    const claims = new Map<string, boolean>();
+    for (const run of runs) for (let i = 0; i < run.claim_keys.length; i++) claims.set(run.claim_keys[i], (claims.get(run.claim_keys[i]) ?? false) || supported.has(run.artifact_ids[i]));
+    const total = claims.size, validated = [...claims.values()].filter(Boolean).length;
+    let barren = 0; for (const run of [...runs].reverse()) { if (run.status !== "completed") continue; if (run.novel) break; barren++; }
+    return { strategy, total_generated: total, total_validated: validated, precision: null,
+      operational_promotion_rate: total ? validated / total : 0, evidence_state: graph ? "current" : "unavailable",
+      tensions_resolved: null, recall: null, avg_validation_lag: null, consecutive_zero_yield: barren,
+      recommended_weight: strategyScore(portfolio, strategy, runs.at(-1)?.input_hash ?? "unobserved") };
   });
 }
-
-// ---------------------------------------------------------------------------
-// Promotion Threshold Calibration
-// ---------------------------------------------------------------------------
-
-/**
- * Bucket historical candidate edges by confidence and compute actual
- * validation rates per bucket. Honours the rolling window â€” only
- * candidates whose normalization_cycle falls within the window count.
- */
-function computeCalibrationBuckets(
-  candidates: ValidationResult[],
-  validatedEdgeIds: Set<string>,
-  cycleWindow: [number, number],
-): CalibrationBucket[] {
-  const [winStart, winEnd] = cycleWindow;
-  const inWindow =
-    winStart === 0 && winEnd === 0
-      ? candidates
-      : candidates.filter(
-          (c) =>
-            c.normalization_cycle >= winStart &&
-            c.normalization_cycle <= winEnd,
-        );
-
-  const bucketRanges: [number, number][] = [
-    [0.0, 0.3],
-    [0.3, 0.4],
-    [0.4, 0.5],
-    [0.5, 0.6],
-    [0.6, 0.7],
-    [0.7, 0.8],
-    [0.8, 0.9],
-    [0.9, 1.01],
-  ];
-
-  return bucketRanges.map(([lo, hi]): CalibrationBucket => {
-    const inBucket = inWindow.filter(
-      (c) => c.confidence >= lo && c.confidence < hi,
-    );
-    const validated = inBucket.filter((c) => validatedEdgeIds.has(c.dream_id));
-    return {
-      confidence_range: [lo, hi >= 1.01 ? 1.0 : hi],
-      total_edges: inBucket.length,
-      eventually_validated: validated.length,
-      validation_rate:
-        inBucket.length > 0
-          ? Math.round((validated.length / inBucket.length) * 1000) / 1000
-          : 0,
-    };
-  });
-}
-
-/**
- * Generate threshold recommendations from calibration buckets, comparing
- * against the *effective* promotion config (policy + live overrides).
- */
-function computeThresholdRecommendations(
-  buckets: CalibrationBucket[],
-  currentConfig: PromotionConfig,
-): ThresholdRecommendation[] {
-  const recommendations: ThresholdRecommendation[] = [];
-
-  // Find the lowest confidence bucket with >=60% validation rate
-  const highYieldBuckets = buckets.filter(
-    (b) => b.total_edges >= 3 && b.validation_rate >= 0.6,
-  );
-
-  if (highYieldBuckets.length > 0) {
-    const lowestHighYield = highYieldBuckets.sort(
-      (a, b) => a.confidence_range[0] - b.confidence_range[0],
-    )[0];
-    const suggestedConfidence = lowestHighYield.confidence_range[0];
-
-    if (suggestedConfidence < currentConfig.promotion_confidence - 0.02) {
-      const clamped = Math.max(
-        GUARDS.promotion_confidence.min,
-        Math.min(GUARDS.promotion_confidence.max, suggestedConfidence),
-      );
-      recommendations.push({
-        parameter: "promotion_confidence",
-        current_value: currentConfig.promotion_confidence,
-        recommended_value: Math.round(clamped * 100) / 100,
-        basis:
-          `Edges at confidence ${lowestHighYield.confidence_range[0]}-${lowestHighYield.confidence_range[1]} ` +
-          `validate at ${(lowestHighYield.validation_rate * 100).toFixed(0)}% rate ` +
-          `(${lowestHighYield.total_edges} edges in window). Lowering threshold would promote more genuine connections.`,
-        confidence: Math.min(lowestHighYield.validation_rate, 0.9),
-      });
-    }
-  }
-
-  // Check if high-confidence edges unexpectedly fail
-  const highConfBuckets = buckets.filter(
-    (b) =>
-      b.confidence_range[0] >= 0.7 &&
-      b.total_edges >= 3 &&
-      b.validation_rate < 0.5,
-  );
-  if (highConfBuckets.length > 0) {
-    const worst = highConfBuckets.sort(
-      (a, b) => a.validation_rate - b.validation_rate,
-    )[0];
-    const suggestedConfidence = worst.confidence_range[1];
-    const clamped = Math.max(
-      GUARDS.promotion_confidence.min,
-      Math.min(GUARDS.promotion_confidence.max, suggestedConfidence),
-    );
-    if (clamped > currentConfig.promotion_confidence + 0.02) {
-      recommendations.push({
-        parameter: "promotion_confidence",
-        current_value: currentConfig.promotion_confidence,
-        recommended_value: Math.round(clamped * 100) / 100,
-        basis:
-          `High-confidence edges (${worst.confidence_range[0]}-${worst.confidence_range[1]}) ` +
-          `validate at only ${(worst.validation_rate * 100).toFixed(0)}% rate. ` +
-          `Raising threshold would reduce false promotions.`,
-        confidence: 0.7,
-      });
-    }
-  }
-
-  return recommendations;
-}
-
-// ---------------------------------------------------------------------------
-// Domain Decay Profiles
-// ---------------------------------------------------------------------------
 
 /**
  * Compute per-domain optimal decay rates from tension history. Resolution
@@ -552,41 +169,15 @@ function computeDomainDecayProfiles(
 // Meta Log I/O
 // ---------------------------------------------------------------------------
 
-function emptyMetaLog(): MetaLogFile {
-  return {
-    metadata: {
-      description: "Metacognitive Analysis Log â€” self-tuning audit trail.",
-      schema_version: "1.1.0",
-      total_entries: 0,
-      last_analysis: null,
-    },
-    entries: [],
-  };
-}
-
-async function loadMetaLog(): Promise<MetaLogFile> {
-  try {
-    if (!existsSync(metaLogPath())) return emptyMetaLog();
-    const raw = await readFile(metaLogPath(), "utf-8");
-    const p = JSON.parse(raw);
-    const e = emptyMetaLog();
-    return {
-      metadata: { ...e.metadata, ...(p.metadata && typeof p.metadata === "object" ? p.metadata : {}) },
-      entries: Array.isArray(p.entries) ? p.entries : [],
-    };
-  } catch {
-    return emptyMetaLog();
-  }
-}
-
-async function saveMetaLog(log: MetaLogFile): Promise<void> {
-  log.metadata.total_entries = log.entries.length;
-  log.metadata.schema_version = "1.1.0";
-  log.metadata.last_analysis =
-    log.entries.length > 0
-      ? log.entries[log.entries.length - 1].timestamp
-      : null;
-  await atomicWriteFile(metaLogPath(), JSON.stringify(log, null, 2));
+const loadMetaLog = readMetaDocument;
+async function appendMetaEntry(entry: MetaLogEntry): Promise<void> {
+  await withGraphReconciliation(async () => {
+    const doc = await readMetaDocument();
+    doc.entries.push(entry); doc.entries = doc.entries.slice(-100);
+    doc.metadata.total_entries = doc.entries.length; doc.metadata.schema_version = "1.2.0";
+    doc.metadata.last_analysis = entry.timestamp;
+    await atomicWriteFile(metaLogPath(), JSON.stringify(doc, null, 2));
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -609,56 +200,20 @@ export async function runMetacognitiveAnalysis(
     `Metacognitive analysis: window=${windowSize}, auto_apply=${autoApply}`,
   );
 
-  const [history, candidatesFile, validatedFile, tensionFile, dreamGraph] =
-    await Promise.all([
-      engine.loadDreamHistory(),
-      engine.loadCandidateEdges(),
-      engine.loadValidatedEdges(),
-      engine.loadTensions(),
-      engine.loadDreamGraph(),
-    ]);
-
+  if (!Number.isSafeInteger(windowSize) || windowSize < 1 || windowSize > 2000) throw new Error("META_WINDOW_INVALID");
+  const { history, tensions, graph, portfolio } = await withGraphRead(async () => ({
+    history: await engine.loadDreamHistory(), tensions: await engine.loadTensions(),
+    graph: await loadCanonicalGraph(getActiveScope()?.uuid ?? "legacy"), portfolio: (await readMetaDocument()).portfolio ?? emptyPortfolio(),
+  }));
   const sessions = history.sessions.slice(-windowSize);
-  const cycleWindow: [number, number] =
-    sessions.length > 0
-      ? [sessions[0].cycle_number, sessions[sessions.length - 1].cycle_number]
-      : [0, 0];
-
-  const candidates = candidatesFile.results;
-  const validatedEdges = validatedFile.edges;
-  const validatedEdgeIds = new Set(validatedEdges.map((e) => e.id));
-  const activeTensions = tensionFile.signals;
-  const resolvedTensions = tensionFile.resolved_tensions ?? [];
-
-  const strategyLookup = buildStrategyLookup(
-    candidates,
-    validatedEdges,
-    dreamGraph.edges,
-  );
-
-  // Snapshot the effective config at analysis-time (drives recommendations
-  // and lands in the meta-log entry for transparency).
+  const cycleWindow: [number, number] = sessions.length ? [sessions[0].cycle_number, sessions.at(-1)!.cycle_number] : [0, 0];
+  const activeTensions = tensions.signals, resolvedTensions = tensions.resolved_tensions ?? [];
   const effectiveConfig = await engine.getEffectivePromotionConfig();
-
-  // 1. Strategy performance
-  const strategyMetrics = computeStrategyMetrics(
-    sessions,
-    candidates,
-    validatedEdges,
-    resolvedTensions,
-    strategyLookup,
-  );
-
-  // 2. Promotion calibration
-  const calibrationBuckets = computeCalibrationBuckets(
-    candidates,
-    validatedEdgeIds,
-    cycleWindow,
-  );
-  const thresholdRecommendations = computeThresholdRecommendations(
-    calibrationBuckets,
-    effectiveConfig,
-  );
+  const scopedPortfolio = { ...portfolio, observations: portfolio.observations.slice(-windowSize * ACTIVE_STRATEGY_NAMES.length) };
+  const strategyMetrics = computePortfolioMetrics(scopedPortfolio, graph.state.availability === "available" ? graph : null);
+  // Promotions are operational dispositions, not reference labels for confidence calibration.
+  const calibrationBuckets: CalibrationBucket[] = [];
+  const thresholdRecommendations: ThresholdRecommendation[] = [];
 
   // 3. Domain decay profiles
   const domainDecayProfiles = computeDomainDecayProfiles(
@@ -704,34 +259,12 @@ export async function runMetacognitiveAnalysis(
     }
   }
 
-  // Overall health verdict
-  const measuredStrategies = strategyMetrics.filter(
-    (m) => m.total_generated > 0,
-  );
-  const avgPrecision =
-    measuredStrategies.length > 0
-      ? measuredStrategies.reduce((s, m) => s + m.precision, 0) /
-        measuredStrategies.length
-      : 0;
-  const zeroYieldStrategies = strategyMetrics.filter(
-    (m) => m.consecutive_zero_yield >= 3,
-  ).length;
-
-  let overallHealth: string;
-  if (sessions.length < 5) {
-    overallHealth =
-      "insufficient data â€” need more dream cycles for meaningful analysis";
-  } else if (avgPrecision >= 0.4 && zeroYieldStrategies <= 3) {
-    overallHealth = "healthy â€” strategies are producing valuable connections";
-  } else if (avgPrecision >= 0.2) {
-    overallHealth =
-      "moderate â€” some strategies underperforming, consider rebalancing";
-  } else {
-    overallHealth =
-      "attention needed â€” low overall precision, review promotion thresholds";
-  }
+  const overallHealth = graph.state.availability !== "available" ? "graph evidence unavailable; accuracy unmeasured"
+    : `Operational novelty and current corroboration observed; labeled accuracy unmeasured. ${portfolio.reviews.length} explicit usefulness reviews.`;
 
   const entry: MetaLogEntry = {
+    graph_revision: graph.revision.graph_revision,graph_currency:graph.currency,graph_state:graph.state,metric_definition_version:"2.0.0", portfolio_revision: portfolio.revision,
+    calibration_status: "independent_labels_unavailable",
     id: `meta_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     timestamp: new Date().toISOString(),
     cycle_window: cycleWindow,
@@ -745,12 +278,7 @@ export async function runMetacognitiveAnalysis(
     overall_health: overallHealth,
   };
 
-  const log = await loadMetaLog();
-  log.entries.push(entry);
-  if (log.entries.length > 100) {
-    log.entries = log.entries.slice(-100);
-  }
-  await saveMetaLog(log);
+  await appendMetaEntry(entry);
 
   logger.info(
     `Metacognitive analysis complete: ${strategyMetrics.length} strategies, ` +

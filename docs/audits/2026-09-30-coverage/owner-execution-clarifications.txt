@@ -1,0 +1,12 @@
+Owner clarifications during revision-7 simulation (2026-09-30)
+
+The graph is not necessarily stale even if a full scan has been done only once. When the project is mutated with DreamGraph, either as MCP or by DreamGraph Architect, the graph is kept up to date.
+It is up to the user. They will know if the project has been heavily modified without DreamGraph around, then they should perform an inclusive scan.
+Old scan does not equal stale graph.
+As a pro system the correct usage is ultimately up to the user. Correct functionality is up to DreamGraph.
+DreamGraph guarantees system correctness under valid use.
+The user owns operating discipline outside that contract.
+
+This transcription preserves the requested meaning; the conversation remains the source.
+
+Additional owner request: Keep a record of last graph mutation time so MCP-aware tools do not say “Graph is stale” based on the last full-scan date.

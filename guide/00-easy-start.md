@@ -2,7 +2,7 @@
 
 > **Start here.** You do not need to understand the internals before using DreamGraph. Pick the path that matches your project, run the short command list, and keep three browser tabs open: Dashboard, Explorer, and Architect.
 
-DreamGraph v12 is browser-first. **Architect** is the main working surface. The Dashboard helps with setup and health. Explorer gives you a visual map when you need orientation.
+DreamGraph v14 is browser-first. **Architect** is the main working surface. The Dashboard helps with setup and health. Explorer gives you a visual map when you need orientation.
 
 ## Before you start
 
@@ -12,7 +12,7 @@ Install DreamGraph from the repository root:
 # Windows
 scripts/install.ps1 -Force
 
-# macOS or Linux
+# Linux / accepted WSL2 test bed
 bash scripts/install.sh --force
 ```
 
@@ -22,7 +22,7 @@ Open a new terminal and verify the install:
 dg --version
 ```
 
-You should see DreamGraph CLI v13.2.0 or newer.
+You should see DreamGraph CLI v14.0.0.
 
 ## Pick your setup path
 

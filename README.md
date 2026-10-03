@@ -1,8 +1,22 @@
 ![DreamGraph](assets/dreamgraph.jpeg)
 
-# DreamGraph v13.4.0 - Glass Atlas
+# DreamGraph v14.0.0 - Ashoka
 
-![Version](https://img.shields.io/badge/version-13.4.0-blue)
+Ashoka's [legacy migration procedure](docs/ashoka/legacy-upgrade.md) provides a reviewed preview, backup, cutover and recovery path. Installing v14 does not migrate a graph automatically. The [sealed system gate](docs/ashoka/slice-27-closure.json) records 2,040 passing root tests, 546 compiled editor tests and eleven Windows browser checks. The maintainer's original instance remains a separate migration decision.
+
+The [Computer Use implementation](docs/ashoka/computer-use.md) extends original execution/job/graph owners with scoped grants, durable action receipts, an isolated browser worker and compact Architect/companion controls. SDK/editor controls retain the original owner and captured endpoint; selection issues no grant. Slice 31 is verified for the maintainer's [Windows and accepted WSL installer/browser scope](docs/ashoka/v14-release-scope.md). Additional platforms/native desktop backends are deferred; unqualified native CLI/provider control remains unavailable without silent substitution.
+
+Ashoka [native-host spend admission](docs/ashoka/model-admission.md) joins editor/SDK API and CLI transport to the durable ledger without transferring provider credentials. Generated core contracts separate possible-dispatch permits, trusted host reports and read-only recovery.
+
+The [matched answer collector](docs/ashoka/admitted-agent-evaluation.md) previews exact context/model/retention/tariff disclosures before an operator-approved native API run. Both answers share one job/spend allocation; partial answers survive failure and remain unscored. The [public GPT-4.1 pilot](docs/ashoka/benchmarks/2026-10-03-gpt-4.1/README.md) records quality failures and does not establish improved understanding or cost savings.
+
+Ashoka's [canonical analytics](docs/ashoka/analytics-observability.md) separates current proof, coverage, currency and workload across thirteen Python modules and the daemon. [Narrative/lucid interaction](docs/ashoka/lifecycle-narrative.md) preserves historical outcomes, derived ancestry and explicit human contributions through cancellation/recovery.
+
+Ashoka strategy alignment uses one [executable catalogue](docs/ashoka/strategies.md) for eleven active dream strategies, exact combined budgets and explicit focus. Reflective is retired explicitly; model hypotheses remain speculative. Implementation modules: `src/cognitive/strategy-catalog.ts` and `src/cognitive/strategy-registry.ts`.
+
+[Typed plan authority](docs/ashoka/plan-authority.md) keeps current ownership, running leases, dependency eligibility and reviewed verification in one core reducer and publication journal.
+
+![Version](https://img.shields.io/badge/version-14.0.0-blue)
 ![VS%20Code](https://img.shields.io/badge/VS%20Code-extension-0098FF?logo=visualstudiocode&logoColor=white)
 ![MCP](https://img.shields.io/badge/MCP-enabled-7C3AED)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=nodedotjs&logoColor=white)
@@ -14,7 +28,9 @@
 
 **New here?** Use the [DreamGraph Easy Start guide](guide/00-easy-start.md) for a short path from install to Dashboard, Explorer, and Architect.
 
-**v13.4.0 - Glass Atlas** brings a compact Explorer with glass nodes, meaningful shapes, restrained animated connections, and collision-aware labels in both views. Dense hubs retain their colors and links remain thin at close zoom. Enrichment gains configurable context depth and better fallback recovery. Current OpenAI, Anthropic, and Codex CLI model support from v13.3.0 remains available. See [release notes](RELEASE_NOTES_v13.4.0.md).
+**Engine alignment audit (2026-09-30):** See the [coverage and correctness report](docs/audits/2026-09-30-coverage/report.md), [subsystem alignment map](docs/audits/2026-09-30-coverage/subsystem-alignment.md), and [unified v14.0.0 - Ashoka plan](plans/graph-trust-and-agent-effectiveness.md). [Revision 7](docs/audits/2026-09-30-coverage/plan-refinement.md) retains the resolved policies, schedule management, CLI controls and [coherent lifecycle/status design](docs/audits/2026-09-30-coverage/plan-lifecycle-status.md), and makes [graph-centered execution and bounded digestion](docs/audits/2026-09-30-coverage/graph-centered-execution.md) a release invariant. It also specifies [Architect context menus and selected-plan navigation](docs/audits/2026-09-30-coverage/architect-context-actions.md). The [Computer Use design](docs/audits/2026-09-30-coverage/computer-use.md) adds adapter-native execution, cross-platform workers and bounded delivery. The [full execution simulation](docs/audits/2026-09-30-coverage/execution-simulation.md) closes contract/dependency/recovery handoffs and makes reconciliation-based freshness explicit: old scan does not mean stale graph. Implementation is authorized and underway; see the [foundation checkpoint](docs/ashoka/foundation.md) and [implementation log](plans/graph-trust-and-agent-effectiveness.implementation-log.md) for verified evidence and remaining work.
+
+**v14.0.0 - Ashoka** aligns graph contracts, agent context, lifecycle, execution, schedules, configuration, provider policies and governed Computer Use. This is the first practical-testing release. See [release notes](RELEASE_NOTES_v14.0.0.md) and the [upgrade guide](docs/ashoka/release-14.0.0.md); the published model pilot does not establish understanding gains or cost savings.
 
 DreamGraph is a governed architecture cognition layer for MCP-enabled software projects. It combines an instance-scoped daemon, CLI, architect beta, VS Code extension, dashboard, and a persistent knowledge graph so project understanding is grounded in source, ADRs, workflows, tests, runtime observations, and human review rather than any single file read or isolated chat turn.
 
@@ -99,7 +115,7 @@ Tier ladder: $5/mo (sponsor badge + name in [`SPONSORS.md`](SPONSORS.md)) · $10
 - **Daemon** — the long-running DreamGraph runtime with stdio or HTTP transport
 - **MCP tool surface** — tools for graph queries, enrichment, source inspection, cognition, ADRs, workflows, and remediation
 - **CLI (`dg`)** — instance creation, attach/detach, start/stop, status, scan, enrich, schedule, export, fork, and migration
-- **Architect beta** — standalone browser Architect for project-bound chat, selected-plan scope, runtime provenance, model/adapter route visibility, governed MCP tool use, and auditable tool traces
+- **Architect beta** — standalone browser Architect with a compact Web64 IDE v2-inspired charcoal workbench, project-bound chat, selected-plan scope, runtime provenance, model/adapter route visibility, governed MCP tool use, and auditable tool traces
 - **Architect CLI (`dg architect`)** — terminal-native Architect client for status, plans, plan lifecycle, runtime config, chat, task controls, ADR/graph/scheduler/Adaptive Future inspection, JSON automation, and dependency-free log-mode TUI projection over daemon contracts
 - **VS Code extension** — VS Code architect chat, dashboard, Explorer (interactive 2D/3D graph + curated mutations), changed-files view, daemon connection, and local support tools
 - **Knowledge graph + cognitive engine** — features, workflows, data model, tensions, validated relationships, dream-cycle reasoning, trust calibration, evidence ledgers, and lifecycle visibility
@@ -160,7 +176,7 @@ code --version
 
 ## Upgrading from an earlier version
 
-If you are running any DreamGraph version prior to **v8.2.6**, please rebuild and reinstall from this release. v8.2.6 fixes the long-standing **confidence inflation bug** in the dream engine (deterministic strategies were re-deriving the same edges and pushing rejected items to `confidence = 1.0`) and adds **self-healing graph integrity** so the fact graph no longer accumulates orphans, dangling references, or asymmetric edges. Earlier versions will continue to run but cannot benefit from these fixes; rebuilding from v8.2.6 is required for full functionality. A migration script for existing data is provided in `scripts/repair-confidence-inflation.mjs` (see [RELEASE_NOTES_v8.2.6.md](RELEASE_NOTES_v8.2.6.md)).
+For the v14 upgrade path, including existing graph formats, see the [Ashoka release and upgrade guide](docs/ashoka/release-14.0.0.md). The historical v8.2.6 confidence repair script remains at `scripts/repair-confidence-inflation.mjs` for affected data.
 
 ## Install From Source
 
@@ -300,6 +316,8 @@ dg scan my-project
 
 ## Core Commands
 
+Ashoka's [generated MCP catalogue](docs/contracts/mcp-catalog.md) contains 93 core tools and 31 resource URIs. Its [shared contract](docs/ashoka/mcp-contract.md) preserves structured results/provenance and private Architect ownership across tools and passes; 94 discipline classifications include one intentional local extension. Generate/check with `npm run mcp:generate` / `npm run mcp:check`.
+
 ```bash
 npm run build
 npm test
@@ -315,7 +333,7 @@ dg plugin list my-project
 dg plugin inspect my-project <plugin-id>
 ```
 
-`--max-hops` sets enrichment graph-neighbor depth for both `dg scan` and `dg enrich` (0–6, default 3). `1` uses direct neighbors; `0` uses node/source evidence without graph neighbors. It reduces context depth rather than imposing a token, call, or spending limit. Use `--skip-scan` for an enrichment-only pass when the source map is current.
+`--max-hops` sets enrichment graph-neighbor depth for both `dg scan` and `dg enrich` (0–6, default 2). `1` uses direct neighbors; `0` uses node/source evidence without graph neighbors. It reduces context depth rather than imposing a token, call, or spending limit. Use `--skip-scan` for an enrichment-only pass when the source map is current.
 
 The daemon permits one scan or enrichment operation per instance at a time. An overlapping request fails with `GRAPH_OPERATION_BUSY` before paid calls or graph writes; enrichment inside its owning scan remains allowed. This also prevents an automatic model-change refresh from overlapping a running scan. The shared operation guard lives in `src/utils/graph-operation.ts`.
 
@@ -339,7 +357,29 @@ For deeper architectural detail, see:
 - [docs/tools-reference.md](docs/tools-reference.md)
 - [docs/workflows.md](docs/workflows.md)
 
+## Instance data
+
+The physical publication registry contains 39 named stores (21 graph stores and 18 metadata stores). Full normalization outcomes are immutable receipt-bound artifacts, separate from that named-store count.
+
+```text
+data/
+  features.json, workflows.json, data_model.json  # source/entity families
+  dream_graph.json, candidate_edges.json          # hypotheses and assessment history
+  normalization_evidence.json                     # exact claim observations and withdrawals
+  validated_edges.json                           # promotion history; current proof is rechecked
+  normalization-result-<operation-sha256>.json     # complete recoverable pass outcomes
+  publication_state.json, reconciliation_journal.json
+  change_obligations.json, dirty_partitions.json
+  plan_state.json, jobs.json, spend_ledger.json
+```
+
 ## Source Layout
+
+The dashboard's compact settings and runtime clients are `src/server/configuration-workspace.ts` and `src/server/runtime-workspace.ts`. They consume the daemon configuration and job/currency authorities; [workspace behavior](docs/ashoka/configuration-workspace.md) includes protected templates, exact retries and effective readback. The daemon root links both Architect and Explorer.
+
+Ashoka's 31 core MCP resource URIs use [revisioned whole-record paging](docs/ashoka/resources.md) through `resources/read` and `query_resource`. Runtime capabilities remain at `system://capabilities`; project entities use `system://capability-entities`. Follow continuation before claiming completeness; raw JSON is never clipped. See [foundation status](docs/ashoka/foundation.md) for implementation and qualification evidence.
+
+Ashoka's [canonical retrieval](docs/ashoka/retrieval.md) supplies all 17 graph families with typed identities, provenance and bounded neighborhoods. Required plan/slice/ADR/evidence context is reserved before optional expansion; missing or oversized mandatory context is explicit. Source debt stays scoped, and an old full scan does not mean a stale graph. Pure retrieval does not probe or call a model; the [published paired pilot](docs/ashoka/benchmarks/2026-10-03-gpt-4.1/README.md) documents observed quality failures without an improvement claim.
 
 ```text
 src/
@@ -350,6 +390,7 @@ src/
   data/
   db/
   discipline/
+  graph/       # canonical contracts/read model, publication, recovery and Explorer projections
   instance/
   plugins/
   resources/
@@ -358,7 +399,7 @@ src/
   utils/
 
 packages/
-  sdk/    # @dreamgraph/sdk — public plugin contracts (manifest, telemetry, reject reasons)
+  sdk/    # @dreamgraph/sdk — generated canonical graph and public plugin contracts
   host/   # @dreamgraph/host — in-process plugin loader, gate registry, watchdog
 
 examples/
@@ -371,6 +412,7 @@ extensions/
       chat-panel.ts
       dashboard-view.ts
       daemon-client.ts
+      managed-cli-pass.ts
       mcp-client.ts
       local-tools.ts
       tool-groups.ts
@@ -399,7 +441,7 @@ explorer/
 
 ## Version Semantics
 
-The CLI, standalone Architect, VS Code Architect, daemon, Explorer, Dashboard, analytics suite, and daemon-exposed MCP authority share release **13.4.0**. MCP initialization and `system://capabilities` report the daemon package version. Analytics reports it with `python -m analytics --version` from the `python/` directory.
+The CLI, standalone Architect, VS Code Architect, daemon, Explorer, Dashboard, analytics suite, and daemon-exposed MCP authority share release **14.0.0**. MCP initialization and `system://capabilities` report the daemon package version. Analytics reports it with `python -m analytics --version` from the `python/` directory.
 
 DreamGraph instance status can show two different version concepts:
 
@@ -426,3 +468,53 @@ Reference docs (auto-generated from the codebase):
 ## License
 
 This repository is licensed under the **DreamGraph Source-Available Community License v2.0**. See [LICENSE](LICENSE) for the full terms.
+
+Ashoka [provider boundaries](docs/ashoka/providers.md) cover API output contracts, independent role dispatch, schema validation, usage, cancellation and explicit CLI adapter behavior.
+
+Ashoka configuration now uses a [typed, revisioned engine.env authority](docs/ashoka/configuration.md). Dashboard scheduler/event/narrative saves persist before runtime application, preserve unrelated values, and reject conflicting edits. The [setting inventory](docs/ashoka/configuration-inventory.json) names typed fields and client/build-only exceptions. Computer Use remains disabled by default; configuration grants no execution authority.
+
+The core configuration modules are `engine-settings.ts` (schemas), `engine-setting-catalogue.ts` (ownership), `engine-env-document.ts` (codec), `engine-configuration.ts` (durable authority), `role-settings.ts` (pure role schemas) and `setting-schema.ts` (UI constraints), under `src/config/`.
+
+Ashoka inference passes through [durable admission](docs/ashoka/model-admission.md). API dispatch requires an exact versioned tariff and positive role run/day allocations; template defaults remain zero. Two-hop enrichment respects bounded neighbors, preserves accepted batches on exhaustion, and reports unavailable usage explicitly. Native CLI subscriptions remain separate from API money. [Indexed retrieval](docs/ashoka/retrieval.md) preserves reference context and frozen task evidence. The model pilot reports its limitations separately.
+
+Ashoka cognitive output now retains [source/model/prompt/schema attribution and a frozen offline evaluation baseline](docs/ashoka/cognitive-policy-evaluation.md). Repeated model agreement remains one evidence ancestry; the measured legacy promotion weakness is retained for Slice 15. These fixtures do not establish superiority of a named model.
+
+The [session authority](docs/ashoka/session-authority.md) binds private Architect state, MCP sampling/discipline, continuations and cancellation to a principal/session. HTTP defaults to loopback; explicit remote mode requires a protected token and exact host/origin controls. `session_authority.json` stores private hashes/preferences/grants alongside publication metadata. Health probes are stateless and cannot exhaust that store; a capacity/recovery refusal returns a bounded HTTP503 while preserving existing identities. No configuration or autonomy setting grants Computer Use. Source owners are `src/server/{session-context,session-authority,http-policy,http-authority,computer-control}.ts`, `src/cognitive/cognitive-provenance.ts` and `src/evaluation/cognitive-policy.ts`; the reproducible runner is `scripts/evaluate-cognitive-policies.mjs`.
+
+
+Ashoka claim evidence is owned by `src/cognitive/normalization-evidence.ts` and its registered `normalization_evidence.json` ledger. See [normalization evidence](docs/ashoka/normalization-evidence.md) for exact typed claims, independent ancestry, source proof/withdrawal and native ADR-241. Model agreement never creates factual corroboration.
+
+`src/cognitive/normalization-publication.ts` owns coherent normalizer snapshots, typed claim resolution and one C04 promotion transaction. The old direct engine promotion methods reject bypasses; source/human/hypothesis semantics and history are preserved.
+
+Ashoka CLI controls bind selected autonomy to daemon-admitted exact actions and separately disclose provider/prompt/presentation verbosity; see [CLI controls](docs/ashoka/cli-controls.md).
+
+The CLI control owners are `src/server/execution-policy.ts` (immutable execution scope and exact action admission), `src/server/scoped-command.ts` (daemon command fence) and `src/architect/cli-bridge.ts` (qualified native launch/output guidance). [Controls and integration boundaries](docs/ashoka/cli-controls.md) distinguish enforced policy from model guidance and unavailable native Computer Use routes.
+
+Slice 25 [client integration](docs/ashoka/client-integration.md) adds canonical bounded HTTP context, generated VS Code contracts, contextual actions, selected-plan reveal and exact action review. `src/server/context-menu.ts`, `src/architect/context-actions.ts`, `src/architect/execution-review-ui.ts`, `src/server/managed-execution.ts`, `src/graph/execution-context.ts` and `packages/token-economy/src/machine-result.ts` own these additions. Private `execution_contexts.json` records host delivery and unresolved effects; it is not graph evidence or model understanding. Editor `extensions/vscode/src/execution-review.ts` and `extensions/vscode/src/webview/execution-review.ts` add captured review/retry controls. `extensions/vscode/src/managed-native-pass.ts` owns native and explicit operator execution. Changed-file Undo uses the original daemon source owners with a reviewed file hash; outcome inspection never repeats the action. The [sealed system gate](docs/ashoka/slice-27-closure.json) records accepted functional qualification.
+
+`src/graph/observed-command.ts` observes bounded scan-visible project source before/after managed native commands, excluding private instance stores, generated paths and secrets. Existing change obligations retain intent before launch and exact changed scopes after termination; external effects remain unattested. Command exit alone does not prove graph synchronization.
+
+`src/plugins/graph-context.ts` connects `ctx.graph` to the core context owner through the SDK's `packages/sdk/src/seams/graph-context.ts`. The 32 generated contracts include the strict context query as well as its result, so editor/SDK request controls share one schema. Plugin reads require declared capabilities/effects and retain unattested delivery; private plugin writes are not claimed reconciled.
+
+Ashoka Slice 14 [persistent strategy learning](docs/ashoka/strategy-learning.md) stores post-dedup observations and reviewed usefulness in existing `meta_log.json`, with atomic dream/learning publication and explicit fixed-allocation recovery. Source owners include `src/cognitive/strategy-portfolio.ts` and `src/cognitive/dream-deduplication.ts`; repeated generation is neither evidence nor labeled accuracy.
+
+Ashoka Slice 16 [curation and retention](docs/ashoka/curation-retention.md) adds append-only dispositions to existing `graph_maintenance.json` and reversible hash-bound archives. The source owner is `src/cognitive/curation.ts`. Reject/retire/reopen, dream decay and quarantine share the graph publication writer; human acceptance remains a human assertion and assessment history is preserved. `mutate_validated_edge` requires `reason` and `expected_revision` and accepts `operation_id`/`dry_run`; retarget creates a proposal requiring revalidation.
+
+Cognitive operational store reads use `src/cognitive/cognitive-store.ts` and the canonical read barrier; missing/corrupt previously published history is unavailable, never an empty reset.
+
+### Ashoka durable job ownership (Slice 17)
+
+The registered `jobs.json` owner in `src/cognitive/jobs.ts` pins role policies, pricing references, shared parent resources, instance storage and conflict lanes. `src/cognitive/job-context.ts` carries the cancellation signal and generation fence to graph publication, managed source effects and inference. Cancellation stops publication and records uncertain termination; it never claims a timed-out promise or paid request was undone.
+
+Slice 17 provides immutable schedule occurrences, definition revisions and replay identities; new schedules start disabled. Scheduler preview and dispatch share the named-zone evaluator (DST gap/fold policy). `/api/schedules/v2` and `/api/jobs/v1` expose the core ports used by the [schedule workspace](docs/ashoka/schedule-workspace.md). `src/cognitive/schedule-definition.ts`, `digestion.ts` and `src/server/schedule-api.ts` are the owners. Readiness observations dispatch no bootstrap work. Bounded dirty-source generations use existing `dirty_partitions.json` and `graph_maintenance.json`; unknown scope and optional unfunded cognition stay pending, without making reconciled facts stale.
+
+Slice17 adds bounded durable webhook dispatch/acknowledgement records to existing engine jobs; transport uncertainty remains recovery-required with its stable receiver deduplication ID. Queue resume, engine recovery and shutdown share the daemon owner. Capability readiness records pending admission and never authorizes paid bootstrap. See docs/ashoka/engine-jobs.md for core scope and qualification limits.
+
+Ashoka Slice 18 aligns temporal/causal and federated evidence: event and observation time are distinct; correlation is advisory; v2 origin/manifests and import receipts prevent repeated support inflation. Exports use fixed redacted vocabulary. See [temporal/federation contract](docs/ashoka/temporal-federation.md) for quarantine, compatibility and bounded affected-generation behavior.
+
+The protected JSON setting DREAMGRAPH_FEDERATION configures sharing for the next execution: allow_import/allow_export, anonymize=true for enabled export, and an optional stable instance_id. Complete candidates use the same schema as the federation owner; malformed settings do not silently re-enable sharing.
+
+Ashoka Slice 19 separates risk observations, advisory proposals, action outcomes, human dispositions and independently verified resolution. Stable risk revisions and retained histories preserve conflict/reappearance evidence. TTL expiry retires attention as expired_unverified; it does not prove false-positive status. See docs/ashoka/risk-remediation.md for the in-progress qualification scope.
+
+
+Ashoka Slice 20 narrative/playback/lifecycle views consume a revision-bound derived source context and separate historical counts from current proof. Story history is retained in archived_chapters/archived_digests; missing/corrupt published history fails closed. Lucid exploration has a finite session-owned existing engine job lease and durable lucid_log.json intent/actions/recovery. Human acceptance records a rationale and human_assertion with zero independent roots, never inflated confidence or source verification. No source/provider/user wait occurs under the writer; see [lifecycle narrative](docs/ashoka/lifecycle-narrative.md).

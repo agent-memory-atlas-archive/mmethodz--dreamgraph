@@ -5,6 +5,8 @@
  * and project binding types for UUID-isolated DreamGraph instances.
  */
 
+import { emptyScheduleDocument } from "../cognitive/schedule-definition.js";
+
 /* ------------------------------------------------------------------ */
 /*  Instance Identity                                                 */
 /* ------------------------------------------------------------------ */
@@ -232,17 +234,17 @@ export const INSTANCE_DIRS = [
  */
 export const DATA_STUBS: Record<string, unknown> = {
   "dream_graph.json":       { nodes: [], edges: [] },
-  "candidate_edges.json":   [],
-  "validated_edges.json":   [],
-  "tension_log.json":       { tensions: [] },
-  "dream_history.json":     { cycles: [] },
+  "candidate_edges.json":   { results: [] },
+  "validated_edges.json":   { edges: [] },
+  "tension_log.json":       { signals: [], resolved_tensions: [] },
+  "dream_history.json":     { sessions: [] },
   "adr_log.json":           { decisions: [] },
   "remediation_log.json":   { metadata: { description: "Remediation plans \u2014 current per tension + history of superseded plans", schema_version: "1.0", last_updated: null }, current: {}, history: [] },
   "ui_registry.json":       { elements: [] },
   "event_log.json":         { events: [] },
   "meta_log.json":          { analyses: [] },
   "system_story.json":      { chapters: [], weekly_digests: [], trends: {} },
-  "schedules.json":         { schedules: [], execution_history: [] },
+  "schedules.json":         emptyScheduleDocument(),
   "graph_maintenance.json": { schema_version: "1.0.0", last_scan_at: null, last_enrichment_at: null, last_datastore_scan_at: null, last_major_graph_change_at: null, current_scan_state_revision: null, last_scan_git_heads: {}, datastore_connection_fingerprint: null, targeted_dream_schedule_ids: [] },
   "scan_state.json":        { schema: "dreamgraph.scan_state.v1", schema_version: "1.0.0", scanner_contract_version: "1.0.0", status: "uninitialized" },
   "threat_log.json":        [],

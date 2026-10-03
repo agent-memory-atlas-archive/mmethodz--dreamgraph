@@ -4,10 +4,13 @@ import { getArchitectLlmConfig } from "../cognitive/llm.js";
 import { config } from "../config/config.js";
 import { getActiveScope } from "../instance/lifecycle.js";
 
-const STALE_GRAPH_AFTER_MS = 24 * 60 * 60 * 1_000;
+// This is a setup projection, not a source-currency judgment. File age cannot
+// establish a scope gap; the canonical context/currency owner supplies those.
+const mapCache = new Map<string, { stamp: string; value: OnboardingReadinessProjection["project_map"] }>();
+const MAX_MAP_BYTES = 32 * 1024 * 1024;
 
 export type OnboardingReadinessStatus = "ready" | "needs_attention" | "useful_later";
-export type ProjectMapStatus = "not_built" | "learning" | "ready" | "stale";
+export type ProjectMapStatus = "not_built" | "learning" | "ready" | "stale" | "unavailable";
 
 export interface OnboardingReadinessCheck {
   id: string;
@@ -54,18 +57,28 @@ function readProjectMap(dataDir: string): OnboardingReadinessProjection["project
   }
 
   try {
-    const graph = JSON.parse(readFileSync(graphPath, "utf8")) as { nodes?: unknown[]; edges?: unknown[] };
-    const graphStat = statSync(graphPath);
+    const graphStat = statSync(graphPath, { bigint: true });
+    const stamp = [graphStat.dev, graphStat.ino, graphStat.size, graphStat.mtimeNs, graphStat.ctimeNs].join(":");
+    const cached = mapCache.get(graphPath);
+    if (cached?.stamp === stamp) return { ...cached.value };
+    if (!graphStat.isFile() || graphStat.size > BigInt(MAX_MAP_BYTES)) throw new Error("PROJECT_MAP_UNAVAILABLE");
+    const bytes = readFileSync(graphPath);
+    const graph = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes).replace(/^\uFEFF/, "")) as { nodes?: unknown[]; edges?: unknown[] };
+    if (!graph || !Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) throw new Error("PROJECT_MAP_INVALID");
+    const after = statSync(graphPath, { bigint: true });
+    if ([after.dev, after.ino, after.size, after.mtimeNs, after.ctimeNs].join(":") !== stamp) throw new Error("PROJECT_MAP_CHANGED");
     const nodeCount = Array.isArray(graph.nodes) ? graph.nodes.length : 0;
     const edgeCount = Array.isArray(graph.edges) ? graph.edges.length : 0;
     const status: ProjectMapStatus = nodeCount + edgeCount === 0
       ? "learning"
-      : Date.now() - graphStat.mtimeMs > STALE_GRAPH_AFTER_MS
-        ? "stale"
-        : "ready";
-    return { status, last_refreshed_at: graphStat.mtime.toISOString(), node_count: nodeCount, edge_count: edgeCount };
+      : "ready";
+    const value = { status, last_refreshed_at: new Date(Number(graphStat.mtimeMs)).toISOString(), node_count: nodeCount, edge_count: edgeCount };
+    if (mapCache.size >= 16) mapCache.delete(mapCache.keys().next().value!);
+    mapCache.set(graphPath, { stamp, value });
+    return { ...value };
   } catch {
-    return { status: "not_built", last_refreshed_at: null, node_count: 0, edge_count: 0 };
+    mapCache.delete(graphPath);
+    return { status: "unavailable", last_refreshed_at: null, node_count: 0, edge_count: 0 };
   }
 }
 
@@ -92,12 +105,12 @@ export function buildOnboardingReadinessProjection(runtime: ArchitectReadinessRu
   const projectAttached = Boolean(scope?.projectRoot);
   const repositoriesConnected = repositoryNames.length > 0;
   const runtimeReady = isArchitectRuntimeReady(runtime);
-  const mapExists = map.status !== "not_built";
+  const mapExists = map.status === "ready" || map.status === "learning";
 
   const requiredToStart: OnboardingReadinessCheck[] = [
     { id: "service", label: "DreamGraph is running", status: "ready", detail: "The daemon is serving this readiness contract.", action: null },
     { id: "project", label: "A project is attached", status: projectAttached ? "ready" : "needs_attention", detail: projectAttached ? "The active instance has a project root." : "Choose a project before Architect starts project work.", action: projectAttached ? null : action("choose_project", "Choose a project", "open_route", "/config") },
-    { id: "project_map", label: "The project map exists", status: mapExists ? "ready" : "needs_attention", detail: mapExists ? `Project map status: ${map.status}.` : "Build the first project map so Architect has repository context.", action: mapExists ? null : action("build_project_map", "Build project map", "run_governed_tool", "scan_project") },
+    { id: "project_map", label: "The project map exists", status: mapExists ? "ready" : "needs_attention", detail: mapExists ? `Project map status: ${map.status}. Its age does not establish graph staleness; scoped currency is reported separately.` : map.status === "unavailable" ? "The project map could not be read. Inspect instance status before choosing repair." : "Build the first project map so Architect has repository context.", action: mapExists ? null : map.status === "unavailable" ? action("inspect_project_map", "Inspect project map", "open_route", "/status") : action("build_project_map", "Build project map", "run_governed_tool", "scan_project") },
     { id: "architect_runtime", label: "Architect can answer", status: runtimeReady ? "ready" : "needs_attention", detail: runtimeReady ? `Architect runtime: ${runtime.adapter}.` : "Choose how Architect should run.", action: runtimeReady ? null : action("choose_architect_runtime", "Choose how Architect runs", "open_route", "/config") },
     { id: "repositories", label: "Repositories are connected", status: repositoriesConnected ? "ready" : "needs_attention", detail: repositoriesConnected ? `${repositoryNames.length} repository connection(s) available.` : "Connect at least one repository for project work.", action: repositoriesConnected ? null : action("connect_repository", "Connect a repository", "open_route", "/config") },
   ];

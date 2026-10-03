@@ -1,0 +1,27 @@
+{
+  "schema": "dreamgraph.ashoka_native_handoff.v1",
+  "slices": [
+    15,
+    30
+  ],
+  "session_id": "ea472546-116f-46df-a577-1946736958f7",
+  "evidence": "docs/ashoka/wave-15-30-tests.json",
+  "scope": "Seventeen dependency handoffs only; remaining job/task/client/native/final gates remain owning slices.",
+  "native_result": {
+    "success": true,
+    "compliance": {
+      "status": "compliant",
+      "parity_percentage": 100,
+      "total_entries": 17,
+      "matched": 17,
+      "gaps_remaining": 0,
+      "regressions": 0
+    },
+    "regressions": 0,
+    "recommendation": {
+      "action": "accept",
+      "justification": "All entries match. No regressions detected."
+    },
+    "message": "Verification: COMPLIANT — 100% parity, 0 gaps, 0 regressions. Recommendation: accept"
+  }
+}

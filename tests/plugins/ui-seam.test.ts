@@ -1,3 +1,4 @@
+import { releaseGraphWriter } from "../../src/graph/writer-lease.js";
 /**
  * M6 — UI typed builder seam.
  *
@@ -128,14 +129,15 @@ afterEach(async () => {
   _resetPluginManagerForTest();
   delete process.env.DG_ALLOW_INPROCESS_PLUGINS;
   setDataDirOverride(previousOverride.dir as unknown as string);
+  await releaseGraphWriter(dataDir);
   await rm(masterDir, { recursive: true, force: true });
 });
 
 // We need to wait for the fire-and-forget registry write to settle.
-async function flushRegistryWrite(expectedCount?: number): Promise<void> {
-  const deadline = Date.now() + 1_000;
+async function flushRegistryWrite(expectedCount?: number, receiptReady: () => boolean = () => true): Promise<void> {
+  const deadline = Date.now() + 3_000;
   do {
-    if (expectedCount === undefined || (await readRegistryElements()).length === expectedCount) {
+    if ((expectedCount === undefined || (await readRegistryElements()).length === expectedCount) && receiptReady()) {
       return;
     }
     await new Promise((r) => setTimeout(r, 25));
@@ -165,7 +167,7 @@ describe("plugin UI seam (M6)", () => {
     const { events, unsubscribe } = collectPluginEvents();
     try {
       await bootstrapPlugins();
-      await flushRegistryWrite(1);
+      await flushRegistryWrite(1, () => events.some(event => event.kind === "plugin.output.accepted" && (event.payload as { seam?: string }).seam === "ui"));
 
       const elements = await readRegistryElements();
       expect(elements.length).toBe(1);

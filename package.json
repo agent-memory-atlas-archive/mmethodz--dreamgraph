@@ -1,6 +1,6 @@
 {
   "name": "dreamgraph",
-  "version": "13.4.0",
+  "version": "14.0.0",
   "description": "Graph-first cognitive daemon with MCP tools, CLI, dashboard, Explorer, and VS Code integration",
   "engines": {
     "node": ">=20.0.0"
@@ -23,6 +23,15 @@
     "dg": "dist/cli/dg.js"
   },
   "scripts": {
+    "metrics:generate": "tsx scripts/generate-metric-definitions.mjs",
+    "metrics:check": "tsx scripts/generate-metric-definitions.mjs --check",
+    "analytics:export": "tsx scripts/export-analytics-snapshot.mjs",
+    "mcp:generate": "tsx scripts/generate-mcp-catalog.mjs",
+    "mcp:check": "tsx scripts/generate-mcp-catalog.mjs --check",
+    "contracts:generate": "tsx scripts/generate-graph-contracts.mjs",
+    "contracts:check": "tsx scripts/generate-graph-contracts.mjs --check",
+    "ashoka:baseline:check": "tsx scripts/freeze-ashoka-baseline.mjs",
+    "ashoka:system:check": "node scripts/run-ashoka-system-checks.mjs",
     "benchmark:token-economy": "node scripts/benchmark-token-economy.mjs",
     "benchmark:scan-mcp": "node scripts/benchmark-scan-mcp.mjs",
     "verify:scan-mcp-release": "vitest run tests/tools/scan-state.test.ts tests/tools/scan-project-incremental-e2e.test.ts tests/tools/coverage-ledger.test.ts tests/tools/enrichment-state.test.ts tests/tools/graph-health.test.ts tests/tools/enrich-parser-nodes.test.ts tests/architect-cli-bridge.test.ts tests/cli-mcp-call.test.ts tests/architect-timeout-streaming.test.ts tests/instance-isolation.test.ts && npm run benchmark:scan-mcp && npm run build",
@@ -35,18 +44,27 @@
     "test": "vitest run",
     "docs:architecture-tree": "node scripts/generate-architecture-tree.mjs",
     "docs:primary-workflows": "node scripts/generate-primary-workflow-docs.mjs",
-    "docs:easy-start": "node scripts/generate-easy-start-docs.mjs"
+    "docs:easy-start": "node scripts/generate-easy-start-docs.mjs",
+    "providers:generate": "tsx scripts/generate-provider-contracts.mjs",
+    "providers:check": "tsx scripts/generate-provider-contracts.mjs --check",
+    "config:inventory": "tsx scripts/generate-configuration-inventory.mjs",
+    "benchmark:retrieval": "tsx scripts/benchmark-retrieval.mjs",
+    "config:check": "tsx scripts/generate-configuration-inventory.mjs --check"
   },
   "bundleDependencies": [
     "@dreamgraph/host",
-    "@dreamgraph/sdk"
+    "@dreamgraph/sdk",
+    "@dreamgraph/token-economy"
   ],
   "dependencies": {
-    "@dreamgraph/host": "13.4.0",
-    "@dreamgraph/sdk": "13.4.0",
+    "@dreamgraph/host": "14.0.0",
+    "@dreamgraph/sdk": "14.0.0",
+    "@dreamgraph/token-economy": "14.0.0",
     "@modelcontextprotocol/sdk": "^1.17.4",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "chalk": "^5.3.0",
     "cheerio": "^1.2.0",
     "commander": "^12.1.0",
@@ -70,8 +88,7 @@
     "turndown": "^7.2.4",
     "web-tree-sitter": "^0.20.8",
     "ws": "^8.21.0",
-    "zod": "^3.23.8",
-    "@dreamgraph/token-economy": "13.4.0"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
@@ -83,5 +100,33 @@
     "js-dos": "8.3.20",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
-  }
+  },
+  "optionalDependencies": {
+    "playwright-core": "1.62.1"
+  },
+  "files": [
+    "dist/**",
+    "packages/*/dist/**",
+    "packages/*/package.json",
+    "packages/*/README.md",
+    "scripts/install.ps1",
+    "scripts/install.sh",
+    "scripts/workspace-artifacts.mjs",
+    "python/analytics/*.py",
+    "python/analytics/README.md",
+    "templates/**",
+    "guide/**",
+    "docs/**/*.md",
+    "!docs/ashoka/sol-6.1-release-handoff.md",
+    "docs/contracts/**",
+    "docs/easy-start.html",
+    "docs/easy-start.pdf",
+    "docs/ashoka/benchmarks/**",
+    "docs/ashoka/slice-26-closure.json",
+    "docs/ashoka/slice-27-closure.json",
+    "README.md",
+    "INSTALL.md",
+    "LICENSE",
+    "RELEASE_NOTES_v14.0.0.md"
+  ]
 }

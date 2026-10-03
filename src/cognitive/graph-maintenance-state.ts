@@ -6,6 +6,10 @@ import { promisify } from "node:util";
 import { atomicWriteFile } from "../utils/atomic-write.js";
 import { dataPath } from "../utils/paths.js";
 import { withFileLock } from "../utils/mutex.js";
+import { stripBom } from "../utils/read-json.js";
+import { CurationSchema, type CurationState } from "./curation.js";
+import { loadPublicationState, publicationContentHash } from "../graph/publication.js";
+import { withGraphRead, withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
 
 const FILE_NAME = "graph_maintenance.json";
 const execFileAsync = promisify(execFile);
@@ -20,6 +24,8 @@ export interface GraphMaintenanceState {
   last_scan_git_heads: Record<string, string>;
   datastore_connection_fingerprint: string | null;
   targeted_dream_schedule_ids: string[];
+  curation?: CurationState;
+  digestion?: import("zod").z.infer<typeof import("./digestion.js").DigestionLedgerSchema>;
 }
 
 function emptyState(): GraphMaintenanceState {
@@ -37,8 +43,15 @@ function emptyState(): GraphMaintenanceState {
 }
 
 export async function loadGraphMaintenanceState(): Promise<GraphMaintenanceState> {
+  return withGraphRead(async () => {
   try {
-    const parsed = JSON.parse(await readFile(dataPath(FILE_NAME), "utf-8")) as Partial<GraphMaintenanceState>;
+    const body = await readFile(dataPath(FILE_NAME), "utf-8");
+    const publication = await loadPublicationState();
+    if (publication.stores[FILE_NAME] && publication.stores[FILE_NAME].hash !== publicationContentHash(body)) throw new Error("UNPUBLISHED_MAINTENANCE_CHANGE");
+    const parsed = JSON.parse(stripBom(body)) as Partial<GraphMaintenanceState>;
+    if (!parsed || typeof parsed !== "object" || parsed.schema_version !== "1.0.0") throw new Error("GRAPH_MAINTENANCE_INVALID");
+    if (parsed.curation !== undefined) parsed.curation = CurationSchema.parse(parsed.curation);
+    if(parsed.digestion!==undefined)parsed.digestion=(await import("./digestion.js")).DigestionLedgerSchema.parse(parsed.digestion);
     const fallback = emptyState();
     return {
       ...fallback,
@@ -51,15 +64,17 @@ export async function loadGraphMaintenanceState(): Promise<GraphMaintenanceState
         ? parsed.targeted_dream_schedule_ids.filter((id): id is string => typeof id === "string")
         : [],
     };
-  } catch {
-    return emptyState();
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT" && !(await loadPublicationState()).stores[FILE_NAME]) return emptyState();
+    throw error;
   }
+  });
 }
 
 export async function updateGraphMaintenanceState(
   patch: Partial<Omit<GraphMaintenanceState, "schema_version">>,
 ): Promise<GraphMaintenanceState> {
-  return withFileLock(FILE_NAME, async () => {
+  return withGraphReconciliation(() => withFileLock(FILE_NAME, async () => {
     const current = await loadGraphMaintenanceState();
     const next: GraphMaintenanceState = {
       ...current,
@@ -70,7 +85,7 @@ export async function updateGraphMaintenanceState(
     };
     await atomicWriteFile(dataPath(FILE_NAME), JSON.stringify(next, null, 2));
     return next;
-  });
+  }));
 }
 
 /** Stable, secret-free marker used only to detect a newly configured datastore. */

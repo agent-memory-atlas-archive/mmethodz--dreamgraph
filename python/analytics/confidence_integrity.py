@@ -9,9 +9,11 @@ from __future__ import annotations
 
 import argparse
 import statistics as stats
+import math
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from .definitions import qualified
 from . import loader
 from ._common import add_common_args, emit, fmt_table, resolve_data_dir_from_args
 
@@ -35,7 +37,7 @@ def _scan(items: list[dict], conf_key: str = "confidence", status_key: str = "st
     for it in items:
         st = (it.get(status_key) or "unknown")
         c = it.get(conf_key)
-        if isinstance(c, (int, float)):
+        if type(c) in (int, float) and math.isfinite(c) and 0<=c<=1:
             cross[st][_bucket(float(c))] += 1
             confs_by_status[st].append(float(c))
         rc = it.get("reinforcement_count")
@@ -44,6 +46,7 @@ def _scan(items: list[dict], conf_key: str = "confidence", status_key: str = "st
     return {"cross": cross, "by_status": confs_by_status, "reinforcements": reinforcements}
 
 
+@qualified("confidence_integrity")
 def analyze(data_dir: Path) -> dict:
     dg = loader.dream_graph(data_dir)
     val = loader.validated_edges(data_dir)

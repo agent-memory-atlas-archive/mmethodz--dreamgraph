@@ -13,11 +13,13 @@
 import type { ArchitectLlm, ArchitectMessage } from "../../architect-llm.js";
 import type { ContextBuilder } from "../../context-builder.js";
 import type { AutonomyState } from "../../autonomy.js";
+import type { ManagedExecutionSnapshot } from "../../generated/graph-contracts.js";
 import type {
   ArchitectContent,
   ArchitectTask,
   EditorContextEnvelope,
   ReasoningPacket,
+  PassStopReason,
 } from "../types.js";
 
 /**
@@ -84,6 +86,9 @@ export interface ChatPanelHost {
   persistAssistantMessage(args: {
     readonly content: string;
     readonly providerRawAssistant?: readonly unknown[];
+    /** Original daemon closure; assistant prose alone never establishes completion. */
+    readonly execution?: ManagedExecutionSnapshot;
+    readonly stopReason?: PassStopReason;
   }): Promise<void>;
 
   /** Reset attachment state after the message has shipped (D3 invariant). */

@@ -21,6 +21,10 @@ import { join } from "node:path";
 import { setDataDirOverride } from "../../src/utils/paths.js";
 import { invalidateCache, setDataDirResolver } from "../../src/utils/cache.js";
 import { config } from "../../src/config/config.js";
+import { commitGraphWrites } from "../../src/graph/publication.js";
+import { releaseGraphWriter } from "../../src/graph/writer-lease.js";
+import { ModelAdmissionError } from "../../src/cognitive/model-admission.js";
+import { enrichmentNodeKey } from "../../src/tools/enrichment-publication.js";
 
 // --- LLM mock ---------------------------------------------------------------
 // Injected per-test via `setMockLlm`. Captures every call so assertions can
@@ -31,6 +35,7 @@ interface MockLlmState {
   responses: Array<string | { text: string; model?: string; tokensUsed?: number }>;
   throwAfter?: number;
   throwMessage?: string;
+  throwError?: Error;
   completeGate?: Promise<void>;
   onCall?: () => void;
   calls: Array<{ messages: unknown; options: unknown }>;
@@ -53,6 +58,7 @@ vi.mock("../../src/cognitive/llm.js", async (importOriginal) => {
       mockState.onCall?.();
       await mockState.completeGate;
       if (mockState.throwAfter !== undefined && idx >= mockState.throwAfter) {
+        if (mockState.throwError) throw mockState.throwError;
         throw new Error(mockState.throwMessage ?? "simulated LLM failure");
       }
       const r = mockState.responses[idx];
@@ -179,6 +185,7 @@ beforeEach(() => {
   mockState.calls = [];
   mockState.throwAfter = undefined;
   mockState.throwMessage = undefined;
+  mockState.throwError = undefined;
   mockState.completeGate = undefined;
   mockState.onCall = undefined;
   tmpDir = mkdtempSync(join(tmpdir(), "dg-enrich-parser-"));
@@ -187,8 +194,9 @@ beforeEach(() => {
   invalidateCache();
 });
 
-afterEach(() => {
+afterEach(async () => {
   delete config.repos.semantic_cache_test;
+  await releaseGraphWriter(tmpDir);
   invalidateCache();
   if (tmpDir && existsSync(tmpDir)) rmSync(tmpDir, { recursive: true, force: true });
 });
@@ -511,6 +519,24 @@ describe("mergeEnrichment", () => {
 // ---------------------------------------------------------------------------
 
 describe("enrichParserNodesProgrammatic — integration", () => {
+
+  it("stops admission exhaustion without fallback and preserves the committed first batch and unfinished checkpoint", async () => {
+    const nodes = [parserNode({ id: "paid-a" }), parserNode({ id: "paid-b" }), parserNode({ id: "paid-c" })];
+    await writeData("data_model.json", nodes); await writeData("features.json", []);
+    mockState.responses = [llmResponseFor([nodes[0]])]; mockState.throwAfter = 1;
+    mockState.throwError = new ModelAdmissionError("ADMISSION_REQUEST_LIMIT", "fixture");
+    const result = await enrichParserNodesProgrammatic({ target: "data_model", batchSize: 1, scheduleStabilization: false });
+    expect(result.success).toBe(true); if (!result.success) return;
+    expect(result.data.stopped_reason).toBe("ADMISSION_REQUEST_LIMIT");
+    expect(result.data.semantic_coverage).toMatchObject({ llm_enriched: 1, fallback_nodes: 0, complete: false });
+    expect(mockState.calls).toHaveLength(2);
+    const stored = await readData<ParserNodeRecord[]>("data_model.json");
+    expect(stored.find(node => node.id === "paid-a")?.enrichment?.enriched_at).toBeDefined();
+    expect(stored.find(node => node.id === "paid-b")?.enrichment?.enriched_at).toBeUndefined();
+    const checkpoint = await readData<any>("enrichment_state.json");
+    expect(checkpoint.nodes[enrichmentNodeKey("data_model.json", { ...nodes[1], graph_type: "data_model" })].state).toBe("failed_retryable");
+    expect(checkpoint.nodes[enrichmentNodeKey("data_model.json", { ...nodes[2], graph_type: "data_model" })].state).toBe("pending");
+  });
   it("rejects an overlapping enrichment before another provider call or graph write", async () => {
     const node = parserNode();
     await writeData("data_model.json", [node]);
@@ -695,11 +721,16 @@ describe("enrichParserNodesProgrammatic — integration", () => {
     if (!first.success) return;
     expect(first.data.enrichment_checkpoint).toMatchObject({ remaining: 1, complete: false });
     const checkpoint = await readData<{ nodes: Record<string, { state: string; reason?: string }> }>("enrichment_state.json");
-    expect(checkpoint.nodes[node.id].state).toBe("failed_retryable");
+    const key = enrichmentNodeKey("data_model.json", node);
+    expect(checkpoint.nodes[key].state).toBe("failed_retryable");
     if (legacy) {
+      checkpoint.nodes[node.id] = checkpoint.nodes[key];
+      delete checkpoint.nodes[key];
       checkpoint.nodes[node.id].state = "enriched";
       checkpoint.nodes[node.id].reason = "evidence_only_fallback";
-      await writeData("enrichment_state.json", checkpoint);
+      // A supported metadata update preserves the publication/hash boundary.
+      // Raw fixture setup remains appropriate only before the first publication.
+      await commitGraphWrites({ writes: [{ file: "enrichment_state.json", content: JSON.stringify(checkpoint) }] });
     }
     const retried = await enrichParserNodesProgrammatic({ target: "data_model" });
     expect(retried.success).toBe(true);
@@ -780,7 +811,7 @@ describe("enrichParserNodesProgrammatic — integration", () => {
       coverage: 0.75,
       reused_neighbor_ids: ["cache-neighbor"],
       source_files_read: [],
-      context_hops: 3,
+      context_hops: 2,
     });
   });
 
@@ -1353,8 +1384,8 @@ describe("enrichParserNodesProgrammatic — integration", () => {
       provider_fingerprint: string;
     }>("enrichment_state.json");
     expect(interrupted.provider_fingerprint).toContain("mock");
-    expect(interrupted.nodes["resume-a"]).toMatchObject({ state: "enriched", attempts: 1 });
-    expect(interrupted.nodes["resume-b"]).toMatchObject({ state: "pending", attempts: 0 });
+    expect(interrupted.nodes[enrichmentNodeKey("features.json", nodes[0])]).toMatchObject({ state: "enriched", attempts: 1 });
+    expect(interrupted.nodes[enrichmentNodeKey("features.json", nodes[1])]).toMatchObject({ state: "pending", attempts: 0 });
     expect(mockState.calls).toHaveLength(1);
 
     const resumed = await enrichParserNodesProgrammatic({ target: "features", batchSize: 1 });
@@ -1383,7 +1414,7 @@ describe("enrichParserNodesProgrammatic — integration", () => {
     expect(failed.success).toBe(true);
     if (!failed.success) return;
     const checkpoint = await readData<{ nodes: Record<string, { state: string; attempts: number; reason?: string }> }>("enrichment_state.json");
-    expect(checkpoint.nodes["retry-timeout"]).toMatchObject({
+    expect(checkpoint.nodes[enrichmentNodeKey("features.json", node)]).toMatchObject({
       state: "failed_retryable", attempts: 1, reason: "transient_timeout",
     });
     expect(failed.data.total_enriched).toBe(0);

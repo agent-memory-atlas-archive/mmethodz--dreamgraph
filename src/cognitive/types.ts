@@ -1,3 +1,4 @@
+import { engineEnvNumber } from "../config/engine-setting-catalogue.js";
 ﻿/**
  * DreamGraph Cognitive Dreaming System â€” Type definitions.
  *
@@ -31,40 +32,13 @@
 export type CognitiveStateName = "awake" | "rem" | "normalizing" | "nightmare" | "lucid";
 
 /** Dream generation strategies */
-export type DreamStrategy =
-  | "gap_detection"
-  | "weak_reinforcement"
-  | "cross_domain"
-  | "missing_abstraction"
-  | "symmetry_completion"
-  | "tension_directed"
-  | "reflective"
-  | "causal_replay"
-  | "pgo_wave"
-  | "llm_dream"
-  | "orphan_bridging"
-  | "schema_grounding"
-  | "all";
+export type DreamStrategy = import("./strategy-catalog.js").StrategyName;
 
 /**
- * Canonical list of every concrete dream strategy (excluding the omnibus
- * "all" alias). Single source of truth â€” when adding a new strategy, append
- * here so metacognition, scheduler, and adaptive selection see it.
+ * Eleven active executors, shared with advertisement and dispatch. Historical
+ * reflective input remains typed for compatibility but fails explicitly.
  */
-export const ALL_DREAM_STRATEGIES_NON_ALL: ReadonlyArray<Exclude<DreamStrategy, "all">> = [
-  "gap_detection",
-  "weak_reinforcement",
-  "cross_domain",
-  "missing_abstraction",
-  "symmetry_completion",
-  "tension_directed",
-  "reflective",
-  "causal_replay",
-  "pgo_wave",
-  "llm_dream",
-  "orphan_bridging",
-  "schema_grounding",
-] as const;
+export { ACTIVE_STRATEGY_NAMES as ALL_DREAM_STRATEGIES_NON_ALL } from "./strategy-catalog.js";
 
 /** Adversarial dream strategies (used in NIGHTMARE state) */
 export type AdversarialStrategy =
@@ -134,8 +108,8 @@ export interface DecayConfig {
 
 /** Default decay settings â€” TTL must survive at least one full 6-strategy rotation */
 export const DEFAULT_DECAY: DecayConfig = {
-  ttl: Number(process.env.DG_DECAY_TTL) || 8,
-  decay_rate: Number(process.env.DG_DECAY_RATE) || 0.05,
+  ttl: engineEnvNumber("DG_DECAY_TTL", 8),
+  decay_rate: engineEnvNumber("DG_DECAY_RATE", 0.05),
 };
 
 // ---------------------------------------------------------------------------
@@ -159,12 +133,12 @@ export interface PromotionConfig {
 }
 
 export const DEFAULT_PROMOTION: PromotionConfig = {
-  promotion_confidence: Number(process.env.DG_PROMOTION_CONFIDENCE) || 0.62,
-  promotion_plausibility: Number(process.env.DG_PROMOTION_PLAUSIBILITY) || 0.45,
-  promotion_evidence: Number(process.env.DG_PROMOTION_EVIDENCE) || 0.4,
-  promotion_evidence_count: Number(process.env.DG_PROMOTION_EVIDENCE_COUNT) || 2,
-  retention_plausibility: Number(process.env.DG_RETENTION_PLAUSIBILITY) || 0.35,
-  max_contradiction: Number(process.env.DG_MAX_CONTRADICTION) || 0.3,
+  promotion_confidence: engineEnvNumber("DG_PROMOTION_CONFIDENCE", 0.62),
+  promotion_plausibility: engineEnvNumber("DG_PROMOTION_PLAUSIBILITY", 0.45),
+  promotion_evidence: engineEnvNumber("DG_PROMOTION_EVIDENCE", 0.4),
+  promotion_evidence_count: engineEnvNumber("DG_PROMOTION_EVIDENCE_COUNT", 2),
+  retention_plausibility: engineEnvNumber("DG_RETENTION_PLAUSIBILITY", 0.35),
+  max_contradiction: engineEnvNumber("DG_MAX_CONTRADICTION", 0.3),
 };
 
 // ---------------------------------------------------------------------------
@@ -220,6 +194,12 @@ export function computeActivationScore(
  * It does not exist in the Fact Graph and must be validated.
  */
 export interface DreamNode {
+  strategy?: DreamStrategy;
+  /** Repository scope is required before any claim-specific entity promotion. */
+  source_repo?: string;
+  evidence_assessment?: import("./normalization-evidence.js").EvidenceAssessment;
+  /** Model assessment attribution; never independent truth evidence. */
+  model_provenance?: import("./cognitive-provenance.js").CognitiveProvenance;
   id: string;
   type: DreamEntityType;
   name: string;
@@ -254,7 +234,7 @@ export interface DreamNode {
   /**
    * Speculative intent â€” the LLM's proposed purpose or role for this entity.
    * Starts as a dream hypothesis. When normalization promotes the node,
-   * intent becomes factual and is written into the fact graph description.
+   * intent remains advisory; it cannot silently become source-backed description.
    */
   intent?: string;
   /** Domain tag for fact-graph placement (e.g. "inference", "core") */
@@ -272,6 +252,11 @@ export interface DreamNode {
  * Connects any two entities (fact or dream) with a proposed relationship.
  */
 export interface DreamEdge {
+  from_kind?: import("../graph/contracts.js").GraphIdentity["kind"];
+  to_kind?: import("../graph/contracts.js").GraphIdentity["kind"];
+  from_repository_id?: string;
+  to_repository_id?: string;
+  evidence_assessment?: import("./normalization-evidence.js").EvidenceAssessment;
   id: string;
   /** Source entity ID (may be fact graph or dream node) */
   from: string;
@@ -369,6 +354,8 @@ export interface DreamGraphFile {
 
 /** Evidence gathered during validation */
 export interface ValidationEvidence {
+  /** Current claim-specific roots. Overlap and generated consensus are only context. */
+  claim_evidence?: import("./normalization-evidence.js").EvidenceAssessment;
   /** Fact graph entities that ground this dream */
   shared_entities: string[];
   /** Workflows that support this relationship */
@@ -383,19 +370,18 @@ export interface ValidationEvidence {
   contradictions: string[];
 }
 
-/** Count of distinct evidence signals (used for promotion gate) */
+/** Only independent, current claim roots count toward corroboration. */
 export function countEvidence(evidence: ValidationEvidence): number {
-  let count = 0;
-  if (evidence.shared_entities.length > 0) count++;
-  if (evidence.shared_workflows.length > 0) count++;
-  if (evidence.domain_overlap.length > 0) count++;
-  if (evidence.keyword_overlap.length > 0) count++;
-  if (evidence.source_repo_match) count++;
-  return count;
+  return evidence.claim_evidence?.independent_roots.length ?? 0;
 }
 
 /** A validation judgment on a single dream artifact */
 export interface ValidationResult {
+  evidence_assessment?: import("./normalization-evidence.js").EvidenceAssessment;
+  evidence_input_hash?: string;
+  semantic_evaluation?: { semantic_relevance: number; reasoning: string };
+  /** Model assessment attribution; never independent truth evidence. */
+  model_provenance?: import("./cognitive-provenance.js").CognitiveProvenance;
   /** ID of the dream node/edge being validated */
   dream_id: string;
   /** Whether a node or edge was validated */
@@ -452,6 +438,16 @@ export interface CandidateEdgesFile {
  * PROMOTION GATE: confidence > 0.7 AND evidence_count >= 2
  */
 export interface ValidatedEdge {
+  /** Explicit human review remains separate from source-verified normalization. */
+  human_asserted?: boolean;
+  human_actor?: string;
+  human_reason?: string;
+  normalization_operation_id?: string;
+  from_kind?: import("../graph/contracts.js").GraphIdentity["kind"];
+  to_kind?: import("../graph/contracts.js").GraphIdentity["kind"];
+  from_repository_id?: string;
+  to_repository_id?: string;
+  evidence_assessment?: import("./normalization-evidence.js").EvidenceAssessment;
   id: string;
   from: string;
   to: string;
@@ -520,7 +516,14 @@ export type TensionDomain =
 export type TensionResolutionType =
   | "confirmed_fixed"   // Verified that the issue is actually resolved
   | "false_positive"    // Turned out not to be a real problem
-  | "wont_fix";         // Acknowledged but intentionally left as-is
+  | "wont_fix"           // Acknowledged but intentionally left as-is
+  | "expired_unverified"; // Attention retired; no assertion that the risk was fixed or false.
+
+export interface RiskLifecycleEvent {
+  id: string; revision: number; at: string;
+  kind: "observed" | "proposed" | "action" | "resolved" | "reopened" | "review_required" | "expired";
+  reason: string; details?: Record<string, unknown>;
+}
 
 /** Who resolved the tension */
 export type TensionResolutionAuthority = "human" | "system";
@@ -538,6 +541,8 @@ export type TensionResolutionStrategy =
   | "wont_fix";  // Acknowledged but intentional â€” close as accepted risk.
 
 export interface TensionResolutionCandidate {
+  id?: string;
+  verification_claim?: import("./normalization-evidence.js").NormalizationClaim;
   /** Hypothesis kind (drives validation strategy) */
   strategy: TensionResolutionStrategy;
   /** Human-readable rationale for the candidate */
@@ -560,6 +565,12 @@ export interface TensionResolutionCandidate {
 /** A tension signal: something the system noticed was hard / missing / weak */
 export interface TensionSignal {
   id: string;
+  risk_key?: string;
+  revision?: number;
+  observation_fingerprint?: string;
+  lifecycle?: "open" | "proposed" | "review_required";
+  lifecycle_history?: RiskLifecycleEvent[];
+  proposal_history?: TensionResolutionCandidate[];
   /** What kind of tension */
   type: "missing_link" | "weak_connection" | "hard_query" | "ungrounded_dream" | "code_insight";
   /** Domain group for clustering and prioritization */
@@ -597,6 +608,7 @@ export interface TensionSignal {
  * what patterns repeat.
  */
 export interface ResolvedTension {
+  id?: string;
   /** Original tension ID */
   tension_id: string;
   /** ISO 8601 resolution timestamp */
@@ -611,6 +623,10 @@ export interface ResolvedTension {
   recheck_ttl?: number;
   /** Snapshot of the original tension at time of resolution */
   original: TensionSignal;
+  resolution_state?: "verified" | "human_disposition" | "expired_unverified";
+  verification?: { claim: import("./normalization-evidence.js").NormalizationClaim; evidence_digest: string; independent_roots: string[]; checked_at: string };
+  reopened_at?: string;
+  reappearance_reason?: string;
 }
 
 /** Tension system configuration */
@@ -626,14 +642,15 @@ export interface TensionConfig {
 }
 
 export const DEFAULT_TENSION_CONFIG: TensionConfig = {
-  max_active_tensions: Number(process.env.DG_MAX_ACTIVE_TENSIONS) || 200,
-  default_tension_ttl: Number(process.env.DG_TENSION_TTL) || 30,
-  tension_urgency_decay: Number(process.env.DG_TENSION_URGENCY_DECAY) || 0.01,
-  min_urgency_threshold: Number(process.env.DG_TENSION_MIN_URGENCY) || 0.05,
+  max_active_tensions: engineEnvNumber("DG_MAX_ACTIVE_TENSIONS", 200),
+  default_tension_ttl: engineEnvNumber("DG_TENSION_TTL", 30),
+  tension_urgency_decay: engineEnvNumber("DG_TENSION_URGENCY_DECAY", 0.01),
+  min_urgency_threshold: engineEnvNumber("DG_TENSION_MIN_URGENCY", 0.05),
 };
 
 export interface TensionFile {
   metadata: {
+    revision?: number;
     description: string;
     schema_version: string;
     total_signals: number;
@@ -888,6 +905,8 @@ export interface DreamCycleInput {
 }
 
 export interface DreamCycleOutput {
+  execution_status?: "skipped_zero_budget";
+  strategy_outcomes?: Record<string, { status: "completed" | "failed" | "skipped"; budget: number; generated: number; omitted_out_of_scope?: number; reason?: string }>;
   cycle_number: number;
   state_transitions: string[];
   dreams_generated: { nodes: number; edges: number };
@@ -1551,8 +1570,12 @@ export interface ExportLivingDocsOutput {
 // CAUSAL REASONING ENGINE
 // ===========================================================================
 
-/** A single causal link: entity A changing tends to cause tension in entity B */
+/** Temporal correlation hypothesis; no causal experiment is implied. Legacy names remain wire aliases. */
 export interface CausalLink {
+  id?: string;
+  assertion_class?: "hypothesis";
+  evidence_ancestry?: string[];
+  policy?: string;
   cause_entity: string;
   effect_entity: string;
   /** How many dream cycles typically elapse between cause and effect */
@@ -1568,6 +1591,8 @@ export interface CausalLink {
 
 /** A multi-hop causal chain: A â†’ B â†’ C */
 export interface CausalChain {
+  assertion_class?: "hypothesis";
+  evidence_ancestry?: string[];
   id: string;
   links: CausalLink[];
   /** Product of all link strengths */
@@ -1579,6 +1604,13 @@ export interface CausalChain {
 
 /** Output of causal analysis */
 export interface CausalInsights {
+  observations?: Array<{id:string;tension_id:string;entity:string;cycle:number;timestamp_iso:string}>;
+  links?: CausalLink[];
+  assertion_class?: "hypothesis";
+  policy?: string;
+  input_fingerprint?: string;
+  reasons?: string[];
+  limitations?: string[];
   chains: CausalChain[];
   propagation_hotspots: Array<{
     entity: string;
@@ -1625,7 +1657,7 @@ export interface DreamArchetype {
 /** Configuration for federated dream exchange */
 export interface FederationConfig {
   /** Unique identifier for this DreamGraph instance */
-  instance_id: string;
+  instance_id?: string;
   /** Whether to allow exporting archetypes */
   allow_export: boolean;
   /** Whether to allow importing archetypes */
@@ -1635,7 +1667,7 @@ export interface FederationConfig {
 }
 
 export const DEFAULT_FEDERATION_CONFIG: FederationConfig = {
-  instance_id: `dreamgraph_${Date.now()}`,
+  // Absent namespace derives from durable instance identity, never a process-start timestamp.
   allow_export: true,
   allow_import: true,
   anonymize: true,
@@ -1655,6 +1687,7 @@ export interface FederatedExchangeFile {
 
 /** Output of archetype export */
 export interface ExportArchetypesOutput {
+  manifest_digest?: string;
   archetypes_exported: number;
   file_path: string;
   instance_id: string;
@@ -1663,6 +1696,9 @@ export interface ExportArchetypesOutput {
 
 /** Output of archetype import */
 export interface ImportArchetypesOutput {
+  status?: "imported" | "quarantined";
+  reason?: string;
+  artifact_digest?: string;
   archetypes_imported: number;
   archetypes_skipped: number;
   tensions_created: number;
@@ -1677,8 +1713,8 @@ export interface ImportArchetypesOutput {
 /** Trajectory of a tension's urgency over time */
 export interface TensionTrajectory {
   tension_id: string;
-  domain: TensionDomain;
-  urgency_over_time: Array<{ cycle: number; urgency: number }>;
+  domain: TensionDomain | null;
+  urgency_over_time: Array<{ cycle: number; urgency: number; event_time?: string; observed_at?: string | null }>;
   peak_urgency: number;
   resolution_cycle?: number;
   pattern: "rising" | "falling" | "stable" | "spike" | "resolved";
@@ -1703,6 +1739,10 @@ export interface SeasonalPattern {
 
 /** Output of temporal analysis */
 export interface TemporalInsights {
+  policy?: string;
+  input_fingerprint?: string;
+  reasons?: string[];
+  limitations?: string[];
   trajectories: TensionTrajectory[];
   predictions: TemporalPrediction[];
   seasonal_patterns: SeasonalPattern[];
@@ -1713,8 +1753,8 @@ export interface TemporalInsights {
   }>;
   time_horizon: {
     total_cycles_analyzed: number;
-    oldest_data: string;
-    newest_data: string;
+    oldest_data: string | null;
+    newest_data: string | null;
   };
   /** Advisory-only future ranking and fallback provenance for this surface. */
   adaptive_future?: AdaptiveFutureSurfaceAdvice;
@@ -1730,6 +1770,10 @@ export type ThreatSeverity = "critical" | "high" | "medium" | "low" | "info";
 /** A threat edge â€” extends DreamEdge with security metadata */
 export interface ThreatEdge {
   id: string;
+  tension_id?: string;
+  assertion_class?: "hypothesis";
+  evidence_fingerprint?: string;
+  review_history?: Array<{at:string;reason:string;previous_lifecycle?:string;previous_acknowledged?:boolean;evidence_fingerprint:string}>;
   from: string;
   to: string;
   threat_category: AdversarialStrategy;
@@ -1796,6 +1840,7 @@ export interface ThreatLogFile {
     total_nightmare_cycles: number;
   };
   threats: ThreatEdge[];
+  archived_threats?: ThreatEdge[];
 }
 
 // ===========================================================================
@@ -1864,6 +1909,7 @@ export interface NarrativeChapter {
 
 /** The system's generated narrative of its own understanding */
 export interface SystemNarrative {
+  projection?: import("./projection-context.js").CognitiveProjectionContext;
   title: string;
   depth: NarrativeDepth;
   generated_at: string;
@@ -2021,6 +2067,9 @@ export interface GeneratedRemediationPlanSet {
 }
 
 export interface RemediationPlanOutcome {
+  id?: string;
+  stage?: "proposal_selected";
+  assertion_class?: "advisory";
   tension_id: string;
   evidence_bundle_id: string;
   selected_plan_id: string;
@@ -2065,6 +2114,9 @@ export interface RemediationStep {
 
 export interface RemediationPlan {
   id: string;
+  stage?: "proposed";
+  assertion_class?: "advisory";
+  input_fingerprint?: string;
   tension_id: string;
   title: string;
   severity: "critical" | "high" | "medium" | "low";
@@ -2113,6 +2165,7 @@ export interface RemediationLogFile {
   current: Record<string, RemediationPlan>;
   /** Append-only history of superseded / closed plans. */
   history: RemediationPlan[];
+  future_signal_history?: FutureSignal[];
   /** Bounded advisory-memory sidecar for Adaptive Future remediation ranking. */
   adaptive_future?: {
     signals: FutureSignal[];
@@ -2121,6 +2174,7 @@ export interface RemediationLogFile {
       evidence_bundle_id: string;
       selected_candidate_id?: string;
       rejected_candidate_ids: string[];
+      selected_source?:"llm"|"heuristic"|"fallback";fallback_used?:boolean;
       model_layer: GeneratedRemediationPlanSet["model_layer"];
       fallback_reason?: string;
       validation_failures: string[];
@@ -2153,14 +2207,17 @@ export interface StrategyMetrics {
   total_generated: number;
   /** Edges that eventually reached "validated" status */
   total_validated: number;
-  /** Precision: validated / generated (0â€“1) */
-  precision: number;
-  /** Tensions resolved by edges originating from this strategy */
-  tensions_resolved: number;
+  /** Labeled accuracy is unavailable without an independent reviewed evaluation. */
+  precision: number | null;
+  /** Present corroboration among deduplicated observations, never labeled accuracy. */
+  operational_promotion_rate?: number;
+  evidence_state?: "current" | "unavailable" | "legacy_unqualified";
+  /** Reviewed attribution, unavailable when historical causation is unknown. */
+  tensions_resolved: number | null;
   /** Recall proxy: tensions_resolved / total_tensions_in_window */
-  recall: number;
+  recall: number | null;
   /** Average cycles from generation to validation */
-  avg_validation_lag: number;
+  avg_validation_lag: number | null;
   /** Consecutive zero-yield cycles */
   consecutive_zero_yield: number;
   /** Recommended budget weight adjustment */
@@ -2197,6 +2254,12 @@ export interface DomainDecayProfile {
 
 /** A single meta-log entry recording analysis results */
 export interface MetaLogEntry {
+  metric_definition_version?:"2.0.0";
+  graph_currency?:import("../graph/contracts.js").GraphCurrency;
+  graph_state?:import("../graph/contracts.js").ResultState;
+  graph_revision?: string | null;
+  portfolio_revision?: number;
+  calibration_status?: "independent_labels_unavailable";
   id: string;
   timestamp: string;
   cycle_window: [number, number];
@@ -2229,6 +2292,7 @@ export interface MetaLogFile {
     last_analysis: string | null;
   };
   entries: MetaLogEntry[];
+  portfolio?: import("./strategy-portfolio.js").StrategyPortfolio;
 }
 
 // ===========================================================================
@@ -2278,6 +2342,7 @@ export interface EventLogEntry {
   };
   result: {
     action_taken: string;
+    execution_status?: "advisory";
     duration_ms: number;
     outcome_summary: string;
   };
@@ -2308,10 +2373,10 @@ export interface EventRouterConfig {
 }
 
 export const DEFAULT_EVENT_ROUTER_CONFIG: EventRouterConfig = {
-  tension_threshold: Number(process.env.DG_EVENT_TENSION_THRESHOLD) || 0.8,
-  runtime_error_threshold: Number(process.env.DG_EVENT_ERROR_THRESHOLD) || 0.05,
-  cooldown_ms: Number(process.env.DG_EVENT_COOLDOWN) || 60_000,
-  max_auto_cycles_per_hour: Number(process.env.DG_EVENT_MAX_CYCLES_HR) || 10,
+  tension_threshold: engineEnvNumber("DG_EVENT_TENSION_THRESHOLD", 0.8),
+  runtime_error_threshold: engineEnvNumber("DG_EVENT_ERROR_THRESHOLD", 0.05),
+  cooldown_ms: engineEnvNumber("DG_EVENT_COOLDOWN", 60_000),
+  max_auto_cycles_per_hour: engineEnvNumber("DG_EVENT_MAX_CYCLES_HR", 10),
 };
 
 // ===========================================================================
@@ -2331,6 +2396,9 @@ export interface StoryMetadata {
 
 /** A diff chapter â€” what changed since the last chapter */
 export interface StoryChapter extends NarrativeChapter {
+  id?: string;
+  projection?: import("./projection-context.js").CognitiveProjectionContext;
+  currentness?: "current" | "superseded" | "unknown";
   /** Sequential chapter number */
   chapter_number: number;
   /** Timestamp of generation */
@@ -2347,6 +2415,8 @@ export interface StoryChapter extends NarrativeChapter {
 
 /** Weekly digest summarizing multiple chapters */
 export interface WeeklyDigest {
+  projection?: import("./projection-context.js").CognitiveProjectionContext;
+  interpretation?: "historical_activity";
   id: string;
   generated_at: string;
   cycle_range: [number, number];
@@ -2359,6 +2429,8 @@ export interface WeeklyDigest {
 
 /** Persistent system autobiography file */
 export interface SystemStoryFile {
+  archived_chapters?: StoryChapter[];
+  archived_digests?: WeeklyDigest[];
   metadata: StoryMetadata;
   chapters: StoryChapter[];
   digests: WeeklyDigest[];
@@ -2377,9 +2449,9 @@ export interface NarrativeConfig {
 }
 
 export const DEFAULT_NARRATIVE_CONFIG: NarrativeConfig = {
-  narrative_interval: Number(process.env.DG_NARRATIVE_INTERVAL) || 10,
-  digest_interval: Number(process.env.DG_NARRATIVE_DIGEST_INTERVAL) || 50,
-  max_chapters: Number(process.env.DG_NARRATIVE_MAX_CHAPTERS) || 100,
+  narrative_interval: engineEnvNumber("DG_NARRATIVE_INTERVAL", 10),
+  digest_interval: engineEnvNumber("DG_NARRATIVE_DIGEST_INTERVAL", 50),
+  max_chapters: engineEnvNumber("DG_NARRATIVE_MAX_CHAPTERS", 100),
   auto_narrate: process.env.DG_NARRATIVE_AUTO !== undefined
     ? process.env.DG_NARRATIVE_AUTO !== "false"
     : true,
@@ -2438,6 +2510,13 @@ export interface DreamSchedule {
   last_skip_reason?: string | null;
   created_at: string;
   updated_at: string;
+  definition_revision?: number;
+  action_version?: string;
+  timezone?: string;
+  fold_policy?: "once" | "both";
+  missed_policy?: "skip" | "catch_up_once";
+  overlap_policy?: "queue_one";
+  archived_at?: string | null;
 }
 
 /** A single execution log entry */
@@ -2454,6 +2533,11 @@ export interface ScheduleExecution {
   error?: string;
   /** Instance UUID that produced this execution (null in legacy mode). */
   instance_uuid?: string;
+  occurrence_id?: string;
+  job_id?: string;
+  definition_revision?: number;
+  action_version?: string;
+  parameters?: Record<string, unknown>;
 }
 
 /** Persistent schedule file */
@@ -2500,13 +2584,13 @@ export const DEFAULT_SCHEDULER_CONFIG: SchedulerConfig = {
   enabled: process.env.DG_SCHEDULER_ENABLED !== undefined
     ? process.env.DG_SCHEDULER_ENABLED !== "false"
     : true,
-  tick_interval_ms: Number(process.env.DG_SCHEDULER_TICK) || 30_000,
-  max_runs_per_hour: Number(process.env.DG_SCHEDULER_MAX_RUNS_HR) || 30,
-  global_cooldown_ms: Number(process.env.DG_SCHEDULER_COOLDOWN) || 10_000,
-  nightmare_cooldown_ms: Number(process.env.DG_SCHEDULER_NIGHTMARE_COOLDOWN) || 300_000,
-  max_history: Number(process.env.DG_SCHEDULER_MAX_HISTORY) || 500,
-  max_error_streak: Number(process.env.DG_SCHEDULER_MAX_ERROR_STREAK) || 3,
-  execution_timeout_ms: Number(process.env.DG_SCHEDULER_EXEC_TIMEOUT) || 600_000,
+  tick_interval_ms: engineEnvNumber("DG_SCHEDULER_TICK", 30_000),
+  max_runs_per_hour: engineEnvNumber("DG_SCHEDULER_MAX_RUNS_HR", 30),
+  global_cooldown_ms: engineEnvNumber("DG_SCHEDULER_COOLDOWN", 10_000),
+  nightmare_cooldown_ms: engineEnvNumber("DG_SCHEDULER_NIGHTMARE_COOLDOWN", 300_000),
+  max_history: engineEnvNumber("DG_SCHEDULER_MAX_HISTORY", 500),
+  max_error_streak: engineEnvNumber("DG_SCHEDULER_MAX_ERROR_STREAK", 3),
+  execution_timeout_ms: engineEnvNumber("DG_SCHEDULER_EXEC_TIMEOUT", 600_000),
 };
 
 // ===========================================================================
@@ -2552,6 +2636,22 @@ export interface GraphRAGQuery {
   include_tensions: boolean;
   /** Include narrative chapters in context (default: true) */
   include_narrative: boolean;
+  /** Canonical is the default. Legacy is an explicit comparison route with incomplete families. */
+  representation?: "canonical" | "legacy";
+  max_neighbors?: number;
+  max_records?: number;
+  metadata_budget_bytes?: number;
+  kinds?: import("../graph/contracts.js").GraphIdentity["kind"][];
+  domains?: string[];
+  repositories?: string[];
+  assertion_classes?: import("../graph/contracts.js").GraphEntity["assertion_class"][];
+  mandatory_identities?: import("../graph/contracts.js").GraphIdentity[];
+  mandatory_evidence_ids?: string[];
+  changed_files?: Array<{ repository_id: string; path: string }>;
+  plan_id?: string;
+  slice_id?: string;
+  execution_id?: string;
+  adapter?: string;
 }
 
 export type AdaptiveFutureSurfaceName =
@@ -2595,6 +2695,9 @@ export interface AdaptiveFutureSurfaceAdvice {
 
 /** Output of the graph_rag_retrieve tool */
 export interface GraphRAGContext {
+  representation?: "canonical" | "legacy";
+  context_pack?: import("../graph/contracts.js").ContextPack;
+  limitations?: string[];
   /** Token-budgeted context string for LLM injection */
   context_text: string;
   /** Entity IDs included in context */
@@ -2620,6 +2723,7 @@ export interface GraphRAGContext {
 
 /** Cognitive preamble â€” compact system context for LLM injection */
 export interface CognitivePreamble {
+  context_pack?: import("../graph/contracts.js").ContextPack;
   /** One-paragraph system description from knowledge graph */
   system_summary: string;
   /** Top architectural relationships (highest confidence validated edges) */
@@ -2669,6 +2773,8 @@ export interface TaskPreambleCompileRequest {
   min_relevance?: number;
   /** Minimum estimated avoided-token cost required before adding context. Default: 64. */
   min_expected_savings_tokens?: number;
+  graph_context?: Omit<import("../graph/context-pack.js").ContextQuery, "query" | "token_budget">;
+  representation?: "canonical" | "legacy";
 }
 
 export type TaskPreambleBudgetDecision =
@@ -2680,6 +2786,7 @@ export type TaskPreambleBudgetDecision =
 
 /** Provider-neutral compiled task preamble, including compact ADR-203 provenance. */
 export interface CompiledTaskPreamble {
+  context_pack?: import("../graph/contracts.js").ContextPack;
   preamble_text: string;
   evidence_anchors: string[];
   token_count: number;
@@ -2705,6 +2812,8 @@ export interface LucidHypothesis {
 
 /** A signal discovered during lucid exploration */
 export interface LucidSignal {
+  assertion_class?: import("../graph/contracts.js").GraphEntity["assertion_class"];
+  evidence_refs?: import("../graph/contracts.js").GraphEntity["evidence"];
   id: string;
   /** Whether the signal supports or contradicts the hypothesis */
   type: "supporting" | "contradicting";
@@ -2719,6 +2828,10 @@ export interface LucidSignal {
 
 /** Findings from a lucid dream exploration */
 export interface LucidFindings {
+  projection?: import("./projection-context.js").CognitiveProjectionContext;
+  revision?: number;
+  session_id?: string;
+  truncated?: boolean;
   hypothesis: LucidHypothesis;
   supporting_signals: LucidSignal[];
   contradictions: LucidSignal[];
@@ -2732,6 +2845,8 @@ export interface LucidFindings {
 
 /** An action the human takes during a lucid dream session */
 export interface LucidAction {
+  operation_id?: string;
+  expected_revision?: number;
   type: "dig_deeper" | "dismiss" | "accept" | "refine";
   /** Signal or edge ID to act on */
   target_id: string;
@@ -2743,6 +2858,11 @@ export interface LucidAction {
 
 /** Result of a complete lucid dream session */
 export interface LucidResult {
+  session_id?: string;
+  owner?: string;
+  termination?: "completed" | "cancelled" | "expired" | "restart_recovery";
+  job_id?: string;
+  result_revision?: number;
   hypothesis: LucidHypothesis;
   findings: LucidFindings;
   actions_taken: LucidAction[];
@@ -2758,6 +2878,12 @@ export interface LucidResult {
 
 /** Persistent log of all lucid dream sessions */
 export interface LucidLogFile {
+  active?: {
+    id:string; owner:string; job_id:string; process_id:string; revision:number; expires_at:string;
+    findings:LucidFindings; actions:LucidAction[]; accepted:ValidatedEdge[];
+    dismissed:Array<{signal:LucidSignal;human_reason:string}>;
+    started_at:string; operations:Record<string,{hash:string;findings:LucidFindings}>;
+  } | null;
   metadata: {
     description: string;
     schema_version: string;

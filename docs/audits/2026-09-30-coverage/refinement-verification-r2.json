@@ -1,0 +1,41 @@
+{
+  "plan_id": "graph-trust-and-agent-effectiveness",
+  "status": "draft",
+  "slice_count": 31,
+  "all_pending": true,
+  "original_29_ids_preserved": true,
+  "checkpoint_count": 0,
+  "execution_state": "idle",
+  "policy_count": 13,
+  "contract_count": 13,
+  "task_cases": 12,
+  "dependency_dag": "acyclic",
+  "release_dependency_closure": 31,
+  "implementation_test_status": "not run; plan-only requirements, not implemented guarantees",
+  "governance": {
+    "session_id": "59fc8e4a-8c02-48ea-a059-3db1db67cd95",
+    "session_status": "completed",
+    "task_scope": "plan refinement only",
+    "native_plan_status": "draft",
+    "approved": false,
+    "delta_entries": 38,
+    "native_plan_items": 171,
+    "original_session": "e211864f-0e9e-4beb-b198-4f8acc3348eb",
+    "supersession": "Revision 2 is the canonical scope for future implementation; original audit artifacts retained historically."
+  },
+  "live_registry": {
+    "instance_id": "ee9ce3b9-0313-4768-b5f1-24b9b3fffc4b",
+    "status": "draft",
+    "slice_count": 31,
+    "checkpoint_count": 0
+  },
+  "plan_sha256": "98601cddf0f9e5d65525db326b55f30fc9572e117cbec6edb25b1229b937b80c",
+  "release_target": "14.0.0",
+  "file_checks": {
+    "relative_links": "pass",
+    "source_anchors": "pass",
+    "markdown_manifest_dependencies": "match",
+    "resolved_policy_ids": "NP01-NP13 present",
+    "package_versions": "unchanged by planning update"
+  }
+}

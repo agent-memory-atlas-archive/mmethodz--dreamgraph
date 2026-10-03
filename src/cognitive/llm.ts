@@ -1,3 +1,5 @@
+import { getSessionContext, sessionEnvironment, sessionNamespace } from "../server/session-context.js";
+import { validateProviderImages, providerImageContent, type LlmImage } from "./provider-images.js";
 /**
  * DreamGraph LLM Provider — The dream engine's brain.
  *
@@ -34,7 +36,14 @@
  *     DREAMGRAPH_LLM_ARCHITECT_MAX_TOKENS  = max response tokens (default: shared max tokens)
  */
 
+import { ModelExecution, admittedModelFetch, currentModelExecution } from "./model-execution.js";
 import { logger } from "../utils/logger.js";
+import { resolveRolePolicy, readRoleProfiles, snapshotRolePolicy, type ModelRole, type ResolvedRolePolicy, type RoleSettings } from "../config/role-policy.js";
+import { modelTemperatureCapability, assertReasoningEffort } from "../config/model-temperature.js";
+import { cognitiveRoleInstruction } from "./role-instructions.js";
+import { providerCapability, assertProviderRequest, type ProviderCapability } from "../config/provider-capabilities.js";
+import { recordRoleQualification, revokeRoleQualification } from "./role-qualification.js";
+import { assertProviderOutcome, assertClientFunctionOutput, providerUsage, compileOutputValidator, validateCompletionText, completionSignal, ProviderOutcomeError, anthropicOutputSchema } from "./provider-outcome.js";
 
 // ---------------------------------------------------------------------------
 // Core types
@@ -43,6 +52,8 @@ import { logger } from "../utils/logger.js";
 export type LlmProviderType = "ollama" | "lmstudio" | "openai" | "anthropic" | "sampling" | "none";
 
 export interface LlmConfig {
+  /** Internal immutable policy binding; transport request bodies cannot provide it. */
+  admissionPolicy?: Readonly<ResolvedRolePolicy>;
   provider: LlmProviderType;
   model: string;
   baseUrl: string;
@@ -51,13 +62,18 @@ export interface LlmConfig {
   maxTokens: number;
   /** Per-request abort timeout in milliseconds. Defaults to 120_000. */
   timeoutMs: number;
+  /** Explicit protocol and reasoning settings; omission retains provider defaults. */
+  api?: "responses" | "chat-completions";
+  reasoningEffort?: string;
+  store?: boolean;
+  capability?: ProviderCapability;
 }
 
-export type LlmConfigSource = "architect" | "general" | "normalizer" | "dreamer" | "provider_default";
+export type LlmConfigSource = "architect" | "general" | "normalizer" | "dreamer" | "computer_use" | "provider_default";
 
 export interface ArchitectLlmConfig extends LlmConfig {
   component: "architect";
-  providerSource: "architect" | "general";
+  providerSource: "architect" | "general" | "computer_use";
   modelSource: LlmConfigSource;
   textVerbosity?: "low" | "medium" | "high";
 }
@@ -71,9 +87,13 @@ export interface TokenUsage {
   inputTokens?: number;
   outputTokens?: number;
   totalTokens?: number;
+  cachedInputTokens?: number;
+  cacheCreationInputTokens?: number;
+  reasoningTokens?: number;
 }
 
 export interface LlmResult {
+  admission?: import("./model-execution.js").ModelCallAdmission;
   text: string;
   finishReason?: string;
   usage?: TokenUsage;
@@ -83,6 +103,7 @@ export interface LlmResponse extends LlmResult {
   model: string;
   tokensUsed?: number;
   stopReason?: string;
+  outputContract?: { api: LlmModelApi; mode: "native_strict" | "local_validation" | "json" | "text"; capabilityVersion: string | null; fallbackReason?: string };
 }
 
 export type LlmModelApi = "chat-completions" | "responses" | "anthropic-messages" | "ollama-chat" | "mcp-sampling" | "none";
@@ -107,10 +128,22 @@ export interface ModelCapabilities {
  * For Ollama both fall back to `format: "json"`.
  */
 export interface LlmCompletionOptions {
+  /** Internal checkpoint/job identity; pins cumulative admission across continuation. */
+  admissionRunId?: string;
+  signal?: AbortSignal;
+  images?: LlmImage[];
+  capability?: ProviderCapability;
+  /** Explicitly allow local validation when native constrained decoding is unavailable. */
+  schemaFallback?: "local_validation";
   temperature?: number;
   maxTokens?: number;
   /** Override the model for this request (uses provider default if omitted) */
   model?: string;
+  api?: "responses" | "chat-completions";
+  reasoningEffort?: string;
+  store?: boolean;
+  /** Retained in instructions when sampling controls are unavailable. */
+  cognitiveRole?: ModelRole;
   /** Optional OpenAI Responses text verbosity. Ignored by providers without native support. */
   textVerbosity?: "low" | "medium" | "high";
   /** Basic JSON mode — model must output valid JSON (no schema enforcement) */
@@ -151,6 +184,7 @@ export type LlmToolCall = {
 
 export type LlmToolContentBlock =
   | { type: "text"; text: string }
+  | ({ type: "image" } & LlmImage)
   | { type: "tool_use"; id: string; name: string; input: Record<string, unknown> }
   | { type: "tool_result"; tool_use_id: string; content: string; is_error?: boolean };
 
@@ -161,11 +195,13 @@ export type LlmToolLoopMessage = {
 };
 
 export type LlmToolLoopResponse = {
+  admission?: import("./model-execution.js").ModelCallAdmission;
   text: string;
   model: string;
   stopReason: string;
   toolCalls: LlmToolCall[];
   providerRawAssistant?: Array<Record<string, unknown>>;
+  usage?: TokenUsage;
 };
 
 function usesBoundAnthropicThinking(model: string): boolean {
@@ -198,7 +234,8 @@ export type LlmRouteFallbackReason =
   | "daemon_model_unavailable"
   | "provider_failed"
   | "invalid_output"
-  | "validation_failed";
+  | "validation_failed"
+  | "role_policy_blocked";
 
 export type LlmRouteTask =
   | "remediation_drafting"
@@ -238,12 +275,24 @@ export interface LlmRouteSelection {
     source: ConnectedLlmContext["source"] | "daemon" | "deterministic_fallback";
     fallback_reason?: LlmRouteFallbackReason;
     temperature?: number;
+    cognitive_role?: ModelRole;
+    temperature_omitted?: string;
+    role_policy_fingerprint?: string;
+    role_policy_revision?: number;
+    role_policy_diagnostics?: string[];
   };
 }
 
 // ---------------------------------------------------------------------------
 // Ollama Provider — local model, no API key, autonomous
 // ---------------------------------------------------------------------------
+
+function withCognitiveRole(messages: LlmMessage[], role?: ModelRole): LlmMessage[] {
+  if (!role) return messages;
+  const instruction = cognitiveRoleInstruction(role);
+  return messages.some(message => message.role === "system" && message.content === instruction)
+    ? messages : [{ role: "system", content: instruction }, ...messages];
+}
 
 class OllamaProvider implements LlmProvider {
   readonly name = "ollama";
@@ -269,9 +318,11 @@ class OllamaProvider implements LlmProvider {
 
   async complete(messages: LlmMessage[], options?: LlmCompletionOptions): Promise<LlmResponse> {
     const temp = options?.temperature ?? this.defaultTemperature;
+    messages = withCognitiveRole(messages, options?.cognitiveRole);
     const maxTokens = options?.maxTokens ?? this.defaultMaxTokens;
 
     const model = options?.model ?? this.model;
+    if (options?.images?.length) throw new Error("PROVIDER_IMAGES_UNQUALIFIED");
 
     const body: Record<string, unknown> = {
       model,
@@ -283,17 +334,17 @@ class OllamaProvider implements LlmProvider {
       },
     };
 
-    // Ollama: both jsonSchema and jsonMode map to format: "json"
-    // (Ollama doesn't support strict schema enforcement)
+    if (options?.jsonSchema) compileOutputValidator(options.jsonSchema.schema);
+    const signal = completionSignal(this.timeoutMs, options?.signal);
     if (options?.jsonSchema || options?.jsonMode) {
-      body.format = "json";
+      body.format = options?.jsonSchema?.schema ?? "json";
     }
 
-    const res = await fetch(`${this.baseUrl}/api/chat`, {
+    const res = await admittedModelFetch("ollama", `${this.baseUrl}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(this.timeoutMs),
+      signal,
     });
 
     if (!res.ok) {
@@ -305,14 +356,20 @@ class OllamaProvider implements LlmProvider {
       message?: { content?: string };
       model?: string;
       eval_count?: number;
+      prompt_eval_count?: number;
       done_reason?: string;
     };
 
+    const usage = providerUsage("ollama", data);
+    assertProviderOutcome("ollama", model, data, usage);
+    validateCompletionText(data.message?.content ?? "", options, "ollama", model, usage);
     return {
       text: data.message?.content ?? "",
       model: data.model ?? this.model,
       tokensUsed: data.eval_count,
       stopReason: data.done_reason,
+      usage,
+      outputContract: { api: "ollama-chat", mode: options?.jsonSchema ? "local_validation" : options?.jsonMode ? "json" : "text", capabilityVersion: null },
     };
   }
 }
@@ -321,95 +378,11 @@ class OllamaProvider implements LlmProvider {
 // OpenAI-Compatible Provider — Anthropic, OpenAI, Groq, LM Studio, etc.
 // ---------------------------------------------------------------------------
 
-/**
- * Process-lifetime cache of (provider, model) pairs known to reject strict
- * `response_format: json_schema`. When a downgrade has been detected once,
- * subsequent requests for the same model skip straight to `json_object` mode
- * to avoid wasting a round trip.
- *
- * Provider-agnostic — affects any OpenAI-compatible endpoint, including
- * LM Studio runtimes that don't implement Structured Outputs and Ollama
- * behind a compatibility shim.
- */
-const _jsonSchemaUnsupported = new Set<string>();
-
-const OPENAI_MODEL_CAPABILITIES: Array<{ pattern: RegExp; capabilities: Omit<ModelCapabilities, "model"> }> = [
-  {
-    pattern: /^(?:gpt-5\.[56]|gpt-6(?:\.1)?)(?:$|[-_])/i,
-    capabilities: {
-      api: "responses",
-      supportsTemperature: false,
-      supportsReasoningEffort: true,
-      supportsStructuredOutputs: true,
-      supportsJsonSchema: true,
-    },
-  },
-  {
-    pattern: /^gpt-[4-9]\.[1-9]/i,
-    capabilities: {
-      api: "chat-completions",
-      supportsTemperature: true,
-      supportsReasoningEffort: false,
-      supportsStructuredOutputs: true,
-      supportsJsonSchema: true,
-    },
-  },
-  {
-    pattern: /^(o[1-9]|gpt-5(?:\b|[-_]))/i,
-    capabilities: {
-      api: "chat-completions",
-      supportsTemperature: false,
-      supportsReasoningEffort: true,
-      supportsStructuredOutputs: true,
-      supportsJsonSchema: true,
-    },
-  },
-];
-
-export function getModelCapabilities(provider: LlmProviderType | string, model: string): ModelCapabilities {
-  const normalizedProvider = provider.toLowerCase();
-  const normalizedModel = model.trim();
-  if (normalizedProvider === "openai") {
-    const match = OPENAI_MODEL_CAPABILITIES.find((entry) => entry.pattern.test(normalizedModel));
-    return {
-      model: normalizedModel,
-      ...(match?.capabilities ?? {
-        api: "chat-completions" as const,
-        supportsTemperature: true,
-        supportsReasoningEffort: false,
-        supportsStructuredOutputs: true,
-        supportsJsonSchema: true,
-      }),
-    };
-  }
-  if (normalizedProvider === "anthropic") {
-    return {
-      model: normalizedModel,
-      api: "anthropic-messages",
-      supportsTemperature: !/^claude-(?:opus-(?:4-[78]|5)|sonnet-5|fable-5|mythos-5)(?:$|[-_])/i.test(normalizedModel),
-      supportsReasoningEffort: false,
-      supportsStructuredOutputs: false,
-      supportsJsonSchema: false,
-    };
-  }
-  if (normalizedProvider === "ollama" || normalizedProvider === "lmstudio") {
-    return {
-      model: normalizedModel,
-      api: normalizedProvider === "ollama" ? "ollama-chat" : "chat-completions",
-      supportsTemperature: true,
-      supportsReasoningEffort: false,
-      supportsStructuredOutputs: false,
-      supportsJsonSchema: false,
-    };
-  }
-  return {
-    model: normalizedModel,
-    api: normalizedProvider === "sampling" ? "mcp-sampling" : "none",
-    supportsTemperature: false,
-    supportsReasoningEffort: false,
-    supportsStructuredOutputs: false,
-    supportsJsonSchema: false,
-  };
+export function getModelCapabilities(provider: LlmProviderType | string, model: string, reasoningEffort?: string, override?: ProviderCapability): ModelCapabilities {
+  const evidence = providerCapability(provider, model, override);
+  return { model: model.trim(), api: evidence?.default_api ?? (provider === "anthropic" ? "anthropic-messages" : provider === "ollama" ? "ollama-chat" : provider === "sampling" ? "mcp-sampling" : provider === "none" ? "none" : "chat-completions"),
+    supportsTemperature: modelTemperatureCapability(provider, model, reasoningEffort).support === "supported",
+    supportsReasoningEffort: Boolean(evidence?.efforts.length), supportsStructuredOutputs: evidence?.strict_schema ?? false, supportsJsonSchema: evidence?.strict_schema ?? false };
 }
 
 /** Heuristic: error body indicates the strict json_schema form is unsupported. */
@@ -439,6 +412,7 @@ class OpenAiCompatibleProvider implements LlmProvider {
     private defaultMaxTokens: number,
     name: string = "openai",
     private timeoutMs: number = 120_000,
+    private requestDefaults: Pick<LlmConfig, "api" | "reasoningEffort" | "store" | "capability"> = {},
   ) {
     this.name = name;
   }
@@ -456,107 +430,50 @@ class OpenAiCompatibleProvider implements LlmProvider {
   }
 
   async complete(messages: LlmMessage[], options?: LlmCompletionOptions): Promise<LlmResponse> {
-    const temp = options?.temperature ?? this.defaultTemperature;
-    const maxTokens = options?.maxTokens ?? this.defaultMaxTokens;
-    const model = options?.model ?? this.model;
-    const capabilities = getModelCapabilities(this.name, model);
-
-    // Newer OpenAI models (o1/o3/o4-mini, gpt-4.1, gpt-5.4-nano, etc.) require
-    // "max_completion_tokens" instead of the legacy "max_tokens" parameter.
-    const useNewTokenParam = /^(o[1-9]|gpt-[4-9]\.[1-9]|gpt-5)/i.test(model);
-
-    const downgradeKey = `${this.name}:${model}`;
-    const knownUnsupported = _jsonSchemaUnsupported.has(downgradeKey);
-
-    if (capabilities.api === "responses") {
-      return this.completeWithResponses(messages, model, temp, maxTokens, capabilities, options);
-    }
-
-    const buildBody = (useStrictSchema: boolean): Record<string, unknown> => {
-      const body: Record<string, unknown> = {
-        model,
-        messages: messages.map(m => ({ role: m.role, content: m.content })),
-        ...(capabilities.supportsTemperature ? { temperature: temp } : {}),
-        ...(useNewTokenParam
-          ? { max_completion_tokens: maxTokens }
-          : { max_tokens: maxTokens }),
-      };
-
-      // Structured Outputs (strict schema) > basic JSON mode > free-form
-      if (options?.jsonSchema && useStrictSchema) {
-        body.response_format = {
-          type: "json_schema",
-          json_schema: {
-            name: options.jsonSchema.name,
-            strict: true,
-            schema: options.jsonSchema.schema,
-          },
-        };
-      } else if (options?.jsonSchema || options?.jsonMode) {
-        // Either jsonMode requested directly, or jsonSchema downgraded.
-        body.response_format = { type: "json_object" };
-      }
-
-      return body;
+    options = { ...this.requestDefaults, ...options };
+    const model = options.model ?? this.model;
+    const capabilities = getModelCapabilities(this.name, model, options.reasoningEffort, options.capability);
+    const api = options.api ?? capabilities.api;
+    const allowLocal = options.schemaFallback === "local_validation";
+    const evidence = assertProviderRequest(this.name, model, api, options.reasoningEffort, Boolean(options.jsonSchema && !allowLocal), false, options.capability);
+    assertReasoningEffort(this.name, model, options.reasoningEffort);
+    if (options.jsonSchema) compileOutputValidator(options.jsonSchema.schema);
+    const signal = completionSignal(this.timeoutMs, options.signal);
+    validateProviderImages(this.name, model, options.images ?? [], options.capability);
+    if (options.images?.length && !messages.some(m => m.role === "user")) throw new Error("PROVIDER_IMAGE_USER_MESSAGE_REQUIRED");
+    messages = withCognitiveRole(messages, options.cognitiveRole);
+    const temp = options.temperature ?? this.defaultTemperature, maxTokens = options.maxTokens ?? this.defaultMaxTokens;
+    if (api === "responses") return this.completeWithResponses(messages, model, temp, maxTokens, capabilities, { ...options, signal });
+    const useNewTokenParam = /^(?:o[134](?:-|$)|gpt-(?:4\.1|5|6)(?:\.|-|$))/.test(model);
+    let useStrict = Boolean(options.jsonSchema && evidence?.strict_schema);
+    const body: Record<string, unknown> = { model, messages: messages.map((m, index) => ({ ...m, content: m.role === "user" && index === messages.map(value => value.role).lastIndexOf("user") ? providerImageContent(m.content, options!.images ?? [], "chat-completions") : m.content })),
+      ...(capabilities.supportsTemperature ? { temperature: temp } : {}),
+      ...(options.reasoningEffort ? { reasoning_effort: options.reasoningEffort } : {}),
+      ...(options.store !== undefined ? { store: options.store } : {}),
+      ...(useNewTokenParam ? { max_completion_tokens: maxTokens } : { max_tokens: maxTokens }) };
+    let callCount = 0;
+    const call = () => {
+      signal.throwIfAborted();
+      if (useStrict) body.response_format = { type: "json_schema", json_schema: { name: options!.jsonSchema!.name, strict: true, schema: options!.jsonSchema!.schema } };
+      else if (options!.jsonSchema || options!.jsonMode) body.response_format = { type: "json_object" };
+      return admittedModelFetch(this.name, this.baseUrl + "/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + this.apiKey }, body: JSON.stringify(body), signal }, callCount++ > 0);
     };
-
-    const callOnce = (useStrictSchema: boolean): Promise<Response> =>
-      fetch(`${this.baseUrl}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify(buildBody(useStrictSchema)),
-        signal: AbortSignal.timeout(this.timeoutMs),
-      });
-
-    // First attempt: use strict schema if requested AND not known-unsupported.
-    let useStrict = !!options?.jsonSchema && !knownUnsupported;
-    let res = await callOnce(useStrict);
-
-    // One-shot downgrade: strict schema rejected → retry once with json_object.
-    if (!res.ok && useStrict) {
-      const errText = await res.text().catch(() => "unknown");
-      if (_isJsonSchemaUnsupportedError(res.status, errText)) {
-        _jsonSchemaUnsupported.add(downgradeKey);
-        logger.warn(
-          `LLM ${this.name}: model "${model}" rejected response_format=json_schema (${res.status}); ` +
-          `falling back to json_object for this process. Body: ${errText.slice(0, 200)}`,
-        );
-        useStrict = false;
-        res = await callOnce(false);
-      } else {
-        throw new Error(`OpenAI-compat ${res.status}: ${errText}`);
-      }
+    let res = await call();
+    let fallbackReason = options.jsonSchema && !useStrict ? "native_schema_unqualified; explicitly authorized local validation" : undefined;
+    if (!res.ok && useStrict && allowLocal) {
+      const error = await res.text().catch(() => "unknown");
+      if (!_isJsonSchemaUnsupportedError(res.status, error)) throw new Error("OpenAI-compat " + res.status);
+      useStrict = false; fallbackReason = "native_schema_rejected; explicitly authorized local validation"; res = await call();
     }
-
-    if (!res.ok) {
-      const errText = await res.text().catch(() => "unknown");
-      throw new Error(`OpenAI-compat ${res.status}: ${errText}`);
-    }
-
-    const data = await res.json() as {
-      choices?: Array<{
-        message?: { content?: string };
-        finish_reason?: string;
-      }>;
-      model?: string;
-      usage?: { completion_tokens?: number };
-    };
-
+    if (!res.ok) throw new Error("OpenAI-compat " + res.status);
+    const data = await res.json() as any;
+    const usage = providerUsage(this.name, data.usage);
+    assertProviderOutcome(this.name, model, data, usage);
     const choice = data.choices?.[0];
-    const usage: TokenUsage | undefined = data.usage?.completion_tokens === undefined
-      ? undefined
-      : { outputTokens: data.usage.completion_tokens };
-    return {
-      text: choice?.message?.content ?? "",
-      model: data.model ?? this.model,
-      tokensUsed: usage?.outputTokens,
-      stopReason: choice?.finish_reason,
-      finishReason: choice?.finish_reason,
-      usage,
-    };
+    if (!choice?.message || typeof choice.message.content !== "string") throw new ProviderOutcomeError("PROVIDER_OUTPUT_INVALID", this.name, model, "missing_message", usage);
+    validateCompletionText(choice.message.content, options, this.name, model, usage);
+    return { text: choice.message.content, model: data.model ?? model, tokensUsed: usage?.outputTokens, stopReason: choice.finish_reason, finishReason: choice.finish_reason, usage,
+      outputContract: { api: "chat-completions", mode: options.jsonSchema ? useStrict ? "native_strict" : "local_validation" : options.jsonMode ? "json" : "text", capabilityVersion: evidence?.version ?? null, ...(fallbackReason ? { fallbackReason } : {}) } };
   }
 
   private async completeWithResponses(
@@ -573,52 +490,60 @@ class OpenAiCompatibleProvider implements LlmProvider {
       .join("\n\n");
     const input = messages
       .filter((message) => message.role !== "system")
-      .map((message) => ({ role: message.role === "assistant" ? "assistant" : "user", content: message.content }));
+      .map((message, index, values) => ({ role: message.role === "assistant" ? "assistant" : "user", content: message.role === "user" && index === values.map(value => value.role).lastIndexOf("user") ? providerImageContent(message.content, options?.images ?? [], "responses") : message.content }));
     const body: Record<string, unknown> = {
       model,
       input,
       max_output_tokens: maxTokens,
       text: {
         ...(options?.textVerbosity ? { verbosity: options.textVerbosity } : {}),
-        ...(options?.jsonSchema ? { format: { type: "json_schema", name: options.jsonSchema.name, schema: options.jsonSchema.schema, strict: true } }
-          : options?.jsonMode ? { format: { type: "json_object" } } : {}),
+        ...(options?.jsonSchema && capabilities.supportsJsonSchema ? { format: { type: "json_schema", name: options.jsonSchema.name, schema: options.jsonSchema.schema, strict: true } }
+          : options?.jsonSchema || options?.jsonMode ? { format: { type: "json_object" } } : {}),
       },
       ...(capabilities.supportsTemperature ? { temperature: temp } : {}),
+      ...(options?.reasoningEffort ? { reasoning: { effort: options.reasoningEffort } } : {}),
+      ...(options?.store !== undefined ? { store: options.store } : {}),
     };
     if (instructions) {
       body.instructions = instructions;
     }
 
-    const res = await fetch(`${this.baseUrl}/responses`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(this.timeoutMs),
-    });
+    let useStrict = !!options?.jsonSchema && capabilities.supportsJsonSchema;
+    let fallbackReason = options?.jsonSchema && !useStrict ? "native_schema_unqualified; explicitly authorized local validation" : undefined;
+    const signal = options?.signal ?? completionSignal(this.timeoutMs);
+    let callCount = 0;
+    const call = () => { signal.throwIfAborted(); return admittedModelFetch(this.name, `${this.baseUrl}/responses`, {
+      method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` }, body: JSON.stringify(body), signal,
+    }, callCount++ > 0); };
+    let res = await call();
+    if (!res.ok && useStrict && options?.schemaFallback === "local_validation") {
+      const error = await res.text().catch(() => "unknown");
+      if (!_isJsonSchemaUnsupportedError(res.status, error)) throw new Error(`OpenAI Responses ${res.status}`);
+      useStrict = false; fallbackReason = "native_schema_rejected; explicitly authorized local validation";
+      (body.text as Record<string, unknown>).format = { type: "json_object" }; res = await call();
+    }
 
     if (!res.ok) {
-      const errText = await res.text().catch(() => "unknown");
-      throw new Error(`OpenAI Responses ${res.status}: ${errText}`);
+      throw new Error(`OpenAI Responses ${res.status}`);
     }
 
     const data = await res.json() as {
       output_text?: string;
       model?: string;
       status?: string;
-      usage?: { output_tokens?: number; completion_tokens?: number };
+      usage?: Record<string, unknown>;
       output?: Array<{ type?: string; content?: Array<{ type?: string; text?: string }> }>;
     };
+    const usage = providerUsage(this.name, data.usage);
+    assertProviderOutcome(this.name, model, data, usage);
     const text = data.output_text ?? (data.output ?? [])
       .filter((item) => item.type === "message")
       .flatMap((item) => item.content ?? [])
       .filter((content) => content.type === "output_text" || content.type === "text")
       .map((content) => content.text ?? "")
       .join("");
-    const outputTokens = data.usage?.output_tokens ?? data.usage?.completion_tokens;
-    const usage: TokenUsage | undefined = outputTokens === undefined ? undefined : { outputTokens };
+    if (typeof text !== "string") throw new ProviderOutcomeError("PROVIDER_OUTPUT_INVALID", this.name, model, "invalid_text", usage);
+    validateCompletionText(text, options, this.name, model, usage);
     return {
       text,
       model: data.model ?? model,
@@ -626,36 +551,65 @@ class OpenAiCompatibleProvider implements LlmProvider {
       stopReason: data.status,
       finishReason: data.status,
       usage,
+      outputContract: { api: "responses", mode: options?.jsonSchema ? useStrict ? "native_strict" : "local_validation" : options?.jsonMode ? "json" : "text",
+        capabilityVersion: providerCapability(this.name, model, options?.capability)?.version ?? null,
+        ...(fallbackReason ? { fallbackReason } : {}) },
     };
   }
 }
 
-export async function completeWithNativeTools(
-  config: ArchitectLlmConfig,
-  messages: LlmToolLoopMessage[],
-  tools: LlmToolDefinition[],
+export async function completeWithNativeTools(config: ArchitectLlmConfig, messages: LlmToolLoopMessage[], tools: LlmToolDefinition[], options: { signal?: AbortSignal } = {}): Promise<LlmToolLoopResponse> {
+  const role=config.admissionPolicy?.policy.role??"architect";
+  if(role!=="architect"&&role!=="computer_use")throw new Error("NATIVE_TOOL_ROLE_UNSUPPORTED");
+  let run = nativeRuns.get(config);
+  if (!run) { run = new ModelExecution(config, role, config.admissionPolicy); nativeRuns.set(config, run); }
+  return run.complete(() => completeWithNativeToolsRaw(config, messages, tools, options));
+}
+
+async function completeWithNativeToolsRaw(
+  config: ArchitectLlmConfig, messages: LlmToolLoopMessage[], tools: LlmToolDefinition[], options: { signal?: AbortSignal } = {},
 ): Promise<LlmToolLoopResponse> {
-  if (config.provider === "anthropic") {
-    return callAnthropicWithTools(config, messages, tools);
+  const signal = completionSignal(config.timeoutMs, options.signal);
+  const capabilities = getModelCapabilities(config.provider, config.model, config.reasoningEffort, config.capability);
+  const api = config.provider === "anthropic" ? "anthropic-messages" : config.api ?? capabilities.api;
+  assertReasoningEffort(config.provider, config.model, config.reasoningEffort);
+  assertProviderRequest(config.provider, config.model, api, config.reasoningEffort, false, tools.length > 0, config.capability);
+  if (!["openai", "lmstudio", "anthropic"].includes(config.provider)) throw new Error("NATIVE_TOOL_ADAPTER_UNSUPPORTED");
+  for (const message of messages) if (Array.isArray(message.content)) {
+    const images = message.content.filter((block): block is Extract<LlmToolContentBlock, { type: "image" }> => block.type === "image");
+    if (images.length && message.role !== "user") throw new Error("PROVIDER_IMAGE_ROLE_UNSUPPORTED");
+    validateProviderImages(config.provider, config.model, images, config.capability);
   }
-  const capabilities = getModelCapabilities(config.provider, config.model);
-  if (config.provider === "openai" && capabilities.api === "responses") {
-    return callOpenAiResponsesWithTools(config, messages, tools);
+  const validators = new Map<string, (value: unknown) => boolean>();
+  for (const tool of tools) {
+    if (!tool.name || validators.has(tool.name)) throw new Error("DUPLICATE_OR_INVALID_TOOL_NAME");
+    validators.set(tool.name, compileOutputValidator(normalizeToolInputSchema(tool.inputSchema)));
   }
-  return callOpenAiCompatibleWithTools(config, messages, tools);
+  const response = config.provider === "anthropic" ? await callAnthropicWithTools(config, messages, tools, signal)
+    : api === "responses" ? await callOpenAiResponsesWithTools(config, messages, tools, signal)
+    : await callOpenAiCompatibleWithTools(config, messages, tools, signal);
+  const ids = new Set<string>();
+  for (const tool of response.toolCalls) {
+    if (!tool.id || ids.has(tool.id) || !validators.get(tool.name)?.(tool.input)) throw new ProviderOutcomeError("TOOL_ARGUMENTS_INVALID", config.provider, config.model, "unadvertised_duplicate_or_invalid_tool", response.usage);
+    ids.add(tool.id);
+  }
+  return response;
 }
 
 async function callOpenAiCompatibleWithTools(
   config: ArchitectLlmConfig,
   messages: LlmToolLoopMessage[],
   tools: LlmToolDefinition[],
+  signal: AbortSignal,
 ): Promise<LlmToolLoopResponse> {
-  const capabilities = getModelCapabilities(config.provider, config.model);
+  const capabilities = getModelCapabilities(config.provider, config.model, config.reasoningEffort, config.capability);
   const useNewTokenParam = /^(o[1-9]|gpt-[4-9]\.[1-9]|gpt-5)/i.test(config.model);
   const body: Record<string, unknown> = {
     model: config.model,
     messages: toOpenAiMessages(messages),
     ...(capabilities.supportsTemperature ? { temperature: config.temperature } : {}),
+    ...(config.reasoningEffort ? { reasoning_effort: config.reasoningEffort } : {}),
+    ...(config.store !== undefined ? { store: config.store } : {}),
     ...(useNewTokenParam
       ? { max_completion_tokens: config.maxTokens }
       : { max_tokens: config.maxTokens }),
@@ -663,19 +617,19 @@ async function callOpenAiCompatibleWithTools(
     tool_choice: "auto",
   };
 
-  const res = await fetch(`${config.baseUrl}/chat/completions`, {
+  const res = await admittedModelFetch(config.provider, `${config.baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${config.apiKey}`,
     },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(config.timeoutMs),
+    signal,
   });
 
   if (!res.ok) {
     const errText = await res.text().catch(() => "unknown");
-    throw new Error(`OpenAI-compatible tool call ${res.status}: ${errText}`);
+    throw new Error(`OpenAI-compatible tool call ${res.status}`);
   }
 
   const data = await res.json() as {
@@ -685,13 +639,16 @@ async function callOpenAiCompatibleWithTools(
     }>;
     model?: string;
   };
+  const usage = providerUsage(config.provider, (data as any).usage);
+  assertProviderOutcome(config.provider, config.model, data, usage);
   const choice = data.choices?.[0];
   const toolCalls = (choice?.message?.tool_calls ?? []).map((toolCall) => ({
     id: toolCall.id,
     name: toolCall.function.name,
-    input: parseToolArguments(toolCall.function.arguments),
+    input: parseToolArguments(toolCall.function.arguments, config.provider, config.model, usage),
   }));
   return {
+    usage,
     text: choice?.message?.content ?? "",
     model: data.model ?? config.model,
     stopReason: choice?.finish_reason === "tool_calls" ? "tool_use" : (choice?.finish_reason ?? "stop"),
@@ -703,8 +660,9 @@ async function callOpenAiResponsesWithTools(
   config: ArchitectLlmConfig,
   messages: LlmToolLoopMessage[],
   tools: LlmToolDefinition[],
+  signal: AbortSignal,
 ): Promise<LlmToolLoopResponse> {
-  const capabilities = getModelCapabilities(config.provider, config.model);
+  const capabilities = getModelCapabilities(config.provider, config.model, config.reasoningEffort, config.capability);
   const systemText = messages
     .filter((message) => message.role === "system")
     .map((message) => typeof message.content === "string" ? message.content : blocksToText(message.content))
@@ -713,31 +671,32 @@ async function callOpenAiResponsesWithTools(
   const body: Record<string, unknown> = {
     model: config.model,
     input: toOpenAiResponsesInput(messages.filter((message) => message.role !== "system")),
-    store: false,
+    store: config.store ?? false,
     include: ["reasoning.encrypted_content"],
     tools: tools.map(toOpenAiResponsesTool),
     tool_choice: "auto",
     max_output_tokens: config.maxTokens,
     ...(config.textVerbosity ? { text: { verbosity: config.textVerbosity } } : {}),
     ...(capabilities.supportsTemperature ? { temperature: config.temperature } : {}),
+    ...(config.reasoningEffort ? { reasoning: { effort: config.reasoningEffort } } : {}),
   };
   if (systemText) {
     body.instructions = systemText;
   }
 
-  const res = await fetch(`${config.baseUrl}/responses`, {
+  const res = await admittedModelFetch(config.provider, `${config.baseUrl}/responses`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${config.apiKey}`,
     },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(config.timeoutMs),
+    signal,
   });
 
   if (!res.ok) {
     const errText = await res.text().catch(() => "unknown");
-    throw new Error(`OpenAI Responses tool call ${res.status}: ${errText}`);
+    throw new Error(`OpenAI Responses tool call ${res.status}`);
   }
 
   const data = await res.json() as {
@@ -756,7 +715,10 @@ async function callOpenAiResponsesWithTools(
       arguments?: string;
     }>;
   };
+  const usage = providerUsage(config.provider, (data as any).usage);
+  assertProviderOutcome(config.provider, config.model, data, usage);
   const output = data.output ?? [];
+  assertClientFunctionOutput(config.provider,config.model,output,"responses",usage);
   const text = data.output_text ?? output
     .filter((item) => item.type === "message")
     .flatMap((item) => item.content ?? [])
@@ -768,9 +730,10 @@ async function callOpenAiResponsesWithTools(
     .map((item) => ({
       id: item.call_id!,
       name: item.name!,
-      input: parseToolArguments(item.arguments ?? "{}"),
+      input: parseToolArguments(item.arguments ?? "{}", config.provider, config.model, usage),
     }));
   return {
+    usage,
     text,
     model: data.model ?? config.model,
     stopReason: toolCalls.length > 0 ? "tool_use" : (data.status ?? "stop"),
@@ -783,6 +746,7 @@ async function callAnthropicWithTools(
   config: ArchitectLlmConfig,
   messages: LlmToolLoopMessage[],
   tools: LlmToolDefinition[],
+  signal: AbortSignal,
 ): Promise<LlmToolLoopResponse> {
   const systemText = messages
     .filter((message) => message.role === "system")
@@ -793,6 +757,7 @@ async function callAnthropicWithTools(
   const body: Record<string, unknown> = {
     model: config.model,
     max_tokens: config.maxTokens,
+    ...(config.reasoningEffort ? { output_config: { effort: config.reasoningEffort } } : {}),
     ...anthropicThinkingOptions(config.model),
     ...(getModelCapabilities("anthropic", config.model).supportsTemperature ? { temperature: config.temperature } : {}),
     messages: messages
@@ -804,7 +769,7 @@ async function callAnthropicWithTools(
     body.system = systemText;
   }
 
-  const res = await fetch(`${config.baseUrl}/messages`, {
+  const res = await admittedModelFetch(config.provider, `${config.baseUrl}/messages`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -813,12 +778,12 @@ async function callAnthropicWithTools(
       ...anthropicThinkingHeaders(config.model),
     },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(config.timeoutMs),
+    signal,
   });
 
   if (!res.ok) {
     const errText = await res.text().catch(() => "unknown");
-    throw new Error(`Anthropic tool call ${res.status}: ${errText}`);
+    throw new Error(`Anthropic tool call ${res.status}`);
   }
 
   const data = await res.json() as {
@@ -827,9 +792,13 @@ async function callAnthropicWithTools(
     stop_reason?: string;
     input_transformations?: unknown[];
   };
+  const usage = providerUsage("anthropic", (data as any).usage);
+  assertProviderOutcome("anthropic", config.model, data, usage);
   logAnthropicThinkingDrops(config.model, data.input_transformations);
   const blocks = data.content ?? [];
+  assertClientFunctionOutput("anthropic",config.model,blocks,"anthropic",usage);
   return {
+    usage,
     text: blocks.filter((block) => block.type === "text").map((block) => block.text ?? "").join(""),
     model: data.model ?? config.model,
     stopReason: data.stop_reason ?? "stop",
@@ -858,6 +827,8 @@ function toOpenAiResponsesInput(messages: LlmToolLoopMessage[]): Array<Record<st
     for (const block of message.content) {
       if (block.type === "text" && block.text) {
         out.push({ role: message.role === "assistant" ? "assistant" : "user", content: block.text });
+      } else if (block.type === "image") {
+        out.push({ role: "user", content: [{ type: "input_image", image_url: `data:${block.mimeType};base64,${block.dataBase64}` }] });
       } else if (block.type === "tool_use") {
         out.push({ type: "function_call", call_id: block.id, name: block.name, arguments: JSON.stringify(block.input ?? {}) });
       } else if (block.type === "tool_result") {
@@ -897,8 +868,9 @@ function toOpenAiMessages(messages: LlmToolLoopMessage[]): Array<Record<string, 
       continue;
     }
 
-    if (text) {
-      out.push({ role: message.role, content: text });
+    const images = message.content.filter((block): block is Extract<LlmToolContentBlock, { type: "image" }> => block.type === "image");
+    if (text || images.length) {
+      out.push({ role: message.role, content: providerImageContent(text, images, "chat-completions") });
     }
     for (const result of toolResults) {
       out.push({ role: "tool", tool_call_id: result.tool_use_id, content: result.content });
@@ -918,6 +890,7 @@ function toAnthropicToolMessage(message: LlmToolLoopMessage): Record<string, unk
     role: message.role,
     content: message.content.map((block) => {
       if (block.type === "text") return { type: "text", text: block.text };
+      if (block.type === "image") return { type: "image", source: { type: "base64", media_type: block.mimeType, data: block.dataBase64 } };
       if (block.type === "tool_use") return { type: "tool_use", id: block.id, name: block.name, input: block.input ?? {} };
       return {
         type: "tool_result",
@@ -958,23 +931,18 @@ function toAnthropicTool(tool: LlmToolDefinition): Record<string, unknown> {
 }
 
 function normalizeToolInputSchema(schema: unknown): Record<string, unknown> {
-  if (!isRecord(schema)) {
-    return { type: "object", properties: {}, additionalProperties: true };
-  }
-  return {
-    type: schema.type === "object" ? "object" : "object",
-    properties: isRecord(schema.properties) ? schema.properties : {},
-    required: Array.isArray(schema.required) ? schema.required : [],
-    ...(schema.additionalProperties !== undefined ? { additionalProperties: schema.additionalProperties } : {}),
-  };
+  if (schema === undefined) return { type: "object", properties: {}, additionalProperties: true };
+  if (!isRecord(schema) || schema.type !== undefined && schema.type !== "object") throw new Error("TOOL_SCHEMA_INVALID");
+  return { type: "object", ...structuredClone(schema) };
 }
 
-function parseToolArguments(raw: string): Record<string, unknown> {
+function parseToolArguments(raw: string, provider: string, model: string, usage?: TokenUsage): Record<string, unknown> {
   try {
     const parsed = JSON.parse(raw || "{}");
-    return isRecord(parsed) ? parsed : {};
+    if (!isRecord(parsed)) throw new Error("TOOL_ARGUMENTS_INVALID");
+    return parsed;
   } catch {
-    return { _raw: raw };
+    throw new ProviderOutcomeError("TOOL_ARGUMENTS_INVALID", provider, model, "invalid_json_object", usage);
   }
 }
 
@@ -987,11 +955,6 @@ function blocksToText(blocks: LlmToolContentBlock[]): string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-/** Test-only: clear the json_schema downgrade cache. */
-export function _resetJsonSchemaDowngradeForTest(): void {
-  _jsonSchemaUnsupported.clear();
 }
 
 // ---------------------------------------------------------------------------
@@ -1013,6 +976,7 @@ class AnthropicProvider implements LlmProvider {
     private defaultTemperature: number,
     private defaultMaxTokens: number,
     private timeoutMs: number = 120_000,
+    private requestDefaults: Pick<LlmConfig, "reasoningEffort" | "capability"> = {},
   ) {}
 
   async isAvailable(): Promise<boolean> {
@@ -1022,74 +986,38 @@ class AnthropicProvider implements LlmProvider {
   }
 
   async complete(messages: LlmMessage[], options?: LlmCompletionOptions): Promise<LlmResponse> {
-    const temp = options?.temperature ?? this.defaultTemperature;
-    const maxTokens = options?.maxTokens ?? this.defaultMaxTokens;
-    const model = options?.model ?? this.model;
-
-    // Anthropic requires system messages as a top-level param, not in the messages array
-    const systemMessages = messages.filter(m => m.role === "system");
-    const nonSystemMessages = messages.filter(m => m.role !== "system");
-    const systemText = systemMessages.map(m => m.content).join("\n\n") || undefined;
-
-    const body: Record<string, unknown> = {
-      model,
-      max_tokens: maxTokens,
+    options = { ...this.requestDefaults, ...options };
+    const model = options.model ?? this.model;
+    const evidence = assertProviderRequest("anthropic", model, "anthropic-messages", options.reasoningEffort, Boolean(options.jsonSchema && options.schemaFallback !== "local_validation"), false, options.capability);
+    if (options.jsonSchema) compileOutputValidator(options.jsonSchema.schema);
+    const signal = completionSignal(this.timeoutMs, options.signal);
+    messages = withCognitiveRole(messages, options.cognitiveRole);
+    const systemText = messages.filter(m => m.role === "system").map(m => m.content).join("\n\n");
+    validateProviderImages("anthropic", model, options.images ?? [], options.capability);
+    if (options.images?.length && !messages.some(m => m.role === "user")) throw new Error("PROVIDER_IMAGE_USER_MESSAGE_REQUIRED");
+    const nativeSchema = Boolean(options.jsonSchema && evidence?.strict_schema);
+    const body: Record<string, unknown> = { model, max_tokens: options.maxTokens ?? this.defaultMaxTokens,
       ...anthropicThinkingOptions(model),
-      ...(getModelCapabilities("anthropic", model).supportsTemperature ? { temperature: temp } : {}),
-      messages: nonSystemMessages.map(m => ({ role: m.role, content: m.content })),
-    };
-
-    if (systemText) {
-      body.system = systemText;
-    }
-
-    // Anthropic doesn't support OpenAI-style structured outputs or json_mode,
-    // but we can hint via a prefill trick: append an assistant message starting with "{"
-    // to encourage JSON output when jsonMode or jsonSchema is requested.
-    if (options?.jsonSchema || options?.jsonMode) {
-      // Add instruction to system message
-      const jsonHint = "\n\nYou MUST respond with valid JSON only. No markdown, no explanation — just the JSON object.";
-      if (body.system) {
-        body.system = (body.system as string) + jsonHint;
-      } else {
-        body.system = jsonHint.trim();
-      }
-    }
-
-    const res = await fetch(`${this.baseUrl}/messages`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": this.apiKey,
-        "anthropic-version": "2023-06-01",
-        ...anthropicThinkingHeaders(model),
-      },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(this.timeoutMs),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text().catch(() => "unknown");
-      throw new Error(`Anthropic ${res.status}: ${errText}`);
-    }
-
-    const data = await res.json() as {
-      content?: Array<{ type: string; text?: string }>;
-      model?: string;
-      usage?: { output_tokens?: number };
-      stop_reason?: string;
-      input_transformations?: unknown[];
-    };
-
+      ...(getModelCapabilities("anthropic", model, options.reasoningEffort).supportsTemperature ? { temperature: options.temperature ?? this.defaultTemperature } : {}),
+      messages: messages.filter(m => m.role !== "system").map((m, index, values) => ({ ...m, content: m.role === "user" && index === values.map(value => value.role).lastIndexOf("user") ? providerImageContent(m.content, options!.images ?? [], "anthropic-messages") : m.content })),
+      ...(systemText ? { system: systemText } : {}) };
+    if (nativeSchema || options.reasoningEffort) body.output_config = {
+      ...(options.reasoningEffort ? { effort: options.reasoningEffort } : {}),
+      ...(nativeSchema ? { format: { type: "json_schema", schema: anthropicOutputSchema(options.jsonSchema!.schema) } } : {}) };
+    if ((options.jsonMode || options.jsonSchema) && !nativeSchema) body.system = (systemText + "\n\nRespond with valid JSON only. No markdown or explanation.").trim();
+    const res = await admittedModelFetch("anthropic", this.baseUrl + "/messages", { method: "POST", headers: { "Content-Type": "application/json", "x-api-key": this.apiKey, "anthropic-version": "2023-06-01", ...anthropicThinkingHeaders(model) }, body: JSON.stringify(body), signal });
+    if (!res.ok) throw new Error("Anthropic " + res.status);
+    const data = await res.json() as any;
+    const usage = providerUsage("anthropic", data.usage);
+    assertProviderOutcome("anthropic", model, data, usage);
     logAnthropicThinkingDrops(model, data.input_transformations);
-
-    return {
-      text: (data.content ?? []).filter(b => b.type === "text").map(b => b.text ?? "").join(""),
-      model: data.model ?? this.model,
-      tokensUsed: data.usage?.output_tokens,
-      stopReason: data.stop_reason,
-    };
+    const text = (data.content ?? []).filter((b: any) => b.type === "text").map((b: any) => b.text ?? "").join("");
+    validateCompletionText(text, options, "anthropic", model, usage);
+    return { text, model: data.model ?? model, tokensUsed: usage?.outputTokens, stopReason: data.stop_reason, finishReason: data.stop_reason, usage,
+      outputContract: { api: "anthropic-messages", mode: options.jsonSchema ? nativeSchema ? "native_strict" : "local_validation" : options.jsonMode ? "json" : "text", capabilityVersion: evidence?.version ?? null,
+        ...(options.jsonSchema && !nativeSchema ? { fallbackReason: "native_schema_unqualified; explicitly authorized local validation" } : {}) } };
   }
+
 }
 
 // ---------------------------------------------------------------------------
@@ -1132,12 +1060,14 @@ class McpSamplingProvider implements LlmProvider {
   }
 
   async complete(messages: LlmMessage[], options?: LlmCompletionOptions): Promise<LlmResponse> {
+    if (options?.images?.length) throw new Error("SAMPLING_IMAGES_UNQUALIFIED");
     if (!this._server) {
       throw new Error("MCP Sampling: No server connected");
     }
+    messages = withCognitiveRole(messages, options?.cognitiveRole);
 
     const srv = this._server as {
-      createMessage: (params: Record<string, unknown>) => Promise<{
+      createMessage: (params: Record<string, unknown>, options?: { signal?: AbortSignal }) => Promise<{
         content: { type: string; text?: string } | Array<{ type: string; text?: string }>;
         model?: string;
         stopReason?: string;
@@ -1146,7 +1076,7 @@ class McpSamplingProvider implements LlmProvider {
 
     // Convert our messages to MCP sampling format
     // MCP sampling expects: messages array + optional systemPrompt
-    const systemMsg = messages.find(m => m.role === "system");
+    const systemText = messages.filter(m => m.role === "system").map(m => m.content).join("\n\n");
     const nonSystemMsgs = messages.filter(m => m.role !== "system");
 
     const params: Record<string, unknown> = {
@@ -1157,19 +1087,18 @@ class McpSamplingProvider implements LlmProvider {
       maxTokens: options?.maxTokens ?? 2048,
     };
 
-    if (systemMsg) {
-      params.systemPrompt = systemMsg.content;
+    if (systemText) {
+      params.systemPrompt = systemText;
     }
 
-    if (options?.temperature !== undefined) {
-      params.modelPreferences = {
-        costPriority: 0.3,
-        speedPriority: 0.5,
-        intelligencePriority: 0.8,
-      };
-    }
+    if (options?.temperature !== undefined) params.temperature = options.temperature;
 
-    const result = await srv.createMessage(params);
+    if (options?.reasoningEffort) throw new Error("SAMPLING_EFFORT_UNQUALIFIED");
+    if (options?.jsonSchema) compileOutputValidator(options.jsonSchema.schema);
+    const signal = completionSignal(120000, options?.signal);
+    const result = await currentModelExecution().request({ provider: "sampling", model: options?.model ?? "client",
+      payload: JSON.stringify(params), output_tokens: Number(params.maxTokens), signal }, async admittedSignal => ({
+        result: await srv.createMessage(params, { signal: admittedSignal }), acknowledged: true }));
 
     // Extract text from response content
     const content = Array.isArray(result.content)
@@ -1180,6 +1109,8 @@ class McpSamplingProvider implements LlmProvider {
       .map(c => c.text ?? "")
       .join("");
 
+    validateCompletionText(text, options, "sampling", result.model ?? "client-llm");
+    assertProviderOutcome("sampling", result.model ?? "client-llm", { stop_reason: result.stopReason });
     return {
       text,
       model: result.model ?? "client-llm",
@@ -1215,10 +1146,8 @@ class NullProvider implements LlmProvider {
 export function parseLlmConfig(): LlmConfig {
   const provider = (process.env.DREAMGRAPH_LLM_PROVIDER ?? "ollama") as LlmProviderType;
 
-  // Provider defaults — model/temperature/maxTokens serve as fallbacks
-  // for per-component configs (dreamer, normalizer) when their env vars
-  // are not set.  There are no base MODEL/TEMPERATURE/MAX_TOKENS env vars;
-  // each component manages its own.
+  // Base settings are fallbacks; independent role policy and per-component
+  // overrides remain authoritative for their executions.
   const temperature = 0.7;
   const maxTokens = 2048;
   const timeoutEnv = Number(process.env.DREAMGRAPH_LLM_TIMEOUT_MS);
@@ -1264,7 +1193,15 @@ export function parseLlmConfig(): LlmConfig {
       break;
   }
 
-  return { provider, model, baseUrl, apiKey, temperature, maxTokens, timeoutMs };
+  const reasoningEffort = process.env.DREAMGRAPH_LLM_REASONING_EFFORT?.trim();
+  const api = process.env.DREAMGRAPH_LLM_API;
+  const retention = process.env.DREAMGRAPH_LLM_RETENTION;
+  return { provider, model: process.env.DREAMGRAPH_LLM_MODEL ?? model, baseUrl, apiKey,
+    temperature: process.env.DREAMGRAPH_LLM_TEMPERATURE === undefined ? temperature : Number(process.env.DREAMGRAPH_LLM_TEMPERATURE),
+    maxTokens: process.env.DREAMGRAPH_LLM_MAX_TOKENS === undefined ? maxTokens : Number(process.env.DREAMGRAPH_LLM_MAX_TOKENS), timeoutMs,
+    ...(api === "responses" ? { api: "responses" as const } : api === "chat_completions" ? { api: "chat-completions" as const } : {}),
+    ...(retention === "store_false" ? { store: false } : retention === "store_true" ? { store: true } : {}),
+    ...(reasoningEffort ? { reasoningEffort } : {}) };
 }
 
 // ---------------------------------------------------------------------------
@@ -1279,11 +1216,12 @@ export function parseLlmConfig(): LlmConfig {
  * low temperature (0.1) for consistent, deterministic validation even
  * when no env var is set.
  */
+export interface CognitiveLlmConfig { model: string; temperature: number; maxTokens: number; reasoningEffort?: string }
 function parseComponentConfig(
   component: "DREAMER" | "NORMALIZER",
   base: LlmConfig,
   defaultTemperature?: number,
-): { model: string; temperature: number; maxTokens: number } {
+): CognitiveLlmConfig {
   const prefix = `DREAMGRAPH_LLM_${component}`;
   const model = process.env[`${prefix}_MODEL`] ?? base.model;
   const temperature = process.env[`${prefix}_TEMPERATURE`]
@@ -1292,7 +1230,8 @@ function parseComponentConfig(
   const maxTokens = process.env[`${prefix}_MAX_TOKENS`]
     ? parseInt(process.env[`${prefix}_MAX_TOKENS`]!, 10)
     : base.maxTokens;
-  return { model, temperature, maxTokens };
+  const reasoningEffort = process.env[`${prefix}_REASONING_EFFORT`]?.trim() || base.reasoningEffort;
+  return { model, temperature, maxTokens, ...(reasoningEffort ? { reasoningEffort } : {}) };
 }
 
 const LLM_PROVIDER_TYPES: readonly LlmProviderType[] = ["ollama", "lmstudio", "openai", "anthropic", "sampling", "none"];
@@ -1331,12 +1270,12 @@ function providerDefaults(provider: LlmProviderType, base: LlmConfig): Pick<LlmC
   }
 }
 
-let _dreamerConfig: { model: string; temperature: number; maxTokens: number } | null = null;
-let _normalizerConfig: { model: string; temperature: number; maxTokens: number } | null = null;
+let _dreamerConfig: CognitiveLlmConfig | null = null;
+let _normalizerConfig: CognitiveLlmConfig | null = null;
 let _architectConfig: ArchitectLlmConfig | null = null;
 
 /** Get dreamer-specific LLM settings (model, temperature, maxTokens) */
-export function getDreamerLlmConfig(): { model: string; temperature: number; maxTokens: number } {
+export function getDreamerLlmConfig(): CognitiveLlmConfig {
   if (!_dreamerConfig) {
     _dreamerConfig = parseComponentConfig("DREAMER", getLlmConfig());
     const base = getLlmConfig();
@@ -1355,7 +1294,7 @@ export function getDreamerLlmConfig(): { model: string; temperature: number; max
  * validation judgments. This is intentionally different from the dreamer's
  * creative 0.7-0.9 temperature — the normalizer is a strict critic.
  */
-export function getNormalizerLlmConfig(): { model: string; temperature: number; maxTokens: number } {
+export function getNormalizerLlmConfig(): CognitiveLlmConfig {
   if (!_normalizerConfig) {
     _normalizerConfig = parseComponentConfig("NORMALIZER", getLlmConfig(), 0.1);
     const base = getLlmConfig();
@@ -1373,6 +1312,18 @@ export function getNormalizerLlmConfig(): { model: string; temperature: number; 
  * Model order: ARCHITECT -> general -> normalizer -> dreamer.
  */
 export function getArchitectLlmConfig(): ArchitectLlmConfig {
+  const session = getSessionContext();
+  if (session && Object.keys(session.environment).length) {
+    const env = sessionEnvironment(), base = getLlmConfig();
+    const provider = parseProviderOverride(env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER || null) ?? base.provider;
+    const defaults = providerDefaults(provider, base);
+    return { component: "architect", provider, providerSource: "architect", model: env.DREAMGRAPH_LLM_ARCHITECT_MODEL || defaults.model,
+      modelSource: "architect", baseUrl: env.DREAMGRAPH_LLM_ARCHITECT_URL || (provider === base.provider ? base.baseUrl : defaults.baseUrl),
+      apiKey: process.env.DREAMGRAPH_LLM_ARCHITECT_API_KEY || (provider === base.provider ? base.apiKey : defaults.apiKey),
+      temperature: Number(env.DREAMGRAPH_LLM_ARCHITECT_TEMPERATURE ?? base.temperature),
+      maxTokens: Number(env.DREAMGRAPH_LLM_ARCHITECT_MAX_TOKENS ?? base.maxTokens), timeoutMs: base.timeoutMs,
+      reasoningEffort: env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT || base.reasoningEffort };
+  }
   if (!_architectConfig) {
     const base = getLlmConfig();
     const requestedProvider = parseProviderOverride(envText("DREAMGRAPH_LLM_ARCHITECT_PROVIDER"));
@@ -1402,6 +1353,7 @@ export function getArchitectLlmConfig(): ArchitectLlmConfig {
       temperature: envNumber("DREAMGRAPH_LLM_ARCHITECT_TEMPERATURE", base.temperature),
       maxTokens: Math.trunc(envNumber("DREAMGRAPH_LLM_ARCHITECT_MAX_TOKENS", base.maxTokens)),
       timeoutMs: base.timeoutMs,
+      reasoningEffort: envText("DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT") ?? base.reasoningEffort,
     };
     logger.info(
       `LLM architect config: provider=${_architectConfig.provider} (${_architectConfig.providerSource}), ` +
@@ -1472,7 +1424,7 @@ let _provider: LlmProvider | null = null;
 let _samplingProvider: McpSamplingProvider | null = null;
 let _config: LlmConfig | null = null;
 
-export function createLlmProviderForConfig(c: LlmConfig): LlmProvider {
+function createRawLlmProvider(c: LlmConfig): LlmProvider {
   switch (c.provider) {
     case "ollama":
       return new OllamaProvider(c.baseUrl, c.model, c.temperature, c.maxTokens, c.timeoutMs);
@@ -1480,20 +1432,43 @@ export function createLlmProviderForConfig(c: LlmConfig): LlmProvider {
       if (!c.apiKey) {
         logger.warn("LLM: OpenAI provider configured but no API key set (DREAMGRAPH_LLM_API_KEY)");
       }
-      return new OpenAiCompatibleProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, "openai", c.timeoutMs);
+      return new OpenAiCompatibleProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, "openai", c.timeoutMs, { api: c.api, reasoningEffort: c.reasoningEffort, store: c.store, capability: c.capability });
     case "lmstudio":
-      return new OpenAiCompatibleProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, "lmstudio", c.timeoutMs);
+      return new OpenAiCompatibleProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, "lmstudio", c.timeoutMs, { api: c.api, reasoningEffort: c.reasoningEffort, store: c.store, capability: c.capability });
     case "anthropic":
       if (!c.apiKey) {
         logger.warn("LLM: Anthropic provider configured but no API key set (DREAMGRAPH_LLM_API_KEY)");
       }
-      return new AnthropicProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, c.timeoutMs);
-    case "sampling":
-      return new McpSamplingProvider();
+      return new AnthropicProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, c.timeoutMs, { reasoningEffort: c.reasoningEffort, capability: c.capability });
+    case "sampling": {
+      const provider = new McpSamplingProvider();
+      provider.setServer(getSessionContext()?.sampling_server ?? null); return provider;
+    }
     default:
       return new NullProvider();
   }
 }
+
+/** Each provider binding owns an immutable, physically pinned run allocation. */
+function bindLlmProvider(raw: LlmProvider, config: LlmConfig): LlmProvider {
+  const runs = new Map<string, ModelExecution>();
+  return { name: raw.name, isAvailable: () => raw.isAvailable(), complete: async (messages, options) => {
+    const { currentJob } = await import("./job-context.js");
+    const role = options?.cognitiveRole ?? config.admissionPolicy?.policy.role ?? "enrichment";
+    const effective = { ...config, model: options?.model ?? config.model, api: options?.api ?? config.api,
+      reasoningEffort: options?.reasoningEffort ?? config.reasoningEffort, store: options?.store ?? config.store };
+    const key = JSON.stringify([sessionNamespace(), currentJob()?.id, role, effective.model, effective.api, effective.reasoningEffort, effective.store, options?.admissionRunId]);
+    let run = runs.get(key);
+    if (!run) { run = new ModelExecution(effective, role, config.admissionPolicy, options?.admissionRunId); runs.set(key, run); }
+    return run.complete(() => raw.complete(messages, options));
+  } };
+}
+export function createLlmProviderForConfig(config: LlmConfig): LlmProvider {
+  const copy = Object.freeze({ ...config });
+  const raw = createRawLlmProvider(copy);
+  return config.provider === "none" ? raw : bindLlmProvider(raw, copy);
+}
+const nativeRuns = new WeakMap<LlmConfig, ModelExecution>();
 
 /** Initialize the LLM provider based on config. Call once at startup. */
 export function initLlmProvider(cfg?: LlmConfig): LlmProvider {
@@ -1515,16 +1490,16 @@ export function initLlmProvider(cfg?: LlmConfig): LlmProvider {
       if (!c.apiKey) {
         logger.warn("LLM: OpenAI provider configured but no API key set (DREAMGRAPH_LLM_API_KEY)");
       }
-      _provider = new OpenAiCompatibleProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, "openai", c.timeoutMs);
+      _provider = new OpenAiCompatibleProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, "openai", c.timeoutMs, { api: c.api, reasoningEffort: c.reasoningEffort, store: c.store, capability: c.capability });
       break;
     case "lmstudio":
-      _provider = new OpenAiCompatibleProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, "lmstudio", c.timeoutMs);
+      _provider = new OpenAiCompatibleProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, "lmstudio", c.timeoutMs, { api: c.api, reasoningEffort: c.reasoningEffort, store: c.store, capability: c.capability });
       break;
     case "anthropic":
       if (!c.apiKey) {
         logger.warn("LLM: Anthropic provider configured but no API key set (DREAMGRAPH_LLM_API_KEY)");
       }
-      _provider = new AnthropicProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, c.timeoutMs);
+      _provider = new AnthropicProvider(c.baseUrl, c.model, c.apiKey, c.temperature, c.maxTokens, c.timeoutMs, { reasoningEffort: c.reasoningEffort, capability: c.capability });
       break;
     case "sampling":
       _samplingProvider = new McpSamplingProvider();
@@ -1535,6 +1510,8 @@ export function initLlmProvider(cfg?: LlmConfig): LlmProvider {
       break;
   }
 
+  if (c.provider !== "none") _provider = bindLlmProvider(_provider!, c);
+
   logger.info(`LLM provider: ${c.provider} (model: ${c.model || "n/a"})`);
   return _provider;
 }
@@ -1544,6 +1521,8 @@ export function initLlmProvider(cfg?: LlmConfig): LlmProvider {
  * Call this after server.connect() when using provider="sampling".
  */
 export function setMcpServerForSampling(server: unknown): void {
+  const owner = getSessionContext();
+  if (owner) { owner.sampling_server = server; return; }
   if (_samplingProvider) {
     _samplingProvider.setServer(server);
   }
@@ -1551,6 +1530,7 @@ export function setMcpServerForSampling(server: unknown): void {
 
 /** Get the active LLM provider. Initializes with defaults if not yet set. */
 export function getLlmProvider(): LlmProvider {
+  if (getSessionContext() && _config?.provider === "sampling") return createLlmProviderForConfig(_config);
   if (!_provider) {
     return initLlmProvider();
   }
@@ -1563,6 +1543,52 @@ export function getLlmConfig(): LlmConfig {
     _config = parseLlmConfig();
   }
   return _config;
+}
+
+/** Slice 7 policy port. Provider/job adapters consume this without reinterpreting role settings. */
+export async function getRoleModelPolicy(role: ModelRole, session?: RoleSettings): Promise<ResolvedRolePolicy> {
+  const { currentJob } = await import("./job-context.js");
+  const pinned = currentJob()?.role_policies[role];
+  if (pinned) {
+    if (session && Object.keys(session).length) throw new Error("JOB_ROLE_OVERRIDE_REQUIRES_NEW_ADMISSION");
+    return structuredClone(pinned);
+  }
+  const profiles = await readRoleProfiles();
+  return resolveRolePolicy({ role, env: role === "architect" ? sessionEnvironment() : process.env, legacy: getLlmConfig(), saved: profiles.roles[role], revision: profiles.revision, session });
+}
+
+/** Bind one immutable role policy to one provider without changing the shared singleton. */
+export async function getRoleLlmProvider(role: ModelRole, session?: RoleSettings): Promise<{ provider: LlmProvider; policy: Readonly<ResolvedRolePolicy>; config: LlmConfig }> {
+  const policy = snapshotRolePolicy(await getRoleModelPolicy(role, session));
+  if (policy.status !== "configured") throw new Error(`ROLE_POLICY_BLOCKED: ${role}: ${policy.diagnostics.map(value => value.code).join(",")}`);
+  if (policy.effective.api === "native_cli") throw new Error(`ROLE_NATIVE_CLI_REQUIRED: ${role} must use its native CLI execution adapter`);
+  const config: LlmConfig = { admissionPolicy: policy, provider: policy.policy.provider as LlmProviderType, model: policy.effective.model,
+    baseUrl: policy.connection.base_url, apiKey: policy.connection.api_key_env ? process.env[policy.connection.api_key_env] ?? "" : "",
+    temperature: policy.requested.temperature, maxTokens: policy.effective.output_tokens, timeoutMs: policy.effective.timeout_ms,
+    ...(policy.effective.api === "responses" ? { api: "responses" } : policy.effective.api === "chat_completions" ? { api: "chat-completions" } : {}),
+    ...(policy.effective.effort ? { reasoningEffort: policy.effective.effort } : {}),
+    ...(policy.effective.retention === "store_false" ? { store: false } : policy.effective.retention === "store_true" ? { store: true } : {}),
+    ...(policy.capability ? { capability: policy.capability } : {}) };
+  if (!config.apiKey && policy.connection.api_key_env === "DREAMGRAPH_LLM_API_KEY" && policy.origins.api_key_env === "legacy" && getLlmConfig().provider === config.provider) config.apiKey = getLlmConfig().apiKey;
+  if (![`${config.provider}-api`, config.provider === "sampling" ? "mcp-sampling" : "none"].includes(policy.effective.adapter)) throw new Error("ROLE_ADAPTER_UNSUPPORTED");
+  Object.freeze(config);
+  // Keep client-selected sampling attached to its actual session transport.
+  const raw = createLlmProviderForConfig(config);
+  const provider: LlmProvider = { name: raw.name, isAvailable: () => ["openai", "anthropic"].includes(config.provider) && !config.apiKey ? Promise.resolve(false) : raw.isAvailable(), complete: async (messages, options) => {
+    if (["openai", "anthropic"].includes(config.provider) && !config.apiKey) throw new Error("ROLE_CREDENTIAL_REQUIRED");
+    if (options?.model && options.model !== config.model || options?.api && options.api !== config.api
+      || options?.reasoningEffort && options.reasoningEffort !== config.reasoningEffort || options?.store !== undefined && options.store !== config.store
+      || options?.capability && JSON.stringify(options.capability) !== JSON.stringify(config.capability)) throw new Error("ROLE_POLICY_REQUEST_MISMATCH");
+    if (policy.effective.strict_schema && !options?.jsonSchema) throw new Error("ROLE_STRICT_SCHEMA_REQUIRED");
+    if (policy.effective.strict_schema && options?.schemaFallback) throw new Error("ROLE_SCHEMA_FALLBACK_DISALLOWED");
+    try {
+    const response = await raw.complete(messages, { ...options, model: config.model, cognitiveRole: role,
+      ...(config.api ? { api: config.api } : {}), ...(config.reasoningEffort ? { reasoningEffort: config.reasoningEffort } : {}),
+      ...(config.store !== undefined ? { store: config.store } : {}), maxTokens: Math.min(options?.maxTokens ?? config.maxTokens, config.maxTokens) });
+    recordRoleQualification(role, policy.fingerprint); return response;
+    } catch (failure) { revokeRoleQualification(role, policy.fingerprint); throw failure; }
+  } };
+  return { provider, policy, config };
 }
 
 function taskDefaultTemperature(task: LlmRouteTask): number {
@@ -1582,7 +1608,7 @@ function taskDefaultTemperature(task: LlmRouteTask): number {
   }
 }
 
-function componentConfig(component: "dreamer" | "normalizer"): { model: string; temperature: number; maxTokens: number } {
+function componentConfig(component: "dreamer" | "normalizer"): CognitiveLlmConfig {
   return component === "normalizer" ? getNormalizerLlmConfig() : getDreamerLlmConfig();
 }
 
@@ -1636,64 +1662,24 @@ export async function selectLlmRoute(request: LlmRouteRequest): Promise<LlmRoute
     }
   }
 
-  const provider = getLlmProvider();
-  const cfg = getLlmConfig();
+  const role: ModelRole = request.task === "graph_enrichment" ? "enrichment" : request.daemon_component ?? (request.task === "normalization" ? "normalizer" : "dreamer");
+  let bound: Awaited<ReturnType<typeof getRoleLlmProvider>>;
+  try { bound = await getRoleLlmProvider(role); }
+  catch (failure) { logger.warn("LLM role route blocked: " + (failure instanceof Error ? failure.message : "invalid configuration")); return fallbackSelection(request, "role_policy_blocked"); }
+  const { provider, config: cfg, policy } = bound;
+  if (cfg.provider === "none") return fallbackSelection(request, request.connected ? "connected_model_unavailable" : "no_connected_model");
+  if (!cfg.model.trim()) return fallbackSelection(request, "no_daemon_model");
+  if (!await provider.isAvailable().catch(() => false)) return fallbackSelection(request, "daemon_model_unavailable");
+  const temperature = request.daemon_temperature ?? cfg.temperature;
+  const temperatureOptions = policy.effective.temperature !== null ? { temperature } : {};
+  const sampling = cfg.provider === "sampling";
+  return { layer: sampling ? "connected" : "daemon", provider, model: sampling ? "client" : cfg.model,
+    options: { model: cfg.model, ...temperatureOptions, cognitiveRole: role, ...(cfg.api ? { api: cfg.api } : {}),
+      ...(cfg.reasoningEffort ? { reasoningEffort: cfg.reasoningEffort } : {}), ...(cfg.store !== undefined ? { store: cfg.store } : {}), maxTokens: Math.min(maxTokens ?? cfg.maxTokens, cfg.maxTokens) },
+    provenance: { task: request.task, layer: sampling ? "connected" : "daemon", provider: provider.name, model: sampling ? "client" : cfg.model, source: sampling ? "sampling" : "daemon",
+      ...temperatureOptions, cognitive_role: role, role_policy_fingerprint: policy.fingerprint, role_policy_revision: policy.policy.revision,
+      ...(policy.effective.temperature === null ? { temperature_omitted: policy.temperature_control.reason } : {}) } };
 
-  if (cfg.provider === "sampling") {
-    const available = await provider.isAvailable().catch(() => false);
-    if (available) {
-      return {
-        layer: "connected",
-        provider,
-        model: "client",
-        options: { model: "client", maxTokens },
-        provenance: {
-          task: request.task,
-          layer: "connected",
-          provider: provider.name,
-          model: "client",
-          source: "sampling",
-        },
-      };
-    }
-  } else if (cfg.provider !== "none") {
-    const component = request.daemon_component ?? "dreamer";
-    const componentCfg = componentConfig(component);
-    const daemonModel = componentCfg.model.trim();
-    if (!daemonModel) {
-      return fallbackSelection(request, "no_daemon_model");
-    }
-
-    const available = await provider.isAvailable().catch(() => false);
-    if (available) {
-      const temperature = request.daemon_temperature ?? taskDefaultTemperature(request.task);
-      return {
-        layer: "daemon",
-        provider,
-        model: daemonModel,
-        options: {
-          model: daemonModel,
-          temperature,
-          maxTokens: maxTokens ?? componentCfg.maxTokens,
-        },
-        provenance: {
-          task: request.task,
-          layer: "daemon",
-          provider: provider.name,
-          model: daemonModel,
-          source: "daemon",
-          temperature,
-        },
-      };
-    }
-
-    return fallbackSelection(request, "daemon_model_unavailable");
-  }
-
-  return fallbackSelection(
-    request,
-    request.connected ? "connected_model_unavailable" : "no_connected_model",
-  );
 }
 
 /** Normalize an LLM route failure into compact fallback provenance. */

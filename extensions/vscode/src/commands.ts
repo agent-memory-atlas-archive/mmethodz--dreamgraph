@@ -34,6 +34,7 @@ import {
   type ResolveOptions,
 } from "./instance-resolver.js";
 import { assemblePrompt } from "./prompts/index.js";
+import { managedReadOnlyModel } from './managed-native-pass.js';
 
 /* ------------------------------------------------------------------ */
 /*  Shared Services (injected from extension.ts)                      */
@@ -282,6 +283,16 @@ function resolveDaemonBrowserUrl(
     url.searchParams.set(key, value);
   }
   return url.toString();
+}
+
+/** Cancels the command wait/model signal; owned work still needs its original closure report. */
+async function withNativeModelProgress(title:string,work:(signal:AbortSignal)=>Promise<void>):Promise<void> {
+  await vscode.window.withProgress({location:vscode.ProgressLocation.Notification,title,cancellable:true},async(_progress,token)=>{
+    const controller=new AbortController(),subscription=token.onCancellationRequested(()=>controller.abort(new Error('COMMAND_CANCELLED')));
+    try{if(token.isCancellationRequested)controller.abort(new Error('COMMAND_CANCELLED'));
+      if(!controller.signal.aborted)await work(controller.signal);
+    }finally{subscription.dispose();}
+  });
 }
 
 function activePlanIdFromEditor(): string | null {
@@ -649,6 +660,7 @@ export async function statusQuickPickCommand(
 /* ------------------------------------------------------------------ */
 
 export async function explainFileCommand(svc: CommandServices): Promise<void> {
+  const originalOwner = { endpoint: svc.daemonClient.baseUrl, instance: svc.getInstance()?.uuid };
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
     vscode.window.showWarningMessage("DreamGraph: No active file to explain.");
@@ -662,13 +674,7 @@ export async function explainFileCommand(svc: CommandServices): Promise<void> {
     return;
   }
 
-  await vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: "DreamGraph: Explaining file…",
-      cancellable: false,
-    },
-    async () => {
+  await withNativeModelProgress("DreamGraph: Explaining file…", async signal => {
       const envelope = await svc.contextBuilder.buildEnvelope(
         undefined,
         "explainFile",
@@ -690,7 +696,9 @@ export async function explainFileCommand(svc: CommandServices): Promise<void> {
       ];
 
       try {
-        const response = await svc.architectLlm.call(messages);
+        if (svc.daemonClient.baseUrl !== originalOwner.endpoint || svc.getInstance()?.uuid !== originalOwner.instance) throw new Error('MANAGED_COMMAND_OWNER_CHANGED');
+        const { response } = await managedReadOnlyModel(svc.daemonClient, svc.architectLlm, messages,
+          (prepared, signal) => svc.architectLlm.call(prepared, signal), { signal, expectedInstance: originalOwner.instance, adapter: 'vscode/explain-file' });
 
         if (svc.chatPanel.isVisible) {
           svc.chatPanel.addExternalMessage(
@@ -708,8 +716,7 @@ export async function explainFileCommand(svc: CommandServices): Promise<void> {
           `DreamGraph: Explain failed — ${err instanceof Error ? err.message : String(err)}`,
         );
       }
-    },
-  );
+    });
 }
 
 /* ------------------------------------------------------------------ */
@@ -719,6 +726,7 @@ export async function explainFileCommand(svc: CommandServices): Promise<void> {
 export async function checkAdrComplianceCommand(
   svc: CommandServices,
 ): Promise<void> {
+  const originalOwner = { endpoint: svc.daemonClient.baseUrl, instance: svc.getInstance()?.uuid };
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
     vscode.window.showWarningMessage("DreamGraph: No active file to check.");
@@ -732,13 +740,7 @@ export async function checkAdrComplianceCommand(
     return;
   }
 
-  await vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: "DreamGraph: Checking ADR compliance…",
-      cancellable: false,
-    },
-    async () => {
+  await withNativeModelProgress("DreamGraph: Checking ADR compliance…", async signal => {
       const envelope = await svc.contextBuilder.buildEnvelope(
         undefined,
         "checkAdrCompliance",
@@ -760,7 +762,9 @@ export async function checkAdrComplianceCommand(
       ];
 
       try {
-        const response = await svc.architectLlm.call(messages);
+        if (svc.daemonClient.baseUrl !== originalOwner.endpoint || svc.getInstance()?.uuid !== originalOwner.instance) throw new Error('MANAGED_COMMAND_OWNER_CHANGED');
+        const { response } = await managedReadOnlyModel(svc.daemonClient, svc.architectLlm, messages,
+          (prepared, signal) => svc.architectLlm.call(prepared, signal), { signal, expectedInstance: originalOwner.instance, adapter: 'vscode/check-adr-compliance' });
 
         if (svc.chatPanel.isVisible) {
           svc.chatPanel.addExternalMessage(
@@ -778,8 +782,7 @@ export async function checkAdrComplianceCommand(
           `DreamGraph: ADR check failed — ${err instanceof Error ? err.message : String(err)}`,
         );
       }
-    },
-  );
+    });
 }
 
 /* ================================================================== */

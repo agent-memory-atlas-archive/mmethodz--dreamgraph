@@ -3,7 +3,8 @@
  * Keep in sync with src/graph/snapshot.ts on the server side.
  */
 
-export const EXPECTED_SNAPSHOT_VERSION = 1;
+import type { GraphIdentity, GraphEntity, GraphRelationship, ResultState, GraphCurrency, RevisionVector } from "../../packages/sdk/src/graph-contracts";
+export const EXPECTED_SNAPSHOT_VERSION = 2;
 
 export type ExplorerNodeType =
   | "feature"
@@ -29,6 +30,9 @@ export interface ExplorerNode {
   degree: number;
   health: number;
   confidence: number;
+  identity?:GraphIdentity;
+  assertion_class?:GraphEntity["assertion_class"];
+  confidence_known?:boolean;
 }
 
 export interface ExplorerEdge {
@@ -36,6 +40,7 @@ export interface ExplorerEdge {
   t: string;
   kind: ExplorerEdgeKind;
   conf: number;
+  id?:string;assertion_class?:GraphRelationship["assertion_class"];relation?:string;
 }
 
 export interface SnapshotStats {
@@ -53,6 +58,10 @@ export interface GraphSnapshot {
   stats: SnapshotStats;
   nodes: ExplorerNode[];
   edges: ExplorerEdge[];
+  representation?:"canonical"|"legacy";
+  revision?:RevisionVector;currency?:GraphCurrency;state?:ResultState;
+  scope?:{rendered_nodes:number;eligible_nodes:number;canonical_entities:number;rendered_edges:number;canonical_relationships:number;omitted_nodes:number;omitted_edges:number;excluded_families:string[]};
+  render_key?:string;canonical_state?:ResultState;
 }
 
 /* ------------------------------------------------------------------ */
@@ -70,6 +79,9 @@ export interface NodeRecord {
   entity: unknown;
   outgoing: ExplorerEdge[];
   incoming: ExplorerEdge[];
+  canonical?:GraphEntity;etag?:string;revision?:RevisionVector;currency?:GraphCurrency;state?:ResultState;
+  adjacency?:{offset:number;limit:number;outgoing_total:number;incoming_total:number;next_offset:number|null};
+  relationships?:GraphRelationship[];
 }
 
 export interface NeighborhoodResult {
@@ -104,7 +116,9 @@ export interface StatsResult {
   nodes_by_type: Record<ExplorerNodeType, number>;
   edges_by_kind: Record<ExplorerEdgeKind, number>;
   health_mean: number;
-  confidence_mean: number;
+  confidence_mean: number|null;
+  recorded_confidence_count?:number;
+  revision?:RevisionVector;currency?:GraphCurrency;state?:ResultState;scope?:GraphSnapshot["scope"];
 }
 
 export type CognitiveTrustState =
@@ -141,6 +155,8 @@ export interface TensionEntity {
 }
 
 export interface TensionView {
+  omitted?:number;
+  etag?:string;revision?:RevisionVector;state?:ResultState;
   active: TensionEntity[];
   resolved: { tension_id: string; resolved_at: string; original: TensionEntity; trust?: CognitiveTrustDescriptor }[];
   total_active: number;

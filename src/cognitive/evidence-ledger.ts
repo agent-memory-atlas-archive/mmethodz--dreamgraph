@@ -19,6 +19,7 @@ export interface EvidenceLedgerEntry {
 }
 
 export interface EvidenceLedger {
+  claim_support?: import("./normalization-evidence.js").EvidenceAssessment;
   claim_id: string;
   claim_type: "candidate" | "validated_edge" | "tension" | "future" | "remediation_step";
   trust: CognitiveTrustDescriptor;
@@ -99,7 +100,7 @@ export function buildCandidateEvidenceLedger(args: {
     pushEntry(groups, {
       id: `${args.result.dream_id}:entity:${entity}`,
       source_class: "source_entity",
-      summary: "Shared fact-graph entity used as semantic validation evidence.",
+      summary: "Endpoint/shared entity context; this does not corroborate the proposed claim.",
       semantic_anchor: entity,
       optional_hints: [],
     });
@@ -108,7 +109,7 @@ export function buildCandidateEvidenceLedger(args: {
     pushEntry(groups, {
       id: `${args.result.dream_id}:workflow:${workflow}`,
       source_class: "workflow",
-      summary: "Workflow overlap used as semantic validation evidence.",
+      summary: "Workflow overlap guides plausibility; it is not independent claim corroboration.",
       semantic_anchor: workflow,
       optional_hints: [],
     });
@@ -116,8 +117,8 @@ export function buildCandidateEvidenceLedger(args: {
   if (evidence.source_repo_match) {
     pushEntry(groups, {
       id: `${args.result.dream_id}:runtime:source-repo-match`,
-      source_class: "runtime_observation",
-      summary: "Candidate endpoints share source repository provenance.",
+      source_class: "source_entity",
+      summary: "Repository overlap is structural context, not a runtime observation or claim proof.",
       semantic_anchor: "validation.evidence.source_repo_match",
       optional_hints: [],
     });
@@ -137,6 +138,7 @@ export function buildCandidateEvidenceLedger(args: {
 
   return {
     claim_id: args.result.dream_id,
+    claim_support: args.result.evidence_assessment,
     claim_type: "candidate",
     trust: args.trust,
     semantic_anchors: anchorsFromValidationEvidence(evidence),
@@ -168,7 +170,7 @@ export function buildValidatedEdgeEvidenceLedger(args: {
   const groups = emptyEvidenceGroups();
   pushEntry(groups, {
     id: `${args.edge.id}:model:${args.edge.normalization_cycle}`,
-    source_class: "model_output",
+    source_class: args.edge.human_asserted?"human_review":"model_output",
     summary: args.edge.evidence_summary,
     semantic_anchor: args.edge.relation,
     optional_hints: [
@@ -180,14 +182,15 @@ export function buildValidatedEdgeEvidenceLedger(args: {
   });
   pushEntry(groups, {
     id: `${args.edge.id}:runtime:normalization-cycle`,
-    source_class: "runtime_observation",
-    summary: "Validated during normalization and promoted to fact-adjacent cognitive space.",
+    source_class: args.edge.human_asserted?"human_review":"model_output",
+    summary: "Normalization-cycle metadata; a cycle number is not an independent runtime observation.",
     semantic_anchor: `normalization_cycle:${args.edge.normalization_cycle}`,
     optional_hints: [`dream_cycle:${args.edge.dream_cycle}`],
   });
 
   return {
     claim_id: args.edge.id,
+    claim_support: args.edge.evidence_assessment,
     claim_type: "validated_edge",
     trust: args.trust,
     semantic_anchors: [args.edge.from, args.edge.to, args.edge.relation],
@@ -205,8 +208,8 @@ export function buildValidatedEdgeEvidenceLedger(args: {
       fallback_reason: null,
     },
     review: {
-      reviewed: false,
-      state: "unreviewed",
+      reviewed: !!args.edge.human_asserted,
+      state: args.edge.human_asserted?"human_reviewed":"unreviewed",
     },
   };
 }

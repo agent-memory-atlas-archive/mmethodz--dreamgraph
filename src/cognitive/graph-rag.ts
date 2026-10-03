@@ -1,5 +1,5 @@
 ﻿/**
- * DreamGraph v5.2 â€” Graph RAG Bridge (Knowledge Backbone)
+ * Canonical Ashoka retrieval with an explicit legacy comparison implementation.
  *
  * Exposes the DreamGraph knowledge graph as a retrieval-augmented generation
  * (RAG) layer for any LLM interaction. The graph becomes a universal context
@@ -47,6 +47,41 @@ import type {
   TaskPreambleEvidenceItem,
 } from "./types.js";
 import { selectLlmRoute } from "./llm.js";
+import { getActiveScope } from "../instance/index.js";
+import { loadCanonicalGraph } from "../graph/read-model.js";
+import { lexicalTokens } from "../graph/retrieval-index.js";
+import { buildContextPack, type ContextQuery } from "../graph/context-pack.js";
+
+/** Pure retrieval has no selected model, paid readiness probe, or model-confidence gate. */
+async function canonicalContext(input: ContextQuery) {
+  return buildContextPack(await loadCanonicalGraph(getActiveScope()?.uuid ?? "legacy"), input);
+}
+
+export async function graphRagRetrieve(input: GraphRAGQuery): Promise<GraphRAGContext> {
+  if (input.representation === "legacy" || !input.representation && process.env.DG_GRAPH_CONTEXT_REPRESENTATION === "legacy") {
+    if (input.mandatory_identities?.length || input.mandatory_evidence_ids?.length || input.changed_files?.length ||
+      input.kinds?.length || input.domains?.length || input.repositories?.length || input.assertion_classes?.length ||
+      input.plan_id || input.slice_id || input.execution_id || input.adapter && input.adapter !== "unbound" ||
+      input.max_neighbors !== undefined && input.max_neighbors !== 20 || input.max_records !== undefined && input.max_records !== 40 ||
+      input.metadata_budget_bytes !== undefined && input.metadata_budget_bytes !== 32768 || input.depth === 0) {
+      throw new Error("LEGACY_CONTEXT_CONTROL_UNSUPPORTED: use canonical retrieval for filters, required anchors, receipts and cardinality limits");
+    }
+    return { ...await legacyGraphRagRetrieve(input), representation: "legacy", limitations: [
+      "Legacy comparison: only features/workflows/data models, validated edges, tensions and story; raw IDs may collide and token counts are estimates.",
+    ] };
+  }
+  const { representation: _representation, ...query } = input;
+  const pack = await canonicalContext(query);
+  return {
+    representation: "canonical", context_pack: pack, context_text: pack.context_text,
+    entities_included: pack.records.filter(record => record.record_type === "entity").map(record => record.id),
+    edges_included: pack.records.filter(record => record.record_type === "relationship").length,
+    tensions_included: pack.records.filter(record => record.identity?.kind === "tension").length,
+    narrative_chapters_included: pack.records.filter(record => record.identity?.kind === "narrative").length,
+    token_count: pack.token_count, retrieval_mode: input.mode ?? "comprehensive", relevance_scores: [],
+    limitations: ["Token counts are UTF-8 byte upper bounds; selection reasons are in context_pack.records. The receipt attests assembly, not adapter delivery."],
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Token estimation (chars / 4 heuristic â€” conservative)
@@ -69,13 +104,7 @@ function uniqueEvidenceAnchors(anchors: Array<string | undefined | null>): strin
 // ---------------------------------------------------------------------------
 
 /** Tokenize text into lowercased terms */
-function tokenize(text: string): string[] {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9_\-\s]/g, " ")
-    .split(/\s+/)
-    .filter((t) => t.length > 1);
-}
+function tokenize(text: string): string[] { return lexicalTokens(text); }
 
 /** Compute term frequency for a single document */
 function computeTf(terms: string[]): Map<string, number> {
@@ -105,18 +134,16 @@ function buildIndex(
   });
 }
 
-/** Compute IDF for a term across all documents */
-function computeIdf(term: string, docs: TfIdfDocument[]): number {
-  const docsWithTerm = docs.filter((d) => d.tf.has(term)).length;
-  if (docsWithTerm === 0) return 0;
-  return Math.log((docs.length + 1) / (docsWithTerm + 1)) + 1;
-}
-
 /** Score documents against a query using TF-IDF cosine similarity */
 export function queryTfIdf(query: string, docs: TfIdfDocument[]): EntitySimilarity[] {
   const queryTerms = tokenize(query);
   if (queryTerms.length === 0 || docs.length === 0) return [];
 
+  // Compute document statistics once per query, rather than scanning all documents
+  // for every term of every vector. No cache trusts mutable legacy document input.
+  const frequency = new Map<string, number>();
+  for (const doc of docs) for (const term of doc.tf.keys()) frequency.set(term, (frequency.get(term) ?? 0) + 1);
+  const idfs = new Map([...frequency].map(([term, count]) => [term, Math.log((docs.length + 1) / (count + 1)) + 1]));
   // Compute query TF
   const queryTf = computeTf(queryTerms);
 
@@ -130,7 +157,7 @@ export function queryTfIdf(query: string, docs: TfIdfDocument[]): EntitySimilari
     const matchedTerms: string[] = [];
 
     for (const [term, qtf] of queryTf) {
-      const idf = computeIdf(term, docs);
+      const idf = (idfs.get(term) ?? 0);
       const qWeight = qtf * idf;
       const dWeight = (doc.tf.get(term) ?? 0) * idf;
 
@@ -146,7 +173,7 @@ export function queryTfIdf(query: string, docs: TfIdfDocument[]): EntitySimilari
     // Also accumulate doc magnitude for all doc terms (for proper cosine)
     for (const [term, dtf] of doc.tf) {
       if (!queryTf.has(term)) {
-        const idf = computeIdf(term, docs);
+        const idf = (idfs.get(term) ?? 0);
         docMag += (dtf * idf) ** 2;
       }
     }
@@ -498,7 +525,7 @@ function serialize(input: SerializationInput): {
 // Public API: graph_rag_retrieve
 // ---------------------------------------------------------------------------
 
-export async function graphRagRetrieve(input: GraphRAGQuery): Promise<GraphRAGContext> {
+async function legacyGraphRagRetrieve(input: GraphRAGQuery): Promise<GraphRAGContext> {
   const start = Date.now();
   const {
     query,
@@ -800,6 +827,16 @@ async function assembleTaskPreambleEvidence(task: string): Promise<TaskPreambleE
  * The compiler never requires an LLM; no-provider and uneconomical cases return no added preamble.
  */
 export async function compileTaskPreamble(request: TaskPreambleCompileRequest): Promise<CompiledTaskPreamble> {
+  if (request.evidence === undefined && request.representation !== "legacy" && (request.representation === "canonical" || process.env.DG_GRAPH_CONTEXT_REPRESENTATION !== "legacy")) {
+    const pack = await canonicalContext({ ...request.graph_context, query: request.task, token_budget: request.max_tokens ?? 300 });
+    return { context_pack: pack, preamble_text: pack.mandatory_satisfied ? pack.context_text : "",
+      evidence_anchors: pack.mandatory_satisfied ? pack.receipt.selected_evidence_ids : [], token_count: pack.mandatory_satisfied ? pack.token_count : 0,
+      budget_decision: !pack.mandatory_satisfied ? "omit_validation_failed" : pack.records.length ? "include" : "omit_no_evidence",
+      omitted_context_reasons: [...pack.omissions.map(item => `${item.reason}:${item.count}`), ...pack.state.reasons.map(reason => reason.code)],
+      validation_failures: pack.mandatory_satisfied ? [] : ["MANDATORY_CONTEXT_INSUFFICIENT"],
+      selected_model_layer: "deterministic_fallback", selected_model_provider: null, selected_model: null,
+      fallback_reason: "deterministic_graph_context_no_provider_required" };
+  }
   const route = await selectLlmRoute({
     task: "task_preamble_compilation",
     daemon_component: "normalizer",
@@ -910,7 +947,12 @@ export async function compileTaskPreamble(request: TaskPreambleCompileRequest): 
 // Public API: get_cognitive_preamble
 // ---------------------------------------------------------------------------
 
-export async function getCognitivePreamble(maxTokens: number = 500): Promise<CognitivePreamble> {
+export async function getCognitivePreamble(maxTokens: number = 500, representation?: "canonical" | "legacy"): Promise<CognitivePreamble> {
+  if (representation !== "legacy" && (representation === "canonical" || process.env.DG_GRAPH_CONTEXT_REPRESENTATION !== "legacy")) {
+    const pack = await canonicalContext({ query: "", mode: "comprehensive", token_budget: maxTokens });
+    // One field owns the emitted text, so a consumer concatenating fields cannot accidentally duplicate the budget.
+    return { context_pack: pack, system_summary: pack.context_text, key_architecture: [], open_questions: [], recent_insights: [], token_count: pack.token_count };
+  }
   logger.info(`Generating cognitive preamble: max_tokens=${maxTokens}`);
 
   const route = await selectLlmRoute({

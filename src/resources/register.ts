@@ -8,6 +8,9 @@
  */
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { inspectRolePolicies } from "../config/role-policy.js";
+import { ACTIVE_STRATEGY_NAMES, STRATEGY_CATALOG } from "../cognitive/strategy-catalog.js";
+import { registerPagedResource, listedResourceUris } from "./resolver.js";
 import { loadJsonArray, loadJsonData } from "../utils/cache.js";
 import { config } from "../config/config.js";
 import { logger } from "../utils/logger.js";
@@ -32,10 +35,14 @@ import {
 } from "../plugins/manager.js";
 
 export function registerResources(server: McpServer): void {
+  registerPagedResource(server, "system-capability-entities", "system://capability-entities", {
+    description: "Canonical project capability entities. system://capabilities always describes the daemon runtime.",
+    mimeType: "application/json",
+  }, async uri => ({ contents: [{ uri: uri.href, mimeType: "application/json", text: JSON.stringify(await loadJsonArray("capabilities.json")) }] }));
   // -----------------------------------------------------------------------
   // system://overview — High-level system overview
   // -----------------------------------------------------------------------
-  server.resource(
+  registerPagedResource(server,
     "system-overview",
     "system://overview",
     {
@@ -51,7 +58,7 @@ export function registerResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -61,7 +68,7 @@ export function registerResources(server: McpServer): void {
   // -----------------------------------------------------------------------
   // system://features — All system features
   // -----------------------------------------------------------------------
-  server.resource(
+  registerPagedResource(server,
     "system-features",
     "system://features",
     {
@@ -77,7 +84,7 @@ export function registerResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -87,7 +94,7 @@ export function registerResources(server: McpServer): void {
   // -----------------------------------------------------------------------
   // system://workflows — Operational workflows
   // -----------------------------------------------------------------------
-  server.resource(
+  registerPagedResource(server,
     "system-workflows",
     "system://workflows",
     {
@@ -103,7 +110,7 @@ export function registerResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -113,7 +120,7 @@ export function registerResources(server: McpServer): void {
   // -----------------------------------------------------------------------
   // system://data-model — Entity definitions and relationships
   // -----------------------------------------------------------------------
-  server.resource(
+  registerPagedResource(server,
     "system-data-model",
     "system://data-model",
     {
@@ -129,7 +136,7 @@ export function registerResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -139,7 +146,7 @@ export function registerResources(server: McpServer): void {
   // -----------------------------------------------------------------------
   // system://datastores — Shared infrastructure (databases) referenced by data_model
   // -----------------------------------------------------------------------
-  server.resource(
+  registerPagedResource(server,
     "system-datastores",
     "system://datastores",
     {
@@ -155,7 +162,7 @@ export function registerResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -165,7 +172,7 @@ export function registerResources(server: McpServer): void {
   // -----------------------------------------------------------------------
   // system://capabilities — Dynamic meta-resource: runtime server state
   // -----------------------------------------------------------------------
-  server.resource(
+  registerPagedResource(server,
     "system-capabilities",
     "system://capabilities",
     {
@@ -190,6 +197,7 @@ export function registerResources(server: McpServer): void {
           version: config.server.version,
           description: "DreamGraph MCP server runtime capability summary.",
         },
+        role_policies: await inspectRolePolicies(),
         repositories: {
           configured: repos,
           note: "Use these names as the 'repo' parameter for read_source_code, list_directory, git_log, git_blame.",
@@ -234,6 +242,7 @@ export function registerResources(server: McpServer): void {
           },
         },
         resources: [
+          { uri: "system://capability-entities", name: "Project Capability Entities", description: "Typed project capabilities; separate from runtime capabilities." },
           { uri: "system://overview", name: "System Overview", description: "High-level overview of repositories, technologies, and purpose." },
           { uri: "system://features", name: "System Features", description: "All known features with metadata and status." },
           { uri: "system://workflows", name: "System Workflows", description: "Operational workflows and step sequences." },
@@ -265,12 +274,8 @@ export function registerResources(server: McpServer): void {
         ],
         cognitive_engine: {
           states: ["AWAKE", "REM", "NORMALIZING", "NIGHTMARE"],
-          dream_strategies: [
-            "gap_detection", "weak_reinforcement", "cross_domain",
-            "missing_abstraction", "symmetry_completion", "tension_directed",
-            "causal_replay", "reflective", "pgo_wave", "llm_dream",
-            "orphan_bridging", "schema_grounding",
-          ],
+          dream_strategies: ACTIVE_STRATEGY_NAMES,
+          strategy_catalog: STRATEGY_CATALOG,
           nightmare_strategies: [
             "privilege_escalation", "data_leak_path", "injection_surface",
             "missing_validation", "broken_access_control",
@@ -284,6 +289,11 @@ export function registerResources(server: McpServer): void {
           key_fields: "string 'field_name' → {name: 'field_name', type: 'unknown', description: ''}",
           relationships: "string 'target_id' → {type: 'references', target: 'target_id', via: ''}",
         },
+        resource_contract: {
+          schema: "dreamgraph.resource_result.v1", uris: listedResourceUris(),
+          query_tool: "query_resource", continuation: "Use the same URI/filter and the returned cursor.",
+          legacy: "Explicit contract_version=legacy returns bounded whole JSON; capability meaning agrees with MCP reads.",
+        },
       };
 
       return {
@@ -291,7 +301,7 @@ export function registerResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(capabilities),
+            text: JSON.stringify(capabilities),
           },
         ],
       };
@@ -301,7 +311,7 @@ export function registerResources(server: McpServer): void {
   // -----------------------------------------------------------------------
   // system://index — Resource entity index for fast lookup
   // -----------------------------------------------------------------------
-  server.resource(
+  registerPagedResource(server,
     "system-index",
     "system://index",
     {
@@ -317,7 +327,7 @@ export function registerResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -335,13 +345,13 @@ export function registerResources(server: McpServer): void {
         {
           uri: uri.href,
           mimeType: "application/json",
-          text: formatJsonToolOutput(snapshot),
+          text: JSON.stringify(snapshot),
         },
       ],
     };
   };
 
-  server.resource(
+  registerPagedResource(server,
     "runtime-metrics",
     "ops://metrics",
     {
@@ -353,7 +363,7 @@ export function registerResources(server: McpServer): void {
     metricsHandler
   );
 
-  server.resource(
+  registerPagedResource(server,
     "system-metrics",
     "system://metrics",
     {
@@ -368,7 +378,7 @@ export function registerResources(server: McpServer): void {
   // -----------------------------------------------------------------------
   // system://plugins — M3 plugin host registry view
   // -----------------------------------------------------------------------
-  server.resource(
+  registerPagedResource(server,
     "system-plugins",
     "system://plugins",
     {
@@ -425,7 +435,7 @@ export function registerResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(payload),
+            text: JSON.stringify(payload),
           },
         ],
       };
@@ -435,7 +445,7 @@ export function registerResources(server: McpServer): void {
   // -----------------------------------------------------------------------
   // system://webhooks — M5 outbound webhook subsystem view
   // -----------------------------------------------------------------------
-  server.resource(
+  registerPagedResource(server,
     "system-webhooks",
     "system://webhooks",
     {
@@ -461,12 +471,12 @@ export function registerResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(payload),
+            text: JSON.stringify(payload),
           },
         ],
       };
     },
   );
 
-  logger.info("Registered 10 resources (including ops://metrics, system://metrics, system://plugins, system://webhooks)");
+  logger.info("Registered 12 system/ops resources (including project capability entities, metrics, plugins and webhooks)");
 }

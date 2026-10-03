@@ -8,7 +8,7 @@ If you are looking for the auto-generated reference (every tool, every parameter
 
 For the shortest route from install to a working browser setup, start with **[DreamGraph Easy Start](00-easy-start.md)**.
 
-Current release: **v13.4.0 - Glass Atlas**.
+Current release: **v14.0.0 - Ashoka**.
 
 ---
 
@@ -90,3 +90,7 @@ Most days you will never type `dg` after starting the daemon. You'll talk to arc
 ---
 
 Ready? Start with **[DreamGraph Easy Start](00-easy-start.md)**
+
+## Ashoka upgrade
+
+Read [v14 upgrade and compatibility](16-ashoka-upgrade.md) before restarting existing instances.

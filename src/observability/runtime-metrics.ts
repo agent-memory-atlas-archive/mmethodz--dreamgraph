@@ -2,6 +2,9 @@ import { loadJsonArray } from "../utils/cache.js";
 import { getMetricsSnapshot } from "../utils/metrics.js";
 import { getMetricsView } from "../graph/metrics.js";
 import type { Feature } from "../types/index.js";
+import {captureCognitiveProjection,type CognitiveProjectionContext} from "../cognitive/projection-context.js";
+import {withGraphRead} from "../utils/graph-reconciliation-barrier.js";
+import {readDirtyPartitions} from "../graph/change-obligations.js";
 
 export type RuntimeMetricSurface = "mcp_tool" | "resource" | "graph_query" | "rest" | "cache" | "feature" | "internal";export interface RuntimeMetricsWindow {
   kind: "process_lifetime";
@@ -22,7 +25,7 @@ export interface RuntimeErrorMetricRow {
   operation_class: string;
   name: string;
   error_count: number;
-  error_rate: number;
+  error_rate: number|null;
   last_error: string | null;
   entity_id?: string;
 }
@@ -78,6 +81,11 @@ export interface RuntimeDeadFeatureCandidateRow {
 }
 
 export interface RuntimeMetricsSnapshotV1 {
+  definition_version:"2.0.0";
+  projection:CognitiveProjectionContext;
+  measurement_windows:{server:"process_lifetime";explorer:{kind:"rolling_samples";maximum_samples:200};quantiles:"per-series only; grouped quantiles unavailable"};
+  context_utility:{delivered:"request activity only";understood:null;verified_rereads_avoided:null;material_outcome_gain:null;next_agent_recovery:null;measurement:"paired task evidence required"};
+  reconciliation:{dirty_regions:number;required_regions:number;optional_regions:number;oldest_dirty_age_ms:number|null;digestion_cost:null};
   snapshot_at: string;
   window: RuntimeMetricsWindow;
   requests: {
@@ -347,7 +355,7 @@ function groupErrorsBySurface(rows: RuntimeErrorMetricRow[]): RuntimeErrorMetric
     });
   }
   return Array.from(grouped.values())
-    .map((row) => ({ ...row, error_rate: row.error_count > 0 ? roundMetric(row.error_rate) : 0 }))
+    .map((row) => ({ ...row, error_rate: null }))
     .sort((a, b) => b.error_count - a.error_count);
 }
 
@@ -390,8 +398,8 @@ function groupLatencyByOperationClass(rows: RuntimeLatencyMetricRow[]): RuntimeL
       name: entry.operation_class,
       count: entry.sumCount,
       avg_ms: entry.sumCount > 0 && entry.weightedAvg > 0 ? roundMetric(entry.weightedAvg / entry.sumCount) : null,
-      p50_ms: entry.p50.length > 0 ? roundMetric(entry.p50.reduce((sum, value) => sum + value, 0) / entry.p50.length) : null,
-      p95_ms: entry.p95.length > 0 ? roundMetric(Math.max(...entry.p95)) : null,
+      p50_ms: null,
+      p95_ms: null,
       max_ms: entry.max.length > 0 ? roundMetric(Math.max(...entry.max)) : null,
     }))
     .sort((a, b) => (b.p95_ms ?? 0) - (a.p95_ms ?? 0) || b.count - a.count);
@@ -401,14 +409,13 @@ function groupLatencyByName(rows: RuntimeLatencyMetricRow[]): RuntimeLatencyMetr
   return [...rows].sort((a, b) => (b.p95_ms ?? b.avg_ms ?? 0) - (a.p95_ms ?? a.avg_ms ?? 0) || b.count - a.count);
 }
 
-async function deriveDeadFeatureCandidates(usage: RuntimeFeatureMetricRow[]): Promise<RuntimeDeadFeatureCandidateRow[]> {
-  const features = await loadJsonArray<Feature>("features.json");
+async function deriveDeadFeatureCandidates(usage: RuntimeFeatureMetricRow[],features:Feature[]): Promise<RuntimeDeadFeatureCandidateRow[]> {
   const usageMap = new Map(usage.map((row) => [row.name, row]));
   return features
     .filter((feature) => !usageMap.has(feature.id))
     .map((feature) => ({
       name: feature.id,
-      reason: "Known feature has no observed runtime usage in the current metrics window.",
+      reason: "No matching entity usage observation in these windows; instrumentation coverage is unknown. This does not establish a dead feature or authorize retirement.",
       usage_count: 0,
       last_used_at: null,
     }))
@@ -416,6 +423,9 @@ async function deriveDeadFeatureCandidates(usage: RuntimeFeatureMetricRow[]): Pr
 }
 
 export async function getRuntimeMetricsSnapshotV1(): Promise<RuntimeMetricsSnapshotV1> {
+  return withGraphRead(async()=>{
+  const {graph,context}=await captureCognitiveProjection();
+  const dirty=(await readDirtyPartitions()).partitions.filter(p=>p.state!=="settled");
   const selfSnapshot = getMetricsSnapshot();
   const toolRows = deriveToolRows();
   const restRows = deriveRestRows();
@@ -424,9 +434,13 @@ export async function getRuntimeMetricsSnapshotV1(): Promise<RuntimeMetricsSnaps
   const errorRows = [...toolRows.errors, ...restRows.errors];
   const latencyRows = [...toolRows.latency, ...restRows.latency, ...graphRows.latency];
   const featureUsage = [...graphRows.features].sort((a, b) => b.usage_count - a.usage_count || a.name.localeCompare(b.name));
-  const deadCandidates = await deriveDeadFeatureCandidates(featureUsage);
+  const deadCandidates = await deriveDeadFeatureCandidates(featureUsage,graph.entities.filter(e=>e.identity.kind==="feature").map(e=>e.payload as unknown as Feature));
 
   return {
+    definition_version:"2.0.0",projection:context,
+    measurement_windows:{server:"process_lifetime",explorer:{kind:"rolling_samples",maximum_samples:200},quantiles:"per-series only; grouped quantiles unavailable"},
+    context_utility:{delivered:"request activity only",understood:null,verified_rereads_avoided:null,material_outcome_gain:null,next_agent_recovery:null,measurement:"paired task evidence required"},
+    reconciliation:{dirty_regions:dirty.length,required_regions:dirty.filter(p=>p.pending_stages.includes("reconciliation")).length,optional_regions:dirty.filter(p=>!p.pending_stages.includes("reconciliation")).length,oldest_dirty_age_ms:dirty.length?Math.max(...dirty.map(p=>Math.max(0,Date.now()-Date.parse(p.first_changed_at)))):null,digestion_cost:null},
     snapshot_at: selfSnapshot.snapshot_at,
     window: {
       kind: "process_lifetime",
@@ -458,4 +472,5 @@ export async function getRuntimeMetricsSnapshotV1(): Promise<RuntimeMetricsSnaps
       dead_candidates: deadCandidates,
     },
   };
+  });
 }

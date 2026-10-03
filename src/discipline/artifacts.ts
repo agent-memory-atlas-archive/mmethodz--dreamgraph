@@ -12,6 +12,7 @@
 import { randomUUID } from "node:crypto";
 import { getActiveSession, attachDeltaTable, attachPlan, attachVerificationReport, recordToolCall } from "./session.js";
 import { logger } from "../utils/logger.js";
+import { bindPlanApproval } from "./approval.js";
 import type {
   DeltaTable,
   DeltaEntry,
@@ -208,7 +209,7 @@ function validatePlanItem(item: PlanItem, deltaEntryIds: Set<string>): PlanValid
     errors.push({
       item_id: item.id,
       field: "delta_entry_id",
-      message: `Delta entry '${item.delta_entry_id}' not found in any session delta table`,
+      message: `Delta entry '${item.delta_entry_id}' not found in the latest delta table`,
     });
   }
 
@@ -267,9 +268,12 @@ export async function validateAndCreatePlan(opts: {
     };
   }
 
-  // Collect all delta entry IDs from session
+  // New waves bind the latest complete delta, never historical union coverage.
+  const latestDelta = session.artifacts.delta_tables.at(-1);
+  if (!latestDelta || !isDeltaComplete(latestDelta).complete) return { success: false,
+    validation_errors: [{ field: "delta_tables", message: "Latest delta must be complete before submitting a plan" }] };
   const deltaEntryIds = new Set<string>();
-  for (const dt of session.artifacts.delta_tables) {
+  for (const dt of [latestDelta]) {
     for (const entry of dt.entries) {
       deltaEntryIds.add(entry.id);
     }
@@ -290,7 +294,7 @@ export async function validateAndCreatePlan(opts: {
 
   // Check that all gaps/partials have plan items
   const addressedDeltas = new Set(opts.items.map((i) => i.delta_entry_id));
-  for (const dt of session.artifacts.delta_tables) {
+  for (const dt of [latestDelta]) {
     for (const entry of dt.entries) {
       if ((entry.status === "confirmed_gap" || entry.status === "partial_match") && !addressedDeltas.has(entry.id)) {
         allErrors.push({
@@ -340,6 +344,7 @@ export async function validateAndCreatePlan(opts: {
     })),
     risk_summary,
   };
+  if (opts.auto_approve) plan.approval_binding = bindPlanApproval(session, plan);
 
   await attachPlan(plan);
   logger.info(
@@ -362,6 +367,7 @@ export async function approvePlan(planIndex?: number): Promise<{
   if (!session) return { success: false, message: "No active session" };
 
   const idx = planIndex ?? session.artifacts.plans.length - 1;
+  if (session.current_phase !== "plan" || idx !== session.artifacts.plans.length - 1) return { success: false, message: "Only the latest plan in PLAN phase may be approved" };
   const plan = session.artifacts.plans[idx];
   if (!plan) return { success: false, message: `Plan at index ${idx} not found` };
 
@@ -369,9 +375,11 @@ export async function approvePlan(planIndex?: number): Promise<{
     return { success: false, message: `Plan is already '${plan.status}', cannot approve` };
   }
 
+  const binding = bindPlanApproval(session, plan);
   plan.status = "approved";
   plan.approved_at = new Date().toISOString();
   plan.approved_by = "human";
+  plan.approval_binding = binding;
 
   // Session was mutated in place; recording a tool call persists it.
   await recordToolCall(

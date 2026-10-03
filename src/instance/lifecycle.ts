@@ -1,3 +1,4 @@
+import { refreshInstanceConfiguration } from "../config/config.js";
 /**
  * DreamGraph v7.0 "El Alarife" — Instance Lifecycle Manager.
  *
@@ -508,6 +509,7 @@ export async function resolveInstanceAtStartup(): Promise<InstanceScope | null> 
     return null;
   }
 
+  let configurationAdmission = false;
   try {
     const { instance, scope } = await loadInstance(uuid);
     activeScope = scope;
@@ -521,7 +523,12 @@ export async function resolveInstanceAtStartup(): Promise<InstanceScope | null> 
     setMutexKeyResolver((key) => scope.mutexKey(key));
 
     // Load per-instance engine.env (LLM provider, API keys, model config).
+    configurationAdmission = true;
+    const { recoverEngineConfiguration } = await import("../config/engine-configuration.js");
+    await recoverEngineConfiguration(scope.engineEnvPath);
     const envVars = loadEngineEnv(scope.engineEnvPath);
+    refreshInstanceConfiguration();
+    configurationAdmission = false;
     if (envVars > 0) {
       logger.info(`Loaded ${envVars} env vars from ${scope.engineEnvPath}`);
     }
@@ -597,6 +604,7 @@ export async function resolveInstanceAtStartup(): Promise<InstanceScope | null> 
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     logger.error(`Failed to load instance ${uuid}: ${msg}`);
+    if (configurationAdmission) { activeScope = null; throw new Error(`INSTANCE_CONFIGURATION_ADMISSION_FAILED: ${msg}`); }
     logger.info("Falling back to unscoped data resolver");
     activeScope = null;
     return null;

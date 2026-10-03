@@ -1,0 +1,60 @@
+{
+  "schema": "dreamgraph.ashoka.slice_verification.v1",
+  "slice": 18,
+  "status": "verified",
+  "native_review": {
+    "status": "compliant",
+    "declared_entries": 21,
+    "matched": 21,
+    "gaps": 0,
+    "regressions": 0,
+    "decision": "accept",
+    "source_audit_id": "tc_1790858385853_guwkvf"
+  },
+  "recorded_at": "2026-10-01T12:41:00Z",
+  "root": {
+    "command": "npx vitest run --maxWorkers=4 --reporter=json --outputFile=docs/ashoka/slice-18-qualified-tests.json",
+    "files": 141,
+    "passed": 1579,
+    "failed": 0,
+    "skipped": 2
+  },
+  "extension": {
+    "build": "passed",
+    "passed": 488,
+    "failed": 0,
+    "build_evidence": "slice-18-extension-build.log",
+    "test_evidence": "slice-18-extension-tests.log"
+  },
+  "server_build": "passed",
+  "catalog": {
+    "tools": 93,
+    "resources": 31,
+    "classifications": 94
+  },
+  "contracts": 31,
+  "baseline": 10,
+  "provider_artifact": "r3",
+  "configuration": {
+    "typed": 308,
+    "literal": 101
+  },
+  "source_audit": "slice-18-source-audit.json",
+  "focused_evidence": [
+    "slice-18-final-focused-tests.json",
+    "slice-18-coalescing-tests.json",
+    "slice-18-integration-repair-tests.json"
+  ],
+  "preserved_failures": [
+    "slice-18-focused-tests.json",
+    "slice-18-evidence-tests.json",
+    "slice-18-tests.json"
+  ],
+  "limits": [
+    "Offline/disposable core dependency qualification; no paid provider or live graph migration.",
+    "Consumer25/schema migration26/model usefulness27 and packaged release28 remain required.",
+    "Redaction uses fixed vocabulary and opaque origin/hash identifiers, not an anonymity promise.",
+    "Correlation remains a hypothesis and remote claims cannot satisfy local independent source evidence.",
+    "Unknown impact and bounded overflow require reconciliation; no paid/fullgraph fallback."
+  ]
+}

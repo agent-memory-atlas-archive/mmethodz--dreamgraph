@@ -1,0 +1,130 @@
+{
+  "schema": "dreamgraph.ashoka.migration_closure.v1",
+  "recorded_at": "2026-10-03T06:04:35.856Z",
+  "slice": 26,
+  "status": "verified",
+  "decision": "Accept existing converter/recovery criteria using full-family failures and the exact original-instance snapshot copy. Packaged activation remains Slice28/operator rollout, as the original revision7 handoff specifies.",
+  "scope": "Migration implementation and recovery; no assertion that the running original instance has been converted.",
+  "criteria": [
+    {
+      "criterion": "Explainable before/after identities and counts; no provenance loss",
+      "evidence": "slice-26-conflict-proposal.json",
+      "result": "Three repaired families become readable. 127 ambiguous active rows are archived with every original version in the verified backup; 90 chapters receive stable distinct identities. No confidence or array-order winner and no fact promotion."
+    },
+    {
+      "criterion": "Fenced exact preview, stale/concurrent/unfinished-work refusal",
+      "evidence": "slice-26-conformance.json and unchanged legacy-graph-upgrade tests",
+      "result": "Passed physical second-writer exclusion, source/config revision checks, exact row choices, unknown-schema refusal, unpublished input and unsettled job refusal."
+    },
+    {
+      "criterion": "Crash/cancel/restore/retry preserve one publication and later work",
+      "evidence": "slice-26-conformance.json plus own-instance copy proof",
+      "result": "Actual killed writer before/after publication recovers; lost-result replay returns the original receipt. Byte-exact copy restoration passed; post-cutover source debt, history, settings and unrelated writes survive reviewed restore."
+    },
+    {
+      "criterion": "Legacy uncertainty and migration notification remain explicit",
+      "evidence": "slice-26-conformance.json, slice-26-health-conformance.json and own-instance copy proof",
+      "result": "Unknown scan/enrichment baselines and unresolved references remain visible; no age-only staleness or fabricated lifecycle verification. Actual Architect notice, legacy progress and 92-plan navigation are qualified."
+    }
+  ],
+  "own_snapshot": {
+    "instance_id": "ee9ce3b9-0313-4768-b5f1-24b9b3fffc4b",
+    "preview_digest": "sha256:cea3377d87ab697d0e9f343229e1730da9bdf12e720fa1f9252ad1d3d75ad545",
+    "revision": {
+      "publication_sequence": 17391,
+      "graph_revision": null,
+      "domains": {
+        "authority": 665,
+        "extension_state": 11,
+        "schedules": 16715
+      }
+    },
+    "counts": {
+      "groups": 61,
+      "resolutions": 217,
+      "archived_active_rows": 127,
+      "story_identity_mappings": 90,
+      "backup_data_files": 35,
+      "backup_config_files": 4,
+      "backup_bytes": 122011335
+    },
+    "before": {
+      "entities": 7515,
+      "relationships": 2655
+    },
+    "after": {
+      "entities": 79689,
+      "relationships": 9575
+    },
+    "interpretation": "Count growth reflects restored visibility of previously rejected duplicate families. Legacy validated-kind rows are not newly verified facts. Remaining endpoint/baseline uncertainty is not hidden."
+  },
+  "rollout": [
+    "Fresh exact preview and explicit row disposition are required before any original-instance mutation. The prepared proposal is not approval for changed bytes.",
+    "The original running instance stays unchanged. Slice28 verifies packaged activation on disposable data; maintainer chooses live adoption during practical testing.",
+    "No paid reconstruction or enrichment is required to establish structural migration correctness. Optional later enrichment uses the existing finite admission."
+  ],
+  "review": {
+    "reviewer": "executing agent under maintainer closure direction, 2026-10-03",
+    "result": "accepted",
+    "independent_model_review": false
+  },
+  "real_provider_requests": 0,
+  "original_instance_changed": false,
+  "artifacts": [
+    {
+      "path": "src/graph/legacy-upgrade.ts",
+      "bytes": 35379,
+      "sha256": "26492d3c215b86ea56c1dd6b5341435edb8d047b0cabf3615cb3ce34d695a929"
+    },
+    {
+      "path": "src/cli/commands/graph-upgrade.ts",
+      "bytes": 5325,
+      "sha256": "7252c62b7f6ce562c186d577c2a7f8c5005663c39f2913ed46257b70b2745b95"
+    },
+    {
+      "path": "tests/legacy-graph-upgrade.test.ts",
+      "bytes": 20643,
+      "sha256": "30886d527a535fb48643dc2e64a15c24383b7602d98c136d522398117186037c"
+    },
+    {
+      "path": "tests/graph-upgrade-notice.test.ts",
+      "bytes": 4098,
+      "sha256": "88f8b1aaa26bcaf48e235567d8813f549f1266d2a54f936ae4818fcccbf9b87a"
+    },
+    {
+      "path": "docs/ashoka/slice-26-conformance.json",
+      "bytes": 22930,
+      "sha256": "ca99f4e94dde3f179c042dc5c6ab1d2ee01d9d52cca1ee0e81363b2c60780798"
+    },
+    {
+      "path": "docs/ashoka/slice-26-health-conformance.json",
+      "bytes": 29005,
+      "sha256": "84fe6267f7139093edaa110f64c9bbdf6d1cd4f7bec8ec01ee999c138d258bb1"
+    },
+    {
+      "path": "docs/ashoka/slice-26-live-preview-oct03.json",
+      "bytes": 495772,
+      "sha256": "06c418304fb3ee6d3ac4de285f98f2d430aefdf2fc8ddabb8c0fcb6a0d053d16"
+    },
+    {
+      "path": "docs/ashoka/slice-26-conflict-proposal.json",
+      "bytes": 13881168,
+      "sha256": "6d551315fb7d52320faf94c0ddd775f81dc704997ab1f0d52c6779ee0c3684be"
+    },
+    {
+      "path": "docs/ashoka/slice-26-conflict-resolutions-proposed.json",
+      "bytes": 86951,
+      "sha256": "58a3ee1ee4a6fe86e29eef33fbbb7d7133b706445772980773fc8251bdfab99d"
+    },
+    {
+      "path": "docs/ashoka/slice-26-conflict-proposal-first.exit.json",
+      "bytes": 74,
+      "sha256": "acfddeb13e0bc351767b9c45400a64f5adf2ce09b034d8debdad87d2866d44e4"
+    },
+    {
+      "path": "docs/audits/2026-09-30-coverage/plan-refinement.md",
+      "bytes": 66254,
+      "sha256": "947678ac8f491c3e221c07c7ea94a7052fa9a163c98964bbe20f9d0560d38525"
+    }
+  ]
+}

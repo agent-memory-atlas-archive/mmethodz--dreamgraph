@@ -15,7 +15,7 @@
 //   - probeDreamgraphHttpMcp(…)                  → liveness probe
 //   - auditFilePathFor(dir, runId)               → bridge↔adapter contract
 //
-// The bridge entry point (`bridge-entry.ts`) is bundled to its own
+// Core src/architect/cli-mcp-bridge.ts is bundled to the extension's
 // standalone artifact (`dist/copilot-cli-bridge.js`) and is NOT
 // re-exported from a runtime barrel; consumers refer to it by absolute
 // disk path because Copilot CLI launches it as a separate process.

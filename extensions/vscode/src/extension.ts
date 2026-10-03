@@ -82,9 +82,6 @@ export function activate(context: vscode.ExtensionContext): void {
     void context.globalState.update(versionKey, currentVersion);
   }
 
-  // Register local runner palette commands (dreamgraph.runCommand, dreamgraph.runBuild)
-  registerRunnerCommands(context);
-
   const config = vscode.workspace.getConfiguration("dreamgraph");
 
   // ---- Layer 3: DreamGraph Client ----
@@ -105,6 +102,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   // ---- Layer 2: Context Orchestration ----
   const architectLlm = new ArchitectLlm(context.secrets);
+  architectLlm.requireModelAdmission();
   const maxContextTokens = config.get<number>("architect.maxContextTokens") ?? 16000;
   const contextBuilder = new ContextBuilder(mcpClient, daemonClient, {
     maxContextTokens,
@@ -127,7 +125,10 @@ export function activate(context: vscode.ExtensionContext): void {
   chatPanel.setArchitectLlm(architectLlm);
   chatPanel.setContextBuilder(contextBuilder);
   chatPanel.setMcpClient(mcpClient);
+  chatPanel.setDaemonClient(daemonClient);
   chatPanel.setChangedFilesProvider(changedFiles);
+  // Capture the selected authority before a palette prompt; no local runner fallback.
+  registerRunnerCommands(context, () => chatPanel.captureManualCommand());
 
   // Load architect config asynchronously
   void architectLlm.loadConfig();

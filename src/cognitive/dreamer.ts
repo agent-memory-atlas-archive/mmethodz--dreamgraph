@@ -8,41 +8,26 @@
  *
  * After F-06 split, individual strategies live under `./strategies/`
  * and this file owns:
- *  - The adaptive strategy selection (skip benched strategies, probe
- *    them periodically)
+ *  - Persistent reviewed allocation with rotating bounded exploration
  *  - Per-strategy yield tracking
  *  - The public `dream()` router that orchestrates strategies, applies
  *    budget allocation, and persists with deduplication
  *
- * Strategies (one file each under `./strategies/`):
- *  1. gap-detection
- *  2. weak-reinforcement
- *  3. cross-domain-bridging
- *  4. missing-abstraction
- *  5. symmetry-completion
- *  6. tension-directed
- *  7. causal-replay (lives in `./causal.ts`)
- *  8. pgo-wave
- *  9. llm-dream
+ * Advertisement and the eleven active executors share strategy-catalog.ts.
+ * Historical reflective requests fail explicitly; they never become "all".
  */
 
 import { logger } from "../utils/logger.js";
+import { randomUUID } from "node:crypto";
+import { readMetaDocument, emptyPortfolio, snapshotLearningHash, allocatePortfolioBudgets, checkPortfolioCapacity,
+  appendPortfolioObservations, candidateAttribution, strategyCharge, strategyVersion, dreamClaimKey,
+  portfolioSetting, type StrategyObservation } from "./strategy-portfolio.js";
 import { engine } from "./engine.js";
-import { causalReplayDream } from "./causal.js";
+import { executeDreamStrategy } from "./strategy-registry.js";
+import { ACTIVE_STRATEGY_NAMES, STRATEGY_CATALOG, allocateStrategyBudgets } from "./strategy-catalog.js";
 import type { DreamNode, DreamEdge, DreamStrategy } from "./types.js";
 
-import { buildFactSnapshot, focusFactSnapshot } from "./strategies/_shared.js";
-import { gapDetection } from "./strategies/gap-detection.js";
-import { weakReinforcement } from "./strategies/weak-reinforcement.js";
-import { crossDomainBridging } from "./strategies/cross-domain-bridging.js";
-import { missingAbstraction } from "./strategies/missing-abstraction.js";
-import { symmetryCompletion } from "./strategies/symmetry-completion.js";
-import { tensionDirected } from "./strategies/tension-directed.js";
-import { pgoWaveDream } from "./strategies/pgo-wave.js";
-import { llmDream } from "./strategies/llm-dream.js";
-import { orphanBridging } from "./strategies/orphan-bridging.js";
-import { schemaGrounding } from "./strategies/schema-grounding.js";
-
+import { buildFactSnapshot, focusFactSnapshot, type FactSnapshot } from "./strategies/_shared.js";
 // ---------------------------------------------------------------------------
 // Public API — Dream Cycle
 // ---------------------------------------------------------------------------
@@ -56,6 +41,7 @@ export interface DreamResult {
   /** Strategies that were skipped this cycle due to adaptive selection */
   skipped_strategies: string[];
   focus_entities: string[];
+  strategy_outcomes?: Record<string, { status: "completed" | "failed" | "skipped"; budget: number; generated: number; persisted?: number; novel?: number; omitted_out_of_scope?: number; reason?: string }>;
 }
 
 export interface DreamFocus {
@@ -64,48 +50,27 @@ export interface DreamFocus {
   reason?: string;
 }
 
-// ---------------------------------------------------------------------------
-// Adaptive Strategy Selection — skip unproductive strategies
-// ---------------------------------------------------------------------------
-
-/** Per-strategy history: how many new edges it produced in recent cycles */
-const strategyHistory = new Map<DreamStrategy, number[]>();
-
-/** Number of consecutive 0-yield cycles before a strategy gets skipped */
-const SKIP_AFTER_BARREN_CYCLES = Number(process.env.DG_BARREN_THRESHOLD) || 3;
-
-/**
- * Record strategy yield and return whether the strategy should run.
- * Has a cooldown: after SKIP_AFTER_BARREN_CYCLES consecutive zeros,
- * the strategy is benched. Every Nth cycle it gets a "probe" run
- * to check if conditions have changed.
- */
-function shouldRunStrategy(strategy: DreamStrategy, currentCycle: number): boolean {
-  const history = strategyHistory.get(strategy) ?? [];
-
-  if (history.length < SKIP_AFTER_BARREN_CYCLES) return true;
-
-  const recentRuns = history.slice(-SKIP_AFTER_BARREN_CYCLES);
-  const allBarren = recentRuns.every((y) => y === 0);
-
-  if (!allBarren) return true;
-
-  const probeInterval = Number(process.env.DG_PROBE_INTERVAL) || 6;
-  if (currentCycle % probeInterval === 0) {
-    logger.debug(`Adaptive probe: re-enabling "${strategy}" for probe cycle ${currentCycle}`);
-    return true;
+/** Validate requests before a cycle changes state or applies decay. */
+export async function prepareDream(strategy: DreamStrategy, maxDreams: number, focus?: DreamFocus): Promise<FactSnapshot> {
+  if (strategy !== "all" && !ACTIVE_STRATEGY_NAMES.includes(strategy as any)) {
+    throw new Error(STRATEGY_CATALOG.some(item => item.name === strategy) ? "STRATEGY_RETIRED: reflective has no autonomous executor" : "STRATEGY_UNKNOWN");
   }
-
-  logger.debug(`Adaptive skip: "${strategy}" benched (${SKIP_AFTER_BARREN_CYCLES} consecutive 0-yield cycles)`);
-  return false;
+  if (!Number.isSafeInteger(maxDreams) || maxDreams < 0 || maxDreams > 1000) throw new Error("STRATEGY_BUDGET_INVALID");
+  if (new Set(focus?.entity_ids ?? []).size > 100) throw new Error("DREAM_FOCUS_LIMIT");
+  const hops = focus?.hops ?? 2;
+  if (!Number.isInteger(hops) || hops < 0 || hops > 4) throw new Error("DREAM_FOCUS_HOPS_INVALID");
+  // Validate all fractions even when no model will be called.
+  allocateStrategyBudgets(ACTIVE_STRATEGY_NAMES, maxDreams, strategyFractions());
+  portfolioSetting("DG_BARREN_THRESHOLD", 3); portfolioSetting("DG_PROBE_INTERVAL", 6); portfolioSetting("DG_STRATEGY_HISTORY", 12);
+  const fullSnapshot = await buildFactSnapshot();
+  const focusIds = [...new Set(focus?.entity_ids ?? [])];
+  if (focusIds.some(id => !fullSnapshot.entities.has(id))) throw new Error("DREAM_FOCUS_UNKNOWN; targeted scope was not broadened");
+  return focusIds.length ? focusFactSnapshot(fullSnapshot, focusIds, hops) : fullSnapshot;
 }
 
-function recordStrategyYield(strategy: DreamStrategy, newEdges: number): void {
-  const history = strategyHistory.get(strategy) ?? [];
-  history.push(newEdges);
-  const maxHistory = Number(process.env.DG_STRATEGY_HISTORY) || 12;
-  if (history.length > maxHistory) history.splice(0, history.length - maxHistory);
-  strategyHistory.set(strategy, history);
+function strategyFractions() {
+  return { llm: process.env.DG_LLM_BUDGET === undefined ? 0.35 : Number(process.env.DG_LLM_BUDGET),
+    pgo: process.env.DG_PGO_BUDGET === undefined ? 0.15 : Number(process.env.DG_PGO_BUDGET) };
 }
 
 /**
@@ -116,27 +81,29 @@ function recordStrategyYield(strategy: DreamStrategy, newEdges: number): void {
  *
  * Enhanced with:
  * - Deduplication (duplicate suppression) instead of raw append
- * - Adaptive strategy selection: skip strategies that have produced
- *   0 new edges for 3+ consecutive cycles, redistributing their
- *   budget to productive strategies.
+ * - Persistent reviewed utility and post-dedup novelty remain separate;
+ *   barren runs reduce allocation without suppressing exploration.
  */
 export async function dream(
   strategy: DreamStrategy = "all",
   maxDreams: number = 100,
   focus?: DreamFocus,
 ): Promise<DreamResult> {
+  const snapshot = await prepareDream(strategy, maxDreams, focus);
   engine.assertState("rem", "dream");
 
+  const focusIds = [...new Set(focus?.entity_ids ?? [])];
+  if (maxDreams === 0) return { nodes: [], edges: [], duplicates_merged: 0, strategy_yields: {}, skipped_strategies: [], focus_entities: focusIds, strategy_outcomes: {} };
+
+  const portfolio = (await readMetaDocument()).portfolio ?? emptyPortfolio();
+  checkPortfolioCapacity(portfolio, maxDreams);
+  const inputHash = snapshotLearningHash(snapshot), operationId = `dream:${randomUUID()}`;
+  const observations: StrategyObservation[] = [];
   const cycle = engine.nextDreamCycle();
   logger.info(
     `REM dream cycle #${cycle} starting (strategy: ${strategy}, max: ${maxDreams})`,
   );
 
-  const fullSnapshot = await buildFactSnapshot();
-  const focusIds = (focus?.entity_ids ?? []).filter((id) => fullSnapshot.entities.has(id)).slice(0, 100);
-  const snapshot = focusIds.length > 0
-    ? focusFactSnapshot(fullSnapshot, focusIds, focus?.hops ?? 2)
-    : fullSnapshot;
   logger.debug(
     `Fact snapshot: ${snapshot.entities.size} entities, ${snapshot.edgeSet.size} edges, ${snapshot.domains.size} domains` +
       (focusIds.length > 0 ? `; targeted around ${focusIds.length} changed entities (${focus?.reason ?? "unspecified"})` : ""),
@@ -147,188 +114,62 @@ export async function dream(
   const strategyYields: Record<string, number> = {};
   const skippedStrategies: string[] = [];
 
-  // LLM dream and PGO wave are always included when running "all"
-  const allStrategies: DreamStrategy[] = [
-    "llm_dream",
-    "pgo_wave",
-    "gap_detection",
-    "weak_reinforcement",
-    "cross_domain",
-    "missing_abstraction",
-    "symmetry_completion",
-    "tension_directed",
-    "causal_replay",
-    "orphan_bridging",
-    "schema_grounding",
-  ];
-
-  const strategiesToRun: DreamStrategy[] =
-    strategy === "all"
-      ? allStrategies.filter((s) => {
-          if (s === "llm_dream" || s === "pgo_wave") return true;
-          if (shouldRunStrategy(s, cycle)) return true;
-          skippedStrategies.push(s);
-          return false;
-        })
-      : [strategy];
-
-  // Budget allocation: LLM gets 35%, PGO wave gets 15%, rest split evenly
-  const hasLlm = strategiesToRun.includes("llm_dream");
-  const hasPgo = strategiesToRun.includes("pgo_wave");
-  const structuralCount = strategiesToRun.length - (hasLlm ? 1 : 0) - (hasPgo ? 1 : 0);
-  const llmFrac = Number(process.env.DG_LLM_BUDGET) || 0.35;
-  const pgoFrac = Number(process.env.DG_PGO_BUDGET) || 0.15;
-  const llmBudget = hasLlm ? Math.ceil(maxDreams * llmFrac) : 0;
-  const pgoBudget = hasPgo ? Math.ceil(maxDreams * pgoFrac) : 0;
-  const structuralBudget = maxDreams - llmBudget - pgoBudget;
-  const perStrategy = structuralCount > 0 ? Math.ceil(structuralBudget / structuralCount) : maxDreams;
-
-  if (skippedStrategies.length > 0) {
-    logger.info(
-      `Adaptive selection: running ${strategiesToRun.length} strategies, skipped [${skippedStrategies.join(", ")}] — LLM: ${llmBudget}, PGO: ${pgoBudget}, structural: ${perStrategy}/each`,
-    );
-  }
-
-  // --------------- LLM Dream — the creative core -------------------
-  if (strategiesToRun.includes("llm_dream")) {
+  const allStrategies = [...ACTIVE_STRATEGY_NAMES] as DreamStrategy[];
+  const strategiesToRun = strategy === "all" ? allStrategies : [strategy];
+  const allocations = allocatePortfolioBudgets(portfolio, strategiesToRun, maxDreams, inputHash, strategyFractions());
+  const strategyOutcomes: NonNullable<DreamResult["strategy_outcomes"]> = {};
+  for (const name of strategiesToRun) {
+    const budget = allocations[name];
+    if (!budget) { strategyYields[name] = 0; strategyOutcomes[name] = { status: "skipped", budget: 0, generated: 0, reason: "zero_candidate_allocation" }; continue; }
+    const started = performance.now();
+    let rows: Array<DreamNode | DreamEdge> = [], failureAttempts: string[] = [];
     try {
-      const llmResult = await llmDream(snapshot, cycle, llmBudget || perStrategy);
-      allNodes.push(...llmResult.nodes);
-      allEdges.push(...llmResult.edges);
-      strategyYields["llm_dream"] = llmResult.edges.length + llmResult.nodes.length;
-      logger.debug(`LLM dream: ${llmResult.edges.length} edges, ${llmResult.nodes.length} nodes`);
-    } catch (err) {
-      strategyYields["llm_dream"] = 0;
-      logger.warn(`LLM dream: failed (${err instanceof Error ? err.message : "error"})`);
+      const result = await executeDreamStrategy(name, { snapshot, cycle, budget });
+      failureAttempts = result.admission?.attempt_ids ?? [];
+      rows = [...result.nodes, ...result.edges];
+      allNodes.push(...result.nodes); allEdges.push(...result.edges);
+      strategyYields[name] = result.nodes.length + result.edges.length;
+      strategyOutcomes[name] = { status: "completed", budget, generated: result.nodes.length + result.edges.length + (result.tensions_raised ?? 0), ...(result.omitted_out_of_scope ? { omitted_out_of_scope: result.omitted_out_of_scope } : {}) };
+    } catch (error) {
+      failureAttempts = (error as { admission?: { attempt_ids?: string[] } })?.admission?.attempt_ids ?? [];
+      strategyYields[name] = 0;
+      strategyOutcomes[name] = { status: "failed", budget, generated: 0, reason: error instanceof Error ? error.message : "Strategy dependency failed" };
+      logger.warn(`Dream strategy ${name}: ${strategyOutcomes[name].reason}`);
     }
-  }
-
-  // --------------- Structural strategies ---------------------------
-  if (strategiesToRun.includes("gap_detection")) {
-    const gaps = gapDetection(snapshot, cycle, perStrategy);
-    allEdges.push(...gaps);
-    strategyYields["gap_detection"] = gaps.length;
-    logger.debug(`Gap detection: ${gaps.length} dream edges`);
-  }
-
-  if (strategiesToRun.includes("weak_reinforcement")) {
-    const weak = weakReinforcement(snapshot, cycle, perStrategy);
-    allEdges.push(...weak);
-    strategyYields["weak_reinforcement"] = weak.length;
-    logger.debug(`Weak reinforcement: ${weak.length} dream edges`);
-  }
-
-  if (strategiesToRun.includes("cross_domain")) {
-    const bridges = crossDomainBridging(snapshot, cycle, perStrategy);
-    allEdges.push(...bridges);
-    strategyYields["cross_domain"] = bridges.length;
-    logger.debug(`Cross-domain bridging: ${bridges.length} dream edges`);
-  }
-
-  if (strategiesToRun.includes("missing_abstraction")) {
-    const abstractions = missingAbstraction(snapshot, cycle, perStrategy);
-    allNodes.push(...abstractions.nodes);
-    allEdges.push(...abstractions.edges);
-    strategyYields["missing_abstraction"] = abstractions.nodes.length + abstractions.edges.length;
-    logger.debug(
-      `Missing abstraction: ${abstractions.nodes.length} nodes, ${abstractions.edges.length} edges`,
-    );
-  }
-
-  if (strategiesToRun.includes("symmetry_completion")) {
-    const symmetry = symmetryCompletion(snapshot, cycle, perStrategy);
-    allEdges.push(...symmetry);
-    strategyYields["symmetry_completion"] = symmetry.length;
-    logger.debug(`Symmetry completion: ${symmetry.length} dream edges`);
-  }
-
-  // Tension-directed dreaming — uses unresolved tensions from the engine
-  if (strategiesToRun.includes("tension_directed")) {
-    const tensions = await engine.getUnresolvedTensions();
-    if (tensions.length > 0) {
-      const tensionEdges = tensionDirected(snapshot, tensions, cycle, perStrategy);
-      allEdges.push(...tensionEdges);
-      strategyYields["tension_directed"] = tensionEdges.length;
-      logger.debug(`Tension-directed: ${tensionEdges.length} dream edges from ${tensions.length} tensions`);
-
-      for (const t of tensions) {
-        t.attempted = true;
-      }
-    } else {
-      strategyYields["tension_directed"] = 0;
-      logger.debug("Tension-directed: no unresolved tensions");
-    }
-  }
-
-  // Causal replay dreaming — mines history for cause-effect patterns
-  if (strategiesToRun.includes("causal_replay")) {
-    try {
-      const causalEdges = await causalReplayDream(cycle, perStrategy);
-      allEdges.push(...causalEdges);
-      strategyYields["causal_replay"] = causalEdges.length;
-      logger.debug(`Causal replay: ${causalEdges.length} dream edges`);
-    } catch (err) {
-      strategyYields["causal_replay"] = 0;
-      logger.debug(`Causal replay: skipped (${err instanceof Error ? err.message : "error"})`);
-    }
-  }
-
-  // PGO wave — stochastic divergence (Lévy flight + stochastic resonance)
-  if (strategiesToRun.includes("pgo_wave")) {
-    const pgoEdges = pgoWaveDream(snapshot, cycle, pgoBudget || perStrategy);
-    allEdges.push(...pgoEdges);
-    strategyYields["pgo_wave"] = pgoEdges.length;
-  }
-
-  // Orphan bridging — attach degree-0 fact-graph entities to nearest neighbor
-  if (strategiesToRun.includes("orphan_bridging")) {
-    const orphanCap = Number(process.env.DG_ORPHAN_BUDGET) || 20;
-    const orphanBudget = Math.min(perStrategy, orphanCap);
-    const orphanEdges = orphanBridging(snapshot, cycle, orphanBudget);
-    allEdges.push(...orphanEdges);
-    strategyYields["orphan_bridging"] = orphanEdges.length;
-    logger.debug(`Orphan bridging: ${orphanEdges.length} dream edges (budget ${orphanBudget})`);
-  }
-
-  // Schema grounding — anchor data_models to scanned datastore tables and
-  // surface cross-repo state sharing through the shared hub.
-  if (strategiesToRun.includes("schema_grounding")) {
-    const sg = await schemaGrounding(snapshot, cycle, perStrategy);
-    allEdges.push(...sg.edges);
-    strategyYields["schema_grounding"] = sg.edges.length;
-    logger.debug(
-      `Schema grounding: ${sg.edges.length} dream edges, ${sg.tensions_raised} tensions raised`,
-    );
-  }
-
-  // Record yields for adaptive selection (only when running "all")
-  if (strategy === "all") {
-    for (const s of allStrategies) {
-      recordStrategyYield(s, strategyYields[s] ?? 0);
-    }
+    const attribution = candidateAttribution(rows);
+    const attemptIds = [...new Set([...attribution.attempt_ids, ...failureAttempts])];
+    const charge = await strategyCharge(attemptIds);
+    observations.push({ id: `${operationId}:${name}`, strategy: name, version: strategyVersion(name), input_hash: inputHash,
+      cycle, status: strategyOutcomes[name].status as "completed" | "failed", budget, generated: rows.length,
+      persisted: 0, novel: 0, claim_keys: [], artifact_ids: [], ancestry: attribution.ancestry, elapsed_ms: performance.now() - started,
+      attempt_ids: attemptIds, ...charge, ...(strategyOutcomes[name].reason ? { reason: strategyOutcomes[name].reason!.slice(0,4096) } : {}),
+      recorded_at: new Date().toISOString() });
   }
 
   // Cap total output
-  allNodes = allNodes.slice(0, maxDreams);
-  allEdges = allEdges.slice(0, maxDreams);
+  if (allNodes.length + allEdges.length > maxDreams) throw new Error("DREAM_COMBINED_OUTPUT_LIMIT");
 
-  // Persist to dream graph with DEDUPLICATION
-  let totalMerged = 0;
-
-  if (allNodes.length > 0) {
-    const nodeResult = await engine.deduplicateAndAppendNodes(allNodes);
-    allNodes = nodeResult.appended;
-    totalMerged += nodeResult.merged;
-  }
-  if (allEdges.length > 0) {
-    const edgeResult = await engine.deduplicateAndAppendEdges(allEdges);
-    allEdges = edgeResult.appended;
-    totalMerged += edgeResult.merged;
-  }
+  // The writer re-reads both stores; graph novelty and learning cannot commit separately.
+  const dedup = await engine.publishDreamCandidates(allNodes, allEdges, { snapshot, operation_id: operationId,
+    prepare_writes: async result => {
+      const doc = await readMetaDocument();
+      for (const observation of observations) {
+        const rows = [...result.nodes, ...result.edges].filter(row => row.strategy === observation.strategy);
+        observation.persisted = rows.length; observation.claim_keys = rows.map(row => dreamClaimKey(row, snapshot));
+        observation.artifact_ids = rows.map(row => `${"from" in row ? "edge" : "node"}:${row.id}`);
+        strategyYields[observation.strategy] = rows.length;
+      }
+      doc.portfolio = appendPortfolioObservations(doc.portfolio ?? emptyPortfolio(), observations);
+      for (const observation of doc.portfolio.observations.filter(o => o.id.startsWith(operationId + ":")))
+        Object.assign(strategyOutcomes[observation.strategy], { persisted: observation.persisted, novel: observation.novel });
+      return [{ file: "meta_log.json", content: JSON.stringify(doc, null, 2) }];
+    } });
+  allNodes = dedup.nodes; allEdges = dedup.edges;
+  const totalMerged = dedup.merged;
 
   logger.info(
     `REM dream cycle #${cycle} complete: ${allNodes.length} nodes, ${allEdges.length} edges ` +
-      `(${totalMerged} duplicates merged — ideas become beliefs)` +
+      `(${totalMerged} duplicates suppressed; speculative output remains untrusted)` +
       (skippedStrategies.length > 0 ? ` [skipped: ${skippedStrategies.join(", ")}]` : ""),
   );
 
@@ -339,5 +180,6 @@ export async function dream(
     strategy_yields: strategyYields,
     skipped_strategies: skippedStrategies,
     focus_entities: focusIds,
+    strategy_outcomes: strategyOutcomes,
   };
 }

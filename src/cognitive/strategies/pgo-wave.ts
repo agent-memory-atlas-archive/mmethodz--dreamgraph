@@ -17,6 +17,7 @@ export function pgoWaveDream(
   snapshot: FactSnapshot,
   cycle: number,
   max: number,
+  random: () => number = Math.random,
 ): DreamEdge[] {
   const edges: DreamEdge[] = [];
   const now = new Date().toISOString();
@@ -27,7 +28,7 @@ export function pgoWaveDream(
   // --- Burst amplitude (geometric distribution) ---
   const burstP = 0.3;
   let burstSize = 1;
-  while (Math.random() > burstP && burstSize < max) burstSize++;
+  while (random() > burstP && burstSize < max) burstSize++;
   burstSize = Math.max(2, Math.min(burstSize, max));
 
   logger.debug(`PGO wave: burst amplitude ${burstSize} (budget: ${max})`);
@@ -36,14 +37,14 @@ export function pgoWaveDream(
   const domainList = Array.from(snapshot.domains);
   const domainIndex = new Map<string, number>();
   for (let i = domainList.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(random() * (i + 1));
     [domainList[i], domainList[j]] = [domainList[j], domainList[i]];
   }
   domainList.forEach((d, i) => domainIndex.set(d, i));
 
   function levyTarget(source: FactEntity): FactEntity | null {
     const alpha = 1.5;
-    const u = Math.random();
+    const u = random();
     const step = Math.floor(1.0 / Math.pow(Math.max(u, 0.001), 1.0 / alpha));
 
     const sourceDomIdx = domainIndex.get(source.domain) ?? 0;
@@ -77,7 +78,7 @@ export function pgoWaveDream(
   const usedPairs = new Set<string>();
 
   for (let i = 0; i < burstSize && edges.length < max; i++) {
-    const source = entityList[Math.floor(Math.random() * entityList.length)];
+    const source = entityList[Math.floor(random() * entityList.length)];
     const target = levyTarget(source);
     if (!target) continue;
 
@@ -96,10 +97,10 @@ export function pgoWaveDream(
 
     const confidence = Math.min(
       0.50,
-      0.25 + distFactor * 0.15 + Math.random() * 0.10,
+      0.25 + distFactor * 0.15 + random() * 0.10,
     );
 
-    const relation = pgoRelations[Math.floor(Math.random() * pgoRelations.length)];
+    const relation = pgoRelations[Math.floor(random() * pgoRelations.length)];
 
     const sharedKw = source.keywords.filter((k) => target.keywords.includes(k));
     const reasonParts = [

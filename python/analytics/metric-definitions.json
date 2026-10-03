@@ -1,0 +1,67 @@
+{
+  "tension_flow": {
+    "population": "unique retained dream sessions and current unresolved risks",
+    "unit": "events",
+    "interpretation": "activity; decay is not closure"
+  },
+  "tension_halflife": {
+    "population": "retained closure events with known aware UTC times",
+    "unit": "seconds",
+    "interpretation": "closure lifetime distribution, not verified-fix half-life"
+  },
+  "reappearance_rate": {
+    "population": "retained closure events with stable risk identity",
+    "unit": "ratio",
+    "interpretation": "recorded reopenings; concern identity is not an entity pair"
+  },
+  "domain_saturation": {
+    "population": "all seven canonical factual families",
+    "unit": "entities",
+    "interpretation": "domain population; unknown domains are explicit"
+  },
+  "hub_health": {
+    "population": "typed factual entities and canonical fact relationships",
+    "unit": "entities",
+    "interpretation": "description coverage among connected entities, not correctness"
+  },
+  "confidence_integrity": {
+    "population": "current canonical entities",
+    "unit": "entities",
+    "interpretation": "confidence availability and assertion classes, not truth accuracy"
+  },
+  "promotion_funnel": {
+    "population": "latest typed canonical candidates and retained promotion rows",
+    "unit": "entities",
+    "interpretation": "current independently supported candidates versus historical promotion labels"
+  },
+  "orphan_pressure": {
+    "population": "all seven typed factual families and canonical fact relationships",
+    "unit": "entities",
+    "interpretation": "known isolated entities and unresolved relationship endpoints"
+  },
+  "model_impact": {
+    "population": "retained dream artifacts with explicit model provenance",
+    "unit": "artifacts",
+    "interpretation": "attribution only; no guessed model identity or usefulness"
+  },
+  "maturity_score": {
+    "population": "canonical result state and latest typed candidates",
+    "unit": "ratio",
+    "interpretation": "evidence coverage; no composite score can erase critical defects"
+  },
+  "meaningful_edges": {
+    "population": "latest typed candidate decisions",
+    "unit": "ratio",
+    "interpretation": "accepted decision rate; task meaningfulness remains unmeasured"
+  },
+  "domain_entropy": {
+    "population": "known-domain factual entities; unknowns excluded and counted",
+    "unit": "bits",
+    "interpretation": "population distribution, not health or desired attention"
+  },
+  "cognitive_load": {
+    "population": "current unresolved risks, unproven candidates and dirty scopes",
+    "unit": "items",
+    "interpretation": "workload, not agent confusion or understanding"
+  }
+}

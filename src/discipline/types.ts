@@ -315,6 +315,7 @@ export type PlanStatus = "draft" | "approved" | "in_progress" | "completed" | "a
 
 /** Structured implementation plan */
 export interface ImplementationPlan {
+  approval_binding?: { generation: number; delta_hash: string; content_hash: string };
   schema_version: "1.0.0";
   session_id: string;
   instance_uuid: string;
@@ -436,6 +437,9 @@ export interface PhaseTransitionRecord {
 
 /** The full task session — persisted to disk */
 export interface TaskSession {
+  approval_generation?: number;
+  /** Private transport owner; absent legacy sessions require explicit privileged migration. */
+  owner_namespace?: string;
   schema_version: "1.0.0";
   id: string;
   instance_uuid: string;

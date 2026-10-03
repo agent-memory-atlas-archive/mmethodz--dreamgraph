@@ -9,6 +9,7 @@ import type {
   TensionView,
 } from "./types";
 import { EXPECTED_SNAPSHOT_VERSION } from "./types";
+import {validateExplorerSnapshot} from "./view-contract";
 
 export class SnapshotVersionError extends Error {
   constructor(public got: number, public expected: number) {
@@ -28,11 +29,17 @@ export async function fetchSnapshot(): Promise<GraphSnapshot> {
   if (body.version !== EXPECTED_SNAPSHOT_VERSION) {
     throw new SnapshotVersionError(body.version, EXPECTED_SNAPSHOT_VERSION);
   }
-  return body;
+  return validateExplorerSnapshot(body);
 }
 
-export function fetchNode(id: string): Promise<NodeRecord> {
-  return getJson<NodeRecord>(`/explorer/api/node/${encodeURIComponent(id)}`);
+export function fetchNode(id:string,etag?:string,offset=0):Promise<NodeRecord>{
+  const qs=new URLSearchParams({offset:String(offset)});if(etag)qs.set("etag",etag);
+  return getJson<NodeRecord>(`/explorer/api/node/${encodeURIComponent(id)}?${qs}`);
+}
+
+export function fetchAgentContext(id:string,etag?:string):Promise<import("../../packages/sdk/src/graph-contracts").ContextPack>{
+  const qs=new URLSearchParams();if(etag)qs.set("etag",etag);
+  return getJson(`/explorer/api/context/${encodeURIComponent(id)}?${qs}`);
 }
 
 export function fetchNeighborhood(
@@ -70,12 +77,13 @@ export function fetchEdges(
 
 export function fetchTensions(
   status: "active" | "resolved" | "all" = "active",
+  etag?:string,
 ): Promise<TensionView> {
-  return getJson<TensionView>(`/explorer/api/tensions?status=${status}`);
+  return getJson<TensionView>(`/explorer/api/tensions?status=${status}${etag?`&etag=${encodeURIComponent(etag)}`:""}`);
 }
 
-export function fetchStats(): Promise<StatsResult> {
-  return getJson<StatsResult>("/explorer/api/stats");
+export function fetchStats(etag?:string): Promise<StatsResult> {
+  return getJson<StatsResult>(`/explorer/api/stats${etag?`?etag=${encodeURIComponent(etag)}`:""}`);
 }
 
 /* ------------------------------------------------------------------ */
@@ -145,12 +153,13 @@ export interface CandidatesResult {
   total: number;
   pending: number;
   orphaned?: number;
+  omitted?:number;
   last_normalization: string | null;
   candidates: CandidateRow[];
 }
 
-export function fetchCandidates(): Promise<CandidatesResult> {
-  return getJson<CandidatesResult>("/explorer/api/candidates");
+export function fetchCandidates(etag?:string): Promise<CandidatesResult> {
+  return getJson<CandidatesResult>(`/explorer/api/candidates${etag?`?etag=${encodeURIComponent(etag)}`:""}`);
 }
 
 interface ClientMetricsBatch {

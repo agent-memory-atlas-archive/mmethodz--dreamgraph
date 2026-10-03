@@ -1,6 +1,8 @@
 # DreamGraph Tools Reference
 
-> Complete catalog of all 76 MCP tools (28 cognitive + 38 general + 10 discipline) and 27 MCP resources.
+> 93 core MCP tools and 31 core MCP resource URIs. The [generated registration catalogue](contracts/mcp-catalog.md) owns current counts, input schemas, effect and discipline policy. Live `tools/list` includes instance hints and plugin contributions; the historical [audit tool matrix](audits/2026-09-30-coverage/mcp-tool-matrix.md) remains baseline evidence. See [MCP compatibility and bridge contract](ashoka/mcp-contract.md).
+
+`scan_project` and `scan_database` retain their analysis discipline phases but are graph-writing effects: managed executions require exact action authority and context admission. An analysis classification does not grant read-only execution privileges.
 
 The DreamGraph Architect actively calls these tools during conversations to build, query, enrich, and maintain the knowledge graph. Any MCP-compatible client can also invoke them directly.
 
@@ -19,8 +21,13 @@ Trigger a full AWAKE → REM → NORMALIZING → AWAKE cycle. Generates speculat
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `strategy` | enum | `"all"` | `llm_dream`, `pgo_wave`, `gap_detection`, `weak_reinforcement`, `cross_domain`, `missing_abstraction`, `symmetry_completion`, `tension_directed`, `causal_replay`, `reflective`, `orphan_bridging`, `schema_grounding`, `all` |
-| `max_dreams` | number (1–500) | 100 | Maximum dream items to generate |
+| `max_dreams` | integer (0–500) | 100 | Combined node/edge/shadow-tension budget; zero skips decay, normalization and inference |
 | `auto_normalize` | boolean | true | Run normalization after dreaming |
+| `focus_entities` | string[] (≤100) | none | Explicit strategy scope; unknown IDs fail without broadening |
+| `focus_hops` | integer (0–4) | 2 | Neighborhood expansion; zero keeps the requested roots |
+| `focus_reason` | string (≤500 characters) | none | Reason for the targeted pass |
+
+`reflective` is retained as a historical input with an explicit retired error. [Strategy execution](ashoka/strategies.md) bounds and validates speculative output; `strategy_outcomes` distinguishes completed, failed and zero-allocation attempts. Named model failures never masquerade as a successful empty strategy.
 
 **Post-cycle hooks (v5.1):** `maybeAutoNarrate()` — generates a chapter every 10 cycles; `checkTensionThresholds()` — dispatches event if tension count exceeds limit.
 
@@ -297,21 +304,35 @@ Retrieve execution history for a schedule or all schedules.
 
 #### `graph_rag_retrieve`
 
-Retrieve knowledge-graph context using TF-IDF entity resolution, BFS sub-graph extraction, and token-budgeted serialization.
+Retrieve a `dreamgraph.context_pack.v1` from the canonical graph without a model call. All 17 entity families, inline facts and speculative relationships preserve typed identities and provenance. Whole evidence units, structured fields, selected plan/slice and relevant ADRs are budgeted before optional expansion. `mandatory_satisfied: false` means required context is insufficient; retrieve the named anchors or increase the budget before dependent execution. Counts and selection reasons describe emitted records.
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `query` | string | yes | — | Natural-language query to resolve against the knowledge graph |
 | `mode` | enum | no | `comprehensive` | Retrieval mode: `entity_focused`, `tension_focused`, `narrative_focused`, `comprehensive` |
-| `maxTokens` | number | no | 2000 | Token budget for the serialized context window |
+| `token_budget` | integer | no | 2000 | 1–10,000; serialized text including heading/provenance, using a conservative UTF-8 byte token upper bound |
+| `metadata_budget_bytes` | integer | no | 32,768 | 4,096–65,536; separate compact pack metadata budget, excluding `context_text` |
+| `depth` | integer | no | 2 | 0–5 graph hops; zero retrieves matching anchors only |
+| `max_neighbors` | integer | no | 20 | 0–100 eligible neighbors per expanded node; independent of hops |
+| `max_records` | integer | no | 40 | 1–128 emitted entities, semantic fields and relationships |
+| `kinds`, `domains`, `repositories`, `assertion_classes` | string[] | no | — | Restrict requested scope without reclassifying evidence |
+| `mandatory_identities`, `mandatory_evidence_ids` | array | no | [] | Required typed anchors/evidence references; missing/filter-conflicting anchors are explicit |
+| `plan_id`, `slice_id` | string | no | — | Reserve selected plan/slice context without claiming it is running |
+| `changed_files` | object[] | no | [] | `{repository_id, path}`; reserve mapped dependencies and name unmapped targeted-source fallback paths |
+| `execution_id`, `adapter` | string | no | — / `unbound` | Bind an assembly receipt; delivery is `unattested` until an adapter actually acknowledges it |
+| `include_tensions`, `include_narrative` | boolean | no | true | Include these families in eligible scope |
+| `representation` | enum | no | `canonical` | `legacy` retains incomplete families/raw IDs/estimated budgets; new controls fail explicitly there |
+
+`dream://context` contains the same canonical pack as one whole paged-resource record. Source fallback names required reads; it does not claim they occurred. Managed source effects affect only known dependent scopes until reconciliation. Pending optional cognition and an old full scan do not make reconciled facts stale. `DG_GRAPH_CONTEXT_REPRESENTATION=legacy` is a temporary comparison switch; explicit `canonical` overrides it.
 
 #### `get_cognitive_preamble`
 
-Return a ready-to-inject LLM preamble summarizing the system's current cognitive state, active tensions, and recent dream history.
+Return the same bounded canonical pack for pre-prompt injection without probing a provider. Whole units that cannot fit are visibly omitted. The internal task compiler returns no accepted preamble when mandatory context is insufficient. Caller-supplied evidence and explicit legacy retrieval retain compatibility/comparison paths.
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `maxTokens` | number | no | 2000 | Token budget for the preamble |
+| `max_tokens` | number | no | 500 | 50–2,000; conservative upper bound for the complete text |
+| `representation` | enum | no | `canonical` | Explicit `legacy` enables the limited old preamble for comparison |
 
 #### `shortest_path`
 
@@ -418,6 +439,7 @@ Create or overwrite a file. Auto-creates parent directories.
 |-----------|------|----------|-------------|
 | `filePath` | string | yes | File path |
 | `content` | string | yes | File content |
+| `expected_hash` | string or null | no | Exact current `sha256:<hex>`; null requires an absent file. A mismatch refuses before source intent/write. |
 | `repo` | string | no | Repo name |
 
 #### `edit_file`
@@ -438,6 +460,7 @@ Delete a file inside a configured repository.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `filePath` | string | yes | File path |
+| `expected_hash` | string | no | Exact reviewed `sha256:<hex>`; refuses newer bytes before intent/deletion. |
 | `repo` | string | no | Repo name |
 
 #### `rename_file`
@@ -590,10 +613,16 @@ Search for a data model entity by name.
 
 Generic URI-based resource query.
 
+MCP resource reads and this tool share the [Ashoka resource contract](ashoka/resources.md). Default results are bounded whole-record pages with revision, currency and explicit completeness. Follow continuation with the same URI/filter. `system://capabilities` describes runtime; project capabilities use `system://capability-entities`.
+
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `uri` | string | yes | `system://features`, `system://workflows`, `system://data-model`, `dream://graph`, etc. |
 | `filter` | object | no | Key/value filter |
+| `limit` | integer | no | 1–1000 whole records; default 50 |
+| `max_bytes` | integer | no | Serialized page byte limit including metadata; 1024–65536, default 8192 |
+| `cursor` | string | no | Opaque same-URI/filter/revision continuation; invalid/changed/expired cursors require restarting |
+| `contract_version` | enum | no | `v1` (default) revisioned records; `legacy` bounded raw presentation without paging |
 
 ---
 
@@ -675,7 +704,7 @@ Fallback nodes remain retryable in `enrichment_state.json`, with at most three c
 
 #### `scan_project`
 
-Automated project scan followed by mandatory graph-wide semantic enrichment. Discovery honors the project-root `.gitignore`, scans requested repositories and UI/native sources, and introspects configured PostgreSQL tables when `DATABASE_URL` is present. It then forces `enrich_parser_nodes(target="all")` with the requested `context_hops` (0–6, default 3) so every canonical node is evaluated with source-backed context. CLI: `dg scan <instance> --max-hops 1`. This controls enrichment depth independently of filesystem `depth`; it also applies when incremental scans explicitly request enrichment. The result reports incomplete semantic coverage explicitly when no valid LLM route can satisfy the node contracts.
+Automated project scan followed by mandatory graph-wide semantic enrichment. Discovery honors the project-root `.gitignore`, scans requested repositories and UI/native sources, and introspects configured PostgreSQL tables when `DATABASE_URL` is present. It then forces `enrich_parser_nodes(target="all")` with the requested `context_hops` (0–6, default 2) so every canonical node is evaluated with source-backed context. CLI: `dg scan <instance> --max-hops 1`. This controls enrichment depth independently of filesystem `depth`; it also applies when incremental scans explicitly request enrichment. The result reports incomplete semantic coverage explicitly when no valid LLM route can satisfy the node contracts.
 
 This is a convenience orchestrator. All individual tools (`init_graph`, `enrich_seed_data`, `register_ui_element`) remain available for manual or targeted enrichment.
 
@@ -1024,7 +1053,9 @@ Complete or abandon the active discipline session.
 
 ---
 
-## MCP Resources (27)
+## MCP Resources (31 core)
+
+All core resources use [the shared revisioned paging envelope](ashoka/resources.md). Empty, partial, unknown and unavailable results remain distinct; oversized records are never clipped. Plugin-contributed resources have their declared host contract.
 
 | URI | Description |
 |-----|-------------|
@@ -1064,8 +1095,11 @@ System resources (registered in [src/resources/register.ts](../src/resources/reg
 | `system://data-model` | Entity definitions and relationships |
 | `system://datastores` | Shared infrastructure (databases) referenced by data_model. Includes scanned table metadata. Empty when no datastore is configured. |
 | `system://capabilities` | Server capabilities, strategies & available tools |
+| `system://capability-entities` | Canonical project capability entities; separate from runtime capabilities |
 | `system://index` | Central entity index for fast lookup and cross-resource linking. `type` covers features/workflows/data_model plus the four auxiliary kinds (`test_suite`, `configuration`, `automation_script`, `mcp_tool`) populated by `scan_project`. |
 | `system://plugins` | M3/M3.5/M4 plugin host inventory. `loaded[]` entries now include `activated`, `subscription_count`, `contributed_tools[]` (names) and `contributed_resources[]` (uri namespaces) alongside the original M3 fields (`id`, `version`, `trusted`, `capabilities`, `last_seen_effects`, `last_rejection`). Also lists `discovered_not_loaded[]`. Updated live by `plugin_reload`/`plugin_unload`. |
+| `system://metrics` | Same live observability snapshot as `ops://metrics` |
+| `system://webhooks` | Registered outbound webhook endpoints (secrets redacted) and dead-letter deliveries |
 
 ### Plugin telemetry event kinds (M3)
 
@@ -1151,3 +1185,21 @@ All mutation endpoints share the same precondition contract:
 - **Reasoned mutations** � Reason text is mandatory. The LLM `reason-suggest` endpoint produces a draft, but the human signs the final text.
 - **Inspect-first UI** � Tensions and candidates render entity/endpoint chips that jump to the Inspector tab; nothing is destructive without first being inspectable.
 <!-- CONTINUATION TEST SLICE 6 -->
+
+
+### Ashoka plan lifecycle HTTP boundary
+
+Browser Architect shares the daemon's typed plan authority. Read-only definition previews use `GET /api/architect/v1/plans/{id}/lifecycle/preview`; content-bound import/reconciliation uses `POST .../lifecycle/review`; lifecycle commands use `POST .../lifecycle/commands` with operation identity and expected state revision/definition hash. The authenticated session supplies actor identity. Runtime lease admission is internal, and prose/audit pass reports do not verify slices. These are HTTP routes, not additional MCP tools; the 93-tool/31-resource catalogue is unchanged. See [C14 authority](ashoka/plan-authority.md).
+
+Ashoka Slice 16 [curation and retention](ashoka/curation-retention.md) adds append-only dispositions to existing `graph_maintenance.json` and reversible hash-bound archives. The source owner is `src/cognitive/curation.ts`. Reject/retire/reopen, dream decay and quarantine share the graph publication writer; human acceptance remains a human assertion and assessment history is preserved. `mutate_validated_edge` now requires `reason` and `expected_revision` and accepts `operation_id`/`dry_run`; retarget creates a proposal requiring revalidation. Qualification is pending.
+
+### Ashoka Slice 17 schedule contract changes
+
+`schedule_dream` defaults `enabled` to false and accepts optional `operation_id`, `timezone` (UTC by default), `fold_policy` (`once`/`both`) and `missed_policy` (`skip`/`catch_up_once`). `update_schedule`, `delete_schedule` and `run_schedule_now` now require `expected_revision` (integer definition revision) and `operation_id` (stable identity). Invalid or unknown action parameters are rejected rather than replaced by broader defaults. Run-now bypasses timing, while retaining rate/cooldown/budget/conflict guards. History preserves original definition snapshots. The inventory remains 93 tools and 31 resources.
+
+Core browser ports are `GET /api/schedules/v2`, `GET /api/schedules/v2/preview?id=...`, `POST /api/schedules/v2/create`, `POST /api/schedules/v2/commands` and bounded `GET /api/jobs/v1?offset=0&limit=50` (maximum 100). Preview explicitly reports its 32-day search horizon and whether all requested occurrences were found. Private session jobs are scoped to the authenticated owner. The schedule workspace in Slice 29 consumes these ports; current qualification is in progress.
+
+Ashoka get_causal_insights describes temporal correlation hypotheses and explicit limitations, not proven causal influence. get_temporal_insights uses recorded readings and unknown times. import_dream_archetypes accepts checked v2 exchanges; invalid/legacy/changed-origin imports return a quarantined outcome. dream://archetypes omits preserved original quarantine bytes. export_dream_archetypes returns the safe immutable artifact path and manifest digest. Catalog counts remain 93 tools / 31 resources.
+
+Slice 19 extends resolve_tension with expected_revision (per-risk conflict detection) and verification_claim (exact independent-source connection predicate). Human dispositions require a rationale; system dispositions cannot accept heuristic wont_fix or prove false-positive status. No tool/resource count changes. Proposal/action/expiry are explicitly distinct from verified resolution.
+The authenticated host execution API (`POST /api/executions/v1/begin`, `/read`, `/finish`) lets a native editor/SDK host retain its own model adapter while obtaining daemon-owned context and exact bounded effect authority. These are host-control routes, not MCP tools advertised to models. Approval issuance uses the host session; the returned ephemeral worker credential is limited to existing MCP/command/context transport and cannot issue new approvals. Cancellation, confirmed termination, graph reconciliation and slice verification remain separate dispositions. Ordinary editor/SDK loop adoption is tracked in Slice25.

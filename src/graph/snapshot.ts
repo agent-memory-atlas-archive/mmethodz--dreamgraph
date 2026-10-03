@@ -11,16 +11,21 @@
  *     edges: [{s,t,kind,conf}]
  *   }
  *
- * Phase 0: read-only, no caching, no SSE invalidation. Recomputed on
- * every request. Future phases add ETag-keyed caching and event-driven
- * invalidation.
+ * Snapshot requests recheck canonical evidence. Detail reads reuse a bounded
+ * exact as-of view; explicit refresh and autonomous snapshot events replace
+ * the rendered view. Cache-invalidated telemetry alone never does so.
  */
 
 import { createHash } from "node:crypto";
-import { loadGraphRaw, type GraphRawSnapshot } from "./store.js";
+import fs from "node:fs/promises";
+import { resolve } from "node:path";
+import { getDataDir } from "../utils/paths.js";
+import type { GraphRawSnapshot } from "./store.js";
 import { recordSnapshotMetrics } from "./metrics.js";
 import { graphEventBus } from "./events.js";
 import { getActiveScope } from "../instance/index.js";
+import { loadCanonicalGraph, type CanonicalGraphRead } from "./read-model.js";
+import { graphIdentityKey, type GraphIdentity, type GraphEntity, type GraphRelationship, type ResultState, type GraphCurrency, type RevisionVector } from "./contracts.js";
 import { FORBIDDEN_PERSISTENCE_SENTINELS } from "../semantic-invariants.js";
 import type {
   Feature,
@@ -33,6 +38,7 @@ import type {
 } from "../types/index.js";
 
 export const SNAPSHOT_VERSION = 1;
+export const CANONICAL_EXPLORER_VERSION = 2;
 
 export type ExplorerNodeType =
   | "feature"
@@ -60,6 +66,9 @@ export interface ExplorerNode {
   health: number;
   /** 0..1 — confidence where applicable (dream nodes, validated nodes). 1.0 default. */
   confidence: number;
+  identity?: GraphIdentity;
+  assertion_class?: GraphEntity["assertion_class"];
+  confidence_known?: boolean;
 }
 
 export interface ExplorerEdge {
@@ -68,6 +77,9 @@ export interface ExplorerEdge {
   kind: ExplorerEdgeKind;
   /** 0..1 confidence. */
   conf: number;
+  id?: string;
+  assertion_class?: GraphRelationship["assertion_class"];
+  relation?: string;
 }
 
 export interface SnapshotStats {
@@ -78,13 +90,20 @@ export interface SnapshotStats {
 }
 
 export interface GraphSnapshot {
-  version: typeof SNAPSHOT_VERSION;
+  version: number;
   etag: string;
   generated_at: string;
   instance_uuid: string;
   stats: SnapshotStats;
   nodes: ExplorerNode[];
   edges: ExplorerEdge[];
+  representation?: "canonical" | "legacy";
+  revision?: RevisionVector;
+  currency?: GraphCurrency;
+  state?: ResultState;
+  scope?: { rendered_nodes: number; eligible_nodes: number; canonical_entities: number; rendered_edges: number; canonical_relationships: number; omitted_nodes: number; omitted_edges: number; excluded_families: string[] };
+  render_key?:string;
+  canonical_state?:ResultState;
 }
 
 /* ------------------------------------------------------------------ */
@@ -347,9 +366,8 @@ function buildSnapshot(raw: GraphRawSnapshot): GraphSnapshot {
 /** Last etag we surfaced — used to detect drift and emit snapshot.changed. */
 let lastEmittedEtag: string | null = null;
 
-export async function getGraphSnapshot(): Promise<GraphSnapshot> {
-  const raw = await loadGraphRaw();
-  const snapshot = buildSnapshot(raw);
+export async function getGraphSnapshot(fresh = false): Promise<GraphSnapshot> {
+  const { snapshot } = await getExplorerGraphView(undefined, fresh);
   if (lastEmittedEtag !== snapshot.etag) {
     const previous = lastEmittedEtag;
     lastEmittedEtag = snapshot.etag;
@@ -372,9 +390,85 @@ export async function getGraphSnapshot(): Promise<GraphSnapshot> {
 /** Test seam — clear etag drift tracking so unit tests start clean. */
 export function _resetSnapshotEmitterForTest(): void {
   lastEmittedEtag = null;
+  resetExplorerViews();
 }
 
 /** Exposed for unit tests so they can drive the builder with fixtures. */
 export function buildSnapshotForTest(raw: GraphRawSnapshot): GraphSnapshot {
   return buildSnapshot(raw);
+}
+
+/** Explicit transitional projection for same-revision compatibility audits. */
+export function buildLegacyGraphSnapshot(raw: GraphRawSnapshot): GraphSnapshot {
+  return { ...buildSnapshot(raw), representation: "legacy" };
+}
+
+/** Both renderers and the agent use the same typed identity and present evidence assessment. */
+export function buildCanonicalExplorerSnapshot(graph: CanonicalGraphRead): GraphSnapshot {
+  const started = performance.now();
+  const types: Partial<Record<GraphIdentity["kind"], ExplorerNodeType>> = {
+    feature:"feature", workflow:"workflow", data_model:"data_model", capability:"capability", auxiliary:"capability",
+    datastore:"datastore", ui_element:"ui_element", dream_node:"dream_node", tension:"tension",
+  };
+  const eligible = graph.entities.filter(e => types[e.identity.kind] && e.assertion_class !== "historical").sort((a,b)=>graphIdentityKey(a.identity).localeCompare(graphIdentityKey(b.identity)));
+  const nodes: ExplorerNode[] = eligible.slice(0,10000).map(entity=>({ id:graphIdentityKey(entity.identity), identity:entity.identity,
+    type:types[entity.identity.kind]!, label:entity.label, degree:0, health:1, confidence:entity.confidence ?? 0.5,
+    confidence_known:entity.confidence !== null, assertion_class:entity.assertion_class }));
+  const byId = new Map(nodes.map(node=>[node.id,node]));
+  const edges: ExplorerEdge[] = [];
+  for (const relation of [...graph.relationships].sort((a,b)=>a.id.localeCompare(b.id))) {
+    if (!relation.source || !relation.target) continue;
+    const s=graphIdentityKey(relation.source), t=graphIdentityKey(relation.target);
+    if (!byId.has(s) || !byId.has(t) || edges.length>=30000) continue;
+    // Historical promotion is never enough to produce the authoritative green channel.
+    const kind = relation.kind === "validated" && relation.assertion_class !== "validated_insight" ? "candidate" : relation.kind;
+    edges.push({id:relation.id,s,t,kind,conf:relation.confidence ?? 0.5,assertion_class:relation.assertion_class,relation:relation.relation});
+    byId.get(s)!.degree++; byId.get(t)!.degree++;
+    if (kind === "tension") { byId.get(s)!.health=Math.max(0.1,byId.get(s)!.health-0.2); byId.get(t)!.health=Math.max(0.1,byId.get(t)!.health-0.2); }
+  }
+  for (const node of nodes) if (!node.degree && node.type !== "tension") node.health=0.6;
+  const scope={rendered_nodes:nodes.length,eligible_nodes:eligible.length,canonical_entities:graph.entities.length,rendered_edges:edges.length,
+    canonical_relationships:graph.relationships.length,omitted_nodes:eligible.length-nodes.length,omitted_edges:graph.relationships.length-edges.length,
+    excluded_families:[...new Set(graph.entities.filter(e=>!types[e.identity.kind]||e.assertion_class==="historical").map(e=>e.identity.kind))].sort()};
+  const state:ResultState={...graph.state,reasons:[...graph.state.reasons]};
+  if (scope.omitted_nodes || scope.omitted_edges) { state.completeness="partial";state.reasons.push({code:"EXPLORER_RENDER_SCOPE",scope:[],detail:`${scope.omitted_nodes} eligible nodes and ${scope.omitted_edges} relationships omitted by render limits or non-rendered families; evidence/context remains available through canonical retrieval.`}); }
+  const render_key=createHash("sha256").update(JSON.stringify({nodes,edges})).digest("hex");
+  const body={version:CANONICAL_EXPLORER_VERSION,representation:"canonical" as const,instance_uuid:graph.instance_id,revision:graph.revision,currency:graph.currency,state,canonical_state:graph.state,render_key,scope,nodes,edges};
+  const serialized=JSON.stringify(body), bytes=Buffer.byteLength(serialized,"utf8");
+  if(bytes>24*1024*1024)throw new Error("EXPLORER_SNAPSHOT_BYTE_LIMIT");
+  const snapshot:GraphSnapshot={...body,etag:`sha256:${createHash("sha256").update(serialized).update(JSON.stringify(graph.store_hashes)).digest("hex").slice(0,32)}`,
+    generated_at:new Date().toISOString(),stats:{node_count:nodes.length,edge_count:edges.length,build_ms:Math.round(performance.now()-started),bytes_uncompressed:bytes}};
+  recordSnapshotMetrics(snapshot.stats);return snapshot;
+}
+
+type ExplorerView = {graph:CanonicalGraphRead;snapshot:GraphSnapshot};
+// A detail request belongs to the rendered snapshot, not whatever publication happens
+// to win the race next. Keep at most three exact physical views. Age alone does
+// not invalidate a displayed snapshot; eviction requires an explicit refresh.
+const retainedViews = new Map<string,ExplorerView>();
+const pendingViews = new Map<string,Promise<ExplorerView>>();
+const MAX_RETAINED_VIEWS = 3;
+export function resetExplorerViews():void { retainedViews.clear(); pendingViews.clear(); }
+function retain(key:string,view:ExplorerView):ExplorerView {
+  retainedViews.delete(key);retainedViews.set(key,view);
+  while(retainedViews.size>MAX_RETAINED_VIEWS)retainedViews.delete(retainedViews.keys().next().value!);
+  return view;
+}
+/** Pure, bounded as-of views. Refresh rechecks all evidence, including source files. */
+export async function getExplorerGraphView(expectedEtag?:string, fresh = false):Promise<ExplorerView>{
+  const directory=await fs.realpath(getDataDir()).catch((error:NodeJS.ErrnoException)=>{if(error.code==='ENOENT')return resolve(getDataDir());throw error;});
+  const instance=getActiveScope()?.uuid??"legacy",prefix=directory+'\0'+instance+'\0';
+  if(expectedEtag){
+    const pinned=retainedViews.get(prefix+expectedEtag);
+    if(!pinned)throw new Error('EXPLORER_REVISION_CONFLICT');
+    return pinned;
+  }
+  // A writer must not join a reader queued behind its own exclusive boundary.
+  const existing=pendingViews.get(prefix);if(existing&&!fresh)return existing;
+  const pending=(async()=>{
+    const graph=await loadCanonicalGraph(instance),view={graph,snapshot:buildCanonicalExplorerSnapshot(graph)};
+    return retain(prefix+view.snapshot.etag,view);
+  })();
+  if(!fresh)pendingViews.set(prefix,pending);
+  try{return await pending;}finally{if(pendingViews.get(prefix)===pending)pendingViews.delete(prefix);}
 }

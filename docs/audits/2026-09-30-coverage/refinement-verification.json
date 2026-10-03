@@ -1,0 +1,140 @@
+{
+  "method": "Read-only built DreamGraph loadPlanDetail; no runtime behavior tests",
+  "plan_id": "graph-trust-and-agent-effectiveness",
+  "title": "DreamGraph v14.0.0 - Ashoka",
+  "plan_revision": 7,
+  "status": "draft",
+  "slice_count": 32,
+  "all_pending": true,
+  "all_32_ids_preserved": true,
+  "checkpoint_count": 0,
+  "execution_state": "idle",
+  "known_current_projection_defect": {
+    "lifecycle": "draft",
+    "current": "slice-0-establish-the-engine-alignment-contract",
+    "active": "slice-0-establish-the-engine-alignment-contract",
+    "next": "slice-0-establish-the-engine-alignment-contract",
+    "disposition": "F15/C14 existing phantom-active projection remains unmodified; draft/idle and zero checkpoints do not mean Slice 0 began."
+  },
+  "release_target": "14.0.0",
+  "checks": {
+    "parser": "pass",
+    "stable_slice_ids": "32/32 preserved",
+    "markdown_manifest_handoffs": "match",
+    "dependency_dag": "acyclic",
+    "dependency_sets_changed": 17,
+    "release_closure": 32,
+    "integration_obligations": "no reverse prerequisite cycle",
+    "contract_count": 17,
+    "policy_count": 14,
+    "concept_paths": 35,
+    "route_paths": 10,
+    "surfaces": 8,
+    "migration_phases": 9,
+    "migration_families": 12,
+    "compound_cases": 21,
+    "schedule_cases": 13,
+    "baseline_task_cases": 12,
+    "lifecycle_cases": 16,
+    "graph_execution_cases": 16,
+    "architect_interaction_cases": 12,
+    "computer_use_cases": 24,
+    "computer_use_work_packages": 8,
+    "relative_links_and_fragments": {
+      "checked": 431,
+      "broken": 0
+    },
+    "source_anchor_paths": "exist",
+    "source_hashes_unchanged": 28,
+    "owner_request_hashes": "match"
+  },
+  "topological_levels": [
+    [
+      0
+    ],
+    [
+      2
+    ],
+    [
+      1,
+      5,
+      7
+    ],
+    [
+      3,
+      8,
+      10
+    ],
+    [
+      4,
+      6
+    ],
+    [
+      9,
+      11
+    ],
+    [
+      12
+    ],
+    [
+      13,
+      21
+    ],
+    [
+      15,
+      30
+    ],
+    [
+      14,
+      16
+    ],
+    [
+      17
+    ],
+    [
+      18
+    ],
+    [
+      19
+    ],
+    [
+      20,
+      22
+    ],
+    [
+      24,
+      29
+    ],
+    [
+      25
+    ],
+    [
+      23,
+      26,
+      31
+    ],
+    [
+      27
+    ],
+    [
+      28
+    ]
+  ],
+  "freshness_rule": "Old scan does not equal stale graph. DreamGraph MCP/Architect mutations keep the graph current; inclusive rescan after substantial changes without DreamGraph is the user’s choice.",
+  "system_correctness_rule": "DreamGraph guarantees system correctness under valid use. The user owns operating discipline outside that contract.",
+  "runtime_acceptance": "Not run; all future implementation, fault-injection, model and platform scenarios remain pending. Static consistency checks do not prove runtime correctness.",
+  "comparative_agent_evaluation": "Specified; not executed",
+  "native_governance": {
+    "current_revision_registered": false,
+    "revision_6_reference": "refinement-verification-r6.json",
+    "historical_session_id": "6b16dd05-1f3d-43fb-923d-ef85018bdb2c",
+    "historical_status": "draft",
+    "approved": false,
+    "reason": "Owner permits only read-only daemon inspection in this pass."
+  },
+  "plan_sha256": "e17d5b562e86b11c71bb5081f4dc96949aa4916a2e2dc2a4b82a2c8f36094c7b",
+  "manifest_sha256": "264c2da00305312f9e48c28008dd31a5cd7f58889fdd80e14c5e00322da52053",
+  "simulation_sha256": "cf57c3e4c53c02e46ffa90e75c3f6a598d5b7a63522a27514009777b3c262b6e",
+  "machine_simulation_sha256": "8175b144068b14aed9f3999bac29e529b96fdb49460a6114659662bf8adde70c",
+  "checked_at": "2026-09-30T14:57:45.071872+00:00"
+}

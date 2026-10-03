@@ -1,0 +1,1658 @@
+{
+  "recorded_at": "2026-09-30T11:18:58.424356+00:00",
+  "commit": "563d10c8109cbe3388cde71168bdcff149c96e0f",
+  "version": "13.4.0",
+  "scope_note": "Existing Architect visual changes are included. Source coverage is root Vitest only; test mentions are discovery evidence, not assertions of behavioral coverage. Live probes target web64-react; stored analytics target DreamGraph.",
+  "totals": {
+    "lines": {
+      "total": 78235,
+      "covered": 32157,
+      "skipped": 0,
+      "pct": 41.1
+    },
+    "statements": {
+      "total": 78235,
+      "covered": 32157,
+      "skipped": 0,
+      "pct": 41.1
+    },
+    "functions": {
+      "total": 2313,
+      "covered": 1545,
+      "skipped": 0,
+      "pct": 66.79
+    },
+    "branches": {
+      "total": 10477,
+      "covered": 7070,
+      "skipped": 0,
+      "pct": 67.48
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "areas": {
+    "packages/host": {
+      "files": 7,
+      "lines_total": 613,
+      "lines_covered": 384,
+      "functions_total": 45,
+      "functions_covered": 25,
+      "line_pct": 62.64,
+      "function_pct": 55.56
+    },
+    "packages/sdk": {
+      "files": 16,
+      "lines_total": 845,
+      "lines_covered": 200,
+      "functions_total": 14,
+      "functions_covered": 2,
+      "line_pct": 23.67,
+      "function_pct": 14.29
+    },
+    "packages/token-economy": {
+      "files": 4,
+      "lines_total": 670,
+      "lines_covered": 0,
+      "functions_total": 4,
+      "functions_covered": 0,
+      "line_pct": 0.0,
+      "function_pct": 0.0
+    },
+    "src/index.ts": {
+      "files": 1,
+      "lines_total": 369,
+      "lines_covered": 0,
+      "functions_total": 1,
+      "functions_covered": 0,
+      "line_pct": 0.0,
+      "function_pct": 0.0
+    },
+    "src/semantic-invariants.ts": {
+      "files": 1,
+      "lines_total": 15,
+      "lines_covered": 15,
+      "functions_total": 0,
+      "functions_covered": 0,
+      "line_pct": 100.0,
+      "function_pct": 0.0
+    },
+    "src/api": {
+      "files": 1,
+      "lines_total": 1173,
+      "lines_covered": 0,
+      "functions_total": 1,
+      "functions_covered": 0,
+      "line_pct": 0.0,
+      "function_pct": 0.0
+    },
+    "src/architect": {
+      "files": 15,
+      "lines_total": 10721,
+      "lines_covered": 7449,
+      "functions_total": 544,
+      "functions_covered": 434,
+      "line_pct": 69.48,
+      "function_pct": 79.78
+    },
+    "src/cli": {
+      "files": 24,
+      "lines_total": 5075,
+      "lines_covered": 675,
+      "functions_total": 133,
+      "functions_covered": 44,
+      "line_pct": 13.3,
+      "function_pct": 33.08
+    },
+    "src/cognitive": {
+      "files": 41,
+      "lines_total": 17298,
+      "lines_covered": 4506,
+      "functions_total": 450,
+      "functions_covered": 205,
+      "line_pct": 26.05,
+      "function_pct": 45.56
+    },
+    "src/config": {
+      "files": 1,
+      "lines_total": 105,
+      "lines_covered": 76,
+      "functions_total": 8,
+      "functions_covered": 7,
+      "line_pct": 72.38,
+      "function_pct": 87.5
+    },
+    "src/discipline": {
+      "files": 10,
+      "lines_total": 3842,
+      "lines_covered": 0,
+      "functions_total": 10,
+      "functions_covered": 0,
+      "line_pct": 0.0,
+      "function_pct": 0.0
+    },
+    "src/explorer": {
+      "files": 10,
+      "lines_total": 1442,
+      "lines_covered": 716,
+      "functions_total": 83,
+      "functions_covered": 45,
+      "line_pct": 49.65,
+      "function_pct": 54.22
+    },
+    "src/graph": {
+      "files": 5,
+      "lines_total": 571,
+      "lines_covered": 403,
+      "functions_total": 28,
+      "functions_covered": 26,
+      "line_pct": 70.58,
+      "function_pct": 92.86
+    },
+    "src/instance": {
+      "files": 9,
+      "lines_total": 1547,
+      "lines_covered": 753,
+      "functions_total": 64,
+      "functions_covered": 28,
+      "line_pct": 48.67,
+      "function_pct": 43.75
+    },
+    "src/observability": {
+      "files": 1,
+      "lines_total": 314,
+      "lines_covered": 3,
+      "functions_total": 13,
+      "functions_covered": 0,
+      "line_pct": 0.96,
+      "function_pct": 0.0
+    },
+    "src/plugins": {
+      "files": 5,
+      "lines_total": 1606,
+      "lines_covered": 1020,
+      "functions_total": 79,
+      "functions_covered": 73,
+      "line_pct": 63.51,
+      "function_pct": 92.41
+    },
+    "src/resources": {
+      "files": 1,
+      "lines_total": 390,
+      "lines_covered": 234,
+      "functions_total": 2,
+      "functions_covered": 1,
+      "line_pct": 60.0,
+      "function_pct": 50.0
+    },
+    "src/scanner": {
+      "files": 14,
+      "lines_total": 8955,
+      "lines_covered": 8030,
+      "functions_total": 348,
+      "functions_covered": 337,
+      "line_pct": 89.67,
+      "function_pct": 96.84
+    },
+    "src/server": {
+      "files": 2,
+      "lines_total": 1407,
+      "lines_covered": 359,
+      "functions_total": 49,
+      "functions_covered": 19,
+      "line_pct": 25.52,
+      "function_pct": 38.78
+    },
+    "src/tools": {
+      "files": 40,
+      "lines_total": 18748,
+      "lines_covered": 6541,
+      "functions_total": 329,
+      "functions_covered": 230,
+      "line_pct": 34.89,
+      "function_pct": 69.91
+    },
+    "src/types": {
+      "files": 1,
+      "lines_total": 744,
+      "lines_covered": 0,
+      "functions_total": 1,
+      "functions_covered": 0,
+      "line_pct": 0.0,
+      "function_pct": 0.0
+    },
+    "src/utils": {
+      "files": 16,
+      "lines_total": 1341,
+      "lines_covered": 513,
+      "functions_total": 81,
+      "functions_covered": 52,
+      "line_pct": 38.26,
+      "function_pct": 64.2
+    },
+    "src/webhooks": {
+      "files": 3,
+      "lines_total": 444,
+      "lines_covered": 280,
+      "functions_total": 26,
+      "functions_covered": 17,
+      "line_pct": 63.06,
+      "function_pct": 65.38
+    }
+  },
+  "tools": [
+    {
+      "name": "get_workflow",
+      "source": "src/tools/get-workflow.ts",
+      "line": 29,
+      "required": [
+        "name"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-native-tool-loop.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "search_data_model",
+      "source": "src/tools/search-data-model.ts",
+      "line": 29,
+      "required": [
+        "entity"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "query_resource",
+      "source": "src/tools/query-resource.ts",
+      "line": 117,
+      "required": [
+        "uri"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "tests/architect-timeout-streaming.test.ts",
+        "tests/standalone-architect-routes.test.ts",
+        "extensions/vscode/src/test/chat-panel-helpers.test.ts",
+        "extensions/vscode/src/test/codex-cli-adapter.test.ts",
+        "extensions/vscode/src/test/codex-cli-orchestrator.test.ts",
+        "extensions/vscode/src/test/codex-cli-provider-port.test.ts",
+        "extensions/vscode/src/test/copilot-cli-adapter.test.ts",
+        "extensions/vscode/src/test/copilot-cli-audit-live.test.ts",
+        "extensions/vscode/src/test/copilot-cli-bridge-audit.test.ts",
+        "extensions/vscode/src/test/copilot-cli-event-stream.test.ts",
+        "extensions/vscode/src/test/copilot-cli-orchestrator.test.ts",
+        "extensions/vscode/src/test/copilot-cli-prompt-serializer.test.ts",
+        "extensions/vscode/src/test/copilot-cli-provider-port.test.ts",
+        "extensions/vscode/src/test/openai-responses-adapter.test.ts",
+        "extensions/vscode/src/test/slice4-verify.test.ts",
+        "extensions/vscode/src/test/tool-classification.test.ts",
+        "extensions/vscode/src/test/tool-groups-primed.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": true
+    },
+    {
+      "name": "list_directory",
+      "source": "src/tools/code-senses.ts",
+      "line": 349,
+      "required": [
+        "dirPath"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-native-tool-loop.test.ts",
+        "extensions/vscode/src/test/copilot-cli-bridge-audit.test.ts",
+        "extensions/vscode/src/test/tool-groups-primed.test.ts",
+        "extensions/vscode/src/test/tool-result-compression.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "read_source_code",
+      "source": "src/tools/code-senses.ts",
+      "line": 439,
+      "required": [
+        "filePath"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-cli-bridge.test.ts",
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "tests/standalone-architect-routes.test.ts",
+        "extensions/vscode/src/test/autonomy-loop.test.ts",
+        "extensions/vscode/src/test/autonomy-token-economy.test.ts",
+        "extensions/vscode/src/test/budget-coordinator.test.ts",
+        "extensions/vscode/src/test/chat-memory.test.ts",
+        "extensions/vscode/src/test/codex-cli-adapter.test.ts",
+        "extensions/vscode/src/test/codex-cli-orchestrator.test.ts",
+        "extensions/vscode/src/test/copilot-cli-adapter.test.ts",
+        "extensions/vscode/src/test/copilot-cli-prompt-serializer.test.ts",
+        "extensions/vscode/src/test/openai-responses-adapter.test.ts",
+        "extensions/vscode/src/test/tool-classification.test.ts",
+        "extensions/vscode/src/test/tool-groups-primed.test.ts",
+        "extensions/vscode/src/test/tool-result-compression.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "create_file",
+      "source": "src/tools/code-senses.ts",
+      "line": 653,
+      "required": [
+        "filePath",
+        "content"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "extensions/vscode/src/test/copilot-cli-prompt-serializer.test.ts",
+        "extensions/vscode/src/test/tool-classification.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "edit_file",
+      "source": "src/tools/code-senses.ts",
+      "line": 746,
+      "required": [
+        "filePath",
+        "old_text",
+        "new_text"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-native-tool-loop.test.ts",
+        "extensions/vscode/src/test/autonomy-loop.test.ts",
+        "extensions/vscode/src/test/codex-cli-adapter.test.ts",
+        "extensions/vscode/src/test/copilot-cli-adapter.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "delete_file",
+      "source": "src/tools/code-senses.ts",
+      "line": 868,
+      "required": [
+        "filePath"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-native-tool-loop.test.ts",
+        "extensions/vscode/src/test/tool-classification.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "rename_file",
+      "source": "src/tools/code-senses.ts",
+      "line": 937,
+      "required": [
+        "oldPath",
+        "newPath"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-native-tool-loop.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "edit_entity",
+      "source": "src/tools/code-senses.ts",
+      "line": 1022,
+      "required": [
+        "filePath",
+        "entity",
+        "new_source"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "extensions/vscode/src/test/codex-cli-provider-port.test.ts",
+        "extensions/vscode/src/test/copilot-cli-orchestrator.test.ts",
+        "extensions/vscode/src/test/copilot-cli-prompt-serializer.test.ts",
+        "extensions/vscode/src/test/copilot-cli-provider-port.test.ts",
+        "extensions/vscode/src/test/tool-classification.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "patch_file",
+      "source": "src/tools/code-senses.ts",
+      "line": 1134,
+      "required": [
+        "filePath",
+        "edits"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-cli-bridge.test.ts",
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "tests/standalone-architect-routes.test.ts",
+        "extensions/vscode/src/test/copilot-cli-prompt-serializer.test.ts",
+        "extensions/vscode/src/test/tool-classification.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "append_to_file",
+      "source": "src/tools/code-senses.ts",
+      "line": 1262,
+      "required": [
+        "filePath",
+        "content"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "edit_markdown_section",
+      "source": "src/tools/code-senses.ts",
+      "line": 1369,
+      "required": [
+        "filePath",
+        "heading",
+        "new_body"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "extensions/vscode/src/test/copilot-cli-prompt-serializer.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "search_source_code",
+      "source": "src/tools/code-senses.ts",
+      "line": 1552,
+      "required": [
+        "query"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "tests/standalone-architect-routes.test.ts",
+        "extensions/vscode/src/test/codex-cli-orchestrator.test.ts",
+        "extensions/vscode/src/test/tool-result-compression.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "list_markdown_chapters",
+      "source": "src/tools/code-senses.ts",
+      "line": 1924,
+      "required": [
+        "filePath"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "read_markdown_chapter",
+      "source": "src/tools/code-senses.ts",
+      "line": 1959,
+      "required": [
+        "filePath",
+        "headingPath"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "patch_markdown_chapter",
+      "source": "src/tools/code-senses.ts",
+      "line": 2009,
+      "required": [
+        "filePath",
+        "headingPath",
+        "operation",
+        "content"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "extensions/vscode/src/test/copilot-cli-orchestrator.test.ts",
+        "extensions/vscode/src/test/copilot-cli-prompt-serializer.test.ts",
+        "extensions/vscode/src/test/copilot-cli-provider-port.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "solidify_cognitive_insight",
+      "source": "src/tools/solidify-insight.ts",
+      "line": 797,
+      "required": [
+        "insightType",
+        "sourceNodeId",
+        "rationale",
+        "confidence"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "tests/tools/solidify-insight.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 58.93,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "fetch_web_page",
+      "source": "src/tools/web-senses.ts",
+      "line": 157,
+      "required": [
+        "url"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "extensions/vscode/src/test/tool-result-compression.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "git_log",
+      "source": "src/tools/git-senses.ts",
+      "line": 176,
+      "required": [
+        "repo"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "git_blame",
+      "source": "src/tools/git-senses.ts",
+      "line": 283,
+      "required": [
+        "repo",
+        "filePath"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "query_db_schema",
+      "source": "src/tools/db-senses.ts",
+      "line": 362,
+      "required": [
+        "query_type",
+        "table_name"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 8.53,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "scan_database",
+      "source": "src/tools/db-senses.ts",
+      "line": 901,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "extensions/vscode/src/test/tool-groups-primed.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 8.53,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "generate_visual_flow",
+      "source": "src/tools/visual-architect.ts",
+      "line": 562,
+      "required": [
+        "target_type",
+        "target_ids"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "record_architecture_decision",
+      "source": "src/tools/adr-historian.ts",
+      "line": 359,
+      "required": [
+        "title",
+        "decided_by",
+        "problem",
+        "constraints",
+        "affected_entities",
+        "chosen",
+        "expected_consequences",
+        "risks",
+        "guard_rails"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "extensions/vscode/src/test/context-cache-invalidation.test.ts",
+        "extensions/vscode/src/test/copilot-cli-prompt-serializer.test.ts",
+        "extensions/vscode/src/test/tool-classification.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 2.03,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "query_architecture_decisions",
+      "source": "src/tools/adr-historian.ts",
+      "line": 457,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "tests/standalone-architect-routes.test.ts",
+        "extensions/vscode/src/test/context-cache-invalidation.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 2.03,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "deprecate_architecture_decision",
+      "source": "src/tools/adr-historian.ts",
+      "line": 570,
+      "required": [
+        "adr_id",
+        "new_status",
+        "reason"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 2.03,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "register_ui_element",
+      "source": "src/tools/ui-registry.ts",
+      "line": 1022,
+      "required": [
+        "id",
+        "name",
+        "purpose",
+        "category",
+        "inputs",
+        "outputs",
+        "interactions"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-cli-bridge.test.ts",
+        "extensions/vscode/src/test/copilot-cli-prompt-serializer.test.ts",
+        "extensions/vscode/src/test/tool-classification.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 58.04,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "query_ui_elements",
+      "source": "src/tools/ui-registry.ts",
+      "line": 1346,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 58.04,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "generate_ui_migration_plan",
+      "source": "src/tools/ui-registry.ts",
+      "line": 1458,
+      "required": [
+        "source_platform",
+        "target_platform"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 58.04,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "export_living_docs",
+      "source": "src/tools/living-docs-exporter.ts",
+      "line": 1141,
+      "required": [
+        "sections"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "query_runtime_metrics",
+      "source": "src/tools/runtime-senses.ts",
+      "line": 113,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "extensions/vscode/src/test/context-cache-invalidation.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "query_self_metrics",
+      "source": "src/tools/runtime-senses.ts",
+      "line": 174,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "init_graph",
+      "source": "src/tools/init-graph.ts",
+      "line": 582,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "extensions/vscode/src/test/tool-groups-primed.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "enrich_seed_data",
+      "source": "src/tools/enrich-seed-data.ts",
+      "line": 780,
+      "required": [
+        "target",
+        "entries"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "extensions/vscode/src/test/action-card-renderer.test.ts",
+        "extensions/vscode/src/test/autonomy-actions.test.ts",
+        "extensions/vscode/src/test/copilot-cli-prompt-serializer.test.ts",
+        "extensions/vscode/src/test/tool-groups-primed.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 51.14,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "enrich_parser_nodes",
+      "source": "src/tools/enrich-parser-nodes.ts",
+      "line": 2284,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/adaptive-future-scaffold.test.ts",
+        "tests/cli-enrichment-hops.test.ts",
+        "tests/explorer-inspector.test.ts",
+        "tests/tools/enrich-parser-nodes.test.ts",
+        "tests/tools/graph-health.test.ts",
+        "tests/tools/ui-registry-scanner-merge.test.ts",
+        "extensions/vscode/src/test/tool-groups-primed.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 87.17,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "wire_links",
+      "source": "src/tools/wire-links.ts",
+      "line": 585,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-native-tool-loop.test.ts",
+        "tests/tools/wire-links.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 33.12,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "scan_project",
+      "source": "src/tools/scan-project.ts",
+      "line": 1664,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-native-tool-loop.test.ts",
+        "tests/auxiliary-entities.test.ts",
+        "tests/cli-enrichment-hops.test.ts",
+        "tests/cli-mcp-call.test.ts",
+        "tests/onboarding-readiness.test.ts",
+        "tests/tools/graph-health.test.ts",
+        "tests/tools/scan-project-gitignore.test.ts",
+        "extensions/vscode/src/test/tool-groups-primed.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 53.17,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "extract_api_surface",
+      "source": "src/tools/api-surface.ts",
+      "line": 1407,
+      "required": [
+        "path"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "extensions/vscode/src/test/tool-groups-primed.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 12.38,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "query_api_surface",
+      "source": "src/tools/api-surface.ts",
+      "line": 1444,
+      "required": [
+        "symbol_name"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-native-tool-loop.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 12.38,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "modify_api_surface",
+      "source": "src/tools/api-surface.ts",
+      "line": 1768,
+      "required": [
+        "action",
+        "module_path",
+        "entry_type",
+        "entry_name"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "extensions/vscode/src/test/copilot-cli-prompt-serializer.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 12.38,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "bootstrap_instance",
+      "source": "src/tools/bootstrap-instance.ts",
+      "line": 49,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-native-tool-loop.test.ts",
+        "tests/tools/graph-health.test.ts",
+        "extensions/vscode/src/test/copilot-cli-orchestrator.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "plugin_reload",
+      "source": "src/tools/plugin-ops.ts",
+      "line": 39,
+      "required": [
+        "plugin_id"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "plugin_unload",
+      "source": "src/tools/plugin-ops.ts",
+      "line": 60,
+      "required": [
+        "plugin_id"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "webhook_register",
+      "source": "src/tools/webhooks.ts",
+      "line": 87,
+      "required": [
+        "url",
+        "secret",
+        "events"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-native-tool-loop.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "webhook_list",
+      "source": "src/tools/webhooks.ts",
+      "line": 106,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "webhook_remove",
+      "source": "src/tools/webhooks.ts",
+      "line": 118,
+      "required": [
+        "id"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "webhook_set_enabled",
+      "source": "src/tools/webhooks.ts",
+      "line": 130,
+      "required": [
+        "id",
+        "enabled"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "webhook_test",
+      "source": "src/tools/webhooks.ts",
+      "line": 141,
+      "required": [
+        "id"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "webhook_dead_letter_list",
+      "source": "src/tools/webhooks.ts",
+      "line": 171,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "webhook_replay",
+      "source": "src/tools/webhooks.ts",
+      "line": 181,
+      "required": [
+        "delivery_id"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "mutate_validated_edge",
+      "source": "src/tools/graph-edge-mutations.ts",
+      "line": 163,
+      "required": [
+        "action",
+        "edge_id"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "graph_health_report",
+      "source": "src/tools/graph-health.ts",
+      "line": 496,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 83.33,
+      "live_readonly_probe": true
+    },
+    {
+      "name": "dream_cycle",
+      "source": "src/cognitive/register.ts",
+      "line": 682,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-pulse.test.ts",
+        "tests/cognitive-producers.test.ts",
+        "tests/explorer-mutations.test.ts",
+        "tests/explorer-snapshot.test.ts",
+        "tests/instance-isolation.test.ts",
+        "tests/living-dreamgraph-projections.test.ts",
+        "tests/standalone-architect-routes.test.ts",
+        "tests/tension-resolution.test.ts",
+        "extensions/vscode/src/test/context-cache-invalidation.test.ts",
+        "extensions/vscode/src/test/entity-links.test.ts",
+        "extensions/vscode/src/test/tool-groups-primed.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "normalize_dreams",
+      "source": "src/cognitive/register.ts",
+      "line": 945,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "extensions/vscode/src/test/context-cache-invalidation.test.ts",
+        "extensions/vscode/src/test/tool-groups-primed.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "cognitive_status",
+      "source": "src/cognitive/register.ts",
+      "line": 1017,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "extensions/vscode/src/test/codex-cli-orchestrator.test.ts",
+        "extensions/vscode/src/test/context-architecture-contract.test.ts",
+        "extensions/vscode/src/test/context-builder-pressure.test.ts",
+        "extensions/vscode/src/test/context-cache-invalidation.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": true
+    },
+    {
+      "name": "query_dreams",
+      "source": "src/cognitive/register.ts",
+      "line": 1045,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "extensions/vscode/src/test/context-cache-invalidation.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "clear_dreams",
+      "source": "src/cognitive/register.ts",
+      "line": 1182,
+      "required": [
+        "target",
+        "confirm"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "quarantine_source_less_facts",
+      "source": "src/cognitive/register.ts",
+      "line": 1251,
+      "required": [
+        "confirm"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "get_dream_insights",
+      "source": "src/cognitive/register.ts",
+      "line": 1290,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": true
+    },
+    {
+      "name": "resolve_tension",
+      "source": "src/cognitive/register.ts",
+      "line": 1527,
+      "required": [
+        "tension_id",
+        "resolved_by",
+        "resolution_type"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "nightmare_cycle",
+      "source": "src/cognitive/register.ts",
+      "line": 1613,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "get_causal_insights",
+      "source": "src/cognitive/register.ts",
+      "line": 1676,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "get_temporal_insights",
+      "source": "src/cognitive/register.ts",
+      "line": 1770,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "export_dream_archetypes",
+      "source": "src/cognitive/register.ts",
+      "line": 1863,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "import_dream_archetypes",
+      "source": "src/cognitive/register.ts",
+      "line": 1893,
+      "required": [
+        "file_path"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "get_system_narrative",
+      "source": "src/cognitive/register.ts",
+      "line": 1927,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "get_remediation_plan",
+      "source": "src/cognitive/register.ts",
+      "line": 1967,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "metacognitive_analysis",
+      "source": "src/cognitive/register.ts",
+      "line": 2012,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "dispatch_cognitive_event",
+      "source": "src/cognitive/register.ts",
+      "line": 2116,
+      "required": [
+        "source",
+        "severity",
+        "description"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "get_system_story",
+      "source": "src/cognitive/register.ts",
+      "line": 2208,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "schedule_dream",
+      "source": "src/cognitive/register.ts",
+      "line": 2272,
+      "required": [
+        "name",
+        "action",
+        "trigger_type"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "list_schedules",
+      "source": "src/cognitive/register.ts",
+      "line": 2404,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "update_schedule",
+      "source": "src/cognitive/register.ts",
+      "line": 2456,
+      "required": [
+        "schedule_id"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "run_schedule_now",
+      "source": "src/cognitive/register.ts",
+      "line": 2519,
+      "required": [
+        "schedule_id"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "delete_schedule",
+      "source": "src/cognitive/register.ts",
+      "line": 2553,
+      "required": [
+        "schedule_id"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "get_schedule_history",
+      "source": "src/cognitive/register.ts",
+      "line": 2589,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "graph_rag_retrieve",
+      "source": "src/cognitive/register.ts",
+      "line": 2631,
+      "required": [
+        "query"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "extensions/vscode/src/test/tool-groups-primed.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": true
+    },
+    {
+      "name": "get_cognitive_preamble",
+      "source": "src/cognitive/register.ts",
+      "line": 2691,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [
+        "tests/architect-continuation.test.ts",
+        "tests/architect-native-tool-loop.test.ts",
+        "tests/task-preamble-compiler.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "lucid_dream",
+      "source": "src/cognitive/register.ts",
+      "line": 2729,
+      "required": [
+        "hypothesis"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "lucid_action",
+      "source": "src/cognitive/register.ts",
+      "line": 2768,
+      "required": [
+        "type",
+        "target_id"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "wake_from_lucid",
+      "source": "src/cognitive/register.ts",
+      "line": 2821,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "shortest_path",
+      "source": "src/cognitive/register.ts",
+      "line": 2852,
+      "required": [
+        "from",
+        "to"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "discipline_start_session",
+      "source": "src/discipline/tools.ts",
+      "line": 153,
+      "required": [
+        "type",
+        "description",
+        "target_scope"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "discipline_transition",
+      "source": "src/discipline/tools.ts",
+      "line": 197,
+      "required": [
+        "target_phase"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "discipline_check_tool",
+      "source": "src/discipline/tools.ts",
+      "line": 236,
+      "required": [
+        "tool_name"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "discipline_record_tool_call",
+      "source": "src/discipline/tools.ts",
+      "line": 265,
+      "required": [
+        "tool_name",
+        "result_summary"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [
+        "extensions/vscode/src/test/codex-cli-orchestrator.test.ts"
+      ],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "discipline_get_session",
+      "source": "src/discipline/tools.ts",
+      "line": 304,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "discipline_record_delta",
+      "source": "src/discipline/tools.ts",
+      "line": 375,
+      "required": [
+        "entries",
+        "sources"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "discipline_submit_plan",
+      "source": "src/discipline/tools.ts",
+      "line": 416,
+      "required": [
+        "description",
+        "items"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "discipline_approve_plan",
+      "source": "src/discipline/tools.ts",
+      "line": 457,
+      "required": [],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "discipline_verify",
+      "source": "src/discipline/tools.ts",
+      "line": 478,
+      "required": [
+        "post_delta_entries",
+        "post_delta_sources",
+        "item_results"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    },
+    {
+      "name": "discipline_complete_session",
+      "source": "src/discipline/tools.ts",
+      "line": 539,
+      "required": [
+        "status"
+      ],
+      "annotations": null,
+      "direct_test_mentions": [],
+      "registration_file_line_coverage_pct": 0,
+      "live_readonly_probe": false
+    }
+  ],
+  "resources": [
+    "system://overview",
+    "system://features",
+    "system://workflows",
+    "system://data-model",
+    "system://datastores",
+    "system://capabilities",
+    "system://index",
+    "ops://metrics",
+    "system://metrics",
+    "system://plugins",
+    "system://webhooks",
+    "ops://api-surface",
+    "dream://graph",
+    "dream://candidates",
+    "dream://validated",
+    "dream://status",
+    "dream://tensions",
+    "dream://history",
+    "dream://adrs",
+    "dream://ui-registry",
+    "dream://threats",
+    "dream://archetypes",
+    "dream://metacognition",
+    "dream://events",
+    "dream://story",
+    "dream://schedules",
+    "dream://schedule-history",
+    "dream://context",
+    "dream://lucid",
+    "discipline://manifest"
+  ],
+  "dreamgraph_stores": [
+    {
+      "file": "features.json",
+      "exists": true,
+      "bytes": 1494501,
+      "modified_at": "2026-08-21T21:37:20.964433+00:00",
+      "entries": 669
+    },
+    {
+      "file": "workflows.json",
+      "exists": true,
+      "bytes": 479622,
+      "modified_at": "2026-08-21T21:37:20.979700+00:00",
+      "entries": 197
+    },
+    {
+      "file": "data_model.json",
+      "exists": true,
+      "bytes": 942895,
+      "modified_at": "2026-08-21T21:37:20.998457+00:00",
+      "entries": 202
+    },
+    {
+      "file": "capabilities.json",
+      "exists": true,
+      "bytes": 85638,
+      "modified_at": "2026-08-21T20:37:40.562394+00:00",
+      "entries": 31
+    },
+    {
+      "file": "auxiliary_entities.json",
+      "exists": true,
+      "bytes": 356247,
+      "modified_at": "2026-08-21T20:31:48.593090+00:00",
+      "entries": null
+    },
+    {
+      "file": "ui_registry.json",
+      "exists": true,
+      "bytes": 352783,
+      "modified_at": "2026-08-21T20:31:37.290137+00:00",
+      "entries": null
+    },
+    {
+      "file": "scan_state.json",
+      "exists": false
+    },
+    {
+      "file": "enrichment_state.json",
+      "exists": false
+    },
+    {
+      "file": "dream_history.json",
+      "exists": true,
+      "bytes": 12573523,
+      "modified_at": "2026-08-21T21:37:21.297669+00:00",
+      "entries": null
+    },
+    {
+      "file": "validated_edges.json",
+      "exists": true,
+      "bytes": 5164963,
+      "modified_at": "2026-08-21T21:37:20.921033+00:00",
+      "entries": null
+    }
+  ]
+}

@@ -340,6 +340,12 @@ foreach ($wsName in $workspacePackages) {
     if (-not $tarballLine) {
         Stop-Install "Could not determine tarball name for $wsName"
     }
+    # Same-version development installs must refresh changed emitted bytes.
+    $addressResult = Invoke-LoggedCommand -FilePath "node" -Arguments @(
+        (Join-Path $PSScriptRoot "workspace-artifacts.mjs"), "address", (Join-Path $VendorDir $tarballLine)
+    ) -WorkingDirectory $SourceDir -Quiet
+    if ($addressResult.ExitCode -ne 0) { Stop-Install "Could not bind package bytes for $wsName" }
+    $tarballLine = ($addressResult.Output -join "").Trim()
     $workspaceTarballs[$wsName] = "file:./vendor/$tarballLine"
     Write-Ok "Packed $wsName -> vendor/$tarballLine"
 }
@@ -349,6 +355,12 @@ $binPkg = [ordered]@{
     version      = $version
     type         = "module"
     dependencies = [ordered]@{}
+}
+if ($pkg.PSObject.Properties["optionalDependencies"]) {
+    $binPkg["optionalDependencies"] = [ordered]@{}
+    foreach ($dep in $pkg.optionalDependencies.PSObject.Properties) {
+        $binPkg.optionalDependencies[$dep.Name] = $dep.Value
+    }
 }
 foreach ($dep in $pkg.dependencies.PSObject.Properties) {
     if ($workspaceTarballs.Contains($dep.Name)) {
@@ -383,6 +395,12 @@ if ($result.ExitCode -ne 0) {
     Stop-Install "npm install failed (exit code $($result.ExitCode))"
 }
 Write-Ok "Dependencies installed"
+
+$artifactResult = Invoke-LoggedCommand -FilePath "node" -Arguments @(
+    (Join-Path $PSScriptRoot "workspace-artifacts.mjs"), "verify", $SourceDir, $BinDir
+) -WorkingDirectory $BinDir
+if ($artifactResult.ExitCode -ne 0) { Stop-Install "Installed workspace artifacts do not match the build; installation is incomplete." }
+Write-Ok "Workspace bytes and daemon imports verified"
 
 # -- Templates -----------------------------------------------------
 $sourceTemplates = Join-Path $SourceDir "templates"
@@ -468,6 +486,7 @@ $versionInfo = [ordered]@{
 } | ConvertTo-Json
 # UTF-8 without BOM (Node JSON.parse chokes on the BOM emitted by PS5.1's -Encoding UTF8).
 [System.IO.File]::WriteAllText((Join-Path $BinDir "version.json"), $versionInfo, (New-Object System.Text.UTF8Encoding $false))
+
 
 # -- Create shims --------------------------------------------------
 Write-Step "Creating command shims..."

@@ -132,6 +132,7 @@ function captureRun(opts: CaptureOptions): Promise<CapturedRun> {
 
     let child: ReturnType<typeof spawn>;
     try {
+      opts.abortSignal?.throwIfAborted();
       let spawnCommand = opts.command;
       let spawnArgs = [...opts.args];
       let useVerbatimArgs = false;
@@ -169,8 +170,8 @@ function captureRun(opts: CaptureOptions): Promise<CapturedRun> {
         durationMs: Date.now() - startedAt,
         timedOut: false,
         timeoutKind: null,
-        aborted: false,
-        spawnError: err instanceof Error ? err : new Error(String(err)),
+        aborted: opts.abortSignal?.aborted === true,
+        spawnError: opts.abortSignal?.aborted ? null : err instanceof Error ? err : new Error(String(err)),
       });
       return;
     }

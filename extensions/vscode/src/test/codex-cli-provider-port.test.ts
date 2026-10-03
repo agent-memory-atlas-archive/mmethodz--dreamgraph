@@ -236,6 +236,21 @@ function makeCallInput(over: Partial<CallProviderInput> = {}): CallProviderInput
   };
 }
 
+test('codex provider-port: a permit signal reaches native spawn and mandatory settlement is awaited', async () => {
+  const proc = makeFakeProcess(), permit = new AbortController(); let settled = false, observed = false;
+  const port = createCodexCliProviderPort({hostLlm:FAKE_LLM,timeoutMs:60000,baseEnv:{},deps:makeDeps({process:proc.process}),
+    preparePrompt:async prompt=>prompt,admissionSignal:()=>permit.signal,
+    settleRun:async result=>{assert.equal(result.ok,true);await Promise.resolve();settled=true;},onRunResult:()=>{observed=settled;}});
+  await port.callProvider(makeCallInput()); assert.equal(proc.log.spawnCalls[0]!.abortSignal,permit.signal); assert.equal(observed,true);
+  permit.abort(); await assert.rejects(port.callProvider(makeCallInput()),/abort/i); assert.equal(proc.log.spawnCalls.length,1);
+});
+test('codex provider-port: settlement loss is mandatory and cannot become a swallowed observer error', async () => {
+  let observed = false;
+  const port=createCodexCliProviderPort({hostLlm:FAKE_LLM,timeoutMs:60000,baseEnv:{},deps:makeDeps(),
+    settleRun:async()=>{throw new Error('retain original accounting report');},onRunResult:()=>{observed=true;}});
+  await assert.rejects(port.callProvider(makeCallInput()),/retain original accounting report/);assert.equal(observed,false);
+});
+
 test("codex provider-port: getCapabilities reports text and image attachments", () => {
   const port = createCodexCliProviderPort({
     hostLlm: FAKE_LLM,
@@ -246,6 +261,17 @@ test("codex provider-port: getCapabilities reports text and image attachments", 
   });
   assert.deepEqual(port.getCapabilities(), { textAttachments: true, imageAttachments: true });
   assert.equal(port.llm, FAKE_LLM);
+});
+test("codex provider-port: awaits mandatory prompt admission before spawn and propagates rejection", async () => {
+  const proc = makeFakeProcess(); let admitted = false;
+  const port = createCodexCliProviderPort({hostLlm: FAKE_LLM, invocationCwd: "/work", timeoutMs:60000, baseEnv:{},
+    deps:makeDeps({process:proc.process}),preparePrompt:async(prompt,signal)=>{assert.equal(proc.log.spawnCalls.length,0);signal?.throwIfAborted();admitted=true;return prompt+"\nRequired whole context: 🌿 receipt";}});
+  await port.callProvider(makeCallInput());assert.ok(admitted);assert.equal(proc.log.spawnCalls.length,1);
+  assert.match(proc.log.spawnCalls[0]!.stdin ?? "",/Required whole context: 🌿 receipt/);
+  const rejected=makeFakeProcess();
+  const blocked=createCodexCliProviderPort({hostLlm:FAKE_LLM,invocationCwd:"/work",timeoutMs:60000,baseEnv:{},deps:makeDeps({process:rejected.process}),
+    preparePrompt:async()=>{throw new Error("context acknowledgement unconfirmed");}});
+  await assert.rejects(blocked.callProvider(makeCallInput()),/acknowledgement unconfirmed/);assert.equal(rejected.log.spawnCalls.length,0);
 });
 
 test("codex provider-port: invocation cwd is optional for multi-repo DreamGraph runs", async () => {

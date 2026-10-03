@@ -1215,3 +1215,11 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; }
 }
+:root .snapshot-state{position:relative;font-size:11px;max-width:250px;margin-left:auto}
+.snapshot-state summary{cursor:pointer;white-space:nowrap;color:#b2c4c7}
+.snapshot-state[open]{position:absolute;right:10px;top:10px;z-index:90;width:340px;max-width:calc(100vw - 24px);background:#172027;border:1px solid #42515c;border-radius:5px;padding:8px;box-shadow:0 10px 24px #0009}
+.snapshot-state p{margin:6px 0;overflow-wrap:anywhere}.snapshot-state strong{color:#cbd9df}
+.evidence-details{border-top:1px solid #33424d;margin:7px 0;padding:6px 0;overflow-wrap:anywhere}.evidence-details summary{cursor:pointer;font-size:12px;color:#bfd0db}.evidence-details p{font-size:11px;color:#95aab8}
+.trust-badge{display:inline-block;padding:2px 6px;border:1px solid #486072;border-radius:3px;color:#b5c8d8;font-size:11px}.trust-validated_insight{color:#8ec3ad;border-color:#517968}.trust-hypothesis,.trust-unknown{color:#c6b789;border-color:#706844}
+.agent-context{font:10px/1.5 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:300px;overflow:auto;border:1px solid #34434f;padding:6px}.adjacency-pages{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;margin:8px 0}
+@media(max-width:850px){.app{grid-template-columns:24px 0 minmax(0,1fr) 0 24px!important}.app>.topbar{grid-column:1/-1;grid-row:1}.app>.canvas-host{grid-column:3;grid-row:2}.app>.sidebar-reopen{grid-column:1;grid-row:2}.app>.sidebar-reopen.right{grid-column:5}.app>aside.left,.app>aside.right{position:absolute;top:50px;bottom:0;z-index:55;width:min(320px,calc(100vw - 48px));background:var(--bg-elev);box-shadow:0 8px 24px #0008}.app>aside.left{left:24px}.app>aside.right{right:24px}.app>.resizer{display:none}.topbar{gap:4px;flex-wrap:wrap;max-height:84px;overflow:visible}.topbar .meta.version,.topbar .meta:has(strong){display:none}.topbar .search{min-width:110px}.canvas-host{min-width:0}}

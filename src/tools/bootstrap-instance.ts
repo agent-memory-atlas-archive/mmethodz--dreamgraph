@@ -94,7 +94,9 @@ export function registerBootstrapInstanceTool(server: McpServer): void {
           const fingerprint = status.fingerprint;
           const llmReady = status.state === "ready";
 
-          if (!llmReady) {
+          // An explicit user-requested bootstrap may perform the first role work.
+          // Reachability permits an attempt; it is not fabricated completion qualification.
+          if (!llmReady && status.reason !== "completion_unqualified") {
             const msg = `LLM not ready (state=${status.state}, reason=${status.reason}${
               status.last_error ? `: ${status.last_error}` : ""
             }). Configure provider credentials and try again.`;
@@ -110,7 +112,7 @@ export function registerBootstrapInstanceTool(server: McpServer): void {
             return success<BootstrapInstanceResult>({
               mode,
               resolved_kind: "skipped_already_done",
-              llm_ready: true,
+              llm_ready: llmReady,
               fingerprint,
               was_fresh_instance: false,
               message:
@@ -181,7 +183,7 @@ export function registerBootstrapInstanceTool(server: McpServer): void {
           return success<BootstrapInstanceResult>({
             mode,
             resolved_kind: resolvedMode,
-            llm_ready: true,
+            llm_ready: (await probeLlmReadiness()).state === "ready",
             fingerprint,
             was_fresh_instance: fresh,
             adrs_recorded: adrsRecorded,

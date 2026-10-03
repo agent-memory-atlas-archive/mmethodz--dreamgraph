@@ -57,5 +57,5 @@ export function registerTools(server: McpServer): void {
   registerGraphEdgeMutationTools(server);
   registerGraphHealthTools(server);
 
-  logger.info("Registered 45 tools");
+  logger.info("Registered core tool owners; the composed live catalogue is authoritative for counts");
 }

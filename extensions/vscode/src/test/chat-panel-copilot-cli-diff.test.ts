@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
-// Source-level audit for Plan A: turn-level workspace snapshot bookend
+// Physical snapshot check plus source-level audit for Plan A: workspace review bookends
 // around copilot-cli runs, so the change-review pending list (and thus
 // the architect Diff view) populates for copilot-cli the same way it
 // does for the native API adapters.
@@ -17,30 +17,34 @@
 //   3. When recorded paths exist, the webview is notified via
 //      `_postPendingReviews()` so the Diff button lights up.
 //
-// Live integration testing requires the vscode module (chat-panel
-// can't be loaded outside the host), so we audit the source the same
-// way slice5-audit does.
+// The shared compiled production loader supplies only VSCode API doubles.
+// Full execution/authority qualification is recorded by the root HTTP/MCP tests;
+// the remaining source audits cover the two CLI review notification bookends.
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import {mkdtemp,writeFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
 
 const chatPanelSource = readFileSync(
   join(process.cwd(), 'src', 'chat-panel.ts'),
   'utf8',
 );
 
-test('Plan A: copilot-cli turn captures a workspace snapshot before runPassViaCopilotCli', () => {
-  // Snapshot var must be declared and gated on copilotCliRoute, with
-  // the captureWorkspaceSnapshot call as the right-hand side.
-  const occurrences = chatPanelSource.match(
-    /const copilotCliReviewSnapshot = copilotCliRoute\s*\?\s*await changeReviewService\.captureWorkspaceSnapshot\(\)\s*:\s*null;/g,
-  );
-  assert.ok(
-    occurrences && occurrences.length === 2,
-    `expected 2 captureWorkspaceSnapshot bookends (handleUserMessage + autonomy continuation), found ${occurrences?.length ?? 0}`,
-  );
+test('Plan A: an owned workspace snapshot retains the original authority and resulting source baseline', async () => {
+  const {changeReviewService:service}=require(join(process.cwd(),'../../tests/helpers/compiled-editor.cjs')).compiledEditor();
+  const root=await mkdtemp(join(tmpdir(),'dg-editor-owned-review-')),file=join(root,'source.ts');
+  const authority={endpoint:'http://original-instance',instanceId:'original-instance'};
+  service.listReviewableWorkspacePaths=async()=>[file];
+  try{
+    await writeFile(file,'baseline 🌿\r\n');const snapshot=await service.captureWorkspaceSnapshot(authority);
+    authority.endpoint='http://changed-selection';await writeFile(file,'changed source');await service.recordWorkspaceChanges(snapshot);
+    const review=service.getPendingReview(file);
+    assert.equal(review.authority.endpoint,'http://original-instance');assert.equal(Buffer.from(review.baselineContent).toString('utf8'),'baseline 🌿\r\n');
+    assert.notEqual(review.lastReviewHash,review.baselineHash);
+  }finally{await rm(root,{recursive:true,force:true});}
 });
 
 test('Plan A: copilot-cli turn reconciles via recordWorkspaceChanges in finally', () => {

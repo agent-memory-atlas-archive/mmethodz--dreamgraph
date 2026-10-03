@@ -1,0 +1,1784 @@
+{
+  "schema": "dreamgraph.ashoka.integration_evidence.v1",
+  "recorded_at": "2026-10-02T11:08:56.237Z",
+  "status": "offline_integration_qualified",
+  "scope": "Shared GE01–GE15 mechanisms plus distinct real host/transport hooks, UX01–UX12 actual Windows Chrome interactions, C14 eight-consumer semantics and C17 typed seams. Fake inference/native callbacks are declared; physical effects and actual transports are exercised.",
+  "root": {
+    "passed": 1850,
+    "skipped": 2,
+    "failed": 0,
+    "files": 159
+  },
+  "editor": {
+    "passed": 509,
+    "failed": 0
+  },
+  "ge": {
+    "GE01": [
+      {
+        "file": "architect-managed-context.test.ts",
+        "name": "native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt",
+        "status": "passed"
+      },
+      {
+        "file": "plan-context-integration.test.ts",
+        "name": "PL16 graph consumers retrieve the actual typed plan and selected slice with the same authority revision and gates",
+        "status": "passed"
+      }
+    ],
+    "GE02": [
+      {
+        "file": "execution-context.test.ts",
+        "name": "missing named source is disclosed on the initial prompt and cannot authorize ordinary effects",
+        "status": "passed"
+      },
+      {
+        "file": "context-pack.test.ts",
+        "name": "canonical bounded graph context keeps corrupt-store uncertainty scoped and does not call an old full scan stale",
+        "status": "passed"
+      },
+      {
+        "file": "client-context-integration.test.ts",
+        "name": "the actual VSCode client validates the generated canonical pack and preserves an HTTP failure",
+        "status": "passed"
+      }
+    ],
+    "GE03": [
+      {
+        "file": "context-pack.test.ts",
+        "name": "canonical bounded graph context reserves selected plan/slice and relevant decisions before optional entities, and reports insufficient mandatory context",
+        "status": "passed"
+      },
+      {
+        "file": "context-pack.test.ts",
+        "name": "canonical bounded graph context budgets complete serialized Unicode evidence, headings and provenance at 100",
+        "status": "passed"
+      },
+      {
+        "file": "context-pack.test.ts",
+        "name": "canonical bounded graph context budgets complete serialized Unicode evidence, headings and provenance at 500",
+        "status": "passed"
+      },
+      {
+        "file": "context-pack.test.ts",
+        "name": "canonical bounded graph context budgets complete serialized Unicode evidence, headings and provenance at 2000",
+        "status": "passed"
+      },
+      {
+        "file": "client-context-integration.test.ts",
+        "name": "prose compaction cannot remove required ADR/graph anchors or alter literal tool source",
+        "status": "passed"
+      }
+    ],
+    "GE04": [
+      {
+        "file": "execution-context.test.ts",
+        "name": "revalidates actual named source content and affected graph constraints, while ignoring unrelated activity",
+        "status": "passed"
+      },
+      {
+        "file": "managed-plan-execution.test.ts",
+        "name": "external plan edits block delivery and worker/model dispatch; source restoration cannot renew a closed pass",
+        "status": "passed"
+      }
+    ],
+    "GE05": [
+      {
+        "file": "architect-managed-context.test.ts",
+        "name": "native API delivers current whole evidence, performs exact governed source/graph effects, refreshes, and closes with its durable receipt",
+        "status": "passed"
+      },
+      {
+        "file": "architect-managed-context.test.ts",
+        "name": "the actual native API pass shares original-host review and reports remaining controls before revocation",
+        "status": "passed"
+      },
+      {
+        "file": "architect-managed-context.test.ts",
+        "name": "native API late completion after cancellation closes with termination uncertainty",
+        "status": "passed"
+      },
+      {
+        "file": "architect-cli-controls.test.ts",
+        "name": "codex-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity",
+        "status": "passed"
+      },
+      {
+        "file": "architect-cli-controls.test.ts",
+        "name": "copilot-cli executes real bridge tool fences for all modes and transmits evidence-preserving verbosity",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the actual editor client retains one owner, injects an exact block, replays acknowledgement and closes a read-only pass",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "parallel host passes share their authenticated owner while another client cannot read or close them",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a worker credential cannot issue a new grant, close another host pass or change its chosen identity",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the actual portable SDK port uses the generated host contract, retains ownership and cannot acknowledge a clipped block",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "editor initialization cancellation stops only its caller and preserves another caller on the shared handshake",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "sdk initialization cancellation stops only its caller and preserves another caller on the shared handshake",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "editor freezes nested exact approvals before the shared session wait",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "sdk freezes nested exact approvals before the shared session wait",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "editor disposal prevents a delayed noncooperative handshake from dispatching or restoring authority",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "sdk disposal prevents a delayed noncooperative handshake from dispatching or restoring authority",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "editor session readiness cannot redirect a queued authority call to a replacement endpoint",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "editor changed endpoints reject late handshake replies rather than adopting a new owner",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK constructor options cannot be mutated into a different transport after construction",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK native lifecycle captures request/port identities, refreshes each continuation and preserves whole literal results",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK handoff rejects a clipped exact checkpoint before worker dispatch and never acknowledges it",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK native worker performs one actual governed source effect and retains durable source debt rather than graph completion",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK wait cancellation keeps a noncooperative callback and late successful reply termination-unconfirmed",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK native termination requires explicit harness evidence and never derives it from settled successful prose",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK refuses missing native termination evidence instead of treating callback settlement as confirmation",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK total pass deadline cancels a noncooperative native wait without claiming that underlying work stopped",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK lost admission retains its original ID, inspects only that owner and can close without repeating admission",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK lost closure retries only its captured confirmed termination after actual owner closure, without repeating native work",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK lost closure retries only its captured unconfirmed termination after actual owner closure, without repeating native work",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK late inspection cannot replace its confirmed inactive closure with an earlier active snapshot",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK refresh rejects a foreign execution receipt before handoff or new worker dispatch",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "SDK worker reads canonical plugin graph evidence through the actual manager/resource transport without inheriting host authority",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "editor CLI admission injects the whole current pack after serialization and closes against actual durable receipts",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "editor CLI byte admission refuses the whole over-budget request before acknowledging or launching it",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "editor CLI cancellation preserves unconfirmed descendant termination instead of proving a no-change pass",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "editor CLI pre-launch failure settles without model work; cancellation during acknowledgement cannot yield a launchable prompt",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the actual editor host records exact review before activation; replay cannot replenish consumed effects",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "exact review rejects foreign/worker authority, stale revisions, changed receipt and conflicting payloads",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "an authenticated owner fences in-flight review; queued HTTP review cannot bypass the changed checkpoint",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "review cannot exceed the original effect ceiling or approve a changed named source",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the actual portable SDK recovers a lost approval reply without reissuing a grant or extending expiry",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a published review alone grants no effect; the unchanged live host can recover activation exactly once",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a saved review cannot reactivate after the actual lease expires",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the actual editor rendezvous waits before the graph writer, then publishes approval before one unchanged source effect",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the actual SDK operator decline settles the pending tool without granting or executing an effect",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "request cancellation removes an enabled review wait without invoking the effect owner",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the editor review controller retains literal exact proposals and retries lost acknowledgement without repeating effects",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the editor controller declines the captured daemon action without dispatch or approval publication",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "editor review decisions cannot redirect through a changed endpoint",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native editor admission delivers whole replacement evidence, uses the actual worker MCP fence and closes unchanged source with durable review",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native editor source changes retain reconciliation debt rather than reporting a graph commit",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native editor commands execute at the actual daemon owner with exact review and complete source observation",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native editor cancelled waiting closes promptly with underlying callback termination unconfirmed",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native editor Unicode request byte refusal happens before delivery and dispatch",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native editor captured instance mismatch refuses before delivery and revokes the owned lease",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "an independently cancelled native round blocks fresh dispatch until its unknown outcome closes",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the compiled ordinary editor loop preserves whole context through actual provider HTTP/MCP and waits for exact lost-ack recovery before continuation",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled editor Undo restores exact Unicode/BOM/mixed newline bytes through actual HTTP/MCP source owners and retains graph debt",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled editor Undo for a created file uses the actual source owner and exact absent/hash precondition",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled editor Undo for a deleted file uses the actual source owner and exact absent/hash precondition",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "Undo refuses a file changed after its review without dispatching authority or overwriting user bytes",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a changed editor authority refuses Undo before admission and retains a retryable original review",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a lost operator closure acknowledgement retains recovery and duplicate Undo/Keep cannot repeat or erase it",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "captured review copies cannot mutate the baseline/authority and stale IDs cannot clear or undo a later edit",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "lost operator admission can close the same original lease without dispatching any tool or minting a replacement",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "operator recovery cannot turn actual unknown termination into a successful closure or redirect to a different instance",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "Stop invalidates queued review clicks before their second owner dispatch",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "operator message-action errors retain the complete actual owner payload and a failed trace, with no local alias fallback",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "an explicit operator message action records changed-file review under its original daemon and retains the actual source closure",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a returned message action persists its original instance outcome and never labels pending source debt as completed after selection changes",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "expired lost-ack review recovers only by reading the original settled closure, without renewing approval or repeating its effect",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "review inspection retains actual unknown termination and disables historical approval after revocation",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "inspection of a pending review fences continuation when its original authority was revoked with unknown termination",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "Stop during a noncooperative inspection cannot resurrect a retired pending review from a late original-host reply",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a compiled palette command uses the original daemon owner, records actual source change and keeps reconciliation separate from exit zero",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a compiled palette capture refuses a later instance selection before any execution admission or local shell fallback",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "palette invocation without an original daemon refuses before dispatch and leaves source unchanged",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the actual palette captures before prompting and shows complete owner evidence with a pending warning despite exit zero",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the actual build palette preserves literal root ext-prefixed script identity and refuses unsafe script names without dispatch",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native-host API accounting reserves the complete Unicode wire before any provider dispatch and recovers exact settlement after closure",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native-host permits require whole delivered context, original owner and host-only transport",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "zero paid allocation or unknown exact tariff cannot issue native-host permits",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native-host requests keep one policy and a shared cumulative run/retry ceiling across changed configuration",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a lost native permit response retains liability, read-only recovery and unknown closure instead of authorizing retry",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native-host deadline stops permit waiting without attesting native work stopped or dropping its liability",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "CLI host accounting stays subscription-unmeasured and cannot borrow an API monetary allowance",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the portable SDK admission port preserves original permit/report identities and read-only outcomes",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native wire model/output/retention/effort and frontier temperature mismatches refuse before ledger dispatch",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "an unconfirmed native report keeps actual partial usage, blocks another permit and cannot strengthen termination on retry",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native-host permits preserve a shorter configured model timeout independently of the longer host authority",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled v1 API seam refuses an absent original managed pass before model, persistence or private tool fallback",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled v1 API seam refreshes whole graph context and literal raw dialogue under one ledger before settled persistence",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled v1 API seam records literal MCP errors without transforming them into successful tool prose",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled v1 API seam separates a complete model loop from source reconciliation and cannot advance autonomy",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled v1 API seam zero allocation refuses before inference and does not record a completed autonomy pass",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled v1 API seam retains a lost original closure reply without assistant persistence, renewal or redispatch",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled v1 API seam forwards Stop to a pending original worker tool and retains unconfirmed termination",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled v1 API streaming seam reports terminal Responses usage before closing and persisting a live answer",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the actual compiled native serializer reserves the whole Unicode wire before provider HTTP and reports real reply usage",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a known zero paid allocation refuses the compiled native provider before dispatch without inventing unsettled work",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a lost native permit reply cannot launch or retry through the compiled adapter",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a lost actual native settlement report fences continuation while preserving settled usage and the original report",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "successive native requests share the original cumulative call ceiling and a refused continuation cannot reach provider HTTP",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native Responses streaming remains live while admission and terminal usage stay with the original host",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "an actual native stream ending without provider completion retains uncertainty and never authorizes another request",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native local streaming handles fragmented NDJSON and reports local usage only after an explicit completion",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native Anthropic messages retain the selected model, finite output and actual terminal usage without transporting credentials to the daemon",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a native 429 is a known request rejection while a disallowed explicit retry remains fenced before another provider request",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native API cancellation stops the host wait without claiming a still-running provider fixture terminated",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "an oversized native provider response is refused whole with unknown liability and cannot resume model dispatch",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the production native model guard refuses all bare API methods before provider dispatch",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "the compiled read-only model helper supplies whole fresh graph context and closes its original host scope",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "read-only native admission refuses a changed selected instance before provider dispatch",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "a read-only native admission acknowledgement loss retains the exact original identity and cannot call the provider",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "an uncertain managed timeout cannot silently spend through a fresh recovery stream",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled Explain File and ADR Compliance use the same original host graph/model authority",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled command authority is captured before asynchronous context reads and refuses changed selection without inference",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled native commands honour an already-cancelled progress token before context or paid work starts",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled command Cancel propagates to native HTTP and cannot publish a successful answer or confirm remote termination",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native CLI prompt reserves original invocation liability with unclaimed API provenance and unmeasured usage",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native CLI continues under the same cumulative ledger, never a fresh allocation after each prompt",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "lost native CLI permit acknowledgement cannot allocate a replacement or confirm closure",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native CLI cancellation/report loss retains original liability and cannot strengthen descendant termination",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native CLI enforces its shorter core permit deadline without proving native work stopped",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "native API still refuses an unresolved provider despite the CLI binding amendment",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "compiled native CLI option builders require the original pass and await its model reservation and report",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "portable SDK model execution reserves before actual native HTTP and reports observed protocol usage under the same graph pass",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "portable SDK lost model admission keeps original inspection and never invokes a replacement callback",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "portable SDK report loss permits exact report recovery without a stronger termination claim or new request",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "portable SDK model timeout rejects waiting while its declared noncooperative callback remains running",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "portable SDK rejects successful prose without explicit provider observation and preserves unknown work",
+        "status": "passed"
+      },
+      {
+        "file": "host-managed-execution.test.ts",
+        "name": "portable SDK callback gets the captured final request despite mutation during asynchronous admission",
+        "status": "passed"
+      },
+      {
+        "file": "daemon-transport-isolation.test.ts",
+        "name": "isolates real native MCP transports, rejects foreign browser binding and removes closed sessions",
+        "status": "passed"
+      },
+      {
+        "file": "daemon-transport-isolation.test.ts",
+        "name": "carries its stdio stream owner through tools and resources",
+        "status": "passed"
+      },
+      {
+        "file": "daemon-transport-isolation.test.ts",
+        "name": "the actual daemon admits one exact managed MCP action once, retains source debt and refuses consumed replay",
+        "status": "passed"
+      },
+      {
+        "file": "graph-context-port.test.ts",
+        "name": "uses one canonical request/result owner, preserves identity and trust, and remains read-only/unattested",
+        "status": "passed"
+      },
+      {
+        "file": "graph-context-port.test.ts",
+        "name": "declines missing capability or effect instead of fabricating a legacy reader",
+        "status": "passed"
+      },
+      {
+        "file": "graph-context-port.test.ts",
+        "name": "rejects invalid controls and honors unload/caller cancellation without claiming private effects stopped",
+        "status": "passed"
+      }
+    ],
+    "GE06": [
+      {
+        "file": "change-obligations.test.ts",
+        "name": "durable source change obligations an unchanged managed edit settles source debt without graph mutation or repeated input",
+        "status": "passed"
+      },
+      {
+        "file": "change-obligations.test.ts",
+        "name": "durable source change obligations the actual MCP edit tool reports an unchanged write without requesting reconciliation",
+        "status": "passed"
+      },
+      {
+        "file": "execution-context.test.ts",
+        "name": "observes actual native additions/deletions as exact pending scopes while excluding instance metadata",
+        "status": "passed"
+      }
+    ],
+    "GE07": [
+      {
+        "file": "change-obligations.test.ts",
+        "name": "durable source change obligations recovers the exact effect after intent_committed without repeating input",
+        "status": "passed"
+      },
+      {
+        "file": "change-obligations.test.ts",
+        "name": "durable source change obligations recovers the exact effect after effect_applied without repeating input",
+        "status": "passed"
+      },
+      {
+        "file": "change-obligations.test.ts",
+        "name": "durable source change obligations recovers the exact effect after effect_recorded without repeating input",
+        "status": "passed"
+      },
+      {
+        "file": "execution-context.test.ts",
+        "name": "a pending closed execution can recover its verified reconciliation without redispatching the source effect",
+        "status": "passed"
+      },
+      {
+        "file": "managed-plan-execution.test.ts",
+        "name": "lost C14 closure acknowledgment replays the persisted original command after host revocation without another event",
+        "status": "passed"
+      }
+    ],
+    "GE08": [
+      {
+        "file": "change-obligations.test.ts",
+        "name": "durable source change obligations tracks real MCP create/edit/rename/delete commands through durable obligations",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE08: repetition, domain/keyword overlap and source_verified flags never manufacture corroboration",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE08/GE12: changed wrapper bytes, repeated model/narrative/federation copies and renamed source copies retain one ancestry",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE08: copying identical source bytes with different lineage IDs cannot create independent roots",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE08: actual semantic model agreement changes plausibility, never independent evidence; unchanged context avoids another call",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE08: cyclic, missing and wrong-claim ancestry remains reviewable without creating a source root; human assertions stay distinct",
+        "status": "passed"
+      }
+    ],
+    "GE09": [
+      {
+        "file": "dirty-digestion.test.ts",
+        "name": "source debt is reconciled first; optional stages then share a bounded coalesced generation",
+        "status": "passed"
+      },
+      {
+        "file": "dirty-digestion.test.ts",
+        "name": "finishing G preserves G+1 and its reconciliation obligation",
+        "status": "passed"
+      },
+      {
+        "file": "dirty-digestion.test.ts",
+        "name": "unfunded optional cognition remains visible without making reconciled source facts stale",
+        "status": "passed"
+      },
+      {
+        "file": "dirty-digestion.test.ts",
+        "name": "unknown affected scope never becomes an all-graph cognition request",
+        "status": "passed"
+      },
+      {
+        "file": "event-job-intake.test.ts",
+        "name": "duplicate storm creates one durable intake and replays its original advisory without cognition",
+        "status": "passed"
+      },
+      {
+        "file": "event-job-intake.test.ts",
+        "name": "unavailable published event history is not an empty successful intake",
+        "status": "passed"
+      }
+    ],
+    "GE10": [
+      {
+        "file": "dirty-digestion.test.ts",
+        "name": "finishing G preserves G+1 and its reconciliation obligation",
+        "status": "passed"
+      },
+      {
+        "file": "engine-jobs.test.ts",
+        "name": "restart-like orphan lease becomes recovery-required and cannot be redispatched",
+        "status": "passed"
+      }
+    ],
+    "GE11": [
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission admits no paid zero allocation or unpriced request and never creates a run record",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission reserves parallel calls atomically across separate service objects and enforces the daily pool",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission binds identity and immutable run policy and cannot dispatch a lost/uncertain request twice",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission retains unknown usage liabilities and conflict slots across restart",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission uses actual input/output without double billing cache/reasoning and releases only unused charge",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission halts new admission on measured variance and never claims invoice control",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission retains the UTC admission day over midnight and keeps the original run cap",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission bounds reasoning, elapsed time and cancellation separately",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission recovers a lost reserve reply from publication without forgetting its budget",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission pins distinct physical roots and detects external ledger corruption",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission independently rejects the requests limit before reservation",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission independently rejects the retries limit before reservation",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission independently rejects the input_tokens limit before reservation",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission independently rejects the output_tokens limit before reservation",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission does not redispatch after a lost dispatch reply or release earlier observed usage",
+        "status": "passed"
+      },
+      {
+        "file": "model-admission.test.ts",
+        "name": "durable model admission shares the principal daily cap across credential aliases and rejects regressed dispatch clocks",
+        "status": "passed"
+      },
+      {
+        "file": "engine-jobs.test.ts",
+        "name": "late provider liability survives cancellation and blocks the engine lane",
+        "status": "passed"
+      },
+      {
+        "file": "managed-plan-execution.test.ts",
+        "name": "independent original-native stop observations release only stopped ownership, preserve first closure, and require every outstanding model attempt",
+        "status": "passed"
+      }
+    ],
+    "GE12": [
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE12: independently attributed current claims promote atomically, emit a committed pulse and replay without duplicate history",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE08/GE12: changed wrapper bytes, repeated model/narrative/federation copies and renamed source copies retain one ancestry",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE12: corroboration is directed and claim-specific; adjacent source references do not validate another relation",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE12: supported node publication commits source seeds, index and promotion marker together without laundering speculative intent",
+        "status": "passed"
+      },
+      {
+        "file": "dream-router-authority.test.ts",
+        "name": "rejects retired/unknown focused requests before decay or cycle mutation",
+        "status": "passed"
+      },
+      {
+        "file": "dream-router-authority.test.ts",
+        "name": "zero MCP budget does not decay, normalize, invoke providers or interrupt another state",
+        "status": "passed"
+      },
+      {
+        "file": "dream-router-authority.test.ts",
+        "name": "actual two-cycle deduplication remaps generated hub edges to the persisted node identity",
+        "status": "passed"
+      },
+      {
+        "file": "dream-router-authority.test.ts",
+        "name": "invalid fractions and unknown scope leave the cycle unchanged; duplicate roots accept zero hops",
+        "status": "passed"
+      },
+      {
+        "file": "dream-router-authority.test.ts",
+        "name": "legacy snapshot identity collision fails visibly and out-of-view links are explicitly omitted",
+        "status": "passed"
+      }
+    ],
+    "GE13": [
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE13/XS15: withdrawal revokes applicability while preserving original evidence, promotion and assessment history",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE13: changed source proof is material; an old scan date alone is irrelevant",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE13: fresh contradictory source prevents promotion even with multiple strong supporting roots",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE13: known managed source debt blocks only affected claims; changing an unrelated file does not invalidate the graph",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE13: rejected candidates are reconsidered when real independent corroboration arrives",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE13: an unconfirmed witness write blocks trust until durable observation recovery",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE13: a confirmed unchanged witness write leaves valid evidence usable without a scan",
+        "status": "passed"
+      },
+      {
+        "file": "normalization-evidence.test.ts",
+        "name": "GE13: physical witness paths expose dependency debt through a repository directory alias",
+        "status": "passed"
+      },
+      {
+        "file": "risk-remediation.test.ts",
+        "name": "concurrent replay retains one risk, distinct concerns do not subset-merge, and stale commands fail without overwriting",
+        "status": "passed"
+      },
+      {
+        "file": "risk-remediation.test.ts",
+        "name": "proposal/action histories survive review, exact action replay is idempotent and automated dispositions cannot invent proof",
+        "status": "passed"
+      },
+      {
+        "file": "risk-remediation.test.ts",
+        "name": "human scope/rationale persists and material reappearance keeps the same identity and original disposition",
+        "status": "passed"
+      },
+      {
+        "file": "risk-remediation.test.ts",
+        "name": "durable action intent permits one dispatch and lost/restarted results never authorize automatic retry",
+        "status": "passed"
+      },
+      {
+        "file": "risk-remediation.test.ts",
+        "name": "unconfirmed remediation effects retain the existing job recovery owner instead of claiming execution success",
+        "status": "passed"
+      },
+      {
+        "file": "risk-remediation.test.ts",
+        "name": "known canonical features are not phantom entities and corrupt factual context cannot yield a successful phantom remedy",
+        "status": "passed"
+      },
+      {
+        "file": "risk-remediation.test.ts",
+        "name": "TTL retires attention as unverified and repeated cluster wrappers cannot increase support",
+        "status": "passed"
+      },
+      {
+        "file": "risk-remediation.test.ts",
+        "name": "remediation replay keeps original proposal/receipt, adaptive memory and selected stage across restart; malformed history fails closed",
+        "status": "passed"
+      },
+      {
+        "file": "risk-remediation.test.ts",
+        "name": "adversarial findings and risk share a compound publication; changed inputs reopen acknowledged review without duplicates",
+        "status": "passed"
+      },
+      {
+        "file": "lifecycle-narrative.test.ts",
+        "name": "human acceptance atomically retains rationale/action/typed assertion and cannot become independent proof",
+        "status": "passed"
+      },
+      {
+        "file": "lifecycle-narrative.test.ts",
+        "name": "changed source findings reject acceptance; explicit refresh retains original contribution and CAS rejects stale commands",
+        "status": "passed"
+      },
+      {
+        "file": "lifecycle-narrative.test.ts",
+        "name": "simultaneous exploration cannot steal the engine lease; disconnect retains outcomes and restores ownership",
+        "status": "passed"
+      },
+      {
+        "file": "lifecycle-narrative.test.ts",
+        "name": "restart recovery archives exact human intent without action redispatch",
+        "status": "passed"
+      },
+      {
+        "file": "lifecycle-narrative.test.ts",
+        "name": "narrative is revision-bound derived context, and scan age/unrelated bookkeeping cannot manufacture staleness",
+        "status": "passed"
+      },
+      {
+        "file": "lifecycle-narrative.test.ts",
+        "name": "concurrent story append/replay preserves every chapter/archive and corrupt history is never replaced by empty success",
+        "status": "passed"
+      }
+    ],
+    "GE14": [
+      {
+        "file": "plan-workflow.test.ts",
+        "name": "C14 pure transition contract (receipt truth is qualified separately by the durable authority) GE14/CU22: closure cannot waive required reconciliation; a false receipt cannot mark implementation",
+        "status": "passed"
+      },
+      {
+        "file": "plan-authority.test.ts",
+        "name": "GE14/CU22 effect contract: reconciliation must finish; optional unfunded digestion can remain pending",
+        "status": "passed"
+      }
+    ],
+    "GE15": [
+      {
+        "file": "plan-context-integration.test.ts",
+        "name": "verified implementation evidence is distinct from the next slice and recovers after a transcript-free read",
+        "status": "passed"
+      },
+      {
+        "file": "execution-context.test.ts",
+        "name": "recovers exact context and pending state across a new owner object, without crossing sessions or reusing execution IDs",
+        "status": "passed"
+      }
+    ]
+  },
+  "ux": {
+    "UX01": [
+      {
+        "name": "B25-04",
+        "detail": "Menu retains captured plan after selection changes; Ask creates an editable draft without sending or mutating."
+      },
+      {
+        "name": "B25-12",
+        "detail": "Sibling overflow controls and slice/concern menus retain native card interactions without nested buttons."
+      },
+      {
+        "name": "B25-21",
+        "detail": "Concern review keeps the unique canonical source anchor, original plan and existing draft, without sending or resolving status from prose."
+      },
+      {
+        "name": "B25-22",
+        "detail": "ADR menu opens the existing proposal editor; changing plan before submit refuses the original draft without writing a proposal against a replacement plan."
+      },
+      {
+        "name": "B25-23",
+        "detail": "Schedule menu opens the actual v2 workspace at its exact captured definition; unlinked plan/slice remain null and edit navigation enqueues no job or model work."
+      },
+      {
+        "name": "B25-24",
+        "detail": "Source file/heading references remain literal unattested evidence, rather than fabricated graph entity identities, and only draft a question."
+      }
+    ],
+    "UX02": [
+      {
+        "name": "B25-04",
+        "detail": "Menu retains captured plan after selection changes; Ask creates an editable draft without sending or mutating."
+      },
+      {
+        "name": "B25-07",
+        "detail": "Captured CAS command rejects changed revision; it cannot silently target the newly selected plan."
+      },
+      {
+        "name": "B25-14",
+        "detail": "Actual approval preview race stops before any lifecycle mutation; the newly selected plan cannot inherit another plan’s reviewed scope."
+      },
+      {
+        "name": "B25-31",
+        "detail": "Changed selection refuses a prepared native purpose before preference/model dispatch and preserves the operator draft."
+      }
+    ],
+    "UX03": [
+      {
+        "name": "B25-07",
+        "detail": "Captured CAS command rejects changed revision; it cannot silently target the newly selected plan."
+      },
+      {
+        "name": "B25-14",
+        "detail": "Actual approval preview race stops before any lifecycle mutation; the newly selected plan cannot inherit another plan’s reviewed scope."
+      },
+      {
+        "name": "B25-16",
+        "detail": "Lost acknowledgement retains exact ID/payload across stop and another execution event; continuation is fenced, retry cannot switch target, and confirmed acknowledgement clears the obsolete blocking status."
+      },
+      {
+        "name": "B25-25",
+        "detail": "One menu activation dispatches once even for queued duplicate clicks; replacing its invoking row invalidates the old popup."
+      },
+      {
+        "name": "B25-29",
+        "detail": "Removing the actual selected row clears its execution/slice views and active selection without choosing another plan or losing the operator draft."
+      }
+    ],
+    "UX04": [
+      {
+        "name": "B25-05",
+        "detail": "Native text-input menu/draft remains intact."
+      },
+      {
+        "name": "B25-06",
+        "detail": "Shift-F10, Home/End, type-ahead and Escape work with focus restoration."
+      },
+      {
+        "name": "B25-27",
+        "detail": "Actual Chromium touch input discovers overflow and taps a target-bound draft without a long-press, right-click or send."
+      }
+    ],
+    "UX05": [
+      {
+        "name": "B25-10",
+        "detail": "Narrow/reduced-motion menu stays inside viewport, with touch-visible overflow styling."
+      },
+      {
+        "name": "B25-18",
+        "detail": "Narrow review is within the viewport with visible native disclosure, complete scrollable detail, and no approval after the request disappears."
+      },
+      {
+        "name": "B25-28",
+        "detail": "Actual 200% CSS layout zoom and forced-colors at the bottom/right edge keeps the entire accessible scrollable menu inside the narrow viewport. This is layout-scale qualification, not a browser-chrome zoom claim."
+      }
+    ],
+    "UX06": [
+      {
+        "name": "B25-09",
+        "detail": "Explicit disclosure chevron and per-plan open state survive lifecycle refresh."
+      }
+    ],
+    "UX07": [
+      {
+        "name": "B25-01",
+        "detail": "Actual 1,000 variable-height rows restore selected plan by ID and center only the rail."
+      }
+    ],
+    "UX08": [
+      {
+        "name": "B25-02",
+        "detail": "Filtering preserves active plan; explicit reveal adds one labelled row without clearing filters or substituting first plan."
+      }
+    ],
+    "UX09": [
+      {
+        "name": "B25-03",
+        "detail": "Background list/detail refresh retains rail scroll instead of stealing focus."
+      },
+      {
+        "name": "B25-08",
+        "detail": "Out-of-order detail loads and delayed reveal ignore stale selection."
+      },
+      {
+        "name": "B25-13",
+        "detail": "Actual delayed preference persistence keeps chat bound to its original plan; result cannot refresh the new selection, and mismatched continuation dispatch is stopped."
+      },
+      {
+        "name": "B25-26",
+        "detail": "A real renamed row above the visible 1,000-plan rail changes height without moving the logical visible plan or its offset."
+      }
+    ],
+    "UX10": [
+      {
+        "name": "B25-04",
+        "detail": "Menu retains captured plan after selection changes; Ask creates an editable draft without sending or mutating."
+      },
+      {
+        "name": "B25-21",
+        "detail": "Concern review keeps the unique canonical source anchor, original plan and existing draft, without sending or resolving status from prose."
+      },
+      {
+        "name": "B25-24",
+        "detail": "Source file/heading references remain literal unattested evidence, rather than fabricated graph entity identities, and only draft a question."
+      },
+      {
+        "name": "B25-30",
+        "detail": "Explicit preparation reads current ownership, stage, source definition, approval and revision, preserves the editable draft, and starts no work."
+      }
+    ],
+    "UX11": [
+      {
+        "name": "B25-14",
+        "detail": "Actual approval preview race stops before any lifecycle mutation; the newly selected plan cannot inherit another plan’s reviewed scope."
+      },
+      {
+        "name": "B25-15",
+        "detail": "Exact review retains literal Unicode/source arguments and original execution/receipt/revision when selected plan changes; no source markup is executed."
+      },
+      {
+        "name": "B25-16",
+        "detail": "Lost acknowledgement retains exact ID/payload across stop and another execution event; continuation is fenced, retry cannot switch target, and confirmed acknowledgement clears the obsolete blocking status."
+      },
+      {
+        "name": "B25-17",
+        "detail": "Decline addresses only the captured proposal and issues no approval."
+      },
+      {
+        "name": "B25-22",
+        "detail": "ADR menu opens the existing proposal editor; changing plan before submit refuses the original draft without writing a proposal against a replacement plan."
+      },
+      {
+        "name": "B25-23",
+        "detail": "Schedule menu opens the actual v2 workspace at its exact captured definition; unlinked plan/slice remain null and edit navigation enqueues no job or model work."
+      },
+      {
+        "name": "B25-30",
+        "detail": "Explicit preparation reads current ownership, stage, source definition, approval and revision, preserves the editable draft, and starts no work."
+      },
+      {
+        "name": "B25-32",
+        "detail": "Normal reviewed submit carries the immutable original native purpose once; clearing the purpose retains the draft, and selection alone never admits implementation."
+      }
+    ],
+    "UX12": [
+      {
+        "name": "B25-11",
+        "detail": "Offline refresh retains the as-of view and exposes failure; reconnect rereads canonical state."
+      },
+      {
+        "name": "B25-19",
+        "detail": "Streamed inspection over the independent UTF-8 byte ceiling refuses without clipping evidence, changing the captured target, or issuing another approval."
+      },
+      {
+        "name": "B25-20",
+        "detail": "Read-only original-execution recovery keeps unknown closure fenced and literal, disables revoked approval, and releases the acknowledgement fence only for a declared settled inactive closure without another effect/approval."
+      },
+      {
+        "name": "B25-21",
+        "detail": "Concern review keeps the unique canonical source anchor, original plan and existing draft, without sending or resolving status from prose."
+      },
+      {
+        "name": "B25-29",
+        "detail": "Removing the actual selected row clears its execution/slice views and active selection without choosing another plan or losing the operator draft."
+      }
+    ]
+  },
+  "c14": [
+    {
+      "name": "Ashoka reported progress",
+      "detail": "Real frozen 32-slice plan/log, compiled daemon, CLI and Chrome preserve 26 completed cards, current Slice25 and next gated candidate without importing, approving or claiming running/verified authority."
+    },
+    {
+      "name": "dreamgraph:draft",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "dreamgraph:implemented",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "dreamgraph:verified",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "dreamgraph:blocked",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "web64:draft",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "web64:implemented",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "web64:verified",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "web64:blocked",
+      "detail": "API/MCP/real CLI/compiled editor client/plugin SDK validation/task memory/analytics and actual browser share committed lifecycle and slice state. Independent real client sessions may advance authority-only publication receipts."
+    },
+    {
+      "name": "Explorer scope",
+      "detail": "Explorer honestly reports plan/slice as non-rendered families; the canonical context endpoint still provides them. No plan-node rendering claim."
+    }
+  ],
+  "c17": [
+    {
+      "file": "change-obligations.test.ts",
+      "name": "durable source change obligations retains C17 effect-double evidence across a lost action result without repeating input or claiming graph reconciliation",
+      "status": "passed"
+    },
+    {
+      "file": "context-pack.test.ts",
+      "name": "canonical bounded graph context provides expiring semantic observations without coordinates, screenshot history or re-verification",
+      "status": "passed"
+    },
+    {
+      "file": "provider-images.test.ts",
+      "name": "bounded image transport uses the responses native image envelope",
+      "status": "passed"
+    },
+    {
+      "file": "provider-images.test.ts",
+      "name": "bounded image transport uses the chat-completions native image envelope",
+      "status": "passed"
+    },
+    {
+      "file": "provider-images.test.ts",
+      "name": "bounded image transport uses the anthropic-messages native image envelope",
+      "status": "passed"
+    },
+    {
+      "file": "provider-images.test.ts",
+      "name": "bounded image transport does not assume vision for gpt-7",
+      "status": "passed"
+    },
+    {
+      "file": "provider-images.test.ts",
+      "name": "bounded image transport does not assume vision for o3-mini",
+      "status": "passed"
+    },
+    {
+      "file": "provider-images.test.ts",
+      "name": "bounded image transport preserves supplied images in the native tool loop",
+      "status": "passed"
+    },
+    {
+      "file": "provider-images.test.ts",
+      "name": "bounded image transport rejects excess/invalid images before inference",
+      "status": "passed"
+    }
+  ],
+  "task_families": [
+    {
+      "id": "dreamgraph:AT01",
+      "family": "AT01",
+      "project": "dreamgraph",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    },
+    {
+      "id": "dreamgraph:AT02",
+      "family": "AT02",
+      "project": "dreamgraph",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    },
+    {
+      "id": "dreamgraph:AT03",
+      "family": "AT03",
+      "project": "dreamgraph",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    },
+    {
+      "id": "dreamgraph:AT04",
+      "family": "AT04",
+      "project": "dreamgraph",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    },
+    {
+      "id": "dreamgraph:AT05",
+      "family": "AT05",
+      "project": "dreamgraph",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    },
+    {
+      "id": "dreamgraph:AT06",
+      "family": "AT06",
+      "project": "dreamgraph",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    },
+    {
+      "id": "web64-react:AT01",
+      "family": "AT01",
+      "project": "web64-react",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    },
+    {
+      "id": "web64-react:AT02",
+      "family": "AT02",
+      "project": "web64-react",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    },
+    {
+      "id": "web64-react:AT03",
+      "family": "AT03",
+      "project": "web64-react",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    },
+    {
+      "id": "web64-react:AT04",
+      "family": "AT04",
+      "project": "web64-react",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    },
+    {
+      "id": "web64-react:AT05",
+      "family": "AT05",
+      "project": "web64-react",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    },
+    {
+      "id": "web64-react:AT06",
+      "family": "AT06",
+      "project": "web64-react",
+      "status": "shared_mechanisms_qualified",
+      "model_understanding": "requires Slice 27 paired execution"
+    }
+  ],
+  "compound": {
+    "XS07": [
+      "GE04",
+      "GE05",
+      "UX02",
+      "UX09"
+    ],
+    "XS09": [
+      "GE07",
+      "GE13",
+      "GE14"
+    ],
+    "XS10": [
+      "GE05",
+      "GE11"
+    ],
+    "XS16": [
+      "GE15",
+      "C14 consumer comparison"
+    ],
+    "XS17": [
+      "GE05",
+      "GE11",
+      "C17 typed seams; native GUI qualification remains Slice 31"
+    ],
+    "XS21": [
+      "GE06",
+      "GE08",
+      "GE13",
+      "GE15"
+    ]
+  },
+  "exclusions": [
+    "GE16 real paired agent-understanding gains remain Slice 27.",
+    "Physical GUI workers/native CLI computer control and macOS/Linux qualification remain Slice 31.",
+    "Dashboard has no separate plan-progress interpretation to compare; its existing health/job semantics are core projections, presentation adoption remains Slice 23.",
+    "No live graph migration, provider canary, global installation or restart is performed."
+  ],
+  "artifacts": [
+    {
+      "path": "docs/ashoka/slice-25-progress-stop-qualified-root-tests-second.json",
+      "bytes": 626235,
+      "sha256": "ee3468e2728e0669ae1a9a637d62dbeaf9e80ed55fc82a108bca53a1bb5fc917"
+    },
+    {
+      "path": "docs/ashoka/browser-25-progress-stop-final-second/qualification.json",
+      "bytes": 6933,
+      "sha256": "b6a47649662fe54154f64deee8a650d3ff0b72ee2d79eaa4f56e9c9d3880bf05"
+    },
+    {
+      "path": "docs/ashoka/plan-consumers-progress-stop-final/qualification.json",
+      "bytes": 10954,
+      "sha256": "e23ee635881bdb94f8302c30aa0d6b14dff29d6587747d48f5379c10d0d8fc8d"
+    },
+    {
+      "path": "tests/fixtures/ashoka/baseline.json",
+      "bytes": 82798,
+      "sha256": "b79c8a1020973cccc7e3a6f94b85dc064c8649b67e86ff0caa802fd5ffed438e"
+    },
+    {
+      "path": "src/graph/contracts.ts",
+      "bytes": 28760,
+      "sha256": "5435a85b544e7c3b20aede692229a04530ccbd9685b6bc5b1a4897f5c1b9a557"
+    },
+    {
+      "path": "src/architect/plan-registry.ts",
+      "bytes": 62594,
+      "sha256": "6fb319178b6d03eb5d08744549ba07ba7a08351fc00a5c2de917edfffa7a3181"
+    },
+    {
+      "path": "src/architect/routes.ts",
+      "bytes": 649021,
+      "sha256": "cd2a24b6f883fde3eb4dae42a16bd418fffd01070f6de723d37c981b977eb608"
+    },
+    {
+      "path": "src/architect/context-actions.ts",
+      "bytes": 13147,
+      "sha256": "21440deee443aa4fe79b4d323309d4606216e70ace3851089142bd74cf24d8c1"
+    },
+    {
+      "path": "src/architect/native-tool-loop.ts",
+      "bytes": 43876,
+      "sha256": "f74731fb92a96b2a3e3d71d4d27f7bf39cb6f43836b71ef7ecf84a7a616acf3e"
+    },
+    {
+      "path": "src/architect/cli-bridge.ts",
+      "bytes": 47315,
+      "sha256": "a671bab59191683b26a61fe7da6c93ef073285ec794615b165ffe800d3391fa3"
+    },
+    {
+      "path": "src/graph/execution-context.ts",
+      "bytes": 38857,
+      "sha256": "7997b7c60974046a41497d43c669dfb0f17af99979ad561d3e61f896de8b0610"
+    },
+    {
+      "path": "src/discipline/plan-runtime.ts",
+      "bytes": 15655,
+      "sha256": "a4725e49ae31993e93ec57db259911204f532b97766efd162b7e0d50f322fb52"
+    },
+    {
+      "path": "src/server/managed-execution.ts",
+      "bytes": 23893,
+      "sha256": "2157cab22943cee04d916504361d0739f2cc427606452e8c3627367c66be0cde"
+    },
+    {
+      "path": "src/server/host-model-admission.ts",
+      "bytes": 14159,
+      "sha256": "bc31a56465b92efad74156d39608d5f0f35a4621c0b9df34206040dd95f8c48f"
+    },
+    {
+      "path": "packages/sdk/src/seams/graph-execution.ts",
+      "bytes": 32873,
+      "sha256": "3e56d176a0c97196b3478214985225a8b72a62cf73fb5600ff623337ba9fb4ee"
+    },
+    {
+      "path": "extensions/vscode/src/daemon-client.ts",
+      "bytes": 21571,
+      "sha256": "47d8093ab5b21caf6bbf54d06436eeec0831871cff96227706126789d08e9aa3"
+    },
+    {
+      "path": "extensions/vscode/src/managed-model-session.ts",
+      "bytes": 6007,
+      "sha256": "0ffbb4442095ba9af08aebf629f24e0edfff795bbb147c4c474a43a8f4cd05f6"
+    },
+    {
+      "path": "scripts/install.ps1",
+      "bytes": 22030,
+      "sha256": "9372c772e96abf5cac5ed4a0d1580d1352bd27e6862afbe2623530560b49fb80"
+    },
+    {
+      "path": "scripts/install.sh",
+      "bytes": 25741,
+      "sha256": "9ea9333caca62ebf510beba4500c0a9e94d8300b8834672c0b5a0c901894e581"
+    },
+    {
+      "path": "scripts/workspace-artifacts.mjs",
+      "bytes": 3729,
+      "sha256": "0db104f863dfa31748694b121383a1c8475ca270322947830b40bfed68351965"
+    },
+    {
+      "path": "src/cli/commands/start.ts",
+      "bytes": 10733,
+      "sha256": "a1a6ea3432b97a810125bac67932f89908faa9496ac4695b0187da3f2f337b8b"
+    },
+    {
+      "path": "tests/architect-plan-authority.test.ts",
+      "bytes": 18211,
+      "sha256": "2fb61b689601a5f1e3c06cfb674f951e32e757dd3dae27eb644fa81553b118b0"
+    },
+    {
+      "path": "tests/managed-plan-execution.test.ts",
+      "bytes": 34925,
+      "sha256": "edcd4fc37c29d294b785b11178135600c54d39b1f2f301ec4313223ea070cd3d"
+    },
+    {
+      "path": "tests/host-managed-execution.test.ts",
+      "bytes": 175980,
+      "sha256": "2b349907e6a219b0e32ad73538ed227a78278a82b63be9e166d977b083792926"
+    },
+    {
+      "path": "tests/workspace-installation.test.ts",
+      "bytes": 3758,
+      "sha256": "40412edfd579c82e00b4a5c3ebc295622cb9038db55e831ecfdbee52b0d197f9"
+    },
+    {
+      "path": "tests/cli-start-health.test.ts",
+      "bytes": 2835,
+      "sha256": "ca69adac42e744b89618ddd5a7fcd5b9bb967177f173e2e54876bf14bc1f3e94"
+    },
+    {
+      "path": "tests/standalone-architect-routes.test.ts",
+      "bytes": 149370,
+      "sha256": "f769442beb932ac1b629284bf8f87cc527481c766e164a6ff4227e1cb42ba2da"
+    },
+    {
+      "path": "tests/fixtures/ashoka/legacy-progress-plan.md",
+      "bytes": 146847,
+      "sha256": "861d820a730703ea8b7e59f5d2b33fea775a65f762b43a2407b583ab49411b06"
+    },
+    {
+      "path": "tests/fixtures/ashoka/legacy-progress-log.md",
+      "bytes": 134872,
+      "sha256": "9e7d958a84788630b1971ecfff8ef84656821ecce47fc8bba03a671da6875099"
+    },
+    {
+      "path": "scripts/qualify-ashoka-architect.mjs",
+      "bytes": 39675,
+      "sha256": "d290ca616a49a6fe70776020463cc3cb8765af8400741cfc7e4a36db92f6ec23"
+    },
+    {
+      "path": "scripts/qualify-ashoka-plan-consumers.mjs",
+      "bytes": 18056,
+      "sha256": "d609add22775c252b52d6d88cefa51fd41053e314421f860c01b51e99687ee52"
+    },
+    {
+      "path": "scripts/qualify-ashoka-integration-evidence.mjs",
+      "bytes": 7696,
+      "sha256": "33c0eb4b8bebcc8689bd932f514c911c619b99ddc411a1360c8acf84ecea23db"
+    },
+    {
+      "path": "docs/ashoka/slice-25-progress-stop-server-build-final.log",
+      "bytes": 48,
+      "sha256": "bc71985c8cf2584694c74170296a11e26cabf9e207d30b283b08bfca0af6ae30"
+    },
+    {
+      "path": "docs/ashoka/slice-25-progress-stop-editor-build-final.log",
+      "bytes": 1628,
+      "sha256": "64c42fa46238a9844759f72fb1c81182435abe9641f7caa1ec8644b93294d38a"
+    },
+    {
+      "path": "docs/ashoka/slice-25-progress-stop-editor-tests-final.log",
+      "bytes": 46246,
+      "sha256": "ac896bc89f782303ceba3be352a0b6dad29261b4c65b2b3f466ff95986c96c74"
+    },
+    {
+      "path": "docs/ashoka/slice-25-progress-stop-generated-checks.log",
+      "bytes": 2855,
+      "sha256": "1a78d32a9b20cbb9c423414d5d1e425612458cde2786183e9b18735a4b030929"
+    }
+  ]
+}

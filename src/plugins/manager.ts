@@ -43,6 +43,7 @@ import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import { graphEventBus, type GraphEventKind } from "../graph/events.js";
 import { getActiveScope } from "../instance/index.js";
+import { createPluginGraphContext } from "./graph-context.js";
 import { logger } from "../utils/logger.js";
 import { applyPluginUiElement, removePluginUiElements } from "../tools/ui-registry.js";
 import {
@@ -96,12 +97,15 @@ export interface ContributedTool {
   definition: ToolDefinition;
   /** Set false on unregister; wrapper handler short-circuits. */
   active: boolean;
+  /** Unregister/unload requests cancellation; it cannot attest private work termination. */
+  signal?: AbortSignal;
 }
 export interface ContributedResource {
   pluginId: string;
   pluginVersion: string;
   definition: ResourceDefinition;
   active: boolean;
+  signal?: AbortSignal;
 }
 const _contributedTools = new Map<string, ContributedTool[]>();
 const _contributedResources = new Map<string, ContributedResource[]>();
@@ -298,6 +302,7 @@ async function activateLoadedPlugin(
   const ctx: PluginContext = createPluginContext({
     manifest: plugin.manifest,
     instanceUuid,
+    graph: createPluginGraphContext(plugin.manifest, scope?.uuid ?? "legacy", abortController.signal),
     logger: createNamespacedLogger(plugin.manifest.id, (level, line) => {
       if (level === "error") logger.error(line);
       else if (level === "warn") logger.warn(line);
@@ -345,6 +350,7 @@ async function activateLoadedPlugin(
           identity,
           telemetry,
           definition,
+          signal: abortController.signal,
         });
       },
     },
@@ -355,6 +361,7 @@ async function activateLoadedPlugin(
           identity,
           telemetry,
           definition,
+          signal: abortController.signal,
         });
       },
     },
@@ -559,6 +566,7 @@ function registerContributedTool(args: {
   identity: { plugin_id: string; plugin_version: string };
   telemetry: TelemetryEmitter;
   definition: ToolDefinition;
+  signal: AbortSignal;
 }): () => void {
   const { plugin, identity, telemetry, definition } = args;
   const expectedPrefix = plugin.manifest.id.replace(/[^a-zA-Z0-9_]/g, '_') + '_';
@@ -622,11 +630,13 @@ function registerContributedTool(args: {
       }
     }
   }
+  const registration = new AbortController();
   const entry: ContributedTool = {
     pluginId: plugin.manifest.id,
     pluginVersion: plugin.manifest.version,
     definition,
     active: true,
+    signal: AbortSignal.any([args.signal, registration.signal]),
   };
   const list = _contributedTools.get(plugin.manifest.id) ?? [];
   list.push(entry);
@@ -648,6 +658,7 @@ function registerContributedTool(args: {
   );
   return () => {
     entry.active = false;
+    registration.abort(new Error('PLUGIN_TOOL_UNREGISTERED'));
   };
 }
 
@@ -656,6 +667,7 @@ function registerContributedResource(args: {
   identity: { plugin_id: string; plugin_version: string };
   telemetry: TelemetryEmitter;
   definition: ResourceDefinition;
+  signal: AbortSignal;
 }): () => void {
   const { plugin, identity, telemetry, definition } = args;
   const expectedNamespace = `plugin://${plugin.manifest.id}`;
@@ -704,11 +716,13 @@ function registerContributedResource(args: {
       });
     }
   }
+  const registration = new AbortController();
   const entry: ContributedResource = {
     pluginId: plugin.manifest.id,
     pluginVersion: plugin.manifest.version,
     definition,
     active: true,
+    signal: AbortSignal.any([args.signal, registration.signal]),
   };
   const list = _contributedResources.get(plugin.manifest.id) ?? [];
   list.push(entry);
@@ -730,6 +744,7 @@ function registerContributedResource(args: {
   );
   return () => {
     entry.active = false;
+    registration.abort(new Error('PLUGIN_RESOURCE_UNREGISTERED'));
   };
 }
 

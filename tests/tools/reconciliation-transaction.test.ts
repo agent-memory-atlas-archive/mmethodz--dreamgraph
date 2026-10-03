@@ -1,6 +1,6 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { mkdtempSync, rmSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -8,6 +8,7 @@ import { setDataDirOverride } from "../../src/utils/paths.js";
 import { invalidateCache, loadJsonData, setDataDirResolver } from "../../src/utils/cache.js";
 import { atomicWriteFile } from "../../src/utils/atomic-write.js";
 import { withGraphRead } from "../../src/utils/graph-reconciliation-barrier.js";
+import { releaseGraphWriter } from "../../src/graph/writer-lease.js";
 import {
   recoverReconciliationTransaction,
   withReconciliationTransaction,
@@ -27,6 +28,7 @@ function deferred(): { promise: Promise<void>; resolve: () => void } {
 
 async function seed(revision = "old"): Promise<void> {
   await mkdir(root, { recursive: true });
+  await unlink(join(root, "publication_state.json")).catch(error => { if (error.code !== "ENOENT") throw error; });
   for (const file of files) {
     await writeFile(join(root, file), JSON.stringify({ revision, file }), "utf-8");
   }
@@ -66,7 +68,10 @@ beforeEach(async () => {
   await import("node:fs/promises").then(({ unlink }) => unlink(join(root, "reconciliation_journal.json")).catch(() => undefined));
 });
 
-afterAll(() => rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 50 }));
+afterAll(async () => {
+  await releaseGraphWriter(root);
+  rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 50 });
+});
 
 describe("instance graph reconciliation barrier", () => {
   it("lets a reader that began first complete against the old revision", async () => {
@@ -107,7 +112,7 @@ describe("instance graph reconciliation barrier", () => {
     expect(await reader).toEqual(["new", "new", "new"]);
   });
 
-  it("rolls back every injected commit interruption without exposing a mixed read", async () => {
+  it("rolls back interruptions before the durable publication marker without exposing a mixed read", async () => {
     const steps = [
       "journal_prepared",
       "before_replace:0:features.json",
@@ -116,7 +121,7 @@ describe("instance graph reconciliation barrier", () => {
       "after_replace:1:workflows.json",
       "before_replace:2:scan_state.json",
       "after_replace:2:scan_state.json",
-      "before_journal_remove",
+      "before_replace:3:publication_state.json",
     ];
     for (const target of steps) {
       await seed();
@@ -127,6 +132,14 @@ describe("instance graph reconciliation barrier", () => {
       })).rejects.toThrow(`fault:${target}`);
       expect(await readSet()).toEqual(["old", "old", "old"]);
     }
+  });
+
+  it("retains the new complete set after the durable marker even when the reply is lost", async () => {
+    await expect(transaction({ fault_inject: step => {
+      if (step === "before_journal_remove") throw new Error("reply lost");
+    } })).rejects.toThrow("reply lost");
+    expect(await readSet()).toEqual(["new", "new", "new"]);
+    expect(await recoverReconciliationTransaction()).toBe("clean");
   });
 
   it("preserves a recovery-required journal when rollback itself fails", async () => {

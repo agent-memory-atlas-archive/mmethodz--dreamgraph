@@ -3,30 +3,27 @@
  *
  * Mtime-aware Map-based cache: on each read we check the file's last-
  * modified time and only re-parse when the file has actually changed.
- * A short MIN_CHECK_MS interval prevents excessive stat() calls during
- * rapid bursts within a single operation, while guaranteeing fresh data
- * between dream cycles (even back-to-back ones).
+ * Physical paths isolate instance entries; the enclosing publication stamp
+ * rejects interrupted or concurrently changed snapshots.
  *
  * v7.0 El Alarife: The cache resolves data files through a pluggable
  * `resolveDataPath` function so it works in both legacy (flat data/)
  * and UUID-scoped instance modes.
  */
 
-import { readFile, stat } from "node:fs/promises";
+import { readFile, stat, realpath } from "node:fs/promises";
 import { resolve } from "node:path";
-import { config } from "../config/config.js";
+import { getDataDir, getScopedDataDirectory } from "./paths.js";
 import { logger } from "./logger.js";
 import { withGraphRead } from "./graph-reconciliation-barrier.js";
-
-/** Minimum milliseconds between mtime checks for the same file. */
-const MIN_CHECK_MS = 5_000;
+import { stripBom } from "./read-json.js";
 
 /**
  * Pluggable data directory resolver.
- * In fallback mode this returns config.dataDir.
+ * Default resolution follows the same active physical instance as publication.
  * In instance mode, lifecycle.ts overrides it at startup.
  */
-let dataDirResolver: () => string = () => config.dataDir;
+let dataDirResolver: () => string = () => getDataDir();
 
 /**
  * Set the data directory resolver.
@@ -54,15 +51,11 @@ export async function loadJsonData<T = unknown>(filename: string): Promise<T> {
 }
 
 async function loadJsonDataUnlocked<T = unknown>(filename: string): Promise<T> {
-  const filePath = resolve(dataDirResolver(), filename);
+  const filePath = resolve(getScopedDataDirectory() ?? dataDirResolver(), filename);
+  const physical = await realpath(filePath);
+  const key = process.platform === "win32" ? physical.toLowerCase() : physical;
   const now = Date.now();
-  const entry = cache.get(filename) as CacheEntry<T> | undefined;
-
-  // If we have a cached entry and checked recently, skip the stat
-  if (entry && now - entry.checkedAt < MIN_CHECK_MS) {
-    logger.debug(`Cache hit (within check interval): ${filename}`);
-    return entry.data;
-  }
+  const entry = cache.get(key) as CacheEntry<T> | undefined;
 
   // Check file mtime
   try {
@@ -79,13 +72,13 @@ async function loadJsonDataUnlocked<T = unknown>(filename: string): Promise<T> {
     // File is new or modified — read and parse
     logger.debug(`Loading from disk (${entry ? "mtime changed" : "first load"}): ${filePath}`);
     const raw = await readFile(filePath, "utf-8");
-    const data = JSON.parse(raw) as T;
-    cache.set(filename, { data, mtimeMs, checkedAt: now });
+    const data = JSON.parse(stripBom(raw)) as T;
+    cache.set(key, { data, mtimeMs, checkedAt: now });
     return data;
   } catch (err) {
     // If file doesn't exist and we have stale data, clear it
     if (entry) {
-      cache.delete(filename);
+      cache.delete(key);
     }
     throw err;
   }
@@ -96,7 +89,11 @@ async function loadJsonDataUnlocked<T = unknown>(filename: string): Promise<T> {
  */
 export function invalidateCache(filename?: string): void {
   if (filename) {
-    cache.delete(filename);
+    const suffix = "/" + filename.replace(/\\/g, "/");
+    for (const key of cache.keys()) {
+      const normalized = key.replace(/\\/g, "/");
+      if (normalized.endsWith(process.platform === "win32" ? suffix.toLowerCase() : suffix)) cache.delete(key);
+    }
   } else {
     cache.clear();
   }
@@ -107,7 +104,8 @@ export function invalidateCache(filename?: string): void {
  *
  * Defensively coerces: if an agent wrote the file as a wrapper object
  * (e.g. `{ "entities": [...] }` instead of `[...]`), we extract the
- * first array-valued property. Returns an empty array on any failure.
+ * first array-valued property as a legacy presentation adapter. Missing optional
+ * bootstrap files return []; corruption and missing published stores propagate.
  *
  * Use this for seed files: features.json, workflows.json, data_model.json.
  */
@@ -128,9 +126,11 @@ export async function loadJsonArray<T>(filename: string): Promise<T[]> {
       }
     }
 
-    logger.warn(`${filename}: expected array, got ${typeof raw}. Returning [].`);
-    return [];
-  } catch {
+    throw new Error(`INVALID_STORE_SHAPE: ${filename}: expected array`);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    const { loadPublicationState } = await import("../graph/publication.js");
+    if ((await loadPublicationState()).stores[filename]) throw new Error(`PUBLISHED_STORE_MISSING: ${filename}`);
     return [];
   }
 }

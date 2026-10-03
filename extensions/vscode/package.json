@@ -2,7 +2,7 @@
   "name": "dreamgraph-vscode",
   "displayName": "DreamGraph",
   "description": "DreamGraph-native development agent — intentional context, architectural discipline, knowledge-grounded AI.",
-  "version": "13.4.0",
+  "version": "14.0.0",
   "icon": "media/dreamgraph-icon.png",
   "publisher": "siteledger-solutions",
   "homepage": "https://dreamgraph.nofs.ai/",
@@ -353,13 +353,16 @@
         "dreamgraph.architect.openai.reasoningEffort": {
           "type": "string",
           "enum": [
+            "none",
+            "minimal",
             "low",
             "medium",
             "high",
-            "xhigh"
+            "xhigh",
+            "max"
           ],
           "default": "medium",
-          "description": "OpenAI GPT-5.5/5.6/6 Responses API reasoning effort for Architect calls. Use low for efficient reasoning, medium for balanced latency/performance, high for complex agentic tasks, and xhigh for hardest asynchronous/evaluation workloads."
+          "description": "Requested model-qualified OpenAI reasoning effort for Chat or Responses. Unsupported effort fails before dispatch; native CLI controls remain adapter-owned."
         },
         "dreamgraph.architect.openai.verbosity": {
           "type": "string",
@@ -412,18 +415,28 @@
         "dreamgraph.platform": {
           "type": "string",
           "description": "Target platform identifier for multi-platform projects."
+        },
+        "dreamgraph.architect.openai.api": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "responses",
+            "chat_completions"
+          ],
+          "default": "auto",
+          "description": "Requested OpenAI protocol. Auto follows core model capability evidence; explicit selection validates API, effort, tools and structured output without changing the model."
         }
       }
     }
   },
   "scripts": {
     "build": "npm run lint:isolation && npm run build:webview && tsc -p ./tsconfig.json && npm run build:extension && npm run build:bridge && npm run build:vendor",
-    "build:webview": "esbuild src/webview/index.ts --bundle --outfile=dist/webview.js --format=iife --platform=browser",
+    "build:webview": "node scripts/build-webview.cjs",
     "build:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --format=cjs --platform=node --target=node18 --external:vscode --minify",
-    "build:bridge": "esbuild src/architect-core/adapters/copilot-cli/host/bridge-entry.ts --bundle --outfile=dist/copilot-cli-bridge.js --format=cjs --platform=node --target=node18",
+    "build:bridge": "esbuild ../../src/architect/cli-mcp-bridge.ts --bundle --outfile=dist/copilot-cli-bridge.js --format=cjs --platform=node --target=node18",
     "build:vendor": "node -e \"const fs=require('fs'),path=require('path');const out=path.join('dist','vendor');fs.mkdirSync(out,{recursive:true});for(const [src,dst] of [['node_modules/markdown-it/dist/markdown-it.min.js','markdown-it.min.js'],['node_modules/dompurify/dist/purify.min.js','purify.min.js']]){let s=fs.readFileSync(src,'utf8');s=s.replace(/[\\n\\r]*\\/\\/[#@]\\s*sourceMappingURL=.*$/m,'');fs.writeFileSync(path.join(out,dst),s);console.log('vendored',src,'->',path.join(out,dst));}\"",
     "watch": "tsc -watch -p ./tsconfig.json",
-    "package": "vsce package",
+    "package": "vsce package --no-dependencies",
     "lint": "eslint src --ext ts",
     "lint:isolation": "node scripts/lint-isolation.mjs",
     "test:context-contract": "npm run build && node --test dist/test/context-architecture-contract.test.js",
@@ -440,10 +453,14 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@dreamgraph/sdk": "file:../../packages/sdk",
+    "@dreamgraph/token-economy": "file:../../packages/token-economy",
     "@modelcontextprotocol/sdk": "^1.27.1",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "dompurify": "^3.4.0",
     "markdown-it": "^14.1.1",
     "mermaid": "^11.12.0",
-    "@dreamgraph/token-economy": "file:../../packages/token-economy"
+    "zod": "^3.25.76"
   }
 }

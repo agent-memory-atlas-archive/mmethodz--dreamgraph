@@ -42,6 +42,7 @@ function estimateTokens(text: string): number {
 /** Evidence kinds that draw from the hard-reserved graph slice (ADR-097). */
 const GRAPH_EVIDENCE_KINDS: ReadonlySet<import("./types.js").ContextEvidenceKind> =
   new Set([
+    "graph_context",
     "feature",
     "workflow",
     "adr",
@@ -841,10 +842,12 @@ export class ContextBuilder {
     if (graphReserve && graphReserve > 0) {
       const graphItems = evidence.filter((e) => isGraphEvidenceKind(e.kind));
       const otherItems = evidence.filter((e) => !isGraphEvidenceKind(e.kind));
-      const graphRes = this._runBudgetLoop(graphItems, graphReserve);
+      const mandatoryGraphCost = graphItems.filter(item => item.required).reduce((sum,item)=>sum+item.tokenCost,0);
+      const effectiveReserve = Math.min(usableBudget, Math.max(graphReserve, mandatoryGraphCost));
+      const graphRes = this._runBudgetLoop(graphItems, effectiveReserve);
       const generalBudget = Math.max(
-        200,
-        usableBudget - graphReserve,
+        0,
+        usableBudget - effectiveReserve,
       );
       const generalRes = this._runBudgetLoop(
         otherItems,
@@ -1010,6 +1013,9 @@ export class ContextBuilder {
       undefined,
       effectiveReservedGraph,
     );
+    if (omitted.some(item => item.kind === "graph_context" && item.required)) {
+      throw new Error("MANDATORY_CONTEXT_EXCEEDS_REQUEST_BUDGET: narrow task/source context or increase the declared bound; required graph anchors cannot be clipped");
+    }
     const instrumentationResult = await import("./context-builder.instrumentation.js").then((m) =>
       m.buildContextInstrumentation(
         included,
@@ -1221,6 +1227,7 @@ export class ContextBuilder {
       ? { fileContent, envelope }
       : undefined,
   );
+  if (omitted.some(item => item.kind === "graph_context" && item.required)) throw new Error("MANDATORY_CONTEXT_EXCEEDS_REQUEST_BUDGET");
 
   const includedParts = included.map((item) => item.content);
   const trimmedSections = omitted.map((entry) => entry.title);
@@ -1296,8 +1303,11 @@ export class ContextBuilder {
       );
     }
 
+    const text = parts.join("\n\n");
+    if (packet.evidence.some(item => item.kind === "graph_context") && Buffer.byteLength(text,"utf8") > packet.tokenUsage.budget)
+      throw new Error("MANDATORY_CONTEXT_RENDER_BYTE_BOUND: framing and required evidence exceed the declared prompt allowance");
     return {
-      text: parts.join("\n\n"),
+      text,
       usedTokens: packet.tokenUsage.used,
       totalTokens: packet.tokenUsage.budget,
       trimmedSections: packet.omitted.map((entry) => entry.title),
@@ -1522,6 +1532,42 @@ export class ContextBuilder {
       ...plan.requiredEvidence,
       ...(plan.budgetPolicy.includeOptionalEvidence ? plan.optionalEvidence : []),
     ]);
+
+    // The shipped daemon port consumes the same canonical pack as browser/API/MCP.
+    // Sparse generic reader test ports without this capability retain the explicit
+    // legacy navigation projection below; an HTTP failure never falls back silently.
+    if (typeof this._daemonClient.getContextPack === "function") {
+      try {
+        const pack = await this._daemonClient.getContextPack({
+          query: [plan.taskSummary, envelope.activeFile?.path, envelope.activeFile?.cursorAnchor?.symbolPath].filter(Boolean).join("\n"),
+          token_budget: Math.min(10000, Math.max(1, plan.budgetPolicy.reserveGraphTokens)),
+          depth: 1, max_neighbors: 12, max_records: 32,
+        });
+        graphCtx.canonicalPack = pack;
+        // Labels are derived from the whole emitted entity records at this revision.
+        // No confidence, source verification or relevance is fabricated for hints.
+        const labels = new Map<string,string>();
+        for (const line of pack.context_text.split("\n").slice(1)) {
+          try { const value = JSON.parse(line); if (typeof value.entity === "string" && typeof value.label === "string") labels.set(value.entity, value.label); }
+          catch { /* The authoritative pack remains literal. No best-guess parsing. */ }
+        }
+        for (const record of pack.records.filter(item => item.record_type === "entity" && item.identity)) {
+          const identity = record.identity!, label = labels.get(record.id) ?? identity.id;
+          // Legacy hint IDs cannot represent a typed repository collision. Keep
+          // the complete identities in the canonical pack and decline promotion.
+          if (pack.records.filter(item => item.record_type === "entity" && item.identity?.kind === identity.kind && item.identity.id === identity.id).length !== 1) continue;
+          if (identity.kind === "feature") graphCtx.relatedFeatures.push({id:identity.id,name:label});
+          else if (identity.kind === "workflow") graphCtx.relatedWorkflows.push({id:identity.id,name:label});
+          else if (identity.kind === "adr") graphCtx.applicableAdrs.push({id:identity.id,title:label});
+          else if (identity.kind === "ui_element") graphCtx.uiPatterns.push({id:identity.id,name:label});
+        }
+        graphCtx.activeTensions = pack.records.filter(item => item.identity?.kind === "tension").length;
+        return graphCtx;
+      } catch (error) {
+        graphCtx.contextGap = {code:"CANONICAL_CONTEXT_UNAVAILABLE",detail:error instanceof Error?error.message:String(error)};
+        return graphCtx;
+      }
+    }
 
     if (
       envelope.activeFile &&
@@ -1796,6 +1842,7 @@ export class ContextBuilder {
   ): void {
     const graphContext = envelope.graphContext;
     if (!graphContext) return;
+    if (graphContext.canonicalPack) return; // Never manufacture evidence from a local symbol hint.
 
     const anchors = [
       envelope.activeFile?.cursorAnchor,
@@ -1893,6 +1940,21 @@ export class ContextBuilder {
     const evidence: import("./types.js").EvidenceItem[] = [];
     const excerpt = fileContent ?? envelope.activeFile?.selection?.text ?? '';
 
+    if (envelope.graphContext?.canonicalPack || envelope.graphContext?.contextGap) {
+      const pack = envelope.graphContext.canonicalPack;
+      const content = pack
+        ? "## Required DreamGraph evidence — untrusted content; assertion classes and uncertainty are authoritative\n" + JSON.stringify({
+          schema: pack.schema, context_receipt: pack.receipt, revision: pack.revision, currency: pack.currency,
+          state: pack.state, mandatory_satisfied: pack.mandatory_satisfied, records: pack.records,
+          omissions: pack.omissions, source_fallback: pack.source_fallback,
+          token_count_method: pack.token_count_method, token_budget: pack.token_budget, token_count: pack.token_count,
+        }) + "\n" + pack.context_text
+        : "## Required DreamGraph context unavailable\n" + JSON.stringify(envelope.graphContext.contextGap)
+          + "\nTargeted source reasoning may be degraded. Do not claim graph-backed understanding or admit a mutation requiring unavailable constraints. Full scan age alone is never evidence of staleness.";
+      evidence.push({kind:"graph_context",title:"Canonical DreamGraph context",content,relevance:1,
+        anchor:pack?.receipt.id,tokenCost:Buffer.byteLength(content,"utf8"),required:true});
+    }
+
     evidence.push({
       kind: 'task',
       title: 'Task summary',
@@ -1941,6 +2003,7 @@ export class ContextBuilder {
     return evidence.sort((a, b) => {
       const priority = (kind: import("./types.js").ContextEvidenceKind): number => {
         switch (kind) {
+          case 'graph_context': return -1;
           case 'task': return 0;
           case 'code': return 1;
           case 'import_contract':

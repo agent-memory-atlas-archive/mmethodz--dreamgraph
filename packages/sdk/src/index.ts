@@ -1,4 +1,5 @@
 export * from "./manifest.js";
+export * from "./graph-contracts.js";
 export * from "./events.js";
 export * from "./plugin.js";
 export * from "./reject-reasons.js";
@@ -10,3 +11,10 @@ export * from "./seams/policies.js";
 export * from "./seams/archetypes.js";
 export * from "./seams/markdown-fences.js";
 export * from "./seams/architect.js";
+export * from "./seams/graph-context.js";
+export * from "./seams/graph-execution.js";
+export * from "./seams/computer-control.js";
+export * from './seams/computer-pass.js';
+
+export * from "./provider-capabilities.js";
+export * from "./mcp-catalog.js";

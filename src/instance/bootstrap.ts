@@ -410,6 +410,12 @@ export async function runReEnrichment(
   repoName?: string,
   onProgress?: (message: string, batch: number) => void,
 ): Promise<ReEnrichmentResult> {
+  const { withEngineJob }=await import("../cognitive/jobs.js");
+  return withEngineJob({operation_id:`bootstrap-enrichment:${crypto.randomUUID()}`,owner:"bootstrap",action:"bootstrap_reenrichment",
+    scope:repoName?[repoName]:Object.keys(config.repos),roles:["enrichment","initial_scan"],parameters:{repo:repoName??null}},
+    signal=>executeReEnrichment(repoName,onProgress,signal));
+}
+async function executeReEnrichment(repoName:string|undefined,onProgress:((message:string,batch:number)=>void)|undefined,signal:AbortSignal):Promise<ReEnrichmentResult>{
   const scope = getActiveScope();
   const tag = scope ? ` [${scope.uuid.slice(0, 8)}]` : "";
   const repo = repoName ?? Object.keys(config.repos)[0] ?? "unknown";
@@ -428,15 +434,17 @@ export async function runReEnrichment(
 
   logger.info(`[re-enrich]${tag} Refreshing graph-wide model-derived knowledge…`);
   try {
+    const enrichmentPolicy=await (await import("../cognitive/llm.js")).getRoleModelPolicy("enrichment");
     const enrichment = await enrichParserNodesProgrammatic({
       target: "all",
       maxNodes: Number.MAX_SAFE_INTEGER,
       batchSize: Math.max(1, Math.min(20, Number(process.env.DREAMGRAPH_ENRICHMENT_BATCH_SIZE) || 12)),
       force: true,
-      contextHops: 3,
+      contextHops: Math.min(2,enrichmentPolicy.policy.budget.max_hops),
       relationContextSize: 40,
       modelSource: "auto",
       onProgress,
+      signal,
     });
     if (!enrichment.success) throw new Error(enrichment.error.message);
     const recorded = await discoverAndRecordADRs(repo);

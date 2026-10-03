@@ -1,0 +1,536 @@
+{
+  "schema": "dreamgraph.cognitive_policy_report.v1",
+  "protocol_sha256": "b65c8d13a3ec924a9d869e0a8ee6c6f5da8b4aaaf30229feb3d6db613f8deef8",
+  "measured_at": "2026-10-01T04:38:30.016Z",
+  "qualification": "offline fixture profiles do not measure the named models; actual normalizer structural baseline is measured separately; real policy/agent superiority remains unverified",
+  "reports": [
+    {
+      "schema": "dreamgraph.cognitive_policy_evaluation.v1",
+      "kind": "offline_fixture",
+      "stage": "initial_scan",
+      "task_hash": "sha256:ea6dcbfb89575e28256b1feaf2a85fee923e6be35fc27b31d3346f0197b7edc6",
+      "results": [
+        {
+          "policy_fingerprint": "sha256:76cc24943efd8d52e408923da7311cdb012a102296d5c7f87e3bcfcc0e5b3d0d",
+          "role": "dreamer",
+          "provider": "openai",
+          "model": "gpt-4.1",
+          "adapter": "openai-api",
+          "api": "responses",
+          "effort": null,
+          "retention": null,
+          "prompt_version": "offline-oracle.v1",
+          "schema_version": "cognitive-reply.v1",
+          "construction_and_fixture_ms": 0.27769999999964057,
+          "assessment": {
+            "schema": "dreamgraph.cognitive_assessment.v1",
+            "case_id": "cognitive:initial_scan",
+            "case_hash": "sha256:ea6dcbfb89575e28256b1feaf2a85fee923e6be35fc27b31d3346f0197b7edc6",
+            "source_manifest_hash": "sha256:c793752fc32f711dcc49174144bf01b634afab4543ec46c2ae555efd2b83e71d",
+            "original_output": "Frozen offline source-anchor hypothesis with explicit contradiction/abstention",
+            "output_hash": "sha256:f4be840fa05d454a8e7734abf94335a4509750a50c8d4969933907f6f737353c",
+            "outcome": "completed",
+            "calls": 0,
+            "latency_ms": 0,
+            "usage": null,
+            "cost": null,
+            "charge_status": "not_measured",
+            "candidates": [
+              {
+                "id": "novel",
+                "claim": "fixture:source-anchor:dg-scan",
+                "cited_source_ids": [
+                  "dg-scan"
+                ],
+                "outcome": "hypothesis",
+                "novel": true,
+                "unknown_citations": [],
+                "supporting_source_ids": [
+                  "dg-scan"
+                ],
+                "contradictory_source_ids": [],
+                "independent_source_count": 1,
+                "unsupported_promotion": false,
+                "factual_error": false,
+                "useful_novel_candidate": true
+              }
+            ],
+            "factual_errors": 0,
+            "useful_novel_candidates": 1,
+            "unsupported_promotions": 0,
+            "missed_contradictions": [],
+            "missed_abstentions": [],
+            "limitations": [
+              "Fixed source-labelled oracle; no model superiority or production promotion is established.",
+              "Repeated/model-consensus ancestry is one source, never independent corroboration."
+            ]
+          }
+        },
+        {
+          "policy_fingerprint": "sha256:303ef64939d6a480c742f53fd7638fa49793312885e8d2c757c5e7bfa301fc58",
+          "role": "dreamer",
+          "provider": "openai",
+          "model": "gpt-5.4",
+          "adapter": "openai-api",
+          "api": "responses",
+          "effort": null,
+          "retention": null,
+          "prompt_version": "offline-oracle.v1",
+          "schema_version": "cognitive-reply.v1",
+          "construction_and_fixture_ms": 0.12429999999994834,
+          "assessment": {
+            "schema": "dreamgraph.cognitive_assessment.v1",
+            "case_id": "cognitive:initial_scan",
+            "case_hash": "sha256:ea6dcbfb89575e28256b1feaf2a85fee923e6be35fc27b31d3346f0197b7edc6",
+            "source_manifest_hash": "sha256:c793752fc32f711dcc49174144bf01b634afab4543ec46c2ae555efd2b83e71d",
+            "original_output": "Frozen offline source-anchor hypothesis with explicit contradiction/abstention",
+            "output_hash": "sha256:f4be840fa05d454a8e7734abf94335a4509750a50c8d4969933907f6f737353c",
+            "outcome": "completed",
+            "calls": 0,
+            "latency_ms": 0,
+            "usage": null,
+            "cost": null,
+            "charge_status": "not_measured",
+            "candidates": [
+              {
+                "id": "novel",
+                "claim": "fixture:source-anchor:dg-scan",
+                "cited_source_ids": [
+                  "dg-scan"
+                ],
+                "outcome": "hypothesis",
+                "novel": true,
+                "unknown_citations": [],
+                "supporting_source_ids": [
+                  "dg-scan"
+                ],
+                "contradictory_source_ids": [],
+                "independent_source_count": 1,
+                "unsupported_promotion": false,
+                "factual_error": false,
+                "useful_novel_candidate": true
+              }
+            ],
+            "factual_errors": 0,
+            "useful_novel_candidates": 1,
+            "unsupported_promotions": 0,
+            "missed_contradictions": [],
+            "missed_abstentions": [],
+            "limitations": [
+              "Fixed source-labelled oracle; no model superiority or production promotion is established.",
+              "Repeated/model-consensus ancestry is one source, never independent corroboration."
+            ]
+          }
+        }
+      ],
+      "model_gain": null,
+      "paid_canaries": "not_run",
+      "actual_computer_use": "unqualified"
+    },
+    {
+      "kind": "deliberate_fault_detection",
+      "assessment": {
+        "schema": "dreamgraph.cognitive_assessment.v1",
+        "case_id": "cognitive:initial_scan",
+        "case_hash": "sha256:ea6dcbfb89575e28256b1feaf2a85fee923e6be35fc27b31d3346f0197b7edc6",
+        "source_manifest_hash": "sha256:c793752fc32f711dcc49174144bf01b634afab4543ec46c2ae555efd2b83e71d",
+        "original_output": "Deliberately bad fixture; never a model output",
+        "output_hash": "sha256:d83b8a66ec7dbf03957fd83b26bdb47369f7dc429d9d62aeca2f9ea768c687fb",
+        "outcome": "completed",
+        "calls": 0,
+        "latency_ms": 0,
+        "usage": null,
+        "cost": null,
+        "charge_status": "not_measured",
+        "candidates": [
+          {
+            "id": "repeated",
+            "claim": "fixture:source-anchor:dg-scan",
+            "cited_source_ids": [
+              "dg-scan",
+              "dg-scan:summary"
+            ],
+            "outcome": "validated",
+            "novel": true,
+            "unknown_citations": [],
+            "supporting_source_ids": [
+              "dg-scan",
+              "dg-scan:summary"
+            ],
+            "contradictory_source_ids": [],
+            "independent_source_count": 1,
+            "unsupported_promotion": true,
+            "factual_error": false,
+            "useful_novel_candidate": false
+          },
+          {
+            "id": "fabricated",
+            "claim": "fixture:unsafe",
+            "cited_source_ids": [
+              "dg-scan"
+            ],
+            "outcome": "hypothesis",
+            "novel": true,
+            "unknown_citations": [],
+            "supporting_source_ids": [],
+            "contradictory_source_ids": [
+              "fixture:contrary"
+            ],
+            "independent_source_count": 0,
+            "unsupported_promotion": false,
+            "factual_error": true,
+            "useful_novel_candidate": false
+          }
+        ],
+        "factual_errors": 1,
+        "useful_novel_candidates": 0,
+        "unsupported_promotions": 1,
+        "missed_contradictions": [],
+        "missed_abstentions": [],
+        "limitations": [
+          "Fixed source-labelled oracle; no model superiority or production promotion is established.",
+          "Repeated/model-consensus ancestry is one source, never independent corroboration."
+        ]
+      }
+    },
+    {
+      "schema": "dreamgraph.cognitive_policy_evaluation.v1",
+      "kind": "offline_fixture",
+      "stage": "mature_graph",
+      "task_hash": "sha256:5d234d60b9290cddd75108ec518ff7afccb6464acfc4af3cb955256700ff1ebf",
+      "results": [
+        {
+          "policy_fingerprint": "sha256:76cc24943efd8d52e408923da7311cdb012a102296d5c7f87e3bcfcc0e5b3d0d",
+          "role": "dreamer",
+          "provider": "openai",
+          "model": "gpt-4.1",
+          "adapter": "openai-api",
+          "api": "responses",
+          "effort": null,
+          "retention": null,
+          "prompt_version": "offline-oracle.v1",
+          "schema_version": "cognitive-reply.v1",
+          "construction_and_fixture_ms": 0.06080000000019936,
+          "assessment": {
+            "schema": "dreamgraph.cognitive_assessment.v1",
+            "case_id": "cognitive:mature_graph",
+            "case_hash": "sha256:5d234d60b9290cddd75108ec518ff7afccb6464acfc4af3cb955256700ff1ebf",
+            "source_manifest_hash": "sha256:5521f1d93d09ef7f162d25da80914f83064666ecfcb80c643d964a96a1054fb5",
+            "original_output": "Frozen offline source-anchor hypothesis with explicit contradiction/abstention",
+            "output_hash": "sha256:f4be840fa05d454a8e7734abf94335a4509750a50c8d4969933907f6f737353c",
+            "outcome": "completed",
+            "calls": 0,
+            "latency_ms": 0,
+            "usage": null,
+            "cost": null,
+            "charge_status": "not_measured",
+            "candidates": [
+              {
+                "id": "novel",
+                "claim": "fixture:source-anchor:dg-scheduler",
+                "cited_source_ids": [
+                  "dg-scheduler"
+                ],
+                "outcome": "hypothesis",
+                "novel": true,
+                "unknown_citations": [],
+                "supporting_source_ids": [
+                  "dg-scheduler"
+                ],
+                "contradictory_source_ids": [],
+                "independent_source_count": 1,
+                "unsupported_promotion": false,
+                "factual_error": false,
+                "useful_novel_candidate": true
+              }
+            ],
+            "factual_errors": 0,
+            "useful_novel_candidates": 1,
+            "unsupported_promotions": 0,
+            "missed_contradictions": [],
+            "missed_abstentions": [],
+            "limitations": [
+              "Fixed source-labelled oracle; no model superiority or production promotion is established.",
+              "Repeated/model-consensus ancestry is one source, never independent corroboration."
+            ]
+          }
+        },
+        {
+          "policy_fingerprint": "sha256:303ef64939d6a480c742f53fd7638fa49793312885e8d2c757c5e7bfa301fc58",
+          "role": "dreamer",
+          "provider": "openai",
+          "model": "gpt-5.4",
+          "adapter": "openai-api",
+          "api": "responses",
+          "effort": null,
+          "retention": null,
+          "prompt_version": "offline-oracle.v1",
+          "schema_version": "cognitive-reply.v1",
+          "construction_and_fixture_ms": 0.0648999999998523,
+          "assessment": {
+            "schema": "dreamgraph.cognitive_assessment.v1",
+            "case_id": "cognitive:mature_graph",
+            "case_hash": "sha256:5d234d60b9290cddd75108ec518ff7afccb6464acfc4af3cb955256700ff1ebf",
+            "source_manifest_hash": "sha256:5521f1d93d09ef7f162d25da80914f83064666ecfcb80c643d964a96a1054fb5",
+            "original_output": "Frozen offline source-anchor hypothesis with explicit contradiction/abstention",
+            "output_hash": "sha256:f4be840fa05d454a8e7734abf94335a4509750a50c8d4969933907f6f737353c",
+            "outcome": "completed",
+            "calls": 0,
+            "latency_ms": 0,
+            "usage": null,
+            "cost": null,
+            "charge_status": "not_measured",
+            "candidates": [
+              {
+                "id": "novel",
+                "claim": "fixture:source-anchor:dg-scheduler",
+                "cited_source_ids": [
+                  "dg-scheduler"
+                ],
+                "outcome": "hypothesis",
+                "novel": true,
+                "unknown_citations": [],
+                "supporting_source_ids": [
+                  "dg-scheduler"
+                ],
+                "contradictory_source_ids": [],
+                "independent_source_count": 1,
+                "unsupported_promotion": false,
+                "factual_error": false,
+                "useful_novel_candidate": true
+              }
+            ],
+            "factual_errors": 0,
+            "useful_novel_candidates": 1,
+            "unsupported_promotions": 0,
+            "missed_contradictions": [],
+            "missed_abstentions": [],
+            "limitations": [
+              "Fixed source-labelled oracle; no model superiority or production promotion is established.",
+              "Repeated/model-consensus ancestry is one source, never independent corroboration."
+            ]
+          }
+        }
+      ],
+      "model_gain": null,
+      "paid_canaries": "not_run",
+      "actual_computer_use": "unqualified"
+    },
+    {
+      "kind": "deliberate_fault_detection",
+      "assessment": {
+        "schema": "dreamgraph.cognitive_assessment.v1",
+        "case_id": "cognitive:mature_graph",
+        "case_hash": "sha256:5d234d60b9290cddd75108ec518ff7afccb6464acfc4af3cb955256700ff1ebf",
+        "source_manifest_hash": "sha256:5521f1d93d09ef7f162d25da80914f83064666ecfcb80c643d964a96a1054fb5",
+        "original_output": "Deliberately bad fixture; never a model output",
+        "output_hash": "sha256:d83b8a66ec7dbf03957fd83b26bdb47369f7dc429d9d62aeca2f9ea768c687fb",
+        "outcome": "completed",
+        "calls": 0,
+        "latency_ms": 0,
+        "usage": null,
+        "cost": null,
+        "charge_status": "not_measured",
+        "candidates": [
+          {
+            "id": "repeated",
+            "claim": "fixture:source-anchor:dg-scheduler",
+            "cited_source_ids": [
+              "dg-scheduler",
+              "dg-scheduler:summary"
+            ],
+            "outcome": "validated",
+            "novel": true,
+            "unknown_citations": [],
+            "supporting_source_ids": [
+              "dg-scheduler",
+              "dg-scheduler:summary"
+            ],
+            "contradictory_source_ids": [],
+            "independent_source_count": 1,
+            "unsupported_promotion": true,
+            "factual_error": false,
+            "useful_novel_candidate": false
+          },
+          {
+            "id": "fabricated",
+            "claim": "fixture:unsafe",
+            "cited_source_ids": [
+              "dg-scheduler"
+            ],
+            "outcome": "hypothesis",
+            "novel": true,
+            "unknown_citations": [],
+            "supporting_source_ids": [],
+            "contradictory_source_ids": [
+              "fixture:contrary"
+            ],
+            "independent_source_count": 0,
+            "unsupported_promotion": false,
+            "factual_error": true,
+            "useful_novel_candidate": false
+          }
+        ],
+        "factual_errors": 1,
+        "useful_novel_candidates": 0,
+        "unsupported_promotions": 1,
+        "missed_contradictions": [],
+        "missed_abstentions": [],
+        "limitations": [
+          "Fixed source-labelled oracle; no model superiority or production promotion is established.",
+          "Repeated/model-consensus ancestry is one source, never independent corroboration."
+        ]
+      }
+    }
+  ],
+  "baseline": {
+    "kind": "actual_current_normalizer_structural_baseline",
+    "source_sha256": "17b3911e859de96f9d0a4eae00c6106f173db625ba048814a30932a306383350",
+    "input_hash": "ca72cdf93346d6e6faa522b77ed955b09e5d09d44f8e1bf1592ce37878aed4e0",
+    "original_output": {
+      "metadata": {
+        "description": "Normalization results — validation judgments on dream artifacts.",
+        "schema_version": "1.0.0",
+        "last_normalization": "2026-10-01T04:38:29.948Z",
+        "total_cycles": 1,
+        "created_at": "2026-10-01T04:38:29.948Z"
+      },
+      "results": [
+        {
+          "dream_id": "baseline:0",
+          "dream_type": "edge",
+          "status": "validated",
+          "confidence": 0.95,
+          "plausibility": 0.89,
+          "evidence_score": 1,
+          "contradiction_score": 0,
+          "evidence": {
+            "shared_entities": [],
+            "shared_workflows": [],
+            "domain_overlap": [
+              "fixture"
+            ],
+            "keyword_overlap": [
+              "shared"
+            ],
+            "source_repo_match": true,
+            "contradictions": []
+          },
+          "evidence_count": 3,
+          "reason_code": "strong_evidence",
+          "reason": "shared domain: fixture. shared keywords: shared.",
+          "validated_at": "2026-10-01T04:38:29.913Z",
+          "normalization_cycle": 1,
+          "strategy": "gap_detection"
+        },
+        {
+          "dream_id": "baseline:1",
+          "dream_type": "edge",
+          "status": "rejected",
+          "confidence": 0.39,
+          "plausibility": 0.29,
+          "evidence_score": 0.35,
+          "contradiction_score": 0,
+          "evidence": {
+            "shared_entities": [],
+            "shared_workflows": [],
+            "domain_overlap": [],
+            "keyword_overlap": [],
+            "source_repo_match": false,
+            "contradictions": []
+          },
+          "evidence_count": 0,
+          "reason_code": "low_signal",
+          "reason": "\"missing\" not in fact graph.",
+          "validated_at": "2026-10-01T04:38:29.913Z",
+          "normalization_cycle": 1,
+          "strategy": "gap_detection"
+        }
+      ]
+    },
+    "result": {
+      "cycle": 1,
+      "processed": 2,
+      "validated": 1,
+      "latent": 0,
+      "rejected": 1,
+      "blockedByGate": 0,
+      "promotedEdges": [
+        {
+          "id": "baseline:0",
+          "from": "alpha",
+          "to": "beta",
+          "type": "feature",
+          "relation": "relates_to",
+          "description": "Synthetic shared ancestry fixture; no proof of source relationship",
+          "confidence": 0.95,
+          "plausibility": 0.89,
+          "evidence_score": 1,
+          "origin": "rem",
+          "status": "validated",
+          "evidence_summary": "shared domain: fixture. shared keywords: shared.",
+          "evidence_count": 3,
+          "reinforcement_count": 8,
+          "dream_cycle": 1,
+          "normalization_cycle": 1,
+          "validated_at": "2026-10-01T04:38:29.913Z",
+          "strategy": "gap_detection"
+        }
+      ],
+      "promotedNodes": 0,
+      "tensionCandidates": [
+        {
+          "dreamId": "baseline:1",
+          "from": "alpha",
+          "to": "missing",
+          "confidence": 0.39,
+          "reason": "\"missing\" not in fact graph."
+        }
+      ],
+      "receipt": {
+        "profile": "balanced",
+        "requested_strict": false,
+        "inherited_strict": false,
+        "override_applied": true,
+        "effective_strict": false,
+        "threshold_source": "policy",
+        "base_promotion_config": {
+          "promotion_confidence": 0.55,
+          "promotion_plausibility": 0.4,
+          "promotion_evidence": 0.35,
+          "promotion_evidence_count": 1,
+          "retention_plausibility": 0.3,
+          "max_contradiction": 0.35
+        },
+        "applied_promotion_config": {
+          "promotion_confidence": 0.5,
+          "promotion_plausibility": 0.4,
+          "promotion_evidence": 0.3,
+          "promotion_evidence_count": 1,
+          "retention_plausibility": 0.3,
+          "max_contradiction": 0.35
+        },
+        "bootstrap": {
+          "active": true,
+          "state": "cold_start",
+          "relaxed_fields": [
+            "promotion_confidence",
+            "promotion_evidence"
+          ]
+        }
+      }
+    },
+    "elapsed_ms": 108.80590000000029,
+    "provider_calls": 0,
+    "usage": null,
+    "cost": null,
+    "independent_source_evidence": "not established by these structural fixtures",
+    "limitations": [
+      "Synthetic endpoints test current structural behavior; no semantic model response or superiority is measured.",
+      "Cold-start settings are retained literally in the normalization receipt."
+    ]
+  },
+  "provider_calls": 0,
+  "model_gain": null,
+  "paid_canaries": "not_run"
+}

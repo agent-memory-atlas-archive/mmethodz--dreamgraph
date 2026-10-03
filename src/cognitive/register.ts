@@ -1,3 +1,5 @@
+import { STRATEGY_NAMES, STRATEGY_DESCRIPTION } from "./strategy-catalog.js";
+import { NormalizationClaimSchema } from "./normalization-evidence.js";
 /**
  * DreamGraph Cognitive System — MCP registration.
  *
@@ -47,7 +49,7 @@ import { existsSync } from "node:fs";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { dataPath } from "../utils/paths.js";
 import { engine } from "./engine.js";
-import { dream } from "./dreamer.js";
+import { dream, prepareDream } from "./dreamer.js";
 import {
   normalize,
   recordWeakConnectionTensions,
@@ -62,6 +64,8 @@ import { runMetacognitiveAnalysis, getMetaLog } from "./metacognition.js";
 import { dispatchEvent, checkTensionThresholds, getEventLog } from "./event-router.js";
 import { generateRemediationPlans } from "./intervention.js";
 import { graphRagRetrieve, getCognitivePreamble } from "./graph-rag.js";
+import { ContextQuerySchema } from "../graph/context-pack.js";
+import type { ContextPack } from "../graph/contracts.js";
 import { selectLlmRoute } from "./llm.js";
 import { findShortestPath } from "./graph-paths.js";
 import type { ShortestPathResult } from "./graph-paths.js";
@@ -81,6 +85,7 @@ import {
 import { logger } from "../utils/logger.js";
 import { success, error, safeExecute } from "../utils/errors.js";
 import { formatJsonToolOutput } from "../utils/tool-output.js";
+import { registerPagedResource } from "../resources/resolver.js";
 import type {
   DreamCycleOutput,
   NormalizeDreamsOutput,
@@ -224,7 +229,7 @@ function buildDeterministicAdaptiveFutureAdvice(params: {
 
 export function registerCognitiveResources(server: McpServer): void {
   // dream://graph — Raw dream graph
-  server.resource(
+  registerPagedResource(server,
     "dream-graph",
     "dream://graph",
     {
@@ -240,7 +245,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -248,7 +253,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://candidates — Normalization results
-  server.resource(
+  registerPagedResource(server,
     "dream-candidates",
     "dream://candidates",
     {
@@ -264,7 +269,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -272,7 +277,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://validated — Promoted edges
-  server.resource(
+  registerPagedResource(server,
     "dream-validated",
     "dream://validated",
     {
@@ -288,7 +293,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -296,7 +301,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://status — Cognitive state
-  server.resource(
+  registerPagedResource(server,
     "dream-status",
     "dream://status",
     {
@@ -312,7 +317,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -320,7 +325,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://tensions — Unresolved tension signals
-  server.resource(
+  registerPagedResource(server,
     "dream-tensions",
     "dream://tensions",
     {
@@ -336,7 +341,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -344,7 +349,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://history — Audit trail summary
-  server.resource(
+  registerPagedResource(server,
     "dream-history",
     "dream://history",
     {
@@ -360,7 +365,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -368,7 +373,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://adrs — Architecture Decision Records
-  server.resource(
+  registerPagedResource(server,
     "dream-adrs",
     "dream://adrs",
     {
@@ -384,7 +389,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -392,7 +397,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://ui-registry — Semantic UI elements
-  server.resource(
+  registerPagedResource(server,
     "dream-ui-registry",
     "dream://ui-registry",
     {
@@ -408,7 +413,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -416,7 +421,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://threats — Adversarial scan results (threat log)
-  server.resource(
+  registerPagedResource(server,
     "dream-threats",
     "dream://threats",
     {
@@ -432,7 +437,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -440,7 +445,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://archetypes — Federated dream archetypes
-  server.resource(
+  registerPagedResource(server,
     "dream-archetypes",
     "dream://archetypes",
     {
@@ -456,7 +461,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -468,7 +473,7 @@ export function registerCognitiveResources(server: McpServer): void {
   // -------------------------------------------------------------------------
 
   // dream://metacognition — Metacognitive analysis log
-  server.resource(
+  registerPagedResource(server,
     "dream-metacognition",
     "dream://metacognition",
     {
@@ -484,7 +489,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -492,7 +497,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://events — Cognitive event log
-  server.resource(
+  registerPagedResource(server,
     "dream-events",
     "dream://events",
     {
@@ -508,7 +513,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -516,7 +521,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://story — Persistent system autobiography
-  server.resource(
+  registerPagedResource(server,
     "dream-story",
     "dream://story",
     {
@@ -532,7 +537,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -544,7 +549,7 @@ export function registerCognitiveResources(server: McpServer): void {
   // -------------------------------------------------------------------------
 
   // dream://schedules — Dream schedule registry
-  server.resource(
+  registerPagedResource(server,
     "dream-schedules",
     "dream://schedules",
     {
@@ -560,7 +565,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -568,7 +573,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://schedule-history — Schedule execution log
-  server.resource(
+  registerPagedResource(server,
     "dream-schedule-history",
     "dream://schedule-history",
     {
@@ -584,7 +589,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -592,7 +597,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://context — Graph RAG context (comprehensive, 2000 tokens)
-  server.resource(
+  registerPagedResource(server,
     "dream-context",
     "dream://context",
     {
@@ -603,7 +608,7 @@ export function registerCognitiveResources(server: McpServer): void {
     async (uri) => {
       logger.debug(`Resource requested: ${uri.href}`);
       const data = await graphRagRetrieve({
-        query: "system overview",
+        query: "",
         mode: "comprehensive",
         token_budget: 2000,
         depth: 2,
@@ -615,7 +620,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data.context_pack ?? data),
           },
         ],
       };
@@ -623,7 +628,7 @@ export function registerCognitiveResources(server: McpServer): void {
   );
 
   // dream://lucid — Lucid dream session archive
-  server.resource(
+  registerPagedResource(server,
     "dream-lucid",
     "dream://lucid",
     {
@@ -639,7 +644,7 @@ export function registerCognitiveResources(server: McpServer): void {
           {
             uri: uri.href,
             mimeType: "application/json",
-            text: formatJsonToolOutput(data),
+            text: JSON.stringify(data),
           },
         ],
       };
@@ -684,31 +689,15 @@ export function registerCognitiveTools(server: McpServer): void {
     "Trigger a full cognitive dream cycle: AWAKE → REM (decay existing dreams, generate speculative connections via LLM + structural analysis with duplicate suppression) → NORMALIZING (three-outcome classifier: validated/latent/rejected with split scoring and promotion gate) → AWAKE. The LLM dream strategy is the creative core — it asks an LLM to analyze the knowledge graph and propose insightful connections. Structural strategies provide graph-algorithm backup. Latent edges remain as speculative memory. Records full history. Supports tension-directed dreaming.",
     {
       strategy: z
-        .enum([
-          "llm_dream",
-          "gap_detection",
-          "weak_reinforcement",
-          "cross_domain",
-          "missing_abstraction",
-          "symmetry_completion",
-          "tension_directed",
-          "causal_replay",
-          "reflective",
-          "pgo_wave",
-          "orphan_bridging",
-          "schema_grounding",
-          "all",
-        ])
+        .enum(STRATEGY_NAMES)
         .optional()
-        .describe(
-          'Dream strategy. "llm_dream": LLM-powered creative dreaming (THE primary strategy). "gap_detection": find unconnected related entities. "weak_reinforcement": strengthen weak edges. "cross_domain": bridge different domains. "missing_abstraction": propose unifying features. "symmetry_completion": add reverse edges. "tension_directed": focus on unresolved tensions. "causal_replay": mine history for cause→effect chains. "reflective": agent-directed insights from code reading. "pgo_wave": stochastic Lévy-flight divergence. "orphan_bridging": attach degree-0 entities to nearest plausible neighbor. "schema_grounding": when scanned datastore evidence exists, propose persistence links and shared-state edges without treating datastore absence as a data_model defect. "all": run all strategies (LLM first, then structural). Default: "all".'
-        ),
+        .describe(STRATEGY_DESCRIPTION),
       max_dreams: z
         .number()
-        .min(1)
+        .int().min(0)
         .max(500)
         .optional()
-        .describe("Maximum number of dream items to generate (default: 100)."),
+        .describe("Combined speculative node/edge/tension budget (default: 100)."),
       auto_normalize: z
         .boolean()
         .optional()
@@ -717,7 +706,7 @@ export function registerCognitiveTools(server: McpServer): void {
         ),
       focus_entities: z.array(z.string().min(1)).max(100).optional()
         .describe("Optional changed graph entity ids. When supplied, dreaming is restricted to these nodes and their bounded semantic neighborhood."),
-      focus_hops: z.number().int().min(1).max(4).optional()
+      focus_hops: z.number().int().min(0).max(4).optional()
         .describe("Neighborhood depth for targeted dreaming (default: 2)."),
       focus_reason: z.string().max(500).optional()
         .describe("Why this graph region needs stabilization, retained in tool/audit context."),
@@ -728,6 +717,7 @@ export function registerCognitiveTools(server: McpServer): void {
       const strat = strategy ?? "all";
       const maxD = max_dreams ?? 100;
       const autoNorm = auto_normalize ?? true;
+      let enteredCycle = false;
 
       logger.info(
         `dream_cycle tool called: strategy=${strat}, max=${maxD}, auto_normalize=${autoNorm}`
@@ -736,6 +726,12 @@ export function registerCognitiveTools(server: McpServer): void {
       const result = await safeExecute<DreamCycleOutput>(
         async (): Promise<ToolResponse<DreamCycleOutput>> => {
           const transitions: string[] = [];
+          await prepareDream(strat, maxD, { entity_ids: focus_entities ?? [], hops: focus_hops ?? 2, reason: focus_reason });
+          if (maxD === 0) return success({ cycle_number: engine.getCurrentDreamCycle(), state_transitions: [],
+            dreams_generated: { nodes: 0, edges: 0 }, focus_entities: [...new Set(focus_entities ?? [])],
+            duplicates_merged: 0, decayed: { nodes: 0, edges: 0 }, promoted_edges: 0, tensions_created: 0,
+            tensions_resolved: 0, tensions_expired: 0, tensions_decayed: 0, duration_ms: Date.now() - startTime,
+            strategy_outcomes: {}, execution_status: "skipped_zero_budget" });
 
           // Ensure we're awake before starting
           if (engine.getState() !== "awake") {
@@ -745,6 +741,7 @@ export function registerCognitiveTools(server: McpServer): void {
 
           // AWAKE → REM
           engine.enterRem();
+          enteredCycle = true;
           await engine.applyCognitiveTuning();
           transitions.push("awake → rem");
 
@@ -906,6 +903,7 @@ export function registerCognitiveTools(server: McpServer): void {
               edges: dreamResult.edges.length,
             },
             focus_entities: dreamResult.focus_entities,
+            strategy_outcomes: dreamResult.strategy_outcomes,
             duplicates_merged: dreamResult.duplicates_merged,
             decayed: {
               nodes: decayResult.decayedNodes,
@@ -924,7 +922,7 @@ export function registerCognitiveTools(server: McpServer): void {
       );
 
       // Safety: ensure we're awake after any error
-      if (engine.getState() !== "awake") {
+      if (enteredCycle && engine.getState() !== "awake") {
         await engine.interrupt();
       }
 
@@ -1530,7 +1528,8 @@ export function registerCognitiveTools(server: McpServer): void {
       "Use this when you have external evidence (e.g. from git blame, " +
       "DB schema query, or human confirmation) that a tension is no longer valid. " +
       "Resolved tensions are archived (not deleted) for institutional memory. " +
-      "Supports: confirmed_fixed, false_positive, wont_fix.",
+      "System closure requires a declared connection predicate with current independent source verification. " +
+      "Human dispositions retain a rationale; proposals, action success and expiry are not verification. Supports: confirmed_fixed, false_positive, wont_fix.",
     {
       tension_id: z
         .string()
@@ -1565,8 +1564,10 @@ export function registerCognitiveTools(server: McpServer): void {
           "Optional re-check window in cycles. If set, the tension can be " +
           "reactivated if new contradictory evidence appears within this window."
         ),
+      expected_revision: z.number().int().nonnegative().optional().describe("Expected per-risk revision; a conflicting human/agent edit is rejected."),
+      verification_claim: NormalizationClaimSchema.optional().describe("Exact connection predicate for independently verified system closure; source proof cannot be supplied as model prose."),
     },
-    async ({ tension_id, resolved_by, resolution_type, evidence, recheck_ttl }) => {
+    async ({ tension_id, resolved_by, resolution_type, evidence, recheck_ttl,expected_revision,verification_claim }) => {
       logger.info(
         "resolve_tension tool called: id=" + tension_id +
         ", by=" + resolved_by +
@@ -1579,7 +1580,7 @@ export function registerCognitiveTools(server: McpServer): void {
           resolved_by,
           resolution_type,
           evidence,
-          recheck_ttl
+          recheck_ttl,{expected_revision,verification_claim}
         );
 
         if (!resolved) {
@@ -1675,8 +1676,8 @@ export function registerCognitiveTools(server: McpServer): void {
   // =========================================================================
   server.tool(
     "get_causal_insights",
-    "Analyze dream history for causal inference chains. Discovers cause→effect relationships " +
-      "between entities, builds propagation chains, and identifies hotspots where changes cascade.",
+    "Analyze recorded tension-onset correlations as advisory hypotheses. Stable ancestry and event times " +
+      "are retained; co-occurrence does not prove causation or the impact of changing an entity.",
     {},
     async () => {
       logger.debug("get_causal_insights tool called");
@@ -1715,7 +1716,7 @@ export function registerCognitiveTools(server: McpServer): void {
               ? {
                 id: `validate-${insights.predicted_impacts.find((impact) => surfaceAnchorIsValid(impact.if_changed) && impact.confidence >= 0.6)!.if_changed}`,
                 label: "Verify predicted impact chain",
-                rationale: `A validated change to ${insights.predicted_impacts.find((impact) => surfaceAnchorIsValid(impact.if_changed) && impact.confidence >= 0.6)!.if_changed} is likely to affect ${insights.predicted_impacts.find((impact) => surfaceAnchorIsValid(impact.if_changed) && impact.confidence >= 0.6)!.likely_affected.length} related entities.`,
+                rationale: `Investigate the temporal correlation involving ${insights.predicted_impacts.find((impact) => surfaceAnchorIsValid(impact.if_changed) && impact.confidence >= 0.6)!.if_changed}; causal influence has not been verified.`,
                 evidence_anchor_ids: [insights.predicted_impacts.find((impact) => surfaceAnchorIsValid(impact.if_changed) && impact.confidence >= 0.6)!.if_changed],
                 future_fit_score: insights.predicted_impacts.find((impact) => surfaceAnchorIsValid(impact.if_changed) && impact.confidence >= 0.6)!.confidence,
               }
@@ -1893,7 +1894,7 @@ export function registerCognitiveTools(server: McpServer): void {
   server.tool(
     "import_dream_archetypes",
     "Import dream archetypes from another DreamGraph instance. " +
-      "Archetypes are deduped and merged into the local archetype store. " +
+    "Versioned origin identities are deduped without increasing local confidence. Invalid imports are quarantined. " +
       "Imported patterns can inform future dream cycles.",
     {
       file_path: z
@@ -2338,17 +2339,21 @@ export function registerCognitiveTools(server: McpServer): void {
         .min(60)
         .optional()
         .describe("For 'on_idle' trigger: seconds of inactivity before triggering (min 60). Preferred over idle_ms."),
+      operation_id: z.string().min(1).max(256).optional().describe("Stable creation identity; reuse after an uncertain reply."),
+      timezone: z.string().optional().describe("IANA timezone; defaults to UTC."),
+      fold_policy: z.enum(["once","both"]).optional(),
+      missed_policy: z.enum(["skip","catch_up_once"]).optional(),
       enabled: z
         .boolean()
         .optional()
-        .describe("Whether the schedule starts enabled (default: true)."),
+        .describe("Whether the schedule starts enabled (default: false)."),
       max_runs: z
         .number()
         .min(1)
         .optional()
         .describe("Optional max execution count. Schedule pauses when reached. Default: unlimited."),
     },
-    async ({ name, action, parameters, trigger_type, interval_ms, interval_seconds, cron, cycle_interval, idle_ms, idle_seconds, enabled, max_runs }) => {
+    async ({ name, action, parameters, trigger_type, interval_ms, interval_seconds, cron, cycle_interval, idle_ms, idle_seconds, enabled, max_runs, operation_id, timezone, fold_policy, missed_policy }) => {
       logger.info(`schedule_dream tool called: name="${name}", action=${action}, trigger=${trigger_type}`);
 
       // Convert seconds to ms if provided
@@ -2374,6 +2379,7 @@ export function registerCognitiveTools(server: McpServer): void {
           const schedule = await createSchedule({
             name,
             action,
+            operation_id, timezone, fold_policy, missed_policy,
             parameters: parameters ?? {},
             trigger_type,
             interval_ms: resolvedIntervalMs,
@@ -2459,6 +2465,8 @@ export function registerCognitiveTools(server: McpServer): void {
       "modify trigger configuration, or set execution limits. " +
       "Re-enabling an error-paused schedule resets its error counter.",
     {
+      expected_revision: z.number().int().min(1).describe("Observed schedule definition revision; stale edits conflict."),
+      operation_id: z.string().min(1).max(256).describe("Stable operation identity; reuse after an uncertain reply."),
       schedule_id: z
         .string()
         .describe("The ID of the schedule to update."),
@@ -2476,7 +2484,7 @@ export function registerCognitiveTools(server: McpServer): void {
       idle_seconds: z.number().min(60).optional().describe("New idle threshold in seconds. Preferred over idle_ms."),
       max_runs: z.number().min(1).optional().describe("New max run count."),
     },
-    async ({ schedule_id, name, enabled, parameters, interval_ms, interval_seconds, cron, cycle_interval, idle_ms, idle_seconds, max_runs }) => {
+    async ({ schedule_id, expected_revision, operation_id, name, enabled, parameters, interval_ms, interval_seconds, cron, cycle_interval, idle_ms, idle_seconds, max_runs }) => {
       logger.info(`update_schedule tool called: id=${schedule_id}`);
 
       // Convert seconds to ms if provided
@@ -2494,7 +2502,7 @@ export function registerCognitiveTools(server: McpServer): void {
             cycle_interval,
             idle_ms: resolvedIdleMs,
             max_runs,
-          });
+          }, { expected_revision, operation_id });
           if (!updated) {
             return error("NOT_FOUND", `Schedule not found: ${schedule_id}`);
           }
@@ -2522,16 +2530,18 @@ export function registerCognitiveTools(server: McpServer): void {
       "Bypasses timing checks but still respects safety guards (rate limits, cooldowns). " +
       "Records execution in schedule history.",
     {
+      expected_revision: z.number().int().min(1).describe("Observed schedule definition revision; stale edits conflict."),
+      operation_id: z.string().min(1).max(256).describe("Stable operation identity; reuse after an uncertain reply."),
       schedule_id: z
         .string()
         .describe("The ID of the schedule to execute immediately."),
     },
-    async ({ schedule_id }) => {
+    async ({ schedule_id, expected_revision, operation_id }) => {
       logger.info(`run_schedule_now tool called: id=${schedule_id}`);
 
       const result = await safeExecute<ScheduleExecution>(
         async (): Promise<ToolResponse<ScheduleExecution>> => {
-          const execution = await runScheduleNow(schedule_id);
+          const execution = await runScheduleNow(schedule_id, { expected_revision, operation_id });
           return success(execution);
         }
       );
@@ -2555,16 +2565,18 @@ export function registerCognitiveTools(server: McpServer): void {
     "Delete a dream schedule permanently. Execution history is retained " +
       "for audit purposes. Use update_schedule to disable instead of deleting.",
     {
+      expected_revision: z.number().int().min(1).describe("Observed schedule definition revision; stale edits conflict."),
+      operation_id: z.string().min(1).max(256).describe("Stable operation identity; reuse after an uncertain reply."),
       schedule_id: z
         .string()
         .describe("The ID of the schedule to delete."),
     },
-    async ({ schedule_id }) => {
+    async ({ schedule_id, expected_revision, operation_id }) => {
       logger.info(`delete_schedule tool called: id=${schedule_id}`);
 
       const result = await safeExecute<{ deleted: boolean; schedule_id: string }>(
         async (): Promise<ToolResponse<{ deleted: boolean; schedule_id: string }>> => {
-          const deleted = await deleteSchedule(schedule_id);
+          const deleted = await deleteSchedule(schedule_id, { expected_revision, operation_id });
           if (!deleted) {
             return error("NOT_FOUND", `Schedule not found: ${schedule_id}`);
           }
@@ -2630,55 +2642,29 @@ export function registerCognitiveTools(server: McpServer): void {
   // =========================================================================
   server.tool(
     "graph_rag_retrieve",
-    "Retrieve token-budgeted knowledge context from the DreamGraph for RAG injection. " +
-      "Resolves natural language queries to graph entities via TF-IDF similarity, " +
-      "extracts subgraphs via BFS expansion, ranks by relevance, and serializes " +
-      "within a configurable token budget. Modes: entity_focused (resolve + expand), " +
-      "tension_focused (top tensions + their entities), narrative_focused (recent " +
-      "story chapters + referenced entities), comprehensive (balanced overview).",
+    "Retrieve a canonical, bounded task context pack with typed graph identities, all graph families, " +
+      "fact/speculative relationships, provenance, revision and explicit insufficiency. Required plan/slice, " +
+      "ADR and evidence anchors precede optional neighbors. Context and metadata budgets are independent. " +
+      "No LLM call is needed. Legacy comparison is explicit and retains its documented limitations.",
     {
-      query: z
-        .string()
-        .describe("Natural language query or entity reference to retrieve context for."),
-      mode: z
-        .enum(["entity_focused", "tension_focused", "narrative_focused", "comprehensive"])
-        .optional()
-        .describe("Retrieval mode (default: comprehensive)."),
-      token_budget: z
-        .number()
-        .min(100)
-        .max(10000)
-        .optional()
-        .describe("Maximum tokens in output (default: 2000)."),
-      depth: z
-        .number()
-        .min(1)
-        .max(5)
-        .optional()
-        .describe("BFS expansion depth from resolved entities (default: 2)."),
+      ...ContextQuerySchema.omit({ observations: true }).shape,
+      representation: z.enum(["canonical", "legacy"]).optional().describe("Default canonical; legacy is a limited comparison route."),
     },
-    async ({ query, mode, token_budget, depth }) => {
-      logger.info(`graph_rag_retrieve tool called: mode=${mode ?? "comprehensive"}, budget=${token_budget ?? 2000}`);
-
-      const result = await safeExecute<GraphRAGContext>(
-        async (): Promise<ToolResponse<GraphRAGContext>> => {
-          const context = await graphRagRetrieve({
-            query,
-            mode: mode ?? "comprehensive",
-            token_budget: token_budget ?? 2000,
-            depth: depth ?? 2,
-            include_tensions: true,
-            include_narrative: true,
-          });
-          return success(context);
+    async (input) => {
+      const result = await safeExecute<GraphRAGContext | ContextPack>(
+        async (): Promise<ToolResponse<GraphRAGContext | ContextPack>> => {
+          const context = await graphRagRetrieve(input);
+          return success(context.context_pack ?? context);
         }
       );
 
       return {
+        isError: !result.success,
+        structuredContent: result as unknown as Record<string, unknown>,
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify(result, null, 2),
+            text: JSON.stringify(result),
           },
         ],
       };
@@ -2690,10 +2676,9 @@ export function registerCognitiveTools(server: McpServer): void {
   // =========================================================================
   server.tool(
     "get_cognitive_preamble",
-    "Generate a compact cognitive preamble for automatic LLM pre-prompt injection. " +
-      "Produces a concise system understanding summary: system description, top 5 " +
-      "architectural relationships, top 3 tensions, and recent cognitive insights. " +
-      "Designed for tight token budgets.",
+    "Generate a bounded canonical context pack for pre-prompt injection without calling a model. " +
+      "All graph families retain their trust class and provenance. Small budgets explicitly report omissions; " +
+      "legacy is an optional limited comparison representation.",
     {
       max_tokens: z
         .number()
@@ -2701,22 +2686,25 @@ export function registerCognitiveTools(server: McpServer): void {
         .max(2000)
         .optional()
         .describe("Maximum tokens in preamble (default: 500)."),
+      representation: z.enum(["canonical", "legacy"]).optional(),
     },
-    async ({ max_tokens }) => {
+    async ({ max_tokens, representation }) => {
       logger.info(`get_cognitive_preamble tool called: max_tokens=${max_tokens ?? 500}`);
 
-      const result = await safeExecute<CognitivePreamble>(
-        async (): Promise<ToolResponse<CognitivePreamble>> => {
-          const preamble = await getCognitivePreamble(max_tokens ?? 500);
-          return success(preamble);
+      const result = await safeExecute<CognitivePreamble | ContextPack>(
+        async (): Promise<ToolResponse<CognitivePreamble | ContextPack>> => {
+          const preamble = await getCognitivePreamble(max_tokens ?? 500, representation);
+          return success(preamble.context_pack ?? preamble);
         }
       );
 
       return {
+        isError: !result.success,
+        structuredContent: result as unknown as Record<string, unknown>,
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify(result, null, 2),
+            text: JSON.stringify(result),
           },
         ],
       };
@@ -2770,7 +2758,7 @@ export function registerCognitiveTools(server: McpServer): void {
     "Perform an interactive action during a lucid dream session. " +
       "Actions: dig_deeper (explore around a signal's entities at greater depth), " +
       "dismiss (mark a contradiction as dismissed with human reasoning), " +
-      "accept (accept a suggested connection → creates a validated edge with authority 'human+system'), " +
+      "accept (record an explicit human assertion with rationale; no independent source verification), " +
       "refine (update the hypothesis text and re-explore). " +
       "Requires an active lucid session (started with lucid_dream).",
     {
@@ -2783,13 +2771,15 @@ export function registerCognitiveTools(server: McpServer): void {
       reason: z
         .string()
         .optional()
-        .describe("Human reasoning (required for dismiss, optional for others)."),
+        .describe("Human rationale (required for accept and dismiss; acceptance is a human assertion, not independent source proof)."),
       refinement: z
         .string()
         .optional()
         .describe("New hypothesis text (required for refine action)."),
+      operation_id: z.string().min(1).max(2048).optional().describe("Stable action retry identity; conflicting payloads reject."),
+      expected_revision: z.number().int().nonnegative().optional().describe("Expected lucid session revision; conflicting edits reject."),
     },
-    async ({ type, target_id, reason, refinement }) => {
+    async ({ type, target_id, reason, refinement, operation_id, expected_revision }) => {
       logger.info(`lucid_action tool called: ${type} on ${target_id}`);
 
       const result = await safeExecute<LucidFindings>(
@@ -2799,6 +2789,7 @@ export function registerCognitiveTools(server: McpServer): void {
             target_id,
             reason,
             refinement,
+            operation_id, expected_revision,
           });
           return success(findings);
         }
@@ -2821,7 +2812,7 @@ export function registerCognitiveTools(server: McpServer): void {
   server.tool(
     "wake_from_lucid",
     "End the current lucid dream session. Transitions from LUCID → AWAKE state. " +
-      "Persists any accepted edges to validated_edges.json (with authority: 'human+system'). " +
+      "Finalizes the session; accepted contributions were atomically recorded as human assertions with their actions. " +
       "Logs the full session to lucid_log.json. Returns the complete session result " +
       "including all findings, actions taken, edges accepted, and contradictions dismissed.",
     {},

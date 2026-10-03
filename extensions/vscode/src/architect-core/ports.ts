@@ -30,6 +30,7 @@ import type {
   BuildContextResult,
   IterationOutcome,
   PassGoal,
+  PassStopReason,
   PromptParts,
   ProviderProposal,
   TaskGoal,
@@ -159,6 +160,8 @@ export interface ProviderPort {
 
 export interface ExecuteToolInput {
   readonly call: ToolUseRequest;
+  /** Cancellation reaches the original executor; stopping a wait is not termination proof. */
+  readonly abortSignal?: AbortSignal;
 }
 
 export interface ToolExecutorPort {
@@ -190,6 +193,8 @@ export interface MemoryPort {
     readonly content: string;
     readonly verdict?: { readonly level: string; readonly summary: string };
     readonly providerRawAssistant?: readonly unknown[];
+    /** Model-loop disposition, separate from the original authority's durable closure. */
+    readonly stopReason?: PassStopReason;
   }): Promise<void>;
 }
 

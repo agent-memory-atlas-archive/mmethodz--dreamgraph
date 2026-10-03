@@ -363,6 +363,7 @@ export async function runCodexCli(
 
     let spawn: CodexCliSpawnResult;
     try {
+      input.abortSignal?.throwIfAborted();
       spawn = await deps.process.spawn(spawnInput);
     } catch (err) {
       const recorded = await finishAudit(deps, runId);

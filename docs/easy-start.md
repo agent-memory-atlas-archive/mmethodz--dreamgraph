@@ -1,8 +1,8 @@
 # DreamGraph Easy Start
 
-> **Start here.** You do not need to understand the internals before using DreamGraph. Pick the path that matches your project, run the short command list, and keep three browser tabs open: Dashboard, Explorer, and Architect.
+> **Start here.** You do not need to understand the internals before using DreamGraph. Pick the path that matches your project, run the short command list, and open Architect. Its Config, Schedules, and Status tabs keep daily work in one place.
 
-DreamGraph v12 is browser-first. **Architect** is the main working surface. The Dashboard helps with setup and health. Explorer gives you a visual map when you need orientation.
+DreamGraph v14 is browser-first. **Architect** is the main working surface. Open Explorer separately when you want a visual map of the graph.
 
 ## Before you start
 
@@ -12,7 +12,7 @@ Install DreamGraph from the repository root:
 # Windows
 scripts/install.ps1 -Force
 
-# macOS or Linux
+# Linux / accepted WSL2 test bed
 bash scripts/install.sh --force
 ```
 
@@ -22,7 +22,7 @@ Open a new terminal and verify the install:
 dg --version
 ```
 
-You should see DreamGraph CLI v13.2.0 or newer.
+You should see DreamGraph CLI v14.0.0.
 
 ## Pick your setup path
 
@@ -65,7 +65,7 @@ dg start platform --http
 dg scan platform --depth deep
 ```
 
-For additional repositories, open the Dashboard Config page and add a `DREAMGRAPH_REPOS` JSON map to the instance `engine.env` file:
+For additional repositories, open the Config tab in Architect and add a `DREAMGRAPH_REPOS` JSON map to the instance `engine.env` file:
 
 ```dotenv
 DREAMGRAPH_REPOS={"api":"C:/work/platform-api","web":"C:/work/platform-web","infra":"C:/work/platform-infra"}
@@ -88,7 +88,7 @@ For Codex CLI, install and sign in to Codex as usual. Open Architect and choose:
 - Adapter: `Codex CLI`
 - Model: your preferred Codex model or `auto`
 
-For Claude, use the Anthropic API route. In Dashboard > Config, set:
+For Claude, use the Anthropic API route. In Architect > Config, set:
 
 ```dotenv
 DREAMGRAPH_LLM_PROVIDER=anthropic
@@ -100,7 +100,7 @@ DREAMGRAPH_LLM_ARCHITECT_MODEL=your-claude-model
 
 Then restart the instance. DreamGraph does not currently import Claude Code conversations or expose a Claude Code inline CLI adapter. The supported Claude path is Anthropic API configuration.
 
-## Open the three browser tabs
+## Open Architect and Explorer
 
 Run:
 
@@ -110,17 +110,16 @@ dg status my-app
 
 Use the host and port shown by `dg status`. If the port is `8100`, open:
 
-| Tab | URL | Use it for |
+| Surface | URL | Use it for |
 |-----|-----|------------|
-| Dashboard | `http://127.0.0.1:8100/` | Health, status, schedules, configuration, and docs. |
-| Explorer | `http://127.0.0.1:8100/explorer` | Visual orientation, search, relationships, and tensions. Both `/explorer` and `/explorer/` work. |
-| Architect | `http://127.0.0.1:8100/architect` | Your main working tab: ask questions, make plans, implement changes, and verify work. |
+| Architect | `http://127.0.0.1:8100/architect` | Your main working tab: ask questions, make plans, implement changes, verify work, and use Config, Schedules, and Status. |
+| Explorer | `http://127.0.0.1:8100/explorer` | Visual orientation, search, relationships, and tensions. Open it from Architect in another browser tab when needed. Both `/explorer` and `/explorer/` work. |
 
 Use them together simply:
 
 1. Start in **Architect** and describe what you want in normal language.
 2. Use **Explorer** when you want to understand how parts of the system connect.
-3. Use **Dashboard** when setup, health, or configuration needs attention.
+3. Use Architect's **Config**, **Schedules**, and **Status** tabs when setup or operations need attention.
 
 ## What to ask Architect first
 
@@ -172,11 +171,11 @@ Your repository stays unchanged. Configure the Anthropic API provider for Archit
 
 ### Can I use a local model?
 
-Yes. Dashboard > Config can point DreamGraph to Ollama or LM Studio. Use the existing [LLM setup guide](../guide/04-llm-setup.md) when you want local model details.
+Yes. Architect > Config can point DreamGraph to Ollama or LM Studio. Use the existing [LLM setup guide](../guide/04-llm-setup.md) when you want local model details.
 
 ### Which tab should I leave open?
 
-Leave Architect open. Keep Explorer beside it for orientation. Visit Dashboard when you need status or configuration.
+Leave Architect open. Open Explorer in another browser tab for orientation when you need it. Use Architect's Status and Config tabs for operations.
 
 ### Architect opens the wrong project
 
@@ -205,7 +204,7 @@ Both `/explorer` and `/explorer/` are supported. Confirm the daemon is running a
 
 ### I added more repositories but Architect cannot see them
 
-Check `DREAMGRAPH_REPOS` in Dashboard > Config, restart the instance, and run a deep scan again.
+Check `DREAMGRAPH_REPOS` in Architect > Config, restart the instance, and run a deep scan again.
 
 ### Where do I go next?
 

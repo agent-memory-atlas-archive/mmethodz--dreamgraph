@@ -1,0 +1,65 @@
+{
+  "schema": "dreamgraph.ashoka_verification_packet.v1",
+  "slices": [
+    15,
+    30
+  ],
+  "recorded_at": "2026-10-01T08:46:13.636195+00:00",
+  "source_scope": "stable root working source; seventeen-item dependency handoff",
+  "root": {
+    "files": 133,
+    "passed": 1499,
+    "skipped": 2,
+    "failed": 0,
+    "raw_report": "docs/ashoka/wave-15-30-tests.raw.json",
+    "log": "docs/ashoka/wave-15-30-tests.log"
+  },
+  "vscode": {
+    "build": "passed",
+    "tests": 488,
+    "passed": 488,
+    "failed": 0,
+    "log": "docs/ashoka/vscode-wave-15-30-tests.log"
+  },
+  "checks": {
+    "server_build": "passed",
+    "mcp": {
+      "tools": 93,
+      "resources": 31,
+      "classifications": 94,
+      "status": "passed"
+    },
+    "contracts": {
+      "count": 31,
+      "source_sha256": "33a249a9d9604c483e667dae3db73d907917cdd1976552373a680b8dded6f2e1",
+      "status": "passed"
+    },
+    "baseline": {
+      "revision": 10,
+      "sha256": "f1e0ee3508d1911a2abde79ea03277f89c54a09013a71cc5a45daa079f1f9349",
+      "owners": 29,
+      "cases": 12,
+      "frozen_evidence": 8,
+      "status": "passed"
+    },
+    "provider_capability": "r3 passed",
+    "configuration": {
+      "typed_settings": 308,
+      "literal_source_keys": 101,
+      "status": "passed"
+    }
+  },
+  "provider_calls": 0,
+  "qualification": {
+    "normalization": "21 actual independent-evidence/transaction/recovery cases; current proof, known witness debt, aliases and complete canonical readback",
+    "cli_controls": "real instrumented Codex and Copilot executable passes; actual stdio/HTTP bridge/effect/stop and fixed-task mode boundaries"
+  },
+  "prior_failed_run": "First root run had one obsolete identity assertion and three routing fixture failures. Routing passes alone; isolated disposable role data now prevents shared default-store interference. Prior raw report retained, not qualification.",
+  "limits": [
+    "Initial declarative JSON source decoder only; qualified parser/test/runtime producers remain separate",
+    "Durable admitted jobs, C14 approved task composition and source-effect/reconciliation adoption remain17/25",
+    "Native Computer Use grants/seat/stop across platforms remain31",
+    "No paid canary or measured model superiority; final task/usefulness evidence27",
+    "No live migration, global install/restart or release bump"
+  ]
+}

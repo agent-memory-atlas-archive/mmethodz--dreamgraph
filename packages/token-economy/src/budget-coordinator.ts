@@ -14,7 +14,7 @@
  * computed only here. No subsystem may derive its own pressure value.
  */
 
-export type CompressionMode = "verbatim" | "expected" | "debt-repay" | "envelope-preserved";
+export type CompressionMode = "verbatim" | "expected" | "debt-repay" | "envelope-preserved" | "whole_result_omission";
 export type PressureLabel = "low" | "normal" | "high";
 
 export interface BudgetSnapshotHistoryEntry {

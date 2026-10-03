@@ -84,7 +84,7 @@ describe("graph health assessment", () => {
     expect(report.primary_recommendation).toMatchObject({
       tool: "enrich_parser_nodes",
       requires_user_approval: true,
-      arguments: { force: true, context_hops: 3 },
+      arguments: { force: false, context_hops: 2 },
     });
   });
 

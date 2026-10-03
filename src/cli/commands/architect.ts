@@ -216,10 +216,15 @@ function printPlanDetail(payload: Record<string, unknown>, section: string): voi
     console.log(`Plan: ${text(plan.title ?? plan.name)}`);
     console.log(`  ID:        ${text(plan.id ?? plan.plan_id)}`);
     console.log(`  Status:    ${text(plan.status)}`);
-    console.log(`  Lifecycle: ${text(operational.plan_lifecycle)}`);
+    console.log(`  Lifecycle: ${text(operational.plan_lifecycle)}${operational.source === "legacy_review_projection" ? " (reported; lifecycle import requires review)" : ""}`);
     console.log(`  Execution: ${text(operational.execution_state)}`);
-    console.log(`  Active:    ${text(asRecord(operational.active_slice).title ?? operational.current_slice_title, "none")}`);
+    console.log(`  Current:   ${text(operational.current_slice_title ?? operational.current_slice_id, "none")}`);
+    console.log(`  Running:   ${text(asRecord(operational.active_slice).title ?? asRecord(operational.active_slice).id, "none")}`);
     console.log(`  Next:      ${text(asRecord(operational.next_slice).title ?? asRecord(operational.next_slice).id, "none")}`);
+    if (operational.source === "legacy_review_projection") {
+      const progress = asRecord(operational.reported_progress);
+      console.log(`  Recorded:  ${text(progress.completed, "0")}/${text(progress.required, "0")} completed (reported; not committed verification)`);
+    }
     console.log(`  Review:    ${text(living.review_state ?? operational.review_state, "unknown")}`);
     console.log(`  Blockers:  ${Array.isArray(living.blockers) && living.blockers.length > 0 ? living.blockers.join("; ") : "none"}`);
     console.log(`  Path:      ${text(plan.path)}`);
@@ -227,7 +232,8 @@ function printPlanDetail(payload: Record<string, unknown>, section: string): voi
   }
 
   if (section === "all" || section === "slices") {
-    const slices = Array.isArray(plan.slices) ? plan.slices as Record<string, unknown>[] : [];
+    const rawSlices = plan.slices ?? registry.slices;
+    const slices = Array.isArray(rawSlices) ? rawSlices as Record<string, unknown>[] : [];
     if (slices.length > 0) {
       console.log("Slices");
       for (const slice of slices) {

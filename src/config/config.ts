@@ -16,6 +16,7 @@ import {
 } from "../cognitive/types.js";
 import type { LlmConfig } from "../cognitive/llm.js";
 import { parseLlmConfig } from "../cognitive/llm.js";
+import { resolveComponentSettings, engineEnvNumber } from "./engine-setting-catalogue.js";
 
 /** Project root — two levels up from dist/config/config.js */
 const PROJECT_ROOT = resolve(fileURLToPath(import.meta.url), "..", "..", "..");
@@ -78,37 +79,17 @@ function parseRepos(): Record<string, string> {
   return {};
 }
 
-function parseEventRouterConfig(): EventRouterConfig {
-  const raw = process.env.DREAMGRAPH_EVENTS;
-  if (!raw) return { ...DEFAULT_EVENT_ROUTER_CONFIG };
-  try {
-    const parsed = JSON.parse(raw);
-    return { ...DEFAULT_EVENT_ROUTER_CONFIG, ...parsed };
-  } catch {
-    return { ...DEFAULT_EVENT_ROUTER_CONFIG };
-  }
-}
-
-function parseNarrativeConfig(): NarrativeConfig {
-  const raw = process.env.DREAMGRAPH_NARRATIVE;
-  if (!raw) return { ...DEFAULT_NARRATIVE_CONFIG };
-  try {
-    const parsed = JSON.parse(raw);
-    return { ...DEFAULT_NARRATIVE_CONFIG, ...parsed };
-  } catch {
-    return { ...DEFAULT_NARRATIVE_CONFIG };
-  }
-}
-
-function parseSchedulerConfig(): SchedulerConfig {
-  const raw = process.env.DREAMGRAPH_SCHEDULER;
-  if (!raw) return { ...DEFAULT_SCHEDULER_CONFIG };
-  try {
-    const parsed = JSON.parse(raw);
-    return { ...DEFAULT_SCHEDULER_CONFIG, ...parsed };
-  } catch {
-    return { ...DEFAULT_SCHEDULER_CONFIG };
-  }
+function parseEventRouterConfig(): EventRouterConfig { return resolveComponentSettings("events", process.env) as EventRouterConfig; }
+function parseNarrativeConfig(): NarrativeConfig { return resolveComponentSettings("narrative", process.env) as NarrativeConfig; }
+function parseSchedulerConfig(): SchedulerConfig { return resolveComponentSettings("scheduler", process.env) as SchedulerConfig; }
+/** Refresh settings after the instance file is loaded, before any consumers start. */
+export function refreshInstanceConfiguration(): void {
+  const candidate = { events: parseEventRouterConfig(), narrative: parseNarrativeConfig(), scheduler: parseSchedulerConfig() };
+  Object.assign(config, candidate);
+  Object.assign(config.database, { connectionString: process.env.DATABASE_URL ?? "",
+    maxConnections: engineEnvNumber("DG_DB_MAX_CONNECTIONS", 3), statementTimeoutMs: engineEnvNumber("DG_DB_STATEMENT_TIMEOUT", 5000),
+    connectionTimeoutMs: engineEnvNumber("DG_DB_CONNECTION_TIMEOUT", 5000), idleTimeoutMs: engineEnvNumber("DG_DB_IDLE_TIMEOUT", 30000),
+    operationTimeoutMs: engineEnvNumber("DG_DB_OPERATION_TIMEOUT", 10000), scanTimeoutMs: engineEnvNumber("DG_DB_SCAN_TIMEOUT_MS", 30000) });
 }
 
 export const config = {
@@ -139,16 +120,16 @@ export const config = {
    */
   database: {
     connectionString: process.env.DATABASE_URL ?? "",
-    maxConnections: Number(process.env.DG_DB_MAX_CONNECTIONS) || 3,
-    statementTimeoutMs: Number(process.env.DG_DB_STATEMENT_TIMEOUT) || 5_000,
+    maxConnections: engineEnvNumber("DG_DB_MAX_CONNECTIONS", 3),
+    statementTimeoutMs: engineEnvNumber("DG_DB_STATEMENT_TIMEOUT", 5_000),
     /** Max ms to wait for a free connection from the pool (0 = forever). */
-    connectionTimeoutMs: Number(process.env.DG_DB_CONNECTION_TIMEOUT) || 5_000,
+    connectionTimeoutMs: engineEnvNumber("DG_DB_CONNECTION_TIMEOUT", 5_000),
     /** Close idle connections after this many ms to avoid stale sockets. */
-    idleTimeoutMs: Number(process.env.DG_DB_IDLE_TIMEOUT) || 30_000,
+    idleTimeoutMs: engineEnvNumber("DG_DB_IDLE_TIMEOUT", 30_000),
     /** Hard cap on the entire query_db_schema operation (acquire + query). */
-    operationTimeoutMs: Number(process.env.DG_DB_OPERATION_TIMEOUT) || 10_000,
+    operationTimeoutMs: engineEnvNumber("DG_DB_OPERATION_TIMEOUT", 10_000),
     /** Hard cap on a full scan_database run (lists tables + per-table introspection). */
-    scanTimeoutMs: Number(process.env.DG_DB_SCAN_TIMEOUT_MS) || 30_000,
+    scanTimeoutMs: engineEnvNumber("DG_DB_SCAN_TIMEOUT_MS", 30_000),
   },
 
   /**

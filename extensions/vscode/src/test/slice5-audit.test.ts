@@ -48,7 +48,8 @@ test('Slice 5 audit: codex-cli is selectable and routes through native ProviderP
   assert.match(chatPanel, /providers: \['anthropic', 'openai', 'ollama', 'lmstudio', 'copilot-cli', 'codex-cli'\]/);
   assert.match(chatPanel, /const codexCliRoute = nativeCliProvider === 'codex-cli'/);
   assert.match(chatPanel, /runPassViaCodexCli\(/);
-  assert.match(chatPanel, /private _buildCodexCliProviderOptions\(\): CodexCliProviderPortOptions/);
+  assert.match(chatPanel, /private _buildCodexCliProviderOptions\(managedPass\?: ManagedCliPass\): CodexCliProviderPortOptions/);
+  assert.equal((chatPanel.match(/providerOptions: this\._buildCodexCliProviderOptions\(managedCliPass\)/g) ?? []).length, 2);
   assert.match(chatPanel, /CODEX_AUTHORITATIVE_TOOL_CATALOG/);
   assert.match(pkg, /"codex-cli"/);
   assert.match(pkg, /"dreamgraph\.architect\.codexCli\.command"/);
@@ -61,7 +62,7 @@ test('Slice 6 audit: codex-cli live tool trace and final reconciliation are wire
 
   assert.match(codexProviderPort, /readonly auditLive\?: CodexCliMcpAuditLivePort/);
   assert.match(codexProviderPort, /readonly onToolCall\?: \(runId: string, call: RecordedMcpToolCall\) => void/);
-  assert.match(codexProviderPort, /input\.abortSignal\?\.aborted === true/);
+  assert.match(codexProviderPort, /executionSignal\?\.aborted === true/);
   assert.match(codexPorts, /interface CodexCliMcpAuditLivePort/);
   assert.match(chatPanel, /const auditLive = createHostAuditLive\(\{ auditDirAbsPath \}\)/);
   assert.match(chatPanel, /onToolCall: \(runId: string, call: RecordedMcpToolCall\): void => \{/);

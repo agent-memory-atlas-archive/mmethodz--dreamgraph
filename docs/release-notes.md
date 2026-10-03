@@ -2,6 +2,8 @@
 
 ## v13.4.0 - Glass Atlas
 
+Browser Architect adopts Web64 IDE v2-inspired charcoal workstation styling, compact controls, flat tabs, a denser inspector, and amber keyboard focus. See the [Architect guide](../guide/15-architect-beta.md).
+
 Explorer gains compact panels, type-specific glass nodes, a coordinated palette, restrained connection flow, and collision-aware labels in 2D and 3D. Link thickness stays bounded at close zoom and dense hubs retain their color. Scan and standalone enrichment accept `--max-hops 0..6`; enrichment recovery and same-instance concurrency protection reduce waste. All distribution components share 13.4.0. See [v13.4.0 notes](../RELEASE_NOTES_v13.4.0.md).
 
 ## v13.3.0 - Current Model Support

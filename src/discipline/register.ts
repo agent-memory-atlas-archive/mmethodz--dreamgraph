@@ -23,6 +23,7 @@
  */
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { registerPagedResource } from "../resources/resolver.js";
 import { logger } from "../utils/logger.js";
 import { buildManifest, getManifestSummary } from "./manifest.js";
 import { registerDisciplineTools } from "./tools.js";
@@ -35,7 +36,7 @@ export function registerDisciplineResource(server: McpServer): void {
   // -----------------------------------------------------------------------
   // discipline://manifest — Machine-readable discipline rules
   // -----------------------------------------------------------------------
-  server.resource(
+  registerPagedResource(server,
     "discipline-manifest",
     "discipline://manifest",
     {
@@ -68,7 +69,7 @@ export function registerDisciplineResource(server: McpServer): void {
     `${summary.data_protection_rules} data files protected`
   );
 
-  // Register discipline execution tools (9 tools)
+  // Register discipline execution tools (10 tools)
   registerDisciplineTools(server);
 }
 

@@ -64,10 +64,10 @@ describe("scan enrichment hop budget", () => {
     }
   });
 
-  it.each([undefined, 0, 1])("passes full scan context_hops=%s through to mandatory enrichment", async (hops) => {
+  it.each([undefined, 0, 1, 2, 3])("passes full scan context_hops=%s through to mandatory enrichment", async (hops) => {
     await runScanProject({ repos: ["fixture"], targets: ["features"], context_hops: hops });
     expect(enrich).toHaveBeenCalledTimes(1);
-    expect(enrich.mock.calls[0][0]).toMatchObject({ target: "all", contextHops: hops ?? 3 });
+    expect(enrich.mock.calls[0][0]).toMatchObject({ target: "all", contextHops: hops ?? 2 });
   });
 
   it("passes a zero-hop budget through explicit incremental enrichment", async () => {
@@ -85,12 +85,12 @@ describe("scan enrichment hop budget", () => {
     expect(enrich).not.toHaveBeenCalled();
   });
 
-  it("exposes zero- and one-hop budgets and the unchanged default through both MCP schemas", () => {
+  it("exposes zero- and one-hop budgets and the two-hop default through both MCP schemas", () => {
     for (const register of [registerScanProjectTool, registerEnrichParserNodesTool]) {
       const tool = vi.fn();
       register({ tool } as unknown as McpServer);
       const schema = tool.mock.calls[0][2].context_hops;
-      expect(schema.parse(undefined)).toBe(3);
+      expect(schema.parse(undefined)).toBe(2);
       expect(schema.parse(0)).toBe(0);
       expect(schema.parse(1)).toBe(1);
       expect(schema.safeParse(7).success).toBe(false);

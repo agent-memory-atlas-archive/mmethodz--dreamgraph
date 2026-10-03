@@ -73,6 +73,8 @@ export interface HostRegistryOptions {
    * on top of whatever is returned from `describeBridgeSpawn`.
    */
   readonly extraBridgeEnv?: Readonly<Record<string, string>>;
+  /** Ephemeral execution-bound worker; use the same authority for the probe and bridge. */
+  readonly sessionBearer?: string;
   /**
    * Hard timeout (ms) for the one-shot `tools/list` probe. Defaults to
    * 15 s — generous enough for a slow round-trip while keeping the
@@ -96,6 +98,7 @@ export function createHostRegistry(opts: HostRegistryOptions): CopilotCliRegistr
       const upstreamNames = await probeHostMcpToolNames({
         url: hostMcpUrl,
         timeoutMs: toolListTimeoutMs,
+        sessionBearer: opts.sessionBearer,
       });
       return Object.freeze(includeBridgeLocalToolNames(upstreamNames));
     },
@@ -103,6 +106,7 @@ export function createHostRegistry(opts: HostRegistryOptions): CopilotCliRegistr
     async describeBridgeSpawn(): Promise<CopilotMcpBridgeSpawn> {
       const env: Record<string, string> = {
         ...(opts.extraBridgeEnv ?? {}),
+        ...(opts.sessionBearer ? { DREAMGRAPH_BRIDGE_SESSION_BEARER: opts.sessionBearer } : {}),
         // The single piece of state the bridge needs to inherit
         // the architect's MCP session. Everything else (audit
         // path, server name) is layered on by the orchestrator
@@ -171,6 +175,7 @@ function includeBridgeLocalToolNames(upstreamNames: readonly string[]): string[]
 async function probeHostMcpToolNames(opts: {
   url: string;
   timeoutMs: number;
+  sessionBearer?: string;
 }): Promise<string[]> {
   let url: URL;
   try {
@@ -181,7 +186,8 @@ async function probeHostMcpToolNames(opts: {
     );
   }
 
-  const transport = new StreamableHTTPClientTransport(url);
+  const transport = new StreamableHTTPClientTransport(url, opts.sessionBearer
+    ? { requestInit: { headers: { "X-DreamGraph-Session": opts.sessionBearer } } } : undefined);
   const client = new Client(
     { name: "dreamgraph-copilot-cli-registry-probe", version: EXTENSION_VERSION },
     { capabilities: {} },

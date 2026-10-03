@@ -11,12 +11,12 @@
  * Extracted from `dreamer.ts` (F-06).
  */
 
+import { performance } from "node:perf_hooks";
+import { cognitiveProvenance } from "../cognitive-provenance.js";
 import { logger } from "../../utils/logger.js";
 import { engine } from "../engine.js";
 import {
-  getLlmProvider,
-  isLlmAvailable,
-  getDreamerLlmConfig,
+  getRoleLlmProvider,
   type LlmMessage,
 } from "../llm.js";
 import type { DreamEdge, DreamNode, TensionSignal } from "../types.js";
@@ -26,12 +26,8 @@ import { dreamId, type FactSnapshot } from "./_shared.js";
 import { GRAPH_SEMANTIC_INVARIANTS } from "../../semantic-invariants.js";
 
 // ---------------------------------------------------------------------------
-// OpenAI Structured Outputs schema for dream responses.
-// When `strict: true`, OpenAI guarantees every response matches this schema
-// exactly — no malformed JSON, no missing fields, no matter how creative the
-// string values get (temperature 0.9+).
-//
-// For Ollama this falls back to basic `format: "json"`.
+// Original schema is validated after every provider reply; refusals/incomplete
+// outputs are explicit failures. Strict support is qualified per selected route.
 // ---------------------------------------------------------------------------
 
 const DREAM_RESPONSE_SCHEMA: Record<string, unknown> = {
@@ -86,19 +82,23 @@ export async function llmDream(
   snapshot: FactSnapshot,
   cycle: number,
   max: number,
-): Promise<{ edges: DreamEdge[]; nodes: DreamNode[] }> {
+): Promise<{ edges: DreamEdge[]; nodes: DreamNode[]; admission?: import("../model-execution.js").ModelCallAdmission }> {
   const edges: DreamEdge[] = [];
   const nodes: DreamNode[] = [];
+  if (!Number.isSafeInteger(max) || max < 0) throw new Error("LLM_DREAM_BUDGET_INVALID");
+  if (max === 0) return { edges, nodes };
   const now = new Date().toISOString();
+  let admission: import("../model-execution.js").ModelCallAdmission | undefined;
 
   // Check LLM availability
-  const available = await isLlmAvailable();
+  const runtime = await getRoleLlmProvider("dreamer");
+  const available = await runtime.provider.isAvailable();
   if (!available) {
     logger.warn("LLM dream: provider not available — check DREAMGRAPH_LLM_PROVIDER, DREAMGRAPH_LLM_API_KEY, and model config. Skipping LLM dreaming.");
-    return { edges, nodes };
+    throw new Error("STRATEGY_DEPENDENCY_UNAVAILABLE: dreamer provider");
   }
 
-  const llm = getLlmProvider();
+  const llm = runtime!.provider;
 
   // Build context for the LLM — summarize the knowledge graph
   const entitySummaries: string[] = [];
@@ -225,7 +225,7 @@ export async function llmDream(
 You analyze a knowledge graph of features, workflows, and data models and propose NOVEL relationships, hidden patterns, architectural insights, and potential risks.
 
 Rules:
-- Output ONLY valid JSON — an array of edge objects
+- Output ONLY a valid JSON object with edges and new_nodes arrays
 - Each edge needs: from (entity ID), to (entity ID), relation (verb), reason (1-2 sentences WHY), confidence (0.0-1.0), type ("hypothetical" for dream edges), and source_evidence (MANDATORY)
 - Use EXISTING entity IDs from the graph (listed below). Do NOT invent entity IDs.
 - **PROOF OF WORK**: Every edge MUST include a "source_evidence" field citing the specific source file path, function, class, or line from the Source Code Evidence section below. Edges without source evidence will be REJECTED by the normalizer. If you cannot cite real code, do not propose the edge.
@@ -240,20 +240,7 @@ Rules:
 - Aim for ${Math.min(max, 15)} edges (quality over quantity)
 - **NEW CONCEPTS**: Propose new_node objects only for concepts the graph is MISSING and the source code evidence supports. Look for source-proven abstractions, behavioral chains, information structures, cross-cutting concerns, or integration points. Do not assume web apps, plugins, pipelines, queues, databases, frameworks, or domain names unless the provided project evidence says so. Each new_node needs: id (dream_llm_<snake_case_name>), name, description, intent (WHY this concept should exist), type ("hypothetical_feature" or "hypothetical_workflow" or "hypothetical_entity"), domain (derive from project evidence or use a neutral existing graph domain), keywords (array of semantic tags grounded in code evidence), and category ("feature", "workflow", or "data_model"). Nodes with strong domain and keyword grounding will be promoted into the fact graph after normalization.
 - Copy-paste exact identifiers, class names, or short code fragments from the provided project evidence (under 50 characters). Do NOT include markdown formatting, newlines, or extra indentation in the source_evidence string, as this will break the exact substring verification.
-- Output format MUST be strictly this JSON array:
-  [
-    {
-      "from": "entity-1",
-      "to": "entity-2",
-      "relation": "implements",
-      "reason": "Because Class A implements Interface B.",
-      "confidence": 0.8,
-      "type": "hypothetical",
-      "source_evidence": "public class JsonFormatter : IGuiTool",
-      "new_node": null // OR the new node object if applicable
-    }
-  ]
-
+- Use the exact supplied output schema: {"edges": [...], "new_nodes": [...]}. All required properties must be present. Never include comments or markdown.
 CRITICAL: Your source_evidence field is verified programmatically against the actual source code provided. If it contains ANY text not present in the Source Code Evidence section, the edge is REJECTED. Copy-paste exact identifiers, class names, method names, or code fragments. Do NOT paraphrase, abbreviate, or invent code.
 
 CRITICAL: If the provided source code does NOT contain evidence for a connection, return FEWER edges or an empty array. It is better to return 0 edges than to fabricate evidence. Empty arrays are a valid and expected response.`;
@@ -299,13 +286,16 @@ Output a JSON object with:
   ];
 
   try {
-    const dreamerCfg = getDreamerLlmConfig();
+    const dreamerCfg = runtime!.config;
     logger.info(
       `LLM dream: sending prompt (${entitySummaries.length} entities, ${edgeSummaries.length} edges) ` +
       `to model=${dreamerCfg.model}, temp=${dreamerCfg.temperature}, maxTokens=${dreamerCfg.maxTokens}`,
     );
 
+    const started = performance.now();
     const response = await llm.complete(messages, {
+      cognitiveRole: "dreamer",
+      ...(dreamerCfg.reasoningEffort ? { reasoningEffort: dreamerCfg.reasoningEffort } : {}),
       temperature: dreamerCfg.temperature,
       maxTokens: dreamerCfg.maxTokens,
       model: dreamerCfg.model,
@@ -315,27 +305,38 @@ Output a JSON object with:
       },
     });
 
+    admission = response.admission;
     logger.info(`LLM dream: received ${response.text.length} chars from ${response.model}`);
 
     const parsed = parseLlmDreamResponse(response.text, snapshot, cycle, now, entityIds, groundingContext);
-    edges.push(...parsed.edges.slice(0, max));
-    nodes.push(...parsed.nodes.slice(0, Math.ceil(max / 2)));
+    const provenance = cognitiveProvenance({ role: "dreamer", prompt_version: "dreamer.grounded.v2", schema_version: "dream_response.v1",
+      messages, output_schema: DREAM_RESPONSE_SCHEMA, source_context: { entitySummaries, edgeSummaries, groundingContext, tensionContext, validatedContext,
+        domains: Array.from(snapshot.domains), sourceFileOverlaps: Array.from(snapshot.sourceFileIndex.entries()).filter(([, ids]) => ids.length > 1).slice(0, 20) },
+      source_ids: entitiesToSummarize.flatMap(entity => entity.source_files), policy: runtime!.policy,
+      elapsed_ms: performance.now() - started, response });
+    for (const edge of parsed.edges) edge.meta = { ...edge.meta, model_provenance: provenance };
+    for (const node of parsed.nodes) node.model_provenance = provenance;
+    nodes.push(...parsed.nodes.slice(0, Math.min(Math.ceil(max / 2), max)));
+    const retainedIds = new Set([...snapshot.entities.keys(), ...nodes.map(node => node.id)]);
+    edges.push(...parsed.edges.filter(edge => retainedIds.has(edge.from) && retainedIds.has(edge.to)).slice(0, max - nodes.length));
 
     logger.info(
       `LLM dream: ${edges.length} edges, ${nodes.length} nodes from ${response.model} ` +
       `(${response.tokensUsed ?? "?"} tokens)`,
     );
   } catch (err) {
-    const dreamerModel = getDreamerLlmConfig().model;
-    const providerName = getLlmProvider().name;
+    if (admission && err && typeof err === "object") Object.assign(err, { admission });
+    const dreamerModel = runtime!.config.model;
+    const providerName = llm.name;
     logger.warn(
       `LLM dream FAILED (provider=${providerName}, model=${dreamerModel}): ` +
       `${err instanceof Error ? err.message : "unknown error"}. ` +
       `Check the model name and API key in Dashboard > Config > LLM.`,
     );
+    throw err;
   }
 
-  return { edges, nodes };
+  return { edges, nodes, ...(admission ? { admission } : {}) };
 }
 
 /**
@@ -393,11 +394,14 @@ function parseLlmDreamResponse(
 
   // Process new nodes first (so their IDs are available for edges)
   const newNodeIds = new Set<string>();
+  const newNodeAliases = new Map<string, string>();
   for (const n of data.new_nodes ?? []) {
     if (!n.id || !n.name) continue;
 
     const nodeId = n.id.startsWith("dream_") ? n.id : `dream_llm_${n.id}`;
+    if (idSet.has(nodeId) || idSet.has(n.id) || newNodeIds.has(nodeId) || newNodeAliases.has(n.id)) continue;
     newNodeIds.add(nodeId);
+    newNodeAliases.set(n.id, nodeId);
 
     let category: DreamNode["category"];
     if (n.category === "feature" || n.category === "workflow" || n.category === "data_model") {
@@ -468,6 +472,9 @@ function parseLlmDreamResponse(
   let rejectedFakeEvidence = 0;
   for (const e of data.edges ?? []) {
     if (!e.from || !e.to || !e.relation) continue;
+    e.from = newNodeAliases.get(e.from) ?? e.from;
+    e.to = newNodeAliases.get(e.to) ?? e.to;
+    if (e.from === e.to) continue;
 
     if (!e.source_evidence || e.source_evidence.trim().length < 10) {
       rejectedNoEvidence++;

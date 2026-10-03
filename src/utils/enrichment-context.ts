@@ -1,4 +1,4 @@
-export const DEFAULT_ENRICHMENT_CONTEXT_HOPS = 3;
+export const DEFAULT_ENRICHMENT_CONTEXT_HOPS = 2;
 export const MAX_ENRICHMENT_CONTEXT_HOPS = 6;
 
 /** Validate before any provider calls; zero explicitly omits graph neighbors. */

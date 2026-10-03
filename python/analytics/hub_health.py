@@ -5,10 +5,12 @@ import argparse
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from .definitions import qualified
 from . import loader
 from ._common import add_common_args, emit, fmt_table, resolve_data_dir_from_args
 
 
+@qualified("hub_health")
 def analyze(data_dir: Path) -> dict:
     fact = loader.all_fact_entities(data_dir)
     by_id = {e.get("id"): e for e in fact if e.get("id")}
@@ -71,7 +73,7 @@ def analyze(data_dir: Path) -> dict:
 
     # Sort: degree desc then health asc to surface "important but fuzzy"
     rows.sort(key=lambda r: (-r["degree"], r["health"]))
-    fuzzy = [r for r in rows if r["health"] < 0.5][:25]
+    fuzzy = [r for r in rows if r["health"] < 0.5]
     return {
         "summary": {
             "total_entities": len(by_id),
@@ -79,7 +81,8 @@ def analyze(data_dir: Path) -> dict:
             "fuzzy_hubs_count": len(fuzzy),
         },
         "top_hubs": rows[:25],
-        "fuzzy_hubs": fuzzy,
+        "fuzzy_hubs": fuzzy[:25],
+        "fuzzy_hubs_omitted": max(0,len(fuzzy)-25),
     }
 
 

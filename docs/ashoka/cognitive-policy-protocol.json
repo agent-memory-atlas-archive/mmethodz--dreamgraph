@@ -1,0 +1,111 @@
+{
+  "schema": "dreamgraph.cognitive_policy_protocol.v1",
+  "version": "ashoka.S9.v1",
+  "frozen_at": "2026-10-01T04:38:24.665108+00:00",
+  "source_protocol_sha256": "838fed9aeb6b263f27370e44b89347b17d843948f878d89efd399d1fc137a22c",
+  "cases": [
+    {
+      "id": "cognitive:initial_scan",
+      "version": "1",
+      "stage": "initial_scan",
+      "prompt_version": "offline-oracle.v1",
+      "schema_version": "cognitive-reply.v1",
+      "sources": [
+        {
+          "id": "dg-scan",
+          "content": "export async function runScanProject(opts: RunScanOptions = {}): Promise<ScanProjectResult> {\n  return withGraphOperation(\"scan\", () => executeScanProject(opts));\n}\n\nasync function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResult> {\n  const contextHops = parseEnrichmentContextHops(opts.context_hops);\n  const VALID_TARGETS = [\"features\", \"workflows\", \"data_model\", \"ui\"];\n  const depth = opts.depth ?? \"deep\";\n  const targetList = opts.targets ?? [...VALID_TARGETS];\n  const repos = opts.repos;\n\n  // Validate targets\n  const invalidTargets = targetList.filter(t => !VALID_TARGETS.includes(t));\n  if (invalidTargets.length > 0) {\n    throw new Error(`Invalid target(s): ${invalidTargets.join(\", \")}. Must be one of: ${VALID_TARGETS.join(\", \")}`);\n  }\n\n  // ---- Progress helper ----\n  let _step = 0;\n  const _totalSteps = 2 + targetList.length + 1;\n  function progress(message: string): void {\n    _step++;\n    logger.info(`scan_project: ${message}`);\n    opts.onProgress?.(message, _step, _totalSteps);\n  }\n\n  // Validate repos\n  const availableRepos = Object.keys(config.repos);\n  if (availableRepos.length === 0) {\n    throw new Error(\"No repositories configured. Set project root or DREAMGRAPH_REPOS.\");\n  }\n  const targetRepos = repos ?? availableRepos;\n  const unknown = targetRepos.filter(r => !config.repos[r]);\n  if (unknown.length > 0) {\n    throw new Error(`Unknown repos: ${unknown.join(\", \")}. Available: ${availableRepos.join(\", \")}`);\n  }",
+          "ancestry_id": "a70f5f667aa7e47b5eef79023626c015d56db40f7b8eb1257bba8fa707396378",
+          "supports": [
+            "fixture:source-anchor:dg-scan"
+          ],
+          "contradicts": []
+        },
+        {
+          "id": "dg-scan:summary",
+          "content": "Synthetic repeated summary of the same source anchor.",
+          "ancestry_id": "a70f5f667aa7e47b5eef79023626c015d56db40f7b8eb1257bba8fa707396378",
+          "supports": [
+            "fixture:source-anchor:dg-scan"
+          ],
+          "contradicts": []
+        },
+        {
+          "id": "fixture:contrary",
+          "content": "Synthetic oracle: this evidence contradicts fixture:unsafe; it supplies no independent support for the source-anchor claim.",
+          "ancestry_id": "fixture:contrary",
+          "supports": [],
+          "contradicts": [
+            "fixture:unsafe"
+          ]
+        }
+      ],
+      "known_claims": [],
+      "required_contradictions": [
+        "fixture:unsafe"
+      ],
+      "required_abstentions": [
+        "fixture:unknown"
+      ]
+    },
+    {
+      "id": "cognitive:mature_graph",
+      "version": "1",
+      "stage": "mature_graph",
+      "prompt_version": "offline-oracle.v1",
+      "schema_version": "cognitive-reply.v1",
+      "sources": [
+        {
+          "id": "dg-scheduler",
+          "content": "export async function runScheduleNow(scheduleId: string): Promise<ScheduleExecution> {\n  // Phase 1: snapshot the schedule under the file lock and stamp it as\n  // in-flight so a concurrent tick cannot also pick it up. Released before\n  // executeAction starts so UI calls remain responsive even if the action\n  // takes 30+ seconds (LLM round-trip).\n  const snapshot = await withFileLock(\"schedules.json\", async () => {\n    const file = await loadScheduleFile();\n    const schedule = file.schedules.find((s) => s.id === scheduleId);\n    if (!schedule) {\n      throw new Error(`Schedule not found: ${scheduleId}`);\n    }\n    if (inFlightSchedules.has(scheduleId)) {\n      throw new Error(`Schedule already running: ${schedule.name}`);\n    }\n    inFlightSchedules.add(scheduleId);\n    const claim: ScheduleClaim = {\n      scheduleId: schedule.id,\n      scheduleName: schedule.name,\n      action: schedule.action,\n      startTime: Date.now(),\n      schedule: { ...schedule },\n    };\n    return claim;\n  });\n\n  // Phase 2: execute under the cognitive-execution mutex (no file lock).\n  let resultSummary = \"\";\n  let success = true;\n  let errorMsg: string | undefined;\n\n  try {\n    await withFileLock(SCHEDULER_EXEC_LOCK, async () => {\n      try {\n        logger.info(`Scheduler (forced): ${snapshot.scheduleName} (${snapshot.action})`);\n        resultSummary = await executeActionWithTimeout(snapshot.schedule);\n      } catch (err) {\n        success = false;\n        errorMsg = err instanceof Error ? err.message : String(err);\n        resultSummary = `Error: ${errorMsg}`;\n      }\n    });\n  } finally {\n    inFlightSchedules.delete(scheduleId);\n  }\n\n  // Phase 3: write the execution record back. We rebuild the execution\n  // object here (rather than relying on writeBackExecution) so we can return\n  // the manual-execution id with its `_manual_` infix, preserving the\n  // public surface of this function.\n  return withFileLock(\"schedules.json\", async () => {\n    const file = await loadScheduleFile();\n    const schedule = file.schedules.find((s) => s.id === scheduleId);\n    const completedAt = new Date();\n    const duration = completedAt.getTime() - snapshot.startTime;\n\n    if (schedule) {\n      if (success) {\n        schedule.error_count = 0;\n        schedule.last_error = null;\n      } else {\n        schedule.error_count++;\n        schedule.last_error = errorMsg ?? \"unknown error\";\n      }\n      schedule.last_run_at = completedAt.toISOString();\n      schedule.run_count++;\n      schedule.updated_at = completedAt.toISOString();\n      computeNextRun(schedule);\n    }\n\n    const execution: ScheduleExecution = {",
+          "ancestry_id": "0631d1e9a021a697052c473fd4f1d06fed150e83c014b6e770b0daa56a99ac55",
+          "supports": [
+            "fixture:source-anchor:dg-scheduler"
+          ],
+          "contradicts": []
+        },
+        {
+          "id": "dg-scheduler:summary",
+          "content": "Synthetic repeated summary of the same source anchor.",
+          "ancestry_id": "0631d1e9a021a697052c473fd4f1d06fed150e83c014b6e770b0daa56a99ac55",
+          "supports": [
+            "fixture:source-anchor:dg-scheduler"
+          ],
+          "contradicts": []
+        },
+        {
+          "id": "fixture:contrary",
+          "content": "Synthetic oracle: this evidence contradicts fixture:unsafe; it supplies no independent support for the source-anchor claim.",
+          "ancestry_id": "fixture:contrary",
+          "supports": [],
+          "contradicts": [
+            "fixture:unsafe"
+          ]
+        }
+      ],
+      "known_claims": [],
+      "required_contradictions": [
+        "fixture:unsafe"
+      ],
+      "required_abstentions": [
+        "fixture:unknown"
+      ]
+    }
+  ],
+  "profiles": [
+    {
+      "name": "economical-initial-fixture",
+      "provider": "openai",
+      "model": "gpt-4.1"
+    },
+    {
+      "name": "mature-frontier-fixture",
+      "provider": "openai",
+      "model": "gpt-5.4"
+    }
+  ],
+  "expected_faults": {
+    "repeated_ancestry_promotion": 1,
+    "fabricated_contradicted_claim": 1
+  },
+  "qualification": "offline fixture profiles do not measure the named models; actual normalizer structural baseline is measured separately; real policy/agent superiority remains unverified"
+}

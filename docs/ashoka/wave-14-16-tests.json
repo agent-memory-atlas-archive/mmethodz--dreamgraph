@@ -1,0 +1,70 @@
+{
+  "schema": "dreamgraph.ashoka_verification_packet.v1",
+  "slices": [
+    14,
+    16
+  ],
+  "recorded_at": "2026-10-01 09:52:09 UTC",
+  "source_scope": "stable root working source; nineteen-item dependency handoff",
+  "root": {
+    "files": 135,
+    "passed": 1524,
+    "skipped": 2,
+    "failed": 0,
+    "raw_report": "docs/ashoka/wave-14-16-tests.raw.json",
+    "log": "docs/ashoka/wave-14-16-tests.log"
+  },
+  "vscode": {
+    "build": "passed",
+    "tests": 488,
+    "passed": 488,
+    "failed": 0,
+    "build_log": "docs/ashoka/vscode-wave-14-16-build.log",
+    "log": "docs/ashoka/vscode-wave-14-16-tests.log"
+  },
+  "checks": {
+    "server_build": "passed",
+    "mcp": {
+      "tools": 93,
+      "resources": 31,
+      "classifications": 94,
+      "status": "passed"
+    },
+    "contracts": {
+      "count": 31,
+      "source_sha256": "33a249a9d9604c483e667dae3db73d907917cdd1976552373a680b8dded6f2e1",
+      "status": "passed"
+    },
+    "baseline": {
+      "revision": 10,
+      "sha256": "f1e0ee3508d1911a2abde79ea03277f89c54a09013a71cc5a45daa079f1f9349",
+      "owners": 29,
+      "cases": 12,
+      "frozen_evidence": 8,
+      "status": "passed"
+    },
+    "provider_capability": "r3 passed",
+    "configuration": {
+      "typed_settings": 308,
+      "literal_source_keys": 101,
+      "status": "passed"
+    }
+  },
+  "qualification": {
+    "strategy_learning": "10 actual persistent allocation/novelty/replay/publication cases, plus accepted strategy fixtures; labeled allocation trace qualifies behavior, not model task superiority",
+    "curation": "10 actual rejection/retirement/restart/restoration/expiry/quarantine/CAS/replay/interruption/human-assertion cases; 23 current-evidence normalization fixtures retain history and require fresh restoration receipt",
+    "evaluation": "9 actual harness fixtures; exact Unicode byte units, separate reported model-token allowance, output byte ceiling and cooperative/non-cooperative assessor cancellation"
+  },
+  "provider_calls": 0,
+  "prior_failed_runs": [
+    "slice-14-16-focused-tests.log",
+    "slice-14-16-focused-retry.log",
+    "slice-14-16-focused-final.log"
+  ],
+  "limits": [
+    "Synthetic labeled allocation trace is not measured agent/model superiority; final task qualification remains27",
+    "Cross-surface curated reopen/retire UI and material task closure remain20/25; durable admitted job/generation coordination remains17",
+    "No universal AST/test/runtime source producer, real provider canary, live migration, global install/restart or release bump",
+    "Computer Use native seat/grant/termination qualification remains31; evaluator cancellation alone never confirms underlying termination"
+  ]
+}

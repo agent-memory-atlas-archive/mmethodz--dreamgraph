@@ -1,0 +1,86 @@
+{
+  "schema": "dreamgraph.completion_pair_specification.v1",
+  "task": {
+    "id": "dreamgraph:AT05",
+    "project": "dreamgraph",
+    "prompt": "Apply an authorized mutation to disposable state, lose the reply, retry, conflict and read back.",
+    "required_outcomes": [
+      "durable_receipt",
+      "same_revision_readback",
+      "single_effect",
+      "stale_write_rejected",
+      "recoverable_interruption"
+    ],
+    "mandatory_evidence_ids": [],
+    "forbidden_assertions": [
+      "success before commit",
+      "duplicate effect",
+      "unrelated state overwritten"
+    ]
+  },
+  "scope": "read_only_supplied_context_completion",
+  "local_results": "private_job_artifact",
+  "execution": {
+    "provider": "openai",
+    "model": "gpt-4.1-2025-04-14",
+    "api": "responses",
+    "effort": null,
+    "prompt_version": "ashoka.bounded-real-pilot.v1",
+    "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488",
+    "input_tokens": 32768,
+    "output_tokens": 1600,
+    "context_bytes": 24000,
+    "output_bytes": 16000,
+    "max_calls": 1,
+    "max_elapsed_ms": 60000,
+    "retention": "store_false",
+    "currency": "USD",
+    "max_amount": 0.16
+  },
+  "arms": [
+    {
+      "arm": "graph_assisted",
+      "context": "Declared disposable contract input (not a live graph):\n{\"instance_id\":\"fixture:dreamgraph\",\"actor\":\"fixture:authorized-agent\",\"operation_id\":\"fixture:mutation:1\",\"before\":{\"features\":[]},\"requested_delta\":{\"features\":[{\"id\":\"fixture:added\",\"source_repo\":\"dreamgraph\",\"source_files\":[\"fixture/source.ts\"]}]},\"interruptions\":[\"before_publication\",\"after_publication_reply_lost\"],\"retry_same_payload\":true,\"conflicting_payload\":{\"features\":[]}}",
+      "context_bytes": 441,
+      "construction_ms": 0.048900000000003274,
+      "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488"
+    },
+    {
+      "arm": "source_only",
+      "context": "Declared disposable contract input (not a live graph):\n{\"instance_id\":\"fixture:dreamgraph\",\"actor\":\"fixture:authorized-agent\",\"operation_id\":\"fixture:mutation:1\",\"before\":{\"features\":[]},\"requested_delta\":{\"features\":[{\"id\":\"fixture:added\",\"source_repo\":\"dreamgraph\",\"source_files\":[\"fixture/source.ts\"]}]},\"interruptions\":[\"before_publication\",\"after_publication_reply_lost\"],\"retry_same_payload\":true,\"conflicting_payload\":{\"features\":[]}}",
+      "context_bytes": 441,
+      "construction_ms": 0.048900000000003274,
+      "source_manifest_hash": "sha256:499ac215325438839c6f13563678d3117f05cbc19acc3fd72dbf03da7cc7d488"
+    }
+  ],
+  "order": "source_first",
+  "endpoint": "https://api.openai.com/v1",
+  "api_key_env": "DREAMGRAPH_EVALUATION_API_KEY",
+  "pricing": {
+    "version": "openai-gpt41-reviewed-2026-10-03",
+    "provider": "openai",
+    "model": "gpt-4.1-2025-04-14",
+    "currency": "USD",
+    "source": "https://developers.openai.com/api/docs/models/gpt-4.1 (official page read 2026-10-03)",
+    "input_per_million": 2,
+    "output_per_million": 8,
+    "output_includes_reasoning": true,
+    "input_includes_images": true
+  },
+  "budget": {
+    "requests": 2,
+    "input_tokens": 65536,
+    "output_tokens": 3200,
+    "reasoning_tokens": 0,
+    "retries": 0,
+    "elapsed_ms": 120000,
+    "concurrency": 1,
+    "max_hops": 0,
+    "max_neighbors": 0,
+    "run_amount": 0.16,
+    "day_amount": 2.5,
+    "currency": "USD",
+    "pricing_version": "openai-gpt41-reviewed-2026-10-03",
+    "billing_principal": "benchmark-operator"
+  }
+}

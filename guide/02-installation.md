@@ -51,12 +51,16 @@ bash scripts/install.sh --force
 
 1. **Checks prerequisites** — refuses to run if Node is too old.
 2. **Builds DreamGraph** — TypeScript compile + Vite build for the Explorer SPA.
-3. **Deploys to `~/.dreamgraph/bin/`** — copies the compiled output, writes a production `package.json`, runs `npm install --omit=dev`.
+3. **Deploys to `~/.dreamgraph/bin/`** — copies the compiled output, writes a production `package.json` with runtime and optional dependencies, runs `npm install --omit=dev`, and verifies the installed workspace bytes and daemon imports.
 4. **Copies templates** — default instance scaffolding goes to `~/.dreamgraph/templates/`.
 5. **Packages and installs the VS Code extension** — only if `code` is on PATH.
 6. **Creates `dg` and `dreamgraph` shims** — these are what you'll type day-to-day.
 7. **Configures PATH** — adds `~/.dreamgraph/bin` to your user PATH on Windows; uses `~/.local/bin` or `/usr/local/bin` on Unix.
 8. **Verifies** — runs `dg --version` to confirm.
+
+Both installers retain optional `playwright-core@1.62.1` for the isolated Computer Use browser worker. They do not download a browser, activate Computer Use or grant control. A missing optional runtime leaves that worker unavailable. Install an explicit browser and run [the installed runtime qualification](../docs/ashoka/computer-use.md) before configuring a worker.
+
+In WSL, use Linux Node/npm and a source checkout on the Linux filesystem. The default Linux installation is `$HOME/.dreamgraph`, separate from the Windows installation. `DREAMGRAPH_MASTER_DIR` can override either location, so check it before installing. A WSL browser qualification covers that Linux runtime; native desktop permissions and a separate Mint installation require their own qualification.
 
 ---
 
@@ -66,7 +70,7 @@ The installer modifies PATH. Your **current** terminal won't see the change. Ope
 
 ```bash
 dg --version
-# DreamGraph CLI v13.4.0 (Glass Atlas)
+# DreamGraph CLI v14.0.0 (Ashoka)
 
 dg --help
 # (lists every subcommand)
@@ -89,7 +93,7 @@ If `code` was missing, install the extension manually:
 ```bash
 cd extensions/vscode
 npm run build
-code --install-extension dreamgraph-vscode-13.4.0.vsix
+code --install-extension dreamgraph-vscode-14.0.0.vsix
 ```
 
 ---
@@ -112,7 +116,7 @@ After upgrading: **restart any running daemons and reload VS Code windows**. The
 dg restart <instance-name>
 ```
 
-> **If you are coming from any version older than v8.2.6, please rebuild from this release.** v8.2.6 fixes the confidence-inflation bug in the dream engine and adds self-healing graph integrity (auto-`wire_links` + bidirectional backlinks). Older versions will keep running but cannot benefit from these fixes. For existing data, the optional `scripts/repair-confidence-inflation.mjs` script re-clamps inflated rejected edges/nodes — see [RELEASE_NOTES_v8.2.6.md](../RELEASE_NOTES_v8.2.6.md).
+For existing graph formats, use the [Ashoka upgrade guide](16-ashoka-upgrade.md) and its reviewed migration procedure. The historical v8.2.6 confidence repair script remains at `scripts/repair-confidence-inflation.mjs` for affected data.
 
 ---
 
@@ -145,6 +149,8 @@ To uninstall the VS Code extension: extensions panel → search "DreamGraph" →
 ---
 
 ## Where things live after install
+
+Development reinstalls at the same version use tarball names bound to their SHA-256 content. Both installers verify every emitted workspace artifact against the installed copy and load the daemon's machine-result consumer before declaring success. A stale dependency cannot pass merely because `dg --version` works. If a daemon health check fails, `dg start`/`dg restart` exits unsuccessfully and retains the original PID metadata and logs for diagnosis; JSON reports `unhealthy` rather than `started`.
 
 | Path | What's there |
 |------|--------------|

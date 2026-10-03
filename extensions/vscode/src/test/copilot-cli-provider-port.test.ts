@@ -193,6 +193,20 @@ function makeCallInput(over: Partial<CallProviderInput> = {}): CallProviderInput
   };
 }
 
+test('copilot provider-port: permit cancellation reaches the native spawn and accounting precedes observers', async () => {
+  const proc=makeFakeProcess(),permit=new AbortController();let settled=false,observed=false;
+  const port=createCopilotCliProviderPort({hostLlm:FAKE_LLM,invocationCwd:'/work',timeoutMs:60000,baseEnv:{},deps:makeDeps({process:proc.port}),
+    preparePrompt:async prompt=>prompt,admissionSignal:()=>permit.signal,settleRun:async()=>{await Promise.resolve();settled=true;},onRunResult:()=>{observed=settled;}});
+  await port.callProvider(makeCallInput());const signal=proc.log.spawnCalls[0]!.abortSignal;assert.ok(signal);assert.equal(observed,true);
+  permit.abort();assert.equal(signal.aborted,true);await assert.rejects(port.callProvider(makeCallInput()),/abort/i);assert.equal(proc.log.spawnCalls.length,1);
+});
+test('copilot provider-port: mandatory settlement failure fences native continuation', async () => {
+  let observed=false;
+  const port=createCopilotCliProviderPort({hostLlm:FAKE_LLM,invocationCwd:'/work',timeoutMs:60000,baseEnv:{},deps:makeDeps(),
+    settleRun:async()=>{throw new Error('retain original accounting report');},onRunResult:()=>{observed=true;}});
+  await assert.rejects(port.callProvider(makeCallInput()),/retain original accounting report/);assert.equal(observed,false);
+});
+
 // ---------------------------------------------------------------------------
 
 test("provider-port: getCapabilities reports text and image attachments", () => {
@@ -206,6 +220,17 @@ test("provider-port: getCapabilities reports text and image attachments", () => 
   const caps = port.getCapabilities();
   assert.equal(caps.textAttachments, true);
   assert.equal(caps.imageAttachments, true);
+});
+test("provider-port: awaits mandatory prompt admission before spawn and propagates rejection", async () => {
+  const proc=makeFakeProcess();let admitted=false;
+  const port=createCopilotCliProviderPort({hostLlm:FAKE_LLM,invocationCwd:"/work",timeoutMs:60000,baseEnv:{},deps:makeDeps({process:proc.port}),
+    preparePrompt:async(prompt,signal)=>{assert.equal(proc.log.spawnCalls.length,0);signal?.throwIfAborted();admitted=true;return prompt+"\nRequired whole context: 🌿 receipt";}});
+  await port.callProvider(makeCallInput());assert.ok(admitted);assert.equal(proc.log.spawnCalls.length,1);
+  const spawn=proc.log.spawnCalls[0]!;assert.match(spawn.args[spawn.args.indexOf("--prompt")+1]!,/Required whole context: 🌿 receipt/);
+  const rejected=makeFakeProcess();
+  const blocked=createCopilotCliProviderPort({hostLlm:FAKE_LLM,invocationCwd:"/work",timeoutMs:60000,baseEnv:{},deps:makeDeps({process:rejected.port}),
+    preparePrompt:async()=>{throw new Error("context acknowledgement unconfirmed");}});
+  await assert.rejects(blocked.callProvider(makeCallInput()),/acknowledgement unconfirmed/);assert.equal(rejected.log.spawnCalls.length,0);
 });
 
 test("provider-port: exposes hostLlm reference verbatim through `llm`", () => {

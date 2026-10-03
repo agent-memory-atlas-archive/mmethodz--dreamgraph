@@ -8,6 +8,8 @@ Use architect when you want the full DreamGraph working surface outside VS Code,
 
 Use the Architect CLI when the same work needs to happen from a terminal, script, CI smoke, or remote session. `dg architect` remains a daemon client: it can inspect status, plans, runtime config, chat, traces, ADRs, graph resources, schedules, and Adaptive Future Review, but it does not become a direct filesystem or provider-native authority.
 
+The browser workbench follows Web64 IDE v2's visual language: neutral charcoal panels, compact beveled controls, flat workspace tabs, and amber keyboard focus. The plan rail and context inspector remain resizable and collapsible. Dense inspector headings leave more room for plan content; the conversation and composer retain their own scrolling space. Narrow windows stack the workspace and sidebars, and reduced-motion preferences suppress decorative transitions. Status colors identify warnings, tool results, and errors without tinting the entire interface.
+
 ---
 
 ## Naming in v12
@@ -47,7 +49,7 @@ In v13, Architect also owns cognitive graph health as part of ordinary reasoning
 
 Before opening architect, you need:
 
-- DreamGraph v13.4.0 Glass Atlas installed.
+- DreamGraph v14.0.0 Ashoka installed.
 - A DreamGraph instance created with `dg init`.
 - A project attached to that instance, either during `dg init` or later with `dg attach`.
 - The daemon running in HTTP mode.
@@ -184,3 +186,6 @@ The important invariant is that the daemon remains authoritative. The browser ca
 ## Next
 
 If you work primarily in VS Code, read [The VS Code extension](06-vs-code-extension.md). If you want to understand the graph view behind architect, read [The Explorer](07-the-explorer.md).
+
+
+Ashoka's governed plan view separates **Current** (owned unfinished work), **Running** (an admitted live execution) and **Next** (a dependency suggestion with explicit approval gates). Read [typed plan lifecycle](../docs/ashoka/plan-authority.md) for definition review/import, immutable original-byte backups and verification requirements. The slice panel supports All/Open/Verified filters, keyboard navigation and Jump to current. Archived plans retain their source/log artifacts; archive cannot hide running or unresolved required work. Legacy checkpoint prose remains review evidence and never silently becomes completion.

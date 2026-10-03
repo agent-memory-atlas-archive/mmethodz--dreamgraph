@@ -33,7 +33,15 @@ function configOverrideArg(override: CodexConfigOverride): string {
   if (key.length === 0) {
     throw new Error("buildCodexArgv: config override key is required");
   }
+  if (!/^[A-Za-z_][A-Za-z0-9_-]*(?:\.[A-Za-z_][A-Za-z0-9_-]*)*$/.test(key)) {
+    throw new Error("buildCodexArgv: config override requires a canonical unquoted key");
+  }
   const value = serializeConfigValue(override.value);
+  const computerFeature = /^features\.(?:computer_use|browser_use|browser_use_external|browser_use_full_cdp_access|in_app_browser)$/i.test(key);
+  const computerPolicy = /^computer_use(?:\.|$)/i.test(key) || /^features$/i.test(key);
+  if (computerFeature && value !== "false" || computerPolicy && !(key === "computer_use.default_app_access" && /^(?:"deny"|deny)$/.test(value))) {
+    throw new Error(`buildCodexArgv: native computer access requires a qualified C17 route: ${key}`);
+  }
   if (DREAMGRAPH_MCP_APPROVAL_KEY_RE.test(key) && !isDreamGraphMcpApprovalValue(value)) {
     throw new Error(
       `buildCodexArgv: config override cannot weaken authoritative sandbox/approval policy: ${key}`,

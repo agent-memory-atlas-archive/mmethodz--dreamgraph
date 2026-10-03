@@ -182,7 +182,7 @@ export async function runPass(input: RunPassInput): Promise<PassResult> {
           abortedDuringTools = true;
           break;
         }
-        const record = await ports.toolExecutor.executeTool({ call });
+        const record = await ports.toolExecutor.executeTool({ call, abortSignal: input.abortSignal });
         toolInvocations.push(record);
       }
 
@@ -212,7 +212,7 @@ export async function runPass(input: RunPassInput): Promise<PassResult> {
       // messages so the model sees the running dialogue.
     }
   } catch (err) {
-    const isAbort = err instanceof Error && err.name === "AbortError";
+    const isAbort = input.abortSignal?.aborted || (err instanceof Error && err.name === "AbortError");
     stopReason = isAbort ? "aborted" : "error";
     const message = err instanceof Error ? err.message : String(err);
     iterations.push(
@@ -237,6 +237,7 @@ export async function runPass(input: RunPassInput): Promise<PassResult> {
   await ports.memory.persistAssistantMessage({
     content: assistantContent,
     providerRawAssistant: lastProviderRawAssistant,
+    stopReason,
   });
 
   // 10. Notify the autonomy subsystem so its pass-budget bookkeeping

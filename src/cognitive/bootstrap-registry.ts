@@ -18,14 +18,15 @@
  * runtime state, not seed data.
  */
 
-import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { dataPath } from "../utils/paths.js";
 import { atomicWriteFile } from "../utils/atomic-write.js";
-import { withFileLock } from "../utils/mutex.js";
-import { logger } from "../utils/logger.js";
+import { z } from "zod";
+import { withGraphRead,withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
+import { loadPublicationState,publicationContentHash,recoverGraphPublication } from "../graph/publication.js";
+import { stripBom } from "../utils/read-json.js";
 
-export type BootstrapKind = "full" | "re_enrich_skipped" | "manual" | "skipped_not_fresh";
+export type BootstrapKind = "full" | "re_enrich_skipped" | "manual" | "skipped_not_fresh" | "pending_admission";
 
 export interface BootstrapHistoryEntry {
   fingerprint: string;
@@ -50,25 +51,17 @@ interface BootstrapHistoryFile {
 
 const FILENAME = "llm_bootstrap_log.json";
 
-async function loadHistory(): Promise<BootstrapHistoryFile> {
-  const file = dataPath(FILENAME);
-  if (!existsSync(file)) return { entries: [] };
-  try {
-    const raw = await readFile(file, "utf-8");
-    const parsed = JSON.parse(raw) as Partial<BootstrapHistoryFile>;
-    return { entries: Array.isArray(parsed.entries) ? parsed.entries : [] };
-  } catch (err) {
-    logger.warn(
-      `bootstrap-registry: unreadable ${FILENAME} — treating as empty (${
-        err instanceof Error ? err.message : err
-      })`,
-    );
-    return { entries: [] };
-  }
+const HistorySchema=z.object({entries:z.array(z.object({fingerprint:z.string().min(1),effective:z.object({provider:z.string(),base_url:z.string(),dreamer_model:z.string(),normalizer_model:z.string()}).strict(),
+ kind:z.enum(["full","re_enrich_skipped","manual","skipped_not_fresh","pending_admission"]),observed_at:z.string(),outcome:z.string(),success:z.boolean()}).strict()).max(10000)}).strict();
+async function loadHistory():Promise<BootstrapHistoryFile>{
+ return withGraphRead(async()=>{const publication=await loadPublicationState();try{const body=await readFile(dataPath(FILENAME),"utf8");
+  if(publication.stores[FILENAME]&&publication.stores[FILENAME].hash!==publicationContentHash(body))throw new Error("UNPUBLISHED_BOOTSTRAP_CHANGE");
+  if(Buffer.byteLength(body)>16*1024*1024)throw new Error("BOOTSTRAP_HISTORY_BYTE_LIMIT");return HistorySchema.parse(JSON.parse(stripBom(body)));
+ }catch(error){if((error as NodeJS.ErrnoException).code==="ENOENT"&&!publication.stores[FILENAME])return {entries:[]};throw new Error(`BOOTSTRAP_HISTORY_UNAVAILABLE: ${String(error)}`);}});
 }
 
 async function saveHistory(history: BootstrapHistoryFile): Promise<void> {
-  await atomicWriteFile(dataPath(FILENAME), JSON.stringify(history, null, 2));
+  await atomicWriteFile(dataPath(FILENAME), JSON.stringify(HistorySchema.parse(history), null, 2));
 }
 
 /** True if this fingerprint has already been observed ready and recorded. */
@@ -79,7 +72,8 @@ export async function hasFingerprintBeenSeen(fingerprint: string): Promise<boole
 
 /** Append a new history entry under the file lock. */
 export async function recordBootstrap(entry: BootstrapHistoryEntry): Promise<void> {
-  await withFileLock(FILENAME, async () => {
+  await withGraphReconciliation(async () => {
+    await recoverGraphPublication();
     const history = await loadHistory();
     // Defensive: dedupe — a second concurrent ready transition for the same
     // fingerprint should produce at most one entry.

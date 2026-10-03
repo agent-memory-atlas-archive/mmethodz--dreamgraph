@@ -14,7 +14,8 @@
  *   2. `requireInstanceAuth` — header check, 401/403 on failure.
  *   3. Body parse — JSON object, optional `dry_run` flag.
  *   4. `requireReason` — body must carry a non-empty `reason` string.
- *   5. `requireEtag` — `If-Match` is mandatory; mismatched → 412.
+ *   5. `requireEtag` — `If-Match` is mandatory; changed subject/dependencies
+ *      or an unretained mismatched snapshot → 412, under the writer boundary.
  *   6. `before_hash` — handler-supplied subject snapshot (sha-256 hex).
  *   7. Run handler (skipped during dry-run if it has side effects).
  *   8. `after_hash` — same subject, post-mutation.
@@ -32,7 +33,9 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { logger } from "../utils/logger.js";
 import { requireInstanceAuth, type AuthSuccess } from "./auth.js";
 import { appendAuditRow, type AuditRow } from "./audit.js";
-import { getGraphSnapshot } from "../graph/snapshot.js";
+import { getGraphSnapshot, getExplorerGraphView } from "../graph/snapshot.js";
+import type { CanonicalGraphRead } from "../graph/read-model.js";
+import { withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
 import { engine } from "../cognitive/engine.js";
 
 export interface MutationContext {
@@ -73,6 +76,8 @@ export interface MutationDefinition {
   requireReason: boolean;
   /** Callback to compute before/after subject hash for audit. */
   hashSubject?: SubjectHasher;
+  /** Exact target/dependency fingerprint for rebasing a retained displayed snapshot. */
+  snapshotSubject?: (graph: CanonicalGraphRead, body: Record<string, unknown>) => string | null;
   /** Handler body. Receives the parsed context, returns affected ids + data. */
   run: MutationHandler;
 }
@@ -158,9 +163,13 @@ class GraphMutationService {
       return true;
     }
 
+    return withGraphReconciliation(async () => {
     if (etag_in) {
-      const current = await getGraphSnapshot();
-      if (current.etag !== etag_in) {
+      const displayed = await getExplorerGraphView(etag_in).catch(() => null);
+      const currentView = await getExplorerGraphView(undefined, true), current = currentView.snapshot;
+      const before = displayed && def.snapshotSubject?.(displayed.graph, body);
+      const unchanged = before != null && before === def.snapshotSubject?.(currentView.graph, body);
+      if (current.etag !== etag_in && !unchanged) {
         await this.audit({
           mutation_id,
           actor: auth.actor_uuid,
@@ -175,7 +184,7 @@ class GraphMutationService {
           error: "etag_mismatch",
           message: `If-Match ${etag_in} does not match current snapshot etag ${current.etag}.`,
         });
-        this.respondError(res, 412, "etag_mismatch", "Snapshot has changed since you fetched it. Reload and retry.");
+        this.respondError(res, 412, "etag_mismatch", "The target or its evidence changed, or the displayed snapshot is no longer retained. Refresh and review before retrying.");
         return true;
       }
     }
@@ -218,7 +227,7 @@ class GraphMutationService {
       // Dry-run never changes the subject — make that explicit on the row.
       if (dry_run) after_hash = before_hash;
 
-      const after = await getGraphSnapshot().catch(() => null);
+      const after = await getGraphSnapshot(true).catch(() => null);
       const etag_out = after?.etag ?? null;
 
       await this.audit({
@@ -269,6 +278,7 @@ class GraphMutationService {
       this.respondError(res, status, code, message);
       return true;
     }
+    });
   }
 
   /**
@@ -343,6 +353,27 @@ function sha256(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
+/** Compare the reviewed subject and its direct dependencies, never wall-clock age
+ * or unrelated publication counters. Unknown/ambiguous subjects cannot rebase. */
+function snapshotSubject(kind: "tension" | "candidate", key: string) {
+  return (graph: CanonicalGraphRead, body: Record<string, unknown>): string | null => {
+    const id = body[key]; if (typeof id !== "string") return null;
+    const targets = graph.entities.filter(e => e.identity.kind === kind && (kind === "candidate" ? e.payload.dream_id === id : e.identity.id === id));
+    if (targets.length !== 1) return null;
+    const target = targets[0], ids = new Set<string>([id, target.identity.id]);
+    for (const value of Array.isArray(target.payload.entities) ? target.payload.entities : []) if (typeof value === "string") ids.add(value);
+    // Candidates refer to a dream node or edge; include its original claim,
+    // any human disposition/validation, and both endpoints being acted upon.
+    const claims = kind === "candidate" ? graph.relationships.filter(r => r.payload.id === id || r.payload.source_dream_id === id) : [];
+    for (const claim of claims) { if (claim.source) ids.add(claim.source.id); if (claim.target) ids.add(claim.target.id); }
+    const entities = graph.entities.filter(e => ids.has(e.identity.id));
+    const evidence = (rows: typeof target.evidence) => rows.map(row => row.origin === "model" ? { ...row, revision: null } : row);
+    return sha256({ instance: graph.instance_id, target: target.identity,
+      entities: entities.map(e => ({ ...e, evidence: evidence(e.evidence) })),
+      claims: claims.map(r => ({ ...r, evidence: evidence(r.evidence) })) });
+  };
+}
+
 /* ------------------------------------------------------------------ */
 /*  Built-in intents                                                  */
 /* ------------------------------------------------------------------ */
@@ -351,6 +382,7 @@ function registerDefaultIntents(svc: GraphMutationService): void {
   /* ---------------- tension.resolve ---------------- */
   svc.register({
     intent: "tension.resolve",
+    snapshotSubject: snapshotSubject("tension", "tension_id"),
     requireEtag: true,
     requireReason: true,
     hashSubject: async (ctx) => {
@@ -388,18 +420,21 @@ function registerDefaultIntents(svc: GraphMutationService): void {
   /* ---------------- candidate.promote ---------------- */
   svc.register({
     intent: "candidate.promote",
+    snapshotSubject: snapshotSubject("candidate", "dream_id"),
     requireEtag: true,
     requireReason: true,
     hashSubject: async (ctx) => {
       const id = ctx.body["dream_id"];
       if (typeof id !== "string") return null;
       const candidates = await engine.loadCandidateEdges();
-      const c = candidates.results.find((r) => r.dream_id === id);
+      const matches = candidates.results.filter(r => r.dream_id === id).sort((a,b) => (b.normalization_cycle ?? 0) - (a.normalization_cycle ?? 0));
+      if (new Set(matches.map(r => r.dream_type)).size > 1) throw new MutationError("conflict", "Candidate kind is ambiguous.", 409);
+      const c = matches[0];
       return c ? sha256(c) : null;
     },
     run: async (ctx) => {
       const dream_id = requireString(ctx.body, "dream_id");
-      const result = await engine.userPromoteCandidate(dream_id);
+      const result = await engine.userPromoteCandidate(dream_id, { reason: ctx.reason, actor: "operator", operation_id: ctx.mutation_id });
       if (!result.edge) {
         throw new MutationError("not_found", `No candidate with dream_id ${dream_id}.`, 404);
       }
@@ -419,18 +454,21 @@ function registerDefaultIntents(svc: GraphMutationService): void {
   /* ---------------- candidate.reject ---------------- */
   svc.register({
     intent: "candidate.reject",
+    snapshotSubject: snapshotSubject("candidate", "dream_id"),
     requireEtag: true,
     requireReason: true,
     hashSubject: async (ctx) => {
       const id = ctx.body["dream_id"];
       if (typeof id !== "string") return null;
       const candidates = await engine.loadCandidateEdges();
-      const c = candidates.results.find((r) => r.dream_id === id);
+      const matches = candidates.results.filter(r => r.dream_id === id).sort((a,b) => (b.normalization_cycle ?? 0) - (a.normalization_cycle ?? 0));
+      if (new Set(matches.map(r => r.dream_type)).size > 1) throw new MutationError("conflict", "Candidate kind is ambiguous.", 409);
+      const c = matches[0];
       return c ? sha256(c) : null;
     },
     run: async (ctx) => {
       const dream_id = requireString(ctx.body, "dream_id");
-      const result = await engine.userRejectCandidate(dream_id);
+      const result = await engine.userRejectCandidate(dream_id, { reason: ctx.reason, actor: "operator", operation_id: ctx.mutation_id });
       if (!result.candidate) {
         throw new MutationError("not_found", `No candidate with dream_id ${dream_id}.`, 404);
       }

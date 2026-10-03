@@ -12,6 +12,9 @@
  */
 
 import { open, rename, unlink } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { dirname, basename, resolve } from "node:path";
+import { getDataDir } from "./paths.js";
 import { logger } from "./logger.js";
 import { withGraphMutation } from "./graph-reconciliation-barrier.js";
 
@@ -74,18 +77,32 @@ export async function atomicWriteFile(
   data: string,
   encoding: BufferEncoding = "utf-8",
 ): Promise<void> {
-  return withGraphMutation(() => atomicWriteFileUnlocked(filePath, data, encoding));
+  return withGraphMutation(async () => {
+    const parent = resolve(dirname(filePath));
+    const dataDir = resolve(getDataDir());
+    const same = process.platform === "win32" ? parent.toLowerCase() === dataDir.toLowerCase() : parent === dataDir;
+    if (same && filePath.endsWith(".json")) {
+      if (["publication_state.json", "reconciliation_journal.json"].includes(basename(filePath))) {
+        throw new Error(`PUBLICATION_INTERNAL_ONLY: ${basename(filePath)}`);
+      }
+      const { commitGraphWrites } = await import("../graph/publication.js");
+      await commitGraphWrites({ writes: [{ file: basename(filePath), content: data }], actor: "legacy_internal_writer" });
+    } else {
+      await atomicWriteFileRaw(filePath, data, encoding);
+    }
+  });
 }
 
-async function atomicWriteFileUnlocked(
+/** Internal publication primitive; never use it for a domain write outside its transaction. */
+export async function atomicWriteFileRaw(
   filePath: string,
   data: string,
-  encoding: BufferEncoding,
+  encoding: BufferEncoding = "utf-8",
 ): Promise<void> {
-  const tmp = filePath + ".tmp";
+  const tmp = filePath + "." + randomUUID() + ".tmp";
   let fd;
   try {
-    fd = await open(tmp, "w");
+    fd = await open(tmp, "wx");
     await fd.writeFile(data, encoding);
     await fd.datasync();           // flush to physical disk
     await fd.close();

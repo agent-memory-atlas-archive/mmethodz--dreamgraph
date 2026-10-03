@@ -1,0 +1,17 @@
+# Risk, remediation and adaptive future review — Slice 19
+
+Verified core dependency handoff: native22-entry acceptance; root142files1589passes/two existing skips/zero failures and488extension passes. See [verification](slice-19-verification.json). The existing tension, threat and remediation owners retain authority; proposals and future ranking remain advisory.
+
+Risk identity includes exact type, domain, entity set and concern. Material observations increment a revision; exact replay does not multiply occurrences, urgency or independent evidence. The common publication owner serializes state updates, and commands carrying an expected risk revision reject conflicting edits. Proposal, action, disposition, verification and reopening events retain stable IDs and original history.
+
+System resolution requires an explicitly declared connection predicate for a connection risk and current canonical normalization backed by at least two independent source roots. Historical validated-edge labels, model confidence, imported assertions, graph enrichment success and elapsed proposal windows cannot prove resolution. Human resolutions retain their rationale as human dispositions. TTL retirement is `expired_unverified`, with no false-positive or fixed claim.
+
+Stored verification predicates are reevaluated after affected-region digestion. Withdrawn, contradictory or unavailable proof reopens the same risk for review; original resolutions remain archived. Shared entities alone are not contradictory evidence, and unchanged human dispositions do not silently reopen.
+
+Actual risk/adversarial/adaptive history, concurrent/restart/withdrawal and job-effect fixtures qualify this dependency handoff. No paid call or live graph rewrite is authorized by this document.
+
+Adversarial findings now reference the canonical tension risk ID and share the tension publication. Material detection-input changes reopen review and preserve prior acknowledgements. Remediation log v1.1.0 retains all original adaptive signals and advisory selections with stable proposal IDs/commit receipts; capacity blocks without silently trimming history. Unknown or corrupt context never becomes phantom-entity certainty. Repeated future signal wrappers are not source proof.
+
+Action dispatch now persists intent before running and registers its effect with the existing engine job owner. A lost/restarted result cannot automatically redispatch that proposal. The legacy enrichment executor currently lacks a bound effect receipt, so its reported success remains an unknown action outcome requiring inspection; it does not count as verified auto-application or source proof, and the parent job retains recovery ownership. Native/API effect receipt integration remains an explicit consumer qualification obligation. Canonical feature/workflow/other factual entities participate in remediation lookup; unavailable family data cannot become phantom-entity certainty.
+
+Proposal replay checks the current input revision before returning an original receipt. Notifications for verified resolution and evidence-based reopening occur after publication. Derived strategy preferences are recorded as patterns rather than explicit user choices. The focused eleven-file qualification passes 127 cases; the final notification/replay refinement passes its four-file risk/evidence/producer/adaptive suite. Full regression and native acceptance pass; final consumer/release gates remain required.

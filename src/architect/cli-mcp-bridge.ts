@@ -37,6 +37,34 @@ const HEALTH_BUDGET_MS = Number.isFinite(HEALTH_TIMEOUT_MS) && HEALTH_TIMEOUT_MS
 const AUDIT_BODY_LIMIT = 16 * 1024;
 const AUDIT_QUEUE_LIMIT = 256;
 const AUDIT_SHUTDOWN_BUDGET_MS = 2_000;
+const MANAGED_CONTEXT = process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER?.startsWith("dgexec.") === true;
+type ContextDelivery = { receipt_id: string; block: string; delivery: "unattested" };
+const deliveries = new Map<string | number, ContextDelivery>();
+const transportReleases = new Map<string | number, () => void>();
+const pendingAcknowledgements = new Set<Promise<unknown>>();
+let contextUnavailable = false;
+let precedingToolTransport = Promise.resolve();
+let queuedToolCalls = 0;
+
+async function contextTransport(action: "refresh" | "deliver", body: unknown, signal?: AbortSignal) {
+  const response = await fetch(new URL(`/api/architect/v1/execution/context/${action}`, HOST_MCP_URL), {
+    method: "POST", headers: { "Content-Type": "application/json", "X-DreamGraph-Session": process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER ?? "" },
+    body: JSON.stringify(body), signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(10000)]) : AbortSignal.timeout(10000),
+  });
+  const bytes = Number(response.headers.get("content-length"));
+  if (Number.isFinite(bytes) && bytes > 256 * 1024) throw new Error("CLI_CONTEXT_RESPONSE_BYTE_BOUND");
+  const reader = response.body?.getReader(); if (!reader) throw new Error("CLI_CONTEXT_RESPONSE_MISSING");
+  const chunks: Uint8Array[] = []; let consumed = 0;
+  try { for (;;) { const next = await reader.read(); if (next.done) break;
+    consumed += next.value.byteLength; if (consumed > 256 * 1024) throw new Error("CLI_CONTEXT_RESPONSE_BYTE_BOUND"); chunks.push(next.value); } }
+  finally { await reader.cancel().catch(() => undefined); reader.releaseLock(); }
+  const raw = Buffer.concat(chunks).toString("utf8");
+  if (!response.ok) throw new Error(`CLI_CONTEXT_TRANSPORT_FAILED:${response.status}`);
+  const result = JSON.parse(raw);
+  if (typeof result.receipt_id !== "string" || !["unattested", "delivered"].includes(result.delivery)
+    || action === "refresh" && (typeof result.block !== "string" || Buffer.byteLength(result.block) > 65536)) throw new Error("CLI_CONTEXT_RESPONSE_INVALID");
+  return result;
+}
 
 function bail(code: number, message: string): never {
   try {
@@ -70,7 +98,8 @@ const upstream = new Client(
   { name: "dreamgraph-architect-cli-mcp-bridge", version: CLI_VERSION },
   { capabilities: {} },
 );
-const upstreamTransport = new StreamableHTTPClientTransport(upstreamUrl);
+const upstreamTransport = new StreamableHTTPClientTransport(upstreamUrl, { requestInit: { headers:
+  process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER ? { "X-DreamGraph-Session": process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER } : {} } });
 
 async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   let handle: ReturnType<typeof setTimeout> | undefined;
@@ -111,21 +140,35 @@ async function main(): Promise<void> {
     },
   );
 
-  let toolListPromise: ReturnType<typeof upstream.listTools> | undefined;
-  server.setRequestHandler(ListToolsRequestSchema, async (req) => {
-    toolListPromise ??= upstream.listTools(req.params);
+  const toolPages = new Map<string, ReturnType<typeof upstream.listTools>>();
+  server.setRequestHandler(ListToolsRequestSchema, async (req, extra) => {
+    const key = req.params?.cursor ?? "";
+    if (!toolPages.has(key)) {
+      if (toolPages.size >= 256) throw new Error("MCP_DISCOVERY_PAGE_LIMIT");
+      toolPages.set(key, upstream.listTools(req.params, { signal: extra.signal }));
+    }
     let result;
     try {
-      result = await toolListPromise;
+      result = await toolPages.get(key)!;
     } catch (error) {
-      toolListPromise = undefined;
+      toolPages.delete(key);
       throw error;
     }
-    if (result.tools.some((tool) => tool.name === RUN_COMMAND_TOOL.name)) return result;
+    // A local extension appears once, on the final page, never on every page.
+    if (result.nextCursor || result.tools.some((tool) => tool.name === RUN_COMMAND_TOOL.name)) return result;
     return { ...result, tools: [...result.tools, RUN_COMMAND_TOOL] };
   });
 
-  server.setRequestHandler(CallToolRequestSchema, async (req) => {
+  server.setRequestHandler(CallToolRequestSchema, async (req, extra) => {
+    if (queuedToolCalls >= 128) throw new Error("CLI_TOOL_TRANSPORT_QUEUE_BOUND");
+    queuedToolCalls++;
+    const preceding = precedingToolTransport;
+    let release!: () => void;
+    precedingToolTransport = new Promise<void>(done => { release = () => { queuedToolCalls--; done(); }; });
+    await preceding;
+    try { extra.signal.throwIfAborted(); if (contextUnavailable) throw new Error("CLI_CONTEXT_RECOVERY_REQUIRED: previous owner result retained; restart only after reviewing its receipts and context failure"); }
+    catch (error) { release(); throw error; }
+    transportReleases.set(extra.requestId, release);
     const startedAtEpochMs = Date.now();
     const correlationId = randomUUID();
     const inputJson = safeStringify(req.params.arguments ?? {});
@@ -140,9 +183,27 @@ async function main(): Promise<void> {
       correlationId,
     });
     try {
-      const result = req.params.name === RUN_COMMAND_TOOL.name
-        ? await runLocalCommand(req.params.arguments ?? {})
-        : await upstream.callTool(req.params);
+      let result = req.params.name === RUN_COMMAND_TOOL.name
+        ? await runLocalCommand(req.params.arguments ?? {}, extra.signal)
+        : await upstream.callTool(req.params, undefined, { signal: extra.signal });
+      if (MANAGED_CONTEXT) {
+        try {
+          const delivery = await contextTransport("refresh", {}, extra.signal) as ContextDelivery;
+          if (!Array.isArray(result.content)) throw new Error("CLI_OWNER_RESULT_CONTENT_INVALID");
+          result = { ...result, content: [...result.content, { type: "text", text: delivery.block }],
+            _meta: { ...result._meta, dreamgraph_required_context: { receipt_id: delivery.receipt_id,
+              delivery: "unattested", mechanism: "whole CLI MCP tool-result transport; provider retention/understanding unconfirmed" } } };
+          deliveries.set(extra.requestId, delivery);
+        } catch (error) {
+          contextUnavailable = true;
+          if (!Array.isArray(result.content)) throw error;
+          // Refresh failure cannot hide a committed owner's literal result or receipts.
+          result = { ...result, isError: true, content: [...result.content, { type: "text", text: JSON.stringify({
+            error: { code: "CLI_CONTEXT_REFRESH_FAILED", message: String(error) },
+            effect_status: "Original owner result retained. Consult its receipts; refresh failure is not rollback. Further dispatch is stopped.",
+          }) }], _meta: { ...result._meta, dreamgraph_context_failure: "recovery_required; no replacement context was delivered" } };
+        }
+      }
       const isError = Boolean((result as { isError?: unknown }).isError);
       auditCallResult({
         tool: req.params.name,
@@ -156,6 +217,7 @@ async function main(): Promise<void> {
       });
       return result;
     } catch (error) {
+      transportReleases.delete(extra.requestId); release();
       auditCallResult({
         tool: req.params.name,
         inputJson,
@@ -171,25 +233,48 @@ async function main(): Promise<void> {
   });
 
   if (upstreamCaps.resources) {
-    server.setRequestHandler(ListResourcesRequestSchema, async (req) => upstream.listResources(req.params));
-    server.setRequestHandler(ListResourceTemplatesRequestSchema, async (req) => upstream.listResourceTemplates(req.params));
-    server.setRequestHandler(ReadResourceRequestSchema, async (req) => upstream.readResource(req.params));
+    server.setRequestHandler(ListResourcesRequestSchema, async (req, extra) => upstream.listResources(req.params, { signal: extra.signal }));
+    server.setRequestHandler(ListResourceTemplatesRequestSchema, async (req, extra) => upstream.listResourceTemplates(req.params, { signal: extra.signal }));
+    server.setRequestHandler(ReadResourceRequestSchema, async (req, extra) => upstream.readResource(req.params, { signal: extra.signal }));
   }
 
   if (upstreamCaps.prompts) {
-    server.setRequestHandler(ListPromptsRequestSchema, async (req) => upstream.listPrompts(req.params));
-    server.setRequestHandler(GetPromptRequestSchema, async (req) => upstream.getPrompt(req.params));
+    server.setRequestHandler(ListPromptsRequestSchema, async (req, extra) => upstream.listPrompts(req.params, { signal: extra.signal }));
+    server.setRequestHandler(GetPromptRequestSchema, async (req, extra) => upstream.getPrompt(req.params, { signal: extra.signal }));
   }
 
   const transport = new StdioServerTransport();
+  const send = transport.send.bind(transport);
+  transport.send = async message => {
+    const candidateId = "result" in message || "error" in message ? message.id : undefined;
+    const responseId = typeof candidateId === "string" || typeof candidateId === "number" ? candidateId : undefined;
+    const delivery = responseId === undefined ? undefined : deliveries.get(responseId);
+    const release = responseId === undefined ? undefined : transportReleases.get(responseId);
+    if (responseId !== undefined) { deliveries.delete(responseId); transportReleases.delete(responseId); }
+    try {
+      await send(message);
+      // This acknowledges exact bytes handed to the CLI's stdio transport, not opaque provider compaction.
+      if (delivery) {
+        const acknowledgement = contextTransport("deliver", { receipt_id: delivery.receipt_id, block: delivery.block });
+        pendingAcknowledgements.add(acknowledgement);
+        try { await acknowledgement; } catch (error) { contextUnavailable = true; throw error; }
+        finally { pendingAcknowledgements.delete(acknowledgement); }
+      }
+    } finally { release?.(); }
+  };
   transport.onclose = () => {
     void shutdown(0);
   };
   await server.connect(transport);
 }
 
+let shuttingDown = false;
 async function shutdown(code: number): Promise<void> {
+  if (shuttingDown) return; shuttingDown = true;
+  await withTimeout(Promise.allSettled([...pendingAcknowledgements]), AUDIT_SHUTDOWN_BUDGET_MS, "context acknowledgement settlement")
+    .catch(error => process.stderr.write(`[architect-cli-mcp-bridge] final context acknowledgement unconfirmed: ${String(error)}\n`));
   try {
+    if (upstreamTransport.sessionId) await upstreamTransport.terminateSession();
     await upstream.close();
   } catch {
     // ignore shutdown failures
@@ -240,91 +325,13 @@ const RUN_COMMAND_OUTPUT_LIMIT = 64 * 1024;
 
 type LocalToolResult = CallToolResult;
 
-async function runLocalCommand(args: unknown): Promise<LocalToolResult> {
-  const input = args && typeof args === "object" && !Array.isArray(args) ? args as Record<string, unknown> : {};
-  const command = typeof input.command === "string" ? input.command.trim() : "";
-  if (command.length === 0) {
-    return localTextResult({ error: "run_command requires a non-empty command" }, true);
-  }
-
-  const cwd = resolveWorkspaceCwd(input.cwd);
-  const requestedTimeout = typeof input.timeoutMs === "number" && Number.isFinite(input.timeoutMs)
-    ? input.timeoutMs
-    : RUN_COMMAND_DEFAULT_TIMEOUT_MS;
-  const timeoutMs = Math.min(RUN_COMMAND_MAX_TIMEOUT_MS, Math.max(1_000, Math.trunc(requestedTimeout)));
-  const startedAt = Date.now();
-  const result = await spawnShellCommand(command, cwd, timeoutMs);
-  return localTextResult({
-    command,
-    cwd,
-    exitCode: result.exitCode,
-    signal: result.signal,
-    timedOut: result.timedOut,
-    durationMs: Math.max(0, Date.now() - startedAt),
-    stdout: result.stdout,
-    stderr: result.stderr,
-  }, result.timedOut || result.exitCode !== 0);
-}
-
-function resolveWorkspaceCwd(value: unknown): string {
-  const root = resolve(WORKSPACE_ROOT);
-  const requested = typeof value === "string" && value.trim().length > 0 ? value.trim() : ".";
-  const abs = isAbsolute(requested) ? resolve(requested) : resolve(root, requested);
-  const rel = relative(root, abs);
-  if (rel === "" || (!rel.startsWith("..") && !isAbsolute(rel))) {
-    return abs;
-  }
-  throw new Error(`run_command cwd must stay inside workspace root ${root}`);
-}
-
-function spawnShellCommand(command: string, cwd: string, timeoutMs: number): Promise<{
-  readonly stdout: string;
-  readonly stderr: string;
-  readonly exitCode: number | null;
-  readonly signal: NodeJS.Signals | null;
-  readonly timedOut: boolean;
-}> {
-  return new Promise((resolvePromise, reject) => {
-    const isWin = process.platform === "win32";
-    const child = isWin
-      ? spawnChild(process.env.ComSpec ?? "cmd.exe", ["/d", "/s", "/c", `"${command}"`], {
-          cwd,
-          env: process.env,
-          stdio: ["ignore", "pipe", "pipe"],
-          windowsHide: true,
-          windowsVerbatimArguments: true,
-        })
-      : spawnChild(process.env.SHELL ?? "/bin/sh", ["-lc", command], {
-          cwd,
-          env: process.env,
-          stdio: ["ignore", "pipe", "pipe"],
-          windowsHide: true,
-        });
-
-    let stdout = "";
-    let stderr = "";
-    let timedOut = false;
-    const timer = setTimeout(() => {
-      timedOut = true;
-      child.kill("SIGTERM");
-    }, timeoutMs);
-    timer.unref?.();
-
-    child.stdout.on("data", (chunk) => {
-      stdout = appendLimited(stdout, String(chunk));
-    });
-    child.stderr.on("data", (chunk) => {
-      stderr = appendLimited(stderr, String(chunk));
-    });
-    child.on("error", (error) => {
-      clearTimeout(timer);
-      reject(error);
-    });
-    child.on("close", (exitCode, signal) => {
-      clearTimeout(timer);
-      resolvePromise({ stdout, stderr, exitCode, signal, timedOut });
-    });
-  });
+async function runLocalCommand(args: unknown, signal: AbortSignal): Promise<LocalToolResult> {
+  const target = new URL("/api/architect/v1/execution/command", HOST_MCP_URL);
+  const response = await fetch(target, { method: "POST", headers: { "Content-Type": "application/json",
+    "X-DreamGraph-Session": process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER ?? "" }, body: JSON.stringify(args),
+    signal: AbortSignal.any([signal, AbortSignal.timeout(RUN_COMMAND_MAX_TIMEOUT_MS + 10000)]) });
+  const result = await response.json();
+  return localTextResult(result, !response.ok || result.timedOut || result.exitCode !== 0);
 }
 
 function appendLimited(current: string, next: string): string {
@@ -358,7 +365,10 @@ function boundedAuditBody(value: string): { body: string; bytes: number; sha256:
   const bytes = Buffer.byteLength(value, "utf8");
   const sha256 = createHash("sha256").update(value).digest("hex");
   if (bytes <= AUDIT_BODY_LIMIT) return { body: value, bytes, sha256, truncated: false };
-  return { body: value.slice(0, AUDIT_BODY_LIMIT), bytes, sha256, truncated: true };
+  const encoded = Buffer.from(value, "utf8");
+  let end = AUDIT_BODY_LIMIT;
+  while (end > 0 && (encoded[end] & 0xc0) === 0x80) end--;
+  return { body: encoded.subarray(0, end).toString("utf8"), bytes, sha256, truncated: true };
 }
 
 function auditCallResult(record: AuditRecord): void {

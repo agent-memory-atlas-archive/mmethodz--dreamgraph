@@ -38,13 +38,13 @@ function dataModelLeaf(id: string): string {
 
 interface TableIndex {
   /** Normalized table name → datastore id. */
-  byName: Map<string, string>;
+  byName: Map<string, string | null>;
   /** Datastore id → set of normalized table names. */
   byStore: Map<string, Set<string>>;
 }
 
 function buildTableIndex(snapshot: FactSnapshot): TableIndex {
-  const byName = new Map<string, string>();
+  const byName = new Map<string, string | null>();
   const byStore = new Map<string, Set<string>>();
   for (const e of snapshot.entities.values()) {
     if (e.type !== "datastore" || !e.tables) continue;
@@ -53,8 +53,9 @@ function buildTableIndex(snapshot: FactSnapshot): TableIndex {
       const n = normTable(t.name);
       if (!n) continue;
       set.add(n);
-      // First-writer-wins (avoid silently swapping anchor of duplicates).
+      // Ambiguous names never pick the first datastore as an authority.
       if (!byName.has(n)) byName.set(n, e.id);
+      else if (byName.get(n) !== e.id) byName.set(n, null);
     }
     byStore.set(e.id, set);
   }
@@ -68,24 +69,25 @@ function buildTableIndex(snapshot: FactSnapshot): TableIndex {
 function resolveByTable(
   dm: FactEntity,
   index: TableIndex,
-): { storeId: string; conf: number; how: "exact" | "fuzzy" } | null {
+): { storeId: string; table: string; conf: number; how: "exact" | "fuzzy" } | null {
   // Try the canonical leaf id first, then the entity name.
   const candidates = [dataModelLeaf(dm.id), normTable(dm.name)].filter(
     (s) => s.length > 0,
   );
   for (const c of candidates) {
     const exact = index.byName.get(c);
-    if (exact) return { storeId: exact, conf: EXACT_CONF, how: "exact" };
+    if (exact) return { storeId: exact, table: c, conf: EXACT_CONF, how: "exact" };
   }
   // Fuzzy: contains-match against any known table name.
+  const matches = new Map<string, { storeId: string; table: string; conf: number; how: "fuzzy" }>();
   for (const c of candidates) {
     for (const [tableName, storeId] of index.byName.entries()) {
-      if (tableName.includes(c) || c.includes(tableName)) {
-        return { storeId, conf: FUZZY_CONF, how: "fuzzy" };
+      if (storeId && (tableName.includes(c) || c.includes(tableName))) {
+        matches.set(`${storeId}|${tableName}`, { storeId, table: tableName, conf: FUZZY_CONF, how: "fuzzy" });
       }
     }
   }
-  return null;
+  return matches.size === 1 ? [...matches.values()][0] : null;
 }
 
 export interface SchemaGroundingResult {
@@ -99,6 +101,9 @@ export async function schemaGrounding(
   max: number,
 ): Promise<SchemaGroundingResult> {
   const edges: DreamEdge[] = [];
+  if (!Number.isSafeInteger(max) || max < 0) throw new Error("SCHEMA_BUDGET_INVALID");
+  if (max === 0) return { edges: [], tensions_raised: 0 };
+  const workingEdges = new Set(snapshot.edgeSet);
   let tensions_raised = 0;
   const now = new Date().toISOString();
 
@@ -142,14 +147,10 @@ export async function schemaGrounding(
     dmStoreOf.set(dm.id, match.storeId);
     const claimed = claimedTables.get(match.storeId);
     if (claimed) {
-      // Mark whichever table candidate matched.
-      const leaf = dataModelLeaf(dm.id);
-      const nameNorm = normTable(dm.name);
-      if (index.byName.get(leaf) === match.storeId) claimed.add(leaf);
-      if (index.byName.get(nameNorm) === match.storeId) claimed.add(nameNorm);
+      claimed.add(match.table);
     }
     if (edges.length >= max) continue;
-    if (snapshot.edgeSet.has(`${dm.id}|${match.storeId}`)) continue;
+    if (workingEdges.has(`${dm.id}|${match.storeId}`)) continue;
     edges.push({
       id: dreamId("schema"),
       from: dm.id,
@@ -173,7 +174,7 @@ export async function schemaGrounding(
       evidence_score: 0,
       contradiction_score: 0,
     });
-    snapshot.edgeSet.add(`${dm.id}|${match.storeId}`);
+    workingEdges.add(`${dm.id}|${match.storeId}`);
   }
 
   // --------------------------------------------------------------------
@@ -227,8 +228,8 @@ export async function schemaGrounding(
             // Only same-type pairings to keep the relation meaningful.
             if (a.type !== b.type) continue;
             if (
-              snapshot.edgeSet.has(`${aId}|${bId}`) ||
-              snapshot.edgeSet.has(`${bId}|${aId}`)
+              workingEdges.has(`${aId}|${bId}`) ||
+              workingEdges.has(`${bId}|${aId}`)
             ) {
               continue;
             }
@@ -256,7 +257,7 @@ export async function schemaGrounding(
               evidence_score: 0,
               contradiction_score: 0,
             });
-            snapshot.edgeSet.add(`${aId}|${bId}`);
+            workingEdges.add(`${aId}|${bId}`);
           }
         }
       }
@@ -272,6 +273,7 @@ export async function schemaGrounding(
   for (const [storeId, names] of index.byStore.entries()) {
     const claimed = claimedTables.get(storeId) ?? new Set();
     for (const name of names) {
+      if (edges.length + tensions_raised >= max) break;
       if (claimed.has(name)) continue;
       try {
         await engine.recordTension({

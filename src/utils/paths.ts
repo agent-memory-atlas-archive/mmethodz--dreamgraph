@@ -11,6 +11,7 @@
  */
 
 import { resolve } from "node:path";
+import { AsyncLocalStorage } from "node:async_hooks";
 import { config } from "../config/config.js";
 
 /**
@@ -18,12 +19,18 @@ import { config } from "../config/config.js";
  * null = fallback mode (use config.dataDir).
  */
 let dataDirOverride: string | null = null;
+const scopedDirectory = new AsyncLocalStorage<string>();
+/** Internal execution pin. This is not a user-supplied transport selector or authority grant. */
+export function withDataDirectory<T>(directory: string, work: () => T): T {
+  return scopedDirectory.run(resolve(directory), work);
+}
+export const getScopedDataDirectory = (): string | undefined => scopedDirectory.getStore();
 
 /**
  * Set the data directory override.
  * Called once at startup by resolveInstanceAtStartup().
  */
-export function setDataDirOverride(dir: string): void {
+export function setDataDirOverride(dir: string | null): void {
   dataDirOverride = dir;
 }
 
@@ -33,7 +40,7 @@ export function setDataDirOverride(dir: string): void {
  * Fallback mode → config.dataDir.
  */
 export function getDataDir(): string {
-  return dataDirOverride ?? config.dataDir;
+  return scopedDirectory.getStore() ?? dataDirOverride ?? config.dataDir;
 }
 
 /**

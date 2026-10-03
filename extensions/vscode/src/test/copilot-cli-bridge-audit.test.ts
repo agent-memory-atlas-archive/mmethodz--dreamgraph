@@ -196,6 +196,7 @@ interface UpstreamHandle {
  */
 async function startUpstreamHttpMcp(opts: {
   toolHandler: (name: string, args: Record<string, unknown>) => unknown;
+  commandHandler?: (args: Record<string, unknown>) => unknown;
 }): Promise<UpstreamHandle> {
   function buildServer(): McpServer {
     const server = new McpServer(
@@ -248,6 +249,10 @@ async function startUpstreamHttpMcp(opts: {
     req.on("data", (c: string) => (body += c));
     req.on("end", () => {
       void (async () => {
+        if (req.url === "/api/architect/v1/execution/command" && opts.commandHandler) {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(opts.commandHandler(safeJson(body) as Record<string, unknown>))); return;
+        }
         const sessionId = req.headers["mcp-session-id"] as string | undefined;
         const parsed = body.length > 0 ? safeJson(body) : undefined;
         if (sessionId && sessions.has(sessionId)) {
@@ -377,6 +382,25 @@ async function readAuditLines(path: string): Promise<string[]> {
   }
 }
 
+async function readTerminalAuditLines(path: string, expected = 1): Promise<string[]> {
+  let lines: string[] = [];
+  const deadline = Date.now() + 5000;
+  do {
+    lines = await readAuditLines(path);
+    if (lines.filter(line => JSON.parse(line).status !== "running").length >= expected) break;
+    await new Promise(done => setTimeout(done, 20));
+  } while (Date.now() < deadline);
+  const records = lines.map(line => JSON.parse(line));
+  const terminal = records.filter(record => record.status !== "running");
+  assert.equal(terminal.length, expected); assert.equal(records.length, expected * 2);
+  for (const record of terminal) {
+    const intent = records.find(item => item.status === "running" && item.correlationId === record.correlationId);
+    assert.ok(intent); assert.equal(intent.tool, record.tool); assert.equal(intent.inputJson, record.inputJson);
+    assert.equal(intent.startedAtEpochMs, record.startedAtEpochMs);
+  }
+  return lines.filter(line => JSON.parse(line).status !== "running");
+}
+
 test("bridge: forwards tools/list to the HTTP upstream", async () => {
   const upstream = await startUpstreamHttpMcp({
     toolHandler: () => "ok",
@@ -394,13 +418,15 @@ test("bridge: forwards tools/list to the HTTP upstream", async () => {
   }
 });
 
-test("bridge: run_command is bridge-local and does not call the upstream handler", async () => {
+test("bridge: run_command delegates to the daemon command port and does not call the upstream MCP handler", async () => {
   let upstreamCalls = 0;
+  let commandCalls = 0;
   const upstream = await startUpstreamHttpMcp({
     toolHandler: () => {
       upstreamCalls += 1;
       return "unexpected-upstream";
     },
+    commandHandler: args => { commandCalls++; assert.equal(args.cwd, "."); return { stdout: "daemon-command-ok", exitCode: 0, timedOut: false }; },
   });
   const bridge = await startBridgeClient({ hostMcpUrl: upstream.url, withAudit: true });
   try {
@@ -410,10 +436,11 @@ test("bridge: run_command is bridge-local and does not call the upstream handler
       arguments: { command, cwd: "." },
     });
     const text = ((result.content as Array<{ type: string; text: string }>)[0] ?? {}).text;
-    assert.match(text, /bridge-local-ok/);
+    assert.match(text, /daemon-command-ok/);
     assert.equal(upstreamCalls, 0);
+    assert.equal(commandCalls, 1);
 
-    const lines = await readAuditLines(bridge.auditPath);
+    const lines = await readTerminalAuditLines(bridge.auditPath);
     assert.equal(lines.length, 1);
     const rec = JSON.parse(lines[0]!);
     assert.equal(rec.server, "dreamgraph");
@@ -424,8 +451,34 @@ test("bridge: run_command is bridge-local and does not call the upstream handler
     await upstream.close();
   }
 });
+test("createHostAudit: unfinished intent fails honestly and retains the physical audit for recovery", async () => {
+  const dir=await mkdtemp(join(tmpdir(),"dg-audit-pending-"));
+  try{
+    const audit=createHostAudit({auditDirAbsPath:dir});await audit.startRecording("pending");
+    const record={server:"dreamgraph",tool:"edit_file",inputJson:"{}",resultJson:"",isError:false,durationMs:0,startedAtEpochMs:1};
+    await writeFile(auditFilePathFor(dir,"pending"),[
+      {...record,status:"running",correlationId:"completed"},
+      {...record,status:"completed",resultJson:'{"commit_receipt":"actual"}',correlationId:"completed"},
+      {...record,status:"running",correlationId:"unfinished"},
+    ].map(item=>JSON.stringify(item)).join("\n"));
+    await assert.rejects(audit.finishRecording("pending"),/CLI_AUDIT_UNSETTLED/);
+    assert.match(await readFile(auditFilePathFor(dir,"pending"),"utf8"),/unfinished/);
+  }finally{await rm(dir,{recursive:true,force:true});}
+});
+test("createHostAudit: malformed terminal acknowledgement cannot settle a running intent", async () => {
+  const dir=await mkdtemp(join(tmpdir(),"dg-audit-invalid-terminal-"));
+  try {
+    const audit=createHostAudit({auditDirAbsPath:dir});await audit.startRecording("invalid-terminal");
+    const record={server:"dreamgraph",tool:"edit_file",inputJson:"{}",resultJson:"",isError:false,durationMs:0,startedAtEpochMs:1,correlationId:"pending"};
+    await writeFile(auditFilePathFor(dir,"invalid-terminal"),[
+      {...record,status:"running"},{...record,status:"completed",resultJson:42},
+    ].map(value=>JSON.stringify(value)).join("\n"));
+    await assert.rejects(audit.finishRecording("invalid-terminal"),/CLI_AUDIT_UNSETTLED/);
+    assert.match(await readFile(auditFilePathFor(dir,"invalid-terminal"),"utf8"),/pending/);
+  }finally{await rm(dir,{recursive:true,force:true});}
+});
 
-test("bridge: forwards tools/call and writes one NDJSON audit record per call", async () => {
+test("bridge: forwards tools/call and retains paired intent/terminal audit records per call", async () => {
   let lastArgs: Record<string, unknown> | null = null;
   const upstream = await startUpstreamHttpMcp({
     toolHandler: (name, args) => {
@@ -454,7 +507,7 @@ test("bridge: forwards tools/call and writes one NDJSON audit record per call", 
       "ok-list_directory",
     );
 
-    const lines = await readAuditLines(bridge.auditPath);
+    const lines = await readTerminalAuditLines(bridge.auditPath, 2);
     assert.equal(lines.length, 2);
     const a = JSON.parse(lines[0]!);
     const b = JSON.parse(lines[1]!);
@@ -486,7 +539,7 @@ test("bridge: marks JSON-RPC error responses with isError=true", async () => {
       bridge.client.callTool({ name: "boom", arguments: {} }),
       /boom failed/,
     );
-    const lines = await readAuditLines(bridge.auditPath);
+    const lines = await readTerminalAuditLines(bridge.auditPath);
     assert.equal(lines.length, 1);
     const rec = JSON.parse(lines[0]!);
     assert.equal(rec.tool, "boom");
@@ -497,6 +550,18 @@ test("bridge: marks JSON-RPC error responses with isError=true", async () => {
     await upstream.close();
   }
 });
+test("bridge: Unicode audit safety ceiling is bytes and never cuts through a UTF-8 character", async () => {
+  const upstream = await startUpstreamHttpMcp({toolHandler: () => "🌿".repeat(10000)});
+  const bridge = await startBridgeClient({hostMcpUrl:upstream.url,withAudit:true});
+  try {
+    const result = await bridge.client.callTool({name:"query_resource",arguments:{}});
+    assert.equal((result.content as Array<{text:string}>)[0]!.text,"🌿".repeat(10000));
+    const record = JSON.parse((await readTerminalAuditLines(bridge.auditPath))[0]!);
+    assert.equal(record.resultTruncated,true);assert.ok(record.resultBytes > 16384);
+    assert.ok(Buffer.byteLength(record.resultJson,"utf8") <= 16384);assert.ok(!record.resultJson.includes("\ufffd"));
+    assert.match(record.resultSha256,/^[a-f0-9]{64}$/);
+  }finally{await bridge.close();await upstream.close();}
+});
 
 test("bridge: only tools/call generates audit records (tools/list does not)", async () => {
   const upstream = await startUpstreamHttpMcp({
@@ -506,7 +571,7 @@ test("bridge: only tools/call generates audit records (tools/list does not)", as
   try {
     await bridge.client.listTools();
     await bridge.client.callTool({ name: "query_resource", arguments: {} });
-    const lines = await readAuditLines(bridge.auditPath);
+    const lines = await readTerminalAuditLines(bridge.auditPath);
     assert.equal(lines.length, 1);
     assert.equal(JSON.parse(lines[0]!).tool, "query_resource");
   } finally {
@@ -578,5 +643,5 @@ test("bridge: fails closed when upstream is unreachable", async () => {
     child.on("close", (c) => res(typeof c === "number" ? c : null));
   });
   assert.notEqual(code, 0);
-  assert.match(stderr, /failed to connect to architect MCP/);
+  assert.match(stderr, /failed to connect to architect MCP|upstream MCP transport closed before initialize completed/);
 });

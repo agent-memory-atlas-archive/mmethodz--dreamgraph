@@ -1,8 +1,15 @@
-import { appendFile, readdir, readFile, stat } from "node:fs/promises";
-import { basename, resolve } from "node:path";
+import { appendFile, readdir, readFile, stat, realpath } from "node:fs/promises";
+import { basename, resolve, relative, sep, isAbsolute } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getActiveScope } from "../instance/lifecycle.js";
 import { loadJsonArray } from "../utils/cache.js";
+import { getDataDir } from "../utils/paths.js";
+import { withGraphRead } from "../utils/graph-reconciliation-barrier.js";
+import { replayPlanRequest, applyPlanCommand, importPlanAuthority, readPlanAuthority, bytesHash } from "../discipline/plan-authority.js";
+import { initialPlanState, planDefinitionDigest, projectPlanState } from "../discipline/plan-workflow.js";
+import { approvalHash } from "../discipline/approval.js";
+import type { PlanDefinition, PlanWorkflowState, PlanExecutionIntent } from "../graph/contracts.js";
+import { checkPlanRuntimeSource } from "../discipline/plan-runtime.js";
 
 export interface ArchitectHeading {
   level: number;
@@ -33,9 +40,18 @@ export interface ArchitectPlanSlice {
   title: string;
   category: "phase" | "slice";
   heading_path: string;
+  /** UTF-16 offset into this exact markdown snapshot, shared with the browser review. */
+  source_offset?: number;
   status: string | null;
   adr_bindings: string[];
   graph_bindings: ArchitectSemanticAnchor[];
+  depends_on?: string[];
+  priority?: number;
+  acceptance_hash?: string;
+  raw_status?: string | null;
+  running?: boolean;
+  verification_fresh?: boolean;
+  status_source?: "typed_plan_authority" | "markdown" | "implementation_log";
 }
 
 export interface ArchitectPlanCheckpoint {
@@ -60,7 +76,7 @@ export type ArchitectPlanLifecycle =
   | "archived"
   | "superseded";
 
-export type ArchitectExecutionState = "idle" | "running" | "partial" | "failed" | "timed_out" | "cancelled" | "complete";
+export type ArchitectExecutionState = "idle" | "running" | "recovery_required" | "partial" | "failed" | "timed_out" | "cancelled" | "complete";
 
 export interface ArchitectPlanSliceRef {
   id: string;
@@ -70,8 +86,8 @@ export interface ArchitectPlanSliceRef {
 
 export interface ArchitectTaskMemoryBinding {
   authority: "dreamgraph";
-  source: "implementation_log_projection";
-  binding_status: "projected";
+  source: "implementation_log_projection" | "typed_plan_authority" | "legacy_review_projection";
+  binding_status: "projected" | "governed" | "review_required" | "recovery_required";
   plan_state_owner: "daemon";
   current_slice_id: string | null;
   current_checkpoint_id: string | null;
@@ -86,7 +102,18 @@ export interface ArchitectTaskMemoryBinding {
 }
 
 export interface ArchitectOperationalPlanState {
-  source: "implementation_log_projection";
+  source: "implementation_log_projection" | "typed_plan_authority" | "legacy_review_projection";
+  revision?: number;
+  definition_hash?: string;
+  current_slice_ids?: string[];
+  running_slice_ids?: string[];
+  next_eligibility?: { can_start: boolean; reasons: string[] } | null;
+  resume_action?: string;
+  reconciliation?: PlanWorkflowState["reconciliation"];
+  verified_slice_ids?: string[];
+  progress?: { required: number; verified: number; implemented: number; current: number; blocked: number; deferred: number; unknown_legacy: number };
+  /** Compatibility claims remain separate from C14 verification and execution authority. */
+  reported_progress?: { required: number; completed: number; verified: number; implemented: number; current: number; blocked: number; deferred: number };
   phase: string | null;
   active_phase: string | null;
   current_slice_id: string | null;
@@ -134,6 +161,8 @@ export interface LivingPlanState {
   open_questions: string[];
   evidence_anchors: ArchitectSemanticAnchor[];
   nervous_points: string[];
+  /** Content-addressed source anchors; positions are never mutation identities. */
+  concerns: Array<{ id: string; kind: "open_question" | "nervous_point"; label: string; source_hash: string; definition_hash: string | null }>;
   branches: LivingPlanBranch[];
   plan_asks: string[];
   adr_bindings: string[];
@@ -224,6 +253,7 @@ interface GraphCatalogEntry {
   kind: "feature" | "workflow" | "capability" | "data_model";
   id: string;
   name: string;
+  pattern: RegExp;
 }
 
 interface ParsedFrontmatter {
@@ -243,6 +273,13 @@ export function getArchitectProjectRoot(): string {
 
 export function getArchitectPlansRoot(): string {
   return resolve(getArchitectProjectRoot(), "plans");
+}
+
+export async function getPlanAuthorityScope(id: string) {
+  let root = getArchitectProjectRoot();
+  try { root = await realpath(root); } catch { /* source reads surface an unavailable root */ }
+  if (process.platform === "win32") root = root.toLowerCase();
+  return { id, instance_id: getActiveScope()?.uuid ?? process.env.DREAMGRAPH_INSTANCE_UUID ?? "legacy", project_id: approvalHash(root) };
 }
 
 const KNOWN_TOOL_NAMES = new Set([
@@ -278,7 +315,7 @@ const KNOWN_TOOL_NAMES = new Set([
   "update_schedule",
 ]);
 
-let graphCatalogPromise: Promise<GraphCatalogEntry[]> | null = null;
+const graphCatalogReads = new Map<string, { stamp: string; value: Promise<GraphCatalogEntry[]> }>();
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -458,9 +495,7 @@ export function buildLivingPlanState(input: {
   const activeSliceId = input.operationalState.active_slice?.id ?? null;
   const completedSliceId = input.operationalState.last_completed_slice?.id ?? null;
   const completedBranchIds = new Set(
-    input.checkpoints
-      .filter(isCompletedCheckpoint)
-      .map((checkpoint) => slugifySliceSegment(checkpoint.slice_id)),
+    (input.operationalState.verified_slice_ids ?? []).map(slugifySliceSegment),
   );
   const branches = candidateHeadings
     .map((heading) => {
@@ -480,7 +515,8 @@ export function buildLivingPlanState(input: {
     .filter((branch) => !completedBranchIds.has(slugifySliceSegment(branch.id)));
   const currentHypothesis = parseFirstMatch(input.markdown, /^Current review stance:\s*(.+)$/m);
   const latestCheckpoint = input.checkpoints.at(-1) ?? null;
-  const currentSlice = input.operationalState.active_slice ?? input.operationalState.next_slice ?? input.operationalState.last_completed_slice;
+  const currentSlice = input.operationalState.current_slice_id ? { id: input.operationalState.current_slice_id,
+    title: input.operationalState.current_slice_title ?? input.operationalState.current_slice_id, status: input.operationalState.current_status } : null;
   const pulse = `${input.operationalState.plan_lifecycle}/${input.operationalState.execution_state}; slice=${currentSlice?.title ?? "none"}; questions=${openQuestions.length}; branches=${branches.length}`;
 
   return {
@@ -495,6 +531,8 @@ export function buildLivingPlanState(input: {
       ...input.graphBindings.filter((binding) => binding.kind !== "adr"),
     ].slice(0, 24),
     nervous_points: nervousPoints,
+    concerns: [...openQuestions.map(label => ({kind:"open_question" as const,label})),...nervousPoints.map(label => ({kind:"nervous_point" as const,label}))].map(record => ({...record,
+      id: `${record.kind}:${bytesHash(record.label)}`, source_hash: bytesHash(input.markdown), definition_hash: input.operationalState.definition_hash ?? null})),
     branches,
     plan_asks: planAsks,
     adr_bindings: input.adrBindings,
@@ -600,8 +638,17 @@ function extractFileBindings(markdown: string): ArchitectSemanticAnchor[] {
 }
 
 async function loadGraphCatalog(): Promise<GraphCatalogEntry[]> {
-  if (!graphCatalogPromise) {
-    graphCatalogPromise = Promise.all([
+  return withGraphRead(async () => {
+    let directory = getDataDir();
+    try { directory = await realpath(directory); } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
+    const key = process.platform === "win32" ? directory.toLowerCase() : directory;
+    const files = ["features.json", "workflows.json", "capabilities.json", "data_model.json"];
+    const stamp = (await Promise.all(files.map(async file => {
+      try { const s = await stat(resolve(directory, file), { bigint: true }); return `${s.dev}:${s.ino}:${s.size}:${s.mtimeNs}:${s.ctimeNs}`; }
+      catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return "absent"; throw error; }
+    }))).join("|");
+    const cached = graphCatalogReads.get(key); if (cached?.stamp === stamp) return cached.value;
+    const value = Promise.all([
       loadJsonArray<{ id?: string; name?: string }>("features.json"),
       loadJsonArray<{ id?: string; name?: string }>("workflows.json"),
       loadJsonArray<{ id?: string; name?: string }>("capabilities.json"),
@@ -609,33 +656,37 @@ async function loadGraphCatalog(): Promise<GraphCatalogEntry[]> {
     ]).then(([features, workflows, capabilities, dataModels]) => {
       const catalog: GraphCatalogEntry[] = [];
       for (const entry of features) {
-        if (entry.id && entry.name) catalog.push({ kind: "feature", id: entry.id, name: entry.name });
+        if (entry.id && entry.name) catalog.push({ kind: "feature", id: entry.id, name: entry.name, pattern: tokenPattern(entry.id) });
       }
       for (const entry of workflows) {
-        if (entry.id && entry.name) catalog.push({ kind: "workflow", id: entry.id, name: entry.name });
+        if (entry.id && entry.name) catalog.push({ kind: "workflow", id: entry.id, name: entry.name, pattern: tokenPattern(entry.id) });
       }
       for (const entry of capabilities) {
-        if (entry.id && entry.name) catalog.push({ kind: "capability", id: entry.id, name: entry.name });
+        if (entry.id && entry.name) catalog.push({ kind: "capability", id: entry.id, name: entry.name, pattern: tokenPattern(entry.id) });
       }
       for (const entry of dataModels) {
-        if (entry.id && entry.name) catalog.push({ kind: "data_model", id: entry.id, name: entry.name });
+        if (entry.id && entry.name) catalog.push({ kind: "data_model", id: entry.id, name: entry.name, pattern: tokenPattern(entry.id) });
       }
       return catalog;
     });
-  }
-  return graphCatalogPromise;
+    const entry = { stamp, value }; graphCatalogReads.delete(key); graphCatalogReads.set(key, entry);
+    if (graphCatalogReads.size > 16) graphCatalogReads.delete(graphCatalogReads.keys().next().value!);
+    try { return await value; } catch (error) { if (graphCatalogReads.get(key) === entry) graphCatalogReads.delete(key); throw error; }
+  });
 }
 
+function tokenPattern(token: string): RegExp { return new RegExp(`(^|[^A-Za-z0-9_-])${escapeRegExp(token)}($|[^A-Za-z0-9_-])`, "i"); }
 function containsToken(markdown: string, token: string): boolean {
-  const pattern = new RegExp(`(^|[^A-Za-z0-9_-])${escapeRegExp(token)}($|[^A-Za-z0-9_-])`, "i");
-  return pattern.test(markdown);
+  return tokenPattern(token).test(markdown);
 }
 
 function extractCatalogBindings(markdown: string, catalog: GraphCatalogEntry[]): ArchitectSemanticAnchor[] {
   const store = new Map<string, ArchitectSemanticAnchor>();
   const lower = markdown.toLowerCase();
   for (const entry of catalog) {
-    const idMatch = containsToken(markdown, entry.id);
+    // Native substring search cheaply excludes absent ASCII IDs. Keep the
+    // original token-boundary expression for matches and non-ASCII identities.
+    const idMatch = (!/^[\x00-\x7f]+$/.test(entry.id) || lower.includes(entry.id.toLowerCase())) && entry.pattern.test(markdown);
     const nameMatch = entry.name.length >= 14 && lower.includes(entry.name.toLowerCase());
     if (!idMatch && !nameMatch) continue;
     pushBinding(store, {
@@ -748,16 +799,20 @@ function extractSlices(
     const adrBindings = extractAdrBindings(section, { attributes: {} });
     const graphBindings = collectGraphBindings(section, adrBindings, catalog);
     slices.push({
-      id: classification.sortId,
+      id: parseFirstMatch(section, /^-\s*(?:id|slice-id):\s*`?([A-Za-z0-9_.-]+)`?\s*$/im) ?? classification.sortId,
       title: heading.title,
       category: classification.category,
       heading_path: heading.path,
+      source_offset: heading.startIndex,
       status:
         classification.category === "phase"
           ? derivePhaseStatus(heading.title, activePhase)
           : extractInlineStatus(section),
       adr_bindings: adrBindings,
       graph_bindings: graphBindings,
+      depends_on: (parseFirstMatch(section, /^-\s*Depends on:\s*(.+)$/im) ?? "").split(/,\s*/).map(value => value.trim()).filter(Boolean),
+      priority: Number(parseFirstMatch(section, /^-\s*Priority:\s*P?(\d+)$/im) ?? "1"),
+      acceptance_hash: approvalHash(section.replace(/^\s*-\s*(?:status|id|slice-id|depends on|priority):.*$/gim, "").replace(/\s+/g, " ").trim()),
     });
   }
   return slices;
@@ -788,253 +843,10 @@ function extractCheckpoints(logMarkdown: string | null): ArchitectPlanCheckpoint
   return checkpoints.sort((left, right) => left.timestamp.localeCompare(right.timestamp));
 }
 
-function normalizeCheckpointStatus(status: string | null | undefined): string {
-  return (status ?? "").trim().toLowerCase().replace(/[\s-]+/g, "_");
+function sliceRef(slice: ArchitectPlanSlice | null | undefined): ArchitectPlanSliceRef | null {
+  return slice ? { id: slice.id, title: slice.title, status: slice.status } : null;
 }
-
-function isImplementationCheckpoint(checkpoint: ArchitectPlanCheckpoint): boolean {
-  const status = normalizeCheckpointStatus(checkpoint.status);
-  return status !== "" && status !== "created" && status !== "action_recorded";
-}
-
-function isCompletedCheckpoint(checkpoint: ArchitectPlanCheckpoint): boolean {
-  const status = normalizeCheckpointStatus(checkpoint.status);
-  return status === "completed" || status === "implemented" || status === "verified";
-}
-
-function sliceRef(slice: ArchitectPlanSlice | null | undefined, fallback?: ArchitectPlanCheckpoint | null): ArchitectPlanSliceRef | null {
-  if (slice) return { id: slice.id, title: slice.title, status: slice.status };
-  if (!fallback) return null;
-  return { id: fallback.slice_id, title: fallback.slice_id, status: fallback.status };
-}
-
-function sliceSlugWithoutOrdinal(slice: ArchitectPlanSlice): string {
-  return slugifySliceSegment(slice.id).replace(/^slice-[a-z0-9]+-?/, "");
-}
-
-function sliceMatchesSlug(slice: ArchitectPlanSlice, normalized: string): boolean {
-  const idSlug = slugifySliceSegment(slice.id);
-  const titleSlug = slugifySliceSegment(slice.title);
-  const idWithoutOrdinal = sliceSlugWithoutOrdinal(slice);
-  const titleWithoutOrdinal = titleSlug.replace(/^slice-[a-z0-9]+-?/, "");
-  return (
-    idSlug === normalized ||
-    titleSlug === normalized ||
-    (idWithoutOrdinal.length > 0 && idWithoutOrdinal === normalized) ||
-    (titleWithoutOrdinal.length > 0 && titleWithoutOrdinal === normalized)
-  );
-}
-
-function findSliceById(slices: ArchitectPlanSlice[], sliceId: string | null | undefined): ArchitectPlanSlice | null {
-  if (!sliceId) return null;
-  const normalized = slugifySliceSegment(sliceId);
-  const ordinal = normalized.match(/^(?:slice-)?([a-z0-9]+)$/i)?.[1] ?? null;
-  return (
-    slices.find((slice) => slice.id === sliceId || sliceMatchesSlug(slice, normalized)) ??
-    (ordinal == null ? null : slices.find((slice) => slice.id === `slice-${ordinal}` || slice.id.startsWith(`slice-${ordinal}-`))) ??
-    null
-  );
-}
-
-function sliceOrdinal(slice: ArchitectPlanSlice): number | null {
-  const match = slice.id.match(/^slice-([0-9]+)(?:-|$)/i) ?? slice.title.match(/^Slice\s+([0-9]+)\b/i);
-  if (!match) return null;
-  const ordinal = Number.parseInt(match[1], 10);
-  return Number.isFinite(ordinal) ? ordinal : null;
-}
-
-function checkpointCompletedSliceIds(slices: ArchitectPlanSlice[], checkpoint: ArchitectPlanCheckpoint): string[] {
-  const implementationSlices = slices.filter((slice) => slice.category === "slice");
-  const completed = new Map<string, ArchitectPlanSlice>();
-  const direct = findSliceById(implementationSlices, checkpoint.slice_id);
-  if (direct) completed.set(direct.id, direct);
-
-  const normalized = slugifySliceSegment(checkpoint.slice_id);
-  const rangeMatch = normalized.match(/^slices?-([0-9]+)-(?:through|to)-([0-9]+)$/i);
-  if (rangeMatch) {
-    const start = Number.parseInt(rangeMatch[1], 10);
-    const end = Number.parseInt(rangeMatch[2], 10);
-    if (Number.isFinite(start) && Number.isFinite(end)) {
-      const low = Math.min(start, end);
-      const high = Math.max(start, end);
-      for (const slice of implementationSlices) {
-        const ordinal = sliceOrdinal(slice);
-        if (ordinal != null && ordinal >= low && ordinal <= high) completed.set(slice.id, slice);
-      }
-    }
-  }
-
-  const completionLines = checkpoint.body
-    .split(/\r?\n/g)
-    .filter((line) => /^-\s*(?:Action|Result):/i.test(line))
-    .filter((line) => /\b(?:implemented|completed|verified|finished)\b/i.test(line));
-  for (const line of completionLines) {
-    for (const match of line.matchAll(/\bSlice\s+([0-9]+)\b/gi)) {
-      const ordinal = match[1];
-      const slice = implementationSlices.find((candidate) => candidate.id === `slice-${ordinal}` || candidate.id.startsWith(`slice-${ordinal}-`));
-      if (slice) completed.set(slice.id, slice);
-    }
-  }
-
-  return [...completed.keys()];
-}
-
-function findNextSliceFromResume(slices: ArchitectPlanSlice[], resumeHint: string | null, afterSliceId: string | null): ArchitectPlanSlice | null {
-  const implementationSlices = slices.filter((slice) => slice.category === "slice");
-  if (resumeHint) {
-    const sliceMatch = resumeHint.match(/\bSlice\s+([A-Za-z0-9]+)\b/i);
-    if (sliceMatch) {
-      const prefix = `slice-${sliceMatch[1].toLowerCase()}`;
-      const byOrdinal = implementationSlices.find((slice) => slice.id === prefix || slice.id.startsWith(`${prefix}-`));
-      if (byOrdinal) return byOrdinal;
-    }
-    const normalizedHint = slugifySliceSegment(resumeHint);
-    const byTitle = implementationSlices.find((slice) => normalizedHint.includes(slugifySliceSegment(slice.title).slice(0, 40)));
-    if (byTitle) return byTitle;
-  }
-
-  if (afterSliceId) {
-    const currentIndex = implementationSlices.findIndex((slice) => slice.id === afterSliceId);
-    if (currentIndex >= 0) return implementationSlices[currentIndex + 1] ?? null;
-  }
-  return implementationSlices[0] ?? null;
-}
-
-function deriveExecutionState(latestCheckpoint: ArchitectPlanCheckpoint | null): ArchitectExecutionState {
-  const status = normalizeCheckpointStatus(latestCheckpoint?.status);
-  if (status === "timed_out" || status === "timeout") return "timed_out";
-  if (status === "partial") return "partial";
-  if (status === "failed" || status === "error") return "failed";
-  if (status === "cancelled" || status === "canceled") return "cancelled";
-  if (status === "running" || status === "implementing" || status === "verifying") return "running";
-  return "idle";
-}
-
-function deriveProjectedPlanStatus(rawStatus: string | null, lifecycle: ArchitectPlanLifecycle): string | null {
-  if (lifecycle !== "planning") return lifecycle;
-  return rawStatus;
-}
-
-function derivePlanLifecycle(
-  planStatus: string | null,
-  slices: ArchitectPlanSlice[],
-  implementationCheckpoints: ArchitectPlanCheckpoint[],
-  completedSliceIds: Set<string>,
-  nextSlice: ArchitectPlanSlice | null,
-): ArchitectPlanLifecycle {
-  const normalizedStatus = normalizeCheckpointStatus(planStatus);
-  if (normalizedStatus === "archived") return "archived";
-  if (normalizedStatus === "superseded") return "superseded";
-  if (normalizedStatus === "completed" || normalizedStatus === "complete" || normalizedStatus === "done") return "completed";
-  if (implementationCheckpoints.length > 0) {
-    const implementationSlices = slices.filter((slice) => slice.category === "slice");
-    if (implementationSlices.length > 0 && implementationSlices.every((slice) => completedSliceIds.has(slice.id))) {
-      return "completed";
-    }
-    return nextSlice ? "implementing" : "implementing";
-  }
-  if (normalizedStatus === "reviewed") return "reviewed";
-  if (normalizedStatus === "implementation_ready" || normalizedStatus === "accepted" || normalizedStatus === "ready") return "implementation_ready";
-  if (normalizedStatus === "draft") return "draft";
-  return "planning";
-}
-
-function deriveImplicitActivePhase(explicitPhase: string | null, planTitle: string, activeSlice: ArchitectPlanSliceRef | null): string | null {
-  if (explicitPhase) return explicitPhase;
-  const sliceText = `${activeSlice?.title ?? ""} ${activeSlice?.id ?? ""}`;
-  const sliceNumber = sliceText.match(/\bSlice\s+([0-9]+)\b/i) ?? sliceText.match(/\bslice-([0-9]+)\b/i);
-  const level = planTitle.match(/\bLevel\s+[0-9]+\b/i)?.[0] ?? null;
-  if (sliceNumber && level) return `Phase ${sliceNumber[1]} / ${level}`;
-  return null;
-}
-
-function buildOperationalState(
-  activePhase: string | null,
-  planStatus: string | null,
-  planTitle: string,
-  slices: ArchitectPlanSlice[],
-  checkpoints: ArchitectPlanCheckpoint[],
-  lastResumeNote: string | null,
-): ArchitectOperationalPlanState {
-  const activePhaseSlice = activePhase == null ? null : slices.find((slice) => slice.title === activePhase) ?? null;
-  const implementationSlices = slices.filter((slice) => slice.category === "slice");
-  const implementationCheckpoints = checkpoints.filter(isImplementationCheckpoint);
-  const latestImplementationCheckpoint = implementationCheckpoints.at(-1) ?? null;
-  const latestCompletedCheckpoint = [...implementationCheckpoints].reverse().find(isCompletedCheckpoint) ?? null;
-  const latestImplementationSlice = findSliceById(slices, latestImplementationCheckpoint?.slice_id);
-  const completedSliceIds = new Set(
-    implementationCheckpoints
-      .filter(isCompletedCheckpoint)
-      .flatMap((checkpoint) => checkpointCompletedSliceIds(slices, checkpoint)),
-  );
-  const latestCompletedSlice =
-    findSliceById(slices, latestCompletedCheckpoint?.slice_id) ??
-    [...implementationSlices].reverse().find((slice) => completedSliceIds.has(slice.id)) ??
-    null;
-  const allImplementationSlicesComplete =
-    implementationSlices.length > 0 && implementationSlices.every((slice) => completedSliceIds.has(slice.id));
-  const rawResumeHint = latestImplementationCheckpoint?.resume_note ?? latestCompletedCheckpoint?.resume_note ?? lastResumeNote;
-  const nextSlice = allImplementationSlicesComplete
-    ? null
-    : findNextSliceFromResume(slices, rawResumeHint, latestCompletedSlice?.id ?? latestCompletedCheckpoint?.slice_id ?? null);
-  const latestImplementationComplete = latestImplementationCheckpoint ? isCompletedCheckpoint(latestImplementationCheckpoint) : false;
-  const activeSlice = allImplementationSlicesComplete
-    ? null
-    : latestImplementationComplete
-      ? nextSlice ?? latestImplementationSlice ?? activePhaseSlice
-      : latestImplementationSlice ?? nextSlice ?? activePhaseSlice;
-  const lifecycle = derivePlanLifecycle(planStatus, slices, implementationCheckpoints, completedSliceIds, nextSlice);
-  const executionState = lifecycle === "completed" ? "complete" : deriveExecutionState(latestImplementationCheckpoint);
-  const activeSliceRef = lifecycle === "completed" ? null : sliceRef(activeSlice, latestImplementationCheckpoint);
-  const lastCompletedSliceRef = sliceRef(latestCompletedSlice, latestCompletedCheckpoint);
-  const nextSliceRef = sliceRef(nextSlice);
-  const completedResumeHint =
-    lifecycle === "completed" && lastCompletedSliceRef
-      ? `completed after ${lastCompletedSliceRef.title ?? lastCompletedSliceRef.id}`
-      : null;
-  const resumeHint = completedResumeHint ?? rawResumeHint;
-  const derivedActivePhase = deriveImplicitActivePhase(activePhase, planTitle, activeSliceRef ?? nextSliceRef ?? lastCompletedSliceRef);
-  const currentSliceId = activeSliceRef?.id ?? null;
-  const currentSliceTitle = activeSliceRef?.title ?? null;
-  const verifiedCheckpointCount = checkpoints.filter((checkpoint) => normalizeCheckpointStatus(checkpoint.status) === "verified").length;
-  const completedCheckpointCount = checkpoints.filter(isCompletedCheckpoint).length;
-
-  return {
-    source: "implementation_log_projection",
-    phase: derivedActivePhase,
-    active_phase: derivedActivePhase,
-    current_slice_id: currentSliceId,
-    current_slice_title: currentSliceTitle,
-    current_status: latestImplementationCheckpoint?.status ?? null,
-    plan_lifecycle: lifecycle,
-    execution_state: executionState,
-    partial: executionState === "partial" || executionState === "timed_out",
-    active_slice: activeSliceRef,
-    last_completed_slice: lastCompletedSliceRef,
-    next_slice: nextSliceRef,
-    last_checkpoint_at: latestImplementationCheckpoint?.timestamp ?? null,
-    checkpoint_count: checkpoints.length,
-    verified_checkpoint_count: verifiedCheckpointCount,
-    completed_checkpoint_count: completedCheckpointCount,
-    resume_hint: resumeHint,
-    task_memory_binding: {
-      authority: "dreamgraph",
-      source: "implementation_log_projection",
-      binding_status: "projected",
-      plan_state_owner: "daemon",
-      current_slice_id: currentSliceId,
-      current_checkpoint_id: latestImplementationCheckpoint?.id ?? null,
-      current_status: latestImplementationCheckpoint?.status ?? null,
-      last_event_at: latestImplementationCheckpoint?.timestamp ?? null,
-      resume_hint: resumeHint,
-      plan_lifecycle: lifecycle,
-      execution_state: executionState,
-      active_slice_id: activeSliceRef?.id ?? null,
-      last_completed_slice_id: lastCompletedSliceRef?.id ?? null,
-      next_slice_id: nextSliceRef?.id ?? null,
-    },
-  };
-}
+function deriveProjectedPlanStatus(_rawStatus: string | null, lifecycle: ArchitectPlanLifecycle): string { return lifecycle; }
 
 function buildEvidenceLinks(
   planPath: string,
@@ -1095,6 +907,112 @@ interface ProjectPlanOptions {
   path?: string;
   logFileName?: string | null;
   logPath?: string | null;
+  summaryOnly?: boolean;
+}
+
+function definitionFromSlices(scope: Awaited<ReturnType<typeof getPlanAuthorityScope>>, markdown: string, logMarkdown: string | null,
+  title: string, phase: string | null, slices: ArchitectPlanSlice[], prior?: PlanWorkflowState): PlanDefinition {
+  // Ordinals are identity hints only. They never imply state or completion.
+  const implemented = slices.filter(slice => slice.category === "slice");
+  for (const slice of implemented) {
+    if (!prior || prior.definition.slices.some(entry => entry.id === slice.id)) continue;
+    const ordinal = slice.id.match(/^slice-([a-z0-9]+)(?:-|$)/i)?.[1];
+    const candidates = prior.definition.slices.filter(entry => entry.id.match(/^slice-([a-z0-9]+)(?:-|$)/i)?.[1] === ordinal);
+    if (ordinal && candidates.length === 1 && implemented.filter(entry => entry.id.match(/^slice-([a-z0-9]+)(?:-|$)/i)?.[1] === ordinal).length === 1) slice.id = candidates[0].id;
+  }
+  const resolveDependency = (raw: string) => {
+    const clean = raw.replace(/`/g, "").trim();
+    const exact = implemented.filter(slice => slice.id === clean);
+    if (exact.length === 1) return exact[0].id;
+    const ordinal = /^Slice\s+([A-Za-z0-9]+)$/i.exec(clean)?.[1]?.toLowerCase();
+    const matches = ordinal ? implemented.filter(slice => slice.id.match(/^slice-([a-z0-9]+)(?:-|$)/i)?.[1] === ordinal) : [];
+    return matches.length === 1 ? matches[0].id : `unresolved:${clean}`;
+  };
+  const definition: PlanDefinition = { ...scope, revision: prior?.definition.revision ?? 1, definition_hash: "pending", source_hash: bytesHash(markdown),
+    log_hash: logMarkdown === null ? null : bytesHash(logMarkdown), title, phase,
+    slices: implemented.map((slice, order) => ({ id: slice.id, title: slice.title, order, priority: slice.priority ?? 1, required: true,
+      depends_on: (slice.depends_on ?? []).map(resolveDependency), acceptance_hash: slice.acceptance_hash ?? approvalHash(slice.heading_path) })) };
+  definition.definition_hash = planDefinitionDigest(definition); return definition;
+}
+function operationalFromAuthority(view: ReturnType<typeof projectPlanState>, slices: ArchitectPlanSlice[], checkpoints: ArchitectPlanCheckpoint[],
+  source: "typed_plan_authority" | "legacy_review_projection", phase: string | null, unknownLegacy: number): ArchitectOperationalPlanState {
+  const { state } = view, byId = new Map(slices.map(slice => [slice.id, slice]));
+  const ref = (id: string | null) => {
+    if (!id) return null;
+    const visible = sliceRef(byId.get(id)); if (visible) return visible;
+    const def = state.definition.slices.find(s => s.id === id), row = state.slices.find(s => s.id === id);
+    return def && row ? { id, title: def.title, status: row.status } : null;
+  };
+  const current = ref(view.current_slice_id), running = ref(view.running_slice_id), next = ref(view.next_slice?.id ?? null), last = ref(state.last_verified_slice_id);
+  const verified = state.slices.filter(slice => slice.status === "verified" && slice.verification?.fresh).map(slice => slice.id);
+  const binding = state.reconciliation.state === "recovery_required" ? "recovery_required" : source === "typed_plan_authority" ? "governed" : "review_required";
+  const execution = view.execution === "running" ? "running" : view.execution === "recovery_required" ? "recovery_required" : state.lifecycle === "completed" ? "complete" : "idle";
+  const resume = view.resume_action.replace(/_/g, " ");
+  return { source, revision: state.revision, definition_hash: state.definition_hash, current_slice_ids: state.current_slice_ids, running_slice_ids: state.running_slice_ids,
+    verified_slice_ids: verified, next_eligibility: view.next_slice ? { can_start: view.next_slice.can_start, reasons: view.next_slice.reasons } : null,
+    resume_action: view.resume_action, reconciliation: state.reconciliation, progress: { ...view.progress, unknown_legacy: unknownLegacy },
+    phase, active_phase: phase, current_slice_id: current?.id ?? null, current_slice_title: current?.title ?? null, current_status: current?.status ?? null,
+    plan_lifecycle: state.lifecycle, execution_state: execution, partial: view.execution === "recovery_required", active_slice: running,
+    last_completed_slice: last, next_slice: next, last_checkpoint_at: source === "typed_plan_authority" ? state.updated_at : null,
+    checkpoint_count: checkpoints.length, verified_checkpoint_count: verified.length, completed_checkpoint_count: verified.length, resume_hint: resume,
+    task_memory_binding: { authority: "dreamgraph", source, binding_status: binding, plan_state_owner: "daemon", current_slice_id: current?.id ?? null,
+      current_checkpoint_id: null, current_status: current?.status ?? null, last_event_at: source === "typed_plan_authority" ? state.updated_at : null,
+      resume_hint: resume, plan_lifecycle: state.lifecycle, execution_state: execution, active_slice_id: running?.id ?? null,
+      last_completed_slice_id: last?.id ?? null, next_slice_id: next?.id ?? null } };
+}
+
+/** A read-only compatibility view. Its claims never enter the reducer or authorize work. */
+function applyLegacyProgress(op: ArchitectOperationalPlanState, slices: ArchitectPlanSlice[], checkpoints: ArchitectPlanCheckpoint[],
+  rawStatus: string | null, definition: PlanDefinition): void {
+  const rows = slices.filter(slice => slice.category === "slice");
+  const normalize = (status: string | null) => status?.trim().toLowerCase().replace(/[ -]+/g, "_") ?? "pending";
+  const completed = (slice: ArchitectPlanSlice) => ["verified", "completed", "complete", "done"].includes(normalize(slice.status));
+  const current = (slice: ArchitectPlanSlice) => ["in_progress", "implementing", "implemented", "verifying", "blocked", "partial", "failed", "timed_out", "cancelled"].includes(normalize(slice.status));
+  const resolveCheckpoint = (checkpoint: ArchitectPlanCheckpoint) => {
+    const exact = rows.filter(slice => slice.id === checkpoint.slice_id || slice.title === checkpoint.slice_id);
+    if (exact.length === 1) return exact[0];
+    const ordinal = /^Slice\s+([A-Za-z0-9]+)$/i.exec(checkpoint.slice_id)?.[1]?.toLowerCase();
+    const matches = ordinal ? rows.filter(slice => slice.id.match(/^slice-([a-z0-9]+)(?:-|$)/i)?.[1] === ordinal) : [];
+    return matches.length === 1 ? matches[0] : null;
+  };
+  for (const slice of rows) {
+    slice.raw_status = slice.status; slice.status_source = "markdown"; slice.running = false; slice.verification_fresh = false;
+    // Explicit definition statuses win over historical log entries. Never infer ranges or prose success.
+    if (slice.status == null) {
+      const checkpoint = [...checkpoints].reverse().find(entry => Number.isFinite(Date.parse(entry.timestamp)) && resolveCheckpoint(entry) === slice
+        && ["pending", "in_progress", "implemented", "verifying", "verified", "completed", "blocked", "deferred", "failed", "partial", "cancelled", "timed_out"].includes(normalize(entry.status)));
+      if (checkpoint) { slice.status = checkpoint.status.trim(); slice.status_source = "implementation_log"; }
+    }
+    slice.status = normalize(slice.status);
+  }
+  const byId = new Map(rows.map(slice => [slice.id, slice]));
+  const currentRows = rows.filter(current), completedRows = rows.filter(completed);
+  const dated = checkpoints.filter(entry => Number.isFinite(Date.parse(entry.timestamp)));
+  const latestCurrent = [...dated].reverse().map(resolveCheckpoint).find(slice => slice && current(slice));
+  const currentRow = currentRows.length === 1 ? currentRows[0] : latestCurrent ?? null;
+  const last = [...dated].reverse().map(resolveCheckpoint).find(slice => slice && completed(slice)) ?? completedRows.at(-1) ?? null;
+  const pending = [...definition.slices].sort((a, b) => a.priority - b.priority || a.order - b.order || a.id.localeCompare(b.id))
+    .filter(def => normalize(byId.get(def.id)?.status ?? null) === "pending");
+  const dependenciesResolved = (def: PlanDefinition["slices"][number]) => def.depends_on.every(id => byId.has(id) && completed(byId.get(id)!));
+  const next = pending.find(dependenciesResolved) ?? pending[0];
+  const reported = normalize(rawStatus);
+  const lifecycle: ArchitectPlanLifecycle = ["draft", "planning", "reviewed", "implementation_ready", "implementing", "verifying", "blocked", "completed", "archived", "superseded"].includes(reported)
+    ? reported as ArchitectPlanLifecycle : currentRows.length || completedRows.length ? "implementing" : "draft";
+  op.current_slice_ids = currentRows.map(slice => slice.id); op.running_slice_ids = []; op.verified_slice_ids = [];
+  op.current_slice_id = currentRow?.id ?? null; op.current_slice_title = currentRow?.title ?? null; op.current_status = currentRow?.status ?? null;
+  op.plan_lifecycle = lifecycle; op.active_slice = null; op.last_completed_slice = sliceRef(last); op.next_slice = sliceRef(next ? byId.get(next.id) : null);
+  op.next_eligibility = next ? { can_start: false, reasons: ["legacy_progress_requires_review", "awaiting_implementation_approval",
+    ...next.depends_on.filter(id => !byId.has(id) || !completed(byId.get(id)!)).map(id => `dependency_unresolved:${id}`)] } : null;
+  op.reported_progress = { required: rows.length, completed: completedRows.length, verified: rows.filter(slice => slice.status === "verified").length,
+    implemented: rows.filter(slice => ["implemented", "verifying"].includes(normalize(slice.status))).length,
+    current: currentRows.length, blocked: rows.filter(slice => slice.status === "blocked").length, deferred: rows.filter(slice => slice.status === "deferred").length };
+  // The original resume note remains available in resume_state. It cannot direct
+  // governed work until the recorded progress has been reviewed and imported.
+  op.resume_action = "review_legacy_progress"; op.resume_hint = "Review recorded progress before importing governed lifecycle state";
+  op.last_checkpoint_at = dated.at(-1)?.timestamp ?? null;
+  op.task_memory_binding = { ...op.task_memory_binding, current_slice_id: op.current_slice_id, current_status: op.current_status,
+    current_checkpoint_id: dated.at(-1)?.id ?? null, last_event_at: op.last_checkpoint_at, resume_hint: op.resume_hint,
+    plan_lifecycle: lifecycle, active_slice_id: null, last_completed_slice_id: last?.id ?? null, next_slice_id: op.next_slice?.id ?? null };
 }
 
 async function projectPlan(fileName: string, options?: ProjectPlanOptions): Promise<ArchitectPlanDetail> {
@@ -1117,7 +1035,9 @@ async function projectPlan(fileName: string, options?: ProjectPlanOptions): Prom
   const adrBindings = extractAdrBindings(markdown, frontmatter);
   const catalog = await loadGraphCatalog();
   const graphBindings = collectGraphBindings(markdown, adrBindings, catalog);
-  const slices = extractSlices(markdown, headings, activePhase, catalog);
+  // The rail needs lifecycle/counts, not per-slice graph-anchor scans. Those
+  // belong to the selected detail and do not participate in the C14 definition.
+  const slices = extractSlices(markdown, headings, activePhase, options?.summaryOnly ? [] : catalog);
   const checkpoints = extractCheckpoints(logMarkdown);
   const path = options?.path ?? `plans/${fileName}`;
   const logPathRelative = logMarkdown == null ? null : (options?.logPath ?? (logFileName == null ? null : `plans/${logFileName}`));
@@ -1126,7 +1046,36 @@ async function projectPlan(fileName: string, options?: ProjectPlanOptions): Prom
     last_resume_note: logMarkdown == null ? null : extractLastResumeNote(logMarkdown),
     log_excerpt: logMarkdown == null ? null : extractLogExcerpt(logMarkdown),
   };
-  const operationalState = buildOperationalState(activePhase, rawStatus, title, slices, checkpoints, resumeState.last_resume_note);
+  const authorityScope = await getPlanAuthorityScope(id);
+  let authority: Awaited<ReturnType<typeof readPlanAuthority>> = null, authorityFailure: string | null = null;
+  try { authority = await readPlanAuthority(authorityScope); } catch (failure) { authorityFailure = failure instanceof Error ? failure.message : "Plan authority unavailable"; }
+  let definition: PlanDefinition;
+  try {
+    definition = definitionFromSlices(authorityScope, markdown, logMarkdown, title, activePhase, slices, authority?.state);
+    initialPlanState(definition, fileStat.mtime.toISOString());
+  } catch (error) {
+    authorityFailure = `Plan definition requires review: ${String(error instanceof Error ? error.message : error)}`;
+    definition = authority?.state.definition ?? definitionFromSlices(authorityScope, markdown, logMarkdown, title, activePhase, [], undefined);
+  }
+  const workflow = authority ? structuredClone(authority.state) : initialPlanState(definition, fileStat.mtime.toISOString());
+  const unknownLegacy = checkpoints.length + slices.filter(slice => slice.category === "slice" && slice.status && slice.status !== "pending").length;
+  if (!authority) {
+    workflow.reconciliation = { state: unknownLegacy || rawStatus && !["draft", "planning"].includes(rawStatus) ? "legacy_review_required" : "current",
+      reasons: unknownLegacy ? ["Legacy statuses and audit/prose checkpoints are not typed verification evidence"] : [] };
+    workflow.lifecycle = rawStatus === "planning" ? "planning" : "draft";
+  } else if (authority.state.definition_hash !== definition.definition_hash) {
+    workflow.reconciliation = { state: "definition_changed", reasons: ["External definition changes require a content-bound reconciliation preview"] };
+  }
+  if (authorityFailure) workflow.reconciliation = { state: "recovery_required", reasons: [authorityFailure] };
+  const workflowSlices = new Map(workflow.slices.map(slice => [slice.id, slice]));
+  for (const slice of slices.filter(slice => authority && slice.category === "slice")) {
+    const record = workflowSlices.get(slice.id); slice.raw_status = slice.status; slice.status = record?.status ?? "pending";
+    slice.status_source = "typed_plan_authority";
+    slice.running = workflow.running_slice_ids.includes(slice.id); slice.verification_fresh = record?.verification?.fresh === true;
+  }
+  const operationalState = operationalFromAuthority(projectPlanState(workflow, new Date().toISOString()), slices, checkpoints,
+    authority ? "typed_plan_authority" : "legacy_review_projection", activePhase, authority ? 0 : unknownLegacy);
+  if (!authority) applyLegacyProgress(operationalState, slices, checkpoints, rawStatus, definition);
   const livingState = buildLivingPlanState({ markdown, headings, checkpoints, graphBindings, adrBindings, operationalState });
   const status = deriveProjectedPlanStatus(rawStatus, operationalState.plan_lifecycle);
 
@@ -1187,7 +1136,7 @@ export async function listPlanFiles(): Promise<string[]> {
 }
 
 export async function buildPlanSummary(fileName: string): Promise<ArchitectPlanSummary> {
-  const detail = await projectPlan(fileName);
+  const detail = await projectPlan(fileName, {summaryOnly:true});
   return {
     id: detail.id,
     title: detail.title,
@@ -1341,4 +1290,73 @@ export async function recordPlanActionAudit(
       "Require a separate governed endpoint before applying any source patch or graph mutation.",
     ],
   };
+}
+
+/** Content-bound preview; reading a legacy plan never writes status or imports claims. */
+export async function previewArchitectPlanAuthority(planId: string) {
+  if (!isSafePlanId(planId)) throw new Error("PLAN_ID_INVALID");
+  const scope = await getPlanAuthorityScope(planId), path = resolve(getArchitectPlansRoot(), `${planId}.md`);
+  const markdown = await readFile(path, "utf8"), logPath = resolve(getArchitectPlansRoot(), `${planId}.implementation-log.md`);
+  const log_markdown = await loadOptionalFile(logPath), headings = parseHeadings(markdown);
+  const title = parseFirstMatch(markdown, /^#\s+(.+)$/m) ?? planId;
+  const phase = parseFirstMatch(markdown, /^- Active phase:\s+`([^`]+)`$/m);
+  const slices = extractSlices(markdown, headings, phase, []), current = await readPlanAuthority(scope);
+  const definition = definitionFromSlices(scope, markdown, log_markdown, title, phase, slices, current?.state);
+  definition.revision = current ? current.state.definition.revision + 1 : 1;
+  initialPlanState(definition, new Date().toISOString()); // rejects duplicate/malformed identities
+  const old = current?.state.definition;
+  const carry_forward_slice_ids = definition.slices.filter(fresh => old?.slices.some(prior => prior.id === fresh.id
+    && prior.acceptance_hash === fresh.acceptance_hash && approvalHash([...prior.depends_on].sort()) === approvalHash([...fresh.depends_on].sort()))).map(s => s.id);
+  const unknown_legacy = extractCheckpoints(log_markdown).length + slices.filter(s => s.status && s.status !== "pending").length;
+  const preview_hash = approvalHash({ definition, revision: current?.state.revision ?? null, carry_forward_slice_ids });
+  return { scope, definition, markdown, log_markdown, preview_hash, carry_forward_slice_ids,
+    existing_revision: current?.state.revision ?? null, unknown_legacy, imported_completion_claims: 0 as const,
+    state: current?.state ?? initialPlanState(definition, new Date().toISOString()) };
+}
+/** Resolve the explicit task against this daemon's original physical project, never a caller's path. */
+export async function captureArchitectPlanRuntimeSource(intent: PlanExecutionIntent, signal?: AbortSignal) {
+  signal?.throwIfAborted();
+  const preview = await previewArchitectPlanAuthority(intent.scope.id);
+  if (approvalHash(preview.scope) !== approvalHash(intent.scope)) throw new Error("PLAN_RUNTIME_PROJECT_SCOPE_REJECTED");
+  if (preview.existing_revision !== intent.expected_revision || preview.state.definition_hash !== intent.expected_definition_hash)
+    throw new Error("PLAN_STATE_REVISION_CONFLICT");
+  if (preview.definition.definition_hash !== intent.expected_definition_hash) throw new Error("PLAN_DEFINITION_RECONCILIATION_REQUIRED");
+  const root = await realpath(getArchitectPlansRoot()), requested = resolve(root, `${intent.scope.id}.md`), physical = await realpath(requested);
+  const inside = relative(root, physical);
+  if (!inside || inside === ".." || inside.startsWith(`..${sep}`) || isAbsolute(inside)) throw new Error("PLAN_RUNTIME_SOURCE_SCOPE_REJECTED");
+  const source = { path: requested, physical_path: physical, content_hash: preview.definition.source_hash };
+  await checkPlanRuntimeSource(source, signal); return source;
+}
+export async function reviewArchitectPlanDefinition(input: { plan_id: string; operation_id: string; preview_hash: string; review_id: string;
+  actor: import("../discipline/plan-workflow.js").PlanActor }) {
+  const request_reference = approvalHash(input);
+  const replay = await replayPlanRequest(input.actor, input.operation_id, request_reference); if (replay) return replay;
+  const preview = await previewArchitectPlanAuthority(input.plan_id);
+  if (input.preview_hash !== preview.preview_hash) throw new Error("PLAN_IMPORT_PREVIEW_CONFLICT");
+  const check_sources = async () => {
+    const current = await readFile(resolve(getArchitectPlansRoot(), `${input.plan_id}.md`), "utf8");
+    const log = await loadOptionalFile(resolve(getArchitectPlansRoot(), `${input.plan_id}.implementation-log.md`));
+    if (bytesHash(current) !== preview.definition.source_hash || (log === null ? null : bytesHash(log)) !== preview.definition.log_hash) throw new Error("PLAN_IMPORT_PREVIEW_CONFLICT");
+  };
+  if (preview.existing_revision === null) return importPlanAuthority({ actor: input.actor, definition: preview.definition, markdown: preview.markdown,
+    log_markdown: preview.log_markdown, operation_id: input.operation_id, review_id: input.review_id, request_reference, check_sources });
+  return applyPlanCommand({ actor: input.actor, plan_id: input.plan_id, operation_id: input.operation_id,
+    expected_revision: preview.state.revision, expected_definition_hash: preview.state.definition_hash, request_reference, check_sources,
+    definition_backup: { markdown: preview.markdown, log_markdown: preview.log_markdown },
+    command: { type: "reconcile_definition", definition: preview.definition, review_id: input.review_id,
+      carry_forward_slice_ids: preview.carry_forward_slice_ids, source_hash: preview.definition.source_hash, log_hash: preview.definition.log_hash } });
+}
+export async function executeArchitectPlanCommand(input: { plan_id: string; operation_id: string; expected_revision: number; expected_definition_hash: string;
+  command: unknown; actor: import("../discipline/plan-workflow.js").PlanActor }) {
+  let preview: Awaited<ReturnType<typeof previewArchitectPlanAuthority>> | undefined;
+  const check_sources = async () => {
+    if (!preview) {
+      preview = await previewArchitectPlanAuthority(input.plan_id);
+      if (preview.existing_revision === null) throw new Error("PLAN_NOT_IMPORTED");
+      if (preview.definition.definition_hash !== preview.state.definition_hash) throw new Error("PLAN_DEFINITION_RECONCILIATION_REQUIRED");
+    }
+    const current = await readFile(resolve(getArchitectPlansRoot(), `${input.plan_id}.md`), "utf8");
+    if (bytesHash(current) !== preview.definition.source_hash) throw new Error("PLAN_IMPORT_PREVIEW_CONFLICT");
+  };
+  return applyPlanCommand({ ...input, check_sources });
 }

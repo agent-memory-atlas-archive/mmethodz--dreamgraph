@@ -22,17 +22,17 @@ export function missingAbstraction(
   const now = new Date().toISOString();
 
   for (const entity of snapshot.entities.values()) {
-    if (nodes.length >= max) break;
+    if (nodes.length + edges.length >= max) break;
 
     const byType = new Map<string, string[]>();
     for (const link of entity.links) {
       const list = byType.get(link.type) ?? [];
-      list.push(link.target);
+      if (link.target !== entity.id && snapshot.entities.has(link.target) && !list.includes(link.target)) list.push(link.target);
       byType.set(link.type, list);
     }
 
     for (const [linkType, targets] of byType) {
-      if (nodes.length >= max) break;
+      if (max - nodes.length - edges.length < 3) break;
       if (targets.length < 2) continue;
 
       let interconnections = 0;
@@ -73,7 +73,7 @@ export function missingAbstraction(
 
       nodes.push(abstractionNode);
 
-      for (const target of targets.slice(0, 5)) {
+      for (const target of targets.slice(0, Math.min(5, max - nodes.length - edges.length))) {
         edges.push({
           id: dreamId("abs_edge"),
           from: abstractionNode.id,

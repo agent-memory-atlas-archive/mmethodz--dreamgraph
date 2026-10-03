@@ -31,6 +31,7 @@ export function symmetryCompletion(
       if (!target) continue;
 
       const reverseRelation = inferReverseRelation(link.relationship);
+      if (reverseRelation.startsWith("reverse_of_") || link.target === entity.id) continue;
 
       edges.push({
         id: dreamId("sym"),

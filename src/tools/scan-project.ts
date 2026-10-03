@@ -37,7 +37,7 @@ import { loadIndexableUIElements } from "../utils/ui-index.js";
 import { success, error, safeExecute } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 import { atomicWriteFile } from "../utils/atomic-write.js";
-import { getLlmProvider, getDreamerLlmConfig, isLlmAvailable } from "../cognitive/llm.js";
+import { getRoleLlmProvider } from "../cognitive/llm.js";
 import type { LlmMessage } from "../cognitive/llm.js";
 import { dream } from "../cognitive/dreamer.js";
 import { normalize } from "../cognitive/normalizer.js";
@@ -76,6 +76,9 @@ import { extractNativeDataModel, hasNativeCodeFiles } from "./native-data-model.
 import { extractNativeUiElements, hasScannableUiFiles } from "./native-ui-scanner.js";
 import { applyScannerUiElements } from "./ui-registry.js";
 import { enrichParserNodesProgrammatic, type EnrichResult } from "./enrich-parser-nodes.js";
+import { randomUUID } from "node:crypto";
+import { summarizeProviderUsage } from "../cognitive/provider-usage.js";
+import { ModelAdmissionError } from "../cognitive/model-admission.js";
 import { DEFAULT_ENRICHMENT_CONTEXT_HOPS, MAX_ENRICHMENT_CONTEXT_HOPS, parseEnrichmentContextHops } from "../utils/enrichment-context.js";
 import { GraphOperationBusyError, withGraphOperation } from "../utils/graph-operation.js";
 import { buildCoverageLedger, validateCoverageLedger } from "./coverage-ledger.js";
@@ -661,7 +664,10 @@ export interface ScanProjectResult {
   };
   semantic_enrichment?: EnrichResult;
   index_entries: number;
-  llm_tokens_used: number;
+  llm_tokens_used: number | null;
+  usage?: import("../cognitive/llm.js").TokenUsage;
+  usage_provenance?: "unavailable" | "partial" | "provider_reported";
+  admission_run_id?: string;
   dream_cycle?: {
     edges_created: number;
     nodes_created: number;
@@ -702,6 +708,7 @@ export interface IncrementalScanTestHooks {
 }
 
 export interface RunScanOptions {
+  signal?: AbortSignal;
   depth?: "shallow" | "deep";
   targets?: string[];
   repos?: string[];
@@ -728,7 +735,11 @@ export interface RunScanOptions {
  * Can also be called programmatically (e.g. during instance bootstrap).
  */
 export async function runScanProject(opts: RunScanOptions = {}): Promise<ScanProjectResult> {
-  return withGraphOperation("scan", () => executeScanProject(opts));
+  if(opts.dry_run)return withGraphOperation("scan",()=>executeScanProject(opts));
+  const { withEngineJob }=await import("../cognitive/jobs.js");
+  return withEngineJob({operation_id:`scan:${crypto.randomUUID()}`,owner:"scan",action:"scan_project",roles:["initial_scan"],
+    scope:opts.repos??Object.keys(config.repos),parameters:{depth:opts.depth??"deep",mode:opts.mode??"full",enrich:opts.enrich??true}},
+    signal=>withGraphOperation("scan", () => executeScanProject({...opts,signal})),opts.signal);
 }
 
 async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResult> {
@@ -939,7 +950,7 @@ async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResu
       const enriched = await enrichParserNodesProgrammatic({
         target: "all", maxNodes: Number.MAX_SAFE_INTEGER, batchSize: 12,
         dryRun: false, force: false, contextHops, relationContextSize: 40,
-        modelSource: "auto", scheduleStabilization: false,
+        modelSource: "auto", scheduleStabilization: false, signal: opts.signal,
       });
       if (enriched.success) explicitEnrichment = enriched.data;
     }
@@ -949,7 +960,7 @@ async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResu
       technology: "incremental", llm_used: false,
       features: counters.features, workflows: counters.workflows, data_model: counters.data_model,
       semantic_enrichment: explicitEnrichment,
-      index_entries: incrementalIndexEntries, llm_tokens_used: explicitEnrichment?.tokens_used ?? 0, delta_preview: deltaPreview,
+      index_entries: incrementalIndexEntries, llm_tokens_used: explicitEnrichment ? explicitEnrichment.tokens_used : 0, delta_preview: deltaPreview,
       incremental_metrics: {
         parser_invocations: scans.reduce((count, scan) => count + scan.files.length, 0),
         unchanged_files_parsed: 0,
@@ -967,7 +978,10 @@ async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResu
 
   const requestedMaxDepth = depth === "shallow" ? 3 : 10;
   const errors: string[] = [];
-  let totalTokens = 0;
+  let totalTokens: number | null = 0;
+  const inferenceRunId = `scan:${randomUUID()}`;
+  const scanUsage: Array<import("../cognitive/llm.js").TokenUsage | undefined> = [];
+  let modelStopped = false;
   let partialModeUsed = false;
 
   // Phase 1: Mechanical scan with adaptive fallback
@@ -999,8 +1013,9 @@ async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResu
   const techSummary = scans.map(s => s.technology).join("; ");
 
   // Phase 2: LLM enrichment (or structural fallback)
-  const llmAvailable = await isLlmAvailable();
-  const dreamerConfig = getDreamerLlmConfig();
+  const initialRuntime = await getRoleLlmProvider("initial_scan").catch(error => { errors.push("Initial-scan role blocked: " + String(error)); return null; });
+  const llmAvailable = initialRuntime && await initialRuntime.provider.isAvailable();
+  const dreamerConfig = initialRuntime?.config;
 
   const featureResult = { inserted: 0, updated: 0, total: 0 };
   const workflowResult = { inserted: 0, updated: 0, total: 0 };
@@ -1009,9 +1024,9 @@ async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResu
   const repoRequiresStructuralOnly = (_scan: ProjectScan): boolean => partialModeUsed;
 
   if (llmAvailable) {
-    logger.info(`scan_project: Phase 2 — LLM enrichment (model: ${dreamerConfig.model})`);
-    progress(`Phase 2 — LLM enrichment (model: ${dreamerConfig.model})…`);
-    const llm = getLlmProvider();
+    logger.info(`scan_project: Phase 2 — LLM enrichment (model: ${dreamerConfig!.model})`);
+    progress(`Phase 2 — LLM enrichment (model: ${dreamerConfig!.model})…`);
+    const llm = initialRuntime!.provider;
 
     for (const scan of scans) {
       const forceStructuralForRepo = repoRequiresStructuralOnly(scan);
@@ -1066,14 +1081,19 @@ async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResu
 
           logger.info(`scan_project: LLM call for ${target} (${scan.repoName})`);
           progress(`LLM extracting ${target} from ${scan.repoName}…`);
+          if (modelStopped || opts.signal?.aborted) throw new ModelAdmissionError("ADMISSION_SCAN_STOPPED", inferenceRunId);
           const response = await llm.complete(messages, {
-            model: dreamerConfig.model,
-            temperature: 0.3,
-            maxTokens: Math.min(dreamerConfig.maxTokens, 4000),
+            signal: opts.signal, admissionRunId: inferenceRunId,
+            cognitiveRole: "initial_scan",
+            ...(dreamerConfig!.reasoningEffort ? { reasoningEffort: dreamerConfig!.reasoningEffort } : {}),
+            model: dreamerConfig!.model,
+            temperature: dreamerConfig!.temperature,
+            maxTokens: Math.min(dreamerConfig!.maxTokens, 4000),
             jsonMode: true,
           });
 
-          totalTokens += response.tokensUsed ?? 0;
+          scanUsage.push(...(response.admission?.usage_by_call.map(usage => usage ?? undefined) ?? [response.usage ?? (response.tokensUsed !== undefined ? { outputTokens: response.tokensUsed } : undefined)]));
+          totalTokens = summarizeProviderUsage(scanUsage).usage?.outputTokens ?? null;
 
           const rawEntries = extractJsonArray(response.text);
           if (rawEntries.length === 0) {
@@ -1129,6 +1149,10 @@ async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResu
           resultRef.total = merged.merged.length;
 
         } catch (err) {
+          if (err instanceof ModelAdmissionError || opts.signal?.aborted) modelStopped = true;
+          const admission = (err as { admission?: import("../cognitive/llm.js").LlmResponse["admission"] }).admission;
+          scanUsage.push(...(admission?.usage_by_call.map(usage => usage ?? undefined) ?? [undefined]));
+          totalTokens = scanUsage.length === 0 ? 0 : summarizeProviderUsage(scanUsage).usage?.outputTokens ?? null;
           const msg = err instanceof Error ? err.message : String(err);
           errors.push(`LLM enrichment failed for ${target} (${scan.repoName}): ${msg}. Structural fallback applied.`);
           logger.warn(`scan_project: LLM error for ${target}: ${msg}`);
@@ -1382,6 +1406,7 @@ async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResu
       relationContextSize: 40,
       modelSource: "auto",
       scheduleStabilization: false,
+      signal: opts.signal,
       onProgress: (message) => {
         // Keep the parent MCP request alive during the longest scan phase and
         // expose durable per-batch checkpoints to CLI/Architect callers.
@@ -1390,7 +1415,8 @@ async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResu
     });
     if (enriched.success) {
       semanticEnrichment = enriched.data;
-      totalTokens += enriched.data.tokens_used;
+      totalTokens = totalTokens === null || enriched.data.tokens_used === null ? null : totalTokens + enriched.data.tokens_used;
+      if (enriched.data.llm_calls > 0) scanUsage.push(enriched.data.usage);
       if (!enriched.data.semantic_coverage.complete) {
         errors.push(
           `Semantic enrichment incomplete: ${enriched.data.semantic_coverage.llm_enriched}/` +
@@ -1618,7 +1644,7 @@ async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResu
 
   const summary =
     `Scan complete: ${scans.length} repo(s), ${totalFiles} files. ` +
-    `${semanticComplete ? `LLM enrichment complete (${semanticEnrichment?.semantic_coverage.llm_enriched ?? 0} nodes, ${totalTokens} tokens)` : "Semantic enrichment incomplete"}. ` +
+    `${semanticComplete ? `LLM enrichment complete (${semanticEnrichment?.semantic_coverage.llm_enriched ?? 0} nodes, ${totalTokens === null ? "unavailable token usage" : `${totalTokens} reported output tokens`})` : "Semantic enrichment incomplete"}. ` +
     `Features: ${featureResult.inserted} new / ${featureResult.total} total. ` +
     `Workflows: ${workflowResult.inserted} new / ${workflowResult.total} total. ` +
     `Data model: ${dataModelResult.inserted} new / ${dataModelResult.total} total. ` +
@@ -1649,6 +1675,9 @@ async function executeScanProject(opts: RunScanOptions): Promise<ScanProjectResu
     semantic_enrichment: semanticEnrichment,
     index_entries: indexEntries,
     llm_tokens_used: totalTokens,
+    usage: summarizeProviderUsage(scanUsage).usage,
+    usage_provenance: summarizeProviderUsage(scanUsage).usage_provenance,
+    admission_run_id: inferenceRunId,
     dream_cycle: dreamCycleResult,
     targeted_dream_schedules: targetedDreamSchedules,
     errors,
@@ -1699,7 +1728,7 @@ export function registerScanProjectTool(server: McpServer): void {
       dry_run: z.boolean().default(false).describe("Preview the incremental delta without parser, LLM, or graph writes."),
       enrich: z.boolean().default(false).describe("Incremental only: explicitly run semantic enrichment after structural reconciliation. Default false."),
       context_hops: z.number().int().min(0).max(MAX_ENRICHMENT_CONTEXT_HOPS).default(DEFAULT_ENRICHMENT_CONTEXT_HOPS)
-        .describe("Maximum semantic graph hops for enrichment (0 omits graph neighbors; default 3). Does not change filesystem scan depth."),
+        .describe("Maximum semantic graph hops for enrichment (0 omits graph neighbors; default 2). Does not change filesystem scan depth."),
     },
     async ({ depth, targets, repos, mode, dry_run, enrich, context_hops }, extra) => {
       const VALID_TARGETS = ["features", "workflows", "data_model", "ui"];
@@ -1746,7 +1775,7 @@ export function registerScanProjectTool(server: McpServer): void {
 
       const result = await safeExecute<ScanProjectResult>(async (): Promise<ToolResponse<ScanProjectResult>> => {
         try {
-          const scanResult = await runScanProject({ depth, targets: targetList, repos, mode, dry_run, enrich, context_hops, onProgress });
+          const scanResult = await runScanProject({ depth, targets: targetList, repos, mode, dry_run, enrich, context_hops, onProgress, signal: extra.signal });
           return success<ScanProjectResult>(scanResult);
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);

@@ -1,0 +1,120 @@
+{
+  "schema": "dreamgraph.ashoka.slice_verification.v1",
+  "slices": [
+    24,
+    29
+  ],
+  "status": "verified",
+  "recorded_at": "2026-10-01T16:46:00.496Z",
+  "native_review": {
+    "status": "compliant",
+    "declared_entries": 26,
+    "matched": 26,
+    "gaps": 0,
+    "regressions": 0,
+    "decision": "accept",
+    "source_audit_id": "tc_1790872990008_oj3v18",
+    "source_files": 64
+  },
+  "root": {
+    "command": "npx vitest run --maxWorkers=4 --reporter=json --outputFile=docs/ashoka/wave-24-29-stable-root-tests.json",
+    "files": 146,
+    "passed": 1613,
+    "failed": 0,
+    "skipped": 2
+  },
+  "focused": {
+    "files": 6,
+    "passed": 60,
+    "evidence": "wave-24-29-final-focused-tests.json"
+  },
+  "extension": {
+    "build": "passed",
+    "command": "node --test dist/test/*.test.js",
+    "passed": 488,
+    "failed": 0,
+    "evidence": "wave-24-29-extension-tests.log"
+  },
+  "builds": {
+    "server": "passed",
+    "explorer": "passed",
+    "vscode": "passed"
+  },
+  "catalog": {
+    "tools": 93,
+    "resources": 31,
+    "classifications": 94
+  },
+  "contracts": {
+    "count": 31,
+    "sha256": "33a249a9d9604c483e667dae3db73d907917cdd1976552373a680b8dded6f2e1"
+  },
+  "baseline": {
+    "revision": 10,
+    "sha256": "f1e0ee3508d1911a2abde79ea03277f89c54a09013a71cc5a45daa079f1f9349"
+  },
+  "provider": {
+    "revision": 3,
+    "check": "passed"
+  },
+  "configuration": {
+    "typed": 308,
+    "literal_source_keys": 101,
+    "check": "passed"
+  },
+  "metrics": {
+    "definitions": 13,
+    "check": "passed"
+  },
+  "browser": {
+    "evidence": "browser-24-29/qualification.json",
+    "engine": "Chrome153.0.8010.50/softwareWebGL",
+    "actual_daemon": "compiled disposable instance",
+    "checks": 11,
+    "page_errors": 0,
+    "graph": {
+      "nodes": 1204,
+      "edges": 2796
+    },
+    "screenshots": [
+      "schedules-desktop.png",
+      "schedules-narrow.png",
+      "explorer-2d.png",
+      "explorer-3d.png",
+      "explorer-narrow-reduced-motion.png"
+    ],
+    "qualification": "Windows Chromium/software renderer; no physical GPU/other-platform/native GUI claim"
+  },
+  "schedule_cases": {
+    "SC01": "core/HTTP atomic duplicate plus actual browser disabled duplicate/history",
+    "SC02": "actual served script/HTTP CAS stale draft and core conflict",
+    "SC03": "core payload-bound replay plus actual browser dropped committed reply exact retry",
+    "SC04": "actual preview/create disabled/enable/no job on reads",
+    "SC05": "strict7Zod action schemas/field errors and browser cron/zero maxima",
+    "SC06": "core identical four-trigger preview/evaluation",
+    "SC07": "actual evaluator named-zone DST gap/fold identities",
+    "SC08": "core job lease/occurrence recovery and bounded missed cron",
+    "SC09": "actual native lucid engine-lane conflict plus core overlap",
+    "SC10": "immutable frozen actual job policies/core admission reservations and22currency checks",
+    "SC11": "browser future pause and actual blocked-before-dispatch cancel; running uncertainty fixture retained",
+    "SC12": "actual browser archive retains succeeded+cancelled jobs/definitions",
+    "SC13": "actual keyboard/narrow/offline/error and online canonical readback"
+  },
+  "limits": [
+    "Not final AT/GE usefulness evidence; remaining25/27 composed gates",
+    "No paid/provider/browser canary or source/live migration/global installation/restart",
+    "Other platform/native Computer Use remains31; migration26; synchronized release28",
+    "Product remains13.4.0 in staging until28",
+    "Legacy v1 Explorer production consumers update; old form POST410"
+  ],
+  "failures_retained": [
+    "wave-24-29-workspace-first-tests.json",
+    "wave-24-29-workspace-qualified-tests.log",
+    "workspace-isolated-tests.log",
+    "browser-24-29-run-first.log",
+    "browser-24-29-run-third.log",
+    "browser-24-29-final.log",
+    "browser-24-29-qualified.log"
+  ],
+  "source_audit": "wave-24-29-source-audit.json"
+}

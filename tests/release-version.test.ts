@@ -1,7 +1,12 @@
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { getDataDir, setDataDirOverride } from "../src/utils/paths.js";
+import { releaseGraphWriter } from "../src/graph/writer-lease.js";
 import { readFileSync } from "node:fs";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { CLI_VERSION } from "../src/cli/version.js";
 import { EXTENSION_VERSION } from "../extensions/vscode/src/version.js";
 import { config } from "../src/config/config.js";
@@ -20,6 +25,10 @@ vi.mock("../src/plugins/contributions.js", () => ({ registerPluginContributions:
 
 const readJson = (file: string) => JSON.parse(readFileSync(file, "utf8").replace(/^\uFEFF/, ""));
 const release = readJson("package.json").version;
+
+let isolatedDirectory: string, priorDirectory: string;
+beforeEach(async () => { priorDirectory = getDataDir(); isolatedDirectory = await mkdtemp(join(tmpdir(), "dg-release-identity-")); setDataDirOverride(isolatedDirectory); });
+afterEach(async () => { await releaseGraphWriter(isolatedDirectory); setDataDirOverride(priorDirectory); await rm(isolatedDirectory, { recursive: true, force: true }); });
 
 describe("synchronized release version", () => {
   it("keeps package manifests, lockfiles, CLI and VS Code identities aligned", () => {
@@ -56,7 +65,9 @@ describe("synchronized release version", () => {
       const text = result.contents[0];
       expect("text" in text).toBe(true);
       if (!("text" in text)) throw new Error("Expected capabilities JSON");
-      expect(JSON.parse(text.text).server.version).toBe(release);
+      const page = JSON.parse(text.text);
+      expect(page.schema).toBe("dreamgraph.resource_result.v1");
+      expect(page.records.find((record: { key: string }) => record.key === "server").payload.version).toBe(release);
     } finally {
       await client.close();
       await server.close();

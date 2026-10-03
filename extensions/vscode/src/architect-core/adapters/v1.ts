@@ -38,6 +38,7 @@ import type {
   ToolInvocationRecord,
 } from "../types.js";
 import type { ChatPanelHost } from "./host.js";
+import type { ManagedNativePass } from "../../managed-native-pass.js";
 
 // ---------------------------------------------------------------------------
 // ContextBuilderPort — host already built the envelope + assembled context;
@@ -128,7 +129,7 @@ export function createPromptComposerPort(host: ChatPanelHost): PromptComposerPor
 //     reasoning items + tool_use/tool_result pairs replay in the same
 //     shape `runAgenticLoop` would have produced.
 // ---------------------------------------------------------------------------
-export function createProviderPort(host: ChatPanelHost): ProviderPort {
+export function createProviderPort(host: ChatPanelHost, managedPass?: ManagedNativePass): ProviderPort {
   return Object.freeze({
     llm: host.architectLlm,
 
@@ -136,20 +137,24 @@ export function createProviderPort(host: ChatPanelHost): ProviderPort {
 
     async callProvider(input: CallProviderInput): Promise<ProviderProposal> {
       const { prompt, tools, iterationHistory, onStreamChunk, abortSignal } = input;
+      if (!managedPass) throw new Error("MANAGED_CORE_PASS_REQUIRED");
+      const signal = abortSignal ? AbortSignal.any([managedPass.signal, abortSignal]) : managedPass.signal;
+      signal.throwIfAborted();
 
       const wireMessages: ArchitectMessage[] = [...prompt.conversation];
 
       if (tools.length === 0) {
         // Pure streaming round-trip. No tool calls possible.
         let buffer = "";
-        const streamed = await host.architectLlm.stream(
-          wireMessages,
+        const prepared = await managedPass.prepare(wireMessages, [], [], signal);
+        const streamed = await managedPass.runModel(host.architectLlm, () => host.architectLlm.stream(
+          prepared.messages,
           (chunk) => {
             buffer += chunk;
             onStreamChunk?.(chunk);
           },
-          abortSignal,
-        );
+          signal,
+        ), signal);
         const text = streamed.content && streamed.content.length > 0 ? streamed.content : buffer;
         const response: ArchitectToolResponse = {
           content: text,
@@ -168,7 +173,10 @@ export function createProviderPort(host: ChatPanelHost): ProviderPort {
       // Tool-enabled round-trip. Reconstruct `rawMessages` from
       // `iterationHistory` so the model sees the same running tool
       // dialogue v1's `runAgenticLoop` builds inline.
-      const rawMessages: unknown[] = [];
+      // When a provider uses raw replay, preserve the original user/history
+      // and multimodal blocks as well as every subsequent tool result.
+      const rawMessages: unknown[] = wireMessages.filter(message => message.role !== "system")
+        .map(message => ({ role: message.role, content: message.content }));
       for (const iter of iterationHistory) {
         const assistantBlocks: Array<Record<string, unknown>> = [];
         if (iter.assistantText) {
@@ -199,12 +207,11 @@ export function createProviderPort(host: ChatPanelHost): ProviderPort {
         }
       }
 
-      const response = await host.architectLlm.callWithTools(
-        wireMessages,
-        (tools as readonly LlmToolDefinition[]).slice(),
-        rawMessages.length > 0 ? rawMessages : undefined,
-        abortSignal,
-      );
+      const wireTools = (tools as readonly LlmToolDefinition[]).slice();
+      const prepared = await managedPass.prepare(wireMessages, wireTools, rawMessages, signal);
+      const response = await managedPass.runModel(host.architectLlm, () => host.architectLlm.callWithTools(
+        prepared.messages, wireTools, prepared.raw, signal,
+      ), signal);
 
       // Forward assistant text via the stream sink so the chat bubble
       // updates for tool-call iterations (matches `runAgenticLoop`).
@@ -221,24 +228,25 @@ export function createProviderPort(host: ChatPanelHost): ProviderPort {
 }
 
 // ---------------------------------------------------------------------------
-// ToolExecutorPort — wraps the host's tool dispatch. The host owns
-// MCP/local routing, compression, tool-trace recording, and progress
-// events; the adapter only times the call and projects the result.
+// ToolExecutorPort — the original execution worker owns MCP/command effects.
+// Whole results stay literal. A private host callback is never an authority fallback.
 // ---------------------------------------------------------------------------
-export function createToolExecutorPort(host: ChatPanelHost): ToolExecutorPort {
+export function createToolExecutorPort(_host: ChatPanelHost, managedPass?: ManagedNativePass): ToolExecutorPort {
   return Object.freeze({
     async executeTool(input: ExecuteToolInput): Promise<ToolInvocationRecord> {
       const startedAt = Date.now();
-      const result = await host.executeTool({
-        id: input.call.id,
-        name: input.call.name,
-        input: input.call.input,
-      });
+      if (!managedPass) throw new Error("MANAGED_CORE_PASS_REQUIRED");
+      const signal = input.abortSignal ? AbortSignal.any([managedPass.signal, input.abortSignal]) : managedPass.signal;
+      const result = await managedPass.callTool(input.call.name, input.call.input ?? {}, signal, 300000);
+      const resultText = JSON.stringify(result);
+      if (typeof resultText !== "string" || Buffer.byteLength(resultText, "utf8") > 8 * 1024 * 1024)
+        throw new Error("MANAGED_CORE_TOOL_RESULT_BYTE_BOUND: complete result required; no clipping");
+      const envelope = result as { isError?: boolean; ok?: boolean } | null;
       return Object.freeze({
         call: input.call,
-        resultText: result.resultText,
-        isError: result.isError,
-        durationMs: result.durationMs > 0 ? result.durationMs : Date.now() - startedAt,
+        resultText,
+        isError: envelope?.isError === true || envelope?.ok === false,
+        durationMs: Date.now() - startedAt,
       });
     },
   });

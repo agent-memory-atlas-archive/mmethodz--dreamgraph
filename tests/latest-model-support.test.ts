@@ -1,5 +1,7 @@
+import { installOfflineAdmissionFixtures } from "./helpers/offline-admission.js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
+import { configurationModelChoices } from "../src/server/configuration-workspace.js";
 import {
   completeWithNativeTools, getModelCapabilities, initLlmProvider,
   type ArchitectLlmConfig, type LlmToolLoopMessage,
@@ -9,9 +11,11 @@ const openai = ["gpt-6.1-sol", "gpt-6-astra", "gpt-6-sol", "gpt-6-luna", "gpt-5.
 const anthropic = ["claude-opus-5-5", "claude-sonnet-5-5", "claude-fable-5-1", "claude-mythos-5-1"];
 const config = (provider: "openai" | "anthropic", model: string): ArchitectLlmConfig => ({
   provider, model, baseUrl: "https://provider.invalid/v1", apiKey: "test", temperature: 0.7,
-  maxTokens: 4096, timeoutMs: 1000, component: "architect", providerSource: "architect", modelSource: "architect",
+  maxTokens: 4096, timeoutMs: 5000, component: "architect", providerSource: "architect", modelSource: "architect",
 });
 afterEach(() => vi.unstubAllGlobals());
+
+installOfflineAdmissionFixtures();
 
 describe("September 2026 model support", () => {
   it.each(openai)("routes %s through Responses without sampling parameters", async (model) => {
@@ -73,7 +77,9 @@ describe("September 2026 model support", () => {
   });
 
   it("keeps current models available on all three model selection surfaces", () => {
-    for (const file of ["src/architect/routes.ts", "src/server/dashboard.ts", "extensions/vscode/src/architect-llm.ts"]) {
+    const dashboardChoices=configurationModelChoices().map(choice=>choice.value);
+    for(const model of [...openai,...anthropic])expect(dashboardChoices,`daemon model registry: ${model}`).toContain(model);
+    for (const file of ["src/architect/routes.ts", "extensions/vscode/src/architect-llm.ts"]) {
       const source = readFileSync(file, "utf8");
       for (const model of [...openai, ...anthropic]) expect(source, `${file}: ${model}`).toContain(model);
     }

@@ -1,46 +1,19 @@
-/**
- * DreamGraph Cognitive Normalizer — Three-outcome classifier.
- *
- * The normalizer is a strict critic that validates dream artifacts
- * against the Fact Graph. It acts as a firewall between imagination
- * and production truth.
- *
- * Three-outcome classification (speculative memory):
- * - validated:  Strong evidence, structurally grounded, no contradictions → promote
- * - latent:     Plausible, structurally valid, but evidence too weak → keep in dream space
- * - rejected:   Contradicted, malformed, or low-value noise → discard
- *
- * Two-pass scoring:
- * PASS 1 — Structural heuristic scoring:
- * - plausibility: structural/semantic fit (domain, keyword, repo coherence)
- * - evidence:     grounding in actual graph data (entity existence, shared connections)
- * - contradiction: severity of conflicts (0 = none, 1 = fatal)
- * - confidence:   combined score = plausibility × 0.45 + evidence × 0.45 + bonus − penalty
- *
- * PASS 2 — LLM semantic validation (normalizer model, low temperature):
- * - Evaluates latent edges and low_signal rejections via LLM
- * - Boosts plausibility/evidence for semantically meaningful connections
- * - Can upgrade rejected → latent or latent → validated
- * - Generates tension signals for rejected edges with confidence ≥ 0.30
- *
- * Promotion thresholds (strict / steady-state):
- * - confidence >= 0.62 AND plausibility >= 0.45 AND evidence >= 0.4 AND evidence_count >= 2
- *   → validated (promoted to fact-adjacent space)
- * - plausibility >= 0.35 AND not contradicted → latent (kept in speculative memory)
- * - everything else → rejected
- *
- * Cold-start bootstrap (ADR-096):
- * - Active until either entity-count reaches the floor (≥50 entities & ≥10
- *   validated edges) OR the bootstrap window elapses (20 cycles or 24h).
- * - Relaxed gate: confidence ≥ 0.50, evidence ≥ 0.30, evidence_count ≥ 1.
- * - exit_reason ("size" | "window" | "manual") is recorded on every exit.
- * - Live tuning floors come from `engine.getEffectivePromotionConfig()`; the
- *   runtime
- *   values shown above are defaults — do not treat them as constants.
- *
- * NORMALIZING state is REQUIRED. Engine enforces this.
+/** Claim-specific normalization. Semantic fit guides exploration; independent source ancestry governs promotion.
+ * ADR-241 preserves ADR-096 dual exit and exploration while removing relaxed factual corroboration.
+ * Current proofs, candidates, promotion and their history publish through one C04 transaction.
  */
 
+import { performance } from "node:perf_hooks";
+import { randomUUID } from "node:crypto";
+import { curationSuppressions, emptyCuration } from "./curation.js";
+import { normalizationClaimKey } from "./normalization-evidence.js";
+import { commitGraphWrites, findOperationReceipt, type CommitGraphInput } from "../graph/publication.js";
+import { assessClaimEvidence, claimCurrencyReasons, claimSourceScopes, NORMALIZATION_EVIDENCE_POLICY, type NormalizationClaim } from "./normalization-evidence.js";
+import { readNormalizationSnapshot, snapshotDocument, edgeClaim, nodeClaim, publishNormalization, NORMALIZATION_SCOPE, type NormalizationSnapshot } from "./normalization-publication.js";
+import { readNormalizationResult, NORMALIZATION_RESULT_LIMIT } from "./normalization-results.js";
+import type { CanonicalGraphRead } from "../graph/read-model.js";
+import type { GraphIdentity } from "../graph/contracts.js";
+import { cognitiveProvenance, type CognitiveProvenance } from "./cognitive-provenance.js";
 import { loadJsonArray } from "../utils/cache.js";
 import { logger } from "../utils/logger.js";
 import { engine } from "./engine.js";
@@ -56,7 +29,7 @@ import type {
   NormalizationReasonCode,
 } from "./types.js";
 import { countEvidence, computeConfidence, DEFAULT_PROMOTION, type PromotionConfig } from "./types.js";
-import { isLlmAvailable, getLlmProvider, getNormalizerLlmConfig } from "./llm.js";
+import { getRoleLlmProvider } from "./llm.js";
 import type { LlmMessage } from "./llm.js";
 import { resolveNormalizationStrictness } from "../instance/policies.js";
 
@@ -94,68 +67,31 @@ interface FactLookup {
   /** Entity → source_repo mapping */
   repos: Map<string, string>;
   /** Entity → type mapping */
-  types: Map<string, "feature" | "workflow" | "data_model">;
+  types: Map<string, GraphIdentity["kind"]>;
   /** Set of "from|to" for existing edges */
   edgeSet: Set<string>;
   /** Workflow step orderings for consistency checks */
   workflowSteps: Map<string, string[]>;
 }
 
-async function buildFactLookup(): Promise<FactLookup> {
-  const [features, workflows, dataModel] = await Promise.all([
-    loadJsonArray<Feature>("features.json"),
-    loadJsonArray<Workflow>("workflows.json"),
-    loadJsonArray<DataModelEntity>("data_model.json"),
-  ]);
-
-  const lookup: FactLookup = {
-    entityIds: new Set(),
-    domains: new Map(),
-    keywords: new Map(),
-    repos: new Map(),
-    types: new Map(),
-    edgeSet: new Set(),
-    workflowSteps: new Map(),
-  };
-
-  for (const f of features) {
-    lookup.entityIds.add(f.id);
-    lookup.domains.set(f.id, f.domain ?? "");
-    lookup.keywords.set(f.id, f.keywords ?? []);
-    lookup.repos.set(f.id, f.source_repo);
-    lookup.types.set(f.id, "feature");
-    for (const link of f.links ?? []) {
-      lookup.edgeSet.add(`${f.id}|${link.target}`);
-    }
+function buildFactLookup(graph: CanonicalGraphRead): FactLookup {
+  const lookup: FactLookup = { entityIds: new Set(), domains: new Map(), keywords: new Map(), repos: new Map(), types: new Map(), edgeSet: new Set(), workflowSteps: new Map() };
+  const facts = graph.entities.filter(e => ["feature", "workflow", "data_model", "capability", "datastore", "ui_element", "auxiliary"].includes(e.identity.kind));
+  const counts = new Map<string, number>();
+  for (const e of facts) counts.set(e.identity.id, (counts.get(e.identity.id) ?? 0) + 1);
+  // Legacy heuristics do not guess when typed namespaces share an ID.
+  for (const e of facts) {
+    if (counts.get(e.identity.id) !== 1) continue;
+    const id = e.identity.id, raw = e.payload;
+    lookup.entityIds.add(id); lookup.domains.set(id, typeof raw.domain === "string" ? raw.domain : "");
+    lookup.keywords.set(id, Array.isArray(raw.keywords) ? raw.keywords.filter((v): v is string => typeof v === "string") : []);
+    lookup.repos.set(id, e.identity.repository_id ?? "");
+    lookup.types.set(id, e.identity.kind);
+    if (e.identity.kind === "workflow") lookup.workflowSteps.set(id, Array.isArray(raw.steps) ? raw.steps.map(s => String((s as { name?: unknown }).name ?? "")) : []);
   }
-
-  for (const w of workflows) {
-    lookup.entityIds.add(w.id);
-    lookup.domains.set(w.id, w.domain ?? "");
-    lookup.keywords.set(w.id, w.keywords ?? []);
-    lookup.repos.set(w.id, w.source_repo);
-    lookup.types.set(w.id, "workflow");
-    // Store step ordering for consistency checks
-    lookup.workflowSteps.set(
-      w.id,
-      (w.steps ?? []).map((s) => s.name)
-    );
-    for (const link of w.links ?? []) {
-      lookup.edgeSet.add(`${w.id}|${link.target}`);
-    }
+  for (const edge of graph.relationships.filter(e => e.kind === "fact" && e.source && e.target)) {
+    if (counts.get(edge.source!.id) === 1 && counts.get(edge.target!.id) === 1) lookup.edgeSet.add(`${edge.source!.id}|${edge.target!.id}`);
   }
-
-  for (const e of dataModel) {
-    lookup.entityIds.add(e.id);
-    lookup.domains.set(e.id, e.domain ?? "");
-    lookup.keywords.set(e.id, e.keywords ?? []);
-    lookup.repos.set(e.id, e.source_repo);
-    lookup.types.set(e.id, "data_model");
-    for (const link of e.links ?? []) {
-      lookup.edgeSet.add(`${e.id}|${link.target}`);
-    }
-  }
-
   return lookup;
 }
 
@@ -320,7 +256,7 @@ function calculateSplitScore(
   // Repo match is factual evidence
   if (repoMatch) evidenceScore += 0.15;
   // Reinforcement history: surviving multiple cycles IS evidence
-  evidenceScore += Math.min(reinforcementCount * 0.04, 0.10);
+  // Repetition affects plausibility only; claim evidence is resolved separately.
   evidenceScore = Math.round(Math.min(Math.max(evidenceScore, 0), 1) * 100) / 100;
 
   // --- Combined Confidence ---
@@ -629,6 +565,7 @@ const SEMANTIC_VALIDATION_SCHEMA: Record<string, unknown> = {
 };
 
 interface SemanticEvaluation {
+  model_provenance?: CognitiveProvenance;
   edge_id: string;
   semantic_relevance: number;
   reasoning: string;
@@ -651,6 +588,7 @@ interface SemanticEvaluation {
 async function llmSemanticValidation(
   edges: Array<{ edge: DreamEdge; result: ValidationResult }>,
   lookup: FactLookup,
+  signal?: AbortSignal,
 ): Promise<Map<string, SemanticEvaluation>> {
   const evaluations = new Map<string, SemanticEvaluation>();
 
@@ -675,13 +613,14 @@ async function llmSemanticValidation(
   if (candidates.length === 0) return evaluations;
 
   // Check LLM availability
-  const available = await isLlmAvailable();
+  const runtime = await getRoleLlmProvider("normalizer").catch(error => { logger.warn("Semantic validation role blocked: " + String(error)); return null; });
+  const available = runtime && await runtime.provider.isAvailable();
   if (!available) {
     logger.debug("Semantic validation: LLM not available, skipping");
     return evaluations;
   }
 
-  const llm = getLlmProvider();
+  const llm = runtime!.provider;
 
   // Batch up to N edges per call (low_signal rejections need coverage)
   const batchSize = Number(process.env.DG_NORMALIZER_BATCH_SIZE) || 20;
@@ -725,8 +664,12 @@ Be a strict critic. Only score above 0.6 if the relationship genuinely reveals s
   try {
     logger.debug(`Semantic validation: evaluating ${batch.length} edges via LLM`);
 
-    const normCfg = getNormalizerLlmConfig();
+    const normCfg = runtime!.config;
+    const started = performance.now();
     const response = await llm.complete(messages, {
+      signal,
+      cognitiveRole: "normalizer",
+      ...(normCfg.reasoningEffort ? { reasoningEffort: normCfg.reasoningEffort } : {}),
       temperature: normCfg.temperature,
       maxTokens: normCfg.maxTokens,
       model: normCfg.model,
@@ -736,11 +679,19 @@ Be a strict critic. Only score above 0.6 if the relationship genuinely reveals s
       },
     });
 
+    const provenance = cognitiveProvenance({ role: "normalizer", prompt_version: "normalizer.semantic-baseline.v1", schema_version: "semantic_validation.v1",
+      messages, output_schema: SEMANTIC_VALIDATION_SCHEMA, source_context: edgeDescriptions,
+      source_ids: batch.flatMap(({ edge }) => [edge.from, edge.to]),
+      ancestry_ids: batch.flatMap(({ edge }) => {
+        const prior = edge.meta?.model_provenance as CognitiveProvenance | undefined;
+        return prior?.ancestry_ids ?? [edge.id];
+      }), policy: runtime!.policy, elapsed_ms: performance.now() - started, response });
     const parsed = JSON.parse(response.text) as { evaluations?: SemanticEvaluation[] };
     if (Array.isArray(parsed.evaluations)) {
       for (const ev of parsed.evaluations) {
         if (ev.edge_id && typeof ev.semantic_relevance === "number") {
           evaluations.set(ev.edge_id, {
+            model_provenance: provenance,
             edge_id: ev.edge_id,
             semantic_relevance: Math.max(0, Math.min(1, ev.semantic_relevance)),
             reasoning: ev.reasoning ?? "",
@@ -765,8 +716,7 @@ Be a strict critic. Only score above 0.6 if the relationship genuinely reveals s
 /**
  * Apply semantic validation results to edge assessments.
  * Edges with high semantic relevance get boosted:
- * - plausibility +0.15, evidence +0.10
- * - evidence_count +1 (semantic = distinct evidence type)
+ * - plausibility increases; independent evidence does not
  * - reason_code → "semantic_boost"
  * - If the boosted scores cross thresholds → upgraded to "validated"
  */
@@ -783,11 +733,10 @@ function applySemanticBoost(
   // Stronger boosts for rejected edges (they start from a deeper deficit)
   const wasRejected = result.status === "rejected";
   const plausBoost = (wasRejected ? 0.30 : 0.15) * boostScale;
-  const evidBoost  = (wasRejected ? 0.20 : 0.10) * boostScale;
+
 
   result.plausibility = Math.round(Math.min(result.plausibility + plausBoost, 1) * 100) / 100;
-  result.evidence_score = Math.round(Math.min(result.evidence_score + evidBoost, 1) * 100) / 100;
-  result.evidence_count += 1; // semantic validation = distinct evidence signal
+  result.semantic_evaluation = { semantic_relevance: evaluation.semantic_relevance, reasoning: evaluation.reasoning };
 
   // Recompute confidence with boosted scores
   result.confidence = computeConfidence(
@@ -826,14 +775,9 @@ function promoteToValidatedEdge(
   // Only "validated" outcome edges pass
   if (result.status !== "validated") return null;
 
-  // Reinforcement persistence counts as evidence: if independent dream cycles
-  // keep re-generating the same connection, that IS a distinct evidence signal.
-  // Threshold: 10+ reinforcements = 1 extra evidence count.
-  const reinforcementBonus = (edge.reinforcement_count ?? 0) >= 10 ? 1 : 0;
-  const effectiveEvidenceCount = result.evidence_count + reinforcementBonus;
-
-  // Must have at least min_evidence_count distinct evidence signals
-  if (effectiveEvidenceCount < promo.promotion_evidence_count) return null;
+  if (result.evidence_assessment?.state !== "supported") return null;
+  const effectiveEvidenceCount = result.evidence_assessment.independent_roots.length;
+  if (effectiveEvidenceCount < Math.max(1, promo.promotion_evidence_count)) return null;
 
   // Only edges between real fact graph entities can be promoted
   const validTypes = ["feature", "workflow", "data_model"] as const;
@@ -841,6 +785,11 @@ function promoteToValidatedEdge(
   if (!edgeType && edge.type !== "hypothetical") return null;
 
   return {
+    evidence_assessment: result.evidence_assessment,
+    from_kind: result.evidence_assessment.claim.type === "edge" ? result.evidence_assessment.claim.from.kind : undefined,
+    to_kind: result.evidence_assessment.claim.type === "edge" ? result.evidence_assessment.claim.to.kind : undefined,
+    from_repository_id: result.evidence_assessment.claim.type === "edge" ? result.evidence_assessment.claim.from.repository_id : undefined,
+    to_repository_id: result.evidence_assessment.claim.type === "edge" ? result.evidence_assessment.claim.to.repository_id : undefined,
     id: edge.id,
     from: edge.from,
     to: edge.to,
@@ -903,6 +852,7 @@ export interface NormalizationResult {
   /** Rejected edges that are tension-worthy (grounded endpoints, non-trivial rejection) */
   tensionCandidates: TensionCandidate[];
   receipt: NormalizationReceipt;
+  operation_receipt?: import("../graph/contracts.js").OperationReceipt;
 }
 
 function isTensionWorthyRejection(
@@ -971,13 +921,16 @@ export async function resolveTensionsFromPromotedEdges(
       if (tension.resolved) continue;
       const fromMatch = tension.entities.includes(promoted.from);
       const toMatch = tension.entities.includes(promoted.to);
-      if (fromMatch && toMatch) {
-        await engine.resolveTension(
+      const claim=tension.resolution_candidate?.verification_claim;
+      if (fromMatch && toMatch && claim?.type==="edge" && claim.from.id===promoted.from && claim.to.id===promoted.to && claim.relation===promoted.relation) {
+        const resolved=await engine.resolveTension(
           tension.id,
           "system",
           "confirmed_fixed",
-          "Addressed by promoted edge " + promoted.from + " -> " + promoted.to
+          "Declared connection predicate verified by current independently supported normalization",
+          undefined,{verification_claim:claim,expected_revision:tension.revision??0}
         );
+        if(!resolved)continue;
         tension.resolved = true;
         tensionsResolved++;
         logger.info(
@@ -1005,41 +958,35 @@ export async function resolveTensionsFromPromotedEdges(
  */
 export async function normalize(
   threshold?: number,
-  strict?: boolean
+  strict?: boolean,
+  options: { operation_id?: string; signal?: AbortSignal; entity_ids?:string[];fault_inject?: CommitGraphInput["fault_inject"] } = {},
 ): Promise<NormalizationResult> {
   engine.assertState("normalizing", "normalize");
 
+  if (threshold !== undefined && (!Number.isFinite(threshold) || threshold < 0 || threshold > 1)) throw new Error("NORMALIZATION_THRESHOLD_INVALID");
+  const operation_id = options.operation_id ?? randomUUID();
+  if(options.entity_ids!==undefined&&(!Array.isArray(options.entity_ids)||options.entity_ids.length>100||options.entity_ids.some(id=>!id)))throw new Error("NORMALIZATION_SCOPE_INVALID");
+  const focus=options.entity_ids===undefined?null:new Set(options.entity_ids);
+  const intent = { threshold: threshold ?? null, strict: strict ?? null, policy: NORMALIZATION_EVIDENCE_POLICY,...(focus?{entity_ids:[...focus].sort()}: {}) };
+  const prior = await findOperationReceipt(operation_id, "normalizer");
+  if (prior) {
+    const replay = await commitGraphWrites({ writes: [], actor: "normalizer", scope: NORMALIZATION_SCOPE, operation_id, intent, cause: "normalization" });
+    return { ...(await readNormalizationResult(replay.receipt) as unknown as NormalizationResult), operation_receipt: replay.receipt };
+  }
+  const assertCurrent = () => { engine.assertState("normalizing", "normalize publication"); options.signal?.throwIfAborted(); };
+  assertCurrent();
   const strictness = await resolveNormalizationStrictness(strict);
   const effectiveStrict = strictness.effective_strict;
 
   // Resolve promotion config from engine (policy tuning + live overrides)
   const strictPromo = await engine.getEffectivePromotionConfig();
 
-  // ADR-096: cold-start bootstrap relaxation.
-  // On a fresh instance the strict gate is unreachable because entity-
-  // existence is required as evidence (entities don't exist yet). During
-  // cold-start we relax the floor to ~0.50 confidence and lower the
-  // evidence requirements so the dream→normalize→promote loop can
-  // produce its first actionable output. Guard rails (ADR-096):
-  //   - relaxed floor MUST NOT exceed 0.50
-  //   - dual exit condition (entity-count OR window) MUST remain
-  //   - exit_reason MUST be populated on every exit event
+  // ADR-241 amends only ADR-096's factual-evidence relaxation. Dual exit remains below.
+  // Cold start keeps low-floor exploration/retention, never weakens corroboration.
   const isColdStart = engine.isColdStart();
   if (isColdStart) engine.markBootstrapStart();
-  const promo: PromotionConfig = isColdStart
-    ? {
-        // Cap at the ADR-096 ceiling — never raise above 0.50 here.
-        promotion_confidence: Math.min(
-          strictPromo.promotion_confidence,
-          engine.getBootstrapRelaxedConfidenceFloor()
-        ),
-        promotion_plausibility: Math.min(strictPromo.promotion_plausibility, 0.4),
-        promotion_evidence: Math.min(strictPromo.promotion_evidence, 0.3),
-        promotion_evidence_count: 1,
-        retention_plausibility: strictPromo.retention_plausibility,
-        max_contradiction: strictPromo.max_contradiction,
-      }
-    : strictPromo;
+  const promo: PromotionConfig = { ...strictPromo, promotion_evidence_count: Math.max(1, strictPromo.promotion_evidence_count),
+    retention_plausibility: isColdStart ? Math.min(strictPromo.retention_plausibility, 0.2) : strictPromo.retention_plausibility };
   const effectiveThreshold = threshold ?? promo.promotion_confidence;
   const relaxedFields = (Object.keys(promo) as Array<keyof PromotionConfig>).filter(
     (key) => promo[key] !== strictPromo[key]
@@ -1066,20 +1013,48 @@ export async function normalize(
   );
   logger.info(`Normalization receipt: ${JSON.stringify(receipt)}`);
 
-  // Load fact graph and dream graph
-  const [lookup, dreamGraph, existingCandidates] = await Promise.all([
-    buildFactLookup(),
-    engine.loadDreamGraph(),
-    engine.loadCandidateEdges(),
-  ]);
-
-  // Build map of previous assessment results by dream ID.
-  // Edges that were previously "validated" or "rejected" are final — skip them.
-  // Edges that were "latent" AND have gained reinforcement since their last
-  // assessment deserve re-evaluation (reinforcement = new evidence).
-  const previousResults = new Map(
-    existingCandidates.results.map((r) => [r.dream_id, r] as const)
-  );
+  const snapshot = await readNormalizationSnapshot();
+  const lookup = buildFactLookup(snapshot.graph);
+  const dreamGraph = snapshotDocument<DreamGraphFile>(snapshot, "dream_graph.json");
+  // Reserve a conservative finite result envelope before any semantic model dispatch.
+  if (dreamGraph.nodes.length + dreamGraph.edges.length > 10000
+    || Buffer.byteLength(JSON.stringify([dreamGraph, snapshot.evidence.ledger])) * 4 + 32768 > NORMALIZATION_RESULT_LIMIT) throw new Error("NORMALIZATION_RESULT_ADMISSION_BUDGET");
+  const existingCandidates = snapshotDocument<import("./types.js").CandidateEdgesFile>(snapshot, "candidate_edges.json");
+  const previousResults = new Map(existingCandidates.results.map(r => [`${r.dream_type}:${r.dream_id}`, r] as const));
+  // Cheap evidence re-evaluation always runs, including rejected/previously promoted claims.
+  // Unchanged evidence reuses prior semantic judgment instead of paying for repeated consensus.
+  const minimumRoots = Math.max(1, strictPromo.promotion_evidence_count);
+  const suppressed = curationSuppressions(snapshot.maintenance.curation ?? emptyCuration());
+  const humanDisposition = new Map<string, string>();
+  for (const decision of snapshot.maintenance.curation?.decisions ?? []) if (decision.action !== "expire") humanDisposition.set(`${decision.target_type}:${decision.target_id}`, decision.action);
+  const applyEvidence = (result: ValidationResult, claim: NormalizationClaim | null): void => {
+    result.evidence_input_hash = snapshot.evidence_fingerprint;
+    result.evidence_assessment = claim ? assessClaimEvidence(claim, snapshot.evidence, minimumRoots) : undefined;
+    const currencyReasons = claim && result.evidence_assessment ? claimCurrencyReasons(claim, snapshot.graph.state, claimSourceScopes(result.evidence_assessment, snapshot.evidence)) : [];
+    if (result.evidence_assessment && currencyReasons.length) {
+      result.evidence_assessment.state = "unproven";
+      result.evidence_assessment.reasons.push(...currencyReasons);
+    }
+    result.evidence_count = result.evidence_assessment?.independent_roots.length ?? 0;
+    result.evidence.claim_evidence = result.evidence_assessment;
+    result.evidence_score = Math.min(result.evidence_count / minimumRoots, 1);
+    if (["reject", "retire"].includes(humanDisposition.get(`${result.dream_type}:${result.dream_id}`) ?? "") || claim && suppressed.has(normalizationClaimKey(claim))) {
+      result.status = "rejected"; result.reason_code = "contradicted";
+      result.reason += " Human disposition requires explicit reopen.";
+    } else if (result.evidence_assessment?.state === "disputed") {
+      result.status = "rejected"; result.reason_code = "contradicted"; result.contradiction_score = 1;
+    } else if (!claim) {
+      result.status = "rejected"; result.reason_code = "invalid_endpoints";
+    } else if (result.evidence_assessment?.state === "supported" && result.contradiction_score < promo.max_contradiction) {
+      result.plausibility = Math.max(result.plausibility, 0.75);
+      result.confidence = computeConfidence(result.plausibility, result.evidence_score, 0, result.contradiction_score);
+      result.status = result.confidence >= effectiveThreshold && result.plausibility >= promo.promotion_plausibility && result.evidence_score >= promo.promotion_evidence ? "validated" : "latent";
+      result.reason_code = result.status === "validated" ? "strong_evidence" : "insufficient_evidence";
+    } else if (result.status === "validated") { result.status = "latent"; result.reason_code = "insufficient_evidence"; }
+    result.reason = result.reason.replace(/ Claim corroboration:.*?(?= LLM semantic:|$)/g, "");
+    result.reason += ` Claim corroboration: ${result.evidence_assessment?.state ?? "identity_unknown"}; ${result.evidence_count} independent source root(s).`;
+    result.confidence = computeConfidence(result.plausibility, result.evidence_score, 0, result.contradiction_score);
+  };
 
   // Validate all eligible edges — PASS 1: structural scoring
   const edgeAssessments: Array<{ edge: DreamEdge; result: ValidationResult }> = [];
@@ -1087,17 +1062,12 @@ export async function normalize(
 
   let edgeIter = 0;
   for (const edge of dreamGraph.edges) {
+    if(focus&&!focus.has(edge.from)&&!focus.has(edge.to))continue;
     if (edge.interrupted) continue;
 
-    const prev = previousResults.get(edge.id);
-    if (prev) {
-      // Already validated or rejected — final, skip
-      if (prev.status === "validated" || prev.status === "rejected") continue;
-      // Latent: only re-evaluate if reinforced since last assessment
-      if (prev.status === "latent" && (edge.reinforcement_count ?? 0) === 0) continue;
-    }
-
+    assertCurrent();
     const result = validateEdge(edge, lookup, cycle, promo);
+    applyEvidence(result, edgeClaim(edge as DreamEdge & Record<string, unknown>, snapshot.graph));
 
     // Apply custom threshold override
     if (result.status === "validated" && result.confidence < effectiveThreshold) {
@@ -1119,14 +1089,19 @@ export async function normalize(
   // PASS 2: LLM semantic validation on latent edges
   // The LLM evaluates abstract concept matches that structural scoring misses.
   // Only runs when LLM is available; gracefully degrades to structural-only.
-  const semanticResults = await llmSemanticValidation(edgeAssessments, lookup);
+  const semanticResults = await llmSemanticValidation(edgeAssessments.filter(({ edge }) => previousResults.get(`edge:${edge.id}`)?.evidence_input_hash !== snapshot.evidence_fingerprint), lookup, options.signal);
   let semanticBoosts = 0;
   for (const { edge, result } of edgeAssessments) {
-    const evaluation = semanticResults.get(edge.id);
+    const previous = previousResults.get(`edge:${edge.id}`);
+    const evaluation = semanticResults.get(edge.id) ?? (previous?.evidence_input_hash === snapshot.evidence_fingerprint && previous.semantic_evaluation
+      ? { ...previous.semantic_evaluation, edge_id: edge.id, model_provenance: previous.model_provenance } : undefined);
     if (evaluation) {
+      result.model_provenance = evaluation.model_provenance;
       applySemanticBoost(result, evaluation, promo);
       if (result.reason_code === "semantic_boost") semanticBoosts++;
     }
+    applyEvidence(result, edgeClaim(edge as DreamEdge & Record<string, unknown>, snapshot.graph));
+    edge.evidence_assessment = result.evidence_assessment;
   }
   if (semanticBoosts > 0) {
     logger.info(`Semantic validation boosted ${semanticBoosts} edges`);
@@ -1180,16 +1155,13 @@ export async function normalize(
   const promotableNodes: DreamNode[] = [];
   let nodeIter = 0;
   for (const node of dreamGraph.nodes) {
+    if(focus&&!focus.has(node.id)&&!node.inspiration.some(id=>focus.has(id)))continue;
     if (node.interrupted) continue;
-    if (node.promoted_at) continue; // Already promoted to fact graph
-
-    const prev = previousResults.get(node.id);
-    if (prev) {
-      if (prev.status === "validated" || prev.status === "rejected") continue;
-      if (prev.status === "latent" && (node.reinforcement_count ?? 0) === 0) continue;
-    }
-
+    const alreadyPromoted = Boolean(node.promoted_at);
+    assertCurrent();
     const result = validateNode(node, lookup, cycle, promo);
+    applyEvidence(result, nodeClaim(node, snapshot.graph.instance_id));
+    node.evidence_assessment = result.evidence_assessment;
 
     if (result.status === "validated" && result.confidence < effectiveThreshold) {
       result.status = "latent";
@@ -1210,7 +1182,7 @@ export async function normalize(
       : 0;
 
     // Collect validated nodes for entity promotion
-    if (result.status === "validated") {
+    if (result.status === "validated" && !alreadyPromoted) {
       promotableNodes.push(node);
     }
 
@@ -1218,64 +1190,9 @@ export async function normalize(
     if (++nodeIter % NORMALIZER_YIELD_BATCH === 0) await yieldToEventLoop();
   }
 
-  // ---------- Multi-file promotion with rollback protection ----------
-  // The promotion sequence touches 3-5 files sequentially.  If any step
-  // fails, we downgrade the in-memory results from "validated" back to
-  // "latent" so the next normalization cycle can retry cleanly instead
-  // of leaving orphaned state across files.
-  // -------------------------------------------------------------------
-
-  // Snapshot dream graph BEFORE writes so we can rollback on failure
-  const dreamGraphSnapshot = JSON.stringify(dreamGraph);
-
-  // Persist updated dream graph (with status/scores written back)
-  await engine.saveDreamGraph(dreamGraph);
-
-  // Persist normalization results
-  if (newResults.length > 0) {
-    await engine.appendValidationResults(newResults);
-  }
-
-  let promotedNodeCount = 0;
-  try {
-    if (promotedEdges.length > 0) {
-      await engine.promoteEdges(promotedEdges);
-    }
-
-    // ENTITY PROMOTION — validated nodes become fact entities
-    // Intent becomes factual when confidence is reached.
-    if (promotableNodes.length > 0) {
-      const result = await engine.promoteNodesToFactGraph(promotableNodes);
-      promotedNodeCount = result.promoted;
-    }
-  } catch (promotionErr) {
-    // Rollback: restore dream graph to pre-promotion state and downgrade
-    // promoted edges back to latent so the next cycle can retry.
-    logger.error(
-      `Promotion failed mid-write \u2014 rolling back dream graph to pre-promotion state. ` +
-      `Error: ${promotionErr instanceof Error ? promotionErr.message : promotionErr}`
-    );
-    try {
-      const restored: DreamGraphFile = JSON.parse(dreamGraphSnapshot);
-      // Downgrade edges that were about to be promoted back to latent
-      for (const edge of restored.edges) {
-        if (promotedEdges.some(pe => pe.id === edge.id)) {
-          edge.status = "latent";
-        }
-      }
-      await engine.saveDreamGraph(restored);
-      logger.warn(`Rollback complete: ${promotedEdges.length} edges reverted to latent, dream graph restored`);
-    } catch (rollbackErr) {
-      logger.error(
-        `CRITICAL: Rollback also failed. Manual intervention may be required. ` +
-        `Error: ${rollbackErr instanceof Error ? rollbackErr.message : rollbackErr}`
-      );
-    }
-    // Zero out promotion counts since they were rolled back
-    promotedEdges.length = 0;
-    promotedNodeCount = 0;
-  }
-
+  // One durable C04 publication follows current proof and state re-checks.
+  // Failures propagate with the actual recovery state; no fabricated partial rollback.
+  const promotedNodeCount = promotableNodes.length;
   const counts = {
     validated: newResults.filter((r) => r.status === "validated").length,
     latent: newResults.filter((r) => r.status === "latent").length,
@@ -1302,6 +1219,12 @@ export async function normalize(
     logger.info(`Normalization: ${tensionCandidates.length} tension-worthy rejections identified`);
   }
 
+  const result: NormalizationResult = { cycle, processed: newResults.length, ...counts, blockedByGate, promotedEdges,
+    promotedNodes: promotedNodeCount, tensionCandidates, receipt };
+  const publication = await publishNormalization({ snapshot, dreamGraph, results: newResults, promotedEdges, promotedNodes: promotableNodes,
+    cycle, minimum_roots: minimumRoots, operation_id, intent, result: result as unknown as Record<string, unknown>,
+    fault_inject: options.fault_inject, assert_current: assertCurrent });
+  const response = { ...result, operation_receipt: publication.receipt };
   logger.info(
     `Normalization cycle #${cycle} complete: ${newResults.length} processed ` +
       `(${counts.validated} validated, ${counts.latent} latent, ${counts.rejected} rejected), ` +
@@ -1328,14 +1251,5 @@ export async function normalize(
     }
   }
 
-  return {
-    cycle,
-    processed: newResults.length,
-    ...counts,
-    blockedByGate,
-    promotedEdges,
-    promotedNodes: promotedNodeCount,
-    tensionCandidates,
-    receipt,
-  };
+  return response;
 }

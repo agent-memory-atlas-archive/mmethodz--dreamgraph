@@ -1,0 +1,38 @@
+import {beforeEach,afterEach,expect,it} from "vitest";
+import {createServer,type Server} from "node:http";
+import {mkdtemp,rm} from "node:fs/promises";
+import {tmpdir} from "node:os";
+import {join} from "node:path";
+import {handleScheduleApi} from "../src/server/schedule-api.js";
+import {getDataDir,setDataDirOverride} from "../src/utils/paths.js";
+import {releaseGraphWriter} from "../src/graph/writer-lease.js";
+import {EngineJobs} from "../src/cognitive/jobs.js";
+import {getSchedulerConfig,updateSchedulerConfig,stopScheduler} from "../src/cognitive/scheduler.js";
+let directory:string,previous:string,server:Server,url:string,config:ReturnType<typeof getSchedulerConfig>;
+beforeEach(async()=>{previous=getDataDir();directory=await mkdtemp(join(tmpdir(),"dg-schedule-http-"));setDataDirOverride(directory);config=getSchedulerConfig();
+ stopScheduler();updateSchedulerConfig({enabled:false,global_cooldown_ms:0,nightmare_cooldown_ms:0,execution_timeout_ms:10000});
+ server=createServer((req,res)=>{void handleScheduleApi(req,res,new URL(req.url!,"http://localhost").pathname);});
+ await new Promise<void>(resolve=>server.listen(0,"127.0.0.1",resolve));url=`http://127.0.0.1:${(server.address() as {port:number}).port}`;});
+afterEach(async()=>{server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));stopScheduler();updateSchedulerConfig({...config,enabled:false});
+ await releaseGraphWriter(directory);setDataDirOverride(previous);await rm(directory,{recursive:true,force:true});});
+const post=async(path:string,body:unknown)=>{const response=await fetch(url+path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});return {status:response.status,body:await response.json()};};
+it("shared schedule ports expose disabled create, preview, CAS conflicts and original manual run replay",async()=>{
+ const created=await post("/api/schedules/v2/create",{operation_id:"create",name:"Bounded maintenance",action:"graph_maintenance",trigger_type:"interval",interval_ms:60000});
+ expect(created.status).toBe(200);const schedule=created.body.schedule;expect(schedule.enabled).toBe(false);
+ const snapshot=await (await fetch(url+"/api/schedules/v2")).json();expect(snapshot.schedules[0].definition_revision).toBe(1);
+ const preview=await (await fetch(url+`/api/schedules/v2/preview?id=${schedule.id}`)).json();expect(preview.occurrences).toHaveLength(8);
+ expect((await new EngineJobs().inspect()).records).toEqual([]);
+ const run={operation_id:"run",expected_revision:1,action:"run_now",target_id:schedule.id};const first=await post("/api/schedules/v2/commands",run);
+ expect(first.status).toBe(200);expect(first.body.result.success).toBe(true);expect(await post("/api/schedules/v2/commands",run)).toEqual(first);
+ const edit={operation_id:"edit",expected_revision:1,action:"update",target_id:schedule.id,updates:{name:"Edited"}};
+ expect((await post("/api/schedules/v2/commands",edit)).status).toBe(200);
+ expect((await post("/api/schedules/v2/commands",{...edit,operation_id:"other",updates:{name:"Lost update"}})).body.error).toBe("SCHEDULE_REVISION_CONFLICT");
+ const jobs=await (await fetch(url+"/api/jobs/v1?limit=1")).json();expect(jobs.total).toBe(1);expect(jobs.records[0].job.state).toBe("succeeded");
+});
+it("queued fence-zero cancellation is supported and changed replay cannot bypass its original CAS",async()=>{
+ const record=await new EngineJobs().accept({operation_id:"queued",owner:"daemon",action:"graph_maintenance",scope:["fixture"],roles:["normalizer"]});
+ const command={operation_id:"cancel",expected_revision:0,action:"cancel_job",target_id:record.job.id};
+ const result=await post("/api/schedules/v2/commands",command);expect(result.status).toBe(200);expect(result.body.result.job.state).toBe("cancelled");expect(result.body.result.work_settled).toBe(true);
+ expect(await post("/api/schedules/v2/commands",command)).toEqual(result);
+ expect((await post("/api/schedules/v2/commands",{...command,expected_revision:1})).body.error).toContain("JOB_CANCEL_OPERATION_CONFLICT");
+});

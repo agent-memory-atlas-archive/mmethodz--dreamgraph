@@ -15,18 +15,21 @@
  *    marker) are passed through verbatim — their pivot hint is more valuable
  *    than the raw bytes.
  *
- * Never refuses, never throws.
+ * Required machine anchors may refuse an insufficient budget. Callers must retain
+ * the original owner result; refusal never establishes effect failure or rollback.
  */
 
 /**
  * Compression mode names match those defined in `budget-coordinator.ts` so the
  * coordinator's compression history stays type-aligned end-to-end.
  */
+import { boundMachineResult } from './machine-result.js';
 export type CompressionMode =
   | 'verbatim'
   | 'expected'
   | 'debt-repay'
-  | 'envelope-preserved';
+  | 'envelope-preserved'
+  | 'whole_result_omission';
 
 /**
  * Minimal duck-typed coordinator contract for the tool-result layer. The
@@ -147,6 +150,12 @@ export function compressToolResult(
     Math.floor(options?.expectedSliceTokens ?? 4_000),
   );
   const expectedSliceChars = expectedSliceTokens * 4;
+  const machine = boundMachineResult(content, expectedSliceChars);
+  if (machine) {
+    const mode = machine.mode as CompressionMode;
+    reportCompression(coordinator, toolName, originalChars, machine.finalChars, mode);
+    return { ...machine, mode };
+  }
 
   // Tier mild — 0 < pressure ≤ 0.5.
   if (pressure <= 0.5) {

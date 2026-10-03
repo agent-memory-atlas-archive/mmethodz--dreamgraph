@@ -1,0 +1,707 @@
+Perform a full pre-implementation execution simulation of the entire unified
+DreamGraph v14.0.0 — Ashoka plan.
+
+This is the final deep architecture/plan-closure pass before GPT-6.1 Sol is
+asked to execute the implementation.
+
+Do NOT implement Ashoka during this task.
+
+Instead, take the complete current Ashoka plan, every incorporated contract,
+every appendix/supporting plan, every nervous-point resolution, every ADR it
+depends upon, and the actual current DreamGraph implementation, and mentally
+execute the overhaul one level deeper from beginning to end.
+
+The goal is to discover and close the loose ends that only become visible when
+the plan is treated as if it were actually being executed.
+
+This is not a request for more speculative architecture.
+
+It is a request to answer:
+
+    "If Sol 6.1 started implementing Ashoka tomorrow exactly as written,
+     where would it still be forced to invent architecture, guess ownership,
+     discover an unstated prerequisite, reinterpret a contract, encounter
+     incompatible state, or reach a point where the plan does not specify
+     what must happen next?"
+
+Find those places now and repair the plan.
+
+──────────────────────────────────────────────────────────────────────────────
+1. USE THE ENTIRE CURRENT ASHOKA SYSTEM
+──────────────────────────────────────────────────────────────────────────────
+
+Treat the unified v14.0.0 — Ashoka plan as the governing spine.
+
+Read and reconcile:
+- all current slices;
+- all current contracts, including C15;
+- all supporting appendix plans;
+- all nervous-point resolutions;
+- current accepted ADRs relevant to the work;
+- audit findings and subsystem-alignment material;
+- current implementation anchors;
+- current surface/adaptor behavior;
+- current migration/version assumptions.
+
+Do not evaluate an appendix in isolation.
+
+An appendix may refine the main plan, but it may not become a competing
+architecture or second authority.
+
+If two appendices or slices independently define the same concept, reconcile
+them to one owner and one contract.
+
+Preserve existing stable slice IDs unless a genuinely new independently
+deliverable responsibility cannot sensibly fit anywhere. Do not manufacture
+new slices simply because a subject is large.
+
+Do not reopen decisions that Ashoka has already explicitly resolved unless
+actual repository evidence demonstrates that the decision is impossible,
+internally contradictory, or unsafe.
+
+──────────────────────────────────────────────────────────────────────────────
+2. DRY-RUN THE REAL DEPENDENCY GRAPH
+──────────────────────────────────────────────────────────────────────────────
+
+Do not simply reread slices numerically.
+
+Construct the effective implementation dependency DAG and simulate the work in
+an order that could actually be executed.
+
+For every slice determine:
+
+- what authoritative state exists before it starts;
+- which earlier contracts it assumes;
+- which schemas/types/interfaces it consumes;
+- which persisted formats it reads or mutates;
+- which events/jobs/lifecycle states it depends upon;
+- which adapters/surfaces consume its result;
+- what migration state may coexist during rollout;
+- what happens after process restart;
+- what happens with two clients;
+- what happens with concurrent writers/jobs;
+- what happens if the slice succeeds only partially;
+- what constitutes durable completion;
+- what evidence permits the next dependent slice to begin;
+- what rollback actually means after later work has occurred.
+
+Look for hidden dependencies.
+
+Examples:
+
+A UI slice may appear to depend only on configuration APIs but actually depend
+on lifecycle states introduced elsewhere.
+
+A persistence migration may require the new identity contract before it can
+safely produce converted records.
+
+A retrieval contract may depend upon indexes whose revision semantics have not
+yet been created.
+
+A compatibility adapter may be needed before the canonical contract can be
+switched.
+
+A scheduler change may depend upon job identity/recovery semantics defined in a
+different slice.
+
+Find these now.
+
+Update dependency declarations where necessary.
+
+──────────────────────────────────────────────────────────────────────────────
+3. FOLLOW EVERY IMPORTANT CONCEPT END TO END
+──────────────────────────────────────────────────────────────────────────────
+
+For each major Ashoka concept, trace:
+
+    producer
+      → canonical owner
+      → persisted representation
+      → mutation authority
+      → emitted lifecycle/events
+      → reader/projection
+      → adapter
+      → user/agent surface
+      → reconciliation/recovery
+
+Do this for at least:
+
+- graph identity;
+- graph revision/snapshots;
+- source evidence;
+- provenance;
+- evidence ancestry;
+- trust state;
+- confidence;
+- freshness/staleness;
+- plan identity;
+- slice lifecycle;
+- current/next slice;
+- job identity;
+- execution identity;
+- session identity;
+- cancellation;
+- operation/commit receipts;
+- reconciliation obligations;
+- dirty graph generations;
+- digestion lifecycle;
+- scheduler state;
+- model role/profile;
+- requested versus effective model;
+- provider/API capability;
+- spend/budget reservations;
+- continuation state;
+- configuration revision;
+- analytics denominators;
+- federation origin;
+- temporal/causal state;
+- tensions/remediation;
+- narrative/lucid state;
+- Computer Use capability/state.
+
+For each concept ask:
+
+    Is there exactly one semantic owner?
+
+    Can two parts of DreamGraph currently disagree about it?
+
+    Can a surface derive its own meaning instead of consuming the authority?
+
+    Can the state become stale without that being observable?
+
+    Can it survive restart?
+
+    Can it survive a lost reply?
+
+    Can it survive concurrent clients?
+
+    Can it be reconstructed from durable state?
+
+Where the answer is unclear, Ashoka is not execution-ready.
+
+Resolve it in the appropriate existing contract/slice.
+
+──────────────────────────────────────────────────────────────────────────────
+4. SIMULATE THE GRAPH-CENTERED EXECUTION LOOP
+──────────────────────────────────────────────────────────────────────────────
+
+C15 is a release invariant, not an optional integration feature.
+
+Dry-run this complete loop through every managed execution route:
+
+    project reality
+        → canonical graph
+        → task-specific context
+        → executing agent
+        → committed project change
+        → targeted reconciliation
+        → bounded digestion
+        → richer canonical graph
+        → next independent agent
+
+Exercise this mentally through:
+
+- Browser Architect;
+- VS Code Architect;
+- native API execution;
+- Codex CLI;
+- Copilot CLI;
+- MCP;
+- SDK/host/plugin paths;
+- Dreamer;
+- Normalizer;
+- targeted/lucid/background cognition where applicable.
+
+For each path identify exactly:
+
+- who creates the context request;
+- who selects graph evidence;
+- how mandatory constraints survive context compression;
+- how staleness is detected;
+- how source verification is requested;
+- how changed scope is observed;
+- where reconciliation obligation becomes durable;
+- how graph changes commit;
+- how dirty regions are admitted;
+- when digestion is scheduled;
+- how optional cognition can remain pending;
+- how the next agent obtains the stabilized result.
+
+The graph must be used because it contains accumulated project intelligence,
+not merely because a prompt says "query DreamGraph".
+
+Avoid graph neighborhood dumping.
+
+The execution route should receive the smallest sufficiently rich context with
+continued bounded access to deeper evidence.
+
+Make sure no route silently falls back to broad repository rediscovery when
+fresh graph knowledge already satisfies the need.
+
+Also make sure stale graph knowledge can never outrank verified current source.
+
+──────────────────────────────────────────────────────────────────────────────
+5. MENTALLY EXECUTE MIGRATIONS, NOT JUST FINAL DESIGNS
+──────────────────────────────────────────────────────────────────────────────
+
+Ashoka changes foundational contracts and may replace large internal graph
+representations that historically relied on JSON.
+
+Do not reason only about a clean new v14 instance.
+
+Simulate:
+
+    existing v13.4 installation
+        → Ashoka upgrade starts
+        → old schemas/data/configs/plans exist
+        → migration preview
+        → backup
+        → staged conversion
+        → mixed old/new compatibility period where required
+        → validation
+        → cutover
+        → restart
+        → normal operation
+        → failed migration
+        → rollback/recovery
+
+Where internal persistence moves away from JSON or otherwise changes physical
+representation, ensure that semantic identity, provenance, revision, trust and
+relationships survive independently of serialization format.
+
+Check:
+- large graph components;
+- scan/enrichment state;
+- evidence;
+- trust state;
+- schedules;
+- plans;
+- lifecycle records;
+- config;
+- indexes;
+- analytics history;
+- federation data;
+- dirty/digestion state;
+- execution receipts.
+
+No migration may rely upon information that the old format never contained.
+
+Unknown historical state remains unknown.
+
+Do not invent history to make migration convenient.
+
+──────────────────────────────────────────────────────────────────────────────
+6. EXECUTE FAILURE PATHS AS SERIOUSLY AS SUCCESS PATHS
+──────────────────────────────────────────────────────────────────────────────
+
+For every major workflow inject realistic failures:
+
+- daemon crash;
+- worker crash;
+- disk failure;
+- partial write;
+- lost response after successful commit;
+- duplicate request;
+- stale client;
+- concurrent human edit;
+- browser refresh;
+- disconnected Architect;
+- provider timeout;
+- provider refusal;
+- budget exhaustion;
+- cancellation with calls still in flight;
+- model capability mismatch;
+- configuration change during a job;
+- incompatible schema/client version;
+- unavailable graph;
+- stale graph;
+- missing scan baseline;
+- corrupted index;
+- failed migration;
+- plugin failure;
+- scheduler restart;
+- duplicate event;
+- federation replay;
+- Computer Use worker disappearance;
+- Computer Use observation becoming stale before an action.
+
+Determine what durable state exists after each failure and exactly how the
+system recovers.
+
+"Retry" is not a recovery design.
+
+Specify what makes the retry idempotent and what evidence identifies the prior
+committed operation.
+
+──────────────────────────────────────────────────────────────────────────────
+7. VALIDATE PLAN LIFECYCLE AS AN AUTHORITY
+──────────────────────────────────────────────────────────────────────────────
+
+Mentally execute plan/slice lifecycle continuously during this simulation.
+
+Ensure the authoritative projection can distinguish at least:
+
+- pending;
+- eligible;
+- current/active;
+- blocked;
+- implementing;
+- verifying;
+- completed;
+- cancelled;
+- superseded;
+- audit-only activity;
+- recovery-required where applicable.
+
+Current and next slice should be derived from authoritative lifecycle,
+dependencies and review gates, not manually maintained UI labels.
+
+Selection in Architect must remain separate from execution state.
+
+An agent saying "done" cannot complete a slice.
+
+A tool invocation succeeding cannot complete a slice.
+
+A Computer Use click succeeding cannot complete a slice.
+
+A source change without required reconciliation cannot complete a slice.
+
+Verification requires the evidence defined by the slice.
+
+Confirm how lifecycle state survives:
+- restart;
+- refresh;
+- two clients;
+- plan edits;
+- stale clients;
+- resumed execution;
+- failed verification.
+
+──────────────────────────────────────────────────────────────────────────────
+8. COMPUTER USE — RUN THE PLAN AGAINST REALITY
+──────────────────────────────────────────────────────────────────────────────
+
+Treat Computer Use as adapter-specific execution under one DreamGraph
+capability contract.
+
+Preserve the established direction:
+
+- Codex CLI uses its own Computer Use capability when genuinely available and
+  sufficient.
+- Native API adapters use the DreamGraph Computer Use harness.
+- Other executors may use their own native capability if they can satisfy the
+  canonical DreamGraph contract.
+- No executor is silently substituted merely because another backend has more
+  capability.
+
+Check the ordered implementation path:
+
+    canonical contracts
+      → worker transport
+      → portable browser execution
+      → platform desktop backends
+      → adapter wiring
+      → recovery
+      → verification
+
+Ensure the architecture remains platform-independent even where worker
+implementations are platform-specific.
+
+Mentally execute capability negotiation, permissions, observation, action,
+stale-screen prevention, cancellation, graph evidence, write-back, recovery
+and platform limitations.
+
+If an executor cannot expose a required control, define the gap honestly.
+
+Do not weaken the common contract to the least capable backend.
+
+──────────────────────────────────────────────────────────────────────────────
+9. CHECK THE EIGHT SURFACES AS PROJECTIONS OF ONE SYSTEM
+──────────────────────────────────────────────────────────────────────────────
+
+Audit the current eight major surfaces together:
+
+- CLI;
+- Browser Architect;
+- VS Code Architect;
+- daemon;
+- Explorer;
+- Dashboard;
+- Analytics Suite;
+- MCP authority.
+
+Also include SDK/host/plugins and provider/CLI adapters where they cross the
+boundary.
+
+For each shared concept determine whether the surface:
+
+- consumes canonical state;
+- reconstructs/reimplements semantics locally;
+- caches state;
+- can become stale;
+- can mutate;
+- understands revisions;
+- understands partial/incomplete state;
+- understands migration/version negotiation.
+
+The objective is not byte-identical presentation.
+
+The objective is semantic agreement.
+
+If two surfaces can answer the same authoritative question differently,
+Ashoka still has a loose end.
+
+──────────────────────────────────────────────────────────────────────────────
+10. LOOK FOR THE MOST DANGEROUS PLANNING DEFECTS
+──────────────────────────────────────────────────────────────────────────────
+
+Actively search for:
+
+- two sources of truth;
+- circular dependencies;
+- hidden prerequisites;
+- missing state transitions;
+- undefined ownership;
+- duplicated registries;
+- duplicated schedulers;
+- duplicated provider capability logic;
+- UI-created semantics;
+- transport-specific semantics leaking upward;
+- API semantics leaking into CLI adapters;
+- unsupported compatibility assumptions;
+- stale state treated as current;
+- unknown state treated as empty;
+- partial data treated as complete;
+- model confidence treated as evidence;
+- repeated evidence treated as independent evidence;
+- success acknowledged before durable commit;
+- cancellation that cannot describe what already happened;
+- rollback that would destroy legitimate newer work;
+- migration steps that cannot be reversed;
+- background jobs without durable ownership;
+- spend checks that occur after calls rather than before admission;
+- unbounded parallel reservations;
+- graph changes not feeding back into cognition;
+- cognition that can recursively trigger itself forever;
+- plan state inferred from prose;
+- acceptance criteria that test wiring rather than behavior;
+- tests that can pass while the original architectural intent is still
+  violated.
+
+Do not merely list these.
+
+Where found, tie each one to:
+- owner;
+- contract;
+- slice;
+- concrete correction;
+- acceptance evidence.
+
+──────────────────────────────────────────────────────────────────────────────
+11. EXECUTE THE ACCEPTANCE SCENARIOS AS A SYSTEM
+──────────────────────────────────────────────────────────────────────────────
+
+Mentally run the existing:
+
+- AT task corpus;
+- plan lifecycle scenarios;
+- graph-execution GE scenarios;
+- schedule scenarios;
+- Computer Use scenarios;
+- system acceptance scenarios;
+- migration/upgrade scenarios.
+
+Do not treat them as independent checklists.
+
+Look for interactions between them.
+
+For example:
+
+    agent receives graph context
+      → edits source
+      → daemon crashes
+      → restart
+      → reconciliation resumes
+      → dirty generation admitted
+      → scheduled cognition also becomes due
+      → budget exhausted
+      → second Architect reconnects
+      → plan remains verifying
+      → next agent asks for context
+
+Ashoka must have a deterministic, explainable outcome for combinations like
+this.
+
+Single-feature tests are insufficient for a system whose failures occur at
+subsystem boundaries.
+
+──────────────────────────────────────────────────────────────────────────────
+12. REFINE TO "SOL CAN EXECUTE THIS"
+──────────────────────────────────────────────────────────────────────────────
+
+For every slice, ask:
+
+    If GPT-6.1 Sol receives this slice with the repository in the expected
+    state, does it have enough information to implement it correctly without
+    designing a missing subsystem or choosing among multiple incompatible
+    architectures?
+
+If not, deepen the plan ONE LEVEL.
+
+Add:
+- exact ownership;
+- implementation anchors;
+- expected inputs/outputs;
+- contract boundaries;
+- migration requirements;
+- ordered work packages where needed;
+- failure behavior;
+- blocking conditions;
+- acceptance evidence.
+
+Do NOT descend into gratuitous function-by-function pseudocode.
+
+Do NOT pre-write the implementation.
+
+Eliminate architectural ambiguity while leaving implementation engineering to
+the executor.
+
+Computer Use may justifiably be somewhat more detailed because of its
+cross-platform execution backends and adapter-dependent routes, but keep it
+within the unified Ashoka architecture.
+
+──────────────────────────────────────────────────────────────────────────────
+13. TIE OFF LOOSE ENDS IN PLACE
+──────────────────────────────────────────────────────────────────────────────
+
+When a loose end is found:
+
+1. determine its existing owner;
+2. update the owning contract/appendix/slice;
+3. update dependent slices if necessary;
+4. update acceptance evidence;
+5. update migration/recovery implications;
+6. update the requirement-to-evidence mapping;
+7. remove or supersede contradictory text.
+
+Do not append an endless "issues discovered" list while leaving the actual
+plan ambiguous.
+
+The plan should become more internally closed with every correction.
+
+Retain an unresolved question only when it genuinely requires maintainer
+judgment or unavailable external evidence.
+
+Do not ask the maintainer decisions already settled by Ashoka.
+
+If a new decision genuinely must be made, present:
+- the precise conflict;
+- viable alternatives;
+- consequences;
+- your recommended default;
+- what is blocked until it is resolved.
+
+──────────────────────────────────────────────────────────────────────────────
+14. PRESERVE DREAMGRAPH'S ORIGINAL ADVANTAGE
+──────────────────────────────────────────────────────────────────────────────
+
+Do not accidentally standardize DreamGraph into a static repository index or a
+thin agent orchestrator.
+
+Ashoka must preserve and align its living cognitive capabilities:
+
+- graph-centered accumulated architectural memory;
+- dream strategies;
+- targeted dreams;
+- lucid interaction;
+- normalization;
+- trust-state;
+- evidence ledger;
+- metacognition;
+- causal reasoning;
+- temporal reasoning;
+- adversarial/tension processing;
+- adaptive future reasoning;
+- intervention/remediation;
+- narration;
+- lifecycle;
+- federation;
+- post-office mechanisms;
+- plugins;
+- UI registry;
+- datastores;
+- scheduling;
+- self-adjustment;
+- other existing engine subsystems discovered during the audit.
+
+Modern executors, Computer Use and provider APIs are capabilities attached to
+DreamGraph.
+
+They are not replacements for DreamGraph's cognitive architecture.
+
+The intended end state is that a capable executor operating through an
+established DreamGraph begins with materially richer project understanding
+than the same executor starting cold from source, and leaves the system richer
+for the next executor.
+
+──────────────────────────────────────────────────────────────────────────────
+15. OUTPUT / MUTATION RULES FOR THIS PASS
+──────────────────────────────────────────────────────────────────────────────
+
+This is a planning refinement pass.
+
+Allowed:
+- read repository/source/tests/docs;
+- inspect current DreamGraph state read-only;
+- inspect current plan/appendices/ADRs;
+- inspect provider/CLI documentation where needed;
+- update the unified Ashoka plan and its supporting planning/audit documents;
+- reconcile appendices and requirement mappings;
+- add narrowly justified planning artifacts.
+
+Not allowed:
+- implement Ashoka runtime behavior;
+- perform destructive graph migration;
+- run paid scans/enrichment/dreaming unless separately authorized;
+- mutate production project data;
+- bump/release v14;
+- silently accept ADRs;
+- claim acceptance tests have passed when they have not been run.
+
+Small feasibility probes are permitted only if they are necessary to resolve a
+real architectural uncertainty. Label them explicitly as probes and do not let
+them become undeclared implementation.
+
+──────────────────────────────────────────────────────────────────────────────
+16. FINAL CLOSURE REPORT
+──────────────────────────────────────────────────────────────────────────────
+
+After refining the plan, report compactly:
+
+1. Loose ends discovered.
+2. Loose ends closed and where they were incorporated.
+3. Dependencies changed.
+4. Contracts/appendices changed.
+5. New implementation blockers, if any.
+6. Remaining genuine maintainer decisions, if any.
+7. Areas deliberately deferred and why.
+8. Whether any slice still requires Sol 6.1 to invent architecture.
+9. Whether any pair of surfaces can still disagree about authoritative state.
+10. Whether any material execution path can still bypass the C15 graph loop.
+11. Whether upgrade/migration/recovery has an undefined state.
+12. Whether the plan is now executable as written.
+
+Do not give a reassuring answer merely because the document is detailed.
+
+If Ashoka still has architectural holes, say so and repair those that can be
+repaired from available evidence.
+
+The completion target for THIS planning pass is:
+
+    "Sol 6.1 may still need to solve implementation problems,
+     but it should not need to solve Ashoka's architecture."
+
+Do not start implementation after reaching that point.
+
+Update the unified DreamGraph v14.0.0 — Ashoka plan and supporting appendices,
+then stand by.

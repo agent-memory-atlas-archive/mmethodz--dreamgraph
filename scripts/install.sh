@@ -139,7 +139,7 @@ ensure_root_build_dependencies() {
             const pkgPath = path.join(root, 'node_modules', ...name.split('/'), 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
             if (pkg.version !== expected) {
-              process.stdout.write(`${name}@${pkg.version} != ${expected}`);
+              process.stdout.write(name + '@' + pkg.version + ' != ' + expected);
               process.exit(1);
             }
           }
@@ -166,10 +166,7 @@ ensure_root_build_dependencies() {
 }
 
 resolve_vscode_cli() {
-    if command -v code.cmd >/dev/null 2>&1; then
-        command -v code.cmd
-        return 0
-    fi
+    # Prefer the executable shell/WSL wrapper over a Windows batch file.
     if command -v code >/dev/null 2>&1; then
         command -v code
         return 0
@@ -191,11 +188,22 @@ can_build_vscode_extension() {
 
 ensure_extension_build_dependencies() {
     local ext_source="$SOURCE_DIR/extensions/vscode"
+    local needs_install=false
     if [[ ! -d "$ext_source/node_modules/typescript" ]] || [[ ! -d "$ext_source/node_modules/esbuild" ]] || [[ ! -d "$ext_source/node_modules/@vscode/vsce" ]]; then
-        echo -e "  ${CYAN}Installing VS Code extension build dependencies...${NC}"
+        needs_install=true
+    elif ! (
+        cd "$ext_source"
+        node -e "require('esbuild').transformSync('const ready = true;', { loader: 'js' });" >/dev/null 2>&1
+    ); then
+        # A checkout shared with Windows may contain esbuild but lack the
+        # current platform's optional native binary. Directory presence is not enough.
+        needs_install=true
+    fi
+    if [[ "$needs_install" == "true" ]]; then
+        echo -e "  ${CYAN}Refreshing VS Code extension build dependencies for this platform...${NC}"
         (
             cd "$ext_source"
-            run_logged -- npm install --loglevel=warn
+            run_logged -- npm install --include=dev --include=optional --loglevel=warn
         )
         ok "VS Code extension build dependencies installed"
     fi
@@ -407,6 +415,7 @@ for ws_name in "${WORKSPACE_PACKAGES[@]}"; do
         fi
     fi
     [[ -z "$tarball_name" ]] && fail "Could not determine tarball name for $ws_name"
+    tarball_name=$(node "$SOURCE_DIR/scripts/workspace-artifacts.mjs" address "$VENDOR_DIR/$tarball_name") || fail "Could not bind package bytes for $ws_name"
     workspace_tarball_put "$ws_name" "file:./vendor/$tarball_name"
     ok "Packed $ws_name -> vendor/$tarball_name"
 done
@@ -439,7 +448,8 @@ node -e "
     name: 'dreamgraph-global',
     version: pkg.version,
     type: 'module',
-    dependencies: deps
+    dependencies: deps,
+    optionalDependencies: Object.assign({}, pkg.optionalDependencies || {})
   };
   require('fs').writeFileSync(
     '$BIN_DIR/package.json',
@@ -457,6 +467,9 @@ remove_install_node_modules "$BIN_DIR/node_modules"
     run_logged -- npm install --omit=dev --loglevel=warn
 )
 ok "Dependencies installed"
+
+run_logged -- node "$SOURCE_DIR/scripts/workspace-artifacts.mjs" verify "$SOURCE_DIR" "$BIN_DIR"
+ok "Workspace bytes and daemon imports verified"
 
 if [[ -d "$SOURCE_DIR/templates" ]]; then
     COPY_TEMPLATES=true
@@ -542,22 +555,12 @@ node -e "
 " "$BIN_DIR/version.json" "$VERSION" "$SOURCE_DIR" "$NODE_VERSION"
 
 step "Creating command shims..."
-LINK_DIR=""
+LINK_DIR="$HOME/.local/bin"
 if mkdir -p "/usr/local/bin" 2>/dev/null && [[ -w "/usr/local/bin" ]]; then
     LINK_DIR="/usr/local/bin"
-else
-    while IFS=':' read -r path_entry; do
-        [[ -z "$path_entry" ]] && continue
-        [[ "$path_entry" == "$HOME/.local/bin" ]] && continue
-        if [[ -d "$path_entry" ]] && [[ -w "$path_entry" ]]; then
-            LINK_DIR="$path_entry"
-            break
-        fi
-    done <<< "$PATH"
 fi
-if [[ -z "$LINK_DIR" ]]; then
-    LINK_DIR="$HOME/.local/bin"
-fi
+# WSL inherits Windows PATH entries. Never install Linux shims into whichever
+# unrelated Windows application directory happens to be writable.
 mkdir -p "$LINK_DIR"
 
 if [[ -n "${DREAMGRAPH_MASTER_DIR:-}" ]]; then

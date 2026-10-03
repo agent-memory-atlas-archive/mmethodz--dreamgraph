@@ -1,0 +1,112 @@
+{
+  "scope": "Actual compiled daemon/configuration authority, CLI readback and Windows Chrome. Isolated instance. Native scan job producer is an explicitly declared queued EngineJobs fixture; no scan/model/GUI backend is dispatched. All six model allocations/call counts are zero. No live data, global install/restart, paid model understanding or other-platform qualification.",
+  "checks": [
+    {
+      "name": "CW01",
+      "detail": "Root has working Explorer/Architect navigation and actual canonical graph/queued scan status. The queued producer does not claim a dispatched scan."
+    },
+    {
+      "name": "CW02",
+      "detail": "Actual original-fence queued cancellation commits without claiming running work stopped or dispatching a retry."
+    },
+    {
+      "name": "CW03",
+      "detail": "Every supported setting maps to a typed control or named read-only exception; global search reveals imported redacted values without writes."
+    },
+    {
+      "name": "CW04",
+      "detail": "Model suggestions consume the current core provider registry and still permit explicit adapter-qualified identifiers."
+    },
+    {
+      "name": "CW05",
+      "detail": "Keyboard tabs retain invalid drafts and accessible field errors; exact zero limits remain zero."
+    },
+    {
+      "name": "CW06",
+      "detail": "Structured component edits remove only their corresponding legacy alias and preserve unrelated zero/paused policy."
+    },
+    {
+      "name": "CW07",
+      "detail": "Committed lost save acknowledgement recovers the original request/receipt after readback, with no second mutation or unrelated scheduler activation."
+    },
+    {
+      "name": "CW08",
+      "detail": "A concurrent save is refused without overwriting intervening intent; drafts remain until explicitly discarded/rebased."
+    },
+    {
+      "name": "CW09",
+      "detail": "Scoped template preview writes nothing, apply stages protected intent and exact undo restores original config bytes without touching graph data."
+    },
+    {
+      "name": "CW10",
+      "detail": "Actual narrow layout and forced-colors keyboard navigation remain usable with visible selection, draft/errors and bounded geometry."
+    },
+    {
+      "name": "CW11",
+      "detail": "Computer Use configuration is finite setup, not an execution grant or platform qualification; actual role allocations remain zero."
+    },
+    {
+      "name": "CW12",
+      "detail": "Offline readback retains the known settings/drafts and shows failure; reconnect reloads authoritative values."
+    },
+    {
+      "name": "CW13",
+      "detail": "Actual compiled daemon stop/start activates a staged removal and readback clears the saved/effective mismatch while preserving graph bytes. Browser never claims the CLI command already ran."
+    },
+    {
+      "name": "CW14",
+      "detail": "Actual compiled CLI reaches this isolated restarted daemon; server metadata is pinned to the local compiled build."
+    },
+    {
+      "name": "CW15",
+      "detail": "Schedule navigation reuses the existing workspace and canonical job/debt authority; six effective model allocations remain zero."
+    }
+  ],
+  "errors": [],
+  "browser": "153.0.8010.50",
+  "cli_status": {
+    "identity": {
+      "uuid": "47c96683-2d2e-497a-9247-ae1725540661",
+      "name": "configuration-check",
+      "created_with_version": "13.4.0",
+      "status": "active",
+      "mode": "development",
+      "policy": "strict",
+      "created_at": "2026-10-02T12:33:43.692Z",
+      "last_active_at": "2026-10-02T12:33:43.692Z"
+    },
+    "project": {
+      "root": "C:\\Users\\MIKAJU~1\\AppData\\Local\\Temp\\dg-configuration-browser-kCinGt",
+      "forked_from": null
+    },
+    "daemon": {
+      "running": true,
+      "pid": 5268,
+      "transport": "http",
+      "port": 64873,
+      "uptime_ms": 1136,
+      "version": "13.4.0",
+      "bin_path": "C:\\Users\\Mika Jussila\\source\\repos\\dreamgraph\\dist\\index.js",
+      "log_file": null,
+      "log_bytes": null,
+      "crashed": false,
+      "crashed_pid": null
+    },
+    "cognitive": {
+      "dream_cycles": 0,
+      "tool_calls": 0,
+      "graph_nodes": 1,
+      "graph_edges": 0,
+      "candidate_edges": 0,
+      "validated_edges": 0,
+      "tensions": 0,
+      "adr_decisions": 0,
+      "ui_elements": 0
+    },
+    "paths": {
+      "instance_root": "C:\\Users\\MIKAJU~1\\AppData\\Local\\Temp\\dg-configuration-browser-kCinGt\\master\\47c96683-2d2e-497a-9247-ae1725540661",
+      "data_dir": "C:\\Users\\MIKAJU~1\\AppData\\Local\\Temp\\dg-configuration-browser-kCinGt\\master\\47c96683-2d2e-497a-9247-ae1725540661\\data"
+    }
+  },
+  "success": true
+}

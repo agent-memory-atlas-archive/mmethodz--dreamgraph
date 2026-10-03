@@ -14,7 +14,7 @@ test('routes current OpenAI reasoning families to the Responses API', () => {
     assert.equal(usesOpenAIResponsesApi(model), true, model);
   }
   assert.equal(usesOpenAIResponsesApi('gpt-5.5'), true);
-  assert.equal(usesOpenAIResponsesApi(' GPT-5.5-2026-04-27 '), true);
+  assert.equal(usesOpenAIResponsesApi(' GPT-5.5-2026-04-23 '), true);
   assert.equal(usesOpenAIResponsesApi('gpt-5.4'), false);
   assert.equal(usesOpenAIResponsesApi('gpt-5'), false);
 });
@@ -205,7 +205,7 @@ test('normalizes Responses tool calls as tool_use finish reason', () => {
 });
 
 test('extracts function calls and hardens malformed or unknown items', () => {
-  const calls = extractOpenAIResponsesToolCalls({
+  assert.throws(() => extractOpenAIResponsesToolCalls({
     output: [
       { type: 'reasoning', id: 'rs_1' },
       { type: 'function_call', call_id: 'call_valid', name: 'read_source_code', arguments: '{"filePath":"src/a.ts"}' },
@@ -214,10 +214,12 @@ test('extracts function calls and hardens malformed or unknown items', () => {
       { type: 'function_call', name: 'missing_id', arguments: '{}' },
       { type: 'custom_tool_call', name: 'unsupported', input: '{}' },
     ],
-  });
+  }), { code: 'TOOL_ARGUMENTS_INVALID' });
+});
 
-  assert.deepEqual(calls, [
-    { id: 'call_valid', name: 'read_source_code', input: { filePath: 'src/a.ts' } },
-    { id: 'call_malformed', name: 'query_resource', input: { arguments: '{bad json' } },
-  ]);
+
+test('Responses item identity cannot replace the required tool call identity', () => {
+  assert.throws(() => extractOpenAIResponsesToolCalls({
+    status: 'completed', output: [{ type: 'function_call', id: 'fc_item', name: 'read_source_code', arguments: '{}' }],
+  }), /missing_call_identity/);
 });

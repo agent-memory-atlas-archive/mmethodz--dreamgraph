@@ -17,6 +17,8 @@ export interface CognitiveLifecycleTransition {
 }
 
 export interface CognitiveLifecycleProjection {
+  projection?: import("./projection-context.js").CognitiveProjectionContext;
+  interpretation:"historical_transitions";
   generated_at: string;
   transitions: CognitiveLifecycleTransition[];
 }
@@ -28,7 +30,7 @@ function tensionAuthority(resolved: ResolvedTension): CognitiveLifecycleAuthorit
 }
 
 function tensionNewState(resolved: ResolvedTension): string {
-  if (/expired|ttl|decay/i.test(resolved.evidence ?? "")) return "expired";
+  if (resolved.resolution_state === "expired_unverified" || resolved.resolution_type === "expired_unverified") return "expired_unverified";
   if (resolved.resolution_type === "wont_fix") return "retired";
   if (resolved.resolution_type === "false_positive") return "rejected";
   return "resolved";
@@ -49,7 +51,7 @@ export function transitionFromResolvedTension(resolved: ResolvedTension): Cognit
       `entities:${resolved.original.entities.join(",")}`,
     ],
     superseding_artifact: null,
-    remaining_uncertainty: newState === "expired" ? "Expired by lifecycle decay; inspect history before treating it as irrelevant forever." : null,
+    remaining_uncertainty: resolved.resolution_state === "verified" ? "Verified at recorded time; current proof can change or reopen review." : "Disposition or expiry is not independent source verification; inspect the retained rationale and original record.",
   };
 }
 
@@ -60,7 +62,7 @@ export function transitionFromSupersededFuture(plan: RemediationPlan): Cognitive
     artifact_kind: "future",
     prior_state: "active",
     new_state: "superseded",
-    changed_at: plan.generated_at,
+    changed_at: null,
     source: "remediation_plans.history",
     authority: "daemon",
     triggering_evidence: [
@@ -70,7 +72,7 @@ export function transitionFromSupersededFuture(plan: RemediationPlan): Cognitive
     superseding_artifact: plan.superseded_by,
     remaining_uncertainty: plan.adaptive_future_review
       ? null
-      : "Supersession is recorded, but no detailed review summary was attached.",
+      : "Supersession is recorded, but no detailed review summary was attached. Its transition time is unavailable; generation time is not supersession time.",
   };
 }
 
@@ -94,14 +96,14 @@ export function transitionsFromDreamHistorySession(session: DreamHistoryEntry): 
     transitions.push({
       artifact_id: `${session.session_id}:narrative-decay`,
       artifact_kind: "narrative",
-      prior_state: "useful",
-      new_state: "expired",
+      prior_state: "active",
+      new_state: "decayed",
       changed_at: session.timestamp,
       source: "dream_history.sessions.decayed_artifacts",
       authority: "daemon",
       triggering_evidence: [`${session.decayed_nodes} node(s) and ${session.decayed_edges} edge(s) decayed during cycle ${session.cycle_number}.`],
       superseding_artifact: null,
-      remaining_uncertainty: "Decay explains reduced usefulness, not permanent deletion of historical context.",
+      remaining_uncertainty: "Decay is retention activity, not proof of reduced usefulness or expiry. Original historical context remains inspectable.",
     });
   }
   return transitions;
@@ -112,11 +114,17 @@ export function buildCognitiveLifecycleProjection(input: {
   remediationHistory?: RemediationPlan[];
   dreamHistory?: DreamHistoryEntry[];
   generatedAt?: string;
+  projection?: import("./projection-context.js").CognitiveProjectionContext;
 }): CognitiveLifecycleProjection {
   return {
+    interpretation:"historical_transitions",projection:input.projection,
     generated_at: input.generatedAt ?? new Date().toISOString(),
     transitions: [
-      ...(input.resolvedTensions ?? []).map(transitionFromResolvedTension),
+      ...(input.resolvedTensions ?? []).flatMap(resolved=>[transitionFromResolvedTension(resolved),...(resolved.reopened_at?[{
+        artifact_id:resolved.tension_id,artifact_kind:"tension" as const,prior_state:tensionNewState(resolved),new_state:"reopened",changed_at:resolved.reopened_at,
+        source:"tension_log.resolved_tensions.reopened_at",authority:"daemon" as const,triggering_evidence:[resolved.reappearance_reason??"Current evidence requires renewed review"],
+        superseding_artifact:null,remaining_uncertainty:"Prior closure is retained as history; it does not resolve the reopened current risk.",
+      }]:[])]),
       ...(input.remediationHistory ?? []).map(transitionFromSupersededFuture).filter((entry): entry is CognitiveLifecycleTransition => entry != null),
       ...(input.dreamHistory ?? []).flatMap(transitionsFromDreamHistorySession),
     ].sort((left, right) => String(right.changed_at ?? "").localeCompare(String(left.changed_at ?? "")) || left.artifact_id.localeCompare(right.artifact_id)),

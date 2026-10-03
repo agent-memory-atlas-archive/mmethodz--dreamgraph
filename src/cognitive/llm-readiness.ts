@@ -1,39 +1,11 @@
-/**
- * LLM-readiness watcher (ADR-098, Slice 2A).
- *
- * Periodically tests whether the configured LLM is actually usable, not just
- * whether env vars are populated. "Ready" requires three conditions, in this
- * order (cheapest first, short-circuited):
- *
- *   1. Effective base model resolves to a non-empty string.
- *   2. Effective dreamer model resolves to a non-empty string.
- *      (Falls back to base via parseComponentConfig when no override set.)
- *   3. Effective normalizer model resolves to a non-empty string.
- *      (Same fallback rule.)
- *   4. A real `complete()` call against the provider returns successfully.
- *
- * The completion call is deliberately tiny (≤ 8 output tokens, single-token
- * answer) to keep token cost trivial. ADR-098 guard rail #1 mandates a real
- * call — env-var presence is not sufficient evidence.
- *
- * Slice 2A scope: probe + status surfacing only. Bootstrap-firing on the
- * ready transition is Slice 2B.
- *
- * Fingerprint: sha256(provider | baseUrl | dreamerModel | normalizerModel).
- * It deliberately excludes the API key (so key rotation doesn't force a
- * re-bootstrap) and includes baseUrl (so endpoint changes — local dev → cloud
- * — DO trigger re-enrichment, per ADR-098 risk mitigation).
- */
+/** Readiness is configuration, reachability and observed successful role work.
+ * No scheduled completion is sent merely to test a provider. Qualification is
+ * fingerprint-bound and disappears on failure/restart until real work succeeds. */
 
 import { createHash } from "node:crypto";
 import { logger } from "../utils/logger.js";
-import {
-  getDreamerLlmConfig,
-  getLlmConfig,
-  getLlmProvider,
-  getNormalizerLlmConfig,
-  type LlmMessage,
-} from "./llm.js";
+import { getRoleLlmProvider } from "./llm.js";
+import { roleQualification } from "./role-qualification.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -46,6 +18,9 @@ export type LlmReadinessReason =
   | "missing_dreamer_model"
   | "missing_normalizer_model"
   | "completion_failed"
+  | "role_policy_blocked"
+  | "provider_unavailable"
+  | "completion_unqualified"
   | "ok";
 
 export interface LlmReadinessEffectiveConfig {
@@ -54,6 +29,7 @@ export interface LlmReadinessEffectiveConfig {
   base_model: string;
   dreamer_model: string;
   normalizer_model: string;
+  roles?: Array<{ role: string; provider: string; model: string; fingerprint: string; qualified_at: string | null; available: boolean }>;
 }
 
 export interface LlmReadinessStatus {
@@ -97,28 +73,15 @@ const _readySubscribers: ReadyTransitionHandler[] = [];
 
 const DEFAULT_INTERVAL_MS = 30_000;
 const MIN_INTERVAL_MS = 5_000;
-const PROBE_TIMEOUT_MS = 10_000;
+
 
 // ---------------------------------------------------------------------------
 // Fingerprint
 // ---------------------------------------------------------------------------
 
 export function computeLlmFingerprint(cfg: LlmReadinessEffectiveConfig): string {
-  const material = [cfg.provider, cfg.base_url, cfg.dreamer_model, cfg.normalizer_model].join("|");
+  const material = JSON.stringify([cfg.provider, cfg.base_url, cfg.dreamer_model, cfg.normalizer_model, cfg.roles?.map(value => value.fingerprint)]);
   return createHash("sha256").update(material).digest("hex").slice(0, 16);
-}
-
-function snapshotEffectiveConfig(): LlmReadinessEffectiveConfig {
-  const base = getLlmConfig();
-  const dreamer = getDreamerLlmConfig();
-  const normalizer = getNormalizerLlmConfig();
-  return {
-    provider: base.provider,
-    base_url: base.baseUrl ?? "",
-    base_model: base.model ?? "",
-    dreamer_model: dreamer.model ?? "",
-    normalizer_model: normalizer.model ?? "",
-  };
 }
 
 // ---------------------------------------------------------------------------
@@ -131,39 +94,24 @@ function snapshotEffectiveConfig(): LlmReadinessEffectiveConfig {
  * Returns the resulting status.
  */
 export async function probeLlmReadiness(): Promise<LlmReadinessStatus> {
-  const effective = snapshotEffectiveConfig();
-  const fingerprint = computeLlmFingerprint(effective);
-  const now = new Date().toISOString();
-  const previous = _status;
-
-  // Step 1-3: model resolution check (cheap, no network).
-  let reason: LlmReadinessReason = "ok";
-  let lastError: string | null = null;
-  if (!effective.base_model.trim()) reason = "missing_base_model";
-  else if (!effective.dreamer_model.trim()) reason = "missing_dreamer_model";
-  else if (!effective.normalizer_model.trim()) reason = "missing_normalizer_model";
-
+  const now = new Date().toISOString(), previous = _status;
+  let effective: LlmReadinessEffectiveConfig = { provider: "independent_roles", base_url: "", base_model: "role_policy", dreamer_model: "", normalizer_model: "", roles: [] };
+  let reason: LlmReadinessReason = "ok", lastError: string | null = null;
   let state: LlmReadinessState = "not_ready";
-
-  if (reason === "ok") {
-    // Step 4: real completion call. Tiny prompt, tiny output.
-    const probeMessages: LlmMessage[] = [
-      { role: "user", content: "Reply with exactly: ok" },
-    ];
-    try {
-      const provider = getLlmProvider();
-      const probeOnce = provider.complete(probeMessages, { maxTokens: 8, temperature: 0 });
-      const timeout = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error(`probe timeout after ${PROBE_TIMEOUT_MS}ms`)), PROBE_TIMEOUT_MS);
-      });
-      await Promise.race([probeOnce, timeout]);
-      state = "ready";
-    } catch (err) {
-      state = "not_ready";
-      reason = "completion_failed";
-      lastError = err instanceof Error ? err.message : String(err);
+  try {
+    // Sequential ownership; only read-only endpoint checks, never inference.
+    for (const role of ["dreamer", "normalizer"] as const) {
+      const bound = await getRoleLlmProvider(role);
+      const available = await bound.provider.isAvailable().catch(() => false);
+      effective[role === "dreamer" ? "dreamer_model" : "normalizer_model"] = bound.config.model;
+      effective.roles!.push({ role, provider: bound.config.provider, model: bound.config.model, fingerprint: bound.policy.fingerprint,
+        qualified_at: roleQualification(role, bound.policy.fingerprint), available });
     }
-  }
+    if (effective.roles!.some(value => !value.available)) reason = "provider_unavailable";
+    else if (effective.roles!.some(value => !value.qualified_at)) { state = "unknown"; reason = "completion_unqualified"; }
+    else state = "ready";
+  } catch { reason = "role_policy_blocked"; lastError = "A cognitive role requires valid configuration/capability evidence."; }
+  const fingerprint = computeLlmFingerprint(effective);
 
   const consecutiveFailures =
     state === "ready" ? 0 : (previous?.consecutive_failures ?? 0) + 1;

@@ -1,3 +1,5 @@
+import { resolveProviderCapability } from "./generated/provider-capabilities.js";
+import { assertProviderOutcome, providerUsage, ProviderOutcomeError } from "./generated/provider-outcome.js";
 import type { ArchitectMessage, ToolDefinition, ToolUseRequest } from "./architect-llm";
 import {
   compactAssistantText,
@@ -10,12 +12,12 @@ import {
   ARCHITECT_PASS_SCHEMA_NAME,
 } from "./architect-pass-schema.js";
 
-export type OpenAIResponsesReasoningEffort = "low" | "medium" | "high" | "xhigh";
+export type OpenAIResponsesReasoningEffort = "none" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max";
 export type OpenAIResponsesTextVerbosity = "low" | "medium" | "high";
 
 export interface OpenAIResponsesOptions {
   model: string;
-  reasoningEffort: OpenAIResponsesReasoningEffort;
+  reasoningEffort?: OpenAIResponsesReasoningEffort;
   textVerbosity: OpenAIResponsesTextVerbosity;
   rawMessages?: unknown[];
   tools?: ToolDefinition[];
@@ -57,13 +59,17 @@ type ResponsesContentBlock =
   | { type: "input_image"; image_url: string };
 
 export function usesOpenAIResponsesApi(model: string): boolean {
-  return /^(?:gpt-5\.[56]|gpt-6(?:\.1)?)(?:$|[-_])/i.test(model.trim());
+  return resolveProviderCapability("openai", model.trim())?.default_api === "responses";
 }
 
 export function buildOpenAIResponsesRequest(
   messages: ArchitectMessage[],
   options: OpenAIResponsesOptions,
 ): Record<string, unknown> {
+  const evidence = resolveProviderCapability("openai", options.model);
+  if (evidence && !(evidence.apis as readonly string[]).includes("responses")) throw new Error("PROVIDER_API_UNSUPPORTED");
+  if (options.reasoningEffort && !(evidence?.efforts as readonly string[] | undefined)?.includes(options.reasoningEffort)) throw new Error("REASONING_EFFORT_UNSUPPORTED");
+  if (options.structuredOutput && !evidence?.strict_schema) throw new Error("STRICT_SCHEMA_CAPABILITY_REQUIRED");
   const compactedMessages = compactMessagesForProvider(messages, "openai");
   const compactedRawMessages = options.rawMessages
     ? compactRawMessagesForProvider(options.rawMessages, "openai")
@@ -76,7 +82,7 @@ export function buildOpenAIResponsesRequest(
     input: compactedRawMessages
       ? translateRawToOpenAIResponses(compactedRawMessages)
       : compactedMessages.map((m) => ({ role: m.role, content: toOpenAIResponsesContent(m.content) })),
-    reasoning: { effort: options.reasoningEffort },
+    ...(options.reasoningEffort ? { reasoning: { effort: options.reasoningEffort } } : {}),
     text: options.structuredOutput
       ? {
           verbosity: options.textVerbosity,
@@ -329,6 +335,7 @@ export function extractOpenAIResponsesText(data: OpenAIResponsesData): string {
 }
 
 export function normalizeOpenAIResponsesResult(data: OpenAIResponsesData): OpenAIResponsesResult {
+  assertProviderOutcome("openai", "responses", data, providerUsage("openai", data.usage));
   const text = extractOpenAIResponsesText(data);
   const toolCalls = extractOpenAIResponsesToolCalls(data);
   const finishReason = toolCalls.length > 0
@@ -345,6 +352,7 @@ export function normalizeOpenAIResponsesResult(data: OpenAIResponsesData): OpenA
 }
 
 export function extractOpenAIResponsesToolCalls(data: OpenAIResponsesData): ToolUseRequest[] {
+  assertProviderOutcome("openai", "responses", data, providerUsage("openai", data.usage));
   const toolCalls: ToolUseRequest[] = [];
 
   for (const item of data.output ?? []) {
@@ -352,26 +360,22 @@ export function extractOpenAIResponsesToolCalls(data: OpenAIResponsesData): Tool
       continue;
     }
 
-    if (typeof item.name !== "string" || item.name.length === 0) {
-      continue;
-    }
+    if (typeof item.name !== "string" || item.name.length === 0) throw new ProviderOutcomeError("TOOL_ARGUMENTS_INVALID", "openai", "responses", "missing_call_name", providerUsage("openai", data.usage));
 
     const id = typeof item.call_id === "string" && item.call_id.length > 0
       ? item.call_id
-      : typeof item.id === "string" && item.id.length > 0
-        ? item.id
-        : "";
-    if (!id) {
-      continue;
-    }
+      : "";
+    if (!id) throw new ProviderOutcomeError("TOOL_ARGUMENTS_INVALID", "openai", "responses", "missing_call_identity", providerUsage("openai", data.usage));
 
-    const rawArguments = typeof item.arguments === "string" ? item.arguments : "{}";
+    if (typeof item.arguments !== "string") throw new ProviderOutcomeError("TOOL_ARGUMENTS_INVALID", "openai", "responses", "missing_call_arguments", providerUsage("openai", data.usage));
+    const rawArguments = item.arguments;
     let input: Record<string, unknown> = {};
     try {
       const parsed = JSON.parse(rawArguments) as unknown;
-      input = isRecord(parsed) ? parsed : { arguments: parsed };
+      if (!isRecord(parsed)) throw new Error("invalid_object");
+      input = parsed;
     } catch {
-      input = { arguments: rawArguments };
+      throw new ProviderOutcomeError("TOOL_ARGUMENTS_INVALID", "openai", "responses", "invalid_json_object", providerUsage("openai", data.usage));
     }
 
     toolCalls.push({ id, name: item.name, input });
