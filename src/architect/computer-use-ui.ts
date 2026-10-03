@@ -4,7 +4,8 @@ export const COMPUTER_USE_CSS=String.raw`
  .computer-drawer{margin:0 10px 6px;padding:6px 8px;border:1px solid #384c44;border-radius:4px;background:#1e2421;font-size:11px}
  .computer-drawer[hidden]{display:none}.computer-drawer summary{cursor:pointer;font-weight:600}.computer-drawer pre{max-height:180px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:5px 0}
  .computer-policy{padding:2px 7px;border:1px solid #3d5148;border-radius:10px;color:#cfe3d8}.computer-policy[data-policy=allow]{border-color:#4f8a6a;color:#9fe0b8}.computer-policy[data-policy=deny]{border-color:#7a4b4b;color:#e3a8a8}.computer-policy[data-policy=ask]{border-color:#7d6a3e;color:#ecd39a}
- .computer-request{margin:8px 0 2px;padding:8px 10px;border:1px solid #7d6a3e;border-left:3px solid #e2c07a;border-radius:4px;background:#2a261d}.computer-request p{margin:4px 0 6px}.computer-request span{margin-left:8px;color:#cfc4a6}
+ .computer-request-note{margin:6px 0 0;color:#ecd39a;font-size:12px}
+ .computer-request{margin:0 10px 6px;padding:8px 10px;border:1px solid #7d6a3e;border-left:3px solid #e2c07a;border-radius:4px;background:#2a261d}.computer-request p{margin:4px 0 6px}.computer-request span{margin-left:8px;color:#cfc4a6}
  #computer-use-arm[aria-pressed=true]{background:#2f5a43;border-color:#5fa37e;color:#eafff2}
  .computer-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.computer-drawer img{max-width:100%;max-height:260px;border:1px solid #46584f}.computer-actions button{padding:3px 7px}
 `;
@@ -126,13 +127,21 @@ export const COMPUTER_USE_SCRIPT=String.raw`
       const allow=document.createElement('button');allow.type='button';allow.textContent='Allow once and run again';
       const deny=document.createElement('button');deny.type='button';deny.textContent='Not now';
       const done=text=>{allow.disabled=true;deny.disabled=true;const note=document.createElement('span');note.textContent=text;box.append(note);};
-      allow.addEventListener('click',()=>{computerArmed=true;renderComputerPolicy();done('Allowed for this request.');
+      let finishRef=null;
+      allow.addEventListener('click',()=>{computerArmed=true;renderComputerPolicy();(finishRef||done)('Allowed for this request.');
         sendChatMessage(originalMessage).catch(error=>{computerStateEl.textContent=String(error&&error.message||error);});});
-      deny.addEventListener('click',()=>done('Not allowed. The request was not re-run.'));
+      deny.addEventListener('click',()=>(finishRef||done)('Not allowed. The request was not re-run.'));
       const actions=document.createElement('div');actions.className='computer-actions';actions.append(allow,deny);
       box.append(title,why,actions);
-      const host=messageEl&&messageEl.node&&messageEl.node.appendChild?messageEl.node:messageEl&&messageEl.appendChild?messageEl:document.getElementById('chat-log');
-      (host||document.body).appendChild(box);
+      // Always visible: in the Computer Use bar directly above the prompt box, not lost in a scrolled transcript.
+      const row=document.querySelector('.computer-row');
+      for(const old of document.querySelectorAll('.computer-request.pending'))old.remove();
+      box.classList.add('pending');
+      if(row&&row.parentNode)row.parentNode.insertBefore(box,row.nextSibling);else (document.getElementById('chat-log')||document.body).appendChild(box);
+      const done0=done;
+      finishRef=text=>{done0(text);box.classList.remove('pending');setTimeout(()=>box.remove(),4000);};
+      const host=messageEl&&messageEl.node?messageEl.node:messageEl;
+      if(host&&host.appendChild){const note=document.createElement('p');note.className='computer-request-note';note.textContent='Waiting for your answer in the Computer Use bar below.';host.appendChild(note);}
       box.scrollIntoView({block:'nearest'});allow.focus();}
     void loadComputerPolicy(true);setInterval(()=>{if(!document.hidden)void loadComputerPolicy(true);},30000);
 `;
