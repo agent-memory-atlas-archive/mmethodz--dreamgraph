@@ -131,7 +131,9 @@ export class ModelAdmission {
       if (now.getTime() - Date.parse(run.created_at) >= budget.elapsed_ms) reject("ADMISSION_RUN_DEADLINE");
       const billing_key = hash({ instance: this.instance_id, principal: budget.billing_principal, provider: request.provider,
         currency: budget.currency });
-      if (ledger.halted_billing_keys[billing_key]?.length) reject("ADMISSION_BILLING_VARIANCE_REQUIRES_REVIEW");
+      // Variance halts protect money. Subscription/local/client channels have no measured spend, so an
+      // agentic CLI using more tokens than its first-request reservation must not stop all future work.
+      if (request.channel === "api" && ledger.halted_billing_keys[billing_key]?.length) reject("ADMISSION_BILLING_VARIANCE_REQUIRES_REVIEW");
       const runAttempts = Object.values(ledger.attempts).filter(attempt => attempt.run_id === request.run_id && attempt.state !== "released");
       if (runAttempts.length >= budget.requests) reject("ADMISSION_REQUEST_LIMIT");
       if (checkedSum(runAttempts.map(attempt => Number(attempt.resources.retry))) + Number(resources.retry) > budget.retries) reject("ADMISSION_RETRY_LIMIT");
@@ -244,7 +246,7 @@ export class ModelAdmission {
       if (observed?.inputTokens !== undefined && (observed.cachedInputTokens ?? 0) + (observed.cacheCreationInputTokens ?? 0) > observed.inputTokens) attempt.variance.push("inconsistent_cache_components");
       if (observed?.outputTokens !== undefined && (observed.reasoningTokens ?? 0) > observed.outputTokens) attempt.variance.push("inconsistent_reasoning_component");
       attempt.variance = [...new Set(attempt.variance)];
-      if (attempt.variance.length) ledger.halted_billing_keys[attempt.billing_key] = [...new Set(attempt.variance)];
+      if (attempt.variance.length && attempt.channel === "api") ledger.halted_billing_keys[attempt.billing_key] = [...new Set(attempt.variance)];
       await this.save(ledger, `settle:${attempt_id}`); return attempt;
     }));
   }
@@ -256,6 +258,24 @@ export class ModelAdmission {
       if (attempt.state !== "reserved") throw new ModelAdmissionError("ADMISSION_RELEASE_REQUIRES_NO_DISPATCH", attempt.run_id, attempt_id);
       attempt.state = "released"; attempt.acknowledged = true; attempt.accounted_nanounits = "0";
       await this.save(ledger, `release:${attempt_id}`);
+    }));
+  }
+  /** Paid billing keys paused because actual usage exceeded a reservation, with what caused it. */
+  async billingReviews() {
+    const ledger = await this.inspect();
+    return Object.entries(ledger.halted_billing_keys).map(([billing_key, variance]) => {
+      const attempts = Object.values(ledger.attempts).filter(attempt => attempt.billing_key === billing_key);
+      const latest = attempts.sort((a, b) => b.admitted_at.localeCompare(a.admitted_at))[0];
+      return { billing_key, variance, provider: latest?.provider ?? null, model: latest?.model ?? null, channel: latest?.channel ?? null, since: latest?.settled_at ?? latest?.admitted_at ?? null };
+    });
+  }
+  /** Operator review: resume a paused billing key. Attempt history and accounting are kept. */
+  async resumeBillingKey(billing_key: string): Promise<boolean> {
+    return this.inScope(() => withGraphReconciliation(async () => {
+      await recoverGraphPublication(); const ledger = await this.load();
+      if (!ledger.halted_billing_keys[billing_key]) return false;
+      delete ledger.halted_billing_keys[billing_key];
+      await this.save(ledger, `review:${billing_key.slice(0, 16)}`); return true;
     }));
   }
   async cancel(run_id: string): Promise<string[]> {

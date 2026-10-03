@@ -129,7 +129,7 @@ const $ = id => document.getElementById(id), root = $('configuration-workspace')
 if (!root) return;
 
 /* ---------------- state ---------------- */
-let snap = null, cat = {}, roles = [], comps = {}, tab = 'models', busy = false, lastOperation = null, repos = null, repoDraft = null, repoDirty = false;
+let snap = null, cat = {}, roles = [], reviews = [], comps = {}, tab = 'models', busy = false, lastOperation = null, repos = null, repoDraft = null, repoDirty = false;
 const D = {};          // key -> string (write) | null (remove from engine.env = use default)
 const errs = {};       // key -> message
 try { const saved = sessionStorage.getItem('dg-config-tab'); if (saved) tab = saved; } catch (e) { /* no storage */ }
@@ -497,6 +497,12 @@ function cell(key, opts) {
 }
 function renderBudgets(p) {
   p.append(h('p', { class: 'cfg-intro' }, 'Hard limits that keep background work bounded. Empty cells use the built-in defaults shown in grey.'));
+  for (const r of reviews) {
+    const resume = h('button', { type: 'button', class: 'cfg-primary', onclick: async () => { resume.disabled = true;
+      try { reviews = (await api('/api/config/v1/billing-reviews/resume', { billing_key: r.billing_key })).result || []; say('Paid requests for ' + (r.provider || 'this provider') + ' resumed.', 'ok'); render(); }
+      catch (e) { say('Could not resume: ' + e.message, 'error'); resume.disabled = false; } } }, 'Reviewed — resume');
+    p.append(card('Paid requests paused' + (r.provider ? ' · ' + r.provider : ''), 'A request' + (r.model ? ' to ' + r.model : '') + ' used more than DreamGraph reserved for it (' + r.variance.map(v => v.replace(/_/g, ' ')).join(', ') + '). Paid requests on this account are paused until you check your limits and prices below.', resume));
+  }
   const apiRoles = roles.filter(r => r.billing && r.billing.channel === 'api' && BUDGET_ROLES.some(b => b[0] === r.role));
   const tbl = h('table', { class: 'cfg-table' }, h('tr', {}, h('th', {}, 'Job'), h('th', {}, 'Requests per run'), h('th', {}, 'Input tokens per run'), h('th', {}, 'Output tokens per run'), h('th', {}, 'Parallel requests'), h('th', {}, 'Spend per run (USD)'), h('th', {}, 'Spend per day (USD)')));
   for (const [r, title] of BUDGET_ROLES) {
@@ -604,6 +610,7 @@ async function load(keepDrafts) {
     comps = r.effective_components || {};
     if (catalogue) { cat = {}; for (const m of catalogue.result) cat[m.key] = m; }
     if (roleState) roles = roleState.result || [];
+    try { reviews = (await api('/api/config/v1/billing-reviews')).result || []; } catch (e) { reviews = []; }
     if (!keepDrafts) { for (const k of Object.keys(D)) delete D[k]; for (const k of Object.keys(errs)) delete errs[k]; }
     const inFile = Object.values(snap.settings).filter(s => s.source === 'instance').length, deployedCount = Object.values(snap.settings).filter(s => s.source === 'deployment').length;
     $('cfg-source').textContent = 'engine.env · ' + inFile + ' value' + (inFile === 1 ? '' : 's') + ' set' + (deployedCount ? ' · ' + deployedCount + ' set by the launch environment' : '') + ' · read ' + new Date().toLocaleTimeString();

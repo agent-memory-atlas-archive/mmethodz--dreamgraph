@@ -806,6 +806,17 @@ async function handleConfigurationApi(req: IncomingMessage, res: ServerResponse,
         template_default: field.secret ? null : defaults[field.key] ?? null, alias_for: componentSettingAlias(field.key),
         ...(field.key.endsWith("_MODEL") ? {model_choices:configurationModelChoices()} : {}), constraints: settingSchema(schema) })) }); return;
     }
+    if (path === "/api/config/v1/billing-reviews" && req.method === "GET") {
+      const { ModelAdmission } = await import("../cognitive/model-admission.js"), { directoryInstanceId } = await import("../instance/identity.js"), { getDataDir } = await import("../utils/paths.js");
+      const directory = getDataDir(), admission = new ModelAdmission(process.env.DREAMGRAPH_INSTANCE_UUID || directoryInstanceId(directory), directory);
+      json(res, 200, { ok: true, result: await admission.billingReviews() }); return;
+    }
+    if (path === "/api/config/v1/billing-reviews/resume" && req.method === "POST") {
+      const input = z.object({ billing_key: z.string().min(1).max(256) }).strict().parse(await readConfigurationRequest(req));
+      const { ModelAdmission } = await import("../cognitive/model-admission.js"), { directoryInstanceId } = await import("../instance/identity.js"), { getDataDir } = await import("../utils/paths.js");
+      const directory = getDataDir(), admission = new ModelAdmission(process.env.DREAMGRAPH_INSTANCE_UUID || directoryInstanceId(directory), directory);
+      json(res, 200, { ok: true, resumed: await admission.resumeBillingKey(input.billing_key), result: await admission.billingReviews() }); return;
+    }
     if (req.method === "GET" && path === "/api/config/v1/roles") {
       const result = await withoutSessionContext(() => withGraphRead(async () => {
         const env = { ...process.env }, legacy = { ...getLlmConfig() }, profiles = await readRoleProfiles();
