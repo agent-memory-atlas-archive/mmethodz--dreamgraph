@@ -57,7 +57,7 @@ The accepted release evidence is Windows maintainer practical qualification plus
 
 ## Evidence and honest limits
 
-[Slice 27](slice-27-closure.json) seals the functional/system evidence: 2,040 root tests, 546 compiled editor tests and eleven actual Windows browser checks, zero failures and two explicitly retired particle skips. These are controlled environment results, not universal latency or support guarantees. The original instance was not migrated by those tests. [Slice 28](slice-28-release-evidence.json) separately records exact release packaging, the clean-source offline gate and publication.
+[Slice 27](slice-27-closure.json) seals the functional/system evidence: 2,040 root tests, 546 compiled editor tests and eleven actual Windows browser checks, zero failures and two explicitly retired particle skips. These are controlled environment results, not universal latency or support guarantees. The original instance was not migrated by those tests. [Slice 28](https://github.com/mmethodz/dreamgraph/blob/main/docs/ashoka/slice-28-release-evidence.json) separately records exact release packaging, the clean-source offline gate and publication.
 
 GitHub Actions refused the release matrix and CodeQL jobs before execution because the account was locked by a billing issue. Remote CI is unavailable and is not reported as passing. No billing change or purchase was made. This does not add qualification environments beyond the accepted Windows and WSL2 scope.
 

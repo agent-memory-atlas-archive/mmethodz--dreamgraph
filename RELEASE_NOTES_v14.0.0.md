@@ -23,4 +23,4 @@ The [published GPT-4.1 pilot](docs/ashoka/benchmarks/2026-10-03-gpt-4.1/README.m
 
 GitHub Actions could not start the release matrix or CodeQL jobs because GitHub reported an account billing lock. Remote CI is **unavailable**, not a passing test result. The release uses the accepted Windows and WSL2 qualification scope and a separate clean-source offline gate; no billing changes or purchases were made.
 
-Exact release artifact hashes, package upgrade/restart/recovery results and publication status are recorded in the [Slice 28 release evidence](docs/ashoka/slice-28-release-evidence.json). These do not imply that the maintainer's original instance was converted.
+Exact release artifact hashes, package upgrade/restart/recovery results and publication status are recorded in the [Slice 28 release evidence](https://github.com/mmethodz/dreamgraph/blob/main/docs/ashoka/slice-28-release-evidence.json). These do not imply that the maintainer's original instance was converted.
