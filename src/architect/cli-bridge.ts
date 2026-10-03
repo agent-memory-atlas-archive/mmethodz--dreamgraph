@@ -241,7 +241,9 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         const result = await runProcess({ command: invocation.command, args: invocation.args, cwd: invocation.cwd,
           env: invocation.env, stdin: invocation.stdin, timeoutMs, signal, onActivity: () => { renewExecution(); } });
         return { result, usage: input.adapter === "codex-cli" ? extractArchitectCodexUsage(result.stdout) : undefined,
-          acknowledged: result.exitCode !== null && !result.timedOut && !signal.aborted };
+          // runProcess resolves only on the child's close event: the native CLI is no longer running,
+          // even when it was stopped (timeout/cancel/stale). It must not keep holding admission concurrency.
+          acknowledged: true };
       });
     } finally {
       await auditTail.stop();

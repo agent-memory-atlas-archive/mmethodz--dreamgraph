@@ -29,7 +29,18 @@ export const COMPUTER_USE_SCRIPT=String.raw`
     const computerAdapter=()=>document.getElementById('architect-adapter-select').value;
     async function computerRequest(route,body){const response=await fetch('/api/architect/v1/computer/'+route,{...(body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{}),cache:'no-store',signal:AbortSignal.timeout(10000)});
       const result=await response.json();if(!response.ok||result.error)throw new Error(result.error||'COMPUTER_REQUEST_FAILED');return result;}
-    function computerShowSetup(value){computerSetupEl.textContent=JSON.stringify(value,null,2);computerImageEl.hidden=true;computerImageEl.removeAttribute('src');}
+    /* Plain-language projections; raw daemon payloads are never shown. */
+    const computerWords=code=>String(code||'').replace(/^COMPUTER_/,'').toLowerCase().replace(/_/g,' ');
+    function computerSetupText(value){
+      if(!value)return 'No setup information.';
+      if(value.route==='native_cli'){const d=value.native_detection,lines=[];
+        lines.push(d?('Codex CLI '+d.version+' has its own Computer Use.'):'This CLI engine uses its own Computer Use when available.');
+        if(d&&d.features){const f=Object.entries(d.features).map(([name,v])=>name.replace(/_/g,' ')+': '+(v.enabled?'available':'off')+(v.stage&&v.stage!=='stable'?' ('+v.stage+')':''));if(f.length)lines.push(f.join(' · '));}
+        lines.push('DreamGraph switches it on per task according to the Computer Use setting ('+(COMPUTER_POLICY_LABEL[computerPolicy]||'').replace('Computer Use: ','')+').');
+        lines.push('The harness below is only used with the API engine.');return lines.join('\n');}
+      if(value.available){const c=value.capability||{},p=value.profile||{};return 'Browser harness ready'+(p.main_origin?' for '+p.main_origin:'')+'.\n'+(c.effective&&c.effective.length?'Allowed: '+c.effective.join(', ')+'.':'')+'\nPrepare the next pass to review its scope and limits.';}
+      return 'Browser harness not available: '+(value.reasons||[]).map(computerWords).join(', ')+'.'+(value.remedy?'\n'+value.remedy:'');}
+    function computerShowSetup(value){computerSetupEl.textContent=computerSetupText(value);computerImageEl.hidden=true;computerImageEl.removeAttribute('src');}
     function computerSelect(value){computerGeneration++;clearTimeout(computerTimer);computerActive=value;computerPolling=null;
       computerImageEl.hidden=true;computerImageEl.removeAttribute('src');computerStopEl.hidden=true;computerRecoverEl.hidden=true;computerPauseEl.hidden=true;computerControlFence=null;computerInspectEl.hidden=!value;
       if(value)void pollComputerState();}
@@ -74,7 +85,9 @@ export const COMPUTER_USE_SCRIPT=String.raw`
       try{const result=await computerRequest('status?'+new URLSearchParams(selected));if(generation!==computerGeneration)return;const j=result.journal;
         const stopLabel=j.session.state==='stopping'&&j.session.terminal_reason==='COMPUTER_INPUT_RELEASED_TERMINATION_PENDING'?'Stopping · input released · confirming termination':j.stop_state==='unknown'?'Recovery required · termination unconfirmed':j.session.state;
         computerStateEl.textContent=(j.capability.effective.some(op=>op!=='observe')?'Interact':'Observe')+' · '+j.targets[0].origin+' · '+j.session.host_id+' · '+stopLabel;
-        computerEvidenceEl.textContent=JSON.stringify({state:j.session.state,stop:j.stop_state,actions:j.usage.actions,images:j.usage.images,expires_at:j.limits.expires_at,reason:j.session.terminal_reason,receipts:j.actions.map(a=>a.receipt)},null,2);
+        computerEvidenceEl.textContent='State: '+computerWords(j.session.state)+' · '+j.usage.actions+' action'+(j.usage.actions===1?'':'s')+' · '+j.usage.images+' screenshot'+(j.usage.images===1?'':'s')
+          +(j.stop_state&&j.stop_state!=='none'?' · stop '+computerWords(j.stop_state):'')+(j.limits.expires_at?' · ends '+new Date(j.limits.expires_at).toLocaleTimeString():'')+(j.session.terminal_reason?'\nReason: '+computerWords(j.session.terminal_reason):'')
+          +(j.actions.length?'\nLast action: '+computerWords(j.actions[j.actions.length-1].receipt&&j.actions[j.actions.length-1].receipt.state):'');
         again=['created','ready','running','paused','stopping'].includes(j.session.state)&&result.worker_available!==false;computerStopEl.hidden=!again;
         computerControlFence=j.session.fence;computerPaused=j.session.state==='paused';computerPauseEl.textContent=computerPaused?'Resume':'Pause';
         computerPauseEl.hidden=!result.pause_supported||!['ready','running','paused'].includes(j.session.state);computerPauseEl.disabled=j.pause_state==='requested';
@@ -96,7 +109,7 @@ export const COMPUTER_USE_SCRIPT=String.raw`
       finally{computerRecoverEl.disabled=false;}});
     computerInspectEl.addEventListener('click',async()=>{if(!computerActive)return;
       const selected={...computerActive},generation=computerGeneration;try{const result=await computerRequest('observation?'+new URLSearchParams(selected));if(generation!==computerGeneration)return;const value=result.observation;
-        computerEvidenceEl.textContent=value?JSON.stringify({observation:value.observation,expired:value.expired,summary:value.summary},null,2):'No retained observation. Durable descriptors and receipts remain available.';
+        computerEvidenceEl.textContent=value?((value.summary?String(value.summary):'Observation captured.')+(value.expired?' (expired)':'')):'No retained observation. Durable descriptors and receipts remain available.';
         computerImageEl.hidden=!value?.image;if(value?.image)computerImageEl.src='data:'+value.image.mime_type+';base64,'+value.image.data_base64;else computerImageEl.removeAttribute('src');}
       catch(error){if(generation===computerGeneration)computerStateEl.textContent=error.message;}});
     window.addEventListener('pagehide',()=>{computerGeneration++;invalidateComputerPreparation();clearTimeout(computerTimer);computerImageEl.removeAttribute('src');});

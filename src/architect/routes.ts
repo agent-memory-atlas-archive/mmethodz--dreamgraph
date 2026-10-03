@@ -2692,6 +2692,16 @@ function describeArchitectFailure(error: unknown): string {
   const candidate = error as { issues?: unknown; message?: unknown } | null;
   if (candidate && Array.isArray(candidate.issues)) return `invalid execution request (${issuesText(candidate.issues as never)})`;
   const message = typeof candidate?.message === "string" ? candidate.message : String(error);
+  const admission: Record<string, string> = {
+    ADMISSION_CONCURRENCY_LIMIT: "another request for this model is still marked as running (it frees itself when that run's time budget ends)",
+    ADMISSION_ZERO_PAID_ALLOCATION: "this paid model has no spend limit; set one in Config → Budgets & limits",
+    ADMISSION_EXACT_PRICING_REQUIRED: "this paid model has no price set; add it in Config → Budgets & limits",
+    ADMISSION_RUN_DEADLINE: "the run used up its time budget",
+    ADMISSION_CONTEXT_LIMIT: "the request is larger than the model's context allowance",
+    ADMISSION_ROLE_POLICY_BLOCKED: "the Architect model is not configured; check Config → Architect",
+  };
+  const code = /^(ADMISSION_[A-Z_]+)/.exec(message.trim())?.[1];
+  if (code && admission[code]) return `${code}: ${admission[code]}`;
   const trimmed = message.trim();
   if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
     try {

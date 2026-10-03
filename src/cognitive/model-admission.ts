@@ -139,7 +139,13 @@ export class ModelAdmission {
         if (checkedSum(runAttempts.map(attempt => used(attempt, field))) + resources[field] > budget[field]) reject(`ADMISSION_${field.toUpperCase()}_LIMIT`);
       }
       // Unacknowledged requests retain conflict capacity across process restart.
-      const active = Object.values(ledger.attempts).filter(attempt => attempt.billing_key === billing_key && attempt.state !== "released" && !attempt.acknowledged);
+      // A run past its elapsed deadline can no longer have a live request: its deadline signal aborted it
+      // (or its process is gone). Such attempts keep their spend accounting but stop holding a
+      // concurrency slot, so one crashed or expired pass cannot block every later pass indefinitely.
+      const nowMs = this.clock().getTime();
+      const live = (attempt: AdmissionAttempt) => { const owner = ledger.runs[attempt.run_id];
+        return !!owner && nowMs - Date.parse(owner.created_at) < owner.budget.elapsed_ms; };
+      const active = Object.values(ledger.attempts).filter(attempt => attempt.billing_key === billing_key && attempt.state !== "released" && !attempt.acknowledged && live(attempt));
       const concurrency = Math.min(budget.concurrency, ...active.map(attempt => ledger.runs[attempt.run_id].budget.concurrency));
       if (active.length >= concurrency) reject("ADMISSION_CONCURRENCY_LIMIT");
       let reserved = 0n;
@@ -167,7 +173,7 @@ export class ModelAdmission {
         if (siblings.length >= ceiling.requests) reject("ADMISSION_PARENT_REQUEST_LIMIT");
         if (checkedSum(siblings.map(attempt => Number(attempt.resources.retry))) + Number(resources.retry) > ceiling.retries) reject("ADMISSION_PARENT_RETRY_LIMIT");
         for (const field of ["input_tokens", "output_tokens", "reasoning_tokens"] as const) if (checkedSum(siblings.map(attempt => used(attempt, field))) + resources[field] > ceiling[field]) reject(`ADMISSION_PARENT_${field.toUpperCase()}_LIMIT`);
-        if (siblings.filter(attempt => !attempt.acknowledged).length >= ceiling.concurrency) reject("ADMISSION_PARENT_CONCURRENCY_LIMIT");
+        if (siblings.filter(attempt => !attempt.acknowledged && live(attempt)).length >= ceiling.concurrency) reject("ADMISSION_PARENT_CONCURRENCY_LIMIT");
         if (request.channel === "api") {
           if (ceiling.currency !== budget.currency) reject("ADMISSION_PARENT_CURRENCY_MISMATCH");
           if (ceiling.billing_principal !== budget.billing_principal) reject("ADMISSION_PARENT_PRINCIPAL_MISMATCH");
