@@ -1682,7 +1682,6 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
     const model = llm.currentConfig?.model;
     return {
       hostLlm: llm,
-      computerUse,
       preparePrompt: (prompt, signal) => managedPass.admitPrompt(prompt, { provider: 'none', model: model || 'auto', adapter: 'copilot-cli',
         api: 'native_cli', base_url: '', effort: null, retention: 'provider_default', strict_schema: false, output_tokens: 8192 }, signal),
       admissionSignal: () => managedPass.admissionSignal,
@@ -1845,6 +1844,7 @@ export class ChatPanel implements vscode.WebviewViewProvider, vscode.Disposable 
 
     return {
       hostLlm: llm,
+      computerUse,
       preparePrompt: (prompt, signal) => managedPass.admitPrompt(prompt, { provider: 'none', model: model || 'auto', adapter: 'codex-cli',
         api: 'native_cli', base_url: '', effort: null, retention: 'provider_default', strict_schema: false, output_tokens: 8192 }, signal),
       admissionSignal: () => managedPass.admissionSignal,
