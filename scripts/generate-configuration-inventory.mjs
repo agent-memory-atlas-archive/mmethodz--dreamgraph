@@ -16,7 +16,10 @@ async function walk(directory) {
 }
 const sourceFiles = (await Promise.all(['src','packages','explorer','extensions/vscode/src','scripts'].map(walk))).flat();
 for (const file of sourceFiles.filter(file => /\.(ts|tsx|js|mjs)$/.test(file)).sort()) {
-  const content = await fs.readFile(path.join(root, file), 'utf8'), tree = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true);
+  // Git may materialize the same source with CRLF or LF. Normalize before
+  // getText() so multiline expressions have byte-identical inventory output.
+  const content = (await fs.readFile(path.join(root, file), 'utf8')).replace(/\r\n?/g, '\n');
+  const tree = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true);
   function visit(node) {
     let key;
     if (ts.isPropertyAccessExpression(node) && node.expression.getText(tree) === 'process.env') key = node.name.text;

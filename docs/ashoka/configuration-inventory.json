@@ -3153,12 +3153,12 @@
         {
           "file": "extensions/vscode/src/architect-core/adapters/copilot-cli/host/bridge-entry.ts",
           "line": 80,
-          "expression": "process.env[\"DREAMGRAPH_AUDIT_PATH\"]\r\n  ?? (AUDIT_DIR.length > 0 && RUN_ID.length > 0\r\n    ? join(AUDIT_DIR, `${RUN_ID.replace(/[^A-Za-z0-9._-]/g, \"_\")}.ndjson`)\r\n    : \"\")"
+          "expression": "process.env[\"DREAMGRAPH_AUDIT_PATH\"]\n  ?? (AUDIT_DIR.length > 0 && RUN_ID.length > 0\n    ? join(AUDIT_DIR, `${RUN_ID.replace(/[^A-Za-z0-9._-]/g, \"_\")}.ndjson`)\n    : \"\")"
         },
         {
           "file": "src/architect/cli-mcp-bridge.ts",
           "line": 27,
-          "expression": "process.env.DREAMGRAPH_AUDIT_PATH\r\n  ?? (AUDIT_DIR.length > 0 && RUN_ID.length > 0\r\n    ? join(AUDIT_DIR, `${RUN_ID.replace(/[^A-Za-z0-9._-]/g, \"_\")}.ndjson`)\r\n    : \"\")"
+          "expression": "process.env.DREAMGRAPH_AUDIT_PATH\n  ?? (AUDIT_DIR.length > 0 && RUN_ID.length > 0\n    ? join(AUDIT_DIR, `${RUN_ID.replace(/[^A-Za-z0-9._-]/g, \"_\")}.ndjson`)\n    : \"\")"
         }
       ],
       "documented": [
@@ -3170,7 +3170,7 @@
       "default_source": {
         "file": "extensions/vscode/src/architect-core/adapters/copilot-cli/host/bridge-entry.ts",
         "line": 80,
-        "expression": "process.env[\"DREAMGRAPH_AUDIT_PATH\"]\r\n  ?? (AUDIT_DIR.length > 0 && RUN_ID.length > 0\r\n    ? join(AUDIT_DIR, `${RUN_ID.replace(/[^A-Za-z0-9._-]/g, \"_\")}.ndjson`)\r\n    : \"\")"
+        "expression": "process.env[\"DREAMGRAPH_AUDIT_PATH\"]\n  ?? (AUDIT_DIR.length > 0 && RUN_ID.length > 0\n    ? join(AUDIT_DIR, `${RUN_ID.replace(/[^A-Za-z0-9._-]/g, \"_\")}.ndjson`)\n    : \"\")"
       }
     },
     {
@@ -4447,7 +4447,7 @@
         {
           "file": "src/cli/commands/status.ts",
           "line": 56,
-          "expression": "_positional[0] ??\r\n    (typeof flags.instance === \"string\" ? flags.instance : undefined) ??\r\n    process.env.DREAMGRAPH_INSTANCE_UUID"
+          "expression": "_positional[0] ??\n    (typeof flags.instance === \"string\" ? flags.instance : undefined) ??\n    process.env.DREAMGRAPH_INSTANCE_UUID"
         },
         {
           "file": "src/cognitive/engine.ts",

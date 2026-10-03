@@ -57,6 +57,8 @@ The accepted release evidence is Windows maintainer practical qualification plus
 
 ## Evidence and honest limits
 
-[Slice 27](slice-27-closure.json) seals the functional/system evidence: 2,040 root tests, 546 compiled editor tests and eleven actual Windows browser checks, zero failures and two explicitly retired particle skips. These are controlled environment results, not universal latency or support guarantees. The original instance was not migrated by those tests. Exact release packaging and remote CI are separately recorded by Slice 28.
+[Slice 27](slice-27-closure.json) seals the functional/system evidence: 2,040 root tests, 546 compiled editor tests and eleven actual Windows browser checks, zero failures and two explicitly retired particle skips. These are controlled environment results, not universal latency or support guarantees. The original instance was not migrated by those tests. [Slice 28](slice-28-release-evidence.json) separately records exact release packaging, the clean-source offline gate and publication.
+
+GitHub Actions refused the release matrix and CodeQL jobs before execution because the account was locked by a billing issue. Remote CI is unavailable and is not reported as passing. No billing change or purchase was made. This does not add qualification environments beyond the accepted Windows and WSL2 scope.
 
 [The public GPT-4.1 pilot](benchmarks/2026-10-03-gpt-4.1/README.md) preserves 14 pairs / 28 calls and quality failures, including lifecycle omissions, trust confusion, invented readbacks and age-only staleness. **No measured agent-understanding improvement, superiority or cost-saving claim is made.** Public requests and answers enable community reproduction; private contexts, replies, credentials, approval and spend ledger remain private. Ordinary CI makes no paid calls. Practical testing and community model/configuration comparisons inform patches.
