@@ -2,6 +2,8 @@
 
 # DreamGraph v14.0.1 - Ashoka
 
+**Current project state:** [Established behavior and maintainer field confirmations](docs/ashoka/project-state.md), including permanent Architect operational tabs, the configuration redesign, working Codex CLI Computer Use and successful graph upgrade on all seven tested instances.
+
 **Current patch:** [v14.0.1 release notes](RELEASE_NOTES_v14.0.1.md) cover legacy graph upgrade recovery, Codex CLI Computer Use cleanup, and consistent validation counts across Status and Explorer. Install and graph migration are separate operations; stop a legacy instance before running `dg graph-upgrade <instance>`. Native API Computer Use remains unqualified in the field, and legacy unresolved references require separate review.
 
 Ashoka's [legacy migration procedure](docs/ashoka/legacy-upgrade.md) provides a reviewed preview, backup, cutover and recovery path. Installing v14 does not migrate a graph automatically. The [sealed system gate](docs/ashoka/slice-27-closure.json) records 2,040 passing root tests, 546 compiled editor tests and eleven Windows browser checks. The maintainer's original instance remains a separate migration decision.
