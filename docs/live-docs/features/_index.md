@@ -633,3 +633,41 @@
 | decoupled_ui_manifest | Decoupled UI Manifest | ui | discovered | dreamgraph |
 | contamination_prevention_guard | Contamination Prevention Guard | testing | discovered | dreamgraph |
 | distributed_ui_sync | Distributed UI Registry Synchronization Channel | ui | discovered | dreamgraph |
+| feature_incremental_additive_scan_plan | Additive Scan | core | released | dreamgraph |
+| rest_metrics_instrumentation | REST Metrics Instrumentation | infrastructure | discovered | dreamgraph |
+| extension_daemon_boundary | Extension-Daemon Boundary Contract | core | discovered | dreamgraph |
+| api_instance_telemetry_bridge | API-Instance Telemetry Bridge | api | discovered | dreamgraph |
+| discipline_enforcement_tools | Discipline Enforcement Tools | discipline | discovered | dreamgraph |
+| feature_scan_completion_mcp_performance_plan | Scan Completion and MCP Transport Performance Plan | core | active | dreamgraph |
+| abstraction_1787344238762_4149 | Unified Standalone Architect CLI Bridge feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344319081_4212 | Unified Src data_model Hub |  | discovered | dreamgraph |
+| abstraction_1787344319081_4221 | Unified Test Flow feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344319081_4224 | Unified Test Flow workflow Hub |  | discovered | dreamgraph |
+| abstraction_1787344319084_4660 | Unified Test Case workflow Hub |  | discovered | dreamgraph |
+| abstraction_1787344319084_4663 | Unified Configuration feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344319084_4672 | Unified Causal Model data_model Hub |  | discovered | dreamgraph |
+| abstraction_1787344319084_4686 | Unified Plugin Manifest feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344319084_4695 | Unified Plugin Manifest data_model Hub |  | discovered | dreamgraph |
+| abstraction_1787344319084_4704 | Unified Audit Log data_model Hub |  | discovered | dreamgraph |
+| abstraction_1787344619308_5151 | Unified Instance Registry feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344686225_5229 | Unified Webview data_model Hub |  | discovered | dreamgraph |
+| abstraction_1787344686228_5457 | Unified Cognitive State Controller feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344746335_5770 | Unified Plugin Tools feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344746336_5812 | Unified Audit Management System feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344746336_5923 | Unified Instance Registry Management workflow Hub |  | discovered | dreamgraph |
+| abstraction_1787344746336_5926 | Unified Graph Data Orchestrator workflow Hub |  | discovered | dreamgraph |
+| abstraction_1787344746336_5932 | Unified LLM Bootstrap Lifecycle State workflow Hub |  | discovered | dreamgraph |
+| abstraction_1787344686226_5239 | Unified Cognitive data_model Hub |  | discovered | dreamgraph |
+| abstraction_1787344746335_5803 | Unified Discipline Integration Layer feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344746336_5827 | Unified Graph Snapshot API feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344806216_6320 | Unified Sdk feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344866189_6848 | Unified Instance Authentication Module feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344866189_6861 | Unified Instance Authentication Protocol feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344866189_6865 | Unified Authentication Framework feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344866189_6884 | Unified API Authentication Integration feature Hub |  | discovered | dreamgraph |
+| abstraction_1787344866190_6909 | Unified UI Element Data Contract Integration feature Hub |  | discovered | dreamgraph |
+| abstraction_1787345106153_8383 | Unified Audit Management System feature Hub |  | discovered | dreamgraph |
+| abstraction_1787345166221_8947 | Unified UI Element Data Contract Integration feature Hub |  | discovered | dreamgraph |
+| abstraction_1787343998514_3270 | Unified Chat Panel data_model Hub |  | discovered | dreamgraph |
+| architect_continuation_ownership_boundary | Architect continuation ownership boundary | core | active | dreamgraph |
+| architect_autonomous_target_completion | Architect autonomous target completion | core | active | dreamgraph |

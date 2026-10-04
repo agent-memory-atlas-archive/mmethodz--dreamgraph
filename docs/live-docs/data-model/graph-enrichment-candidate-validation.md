@@ -1,6 +1,6 @@
 # Graph Enrichment Candidate Validation
 
-> Validation contract for LLM-shaped graph enrichment candidates: parser-node anchors and wire-link edges must pass id, vocabulary, evidence excerpt, confidence, direction, and bounded-count checks before persistence; invalid output falls back to deterministic structural enrichment or safe no-op behavior.
+> This node is the validation contract that constrains LLM-produced graph enrichment output before it can be merged into DreamGraph stores. The `enrich_parser_nodes` tool defines a strict per-node enrichment shape with required description, intent, purpose, tags, feature anchors, relations, and optional UI knowledge, while `wire_links` separately defines a bounded JSON schema for candidate links with controlled relationship vocabulary, direction, evidence excerpt, confidence, and strength. It exists to keep graph enrichment safe and evidence-bounded: invalid or malformed model output is rejected or reduced to safe behavior, and the associated tests verify batching, parsing, persistence boundaries, and LLM-unavailable short-circuit behavior rather than allowing unchecked graph mutation.
 
 **Table:** `N/A`  
 **Storage:** N/A  

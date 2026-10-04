@@ -1,6 +1,6 @@
 # Remediation Evidence Bundle
 
-> Evidence contract used by Adaptive Future Engine remediation drafting and future-fit ranking. Bundles include scoped evidence anchors, ADR guard rails, entity summaries, allowed action classes, deterministic short-circuit metadata, verification obligations, and optional learning_hooks that are harvested into FutureSignal entries only when every hook anchor is present in the bundle.
+> This node is the evidence contract that scopes what remediation drafting and future-fit ranking are allowed to use when `cognitive_intervention` generates candidate plans. The test evidence shows bundles carrying graph entities, source anchors, ADR guard rails, allowed action classes, deterministic short-circuit metadata, and verification obligations, and the intervention module imports the same contract to validate and score candidate futures. It exists to keep Adaptive Future Engine remediation advisory behavior evidence-bounded: only known anchors may be cited, verification paths must be grounded, and learning or future-signal harvesting stays constrained to the supplied bundle rather than arbitrary repo context.
 
 **Table:** `N/A`  
 **Storage:** typescript:src/cognitive/types.ts  

@@ -1,0 +1,9 @@
+# Living documentation refresh — v14.0.1
+
+The maintainer's running DreamGraph instance exported a local documentation snapshot on 2026-10-04 at 08:19:55 UTC. It contained 1,401 Markdown files (1,666,968 bytes) across six sections: 669 features, 202 data-model entities, 197 workflows, 241 architecture decisions, 85 UI entries, and one API-reference index. The top-level index is additional. The source export is retained locally under `.codex/ashoka-14.0.1/living-docs`; its sorted path-and-content SHA-256 manifest digest is `4d4c19955df4c50ba1eaa1707d5323a147fd02b4c0f6e2202b92d46a34eb23f5`.
+
+This public snapshot refreshes 152 files: the overview and four section indexes, ADR-241, 38 newly exported feature entries, 107 data-model entries, and one new workflow. Existing detailed workflow pages remain intact. In particular, the export's provisional `release-workflow` parser node has no steps, so it does not replace the [seven-step release procedure](../workflows/release-workflow.md) or the detailed copy already in this snapshot.
+
+The graph export is evidence from a running instance, not a claim that every entry reflects current source behavior. Most feature and workflow descriptions in the export are explicitly provisional structural fallbacks; unchanged detailed pages and historical entries remain available. This refresh does not reconcile unresolved graph references, perform a scan, or change graph authority.
+
+The export had no case-insensitive filename collisions or broken relative Markdown links. A bounded publication scan found no private-key blocks, credential assignments, or absolute user-home paths in the exported Markdown. Twelve pages contain credential-related terminology; the scan did not identify credential values. The raw graph, runtime configuration, transcripts, and local export directory are not published.

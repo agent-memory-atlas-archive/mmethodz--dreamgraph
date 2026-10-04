@@ -197,3 +197,10 @@
 | llm_bootstrap_lineage | LLM Bootstrap Lineage Data Model | - | - |
 | persistent_cognitive_state_log | Persistent Cognitive State Log | - | - |
 | bootstrap_model_lifecycle | LLM Bootstrap Model Lifecycle Chain | - | - |
+| graph_context_contract | Graph Context Contract | - | - |
+| data_scan_state_v1 | Scan State v1 | - | - |
+| federated_dream_archetypes | Federated Dream Archetypes | - | - |
+| llm_bootstrap_fingerprint_history | LLM Bootstrap Fingerprint History | - | - |
+| llm_fingerprint_history | LLM Fingerprint History | - | - |
+| architect_continuation_token | Architect Continuation Token | - | - |
+| recommended_action_contract | Recommended Action Contract | - | - |

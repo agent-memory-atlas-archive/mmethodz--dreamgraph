@@ -1,6 +1,6 @@
 # Remediation Log Adaptive Future Sidecar
 
-> Bounded prompt-free remediation persistence sidecar for Adaptive Future Engine metadata. Stores compact evidence anchors, selected candidate and selected source, rejected candidates, fallback usage/reason, validation failures, future-fit score, objection count, future signal ids, outcomes, and metrics without storing raw prompts or secret-bearing diagnostics.
+> This node represents the bounded persistence sidecar that stores Adaptive Future Engine remediation metadata alongside intervention outputs without retaining raw prompts or secret-bearing diagnostics. In `src/cognitive/intervention.ts`, the intervention engine defines capped retention for future signals, future outcomes, and candidate runs, showing that this sidecar exists to keep remediation ranking evidence compact, durable, and auditable rather than becoming an unbounded transcript store. It participates directly in the `cognitive_intervention` flow by recording selected source/fallback behavior, validation failures, and future-signal references for remediation planning, and it is semantically tied to both `remediation_evidence_bundle` as upstream evidence input and `feature_adaptive_future_engine` as the advisory ranking layer whose metadata it preserves.
 
 **Table:** `N/A`  
 **Storage:** file-backed JSON/JSONL sidecar files  

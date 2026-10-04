@@ -1,6 +1,6 @@
 # Archetype Exchange Record
 
-> A structured bundle representing the secure, metadata-capsuled transfer of validated pattern archetypes between federated DreamGraph systems.. Intent: Unifying export/import of schemas used for federation-level cross-pollination of edge, anomaly, and best-practice patterns. Central to supporting cognitive_federation, but lacking a first-class model.
+> This node represents the transferable data package used when DreamGraph instances exchange validated archetypes across federation boundaries. In the supplied neighborhood it sits between exchange workflows such as `federated_archetype_import_export`, `validated_archetype_exchange`, and `federated_dream_archetype_exchange`, and the reusable pattern concepts `dream_archetype` and `federated_dream_archetypes`, implying it is the concrete envelope that carries anonymized pattern knowledge rather than the workflow that moves it. It exists to make cross-instance sharing auditable, privacy-aware, and integrable with `cognitive_federation`, though the exact schema fields and serialization format are not evidenced here.
 
 **Table:** `N/A`  
 **Storage:** N/A  

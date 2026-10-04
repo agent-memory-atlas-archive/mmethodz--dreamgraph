@@ -1,6 +1,6 @@
 # Solidify Insight Candidate Classification
 
-> Strict advisory output shape used by solidify_cognitive_insight to classify speculative cognitive insight before any durable mutation. The model may propose a target type, evidence anchors, confidence, risks, required validation, ADR guard-rail review, contradictions, and duplicate hints; engine validation decides whether the candidate is surfaced, rejected/no-op, or followed by deterministic fallback.
+> This node is the strict advisory classification contract used by `solidify_cognitive_insight` before any speculative insight can become a durable graph mutation. The source defines a closed JSON schema with target type, source and target ids, evidence anchors, confidence, rationale, risks, required validation, ADR guard-rail review, and contradictions, while the tests show that duplicates, unknown ids, contradictions, and guard-rail bypass language are rejected. It exists to separate model suggestion from fact mutation: the tool may classify a possible durable target, but engine validation and fallback policy decide whether the result is accepted, surfaced as no-op/rejected, or handled deterministically.
 
 **Table:** `N/A`  
 **Storage:** N/A  

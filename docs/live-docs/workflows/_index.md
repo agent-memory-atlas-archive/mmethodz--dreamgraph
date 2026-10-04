@@ -198,3 +198,4 @@
 | plugin_ui_registry_sync | Plugin UI Registry Sync | derived from grounded behavioral evidence | 0 |
 | workflow_incremental_evidence_lifecycle | Incremental Evidence Lifecycle | Explicit scan_project mode=incremental or dg scan --incremental request after a compatible full baseline | 6 |
 | workflow_scan_completion_and_mcp_performance | Scan Completion and MCP Performance Remediation | Committed scan, enrichment continuation, or Codex/daemon MCP invocation | 6 |
+| workflow_architect_continuation_boundary_and_autonomous_completion | Architect continuation boundary and autonomous completion | Architect autonomous execution request | 5 |

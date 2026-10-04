@@ -1,6 +1,6 @@
 # UI Migration Candidate Plan
 
-> Optional advisory plan attached to generate_ui_migration_plan output. It compares migration futures, maps source UI registry elements to existing targets or explicitly proposed new elements, and records risks, data-contract changes, verification, graph updates, and UI-registry updates after strict validation.
+> This node is the optional advisory output contract for `generate_ui_migration_plan`, describing how a source UI element could be ported or refactored while preserving semantic registry constraints. The UI registry evidence shows the registry is intentionally platform-independent and captures what elements are, not how they look, while the tests prove that a valid migration plan must compare futures, map source elements to existing or explicitly proposed new elements, and record risks, verification, graph updates, and UI-registry updates under strict validation. It exists to let DreamGraph reason about UI migration as an evidence-bounded planning artifact rather than directly mutating the registry or implementation, and it is tied to `ui_registry` as the semantic source of element contracts and to `feature_adaptive_future_engine` as an advisory future-comparison surface.
 
 **Table:** `N/A`  
 **Storage:** N/A  

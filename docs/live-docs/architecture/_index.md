@@ -242,3 +242,4 @@
 | ✅ ADR-238 | [Revision-scoped bridge discovery cache and bounded asynchronous audit evidence](adr-238.md) | accepted | 2026-08-21T20:09:32.665Z | collaborative |
 | ✅ ADR-239 | [Layer-owned typed timeout and cancellation outcomes for governed CLI/MCP execution](adr-239.md) | accepted | 2026-08-21T20:22:48.605Z | collaborative |
 | ✅ ADR-240 | [Separate API continuation envelopes from CLI execution and keep autonomous targets authoritative](adr-240.md) | accepted | 2026-08-21T20:59:39.591Z | collaborative |
+| ✅ ADR-241 | [Ashoka scoped amendment to ADR-096: exploration floors do not create factual evidence](adr-241.md) | accepted | 2026-10-01T07:17:19.773Z | system |

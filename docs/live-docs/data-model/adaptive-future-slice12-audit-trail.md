@@ -1,6 +1,6 @@
 # Adaptive Future Slice 12 Audit Trail
 
-> Bounded Adaptive Future Engine audit metadata for selected and rejected candidate futures across planning-doc, adapter, graph-tool, and cognitive-workflow task classes. Slice 12 now provides shared deterministic task-class inference plus graph-tool and cognitive-workflow consumers.
+> This node is the shared audit metadata scaffold for Adaptive Future Engine Slice 12, defining how candidate futures are normalized, scored, selected, rejected, and annotated across multiple task classes. The scaffold source defines task classes, anchor kinds, route and fallback enums, score factors, candidate audit records, and a builder that sorts candidates and marks the selected one, while `enrich_parser_nodes` and `solidify_cognitive_insight` both import it as graph-tool and cognitive-workflow consumers. It exists to make advisory future comparison compact, deterministic, and reusable across tools without turning the audit layer into an enforcement state machine, and it is directly tied to `feature_adaptive_future_engine` and the rollout workflow that introduced Slice 12.
 
 **Table:** `N/A`  
 **Storage:** N/A  
