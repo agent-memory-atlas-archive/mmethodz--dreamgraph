@@ -1,0 +1,142 @@
+{
+  "schema": "dreamgraph.release_packages.v1",
+  "baseline_version": "14.0.0",
+  "target_version": "14.0.1",
+  "success": true,
+  "checks": [
+    {
+      "name": "Installed CLI 14.0.0",
+      "value": {
+        "version": "DreamGraph CLI v14.0.0 (Ashoka)",
+        "same_bin": true
+      }
+    },
+    {
+      "name": "Daemon health 14.0.0",
+      "value": {
+        "http": 200,
+        "start_ms": 12019
+      }
+    },
+    {
+      "name": "Actual 14.0.0 CLI MCP client",
+      "value": {
+        "tool_count": 93,
+        "read": true,
+        "contract_version": "legacy"
+      }
+    },
+    {
+      "name": "Installed CLI 14.0.1",
+      "value": {
+        "version": "DreamGraph CLI v14.0.1 (Ashoka)",
+        "same_bin": true
+      }
+    },
+    {
+      "name": "Installed workspace bytes and daemon import",
+      "value": [
+        {
+          "name": "@dreamgraph/sdk",
+          "version": "14.0.1",
+          "files": 92
+        },
+        {
+          "name": "@dreamgraph/host",
+          "version": "14.0.1",
+          "files": 28
+        },
+        {
+          "name": "@dreamgraph/token-economy",
+          "version": "14.0.1",
+          "files": 20
+        }
+      ]
+    },
+    {
+      "name": "Install leaves graph, instance configuration and extension history untouched",
+      "value": true
+    },
+    {
+      "name": "Daemon health 14.0.1",
+      "value": {
+        "http": 200,
+        "start_ms": 5298
+      }
+    },
+    {
+      "name": "14.0.0 client reconnects to 14.0.1 MCP authority",
+      "value": {
+        "tool_count": 93,
+        "explicit_legacy_contract_read": true,
+        "canonical_missing_identity_refused": true
+      }
+    },
+    {
+      "name": "Packaged web surfaces and sibling template config readback",
+      "value": true
+    },
+    {
+      "name": "Installed CLI reviewed migration and lost-reply replay",
+      "value": {
+        "changed_files": 1,
+        "replayed": true
+      }
+    },
+    {
+      "name": "Daemon health 14.0.1",
+      "value": {
+        "http": 200,
+        "start_ms": 2429
+      }
+    },
+    {
+      "name": "Post-migration restart and legacy lookup",
+      "value": true
+    },
+    {
+      "name": "Reviewed exact-byte restore preserves later configuration and unrelated history",
+      "value": true
+    },
+    {
+      "name": "Unknown/future schema refuses migration",
+      "value": true
+    }
+  ],
+  "scope": "Exact 14.0.0 and 14.0.1 tarball payloads; disposable shared-bin install/restart and retained legacy data. Excludes PATH/VS Code activation, real instances and paid requests.",
+  "model_requests": 0,
+  "artifacts": [
+    {
+      "file": "dreamgraph-14.0.0.tgz",
+      "sha256": "2138b30045e585eb1ca2329771d696b466ab9bea0c1fe4ce9f0927d5e414f3a0"
+    },
+    {
+      "file": "dreamgraph-sdk-14.0.0.tgz",
+      "sha256": "960aeb64dc9211b4c0cfcbe90e7995daefea25c095282e253caf7367322e5c51"
+    },
+    {
+      "file": "dreamgraph-host-14.0.0.tgz",
+      "sha256": "a932e0a9c9eccb6f740d6991d86a53fa112e9c4794348664d861e55a3a0ea6d6"
+    },
+    {
+      "file": "dreamgraph-token-economy-14.0.0.tgz",
+      "sha256": "272511bb8dc78e21368ac7ca6b887ddaf2b4c2570f276f098e1cf78eeece89b2"
+    },
+    {
+      "file": "dreamgraph-14.0.1.tgz",
+      "sha256": "7775a0bf7b528b16fce09f643a7df21ccd19f0693113ea029eae9ceabea0fa49"
+    },
+    {
+      "file": "dreamgraph-sdk-14.0.1.tgz",
+      "sha256": "90cdb57c98d98074c50c4ffc6fa22a9677282f27bc80acdd2ec1040cf6aa1a5e"
+    },
+    {
+      "file": "dreamgraph-host-14.0.1.tgz",
+      "sha256": "dc5f62b366cc0d14aaf32329cdb0c3b4619aa1d6a0755224981110d8104bbf55"
+    },
+    {
+      "file": "dreamgraph-token-economy-14.0.1.tgz",
+      "sha256": "8a6b2791dd45983bcab0ef8e2bb9c736d0f509d2086c1e77a35ddc25a5cb8fdf"
+    }
+  ]
+}

@@ -1,0 +1,330 @@
+{
+  "schema": "dreamgraph.ashoka.patch_release_evidence.v1",
+  "version": "14.0.1",
+  "release_name": "Ashoka",
+  "status": "published",
+  "recorded_at": "2026-10-04T09:56:33.786Z",
+  "workflow": {
+    "graph_id": "release_workflow",
+    "source": "../workflows/release-workflow.md",
+    "steps_completed": [
+      "version alignment",
+      "documentation and living-doc exports",
+      "packaging",
+      "Claude release notes",
+      "commit/tag/push",
+      "GitHub release and assets",
+      "owned website publication"
+    ],
+    "graph_projection_note": "The graph workflow retains an active provisional zero-step projection. Its explicit GitHub/owned-website links and the seven-step repository workflow were used together."
+  },
+  "source_qualification": {
+    "commit": "4ee3d5ee6f2cf8bd5231b43dfd92fbc73c915725",
+    "git_archive_clean_checkout": true,
+    "source_hash": "375ab67f799aad71838f5b02a242f95a59ec72007d7fee8965f96aa5695955b0",
+    "result": "release-14.0.1/offline-gate.json",
+    "platform": "win32",
+    "node": "25.2.1",
+    "steps": 12,
+    "root": {
+      "passed": 2127,
+      "failed": 0,
+      "skipped": 2,
+      "skip_names": [
+        "pushParticlesForEdge ParticleSystem removed in Slice F1 — flow now lives on the tube shader",
+        "ParticleSystem ParticleSystem removed in Slice F1"
+      ],
+      "files": 197
+    },
+    "editor": {
+      "passed": 546,
+      "failed": 0,
+      "skipped": 0
+    },
+    "browser": {
+      "platform": "win32",
+      "architecture": "x64",
+      "checks": 11,
+      "stop_release_ms": 12.532400000000052,
+      "termination_ms": 400.1929,
+      "control_loss_stop_ms": 2767.710299999999
+    },
+    "model_requests": 0
+  },
+  "package_qualification": {
+    "result": "release-14.0.1/package-qualification.json",
+    "success": true,
+    "baseline_version": "14.0.0",
+    "target_version": "14.0.1",
+    "checks": [
+      {
+        "name": "Installed CLI 14.0.0",
+        "value": {
+          "version": "DreamGraph CLI v14.0.0 (Ashoka)",
+          "same_bin": true
+        }
+      },
+      {
+        "name": "Daemon health 14.0.0",
+        "value": {
+          "http": 200,
+          "start_ms": 12019
+        }
+      },
+      {
+        "name": "Actual 14.0.0 CLI MCP client",
+        "value": {
+          "tool_count": 93,
+          "read": true,
+          "contract_version": "legacy"
+        }
+      },
+      {
+        "name": "Installed CLI 14.0.1",
+        "value": {
+          "version": "DreamGraph CLI v14.0.1 (Ashoka)",
+          "same_bin": true
+        }
+      },
+      {
+        "name": "Installed workspace bytes and daemon import",
+        "value": [
+          {
+            "name": "@dreamgraph/sdk",
+            "version": "14.0.1",
+            "files": 92
+          },
+          {
+            "name": "@dreamgraph/host",
+            "version": "14.0.1",
+            "files": 28
+          },
+          {
+            "name": "@dreamgraph/token-economy",
+            "version": "14.0.1",
+            "files": 20
+          }
+        ]
+      },
+      {
+        "name": "Install leaves graph, instance configuration and extension history untouched",
+        "value": true
+      },
+      {
+        "name": "Daemon health 14.0.1",
+        "value": {
+          "http": 200,
+          "start_ms": 5298
+        }
+      },
+      {
+        "name": "14.0.0 client reconnects to 14.0.1 MCP authority",
+        "value": {
+          "tool_count": 93,
+          "explicit_legacy_contract_read": true,
+          "canonical_missing_identity_refused": true
+        }
+      },
+      {
+        "name": "Packaged web surfaces and sibling template config readback",
+        "value": true
+      },
+      {
+        "name": "Installed CLI reviewed migration and lost-reply replay",
+        "value": {
+          "changed_files": 1,
+          "replayed": true
+        }
+      },
+      {
+        "name": "Daemon health 14.0.1",
+        "value": {
+          "http": 200,
+          "start_ms": 2429
+        }
+      },
+      {
+        "name": "Post-migration restart and legacy lookup",
+        "value": true
+      },
+      {
+        "name": "Reviewed exact-byte restore preserves later configuration and unrelated history",
+        "value": true
+      },
+      {
+        "name": "Unknown/future schema refuses migration",
+        "value": true
+      }
+    ],
+    "scope": "Exact 14.0.0 and 14.0.1 tarball payloads; disposable shared-bin install/restart and retained legacy data. Excludes PATH/VS Code activation, real instances and paid requests.",
+    "model_requests": 0,
+    "root_package_sha256": "7775a0bf7b528b16fce09f643a7df21ccd19f0693113ea029eae9ceabea0fa49"
+  },
+  "documentation": {
+    "release_notes": "../../RELEASE_NOTES_v14.0.1.md",
+    "living_docs": "../live-docs/export-summary-14.0.1.md",
+    "formats": [
+      "Markdown",
+      "HTML",
+      "PDF"
+    ],
+    "pdf_pages": 6
+  },
+  "remote_ci": {
+    "status": "unavailable_not_started",
+    "reason": "GitHub account billing lock prevented all job steps.",
+    "observed_run": "https://github.com/mmethodz/dreamgraph/actions/runs/37192467903",
+    "codeql_run": "https://github.com/mmethodz/dreamgraph/actions/runs/37192467898",
+    "commit": "4ee3d5ee6f2cf8bd5231b43dfd92fbc73c915725",
+    "executed_steps": 0,
+    "disposition": "No remote CI or CodeQL success claim. Local clean-source Windows gate and existing accepted WSL2 scope remain the release evidence; no account or billing changes."
+  },
+  "publication": {
+    "tag": "v14.0.1",
+    "github": "https://github.com/mmethodz/dreamgraph/releases/tag/v14.0.1",
+    "release_commit": "4ee3d5ee6f2cf8bd5231b43dfd92fbc73c915725",
+    "published_at": "2026-10-04T09:53:11Z",
+    "assets": [
+      {
+        "file": "dreamgraph-14.0.1.tgz",
+        "bytes": 6297407,
+        "sha256": "7775a0bf7b528b16fce09f643a7df21ccd19f0693113ea029eae9ceabea0fa49",
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.1/dreamgraph-14.0.1.tgz"
+      },
+      {
+        "file": "dreamgraph-sdk-14.0.1.tgz",
+        "bytes": 189276,
+        "sha256": "90cdb57c98d98074c50c4ffc6fa22a9677282f27bc80acdd2ec1040cf6aa1a5e",
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.1/dreamgraph-sdk-14.0.1.tgz"
+      },
+      {
+        "file": "dreamgraph-host-14.0.1.tgz",
+        "bytes": 19660,
+        "sha256": "dc5f62b366cc0d14aaf32329cdb0c3b4619aa1d6a0755224981110d8104bbf55",
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.1/dreamgraph-host-14.0.1.tgz"
+      },
+      {
+        "file": "dreamgraph-token-economy-14.0.1.tgz",
+        "bytes": 17285,
+        "sha256": "8a6b2791dd45983bcab0ef8e2bb9c736d0f509d2086c1e77a35ddc25a5cb8fdf",
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.1/dreamgraph-token-economy-14.0.1.tgz"
+      },
+      {
+        "file": "dreamgraph-vscode-14.0.1.vsix",
+        "bytes": 1539736,
+        "sha256": "bb0e373a6c6dd3b40556bf3f3ecd679d813f2c97cc11f20ef64a56a159687217",
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.1/dreamgraph-vscode-14.0.1.vsix"
+      },
+      {
+        "file": "dreamgraph-docs-14.0.1.zip",
+        "bytes": 3819060,
+        "sha256": "0fa2a32b904866eeb565524c24848fa333f1768eeae057661ccf9c2e7439ac69",
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.1/dreamgraph-docs-14.0.1.zip"
+      },
+      {
+        "file": "dreamgraph-easy-start-14.0.1.pdf",
+        "bytes": 85457,
+        "sha256": "473373b41afc1188088c53d45bfc9ca294a1f8c829714a11d5a305eff675d8c5",
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.1/dreamgraph-easy-start-14.0.1.pdf"
+      },
+      {
+        "file": "SHA256SUMS.txt",
+        "bytes": 663,
+        "sha256": "181d2201c429e6bdfbe0072f5467c4ab8f424fb00c48fe6dc13d8c9593d19025",
+        "url": "https://github.com/mmethodz/dreamgraph/releases/download/v14.0.1/SHA256SUMS.txt"
+      }
+    ],
+    "website": {
+      "schema": "dreamgraph.website_deployment.v1",
+      "status": "completed",
+      "public_version": "14.0.1",
+      "verified_at": "2026-10-04T09:55:57.898Z",
+      "url": "https://dreamgraph.nofs.ai/",
+      "source_commit": "bd8d38ced126afb3862da240a45d314c17387bec",
+      "source_archive_sha256": "e59184287c49c8e66fd06b4066756f84d1e4535546614f45330375194c31b646",
+      "hostinger": {
+        "status": "Completed",
+        "current": true,
+        "source_file": "dreamgraph-website-14.0.1-source.zip",
+        "displayed_time": "2026-10-04 12:53:56",
+        "verified_at": "2026-10-04T09:55:44.124Z"
+      },
+      "checks": [
+        {
+          "path": "/assets/index-CQSuW8SI.js",
+          "sha256": "69c9149027f0d18522baeb06d3d20ff135a0b01fc8c02bad43ea41c65bd0e19c",
+          "bytes": 688503,
+          "http": 200
+        },
+        {
+          "path": "/assets/index-BajmnFMr.css",
+          "sha256": "c9648df4f6a9e9c0e7601a0c34f4c223a75533bda7c76b56ab32f24e53bdbe3b",
+          "bytes": 16616,
+          "http": 200
+        },
+        {
+          "path": "/docs/ashoka/release-notes-v14.0.1.md",
+          "sha256": "548c720979e2d9649bc565095e7306e33168a0a858122754abdbe2edbe348658",
+          "bytes": 7683,
+          "http": 200
+        },
+        {
+          "path": "/docs/ashoka/release-notes.md",
+          "sha256": "548c720979e2d9649bc565095e7306e33168a0a858122754abdbe2edbe348658",
+          "bytes": 7683,
+          "http": 200
+        },
+        {
+          "path": "/docs/easy-start.md",
+          "sha256": "32138f9a364c0b0c5009d2532c9979aceba23713b13f9631baf155d1560eb753",
+          "bytes": 6898,
+          "http": 200
+        },
+        {
+          "path": "/docs/easy-start.html",
+          "sha256": "5ca67cef954d80a4871c817553a29a4aab070e878e82ca9dd280fa1ded0cfb8d",
+          "bytes": 9643,
+          "http": 200
+        },
+        {
+          "path": "/docs/easy-start.pdf",
+          "sha256": "473373b41afc1188088c53d45bfc9ca294a1f8c829714a11d5a305eff675d8c5",
+          "bytes": 85457,
+          "http": 200
+        }
+      ],
+      "rendered": {
+        "version": "14.0.1",
+        "verified_at": "2026-10-04T09:55:44.121Z",
+        "pages": [
+          {
+            "path": "/",
+            "verified": true,
+            "visible": "DREAMGRAPH V14.0.1 - ASHOKA"
+          },
+          {
+            "path": "/download",
+            "verified": true,
+            "visible": "DreamGraph v14.0.1 - Ashoka is the first field patch."
+          },
+          {
+            "path": "/guide/ashoka-upgrade",
+            "verified": true,
+            "visible": "DreamGraph v14.0.1 — Ashoka release and upgrade guide"
+          },
+          {
+            "path": "/versions",
+            "verified": true,
+            "visible": "Current release: DreamGraph v14.0.1 — Ashoka."
+          }
+        ]
+      },
+      "scope": "Existing Hostinger website and unchanged Node 22/Vite settings; exact static artifacts plus rendered Windows browser verification. No new DreamGraph platform qualification or account changes."
+    }
+  },
+  "retained_scope": {
+    "linux": "Existing accepted WSL2 Ubuntu 24.04 / Node 20 installer and isolated-browser-worker evidence; no new platform qualification.",
+    "live_instances": "The release pass did not install, restart or migrate maintainer instances.",
+    "benchmark": "No new paid canary or agent-usefulness claim; published v14 pilot limitations and field-testing exclusions remain."
+  }
+}
