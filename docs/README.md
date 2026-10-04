@@ -6,9 +6,9 @@
 - [Strategy execution contract](ashoka/strategies.md) — eleven active executors, explicit reflective retirement, preserved focus and bounded speculative outputs.
 - [Typed plan authority](ashoka/plan-authority.md) — C14 lifecycle, current/running separation, reviewed evidence and durable transitions.
 
-Version: **14.0.0 — Ashoka**. See the [release notes](../RELEASE_NOTES_v14.0.0.md) and [upgrade guide](ashoka/release-14.0.0.md).
+Version: **14.0.1 — Ashoka**. See the [current release notes](../RELEASE_NOTES_v14.0.1.md), [v14.0.0 baseline notes](../RELEASE_NOTES_v14.0.0.md), and [upgrade guide](ashoka/release-14.0.0.md).
 
-Easy Start is available as [Markdown](easy-start.md), [HTML](easy-start.html) and a [six-page PDF](easy-start.pdf), including the integrated Architect operational tabs.
+Easy Start is current in [Markdown](easy-start.md), [HTML](easy-start.html), and the [six-page PDF](easy-start.pdf), all updated for v14.0.1.
 
 Ashoka's [Computer Use implementation](ashoka/computer-use.md) is verified for the maintainer's [Windows and accepted WSL installer/browser release scope](ashoka/v14-release-scope.md). Additional native platforms/backends are deferred, and unqualified routes remain disabled. Installation and legacy graph migration remain separate operations.
 

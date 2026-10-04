@@ -2,7 +2,7 @@
 export const MCP_CATALOG_V1 = {
   "schema": "dreamgraph.mcp_catalog.v1",
   "contract_version": 1,
-  "server_version": "14.0.0",
+  "server_version": "14.0.1",
   "compatibility": {
     "accepted_contract_versions": [
       1

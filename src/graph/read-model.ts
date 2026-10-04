@@ -13,6 +13,7 @@ import { readNormalizationResult } from "../cognitive/normalization-results.js";
 import { loadGraphMaintenanceState } from "../cognitive/graph-maintenance-state.js";
 import { curationSuppressions, emptyCuration } from "../cognitive/curation.js";
 import { projectPlanAuthorityEntities } from "../discipline/plan-authority.js";
+import { storeRows, validationPipelineCounts, type ValidationPipelineCounts } from "../cognitive/validation-pipeline.js";
 import {
   GraphEntitySchema, GraphKindSchema, GraphRelationshipSchema, graphIdentityKey, classifySchemaMajor,
   type GraphEntity, type GraphIdentity, type GraphRelationship, type ResultState, type GraphEnvelope,
@@ -50,6 +51,8 @@ export interface CanonicalGraphRead {
   entities: GraphEntity[];
   relationships: GraphRelationship[];
   store_hashes: Record<string, string | null>;
+  /** Normalization pipeline counts from the raw stores (per dream, latest assessment): the same definition the Status board and `dg status` use. Null when candidate_edges.json is unavailable. */
+  validation_pipeline?: ValidationPipelineCounts | null;
   /** Exact keys only; ambiguous legacy IDs are never guessed. */
   by_identity: Map<string, GraphEntity>;
   source_dependents: Map<string, Set<string>>;
@@ -63,6 +66,8 @@ export const LegacyConflictEntrySchema = z.object({
   schema: z.literal("dreamgraph.legacy_conflict.v1"), group_id: legacyConflictHash,
   file: z.string().min(1), collection: z.string().min(1), index: z.number().int().nonnegative(),
   original_id: z.string().nullable(), row_hash: legacyConflictHash, row: record,
+  /** "superseded": an older revision with a recorded order (validated_at / normalization_cycle); the newest stays active. Absent: unresolved conflict. */
+  disposition: z.literal("superseded").optional(),
 }).strict();
 const stableConflictRow = (value: unknown): string => value === null || typeof value !== "object" ? JSON.stringify(value)
   : Array.isArray(value) ? "[" + value.map(stableConflictRow).join(",") + "]"
@@ -247,7 +252,8 @@ export async function loadCanonicalGraph(instance_id: string): Promise<Canonical
           by_legacy_id.set(id, [...(by_legacy_id.get(id) ?? []), identity]);
         }
         const historicalGroups = new Map<string, number>();
-        for (const entry of historicalConflicts) historicalGroups.set(entry.group_id, (historicalGroups.get(entry.group_id) ?? 0) + 1);
+        // Superseded revisions are resolved history, not a defect: only unresolved conflict groups are reported.
+        for (const entry of historicalConflicts) if (entry.disposition !== "superseded") historicalGroups.set(entry.group_id, (historicalGroups.get(entry.group_id) ?? 0) + 1);
         for (const [group_id, variants] of historicalGroups) reasons.push({ code: "LEGACY_CONFLICT_PRESERVED",
           scope: [family.file, group_id], detail: `${variants} historical variants are withheld from active graph authority; no winner was selected.` });
       } catch (error) {
@@ -460,8 +466,12 @@ export async function loadCanonicalGraph(instance_id: string): Promise<Canonical
       record.payload = { ...record.payload, current_evidence_assessment: { ...assessment, state: "unproven", reasons: [...assessment.reasons, ...gaps] } };
       record.evidence = record.evidence.map(ref => ({ ...ref, validation: "unreviewed" }));
     }
+    const validation_pipeline = rawStores.has("candidate_edges.json")
+      ? validationPipelineCounts(storeRows(rawStores.get("candidate_edges.json"), "results"),
+        rawStores.has("validated_edges.json") ? storeRows(rawStores.get("validated_edges.json"), "edges") : null)
+      : null;
     return { schema: "dreamgraph.graph_snapshot.v1", instance_id, revision: publication.revision,
-      currency: publication.currency, state, entities, relationships, store_hashes, by_identity,
+      currency: publication.currency, state, entities, relationships, store_hashes, validation_pipeline, by_identity,
       source_dependents, evidence_dependents, entity_dependents };
   });
 }

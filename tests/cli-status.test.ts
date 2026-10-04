@@ -1,9 +1,9 @@
-import { afterEach, describe, expect, it } from "vitest";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
-import { gatherDataStats } from "../src/cli/commands/status.js";
+import { cmdStatus, gatherDataStats } from "../src/cli/commands/status.js";
 
 const tempDirs: string[] = [];
 
@@ -47,5 +47,33 @@ describe("dg status data stats", () => {
     expect(stats.graphEdges).toBe(2);
     expect(stats.tensions).toBe(1);
     expect(stats.uiElements).toBe(2);
+  });
+
+  it("keeps the v14 raw-count JSON keys while adding the distinct-dream validation pipeline", async () => {
+    const master = await fixtureDir(), uuid = "11111111-1111-4111-8111-111111111111", name = "status-json-fixture";
+    const root = join(master, uuid), data = join(root, "data");
+    await mkdir(data, { recursive: true });
+    const timestamp = "2026-10-04T00:00:00.000Z";
+    await writeJson(master, "instances.json", { schema_version: "1.0.0", instances: [{
+      uuid, name, project_root: null, mode: "passive", status: "active", created_at: timestamp, last_active_at: timestamp,
+    }] });
+    await writeJson(root, "instance.json", { uuid, name, project_root: null, mode: "passive", policy_profile: "balanced",
+      version: "14.0.0", transport: { type: "http" }, created_at: timestamp, last_active_at: timestamp,
+      total_dream_cycles: 0, total_tool_calls: 0 });
+    await writeJson(data, "candidate_edges.json", { results: [
+      { dream_type: "edge", dream_id: "one", normalization_cycle: 1, status: "latent", validated_at: timestamp },
+      { dream_type: "edge", dream_id: "one", normalization_cycle: 2, status: "validated", validated_at: timestamp },
+      { dream_type: "node", dream_id: "two", normalization_cycle: 1, status: "rejected", validated_at: timestamp },
+    ] });
+    await writeJson(data, "validated_edges.json", { edges: [{ id: "one" }] });
+    const printed = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    try {
+      await cmdStatus([name], { "master-dir": master, json: true } as Parameters<typeof cmdStatus>[1]);
+      const result = JSON.parse(String(printed.mock.calls.at(-1)?.[0]));
+      expect(result.cognitive.candidate_edges).toBe(3);
+      expect(result.cognitive.validated_edges).toBe(1);
+      expect(result.cognitive.validation_pipeline).toMatchObject({ assessed: 2, validated: 1, rejected: 1,
+        latent: 0, assessment_rows: 3, promoted_edges: 1, validation_rate: 0.5 });
+    } finally { printed.mockRestore(); }
   });
 });

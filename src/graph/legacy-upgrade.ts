@@ -27,6 +27,74 @@ const stable = (value: unknown): string => value === null || typeof value !== "o
 const hash = (bytes: string | Buffer) => "sha256:" + createHash("sha256").update(bytes).digest("hex");
 const object = (value: unknown): value is Record<string, any> => !!value && typeof value === "object" && !Array.isArray(value);
 const text = (value: unknown): string | null => typeof value === "string" && value.length > 0 ? value : null;
+const utcMs = (value: unknown): number | null => { if (typeof value !== "string") return null; const ms = Date.parse(value); return Number.isFinite(ms) && /^\d{4}-\d{2}-\d{2}T/.test(value) ? ms : null; };
+/** Same content address the v14 narrator gives every chapter (src/cognitive/narrator.ts appendToStory + risk-lifecycle riskDigest). */
+const narratorStable = (value: unknown): string => value === null || typeof value !== "object" ? (JSON.stringify(value) ?? "null") : Array.isArray(value) ? `[${value.map(narratorStable).join(",")}]`
+  : `{${Object.keys(value).filter(key => (value as Record<string, unknown>)[key] !== undefined).sort().map(key => JSON.stringify(key) + ":" + narratorStable((value as Record<string, unknown>)[key])).join(",")}}`;
+/**
+ * Legacy narrators had no chapter id and derived chapter_number from a capped chapter count, so every chapter after the
+ * cap repeated the same number. A legacy chapter with a cycle range and text gets exactly the id v14 would have assigned.
+ */
+/**
+ * Legacy dreamer re-dreams that reused an existing dream node id (the LLM produced the same slug in a
+ * later cycle). A later row is a distinct, never-assessed dream when: it is still "candidate" and was never
+ * promoted, it was created after the first row with that id, no normalization assessment of that id was
+ * recorded after it was created (so every assessment belongs to an earlier row), and no dream edge refers to
+ * the id (so no reference becomes ambiguous). Such a row keeps all its content and gets its own identity
+ * `<id>~c<dream_cycle>`; the first row keeps the id. Anything else stays a conflict.
+ */
+function legacyRedreamIds(snapshot: { files: Map<string, { value: unknown }> }): Map<number, string> {
+  const result = new Map<number, string>();
+  const graph = snapshot.files.get("dream_graph.json")?.value;
+  const nodes: unknown[] = object(graph) && Array.isArray(graph.nodes) ? graph.nodes : [];
+  const edges: unknown[] = object(graph) && Array.isArray(graph.edges) ? graph.edges : [];
+  const candidates = snapshot.files.get("candidate_edges.json")?.value;
+  const assessments: unknown[] = Array.isArray(candidates) ? candidates : object(candidates) && Array.isArray(candidates.results) ? candidates.results : [];
+  const ms = (value: unknown) => { const t = typeof value === "string" ? Date.parse(value) : NaN; return Number.isFinite(t) ? t : null; };
+  const byId = new Map<string, number[]>();
+  nodes.forEach((row, index) => { if (object(row) && text(row.id)) byId.set(row.id, [...(byId.get(row.id) ?? []), index]); });
+  const taken = new Set(byId.keys());
+  for (const [dreamId, indexes] of byId) {
+    if (indexes.length < 2) continue;
+    if (edges.some(edge => object(edge) && (edge.from === dreamId || edge.to === dreamId))) continue;
+    const rows = indexes.map(index => ({ index, row: nodes[index] as Record<string, any>, created: ms((nodes[index] as Record<string, any>).created_at) }));
+    if (rows.some(item => item.created === null)) continue;
+    rows.sort((a, b) => a.created! - b.created! || a.index - b.index);
+    const assessedAt = assessments.flatMap(row => object(row) && row.dream_type === "node" && row.dream_id === dreamId ? [ms(row.validated_at)] : []);
+    for (const later of rows.slice(1)) {
+      const cycle = later.row.dream_cycle;
+      if (later.row.status !== "candidate" || later.row.promoted_at || !Number.isSafeInteger(cycle) || later.created === rows[0].created) continue;
+      if (assessedAt.some(at => at === null || at >= later.created!)) continue;
+      const newId = `${dreamId}~c${cycle}`;
+      if (taken.has(newId)) continue;
+      taken.add(newId); result.set(later.index, newId);
+    }
+  }
+  return result;
+}
+
+function legacyChapterId(family: { kind: string }, collection: string, row: Record<string, any>): string | null {
+  if (family.kind !== "narrative" || collection !== "chapters" || text(row.id) || !Array.isArray(row.cycle_range) || typeof row.narrative_text !== "string") return null;
+  return createHash("sha256").update(narratorStable([row.projection?.dependencies ?? null, row.cycle_range, row.narrative_text])).digest("hex");
+}
+/**
+ * Recorded order between two revisions of the same legacy subject: >0 when b is newer, <0 when a is newer, 0 when no
+ * recorded order exists (those stay conflicts and are never guessed).
+ * - candidate assessments of one dream in one normalization cycle (legacy re-runs reused the cycle): validated_at.
+ * - validated edges re-validated under one id with the same endpoints and relation: normalization_cycle, then validated_at.
+ */
+function revisionOrder(file: string, a: Record<string, any>, b: Record<string, any>): number {
+  const time = (): number => { const x = utcMs(a.validated_at), y = utcMs(b.validated_at); return x === null || y === null ? 0 : Math.sign(y - x); };
+  if (file === "candidate_edges.json") return a.dream_type === b.dream_type && a.dream_id === b.dream_id && a.normalization_cycle === b.normalization_cycle ? time() : 0;
+  if (file === "validated_edges.json") {
+    if (!text(a.from) || !text(a.to) || a.from !== b.from || a.to !== b.to || (a.relation ?? null) !== (b.relation ?? null) || (a.type ?? null) !== (b.type ?? null)) return 0;
+    if (Number.isSafeInteger(a.normalization_cycle) && Number.isSafeInteger(b.normalization_cycle) && a.normalization_cycle !== b.normalization_cycle) return Math.sign(b.normalization_cycle - a.normalization_cycle);
+    return time();
+  }
+  return 0;
+}
+/** Daemon-owned engine.env apply receipts inside an instance config directory (src/config/engine-configuration.ts). */
+const ENGINE_CONFIG_RECEIPTS_DIR = ".engine-config";
 const fold = (value: string) => process.platform === "win32" ? value.toLowerCase() : value;
 const within = (root: string, target: string) => { const relative = path.relative(fold(root), fold(target)); return relative === "" || relative !== ".." && !relative.startsWith(".." + path.sep) && !path.isAbsolute(relative); };
 const ResolutionSchema = z.object({ file, collection: id, index: z.number().int().nonnegative(), row_hash: sha,
@@ -75,6 +143,29 @@ export type GraphUpgradeProgress =
   | { stage: "publishing" }
   | { stage: "published"; replayed: boolean };
 
+/**
+ * Why an unsettled managed execution still holds graph state, or null when it holds none.
+ *
+ * The upgrade runs offline under the graph writer, so no execution lease is live: effect and
+ * model admission die with the daemon that held them. An execution that was never settled
+ * (left "running" by a dead daemon) or whose only open item is the host's own unconfirmed
+ * adapter stop (`host_adapter_termination` unknown, e.g. a CLI run ended by the pass ceiling)
+ * can no longer change the graph and references nothing the upgrade rewrites. It stays exactly
+ * as recorded in execution_contexts.json (the upgrade never edits that store). Anything that
+ * does reference graph or plan state keeps blocking.
+ */
+export function executionGraphResidue(entry: z.infer<typeof ManagedExecutionStoreSchema>["entries"][number]): string | null {
+  if (["no_change", "state_committed", "graph_committed"].includes(entry.status) && entry.plan_closure?.effective_termination !== "unconfirmed") return null;
+  if (entry.plan_execution || entry.plan_closure) return "plan execution";
+  if (entry.obligation_ids.length) return "change obligations";
+  if (entry.source_gaps.length) return "source gaps";
+  if (entry.computer_sessions.length) return "computer sessions";
+  if (entry.effects.some(effect => effect.receipt_ids.length || effect.state_receipt_ids.length)) return "committed effects awaiting settlement";
+  if (entry.effects.some(effect => effect.tool !== "host_adapter_termination" && effect.outcome === "unknown")) return "effects with unknown outcome";
+  if (!["running", "assembled", "recovery_required"].includes(entry.status)) return entry.status;
+  return null;
+}
+
 /** Pins the physical instance. CLI mutation commands are offline and cannot steal a running daemon's writer. */
 export class LegacyGraphUpgrade {
   constructor(readonly directory: string, readonly instance_id: string, readonly config_directory?:string,
@@ -113,7 +204,11 @@ export class LegacyGraphUpgrade {
       config_directory_hash=hash(fold(configRoot));
       const configs=await fs.readdir(configRoot,{withFileTypes:true});if(configs.length>64)throw new Error("GRAPH_UPGRADE_CONFIG_CAPACITY");
       for(const entry of configs.sort((a,b)=>a.name.localeCompare(b.name))){
-        if(!entry.isFile()||entry.isSymbolicLink()||! /^[a-zA-Z0-9_.-]+$/.test(entry.name))throw new Error("GRAPH_UPGRADE_CONFIG_LINK_OR_KIND");
+        // The daemon's own engine.env apply receipts (src/config/engine-configuration.ts: .engine-config/<sha>/<sha>.json).
+        // They are recovery metadata for engine.env, which is stamped and backed up itself, never graph or configuration
+        // input, and they grow with every config edit. Skip that one real directory; anything else unexpected still fails closed.
+        if(entry.name===ENGINE_CONFIG_RECEIPTS_DIR&&entry.isDirectory()&&!entry.isSymbolicLink())continue;
+        if(!entry.isFile()||entry.isSymbolicLink()||! /^[a-zA-Z0-9_.-]+$/.test(entry.name))throw new Error("GRAPH_UPGRADE_CONFIG_LINK_OR_KIND: "+JSON.stringify(entry.name.slice(0,128))+(entry.isSymbolicLink()?" is a link":entry.isDirectory()?" is a directory":entry.isFile()?" has an unsupported name":" is not a regular file"));
         const target=path.join(configRoot,entry.name),before=await fs.stat(target,{bigint:true});
         if(before.size>BigInt(10*1024*1024)||(total+=Number(before.size))>MAX_TOTAL)throw new Error("GRAPH_UPGRADE_BYTE_CAPACITY");
         const bytes=await fs.readFile(target),after=await fs.stat(target,{bigint:true});
@@ -131,6 +226,8 @@ export class LegacyGraphUpgrade {
       file === "candidate_edges.json" && text(row.dream_id) && ["edge","node"].includes(row.dream_type) && Number.isSafeInteger(row.normalization_cycle)
         ? stable(["assessment", row.dream_type, row.dream_id, row.normalization_cycle])
         : stable(["identity", identity, row.source_repo ?? null]);
+    const redreamIds = legacyRedreamIds(snapshot);
+    const redreamId = (file: string, collection: string, index: number) => file === "dream_graph.json" && collection === "nodes" ? redreamIds.get(index) ?? null : null;
     for (const resolution of resolutions) { ResolutionSchema.parse(resolution); const key = address(resolution.file, resolution.collection, resolution.index);
       if (requested.has(key)) throw new Error("GRAPH_UPGRADE_RESOLUTION_DUPLICATE"); requested.set(key, resolution); }
     for (const family of CANONICAL_FAMILIES) {
@@ -150,28 +247,40 @@ export class LegacyGraphUpgrade {
         if (entries.length > MAX_ROWS) throw new Error("GRAPH_UPGRADE_ROW_CAPACITY");
         const conflicting = new Map<string,string>();
         if (preserve_conflicts) {
-          const candidates = new Map<string, Array<{index:number; row:Record<string,any>}>>();
+          const candidates = new Map<string, Array<{index:number; row:Record<string,any>; mapped:boolean}>>();
           for (let index = 0; index < entries.length; index++) {
             const original = entries[index]; if (!object(original) || original._schema || original._note) continue;
             const resolution = requested.get(address(family.file, collection, index));
             if (resolution?.action === "archive") continue;
             const row = {...original}; if (resolution?.action === "set_id") row.id = resolution.new_id;
+            const chapterId = legacyChapterId(family, collection, row); if (chapterId) row.id = chapterId;
+            const redream = resolution ? null : redreamId(family.file, collection, index); if (redream) row.id = redream;
             const identity = legacyIdentity(family, row) ?? "legacy:" + family.kind + ":" + hash(stable([family.file, collection, row])).slice(7,31);
             const key = grouping(family.file, collection, row, identity);
-            candidates.set(key,[...(candidates.get(key) ?? []),{index,row}]);
+            candidates.set(key,[...(candidates.get(key) ?? []),{index,row,mapped:resolution?.action === "set_id"}]);
           }
-          for (const [key, variants] of candidates) if (variants.length > 1 && new Set(variants.map(item => stable(item.row))).size > 1)
-            conflicting.set(key, hash(stable([family.file,collection,key])));
+          for (const [key, variants] of candidates) if (variants.length > 1 && new Set(variants.map(item => stable(item.row))).size > 1) {
+            // A group whose differing revisions all have a recorded order is superseded below, not quarantined.
+            // Collisions created by a reviewed ID mapping stay conflicts: that grouping is the operator's decision.
+            const ordered = !variants.some(item => item.mapped) && variants.every((x, i) => variants.slice(i + 1).every(y => stable(x.row) === stable(y.row) || revisionOrder(family.file, x.row, y.row) !== 0));
+            if (!ordered) conflicting.set(key, hash(stable([family.file,collection,key])));
+          }
           if (conflicting.size && !header) { blockers.push("CONFLICT_HISTORY_REQUIRES_OBJECT_STORE: " + family.file); conflicting.clear(); }
         }
-        const retained: any[] = [], groups = new Map<string, { row: any; index: number; row_hash: string; identity: string }>();
+        const retained: any[] = [], groups = new Map<string, { row: any; index: number; row_hash: string; identity: string; original: Record<string, any>; original_id: string | null; mapped: boolean }>();
         for (let index = 0; index < entries.length; index++) {
           const row = entries[index]; if (!object(row)) { blockers.push("INVALID_ENTITY: " + family.file + "/" + collection + "/" + index); continue; }
           if (row._schema || row._note) { retained.push(row); continue; }
           const originalRow = structuredClone(row);
           const row_hash = hash(stable(row)), key = address(family.file, collection, index), resolution = requested.get(key);
+          const original_id = legacyIdentity(family, row);
+          const chapterId = resolution ? null : legacyChapterId(family, collection, row);
+          if (chapterId) { row.id = chapterId; changed = true;
+            findings.push({ code: "LEGACY_CHAPTER_ID_ASSIGNED", file: family.file, collection, index, row_hash, original_id, new_id: chapterId, disposition: "assigned" }); }
+          const redream = resolution ? null : redreamId(family.file, collection, index);
+          if (redream) { row.id = redream; changed = true;
+            findings.push({ code: "LEGACY_REDREAM_ID_ASSIGNED", file: family.file, collection, index, row_hash, original_id, new_id: redream, disposition: "assigned" }); }
           let identity = legacyIdentity(family, row);
-          const original_id = identity;
           let mapped = false;
           if (resolution) {
             used.add(key); if (resolution.row_hash !== row_hash) throw new Error("GRAPH_UPGRADE_RESOLUTION_CHANGED");
@@ -199,9 +308,24 @@ export class LegacyGraphUpgrade {
           const groupKey = grouping(family.file, collection, row, identity), prior = groups.get(groupKey);
           if (prior) {
             if (stable(prior.row) === stable(row)) { changed = true; findings.push({ code: "EXACT_DUPLICATE_ARCHIVED", file: family.file, collection, index, row_hash, original_id, new_id: prior.identity, disposition: "archived" }); continue; }
+            const order = mapped || prior.mapped ? 0 : revisionOrder(family.file, prior.row, row);
+            if (order !== 0 && header) {
+              // The older revision is kept byte-exact as superseded history; the newest recorded revision stays active.
+              const older = order > 0 ? { index: prior.index, original_id: prior.original_id, row_hash: prior.row_hash, row: prior.original }
+                : { index, original_id, row_hash, row: originalRow };
+              if (history.length >= MAX_ROWS) throw new Error("GRAPH_UPGRADE_CONFLICT_HISTORY_CAPACITY");
+              history.push({ schema: "dreamgraph.legacy_conflict.v1", group_id: hash(stable([family.file, collection, groupKey])), file: family.file, collection,
+                index: older.index, original_id: older.original_id, row_hash: older.row_hash, row: older.row, disposition: "superseded" });
+              header.legacy_conflicts = history; changed = true;
+              findings.push({ code: "LEGACY_REVISION_SUPERSEDED", file: family.file, collection, index: older.index, row_hash: older.row_hash, original_id: older.original_id, new_id: order > 0 ? identity : prior.identity, disposition: "preserved" });
+              if (order < 0) continue;
+              const at = retained.indexOf(prior.row); if (at >= 0) retained.splice(at, 1);
+              groups.set(groupKey, { row, index, row_hash, identity, original: originalRow, original_id, mapped });
+              retained.push(row); continue;
+            }
             blockers.push("CONFLICTING_DUPLICATE: " + family.file + "/" + collection + "/" + prior.index + "," + index);
             findings.push({ code: "CONFLICTING_DUPLICATE", file: family.file, collection, index, row_hash, original_id, new_id: null, disposition: "blocked" });
-          } else groups.set(groupKey, { row, index, row_hash, identity });
+          } else groups.set(groupKey, { row, index, row_hash, identity, original: originalRow, original_id, mapped });
           retained.push(row);
         }
         if (Array.isArray(value)) { value.length = 0; for (const row of retained) value.push(row); } else header![collection] = retained;
@@ -254,7 +378,10 @@ export class LegacyGraphUpgrade {
     if (jobs !== undefined) { const owner = EngineJobsStoreSchema.parse(jobs);
       if(owner.instance_id!==this.instance_id)throw new Error("GRAPH_UPGRADE_JOB_INSTANCE_MISMATCH");
       if(owner.records.some(record=> !["cancelled","succeeded","failed","partial"].includes(record.job.state) || !record.work_settled || record.external_effects.some(effect=>effect.state!=="acknowledged"))) throw new Error("GRAPH_UPGRADE_ACTIVE_OR_UNCONFIRMED_JOB"); }
-    if (executions !== undefined && ManagedExecutionStoreSchema.parse(executions).entries.some(entry => !["no_change","state_committed","graph_committed"].includes(entry.status) || entry.plan_closure?.effective_termination === "unconfirmed")) throw new Error("GRAPH_UPGRADE_ACTIVE_OR_UNCONFIRMED_EXECUTION");
+    if (executions !== undefined) {
+      const holding = ManagedExecutionStoreSchema.parse(executions).entries.flatMap(entry => { const why = executionGraphResidue(entry); return why ? [`${entry.id} (${entry.status}: ${why})`] : []; });
+      if (holding.length) throw new Error(`GRAPH_UPGRADE_ACTIVE_OR_UNCONFIRMED_EXECUTION: ${holding.slice(0, 5).join("; ")}${holding.length > 5 ? `; +${holding.length - 5} more` : ""}`);
+    }
     if (plans !== undefined && object(plans) && plans.schema === "dreamgraph.plan_authority.v1" && Object.values(decodePlanAuthorityStore(plans).records).some(record => record.state.leases.length)) throw new Error("GRAPH_UPGRADE_ACTIVE_PLAN_LEASE");
   }
   private log(snapshot: Snapshot) { return LogSchema.parse(snapshot.files.get(FILE)?.value ?? { schema: "dreamgraph.graph_upgrades.v1", entries: [] }); }

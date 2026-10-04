@@ -70,7 +70,7 @@ The installer modifies PATH. Your **current** terminal won't see the change. Ope
 
 ```bash
 dg --version
-# DreamGraph CLI v14.0.0 (Ashoka)
+# DreamGraph CLI v14.0.1 (Ashoka)
 
 dg --help
 # (lists every subcommand)
@@ -93,7 +93,7 @@ If `code` was missing, install the extension manually:
 ```bash
 cd extensions/vscode
 npm run build
-code --install-extension dreamgraph-vscode-14.0.0.vsix
+code --install-extension dreamgraph-vscode-14.0.1.vsix
 ```
 
 ---

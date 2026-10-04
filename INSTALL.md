@@ -29,7 +29,7 @@ cd dreamgraph
 
 ### Linux / macOS (Bash)
 
-For v14.0.0, Linux qualification is the accepted WSL2 Ubuntu 24.04 / Node 20 installer and isolated-browser-worker pass. The Bash script also retains macOS paths, but macOS and additional native desktop environments are not qualified by this release. See the [release scope](docs/ashoka/v14-release-scope.md).
+The v14 qualification includes the accepted WSL2 Ubuntu 24.04 / Node 20 installer and isolated-browser-worker pass. The Bash script also retains macOS paths, but macOS and additional native desktop environments are not qualified by this release. See the [release scope](docs/ashoka/v14-release-scope.md).
 
 ```bash
 git clone https://github.com/mmethodz/dreamgraph.git
@@ -74,6 +74,8 @@ Re-run the installer with `--force` (or `-Force` on PowerShell) to overwrite an 
 # Linux / macOS
 bash scripts/install.sh --force
 ```
+
+The installer updates the shared `~/.dreamgraph/bin` runtime. Restart each running instance to use the new version. If an instance still has a legacy graph, stop it, run `dg graph-upgrade <instance>`, then restart it. The upgrade saves a verified backup and review; see the [v14.0.1 patch notes](RELEASE_NOTES_v14.0.1.md) for the recovery behavior and known limitations.
 
 ---
 
@@ -172,12 +174,12 @@ export PATH="$HOME/.local/bin:$PATH"
 
 1. Check the extension is installed: Extensions sidebar > search "DreamGraph"
 2. If missing, the installer may have skipped it (VS Code `code` CLI not in PATH)
-3. Manual install after packaging: `code --install-extension extensions/vscode/dreamgraph-vscode-14.0.0.vsix`
+3. Manual install after packaging: `code --install-extension extensions/vscode/dreamgraph-vscode-14.0.1.vsix`
 4. Reload VS Code: `Ctrl+Shift+P` > "Reload Window"
 
 ### Extension activation error (missing modules)
 
-The v14.0.0 VSIX bundles its runtime and vendors its webview libraries. Reinstall the v14.0.0 VSIX and reload VS Code rather than installing npm dependencies inside the installed extension. If activation still fails, retain the exact missing-module message and report it with the extension and VS Code versions. Physical VS Code activation is not implied by the compiled-suite/package checks.
+The v14.0.1 VSIX bundles its runtime and vendors its webview libraries. Reinstall the v14.0.1 VSIX and reload VS Code rather than installing npm dependencies inside the installed extension. If activation still fails, retain the exact missing-module message and report it with the extension and VS Code versions. Physical VS Code activation is not implied by the compiled-suite/package checks.
 
 ### PowerShell execution policy error
 

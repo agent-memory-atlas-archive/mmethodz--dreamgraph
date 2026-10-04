@@ -22,7 +22,7 @@ import { beginHostExecution, endHostExecution, withHostExecution } from "../serv
 import type { PlanExecutionIntent } from "../graph/contracts.js";
 import { deliverManagedContext, readManagedContext, type ManagedExecutionContext } from "../graph/execution-context.js";
 import { startCodexCuaHost, type CodexCuaHost } from "./codex-cua-host.js";
-import { codexBrowserTabIdsFromTranscript, releaseCodexBrowserSession } from "./codex-cua-release.js";
+import { codexBrowserTabIdsFromTranscript, codexBrowserReleaseConfirmed, releaseCodexBrowserSession } from "./codex-cua-release.js";
 import { codexComputerUseServersToml, codexTurnEndHooksToml, codexNativeToolTrace, createCodexItemClock, createCodexTranscriptWriter, createCodexSessionGrantWatcher, readCodexNotify, discoverCodexComputerUseServers, resolveCodexSourceHome, widenCodexComputerUseSurfaces, type CodexComputerUseServer } from "./codex-computer-use.js";
 
 export type ArchitectCliAdapter = "codex-cli" | "copilot-cli";
@@ -61,6 +61,8 @@ export interface ArchitectCliBridgeRoute {
   computer_use_transcript?: string;
   /** Log of DreamGraph's cua_repl host (turn-end cleanup) for this run. */
   computer_use_cleanup_log?: string;
+  /** Browser control is confirmed released only after the release reply, never from log existence. */
+  computer_use_release?: { state: "confirmed" | "unconfirmed" | "no_control_observed"; reason: string };
   effective_controls?: ReturnType<typeof executionPolicyProjection>;
   output_controls?: { provider: "configured_optional" | "unsupported"; prompt: "guided"; presentation: "enforced"; exact_density: "not_guaranteed" };
 }
@@ -124,6 +126,18 @@ interface ProcessResult {
   signal: NodeJS.Signals | null;
   timedOut: boolean;
   durationMs: number;
+  /**
+   * DreamGraph observed the adapter's work end: the process exited on its own, or DreamGraph
+   * killed its whole process tree and the kill was confirmed. A failed run is not an unknown stop.
+   */
+  terminationConfirmed: boolean;
+}
+
+interface ComputerUseReleaseProof { confirmed: boolean; logPath: string | null; reason: string }
+
+/** A closed adapter is not a completed control handoff when its granted browser session is still held. */
+export function cliWorkTermination(adapterProcessConfirmed: boolean, computerReleaseConfirmed: boolean | null): "confirmed" | "unconfirmed" {
+  return adapterProcessConfirmed && computerReleaseConfirmed !== false ? "confirmed" : "unconfirmed";
 }
 
 interface AuditRecord {
@@ -226,7 +240,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
   const endCuaHosts = (reason: string) => Promise.all(cuaHosts.map((host) => host.end(reason).catch(() => undefined)));
   // Releases the browser tabs the run's Codex Computer Use session still holds. Set once the run has a
   // transcript; runs at most once, from the normal path or from the final cleanup (ceiling, cancel, crash).
-  let releaseComputerUse: (() => Promise<string | null>) | null = null;
+  let releaseComputerUse: (() => Promise<ComputerUseReleaseProof>) | null = null;
   try {
     const capability = await probeCliControlCapability(input.adapter, executionSignal);
     await mkdir(auditDir, { recursive: true, mode: 0o700 });
@@ -255,19 +269,25 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       : null;
     if (invocation.computerUseReleaseServer && sessionGrant && transcript) {
       const server = invocation.computerUseReleaseServer;
-      let released: Promise<string | null> | null = null;
+      let released: Promise<ComputerUseReleaseProof> | null = null;
       // Codex exec does not release the browser session at turn end (no Stop-hook cleanup), which leaves the
       // tab claimed and the Computer Use cursor on it. Release it the verified way: bind each tab the session
       // held as that session in a new turn, then end that turn.
       releaseComputerUse = () => released ??= (async () => {
         const text = await transcript.close();
+        const tabIds = codexBrowserTabIdsFromTranscript(text);
+        const controlObserved = tabIds.length > 0 || codexNativeToolTrace(text).some(entry => invocation.computerUseServers?.some(name => entry.tool.startsWith(name + ":")));
+        if (!controlObserved) return { confirmed: true, logPath: null, reason: "no_control_observed" };
         const sessionId = sessionGrant.threadId;
-        if (!sessionId || !text) return null;
-        const release = await releaseCodexBrowserSession({ server, sessionId, tabIds: codexBrowserTabIdsFromTranscript(text) });
+        if (!sessionId || !text || tabIds.length === 0) return { confirmed: false, logPath: null,
+          reason: !sessionId ? "session_id_unavailable" : "controlled_tab_identity_unavailable" };
+        const release = await releaseCodexBrowserSession({ server, sessionId, tabIds });
         const logPath = transcript.path.replace(/\.jsonl$/, ".cua-release.log");
-        await writeFile(logPath, release.log.join("\n") + "\n", { mode: 0o600 });
-        return logPath;
-      })().catch(() => null);
+        const logWritten = await writeFile(logPath, release.log.join("\n") + "\n", { mode: 0o600 }).then(() => true, () => false);
+        const confirmed = codexBrowserReleaseConfirmed(release);
+        return { confirmed, logPath: logWritten ? logPath : null,
+          reason: confirmed ? "browser_release_confirmed" : "browser_release_unconfirmed" };
+      })().catch(() => ({ confirmed: false, logPath: null, reason: "browser_release_failed" }));
     }
     let processResult: ProcessResult;
     try {
@@ -308,7 +328,10 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     // Codex exec does not release the browser session at turn end (no Stop-hook cleanup), which leaves the
     // tab claimed and the Computer Use cursor on it. Release it the verified way: bind each tab the session
     // held as that session in a new turn, then end that turn.
-    if (releaseComputerUse) computerUseCleanupLog = await releaseComputerUse() ?? computerUseCleanupLog;
+    const computerUseRelease = invocation.computerUseServers
+      ? releaseComputerUse ? await releaseComputerUse() : { confirmed: false, logPath: null, reason: "release_proof_unavailable" }
+      : null;
+    if (computerUseRelease?.logPath) computerUseCleanupLog = computerUseRelease.logPath;
     const computerUseRequestRecord = audit.find((record) => record.tool === "request_computer_use");
     let computerUseRequest: { reason: string } | undefined;
     if (computerUseRequestRecord) { let reason = ""; try { reason = String((JSON.parse(computerUseRequestRecord.inputJson ?? "{}") as { reason?: unknown }).reason ?? ""); } catch { /* bounded audit body */ }
@@ -319,7 +342,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     const usage = input.adapter === "codex-cli" ? extractArchitectCodexUsage(processResult.stdout) : undefined;
     const completedTools = toolTrace.filter((entry) => entry.status === "completed").length;
     const abortReason = executionSignal.aborted ? String((executionSignal.reason as Error | undefined)?.message ?? "") : "";
-    const failureReason = /^EXECUTION_(STALE|CEILING_REACHED)/.test(abortReason) ? abortReason
+    const processFailureReason = /^EXECUTION_(STALE|CEILING_REACHED)/.test(abortReason) ? abortReason
       : executionSignal.aborted ? "ARCHITECT_CLI_CANCELLED" : processResult.timedOut
       ? `${input.adapter.toUpperCase()}_BRIDGE_TIMEOUT: timeout after ${timeoutMs}ms; completed tools ${completedTools}/${toolTrace.length}`
       : processResult.exitCode !== 0
@@ -327,12 +350,15 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         : !content.trim()
           ? `${input.adapter.toUpperCase()}_BRIDGE_EMPTY_RESPONSE: CLI completed without assistant text`
           : null;
+    const failureReason = computerUseRelease && !computerUseRelease.confirmed
+      ? `CODEX_COMPUTER_USE_RELEASE_UNCONFIRMED: ${computerUseRelease.reason}${processFailureReason ? `; ${processFailureReason}` : ""}`
+      : processFailureReason;
 
     const expired = /^EXECUTION_(STALE|CEILING_REACHED)/.test(abortReason);
     const cancelled = executionSignal.aborted && !expired;
     const effectiveControls = executionSignal.aborted ? lease.controls : await withHostExecution(runId, async () => executionPolicyProjection(getSessionContext()!.execution_policy!));
     await endHostExecution({ execution_id: runId, outcome: cancelled ? "cancelled" : failureReason ? "failed" : "completed",
-      work_termination: !failureReason && !processResult.signal ? "confirmed" : "unconfirmed" }); finished = true;
+      work_termination: cliWorkTermination(processResult.terminationConfirmed, computerUseRelease?.confirmed ?? null) }); finished = true;
     return {
       ...(computerUseRequest ? { computer_use_request: computerUseRequest } : {}),
       graph_execution: await readManagedContext(runId),
@@ -350,7 +376,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         required_tools: toolRequirements.requirements?.required_tools ?? [],
         unavailable_required_tools: toolRequirements.unavailable_required_tools,
         iterations: 1,
-        stop_reason: expired ? (abortReason.startsWith("EXECUTION_STALE") ? "execution_stale" : "execution_ceiling_reached") : cancelled ? "cli_cancelled" : processResult.timedOut ? "cli_timed_out" : processResult.exitCode !== 0 ? "cli_failed" : failureReason ? "cli_empty_response" : "cli_completed",
+        stop_reason: computerUseRelease?.confirmed === false ? "computer_use_release_unconfirmed" : expired ? (abortReason.startsWith("EXECUTION_STALE") ? "execution_stale" : "execution_ceiling_reached") : cancelled ? "cli_cancelled" : processResult.timedOut ? "cli_timed_out" : processResult.exitCode !== 0 ? "cli_failed" : failureReason ? "cli_empty_response" : "cli_completed",
         fallback_reason: failureReason,
         run_id: runId,
         executable: invocation.command,
@@ -364,6 +390,9 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         ...(sessionGrant?.threadId ? { computer_use_session: sessionGrant.threadId } : {}),
         ...(computerUseTranscript ? { computer_use_transcript: computerUseTranscript } : {}),
         ...(computerUseCleanupLog ? { computer_use_cleanup_log: computerUseCleanupLog } : {}),
+        ...(computerUseRelease ? { computer_use_release: { state: computerUseRelease.confirmed
+          ? computerUseRelease.reason === "no_control_observed" ? "no_control_observed" as const : "confirmed" as const
+          : "unconfirmed" as const, reason: computerUseRelease.reason } } : {}),
         effective_controls: effectiveControls,
         output_controls: { provider: input.adapter === "codex-cli" ? "configured_optional" : "unsupported", prompt: "guided", presentation: "enforced", exact_density: "not_guaranteed" },
       },
@@ -1002,10 +1031,22 @@ function runProcess(input: {
     let stderr = "";
     let timedOut = false;
     let settled = false;
+    // Resolves true when the whole process tree is known to be gone.
+    let treeKill: Promise<boolean> | null = null;
     const terminateChild = () => {
-      if (!child.pid) return;
-      if (IS_WINDOWS) { const killer = spawn("taskkill.exe", ["/PID", String(child.pid), "/T", "/F"], { windowsHide: true, stdio: "ignore" }); killer.on("error", () => undefined); }
-      else try { process.kill(-child.pid, "SIGKILL"); } catch { child.kill("SIGKILL"); }
+      if (!child.pid || treeKill) return;
+      if (IS_WINDOWS) {
+        treeKill = new Promise<boolean>((done) => {
+          const killer = spawn("taskkill.exe", ["/PID", String(child.pid), "/T", "/F"], { windowsHide: true, stdio: "ignore" });
+          // 0 = tree killed; 128 = already gone.
+          killer.on("exit", (code) => done(code === 0 || code === 128));
+          killer.on("error", () => done(false));
+          setTimeout(() => done(false), 15_000).unref?.();
+        });
+      } else {
+        try { process.kill(-child.pid, "SIGKILL"); treeKill = Promise.resolve(true); }
+        catch { child.kill("SIGKILL"); treeKill = Promise.resolve(false); }
+      }
     };
     const timer = setTimeout(() => {
       timedOut = true;
@@ -1040,14 +1081,16 @@ function runProcess(input: {
       input.signal?.removeEventListener("abort", abortListener);
       if (settled) return;
       settled = true;
-      resolvePromise({
+      const durationMs = Math.max(0, Date.now() - startedAt);
+      void (treeKill ?? Promise.resolve(true)).then((terminationConfirmed) => resolvePromise({
         stdout,
         stderr,
         exitCode,
         signal,
         timedOut,
-        durationMs: Math.max(0, Date.now() - startedAt),
-      });
+        durationMs,
+        terminationConfirmed,
+      }));
     });
 
     child.stdin.end(input.stdin);

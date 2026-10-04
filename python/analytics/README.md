@@ -1,4 +1,4 @@
-# DreamGraph Analytics v14.0.0
+# DreamGraph Analytics v14.0.1
 
 Ashoka's canonical mode requires one immutable core export. From the repository root, run `npm run analytics:export -- --data-dir <instance-data> --output <snapshot.json>`, then from `python/` run `python -m analytics tension_flow --snapshot <snapshot.json> --json`. The daemon also exposes `GET /api/analytics/v1/snapshot` through its authenticated read boundary. All thirteen modules use definition2, exact export hashes, typed identities, one revision, common current trust and explicit unknown denominators. Each report separates its canonical `measurement` from retained heuristic diagnostics. Nested reports reuse the same snapshot. Compare the captured revision with the daemon before treating an export as current; scan age is not currency.
 

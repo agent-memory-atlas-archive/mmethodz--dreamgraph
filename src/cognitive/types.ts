@@ -751,10 +751,17 @@ export interface DreamGraphStats {
   avg_activation: number;
 }
 
+/** Per dream, latest assessment (src/cognitive/validation-pipeline.ts); the same numbers `dg status` and the Explorer show. */
 export interface ValidationStats {
   validated: number;
+  /** Dreams still pending (not re-assessment rows; see latent_assessments). */
   latent: number;
   rejected: number;
+  assessed?: number;
+  validation_rate?: number | null;
+  assessment_rows?: number;
+  latent_assessments?: number;
+  promoted_edges?: number | null;
 }
 
 export interface TensionStats {

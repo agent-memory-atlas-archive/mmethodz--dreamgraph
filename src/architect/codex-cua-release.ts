@@ -40,6 +40,12 @@ export interface CodexBrowserReleaseResult {
   log: string[];
 }
 
+/** A log file is diagnostic evidence, not proof that the browser relinquished control. */
+export function codexBrowserReleaseConfirmed(result: CodexBrowserReleaseResult): boolean {
+  if (result.tabs.length === 0 || result.tabs.some(tab => tab.outcome === "failed")) return false;
+  return result.tabs.some(tab => tab.outcome === "bound") ? result.turn_ended === "ok" : true;
+}
+
 export interface CodexBrowserReleaseOptions {
   server: CodexComputerUseServer;
   sessionId: string;

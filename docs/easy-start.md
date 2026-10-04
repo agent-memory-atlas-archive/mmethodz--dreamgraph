@@ -22,7 +22,7 @@ Open a new terminal and verify the install:
 dg --version
 ```
 
-You should see DreamGraph CLI v14.0.0.
+You should see DreamGraph CLI v14.0.1.
 
 ## Pick your setup path
 

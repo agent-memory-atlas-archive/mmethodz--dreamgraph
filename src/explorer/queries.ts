@@ -44,6 +44,7 @@ import type {
   ResolvedTension,
   TensionSignal,
 } from "../cognitive/types.js";
+import type { ValidationPipelineCounts } from "../cognitive/validation-pipeline.js";
 
 /* ------------------------------------------------------------------ */
 /*  GraphIndex — O(1) per-node neighbor lookup                        */
@@ -407,13 +408,15 @@ export interface StatsResult {
   currency?:GraphCurrency;
   state?:ResultState;
   scope?:GraphSnapshot["scope"];
+  /** Normalization pipeline (per dream, latest assessment): same definition as the Status board and `dg status`. edges_by_kind counts rendered edges only. */
+  validation_pipeline?:ValidationPipelineCounts|null;
 }
 
 const NODE_TYPES: ExplorerNodeType[] = [
   "feature", "workflow", "data_model", "capability", "datastore", "ui_element", "dream_node", "tension",
 ];
 const EDGE_KINDS: ExplorerEdgeKind[] = [
-  "fact", "validated", "candidate", "dream", "tension",
+  "fact", "validated", "candidate", "latent", "dream", "tension",
 ];
 
 export async function getStats(expectedEtag?:string): Promise<StatsResult> {
@@ -453,6 +456,7 @@ export async function getStats(expectedEtag?:string): Promise<StatsResult> {
     health_mean: healthSum / denom,
     confidence_mean:confCount?confSum/confCount:null,recorded_confidence_count:confCount,
     revision:idx.snapshot.revision,currency:idx.snapshot.currency,state:idx.snapshot.state,scope:idx.snapshot.scope,
+    validation_pipeline:idx.graph?.validation_pipeline??null,
   };
 }
 

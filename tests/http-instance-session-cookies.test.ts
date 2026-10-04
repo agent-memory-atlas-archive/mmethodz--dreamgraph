@@ -146,6 +146,25 @@ describe("browser session cookies across local DreamGraph instances", () => {
     expect(badScoped.state.error).toBe("SESSION_BEARER_REJECTED");
   }, 15_000);
 
+  it("replaces an expired or invalid scoped cookie on page navigation instead of locking the UI, but never for API calls", async () => {
+    const daemon = await startDaemon("expired");
+    const first = await fetch(daemon.base + "/architect/forwarded", { headers: { Accept: "text/html" } });
+    expect(first.status).toBe(200);
+    const jar = new HostCookieJar();
+    expect(jar.keep(first)).toBeTruthy();
+    const scopedName = [...jar.values.keys()][0];
+    // A cookie the session store no longer accepts (expired after 12 h, or garbage).
+    const stale = `${scopedName}=00000000-0000-4000-8000-000000000000.expired`;
+    const page = await fetch(daemon.base + "/architect/forwarded", { headers: { Accept: "text/html", Cookie: stale } });
+    expect(page.status).toBe(200);
+    const body = await page.json() as { forwarded?: string };
+    expect(body.forwarded).toBe(page.headers.get("X-DreamGraph-Session"));
+    expect(page.headers.get("set-cookie")).toContain(`${scopedName}=`);
+    const api = await status(daemon, stale);
+    expect(api.response.status).toBe(401);
+    expect(api.state.error).toBe("SESSION_BEARER_REJECTED");
+  }, 15_000);
+
   it("accepts a valid same-instance legacy cookie and issues its scoped replacement without losing the session", async () => {
     const daemon = await startDaemon("first");
     const original = await status(daemon);

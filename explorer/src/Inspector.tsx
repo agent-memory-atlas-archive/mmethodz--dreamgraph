@@ -76,6 +76,19 @@ export function Inspector({selected,stats,onNavigate,etag,onRefresh}:Props){
             <dt>Topology proxy</dt><dd>{stats.health_mean.toFixed(2)}</dd>
             <dt>Recorded confidence</dt><dd>{stats.confidence_mean===null?"Unknown":stats.confidence_mean.toFixed(2)} · not truth</dd>
           </dl>
+          {stats.validation_pipeline ? (() => { const p = stats.validation_pipeline; return (
+            <>
+              <h3 className="inspector-subtitle">Validation pipeline</h3>
+              <dl className="kv" title="Per dream, latest assessment: the same counts as the Status board and dg status">
+                <dt>Assessed dreams</dt><dd>{p.assessed.toLocaleString()}</dd>
+                <dt>Validated</dt><dd>{p.validated.toLocaleString()} <small>(edges {p.by_type.edge.validated.toLocaleString()} · nodes {p.by_type.node.validated.toLocaleString()})</small></dd>
+                <dt>Rejected</dt><dd>{p.rejected.toLocaleString()}</dd>
+                <dt>Latent</dt><dd>{p.latent.toLocaleString()}</dd>
+                <dt>Validation rate</dt><dd>{p.validation_rate === null ? "n/a" : `${(p.validation_rate * 100).toFixed(1)}%`} <small>validated ÷ decided</small></dd>
+                <dt>Promoted edge store</dt><dd>{(p.promoted_edges ?? 0).toLocaleString()}</dd>
+              </dl>
+            </>
+          ); })() : null}
           </>
         ) : (
           <p className="inspector-empty">Loading stats…</p>
@@ -91,7 +104,7 @@ export function Inspector({selected,stats,onNavigate,etag,onRefresh}:Props){
                 </Fragment>
               ))}
             </dl>
-            <h3 className="inspector-subtitle">By edge kind</h3>
+            <h3 className="inspector-subtitle" title="Connections drawn in this view, not pipeline counts">Rendered connections by kind</h3>
             <dl className="kv">
               {Object.entries(stats.edges_by_kind).map(([k, v]) => (
                 <Fragment key={k}>

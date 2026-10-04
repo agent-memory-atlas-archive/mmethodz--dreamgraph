@@ -54,6 +54,7 @@ export type ExplorerEdgeKind =
   | "fact"        // from seed `links` arrays
   | "validated"   // from validated_edges.json
   | "candidate"   // from candidate_edges.json (post-normalize, not yet promoted)
+  | "latent"      // not rejected, waiting for proof: latent candidates and promoted edges without current evidence
   | "dream"       // from dream_graph.json edges
   | "tension";    // implicit edges between tension.entities
 
@@ -403,6 +404,27 @@ export function buildLegacyGraphSnapshot(raw: GraphRawSnapshot): GraphSnapshot {
   return { ...buildSnapshot(raw), representation: "legacy" };
 }
 
+/**
+ * The Explorer shows one line per diagnostic. A code repeated per item (e.g. CANDIDATE_ENDPOINTS_UNKNOWN for every
+ * historical assessment of a decayed dream) collapses to one summary with its count and a bounded scope sample, so
+ * legacy graphs with tens of thousands of per-item reasons stay renderable. Per-item detail remains in the canonical
+ * graph and bounded agent context. Codes with few occurrences are kept exactly as reported.
+ */
+const EXPLORER_REASONS_PER_CODE = 20;
+export function compactExplorerReasons(state: ResultState): ResultState {
+  const byCode = new Map<string, ResultState["reasons"]>();
+  for (const reason of state.reasons) { const items = byCode.get(reason.code); if (items) items.push(reason); else byCode.set(reason.code, [reason]); }
+  const reasons: ResultState["reasons"] = [];
+  for (const [code, items] of byCode) {
+    if (items.length <= EXPLORER_REASONS_PER_CODE) { reasons.push(...items); continue; }
+    const scope: string[] = [];
+    for (const item of items) { for (const value of item.scope) if (!scope.includes(value)) scope.push(value); if (scope.length >= EXPLORER_REASONS_PER_CODE) break; }
+    scope.length = Math.min(scope.length, EXPLORER_REASONS_PER_CODE);
+    reasons.push({ code, scope, detail: `${items.length} occurrences; first ${scope.length} scopes shown. ${items[0].detail}` });
+  }
+  return { ...state, reasons };
+}
+
 /** Both renderers and the agent use the same typed identity and present evidence assessment. */
 export function buildCanonicalExplorerSnapshot(graph: CanonicalGraphRead): GraphSnapshot {
   const started = performance.now();
@@ -420,8 +442,10 @@ export function buildCanonicalExplorerSnapshot(graph: CanonicalGraphRead): Graph
     if (!relation.source || !relation.target) continue;
     const s=graphIdentityKey(relation.source), t=graphIdentityKey(relation.target);
     if (!byId.has(s) || !byId.has(t) || edges.length>=30000) continue;
-    // Historical promotion is never enough to produce the authoritative green channel.
-    const kind = relation.kind === "validated" && relation.assertion_class !== "validated_insight" ? "candidate" : relation.kind;
+    // Latent = not rejected, waiting for proof. A promoted edge without current evidence
+    // (hypothesis) is latent, never the authoritative green channel; so is a latent candidate.
+    const kind: ExplorerEdgeKind = (relation.kind === "validated" && relation.assertion_class === "hypothesis")
+      || (relation.kind === "candidate" && relation.payload?.status === "latent") ? "latent" : relation.kind;
     edges.push({id:relation.id,s,t,kind,conf:relation.confidence ?? 0.5,assertion_class:relation.assertion_class,relation:relation.relation});
     byId.get(s)!.degree++; byId.get(t)!.degree++;
     if (kind === "tension") { byId.get(s)!.health=Math.max(0.1,byId.get(s)!.health-0.2); byId.get(t)!.health=Math.max(0.1,byId.get(t)!.health-0.2); }
@@ -430,10 +454,10 @@ export function buildCanonicalExplorerSnapshot(graph: CanonicalGraphRead): Graph
   const scope={rendered_nodes:nodes.length,eligible_nodes:eligible.length,canonical_entities:graph.entities.length,rendered_edges:edges.length,
     canonical_relationships:graph.relationships.length,omitted_nodes:eligible.length-nodes.length,omitted_edges:graph.relationships.length-edges.length,
     excluded_families:[...new Set(graph.entities.filter(e=>!types[e.identity.kind]||e.assertion_class==="historical").map(e=>e.identity.kind))].sort()};
-  const state:ResultState={...graph.state,reasons:[...graph.state.reasons]};
+  const state:ResultState=compactExplorerReasons(graph.state);
   if (scope.omitted_nodes || scope.omitted_edges) { state.completeness="partial";state.reasons.push({code:"EXPLORER_RENDER_SCOPE",scope:[],detail:`${scope.omitted_nodes} eligible nodes and ${scope.omitted_edges} relationships omitted by render limits or non-rendered families; evidence/context remains available through canonical retrieval.`}); }
   const render_key=createHash("sha256").update(JSON.stringify({nodes,edges})).digest("hex");
-  const body={version:CANONICAL_EXPLORER_VERSION,representation:"canonical" as const,instance_uuid:graph.instance_id,revision:graph.revision,currency:graph.currency,state,canonical_state:graph.state,render_key,scope,nodes,edges};
+  const body={version:CANONICAL_EXPLORER_VERSION,representation:"canonical" as const,instance_uuid:graph.instance_id,revision:graph.revision,currency:graph.currency,state,canonical_state:compactExplorerReasons(graph.state),render_key,scope,nodes,edges};
   const serialized=JSON.stringify(body), bytes=Buffer.byteLength(serialized,"utf8");
   if(bytes>24*1024*1024)throw new Error("EXPLORER_SNAPSHOT_BYTE_LIMIT");
   const snapshot:GraphSnapshot={...body,etag:`sha256:${createHash("sha256").update(serialized).update(JSON.stringify(graph.store_hashes)).digest("hex").slice(0,32)}`,

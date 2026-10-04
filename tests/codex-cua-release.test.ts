@@ -3,7 +3,8 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { codexBrowserTabIdsFromTranscript, releaseCodexBrowserSession } from "../src/architect/codex-cua-release.js";
+import { codexBrowserTabIdsFromTranscript, codexBrowserReleaseConfirmed, releaseCodexBrowserSession } from "../src/architect/codex-cua-release.js";
+import { cliWorkTermination } from "../src/architect/cli-bridge.js";
 
 let dir: string;
 beforeEach(async () => { dir = await mkdtemp(join(tmpdir(), "dg-cua-release-")); });
@@ -14,6 +15,7 @@ afterEach(async () => { await rm(dir, { recursive: true, force: true }); });
 const FAKE = `
 import { appendFileSync } from "node:fs";
 const record = process.argv[2];
+const failStop = process.argv[3] === "fail-stop";
 let browserCalls = 0, buf = "";
 process.stdin.on("data", (c) => {
   buf += c.toString();
@@ -31,7 +33,9 @@ process.stdin.on("data", (c) => {
       if (browserCalls === 1) reply({ content: [{ type: "text", text: "Unable to load browser request-header policy. Retry the browser command." }] });
       else if (m.params.arguments.code.includes('"999"')) reply({ content: [{ type: "text", text: "Tab 999 not found" }], isError: true });
       else reply({ content: [{ type: "text", text: "Selected Browser" }] });
-    } else if (m.params?.name === "turn_ended") reply({ content: [{ type: "text", text: "{}" }] });
+    } else if (m.params?.name === "turn_ended") reply(failStop
+      ? { content: [{ type: "text", text: "Stop hook rejected" }], isError: true }
+      : { content: [{ type: "text", text: "{}" }] });
   }
 });
 process.stdin.on("end", () => process.exit(0));
@@ -61,6 +65,8 @@ describe("releasing a finished Codex Computer Use browser session", () => {
       { tab_id: "999", outcome: "gone", detail: "Tab 999 not found" },
     ]);
     expect(result.turn_ended).toBe("ok");
+    expect(codexBrowserReleaseConfirmed(result)).toBe(true);
+    expect(cliWorkTermination(true, codexBrowserReleaseConfirmed(result))).toBe("confirmed");
 
     const sent = (await readFile(record, "utf8")).trim().split("\n").map((line) => JSON.parse(line));
     const js = sent.filter((m) => m.params?.name === "js");
@@ -70,6 +76,21 @@ describe("releasing a finished Codex Computer Use browser session", () => {
     expect(meta.turn_id).toBe(result.turn_id);
     const ended = sent.find((m) => m.params?.name === "turn_ended");
     expect(ended.params.arguments).toEqual({ hook_event_name: "Stop", session_id: "01a1045d-9282-7c42-8973-eda9105b4604", turn_id: result.turn_id });
+  });
+
+  it("does not treat a written cleanup trace or a bound tab as confirmed when the Stop hook fails", async () => {
+    const script = join(dir, "fake-failed-stop.mjs"), record = join(dir, "failed-stop.jsonl");
+    await writeFile(script, FAKE);
+    const result = await releaseCodexBrowserSession({
+      server: { name: "cua_repl", command: process.execPath, args: [script, record, "fail-stop"], env: {}, env_vars: [], source: "test" },
+      sessionId: "01a1045d-9282-7c42-8973-eda9105b4604", tabIds: ["1198216301"], retryDelayMs: 10,
+    });
+    expect(result.tabs).toEqual([{ tab_id: "1198216301", outcome: "bound", detail: "" }]);
+    expect(result.turn_ended).toBe("error");
+    expect(codexBrowserReleaseConfirmed(result)).toBe(false);
+    expect(cliWorkTermination(true, codexBrowserReleaseConfirmed(result))).toBe("unconfirmed");
+    expect(result.log.join("\n")).toContain("turn_ended: error");
+    expect((await readFile(record, "utf8"))).toContain("turn_ended");
   });
 
   it("does nothing without a valid session or any recorded tab", async () => {

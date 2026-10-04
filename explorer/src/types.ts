@@ -20,6 +20,7 @@ export type ExplorerEdgeKind =
   | "fact"
   | "validated"
   | "candidate"
+  | "latent"
   | "dream"
   | "tension";
 
@@ -119,6 +120,21 @@ export interface StatsResult {
   confidence_mean: number|null;
   recorded_confidence_count?:number;
   revision?:RevisionVector;currency?:GraphCurrency;state?:ResultState;scope?:GraphSnapshot["scope"];
+  /** Normalization pipeline (per dream, latest assessment): same definition as the Status board and `dg status`. */
+  validation_pipeline?:ValidationPipelineCounts|null;
+}
+
+/** Mirror of src/cognitive/validation-pipeline.ts ValidationPipelineCounts. */
+export interface ValidationPipelineCounts {
+  assessed: number;
+  validated: number;
+  rejected: number;
+  latent: number;
+  by_type: Record<"edge" | "node" | "other", Record<"validated" | "latent" | "rejected", number>>;
+  validation_rate: number | null;
+  assessment_rows: number;
+  latent_assessments: number;
+  promoted_edges: number | null;
 }
 
 export type CognitiveTrustState =

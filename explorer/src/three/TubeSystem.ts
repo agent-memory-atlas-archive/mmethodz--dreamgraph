@@ -71,6 +71,7 @@ const KIND_MOTION: Record<
 > = {
   validated: { speed: 0.16, density: 1.4, direction: 1 },
   candidate: { speed: 0.12, density: 1.2, direction: 1 },
+  latent:    { speed: 0.05, density: 0.8, direction: 1 },
   dream:     { speed: 0.09, density: 1.3, direction: 1 },
   tension:   { speed: 0.20, density: 1.8, direction: 0 },
   fact:      { speed: 0.07, density: 1.0, direction: 1 },

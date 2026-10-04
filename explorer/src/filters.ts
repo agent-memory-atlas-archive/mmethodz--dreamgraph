@@ -31,6 +31,7 @@ export const ALL_EDGE_KINDS: ExplorerEdgeKind[] = [
   "fact",
   "validated",
   "candidate",
+  "latent",
   "dream",
   "tension",
 ];

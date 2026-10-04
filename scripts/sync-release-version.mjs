@@ -30,5 +30,5 @@ for (const file of ['src/cli/version.ts', 'extensions/vscode/src/version.ts']) {
 }
 const prompt = 'extensions/vscode/src/prompts/architect-core.ts';
 if (version === '14.0.0') await writeFile('src/cli/version.ts', (await readFile('src/cli/version.ts', 'utf8')).replace('CLI_RELEASE_NAME = "Glass Atlas"', 'CLI_RELEASE_NAME = "Ashoka"'));
-await writeFile(prompt, (await readFile(prompt, 'utf8')).replace('v' + old + ' Glass Atlas', 'v' + version + ' Ashoka'));
+await writeFile(prompt, (await readFile(prompt, 'utf8')).replace('v' + old + ' Glass Atlas', 'v' + version + ' Ashoka').replace('v' + old + ' Ashoka', 'v' + version + ' Ashoka'));
 console.log('Synchronized product versions to ' + version + '; schema versions unchanged.');

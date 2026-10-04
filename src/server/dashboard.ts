@@ -656,9 +656,10 @@ async function renderStatus(): Promise<string> {
   body += pieChart;
   body += `
   <div class="grid">
-    <div class="card"><div class="card-title">Validated</div><div class="card-value" style="color:var(--green)">${vs.validated}</div></div>
-    <div class="card"><div class="card-title">Latent</div><div class="card-value" style="color:var(--yellow)">${vs.latent}</div></div>
+    <div class="card"><div class="card-title">Validated</div><div class="card-value" style="color:var(--green)">${vs.validated}</div>${vs.promoted_edges != null ? `<div class="card-sub">Dreams · promoted edge store ${vs.promoted_edges}</div>` : ""}</div>
+    <div class="card"><div class="card-title">Latent</div><div class="card-value" style="color:var(--yellow)">${vs.latent}</div>${vs.latent_assessments != null ? `<div class="card-sub">Pending dreams · ${vs.latent_assessments} latent re-assessments</div>` : ""}</div>
     <div class="card"><div class="card-title">Rejected</div><div class="card-value" style="color:var(--red)">${vs.rejected}</div></div>
+    <div class="card"><div class="card-title">Validation rate</div><div class="card-value">${vs.validation_rate == null ? "n/a" : (vs.validation_rate * 100).toFixed(1) + "%"}</div>${vs.assessed != null ? `<div class="card-sub">Validated ÷ decided · ${vs.assessed} dreams assessed${vs.assessment_rows != null ? ` (${vs.assessment_rows} assessment rows)` : ""}</div>` : ""}</div>
   </div>`;
 
   // ---- Tensions ----

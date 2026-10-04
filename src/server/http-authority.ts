@@ -60,14 +60,16 @@ export class DaemonHttpAuthority {
         if (legacy !== undefined && res && !health) this.setSessionCookie(res, provided);
         return health ? healthContext() : context; }
       catch (error) {
-        // A global pre-fix cookie can belong to a different port/instance. Only
-        // fresh document navigation (or explicit remote login) may disregard it;
-        // scoped cookies, headers, API effects and WebSocket upgrades fail closed.
+        // A cookie can belong to a different port/instance (global pre-fix cookie) or to an expired session.
+        // Only fresh document navigation (or explicit remote login) may disregard it.
         const document = req.method === "GET" && !path.startsWith("/api/") && !["/mcp", "/mcp/"].includes(path)
           && (req.headers.accept?.includes("text/html") || ["/", "/architect", "/architect/", "/explorer", "/explorer/", "/config", "/schedules", "/status", "/docs"].includes(path));
         const login = path === "/auth" && req.method === "POST";
         const rejectedCredential = error instanceof Error && ["SESSION_BEARER_INVALID", "SESSION_AUTHORITY_REJECTED"].includes(error.message);
-        if (!(legacy !== undefined && !provided.startsWith("dgexec.") && rejectedCredential && !upgrade && (document || login))) {
+        // A cookie (legacy or this instance's scoped one) that is merely expired/invalid must not lock the operator out
+        // of the UI: fresh document navigation mints a new session, exactly as with no cookie at all. Explicit
+        // X-DreamGraph-Session headers, API effects, WebSocket upgrades and execution bearers still fail closed.
+        if (!(typeof header !== "string" && !provided.startsWith("dgexec.") && rejectedCredential && !upgrade && (document || login))) {
           if (res) json(res, 401, { error: "SESSION_BEARER_REJECTED" }); return null;
         }
       }

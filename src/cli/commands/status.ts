@@ -27,6 +27,7 @@ import {
   formatUptime,
   formatBytes,
 } from "../utils/daemon.js";
+import { validationPipelineCounts, formatValidationRate, type ValidationPipelineCounts } from "../../cognitive/validation-pipeline.js";
 
 export async function cmdStatus(
   _positional: string[],
@@ -93,6 +94,7 @@ Options:
   // Gather cognitive data stats
   const dataDir = resolve(instanceRoot, "data");
   const stats = await gatherDataStats(dataDir);
+  const pipeline = stats.validationPipeline;
 
   // Gather daemon state (with crash detection per TDD Section 3.3)
   const daemon = await gatherDaemonState(instanceRoot, entry.uuid);
@@ -132,8 +134,11 @@ Options:
         tool_calls: instance.total_tool_calls,
         graph_nodes: stats.graphNodes,
         graph_edges: stats.graphEdges,
+        // Deprecated v14 JSON aliases: historical raw store-row counts, retained for patch compatibility.
         candidate_edges: stats.candidateEdges,
         validated_edges: stats.validatedEdges,
+        // Shared definition with the Status board and the Explorer (per dream, latest assessment).
+        validation_pipeline: pipeline,
         tensions: stats.tensions,
         adr_decisions: stats.adrDecisions,
         ui_elements: stats.uiElements,
@@ -185,8 +190,13 @@ Options:
   Tool Calls:      ${instance.total_tool_calls}
   Graph Nodes:     ${stats.graphNodes}
   Graph Edges:     ${stats.graphEdges}
-  Candidate Edges: ${stats.candidateEdges}
-  Validated Edges: ${stats.validatedEdges}
+  Validation Pipeline (per dream, latest assessment)
+    Assessed:      ${pipeline.assessed}  (${pipeline.assessment_rows} assessment rows)
+    Validated:     ${pipeline.validated}  (edges ${pipeline.by_type.edge.validated} · nodes ${pipeline.by_type.node.validated})
+    Rejected:      ${pipeline.rejected}
+    Latent:        ${pipeline.latent}  (${pipeline.latent_assessments} latent re-assessments)
+    Rate:          ${formatValidationRate(pipeline.validation_rate)}  (validated ÷ decided)
+    Promoted:      ${pipeline.promoted_edges ?? 0}  (validated_edges.json)
   Tensions:        ${stats.tensions}
   ADR Decisions:   ${stats.adrDecisions}
   UI Elements:     ${stats.uiElements}
@@ -215,8 +225,11 @@ Options:
 interface DataStats {
   graphNodes: number;
   graphEdges: number;
+  /** Deprecated JSON aliases: raw result/edge rows, not distinct dreams. */
   candidateEdges: number;
   validatedEdges: number;
+  /** Shared definition with the Status board and the Explorer (src/cognitive/validation-pipeline.ts). */
+  validationPipeline: ValidationPipelineCounts;
   tensions: number;
   adrDecisions: number;
   uiElements: number;
@@ -228,6 +241,7 @@ export async function gatherDataStats(dataDir: string): Promise<DataStats> {
     graphEdges: 0,
     candidateEdges: 0,
     validatedEdges: 0,
+    validationPipeline: validationPipelineCounts([]),
     tensions: 0,
     adrDecisions: 0,
     uiElements: 0,
@@ -300,6 +314,7 @@ export async function gatherDataStats(dataDir: string): Promise<DataStats> {
     ? validated
     : validated?.edges ?? [];
   stats.validatedEdges = validatedEdges.length;
+  stats.validationPipeline = validationPipelineCounts(candidateResults, validatedEdges);
 
   const tensions = (await read("tension_log.json")) as {
     signals?: unknown[];

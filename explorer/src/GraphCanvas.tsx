@@ -716,6 +716,7 @@ function edgeKindByte(kind: string): number {
   switch (kind) {
     case "validated": return EDGE_KIND_VALIDATED;
     case "candidate": return EDGE_KIND_CANDIDATE;
+    case "latent":    return EDGE_KIND_CANDIDATE; // dashed: waiting for proof
     case "dream":     return EDGE_KIND_DREAM;
     case "tension":   return EDGE_KIND_TENSION;
     default:          return EDGE_KIND_FACT;

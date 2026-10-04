@@ -9,6 +9,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   buildSnapshotForTest,
+  compactExplorerReasons,
   SNAPSHOT_VERSION,
 } from "../src/graph/snapshot.js";
 import type { GraphRawSnapshot } from "../src/graph/store.js";
@@ -249,5 +250,21 @@ describe("Explorer metrics", () => {
     const view = getMetricsView();
     expect(view.metrics["client.render.fps_estimate"].last).toBe(58);
     expect(view.metrics["client.render.node_count"].last).toBe(42);
+  });
+});
+
+describe("explorer diagnostics stay renderable for large legacy graphs", () => {
+  it("collapses a code repeated per item to one counted line, keeping rare codes exactly", () => {
+    const many = Array.from({ length: 62_539 }, (_, i) => ({ code: "CANDIDATE_ENDPOINTS_UNKNOWN", scope: [`candidate:${i}`], detail: "Underlying dream edge is unavailable." }));
+    const rare = { code: "LEGACY_CONTEXT_LIMITATION", scope: ["dream://context"], detail: "Rare reason." };
+    const state = { availability: "available" as const, completeness: "partial" as const, freshness: "unknown" as const, reasons: [...many, rare] };
+    const compact = compactExplorerReasons(state);
+    expect(compact.reasons).toHaveLength(2);
+    expect(compact.reasons[0].code).toBe("CANDIDATE_ENDPOINTS_UNKNOWN");
+    expect(compact.reasons[0].scope).toHaveLength(20);
+    expect(compact.reasons[0].detail).toContain("62539 occurrences");
+    expect(compact.reasons[1]).toEqual(rare);
+    expect(compact.completeness).toBe("partial");
+    expect(Buffer.byteLength(JSON.stringify(compact))).toBeLessThan(10_000);
   });
 });

@@ -31,6 +31,8 @@ export const EDGE_STYLES: Record<ExplorerEdgeKind, EdgeStyle> = {
   candidate: { color: "#849ef1", size: 0.7 },
   dream: { color: "#b49adc", size: 0.8 },
   tension: { color: "#ed8794", size: 1.0 },
+  /** Not rejected, waiting for proof: latent candidates and promoted edges without current evidence. */
+  latent: { color: "#8fa8a0", size: 0.6 },
 };
 
 /** Matching silhouettes in the glass atlas and its accessible legend. */

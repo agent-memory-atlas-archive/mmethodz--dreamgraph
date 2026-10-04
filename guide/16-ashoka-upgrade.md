@@ -1,5 +1,7 @@
 # DreamGraph v14.0.0 — Ashoka release and upgrade guide
 
+This is the v14.0.0 baseline guide. For the current v14.0.1 field fixes, upgrade order and limitations, see the [patch release notes](../RELEASE_NOTES_v14.0.1.md).
+
 Ashoka is the first practical-testing release of the unified graph, execution and recovery overhaul. CLI, engine/daemon and MCP authority, browser Architect, VS Code Architect, Explorer, dashboard, analytics and SDK/host/token-economy packages share product version **14.0.0**. Schema and protocol majors are independently versioned; installing a product major does not migrate stored data.
 
 ## Install and restart

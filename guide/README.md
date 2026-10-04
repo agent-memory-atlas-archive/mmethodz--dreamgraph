@@ -8,7 +8,7 @@ If you are looking for the auto-generated reference (every tool, every parameter
 
 For the shortest route from install to a working browser setup, start with **[DreamGraph Easy Start](00-easy-start.md)**.
 
-Current release: **v14.0.0 - Ashoka**.
+Current release: **v14.0.1 - Ashoka**. See the [patch notes](../RELEASE_NOTES_v14.0.1.md); the [v14.0.0 upgrade guide](16-ashoka-upgrade.md) remains the baseline migration guide.
 
 ---
 

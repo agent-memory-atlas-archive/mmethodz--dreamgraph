@@ -80,6 +80,7 @@ import type {
 } from "./types.js";
 import type { Feature, Workflow, DataModelEntity, ResourceIndex, IndexEntry } from "../types/index.js";
 import { DEFAULT_DECAY, DEFAULT_PROMOTION, DEFAULT_TENSION_CONFIG } from "./types.js";
+import { validationPipelineCounts } from "./validation-pipeline.js";
 
 // ---------------------------------------------------------------------------
 // Path resolution (lazy — resolved at call time for instance mode support)
@@ -1692,7 +1693,7 @@ class CognitiveEngine {
       avg_reinforcement: 0,
       avg_activation: 0,
     };
-    let validatedStats = { validated: 0, latent: 0, rejected: 0 };
+    let validatedStats: CognitiveState["validated_stats"] = { validated: 0, latent: 0, rejected: 0 };
     let tensionStats: CognitiveState["tension_stats"] = {
       total: 0,
       unresolved: 0,
@@ -1743,11 +1744,12 @@ class CognitiveEngine {
 
     try {
       const candidates = await this.loadCandidateEdges();
-      for (const r of candidates.results) {
-        if (r.status === "validated") validatedStats.validated++;
-        else if (r.status === "latent") validatedStats.latent++;
-        else validatedStats.rejected++;
-      }
+      let promoted: unknown[] | null = null;
+      try { promoted = (await this.loadValidatedEdges()).edges; } catch { /* promoted store optional for the pipeline counts */ }
+      const pipeline = validationPipelineCounts(candidates.results, promoted);
+      validatedStats = { validated: pipeline.validated, latent: pipeline.latent, rejected: pipeline.rejected, assessed: pipeline.assessed,
+        validation_rate: pipeline.validation_rate, assessment_rows: pipeline.assessment_rows, latent_assessments: pipeline.latent_assessments,
+        promoted_edges: pipeline.promoted_edges };
     } catch (err) {
       logger.debug(`getStatus: candidate edges stats unavailable: ${err instanceof Error ? err.message : err}`);
     }

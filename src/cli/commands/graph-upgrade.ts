@@ -73,6 +73,12 @@ function printPreviewSummary(action: string, name: string, preview: Preview, tar
       lines.push(`Conflicting revisions preserved in quarantined history: ${count(preserved.length)}. No canonical winner selected.`);
       lines.push("Previously rejected stores can now expose unrelated records and additional diagnostics. Increased counts do not mean references were repaired.");
     }
+    const superseded = preview.findings.filter(finding => finding.code === "LEGACY_REVISION_SUPERSEDED");
+    if (superseded.length) lines.push(`Earlier revisions superseded by a later recorded revision (validated_at / normalization_cycle): ${count(superseded.length)}. Kept byte-exact as history; the newest stays active.`);
+    const chapters = preview.findings.filter(finding => finding.code === "LEGACY_CHAPTER_ID_ASSIGNED");
+    if (chapters.length) lines.push(`Legacy story chapters given their v14 content identity: ${count(chapters.length)}.`);
+    const redreams = preview.findings.filter(finding => finding.code === "LEGACY_REDREAM_ID_ASSIGNED");
+    if (redreams.length) lines.push(`Unassessed re-dreams that reused an existing dream id, given their own id (<id>~c<cycle>): ${count(redreams.length)}. Content unchanged; the first dream keeps the id.`);
     if (preview.blockers.some(blocker => blocker.startsWith("CONFLICTING_DUPLICATE:"))) {
       lines.push("To retain all conflicting revisions without choosing a winner, use --preserve-conflicts; otherwise supply reviewed --resolutions.");
     }

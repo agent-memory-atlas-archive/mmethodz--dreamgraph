@@ -113,6 +113,21 @@ describe("reviewed offline legacy graph upgrade",()=>{
       expect(await fs.readFile(join(configRoot,"engine.env"),"utf8")).toBe("KEY=later-intent\n");
     } finally { await fs.rm(configRoot,{recursive:true,force:true}); }
   });
+  it("skips the daemon's own .engine-config receipt store but still fails closed on any other config entry",async()=>{
+    // An instance whose engine.env was ever edited through the Config page has config/.engine-config/<sha>/<sha>.json.
+    const configRoot=await fs.mkdtemp(join(tmpdir(),"dg-upgrade-config-"));
+    try {
+      await fs.writeFile(join(configRoot,"engine.env"),"KEY=value\n");
+      const receipts=join(configRoot,".engine-config","a".repeat(64));await fs.mkdir(receipts,{recursive:true});
+      await fs.writeFile(join(receipts,"b".repeat(64)+".json"),'{"schema":"dreamgraph.engine_config_receipt.v1"}');
+      await features([{name:"original"}]);const configured=new LegacyGraphUpgrade(directory,"fixture",configRoot);
+      await fs.mkdir(join(configRoot,"unexpected"));
+      await expect(configured.preview()).rejects.toThrow('GRAPH_UPGRADE_CONFIG_LINK_OR_KIND: "unexpected" is a directory');
+      await fs.rmdir(join(configRoot,"unexpected"));
+      const preview=await configured.preview();expect(preview.config_files.map(entry=>entry.file)).toEqual(["engine.env"]);
+      await configured.apply(preview,approval(preview));
+    } finally { await fs.rm(configRoot,{recursive:true,force:true}); }
+  });
   it("cannot acquire a live process writer and proceeds only after that kernel owner exits",async()=>{
     await features([{name:"original"}]);const preview=await service.preview(),module=pathToFileURL(resolve("src/graph/writer-lease.ts")).href;
     const child=spawn(process.execPath,["--import","tsx","--input-type=module","-e",`import {assertGraphWriter} from ${JSON.stringify(module)};await assertGraphWriter(process.env.DG_UPGRADE_DIR);console.log('held');process.stdin.resume();`],{cwd:process.cwd(),env:{...process.env,DG_UPGRADE_DIR:directory},stdio:["pipe","pipe","pipe"],windowsHide:true});

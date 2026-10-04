@@ -49,7 +49,7 @@ In v13, Architect also owns cognitive graph health as part of ordinary reasoning
 
 Before opening architect, you need:
 
-- DreamGraph v14.0.0 Ashoka installed.
+- DreamGraph v14.0.1 Ashoka installed.
 - A DreamGraph instance created with `dg init`.
 - A project attached to that instance, either during `dg init` or later with `dg attach`.
 - The daemon running in HTTP mode.

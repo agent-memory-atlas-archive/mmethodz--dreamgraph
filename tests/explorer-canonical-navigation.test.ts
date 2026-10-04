@@ -31,7 +31,7 @@ it("preserves typed collisions and current trust instead of raw historical valid
  await expect(getNodeRecord("Public")).rejects.toThrow("EXPLORER_AMBIGUOUS_ID");expect((await search("Public",null,25)).hits).toHaveLength(2);
  const feature=matching.find(n=>n.type==="feature")!,record=(await getNodeRecord(feature.id,snapshot.etag))!;
  expect(record.canonical?.identity).toEqual(feature.identity);expect(record.outgoing).toHaveLength(3);expect(record.revision).toEqual(snapshot.revision);
- expect(snapshot.edges.some(edge=>edge.kind==="validated")).toBe(false);expect(snapshot.edges.find(edge=>edge.kind==="candidate")?.assertion_class).toBe("hypothesis");
+ expect(snapshot.edges.some(edge=>edge.kind==="validated")).toBe(false);expect(snapshot.edges.find(edge=>edge.kind==="latent")?.assertion_class).toBe("hypothesis");
  expect((await getStats()).confidence_mean).toBeNull();
  const graph=await loadCanonicalGraph("legacy"),actual=await getExplorerContext(feature.id,snapshot.etag);
  const agent=buildContextPack(graph,{query:"Public",mode:"entity_focused",mandatory_identities:[feature.identity!],depth:1,max_neighbors:12,max_records:24,token_budget:3000,adapter:"explorer"});

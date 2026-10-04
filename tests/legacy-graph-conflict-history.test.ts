@@ -24,14 +24,15 @@ afterEach(async () => { await releaseGraphWriter(directory); await fs.rm(directo
 async function fixture() {
   const values = {
     "candidate_edges.json": { metadata: { schema_version: "1.0.0" }, results: [
-      { dream_type: "node", dream_id: "dream-a", normalization_cycle: 1, status: "latent", confidence: 0.2, validated_at: "2025-01-01T00:00:00Z" },
-      { dream_type: "node", dream_id: "dream-a", normalization_cycle: 1, status: "latent", confidence: 0.3, validated_at: "2025-01-02T00:00:00Z" },
+      // Genuine conflicts: no recorded order between the two variants (same cycle, no validated_at).
+      { dream_type: "node", dream_id: "dream-a", normalization_cycle: 1, status: "latent", confidence: 0.2 },
+      { dream_type: "node", dream_id: "dream-a", normalization_cycle: 1, status: "latent", confidence: 0.3 },
       { dream_type: "node", dream_id: "dream-a", normalization_cycle: 2, status: "latent", confidence: 0.4, validated_at: "2025-01-03T00:00:00Z" },
       { dream_type: "node", dream_id: "dream-b", normalization_cycle: 1, status: "latent", confidence: 0.5 },
     ] },
     "validated_edges.json": { metadata: { schema_version: "1.0.0" }, edges: [
       { id: "validated-a", from: "left", to: "right", normalization_cycle: 1, confidence: 0.2 },
-      { id: "validated-a", from: "left", to: "right", normalization_cycle: 2, confidence: 0.8 },
+      { id: "validated-a", from: "left", to: "right", normalization_cycle: 1, confidence: 0.8 },
       { id: "validated-b", from: "left", to: "right", normalization_cycle: 1, confidence: 0.6 },
     ] },
     "system_story.json": { metadata: { schema_version: "1.0.0" }, chapters: [
@@ -85,6 +86,48 @@ describe("explicit legacy conflict preservation", () => {
     expect(graph.entities.some(entity => entity.identity.kind === "narrative" && entity.identity.id === "chapter:2")).toBe(true);
     expect(graph.entities.some(entity => entity.identity.kind === "validated" && entity.identity.id === "validated-a")).toBe(false);
     expect(graph.entities.some(entity => entity.identity.kind === "narrative" && entity.identity.id === "chapter:1")).toBe(false);
+  });
+
+  it("supersedes recorded revisions and gives legacy chapters their v14 identity without any review or flag", async () => {
+    const values = {
+      "candidate_edges.json": { metadata: { schema_version: "1.0.0" }, results: [
+        // Legacy re-run of one normalization cycle: the later validated_at is the active assessment.
+        { dream_type: "edge", dream_id: "dream-a", normalization_cycle: 7, status: "latent", confidence: 0.2, validated_at: "2026-04-10T21:47:53.714Z" },
+        { dream_type: "edge", dream_id: "dream-b", normalization_cycle: 7, status: "latent", confidence: 0.5, validated_at: "2026-04-10T21:47:53.714Z" },
+        { dream_type: "edge", dream_id: "dream-a", normalization_cycle: 7, status: "latent", confidence: 0.6, validated_at: "2026-04-10T23:32:56.318Z" },
+      ] },
+      "validated_edges.json": { metadata: { schema_version: "1.0.0" }, edges: [
+        { id: "validated-a", from: "left", to: "right", relation: "uses", normalization_cycle: 412, confidence: 0.46 },
+        { id: "validated-a", from: "left", to: "right", relation: "uses", normalization_cycle: 417, confidence: 0.56 },
+        { id: "validated-a", from: "left", to: "right", relation: "uses", normalization_cycle: 416, confidence: 0.5 },
+      ] },
+      "system_story.json": { metadata: { schema_version: "1.0.0", total_chapters: 100 }, chapters: [
+        // Legacy narrator: chapter_number stuck at total_chapters + 1 after the chapter cap.
+        { chapter_number: 101, title: "A Phase of Discovery", cycle_range: [1100, 1109], narrative_text: "First text" },
+        { chapter_number: 101, title: "A Phase of Discovery", cycle_range: [1110, 1120], narrative_text: "Second text" },
+      ], digests: [] },
+    };
+    for (const [file, value] of Object.entries(values)) await fs.writeFile(join(directory, file), JSON.stringify(value));
+    const preview = await upgrade.preview();
+    expect(preview.blockers).toEqual([]);
+    expect(preview.findings.filter(value => value.code === "LEGACY_REVISION_SUPERSEDED")).toHaveLength(3);
+    expect(preview.findings.filter(value => value.code === "LEGACY_CHAPTER_ID_ASSIGNED")).toHaveLength(2);
+    await upgrade.apply(preview, approval(preview.digest, "supersede"));
+    const candidates = JSON.parse(await fs.readFile(join(directory, "candidate_edges.json"), "utf8"));
+    expect(candidates.results.map((row: { confidence: number }) => row.confidence)).toEqual([0.5, 0.6]);
+    expect(candidates.legacy_conflicts.map((entry: any) => [entry.disposition, entry.index, entry.row])).toEqual([["superseded", 0, values["candidate_edges.json"].results[0]]]);
+    const validated = JSON.parse(await fs.readFile(join(directory, "validated_edges.json"), "utf8"));
+    expect(validated.edges.map((row: { normalization_cycle: number }) => row.normalization_cycle)).toEqual([417]);
+    expect(validated.legacy_conflicts.map((entry: any) => [entry.disposition, entry.row.normalization_cycle])).toEqual([["superseded", 412], ["superseded", 416]]);
+    const story = JSON.parse(await fs.readFile(join(directory, "system_story.json"), "utf8"));
+    const digest = (row: any) => createHash("sha256").update(JSON.stringify([null, row.cycle_range, row.narrative_text])).digest("hex");
+    expect(story.chapters.map((row: { id: string }) => row.id)).toEqual(values["system_story.json"].chapters.map(digest));
+    expect(story.chapters.map((row: { chapter_number: number }) => row.chapter_number)).toEqual([101, 101]);
+    const graph = await scope(() => loadCanonicalGraph("fixture"));
+    expect(graph.state.reasons.some(reason => ["DUPLICATE_TYPED_ID", "LEGACY_CONFLICT_PRESERVED"].includes(reason.code))).toBe(false);
+    expect(graph.entities.find(entity => entity.identity.kind === "candidate" && entity.payload.dream_id === "dream-a")?.payload.confidence).toBe(0.6);
+    expect(graph.entities.find(entity => entity.identity.kind === "validated" && entity.identity.id === "validated-a")?.payload.normalization_cycle).toBe(417);
+    expect(graph.entities.filter(entity => entity.identity.kind === "narrative")).toHaveLength(2);
   });
 
   it("retains original bytes through verified backup and reviewed restore", async () => {
@@ -167,5 +210,40 @@ describe("explicit legacy conflict preservation", () => {
     expect(doc.edges).toEqual([]);
     expect(doc.legacy_conflicts.map((entry: { row: unknown }) => entry.row)).toEqual([first, second]);
     expect(doc.legacy_conflicts[1].row_hash).toBe(row_hash);
+  });
+  it("gives an unassessed legacy re-dream that reused a dream id its own id, and keeps real conflicts blocking", async () => {
+    const first = { id: "dream_llm_bridge", type: "hypothetical_feature", name: "Bridge", status: "validated", dream_cycle: 264, created_at: "2026-05-12T17:56:32.113Z", promoted_at: "2026-05-12T17:57:20.612Z", origin: "rem" };
+    const redream = { id: "dream_llm_bridge", type: "hypothetical_feature", name: "Bridge again", status: "candidate", dream_cycle: 265, created_at: "2026-05-12T17:59:02.143Z", promoted_at: null, origin: "rem" };
+    const write = async (nodes: unknown[], edges: unknown[] = [], assessedAt = "2026-05-12T17:57:20.468Z") => {
+      await fs.writeFile(join(directory, "dream_graph.json"), JSON.stringify({ metadata: { schema_version: "1.0.0" }, nodes, edges }));
+      await fs.writeFile(join(directory, "candidate_edges.json"), JSON.stringify({ metadata: { schema_version: "1.0.0" }, results: [
+        { dream_type: "node", dream_id: "dream_llm_bridge", normalization_cycle: 257, status: "validated", validated_at: assessedAt },
+      ] }));
+    };
+    await write([first, redream]);
+    const preview = await upgrade.preview();
+    expect(preview.blockers).toEqual([]);
+    expect(preview.findings.filter(value => value.code === "LEGACY_REDREAM_ID_ASSIGNED").map(value => [value.index, value.original_id, value.new_id]))
+      .toEqual([[1, "dream_llm_bridge", "dream_llm_bridge~c265"]]);
+    await upgrade.apply(preview, approval(preview.digest, "redream"));
+    const graph = JSON.parse(await fs.readFile(join(directory, "dream_graph.json"), "utf8"));
+    expect(graph.nodes).toEqual([first, { ...redream, id: "dream_llm_bridge~c265" }]);
+    const read = await scope(() => loadCanonicalGraph("fixture"));
+    expect(read.state.reasons.some(reason => reason.code === "DUPLICATE_TYPED_ID")).toBe(false);
+    expect(read.entities.filter(entity => entity.identity.kind === "dream_node").map(entity => entity.identity.id).sort()).toEqual(["dream_llm_bridge", "dream_llm_bridge~c265"]);
+  });
+
+  it("does not rename a re-dream when an assessment or a dream edge could belong to it", async () => {
+    const first = { id: "d", type: "hypothetical_feature", status: "validated", dream_cycle: 1, created_at: "2026-05-12T17:00:00Z", promoted_at: "2026-05-12T17:01:00Z" };
+    const later = { id: "d", type: "hypothetical_feature", status: "candidate", dream_cycle: 2, created_at: "2026-05-12T18:00:00Z", promoted_at: null };
+    const write = async (edges: unknown[], assessedAt: string) => {
+      await fs.writeFile(join(directory, "dream_graph.json"), JSON.stringify({ metadata: { schema_version: "1.0.0" }, nodes: [first, later], edges }));
+      await fs.writeFile(join(directory, "candidate_edges.json"), JSON.stringify({ metadata: { schema_version: "1.0.0" }, results: [
+        { dream_type: "node", dream_id: "d", normalization_cycle: 1, status: "validated", validated_at: assessedAt }] }));
+    };
+    await write([], "2026-05-12T18:30:00Z");
+    expect((await upgrade.preview()).blockers.some(value => value.startsWith("CONFLICTING_DUPLICATE: dream_graph.json"))).toBe(true);
+    await write([{ id: "e", from: "d", to: "x" }], "2026-05-12T17:01:00Z");
+    expect((await upgrade.preview()).blockers.some(value => value.startsWith("CONFLICTING_DUPLICATE: dream_graph.json"))).toBe(true);
   });
 });
