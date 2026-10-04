@@ -40,6 +40,8 @@ test('Slice 5 audit: styles include context footer, action buttons, and implicit
 test('Slice 5 audit: codex-cli is selectable and routes through native ProviderPort', () => {
   const chatPanel = readFileSync(join(process.cwd(), 'src', 'chat-panel.ts'), 'utf8');
   const architectLlm = readFileSync(join(process.cwd(), 'src', 'architect-llm.ts'), 'utf8');
+  const daemonClient = readFileSync(join(process.cwd(), 'src', 'daemon-client.ts'), 'utf8');
+  const codexProviderPort = readFileSync(join(process.cwd(), 'src', 'architect-core', 'adapters', 'codex-cli', 'provider-port.ts'), 'utf8');
   const pkg = readFileSync(join(process.cwd(), 'package.json'), 'utf8');
 
   assert.match(architectLlm, /export type ArchitectProvider = .*"codex-cli"/);
@@ -48,8 +50,12 @@ test('Slice 5 audit: codex-cli is selectable and routes through native ProviderP
   assert.match(chatPanel, /providers: \['anthropic', 'openai', 'ollama', 'lmstudio', 'copilot-cli', 'codex-cli'\]/);
   assert.match(chatPanel, /const codexCliRoute = nativeCliProvider === 'codex-cli'/);
   assert.match(chatPanel, /runPassViaCodexCli\(/);
-  assert.match(chatPanel, /private _buildCodexCliProviderOptions\(managedPass\?: ManagedCliPass\): CodexCliProviderPortOptions/);
-  assert.equal((chatPanel.match(/providerOptions: this\._buildCodexCliProviderOptions\(managedCliPass\)/g) ?? []).length, 2);
+  assert.match(chatPanel, /private _buildCodexCliProviderOptions\(managedPass\?: ManagedCliPass, computerUse = false\): CodexCliProviderPortOptions/);
+  assert.match(chatPanel, /private async _resolveCodexComputerUse\(\): Promise<boolean>[\s\S]*?this\.daemonClient\.getComputerUsePolicy\(\)[\s\S]*?return policy === 'allow'/);
+  assert.match(daemonClient, /getComputerUsePolicy\(\): Promise<"allow" \| "ask" \| "deny">[\s\S]*?_fetch\("\/api\/computer-use\/v1\/policy"\)[\s\S]*?return "deny"/);
+  assert.equal((chatPanel.match(/providerOptions: this\._buildCodexCliProviderOptions\(managedCliPass, await this\._resolveCodexComputerUse\(\)\)/g) ?? []).length, 2);
+  assert.match(chatPanel, /return \{\s*hostLlm: llm,\s*computerUse,/);
+  assert.match(codexProviderPort, /\.\.\.\(options\.computerUse === true \? \{ computerUse: true \} : \{\}\)/);
   assert.match(chatPanel, /CODEX_AUTHORITATIVE_TOOL_CATALOG/);
   assert.match(pkg, /"codex-cli"/);
   assert.match(pkg, /"dreamgraph\.architect\.codexCli\.command"/);
