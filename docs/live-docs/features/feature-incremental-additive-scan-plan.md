@@ -2,10 +2,10 @@
 
 > Additive Scan is a parser-node evidenced from src/tools/scan-project.ts, src/tools/scan-state.ts. Its declared fields, source provenance, and explicit links define how it participates in the project while semantic model output is unavailable. This evidence-only account is intentionally provisional and will be replaced by the next successful LLM enrichment pass.
 
-**Repository:** dreamgraph  
-**Domain:** core  
-**Status:** released  
-**Source files:** src/tools/scan-project.ts, src/tools/scan-state.ts, src/tools/incremental-reconciliation.ts, src/tools/reconciliation-transaction.ts, src/utils/graph-reconciliation-barrier.ts, src/cli/commands/scan.ts, tests/tools/scan-project-incremental-e2e.test.ts, RELEASE_NOTES_v13.1.0.md  
+**Repository:** dreamgraph<br>
+**Domain:** core<br>
+**Status:** released<br>
+**Source files:** src/tools/scan-project.ts, src/tools/scan-state.ts, src/tools/incremental-reconciliation.ts, src/tools/reconciliation-transaction.ts, src/utils/graph-reconciliation-barrier.ts, src/cli/commands/scan.ts, tests/tools/scan-project-incremental-e2e.test.ts, RELEASE_NOTES_v13.1.0.md<br>
 
 ## Relationships
 
@@ -24,4 +24,3 @@
 | dreamgraph_src_tools | feature | depends_on | moderate | auto-backlink |
 
 **Tags:** v13.1.0, additive-scan, incremental-scan, verified, released, parser-discovered, structural-fallback
-
