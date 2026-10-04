@@ -49,7 +49,9 @@ afterEach(async () => {
   dom?.window.close(); dom = undefined; if (server?.listening) { server.closeAllConnections(); await new Promise<void>(done => server.close(() => done())); }
   stopScheduler(); updateSchedulerConfig({ ...oldScheduler, enabled: false }); vi.restoreAllMocks();
   for (const key of Object.keys(process.env)) if (!(key in envBefore)) delete process.env[key]; Object.assign(process.env, envBefore); initLlmProvider(oldModel);
-  await releaseGraphWriter(configDir); await releaseGraphWriter(dataDir);for(const part of ["workers","targets"])await releaseGraphWriter(join(configDir,"computer-use",part)).catch(error=>{if(error.code!=="ENOENT")throw error;});setDataDirOverride(previous); await rm(directory, { recursive: true, force: true });
+  await releaseGraphWriter(configDir); await releaseGraphWriter(dataDir);for(const part of ["workers","targets"])await releaseGraphWriter(join(configDir,"computer-use",part)).catch(error=>{if(error.code!=="ENOENT")throw error;});setDataDirOverride(previous);
+  // Windows may still be releasing a just-closed writer handle after the DOM and HTTP server settle.
+  await rm(directory, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
 });
 async function post(path: string, body: unknown) { const response = await fetch(url + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); return { status: response.status, body: await response.json() }; }
 async function eventually(check: () => boolean | Promise<boolean>) { for (let i = 0; i < 150; i++) { if (await check()) return; await new Promise(done => setTimeout(done, 15)); } throw Error("Browser condition not reached"); }
