@@ -81,6 +81,7 @@ describe("Codex isolated home Computer Use wiring", () => {
     expect(prompt).toContain("pre-approved");
     expect(prompt).toContain("cua.getTab");
     expect(prompt).toContain("exclusively through the DreamGraph MCP tools");
+    expect(prompt).toContain("never call tab.markDeliverable() or tab.markHandoff()");
     expect(prompt).toContain("cua_repl");
   });
 });

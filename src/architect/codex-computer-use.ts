@@ -383,10 +383,12 @@ export async function createCodexTranscriptWriter(dir: string, runKey: string): 
     const stream = createWriteStream(path, { flags: "w", mode: 0o600 });
     let failed = false;
     stream.on("error", () => { failed = true; });
+    // close() is idempotent: the normal path and the run's final cleanup may both call it.
+    let closing: Promise<string> | null = null;
     return {
       path,
-      write(chunk: string) { if (!failed) stream.write(chunk); },
-      close: () => new Promise<string>((resolve) => {
+      write(chunk: string) { if (!failed && !closing) stream.write(chunk); },
+      close: () => closing ??= new Promise<string>((resolve) => {
         stream.end(() => { readFile(path, "utf8").then(resolve, () => resolve("")); });
       }),
     };

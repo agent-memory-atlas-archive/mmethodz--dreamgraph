@@ -22,6 +22,7 @@ import { beginHostExecution, endHostExecution, withHostExecution } from "../serv
 import type { PlanExecutionIntent } from "../graph/contracts.js";
 import { deliverManagedContext, readManagedContext, type ManagedExecutionContext } from "../graph/execution-context.js";
 import { startCodexCuaHost, type CodexCuaHost } from "./codex-cua-host.js";
+import { codexBrowserTabIdsFromTranscript, releaseCodexBrowserSession } from "./codex-cua-release.js";
 import { codexComputerUseServersToml, codexTurnEndHooksToml, codexNativeToolTrace, createCodexItemClock, createCodexTranscriptWriter, createCodexSessionGrantWatcher, readCodexNotify, discoverCodexComputerUseServers, resolveCodexSourceHome, widenCodexComputerUseSurfaces, type CodexComputerUseServer } from "./codex-computer-use.js";
 
 export type ArchitectCliAdapter = "codex-cli" | "copilot-cli";
@@ -223,6 +224,9 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
 
   const cuaHosts: CodexCuaHost[] = [];
   const endCuaHosts = (reason: string) => Promise.all(cuaHosts.map((host) => host.end(reason).catch(() => undefined)));
+  // Releases the browser tabs the run's Codex Computer Use session still holds. Set once the run has a
+  // transcript; runs at most once, from the normal path or from the final cleanup (ceiling, cancel, crash).
+  let releaseComputerUse: (() => Promise<string | null>) | null = null;
   try {
     const capability = await probeCliControlCapability(input.adapter, executionSignal);
     await mkdir(auditDir, { recursive: true, mode: 0o700 });
@@ -249,6 +253,22 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     const transcript = invocation.computerUseServers
       ? await createCodexTranscriptWriter(join(tmpdir(), "dreamgraph-codex-transcripts"), createHash("sha256").update(runId).digest("hex").slice(0, 32))
       : null;
+    if (invocation.computerUseReleaseServer && sessionGrant && transcript) {
+      const server = invocation.computerUseReleaseServer;
+      let released: Promise<string | null> | null = null;
+      // Codex exec does not release the browser session at turn end (no Stop-hook cleanup), which leaves the
+      // tab claimed and the Computer Use cursor on it. Release it the verified way: bind each tab the session
+      // held as that session in a new turn, then end that turn.
+      releaseComputerUse = () => released ??= (async () => {
+        const text = await transcript.close();
+        const sessionId = sessionGrant.threadId;
+        if (!sessionId || !text) return null;
+        const release = await releaseCodexBrowserSession({ server, sessionId, tabIds: codexBrowserTabIdsFromTranscript(text) });
+        const logPath = transcript.path.replace(/\.jsonl$/, ".cua-release.log");
+        await writeFile(logPath, release.log.join("\n") + "\n", { mode: 0o600 });
+        return logPath;
+      })().catch(() => null);
+    }
     let processResult: ProcessResult;
     try {
       const baseConfig = getArchitectLlmConfig();
@@ -285,6 +305,10 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         } catch { computerUseCleanupLog = null; }
       }
     }
+    // Codex exec does not release the browser session at turn end (no Stop-hook cleanup), which leaves the
+    // tab claimed and the Computer Use cursor on it. Release it the verified way: bind each tab the session
+    // held as that session in a new turn, then end that turn.
+    if (releaseComputerUse) computerUseCleanupLog = await releaseComputerUse() ?? computerUseCleanupLog;
     const computerUseRequestRecord = audit.find((record) => record.tool === "request_computer_use");
     let computerUseRequest: { reason: string } | undefined;
     if (computerUseRequestRecord) { let reason = ""; try { reason = String((JSON.parse(computerUseRequestRecord.inputJson ?? "{}") as { reason?: unknown }).reason ?? ""); } catch { /* bounded audit body */ }
@@ -362,6 +386,8 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     try { if (!finished) await endHostExecution({ execution_id: runId, outcome: executionSignal.aborted ? "cancelled" : "failed",
       work_termination: dispatched ? "unconfirmed" : "confirmed" }); }
     finally {
+      // Ceiling, cancel or crash skip the normal path: release the Computer Use session here too (no-op if done).
+      if (releaseComputerUse) await releaseComputerUse();
       await endCuaHosts(finished ? "run finished" : "run failed");
       await rm(scratchDir, { recursive: true, force: true }).catch(() => undefined);
     }
@@ -566,7 +592,7 @@ async function prepareCodexInvocation(input: {
   computerUse?: boolean;
   /** Receives each daemon-owned cua_repl host as soon as it starts (so it is always ended). */
   registerCuaHost?: (host: CodexCuaHost) => void;
-}): Promise<{ command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string; outputPath: string | null; computerUseServers?: string[]; cuaControlDir?: string }> {
+}): Promise<{ command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string; outputPath: string | null; computerUseServers?: string[]; cuaControlDir?: string; computerUseReleaseServer?: CodexComputerUseServer }> {
   const command = await resolveArchitectCliExecutable("codex-cli");
   // Granted Computer Use: wire the Codex app's own Computer Use MCP server(s) into the
   // isolated home. Fail before the model is admitted if the runtime is not installed.
@@ -582,13 +608,18 @@ async function prepareCodexInvocation(input: {
     // Turn-end cleanup: Codex kills its MCP servers outright on exit, so the daemon hosts cua_repl
     // itself (outside Codex's process tree) and Codex connects over local HTTP. After the run the
     // daemon sends `turn_ended` (what the Codex app's plugin hook does) and stops the server.
-    const hosted: CodexComputerUseServer[] = [];
-    for (const server of computerUseServers) {
-      const host = await startCodexCuaHost({ command: server.command, args: server.args, env: { ...stringEnv(process.env), ...server.env } });
-      input.registerCuaHost?.(host);
-      hosted.push({ ...server, url: host.url });
+    // Default: Codex starts cua_repl itself over stdio (the verified route) and the config's Stop/Interrupt
+    // hooks perform the cleanup. The daemon-owned HTTP host stays opt-in until it streams server-initiated
+    // messages on the triggering request's response (MCP Streamable HTTP); cua_repl hangs without that.
+    if (process.env.DREAMGRAPH_CODEX_CUA_TRANSPORT === "daemon-http") {
+      const hosted: CodexComputerUseServer[] = [];
+      for (const server of computerUseServers) {
+        const host = await startCodexCuaHost({ command: server.command, args: server.args, env: { ...stringEnv(process.env), ...server.env } });
+        input.registerCuaHost?.(host);
+        hosted.push({ ...server, url: host.url });
+      }
+      computerUseServers = hosted;
     }
-    computerUseServers = hosted;
     // Keep the operator's own Codex notify (the desktop Computer Use helper's turn-ended).
     const operatorNotify = await readCodexNotify(resolveCodexSourceHome());
     if (operatorNotify.length > 0) codexNotify = operatorNotify;
@@ -640,6 +671,8 @@ async function prepareCodexInvocation(input: {
     outputPath,
     ...(computerUseServers.length > 0 ? { computerUseServers: computerUseServers.map((server) => server.name) } : {}),
     ...(cuaControlDir ? { cuaControlDir } : {}),
+    // Stdio cua_repl (Codex starts it): the daemon releases the session's browser tabs after the run.
+    ...(computerUseServers.length > 0 && !computerUseServers.some((server) => server.url) ? { computerUseReleaseServer: computerUseServers.find((server) => server.name === "cua_repl") ?? computerUseServers[0]! } : {}),
   };
 }
 
@@ -657,7 +690,7 @@ async function prepareCopilotInvocation(input: {
   envBase: Record<string, string>;
   runId: string;
   availableToolNames: string[];
-}): Promise<{ command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string; outputPath: string | null; computerUseServers?: string[]; cuaControlDir?: string }> {
+}): Promise<{ command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string; outputPath: string | null; computerUseServers?: string[]; cuaControlDir?: string; computerUseReleaseServer?: CodexComputerUseServer }> {
   const command = await resolveArchitectCliExecutable("copilot-cli");
   const copilotHome = join(input.scratchDir, "copilot-home");
   const promptFilePath = join(input.scratchDir, "prompt.md");
@@ -724,9 +757,7 @@ export function createArchitectCodexConfigToml(input: {
     "[mcp_servers.dreamgraph]",
     `command = ${tomlString(input.bridgeCommand)}`,
     `args = ${tomlArray(input.bridgeArgs)}`,
-    `trust_level = ${tomlString("trusted")}`,
     "disabled_tools = []",
-    "default_tools_enabled = true",
     `default_tools_approval_mode = ${tomlString("approve")}`,
     "",
     "[mcp_servers.dreamgraph.env]",
@@ -805,7 +836,7 @@ export function createCliControlInstructions(autonomy: "manual" | "supervised" |
     : verbosity === "detailed" ? "Explain the outcome, relevant rationale, alternatives and uncertainty, with evidence links and diagnostic summary."
     : "Give the outcome with focused evidence and useful reasoning summary.";
   return `Effective controls: autonomy=${autonomy}; verbosity=${verbosity}. ${action} ${density} All modes preserve graph/ADR anchors, provenance, failures, scoped currency/completeness warnings and reconciliation obligations. Output density is guidance, never permission or guaranteed word count. The daemon enforces approved effect arguments and finite limits; ${computerUse === "granted"
-    ? "the local operator has GRANTED full native Computer Use for this pass: use your own tools (in Codex: the cua_repl MCP server, browser and desktop surfaces) to operate any web page or application on this machine to fulfil the request. Site and app access is pre-approved for this run; do not stop to ask for permission. If the request concerns a page or app that is already open, take over that existing tab or window (for a browser tab: cua.getTab({ url }) or browser.user.openTabs() then claimTab) instead of opening a new one. Native page dialogs (alert/confirm/prompt) block the page until answered: answer them with the browser dialog API (accept(), accept(text) or dismiss()) or the desktop surface, then continue. Computer Use is for operating web pages and applications only: never use it (or cua_repl JavaScript, editors, terminals or file dialogs) to read, write, run or change this project's repository; every project read, mutation and command still goes exclusively through the DreamGraph MCP tools. Report what you did and observed."
+    ? "the local operator has GRANTED full native Computer Use for this pass: use your own tools (in Codex: the cua_repl MCP server, browser and desktop surfaces) to operate any web page or application on this machine to fulfil the request. Site and app access is pre-approved for this run; do not stop to ask for permission. If the request concerns a page or app that is already open, take over that existing tab or window (for a browser tab: cua.getTab({ url }) or browser.user.openTabs() then claimTab) instead of opening a new one. Native page dialogs (alert/confirm/prompt) block the page until answered: answer them with the browser dialog API (accept(), accept(text) or dismiss()) or the desktop surface, then continue. Browser errors that say to retry (for example \"Unable to load browser request-header policy. Retry the browser command.\") are transient start-up checks: wait about two seconds and retry the same browser call up to three times before switching to another route. Every DreamGraph pass is a fresh Codex session that is never resumed, so the browser must be fully released when this turn ends: never call tab.markDeliverable() or tab.markHandoff() (a marked tab stays claimed by a session that no longer exists, leaving the Computer Use cursor and debugging banner on it); if a result page must stay open for the operator, show it in a claimed user tab (navigate that tab) instead of an agent-created tab, because unmarked agent tabs close and unmarked claimed tabs are released and left open at turn end. Computer Use is for operating web pages and applications only: never use it (or cua_repl JavaScript, editors, terminals or file dialogs) to read, write, run or change this project's repository; every project read, mutation and command still goes exclusively through the DreamGraph MCP tools. Report what you did and observed."
     : computerUse === "requestable"
       ? "Computer Use is NOT granted for this pass. If the request genuinely requires operating this computer (browser, apps, screen), call the DreamGraph tool request_computer_use with a one-sentence reason, then end your turn; the operator will be asked and the request re-run with Computer Use if allowed. Otherwise do not ask."
       : "no native Computer Use permission is implied."}`;

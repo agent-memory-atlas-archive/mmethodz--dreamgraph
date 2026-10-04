@@ -5050,6 +5050,8 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
     completed_passes: completedPasses,
     max_passes: continuationMaxPasses,
     now: continuationNow,
+    previous_selected_action_id: continuationState?.selected_action_id ?? null,
+    auto_retry_streak: continuationState?.auto_retry_streak ?? 0,
   };
   const continuationParseResult = routeFailureReason
     ? synthesizeArchitectRouteFailureContinuation({

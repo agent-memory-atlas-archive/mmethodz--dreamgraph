@@ -25,6 +25,8 @@ const AttemptSchema = z.object({
   reserved_nanounits: amount, accounted_nanounits: amount, settlement_fingerprint: id.nullable(),
   charge_source: z.enum(["not_applicable", "conservative_reservation", "provider_usage_estimate", "unmeasured_subscription"]),
   source_scope: z.array(id).max(128), variance: z.array(id),
+  /** Process that admitted the attempt; only a live owner can still have a request in flight. */
+  owner_pid: count.optional(),
 }).strict();
 const RunSchema = z.object({ id, instance_id: id, policy_fingerprint: id, budget: BudgetSchema,
   created_at: utc, cancel_requested_at: utc.nullable(), parent_run_id: id.nullable().default(null) }).strict();
@@ -44,6 +46,17 @@ export interface AdmissionRequest {
   parent_run_id?: string;
   provider: string; model: string; channel: AdmissionAttempt["channel"]; credential_reference: string | null;
   payload_hash: string; source_scope: string[]; resources: z.infer<typeof ResourcesSchema>; pricing?: ModelPricing | null;
+}
+/**
+ * True when the process that admitted an attempt is still running. A request can only be in flight while
+ * its owning daemon lives: after a crash or restart nobody can dispatch or settle it, so it must not keep
+ * holding a concurrency slot (it used to block every later pass until its time budget ran out).
+ * Attempts written before owner tracking (no owner_pid) predate this process and are treated as orphaned.
+ */
+export function ownerAlive(pid: number | undefined): boolean {
+  if (pid === undefined) return false;
+  if (pid === process.pid) return true;
+  try { process.kill(pid, 0); return true; } catch (error) { return (error as NodeJS.ErrnoException).code === "EPERM"; }
 }
 const hash = (value: unknown): string => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const FILE = "spend_ledger.json";
@@ -140,13 +153,13 @@ export class ModelAdmission {
       for (const field of ["input_tokens", "output_tokens", "reasoning_tokens"] as const) {
         if (checkedSum(runAttempts.map(attempt => used(attempt, field))) + resources[field] > budget[field]) reject(`ADMISSION_${field.toUpperCase()}_LIMIT`);
       }
-      // Unacknowledged requests retain conflict capacity across process restart.
-      // A run past its elapsed deadline can no longer have a live request: its deadline signal aborted it
-      // (or its process is gone). Such attempts keep their spend accounting but stop holding a
-      // concurrency slot, so one crashed or expired pass cannot block every later pass indefinitely.
+      // Unacknowledged requests hold a concurrency slot while they can still be in flight: the run is inside
+      // its elapsed budget AND the process that admitted it is still running. Expired or orphaned attempts
+      // (deadline passed, daemon restarted/crashed) keep their spend accounting but release the slot, so one
+      // crashed, killed or expired pass cannot block every later pass.
       const nowMs = this.clock().getTime();
       const live = (attempt: AdmissionAttempt) => { const owner = ledger.runs[attempt.run_id];
-        return !!owner && nowMs - Date.parse(owner.created_at) < owner.budget.elapsed_ms; };
+        return !!owner && nowMs - Date.parse(owner.created_at) < owner.budget.elapsed_ms && ownerAlive(attempt.owner_pid); };
       const active = Object.values(ledger.attempts).filter(attempt => attempt.billing_key === billing_key && attempt.state !== "released" && !attempt.acknowledged && live(attempt));
       const concurrency = Math.min(budget.concurrency, ...active.map(attempt => ledger.runs[attempt.run_id].budget.concurrency));
       if (active.length >= concurrency) reject("ADMISSION_CONCURRENCY_LIMIT");
@@ -192,7 +205,7 @@ export class ModelAdmission {
         credential_reference: request.credential_reference, day, admitted_at: timestamp, dispatched_at: null, settled_at: null,
         state: "reserved", acknowledged: false, resources, usage: null, pricing, reserved_nanounits: String(reserved), accounted_nanounits: String(reserved),
         settlement_fingerprint: null, charge_source: request.channel === "api" ? "conservative_reservation" : request.channel === "subscription" ? "unmeasured_subscription" : "not_applicable",
-        source_scope: request.source_scope, variance: [] };
+        source_scope: request.source_scope, variance: [], owner_pid: process.pid };
       ledger.runs[request.run_id] = run; ledger.attempts[request.id] = attempt;
       await this.save(ledger, `reserve:${request.id}`);
       return attempt;

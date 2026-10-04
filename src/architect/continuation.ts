@@ -11,6 +11,9 @@ const MAX_ACTIONS = 8;
 const MAX_TOOLS = 24;
 const MAX_FALLBACK_EVIDENCE_ITEMS = 16;
 const CONTINUATION_TOKEN_VERSION = 1;
+/** Consecutive automatic "continue requested completion target" retries allowed before stopping for the operator. */
+export const ARCHITECT_AUTO_RETRY_LIMIT = 2;
+const AUTO_RETRY_ACTION_ID = "continue-requested-target";
 
 const MUTATION_TOOL_PATTERN = /\b(?:patch_file|append_to_file|create_file|edit_file|delete_file|rename_file|edit_entity|edit_markdown_section|patch_markdown_chapter)\b/i;
 
@@ -94,6 +97,8 @@ export interface ArchitectContinuationState {
     reason: string | null;
     diagnostics: string[];
   };
+  /** Consecutive automatic generic retries that led to this state (absent in older tokens = 0). */
+  auto_retry_streak?: number;
 }
 
 export interface ArchitectContinuationDecision {
@@ -117,6 +122,10 @@ export interface ArchitectContinuationContext {
   completed_passes?: number;
   max_passes?: number;
   now?: Date;
+  /** Action selected for the pass that just ran (from the incoming continuation token). */
+  previous_selected_action_id?: string | null;
+  /** Consecutive automatic generic retries so far (from the incoming continuation token). */
+  auto_retry_streak?: number;
 }
 
 export interface ArchitectRouteFailureContinuationInput {
@@ -727,6 +736,18 @@ export function decideArchitectContinuation(input: {
     return stoppedDecision("assistant_requested_user_input", parseResult.report, parseResult.diagnostics, context, completedPasses, maxPasses, selected);
   }
 
+  // The generic CLI retry ("Continue requested completion target") must not loop: after
+  // ARCHITECT_AUTO_RETRY_LIMIT consecutive automatic retries, stop and hand back to the operator.
+  let autoRetryStreak = 0;
+  if (input.autonomyAllowsContinue && selected.id === AUTO_RETRY_ACTION_ID) {
+    autoRetryStreak = context.previous_selected_action_id === AUTO_RETRY_ACTION_ID
+      ? normalizeNonNegativeInteger(context.auto_retry_streak, 0) + 1
+      : 1;
+    if (autoRetryStreak > ARCHITECT_AUTO_RETRY_LIMIT) {
+      return stoppedDecision("automatic_retry_limit", parseResult.report, parseResult.diagnostics, context, completedPasses, maxPasses);
+    }
+  }
+
   const manifest = buildArchitectContinuationToolManifest(selected);
   const state = buildContinuationState({
     context,
@@ -737,6 +758,7 @@ export function decideArchitectContinuation(input: {
     stopped: false,
     reason: null,
     diagnostics: parseResult.diagnostics,
+    autoRetryStreak,
   });
   const token = encodeArchitectContinuationToken(state);
 
@@ -1023,6 +1045,7 @@ function buildContinuationState(input: {
   stopped: boolean;
   reason: string | null;
   diagnostics: string[];
+  autoRetryStreak?: number;
 }): ArchitectContinuationState {
   const selectedAction = input.selectedAction;
   const selectedManifest = selectedAction ? buildArchitectContinuationToolManifest(selectedAction) : null;
@@ -1045,6 +1068,7 @@ function buildContinuationState(input: {
       reason: input.reason,
       diagnostics: [...input.diagnostics],
     },
+    ...(input.autoRetryStreak ? { auto_retry_streak: input.autoRetryStreak } : {}),
   };
 }
 

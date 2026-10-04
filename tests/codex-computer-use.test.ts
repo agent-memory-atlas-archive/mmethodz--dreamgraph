@@ -161,3 +161,12 @@ it("streams the full transcript to disk regardless of the in-memory output cap",
   expect(text.endsWith('{"type":"turn.completed"}\n')).toBe(true);
   expect(await createCodexTranscriptWriter(join(home, "s"), "../x")).toBeNull();
 });
+
+it("closes the transcript once even when the normal path and the final cleanup both close it", async () => {
+  const writer = await createCodexTranscriptWriter(join(home, "c"), "0123456789abcdef");
+  writer!.write('{"type":"thread.started","thread_id":"01a1045d-9282-7c42-8973-eda9105b4604"}\n');
+  const [first, second] = await Promise.all([writer!.close(), writer!.close()]);
+  expect(first).toBe(second);
+  writer!.write("late chunk after close\n");
+  expect(await writer!.close()).toBe(first);
+});
