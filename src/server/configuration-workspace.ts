@@ -53,6 +53,7 @@ export function renderConfigurationWorkspace(revision: string, restartCommand: s
     <span id="cw-draft-count">No unsaved changes</span>
     <button id="cw-discard" type="button" disabled>Discard</button>
     <button id="cw-undo" type="button" disabled title="Restore engine.env as it was before your last save">Undo last save</button>
+    <button id="cw-retry" type="button" hidden>Retry the captured save</button>
     <button id="cw-save" type="button" class="cfg-primary" disabled>Save changes</button>
   </footer>
   <input type="hidden" id="cw-revision" value="${escape(revision)}"><input type="hidden" id="cw-restart-command" value="${escape(restartCommand)}">
@@ -117,9 +118,13 @@ details.cfg-more>.cfg-grid,details.cfg-more>div{margin-top:10px}
 .cfg-raw{display:grid;grid-template-columns:minmax(180px,30%) minmax(0,1fr) auto;gap:6px 10px;align-items:center;font-size:12px}
 .cfg-raw .k{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:var(--c-dim);overflow-wrap:anywhere}
 .cfg-raw .n{font-weight:600}.cfg-raw .src{font-size:10.5px;color:var(--c-dim)}
+.cfg-profile-tree{display:flex;flex-direction:column;gap:6px;min-width:0}.cfg-profile-property{display:grid;grid-template-columns:minmax(130px,32%) minmax(0,1fr);gap:8px;align-items:start;padding:5px 0;border-bottom:1px solid #2a2f35}.cfg-profile-property>label{font-size:12px;color:var(--c-dim)}
+.cfg-profile-property .cfg-profile-property{padding-left:10px}.cfg-profile-tree textarea{font-family:ui-monospace,Consolas,monospace}
+.cfg-template-controls{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.cfg-template-controls label{display:flex;flex-direction:column;gap:4px;min-width:150px;font-size:12px}.cfg-template-controls button{align-self:end}
+.cfg-template-diff{max-height:250px;overflow:auto;margin-top:8px}.cfg-template-diff-row{display:grid;grid-template-columns:minmax(160px,30%) minmax(0,1fr) auto;gap:8px;padding:5px 0;border-bottom:1px solid var(--c-line);font-size:12px}.cfg-template-diff-row code{overflow-wrap:anywhere}.cfg-template-diff-row span{overflow-wrap:anywhere}
 .cfg-savebar{flex:none;display:flex;gap:8px;align-items:center;justify-content:flex-end;border-top:1px solid var(--c-line);padding:8px 2px;background:inherit}
 .cfg-savebar>span{margin-right:auto;color:var(--c-dim)}.cfg-savebar>span.dirty{color:var(--c-warn)}
-@media(max-width:700px){.cfg-repo,.cfg-repo-head{grid-template-columns:1fr 1fr}.cfg-repo .x{grid-column:2;justify-self:end;width:34px}.cfg-repo-head{display:none}.cfg-raw{grid-template-columns:1fr}}
+@media(max-width:700px){.cfg-repo,.cfg-repo-head{grid-template-columns:1fr 1fr}.cfg-repo .x{grid-column:2;justify-self:end;width:34px}.cfg-repo-head{display:none}.cfg-raw,.cfg-template-diff-row{grid-template-columns:1fr}}
 `;
 
 /** Served as /config/workspace.js. No backticks or template placeholders may appear inside. */
@@ -129,7 +134,9 @@ const $ = id => document.getElementById(id), root = $('configuration-workspace')
 if (!root) return;
 
 /* ---------------- state ---------------- */
-let snap = null, cat = {}, roles = [], reviews = [], comps = {}, tab = 'models', busy = false, lastOperation = null, repos = null, repoDraft = null, repoDirty = false;
+let snap = null, cat = {}, roles = [], reviews = [], comps = {}, tab = 'models', busy = false, lastOperation = null, captured = null, repos = null, repoDraft = null, repoDirty = false;
+let profileSchemas = null, profileNames = [], profileDocument = null, profileDraft = null, profileDirty = false, profileCaptured = null, profileBusy = false, profileReadGeneration = 0;
+let templatePreview = null, templateCapture = null;
 const D = {};          // key -> string (write) | null (remove from engine.env = use default)
 const errs = {};       // key -> message
 try { const saved = sessionStorage.getItem('dg-config-tab'); if (saved) tab = saved; } catch (e) { /* no storage */ }
@@ -435,7 +442,7 @@ function setComp(comp, prop, value) {
   const key = COMP_KEY[comp], next = compValue(comp); next[prop] = value;
   setDraft(key, JSON.stringify(next));
   // Legacy per-field aliases in engine.env would shadow the object on restart.
-  for (const [k, m] of Object.entries(cat)) if (m.alias_for && m.alias_for.key === key && saved(k) !== null) setDraft(k, null);
+  for (const [k, m] of Object.entries(cat)) if (m.alias_for && m.alias_for.key === key && m.alias_for.property === prop && saved(k) !== null) setDraft(k, null);
 }
 function compField(comp, prop, title, help, kind, opts) {
   opts = opts || {}; const v = compValue(comp)[prop], id = 'c-' + comp + '-' + prop, scale = opts.scale || 1;
@@ -539,11 +546,176 @@ function renderComputer(p) {
     opt('deny', 'Deny', 'Never operate this computer.'))),
     h('div', { class: 'cfg-status' }, 'Codex CLI uses its own built-in Computer Use. The API engine uses DreamGraph\'s browser harness, which is prepared per task from the Architect\'s Harness button.')));
   p.append(more('Time limit for tasks', grid(num('DREAMGRAPH_ARCHITECT_PASS_TIMEOUT_MS', 'Time limit per task', 'Tasks that use the computer usually need longer. Shared with the Architect page.', { unit: 'minutes', scale: 60000, min: 1, max: 240 }))));
+  p.append(profilePanel());
+}
+
+/* Scoped profile authoring is setup only. The Architect still admits each pass and grant. */
+function profileInitial(schema) {
+  if (Object.hasOwn(schema, 'default')) return structuredClone(schema.default);
+  if (Object.hasOwn(schema, 'const')) return schema.const;
+  if (schema.anyOf) return profileInitial(schema.anyOf.find(s => s.type !== 'null') || schema.anyOf[0]);
+  if (schema.enum) return schema.enum[0];
+  if (schema.type === 'object') return Object.fromEntries(Object.entries(schema.properties || {}).filter(([, s]) => !s.optional).map(([k, s]) => [k, profileInitial(s)]));
+  if (schema.type === 'array') return [];
+  if (schema.type === 'boolean') return false;
+  if (schema.type === 'number' || schema.type === 'integer') return schema.checks?.find(c => c.kind === 'min')?.value ?? 0;
+  if (schema.type === 'null') return null;
+  return '';
+}
+function profileTree(schema, value, changed, name, depth = 0) {
+  const box = h('div', { class: 'cfg-profile-tree' });
+  if (schema.anyOf) {
+    const branches = schema.anyOf, choice = h('select', { 'aria-label': name + ' value type' });
+    const chosen = branches.findIndex(s => s.const !== undefined && s.const === value || s.type === (Array.isArray(value) ? 'array' : value === null ? 'null' : typeof value));
+    branches.forEach((s, i) => choice.append(h('option', { value: i }, s.type || String(s.const)))); choice.value = String(Math.max(0, chosen));
+    const child = h('div'); const draw = () => child.replaceChildren(profileTree(branches[Number(choice.value)], value, changed, name, depth));
+    choice.addEventListener('change', () => { value = profileInitial(branches[Number(choice.value)]); changed(value); draw(); }); box.append(choice, child); draw(); return box;
+  }
+  if (schema.type === 'object' && schema.properties && depth < 6) {
+    const object = value && typeof value === 'object' && !Array.isArray(value) ? structuredClone(value) : {};
+    for (const [key, childSchema] of Object.entries(schema.properties)) {
+      const row = h('div', { class: 'cfg-profile-property' }), toggle = h('input', { type: 'checkbox' }); toggle.checked = Object.hasOwn(object, key);
+      const caption = h('label', {}, toggle, ' ' + key.replace(/_/g, ' ') + (childSchema.optional ? '' : ' *')), editor = h('div');
+      const draw = () => editor.replaceChildren(toggle.checked ? profileTree(childSchema, object[key], v => { object[key] = v; changed(object); }, name + ' ' + key, depth + 1) : h('span', { class: 'help' }, 'Not set'));
+      toggle.addEventListener('change', () => { if (toggle.checked) object[key] = profileInitial(childSchema); else delete object[key]; changed(object); draw(); });
+      row.append(caption, editor); box.append(row); draw();
+    }
+    return box;
+  }
+  if (schema.type === 'array' && depth < 6 && Array.isArray(value) && value.length <= 64) {
+    const rows = h('div'), items = structuredClone(value), add = h('button', { type: 'button' }, 'Add item');
+    const draw = () => { rows.replaceChildren(); items.forEach((item, i) => { const remove = h('button', { type: 'button', onclick: () => { items.splice(i, 1); changed(items); draw(); } }, 'Remove');
+      rows.append(h('div', { class: 'cfg-profile-property' }, h('span', {}, 'Item ' + (i + 1)), h('div', {}, profileTree(schema.items, item, v => { items[i] = v; changed(items); }, name + ' ' + i, depth + 1), remove))); }); };
+    add.addEventListener('click', () => { if (items.length >= 64) return; items.push(profileInitial(schema.items)); changed(items); draw(); }); box.append(rows, add); draw(); return box;
+  }
+  let control;
+  if (schema.enum || schema.type === 'boolean' || Object.hasOwn(schema, 'const')) {
+    const values = schema.enum || (Object.hasOwn(schema, 'const') ? [schema.const] : [true, false]); control = h('select', { 'aria-label': name });
+    values.forEach(v => control.append(h('option', { value: String(v) }, String(v)))); control.value = String(value);
+    control.addEventListener('change', () => changed(schema.type === 'boolean' ? control.value === 'true' : Object.hasOwn(schema, 'const') ? schema.const : control.value));
+  } else if (schema.type === 'object' || schema.type === 'array') {
+    control = h('textarea', { 'aria-label': name + ' complete JSON', rows: 8 }); control.value = JSON.stringify(value ?? profileInitial(schema), null, 2);
+    control.addEventListener('input', () => { try { changed(JSON.parse(control.value)); control.setCustomValidity(''); } catch (e) { control.setCustomValidity('Enter valid JSON.'); } });
+  } else if (schema.type === 'null') return box.append(h('span', {}, 'null')), box;
+  else {
+    control = h('input', { 'aria-label': name, type: schema.type === 'number' || schema.type === 'integer' ? 'number' : 'text', value: value ?? '' });
+    if (control.type === 'number') { control.step = schema.type === 'integer' ? '1' : 'any'; for (const c of schema.checks || []) { if (c.kind === 'min') control.min = String(c.value); if (c.kind === 'max') control.max = String(c.value); } }
+    control.addEventListener('input', () => changed(control.type === 'number' ? Number(control.value) : control.value));
+  }
+  box.append(control); return box;
+}
+function profilePanel() {
+  const details = h('details', { id: 'cw-computer-profiles', class: 'cfg-more' }, h('summary', {}, 'Browser workers and scoped targets'));
+  details.append(h('p', { class: 'help' }, 'Import qualification from this installation, then review allowed origins, controls, postconditions and observation limits. Saving a profile does not activate Computer Use or grant a session.'));
+  const kind = h('select', { id: 'cw-computer-kind' }, h('option', { value: 'worker' }, 'Browser worker'), h('option', { value: 'target' }, 'Browser target'));
+  const id = h('input', { id: 'cw-computer-id', list: 'cw-computer-names', autocomplete: 'off', pattern: '[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}', placeholder: 'local-browser' });
+  details.append(h('div', { class: 'cfg-grid' }, h('label', {}, 'Type', kind), h('label', {}, 'Name', id)), h('datalist', { id: 'cw-computer-names' }),
+    h('div', { class: 'cfg-inline' }, h('button', { id: 'cw-computer-read', type: 'button' }, 'Read / new draft'), h('label', {}, 'Import reviewed JSON', h('input', { id: 'cw-computer-import', type: 'file', accept: '.json,application/json', disabled: true }))),
+    h('p', { class: 'help' }, 'Qualification command: dg computer-use qualify --browser-executable <absolute-path> --browser-version <exact-version> --worker-id <name> --out <new-file>'),
+    h('div', { id: 'cw-computer-status', role: 'status', 'aria-live': 'polite' }, 'Profiles are read on demand.'), h('div', { id: 'cw-computer-editor' }),
+    h('div', { class: 'cfg-inline' }, h('button', { id: 'cw-computer-save', type: 'button', disabled: true }, 'Save reviewed profile'), h('button', { id: 'cw-computer-retry', type: 'button', hidden: true }, 'Recover exact save')));
+  const live = () => details.isConnected && tab === 'computer';
+  const status = message => { if (!live()) return; const n = details.querySelector('#cw-computer-status'); if (n) n.textContent = message; };
+  const controls = () => { if (!live()) return; const locked = profileBusy || !!profileCaptured; for (const key of ['cw-computer-kind', 'cw-computer-id', 'cw-computer-read']) $(key).disabled = locked;
+    $('cw-computer-import').disabled = locked || !profileDocument; $('cw-computer-save').disabled = locked || !profileDocument || !profileDirty;
+    $('cw-computer-retry').hidden = !profileCaptured || profileBusy; $('cw-computer-retry').disabled = profileBusy;
+    for (const n of $('cw-computer-editor').querySelectorAll('input,select,textarea,button')) n.disabled = locked; };
+  const names = () => { if (!live()) return; const list = details.querySelector('#cw-computer-names'); list.replaceChildren(); for (const p of profileNames.filter(p => p.kind === kind.value)) list.append(h('option', { value: p.id })); };
+  const catalogue = async () => { const result = await api('/api/architect/v1/computer/profiles'); profileSchemas = result.schemas; profileNames = result.profiles; names(); };
+  const draw = () => { if (!live()) return; const editor = details.querySelector('#cw-computer-editor'); editor.replaceChildren(); if (profileDocument) editor.append(profileTree(profileSchemas[profileDocument.kind], profileDraft, v => { profileDraft = structuredClone(v); profileDirty = true; controls(); }, 'Computer ' + profileDocument.kind)); controls(); };
+  const invalidate = () => { profileReadGeneration++; profileDocument = null; profileDraft = null; profileDirty = false; if (live()) details.querySelector('#cw-computer-editor').replaceChildren(); controls(); };
+  for (const n of [kind, id]) n.addEventListener(n === kind ? 'change' : 'input', () => { invalidate(); names(); status('Selection changed. Read the exact named profile before editing.'); });
+  details.addEventListener('toggle', async () => { if (!details.open || !live()) return; try { if (!profileSchemas) await catalogue(); if (profileDocument) { kind.value = profileDocument.kind; id.value = profileDocument.id; names(); draw(); status(profileCaptured ? 'Profile save outcome uncertain. Recover the exact save.' : 'Saved or drafted profile restored; saving does not issue a grant.'); }
+    else status('Select a name to read, or enter a new name.'); controls(); } catch (e) { status(e.message); } });
+  details.querySelector('#cw-computer-read').addEventListener('click', async () => {
+    if (profileBusy || profileCaptured) return; if (!id.checkValidity() || !id.value.trim()) { status('Enter a profile name using letters, digits, underscore or hyphen.'); return; }
+    const selection = { kind: kind.value, id: id.value.trim() }, ticket = ++profileReadGeneration; profileBusy = true; controls();
+    try { if (!profileSchemas) await catalogue(); const response = await api('/api/architect/v1/computer/profiles/read?' + new URLSearchParams(selection)); if (ticket !== profileReadGeneration) return;
+      profileDocument = response.result; profileDraft = profileDocument.value || { ...profileInitial(profileSchemas[selection.kind]), id: selection.id }; profileDirty = !profileDocument.value; draw();
+      status((profileDocument.value ? 'Saved profile loaded.' : 'New unsaved profile.') + (profileDocument.runtime_current === false ? ' Worker needs fresh qualification.' : '') + ' Saving does not enable Computer Use or issue a grant.');
+    } catch (e) { if (ticket === profileReadGeneration) status(e.message); } finally { if (ticket === profileReadGeneration) { profileBusy = false; controls(); } }
+  });
+  details.querySelector('#cw-computer-import').addEventListener('change', async event => { const file = event.target.files[0], ticket = profileReadGeneration; if (!file || !profileDocument) return;
+    try { if (file.size > 65536) throw Error('COMPUTER_CONFIGURATION_BYTE_BOUND'); const parsed = JSON.parse(await file.text()); if (ticket !== profileReadGeneration) return;
+      const imported = parsed.schema === 'dreamgraph.browser_runtime_qualification.v1' ? parsed.worker : parsed; if (imported.id !== profileDocument.id) throw Error('COMPUTER_CONFIGURATION_ID_MISMATCH');
+      profileDraft = imported; profileDirty = true; draw(); status('Imported into draft. Review the complete scope and pins before saving.');
+    } catch (e) { if (ticket === profileReadGeneration) status(e.message); } finally { event.target.value = ''; } });
+  const saveProfile = async request => { if (profileBusy) return; profileBusy = true; profileCaptured = request; controls(); status('Saving the exact reviewed profile…');
+    try { const response = await api('/api/architect/v1/computer/profiles/apply', request); profileCaptured = null; profileDocument = response.result; profileDraft = response.result.value; profileDirty = false; draw();
+      status((response.effective_state || 'Saved.') + (response.result.runtime_current === false ? ' Worker qualification is not current.' : '')); await catalogue(); }
+    catch (e) { if (e.status !== undefined && e.status < 500) { profileCaptured = null; status('Profile not saved: ' + e.message + '. Draft retained; read back after a conflict.'); }
+      else status('Save outcome uncertain: ' + e.message + '. Recover the exact save; no new operation was started.'); }
+    finally { profileBusy = false; controls(); } };
+  details.querySelector('#cw-computer-save').addEventListener('click', () => { if (!profileDocument || !profileDirty || profileCaptured || profileBusy) return;
+    for (const input of $('cw-computer-editor').querySelectorAll('input,select,textarea')) if (!input.checkValidity()) { input.focus(); status(input.validationMessage); return; }
+    saveProfile({ kind: profileDocument.kind, id: profileDocument.id, expected_revision: profileDocument.revision, operation_id: crypto.randomUUID(), value: structuredClone(profileDraft) }); });
+  details.querySelector('#cw-computer-retry').addEventListener('click', () => { if (profileCaptured) saveProfile(profileCaptured); });
+  return details;
 }
 
 /* ---------------- advanced ---------------- */
+function renderTemplates(p) {
+  const template = h('select', { id: 'cw-template', 'aria-label': 'Template' },
+    h('option', { value: 'default' }, 'Default'), h('option', { value: 'ollama' }, 'Ollama'), h('option', { value: 'lmstudio' }, 'LM Studio'));
+  const scope = h('select', { id: 'cw-template-scope', 'aria-label': 'Template scope' }, h('option', { value: 'all' }, 'All editable settings'));
+  for (const [id, title] of [['models', 'Models & roles'], ['scanning', 'Scan & enrichment'], ['cognition', 'Cognition & truth'],
+    ['scheduling', 'Schedules & events'], ['retrieval', 'Retrieval & budgets'], ['integrations', 'Repositories & connections'],
+    ['computer', 'Computer Use'], ['advanced', 'Advanced']])
+    scope.append(h('option', { value: id }, title));
+  const previewButton = h('button', { id: 'cw-preview', type: 'button' }, 'Preview changes');
+  const applyButton = h('button', { id: 'cw-apply-template', type: 'button', class: 'cfg-primary' }, 'Apply reviewed diff');
+  const diff = h('div', { id: 'cw-diff', class: 'cfg-template-diff', 'aria-live': 'polite' });
+  const selected = () => ({ template: template.value, ...(scope.value === 'all' ? {} : {
+    keys: Object.values(cat).filter(m => m.category === scope.value && m.apply !== 'read_only').map(m => m.key).sort() }) });
+  const invalidate = () => { if (templateCapture) return; templatePreview = null; draw(); };
+  const draw = () => {
+    template.disabled = scope.disabled = busy || !!templateCapture;
+    previewButton.disabled = busy || !!captured || !!templateCapture || !!Object.keys(D).length || repoDirty;
+    applyButton.disabled = busy || !!captured || (!templateCapture && (!templatePreview?.result.diff.length || !!Object.keys(D).length || repoDirty));
+    applyButton.textContent = templateCapture ? 'Retry captured apply' : 'Apply reviewed diff';
+    diff.replaceChildren();
+    if (!templatePreview) return;
+    const result = templatePreview.result;
+    diff.append(h('p', { class: 'help' }, result.diff.length + ' changes; ' + result.retained.length + ' protected or unknown settings retained.'));
+    for (const change of result.diff) diff.append(h('div', { class: 'cfg-template-diff-row' },
+      h('code', {}, change.key), h('span', {}, String(change.before ?? 'default') + ' → ' + String(change.after ?? 'default')),
+      h('span', { class: 'tag' }, change.apply)));
+  };
+  template.addEventListener('change', invalidate); scope.addEventListener('change', invalidate);
+  previewButton.addEventListener('click', async () => {
+    if (busy || captured || templateCapture || Object.keys(D).length || repoDirty) return;
+    busy = true; draw(); refreshDirty();
+    try { const body = selected(), response = await api('/api/config/v1/template/preview', body);
+      templatePreview = { body, result: response.result }; say('Preview only. Review the exact changes before applying.'); }
+    catch (e) { templatePreview = null; say('Template preview failed: ' + e.message, 'error'); }
+    finally { busy = false; draw(); refreshDirty(); }
+  });
+  applyButton.addEventListener('click', async () => {
+    if (busy || captured || (!templateCapture && (Object.keys(D).length || repoDirty)) || (!templatePreview && !templateCapture)) return;
+    if (!templateCapture) {
+      if (!templatePreview.result.diff.length) return;
+      templateCapture = { ...templatePreview.body, expected_revision: templatePreview.result.revision,
+        expected_template_hash: templatePreview.result.template_hash,
+        operation_id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random() };
+    }
+    busy = true; draw(); refreshDirty();
+    try { const submitted = templateCapture, result = await api('/api/config/v1/template/apply', submitted);
+      templateCapture = null; templatePreview = null; lastOperation = result.receipt && result.receipt.operation_id || submitted.operation_id;
+      busy = false; await load(true);
+      const restart = result.receipt && result.receipt.restart_required || [];
+      say('Template applied. ' + (restart.length ? 'Restart DreamGraph to apply: ' + restart.map(label).join(', ') + ' (' + $('cw-restart-command').value + ').' : 'New work uses the saved settings.'), 'ok'); }
+    catch (e) { if (e.status !== undefined && e.status < 500) { templateCapture = null; templatePreview = null; }
+      say(templateCapture ? 'Template outcome uncertain. Retry the captured apply to recover its receipt.' : 'Template not applied: ' + e.message, 'error'); }
+    finally { busy = false; draw(); refreshDirty(); }
+  });
+  if (templatePreview) { template.value = templatePreview.body.template; scope.value = templatePreview.body.keys ? (Object.values(cat).find(m => templatePreview.body.keys.includes(m.key)) || {}).category || 'all' : 'all'; }
+  draw();
+  p.append(card('Apply a template', 'Preview first. Protected secrets, instance paths, repositories and policies remain in place.',
+    h('div', { class: 'cfg-template-controls' }, h('label', {}, 'Template', template), h('label', {}, 'Scope', scope), previewButton, applyButton), diff));
+}
 function renderAdvanced(p) {
   p.append(h('p', { class: 'cfg-intro' }, 'Fine-tuning. The defaults suit most projects.'));
+  renderTemplates(p);
   p.append(card('Common', null, grid(
     onoff('DREAMGRAPH_DEBUG', 'Debug logging', 'Writes much more detail to the instance log.'),
     num('DREAMGRAPH_GRAPH_STALE_HOURS', 'Suggest a rescan after', 'Only a hint; an old scan is not treated as wrong.', { unit: 'hours', min: 1, step: 1 }),
@@ -594,12 +766,14 @@ function render() {
   refreshDirty();
 }
 function refreshDirty() {
+  root.dataset.busy = String(busy);
   const n = Object.keys(D).length + (repoDirty ? 1 : 0), bad = Object.keys(errs).length;
   const span = $('cw-draft-count');
   span.textContent = bad ? 'Fix ' + bad + ' invalid value' + (bad > 1 ? 's' : '') + ' before saving' : n ? n + ' unsaved change' + (n > 1 ? 's' : '') : 'No unsaved changes';
   span.className = n || bad ? 'dirty' : '';
-  $('cw-save').disabled = busy || !n || !!bad; $('cw-discard').disabled = busy || !n; $('cw-undo').disabled = busy || !lastOperation || !!n;
-  $('cw-refresh').disabled = busy;
+  $('cw-save').disabled = busy || !!captured || !!templateCapture || !n || !!bad; $('cw-discard').disabled = busy || !!captured || !!templateCapture || !n; $('cw-undo').disabled = busy || !!captured || !!templateCapture || !lastOperation || !!n;
+  $('cw-retry').hidden = !captured; $('cw-retry').disabled = busy;
+  $('cw-refresh').disabled = busy || !!captured || !!templateCapture;
 }
 async function load(keepDrafts) {
   busy = true; refreshDirty();
@@ -624,43 +798,64 @@ async function load(keepDrafts) {
   finally { busy = false; render(); }
 }
 async function save() {
-  if (busy) return; busy = true; refreshDirty(); say('Saving…');
+  if (busy || captured || templateCapture) return; busy = true; refreshDirty(); say('Saving…');
   const updates = Object.assign({}, D), parts = [];
   try {
     if (repoDirty) { await saveRepos(); parts.push('repositories'); }
     if (Object.keys(updates).length) {
       const operation = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random());
-      const result = await api('/api/config/v1/apply', { expected_revision: snap.revision, operation_id: operation, updates });
+      captured = { expected_revision: snap.revision, operation_id: operation, updates };
+      const submitted = captured;
+      const result = await api('/api/config/v1/apply', submitted);
+      captured = null;
       lastOperation = result.receipt && result.receipt.operation_id || operation;
-      for (const k of Object.keys(D)) delete D[k];
+      for (const [k, v] of Object.entries(submitted.updates)) if (D[k] === v) delete D[k];
       const restart = result.receipt && result.receipt.restart_required || [];
       parts.push(Object.keys(updates).length + ' setting' + (Object.keys(updates).length > 1 ? 's' : ''));
-      await load(false);
+      await load(true);
       say('Saved ' + parts.join(' and ') + '. ' + (restart.length ? 'Restart DreamGraph to apply: ' + restart.map(label).join(', ') + ' (' + $('cw-restart-command').value + ').' : 'Changes apply to new work right away.'), restart.length ? undefined : 'ok');
     } else { await load(true); say('Saved ' + parts.join(' and ') + '.', 'ok'); }
   } catch (e) {
+    if (captured && (e.status === undefined || e.status >= 500)) { busy = false; say('Save outcome uncertain. Retry the captured request to recover its receipt; do not start another save.', 'error'); refreshDirty(); return; }
+    captured = null;
     for (const f of e.fields || []) { const k = f.field.split('.').pop(); if (k) errs[k] = f.message; }
     say('Not saved: ' + e.message, 'error'); busy = false; render(); return;
   }
   busy = false; refreshDirty();
 }
+async function retryCaptured() {
+  if (!captured || busy) return;
+  busy = true; refreshDirty(); say('Checking the captured save…');
+  try {
+    const submitted = captured;
+    const result = await api('/api/config/v1/apply', submitted);
+    captured = null; lastOperation = result.receipt && result.receipt.operation_id || lastOperation;
+    for (const [k, v] of Object.entries(submitted.updates)) if (D[k] === v) delete D[k];
+    await load(true);
+    say('Captured save confirmed. Changes apply to new work; restart DreamGraph for restart-only settings.', 'ok');
+  } catch (e) {
+    if (e.status !== undefined && e.status < 500) captured = null;
+    say(captured ? 'Save outcome still uncertain. Retry the same captured request.' : 'Save not confirmed: ' + e.message, 'error');
+  } finally { busy = false; refreshDirty(); }
+}
 async function undo() {
-  if (!lastOperation || busy) return; busy = true; refreshDirty();
+  if (!lastOperation || busy || captured || templateCapture) return; busy = true; refreshDirty();
   try { await api('/api/config/v1/undo', { expected_revision: snap.revision, operation_id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), undo_operation_id: lastOperation });
     lastOperation = null; busy = false; await load(false); say('Your last save was undone. Restart DreamGraph if it changed restart-only settings.', 'ok'); }
   catch (e) { busy = false; say('Undo failed: ' + e.message, 'error'); refreshDirty(); }
 }
 $('cw-save').addEventListener('click', save);
+$('cw-retry').addEventListener('click', retryCaptured);
 $('cw-undo').addEventListener('click', undo);
-$('cw-discard').addEventListener('click', () => { for (const k of Object.keys(D)) delete D[k]; for (const k of Object.keys(errs)) delete errs[k]; repoDirty = false; if (repos) repoDraft = repos.repositories.map(x => ({ ...x })); say('Edits discarded.'); render(); });
-$('cw-refresh').addEventListener('click', () => { if (Object.keys(D).length && !confirm('Reload engine.env and discard your unsaved edits?')) return; repos = null; repoDirty = false; load(false).then(() => say('Reloaded from engine.env.', 'ok')); });
+$('cw-discard').addEventListener('click', () => { if (captured || templateCapture) return; for (const k of Object.keys(D)) delete D[k]; for (const k of Object.keys(errs)) delete errs[k]; repoDirty = false; if (repos) repoDraft = repos.repositories.map(x => ({ ...x })); say('Edits discarded.'); render(); });
+$('cw-refresh').addEventListener('click', () => { if (busy || captured || templateCapture) return; if (Object.keys(D).length && !confirm('Reload engine.env and discard your unsaved edits?')) return; repos = null; repoDirty = false; load(false).then(() => say('Reloaded from engine.env.', 'ok')); });
 $('cw-tabs').addEventListener('click', e => { const b = e.target.closest('[role=tab]'); if (b) selectTab(b.dataset.tab); });
 $('cw-tabs').addEventListener('keydown', e => { const t = Array.from(root.querySelectorAll('#cw-tabs [role=tab]')), i = t.findIndex(b => b.dataset.tab === tab);
   const j = e.key === 'ArrowRight' ? (i + 1) % t.length : e.key === 'ArrowLeft' ? (i - 1 + t.length) % t.length : e.key === 'Home' ? 0 : e.key === 'End' ? t.length - 1 : -1;
   if (j >= 0) { e.preventDefault(); selectTab(t[j].dataset.tab); t[j].focus(); } });
-window.addEventListener('beforeunload', e => { if (Object.keys(D).length || repoDirty) { e.preventDefault(); e.returnValue = ''; } });
+window.addEventListener('beforeunload', e => { if (Object.keys(D).length || repoDirty || profileDirty || profileCaptured || templateCapture) { e.preventDefault(); e.returnValue = ''; } });
 /* Read engine.env every time the page (or the Architect tab showing it) becomes visible again. */
-document.addEventListener('visibilitychange', () => { if (!document.hidden && !busy && !Object.keys(D).length && !repoDirty) load(false); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !busy && !captured && !templateCapture && !Object.keys(D).length && !repoDirty) load(false); });
 selectTab(tab);
 load(false);
 })();`;

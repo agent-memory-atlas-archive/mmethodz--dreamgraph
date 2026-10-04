@@ -30,9 +30,9 @@ describe("configuration HTTP parity", () => {
     const before = await readFile(envPath, "utf8"), response = await post("/api/config/v1/apply", { expected_revision: state.result.revision, operation_id: "invalid", updates: { DG_SCHEDULER_TICK: "NaN" } });
     expect(response.status).toBe(400); expect(await readFile(envPath, "utf8")).toBe(before);
   });
-  it("saves scheduler settings through the rendered form and reloads exactly", async () => {
+  it("keeps the legacy scheduler form route revision checked and reloads exactly", async () => {
     const page = await (await fetch(base + "/config")).text(); expect(page).not.toContain("hidden-secret");
-    const revision = page.match(/name="_config_revision" value="([^"]+)"/)?.[1]; expect(revision).toBeTruthy();
+    const revision = page.match(/id="cw-revision" value="([^"]+)"/)?.[1]; expect(revision).toBeTruthy();
     const response = await fetch(base + "/config", { method: "POST", redirect: "manual", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ _section: "scheduler", _config_revision: revision!, _operation_id: "scheduler-form", enabled: "false", tick_interval_ms: "30000", max_runs_per_hour: "0", global_cooldown_ms: "0", nightmare_cooldown_ms: "300000", max_error_streak: "3" }) });
     expect(response.status).toBe(303); expect(getSchedulerConfig()).toMatchObject({ enabled: false, max_runs_per_hour: 0, global_cooldown_ms: 0 });
     const values = parseEngineEnvDocument(await readFile(envPath, "utf8")); expect(values.DG_SCHEDULER_MAX_RUNS_HR).toBeUndefined(); expect(values.CUSTOM_SETTING).toBe("unchanged"); expect(values.DREAMGRAPH_LLM_API_KEY).toBe("hidden-secret");

@@ -25,7 +25,8 @@ const create=(name="Maintenance")=>createSchedule({name,action:"graph_maintenanc
 async function eventually(test:()=>boolean|Promise<boolean>){for(let i=0;i<100;i++){if(await test())return;await new Promise(done=>setTimeout(done,20));}throw new Error("fixture condition not reached");}
 async function browser(query=""){const errors:string[]=[];const virtualConsole=new VirtualConsole();virtualConsole.on("jsdomError",error=>errors.push(error.message));
  dom=await JSDOM.fromURL(url+"/schedules"+query,{resources:"usable",runScripts:"dangerously",pretendToBeVisual:true,virtualConsole,beforeParse(window){window.fetch=((path:any,input:any)=>fetch(new URL(path,url),input)) as any;window.structuredClone=structuredClone;Object.defineProperty(window.crypto,"randomUUID",{value:randomUUID});window.HTMLElement.prototype.scrollIntoView=()=>{};}});
- await eventually(()=>!!dom!.window.document.querySelector("#sw-runtime")?.textContent?.includes("revision"));return {document:dom.window.document,errors};
+ await eventually(()=>dom!.window.document.querySelector("#schedule-workspace")?.getAttribute("data-loading")==="false" || errors.length>0);
+ if(errors.length)throw new Error(errors.join("\n"));return {document:dom.window.document,errors};
 }
 it("schema-derived action fields and draft preview validate without creating files/jobs or changing definitions",async()=>{
  const descriptors=scheduleActionDescriptors();expect(descriptors).toHaveLength(7);expect(descriptors.find(d=>d.action==="dream_cycle")!.fields.focus_hops.maximum).toBe(4);
@@ -49,70 +50,74 @@ it("enable and enqueue bind reviewed policy; lost replies replay originals rathe
  const current=(await getSchedules())[0],next=await scheduleDraftPreview({},current);vi.stubEnv("DREAMGRAPH_LLM_NORMALIZER_MODEL","other-model");
  const blocked=await post("/api/schedules/v2/commands",{target_id:current.id,expected_revision:2,operation_id:"run",action:"enqueue",preview_digest:next.preview_digest});expect(blocked.body.error).toBe("SCHEDULE_POLICY_PREVIEW_CONFLICT");expect((await new EngineJobs().inspect()).records).toHaveLength(0);
 });
-it("actual served browser script saves disabled, preserves invalid drafts, and supports keyboard tabs/filter/edit",async()=>{
+it("actual served browser script keeps invalid drafts and saves a disabled schedule without enqueueing work",async()=>{
  await create("Alpha");await create("Beta");const {document,errors}=await browser();
- (document.querySelector("#sw-new") as HTMLButtonElement).click();const form=document.querySelector("#sw-editor") as HTMLFormElement;
- (form.elements.namedItem("name") as HTMLInputElement).value="Browser created";
- const trigger=form.elements.namedItem("trigger_type") as HTMLSelectElement;trigger.value="cron_like";trigger.dispatchEvent(new dom!.window.Event("change",{bubbles:true}));
- (form.elements.namedItem("cron") as HTMLInputElement).value="bad cron";(document.querySelector("#sw-preview") as HTMLButtonElement).click();await eventually(()=>document.querySelector("#sw-field-errors")!.textContent!.includes("SCHEDULE_INVALID_CRON"));expect(form.hidden).toBe(false);expect(await getSchedules()).toHaveLength(2);
- trigger.value="interval";trigger.dispatchEvent(new dom!.window.Event("change",{bubbles:true}));(form.elements.namedItem("duration") as HTMLInputElement).value="2";(form.elements.namedItem("unit") as HTMLSelectElement).value="60000";
- form.dispatchEvent(new dom!.window.Event("submit",{bubbles:true,cancelable:true}));await eventually(async()=>(await getSchedules()).length===3);await eventually(()=>form.hidden&&document.querySelector("#sw-status")!.textContent!.includes("Authority readback"));
- expect((await getSchedules()).find(s=>s.name==="Browser created")).toMatchObject({enabled:false,interval_ms:120000});expect((await new EngineJobs().inspect()).records).toHaveLength(0);
- const tab=document.querySelector("#sw-tab-schedules") as HTMLButtonElement;tab.focus();tab.dispatchEvent(new dom!.window.KeyboardEvent("keydown",{key:"End",bubbles:true}));expect(document.querySelector("#sw-tab-runs")!.getAttribute("aria-selected")).toBe("true");
- expect(errors).toEqual([]);
+ (document.querySelector("#sw-new") as HTMLButtonElement).click();
+ const name=document.querySelector("#se-name") as HTMLInputElement;name.value="Browser created";name.dispatchEvent(new dom!.window.Event("input"));
+ const calendar=document.querySelector('input[name="se-trigger"][value="cron_like"]') as HTMLInputElement;calendar.click();
+ const cron=Array.from(document.querySelectorAll<HTMLInputElement>('.sch-grid input')).find(input=>input.placeholder?.includes('minute hour'))!;
+ cron.value="bad cron";cron.dispatchEvent(new dom!.window.Event("input"));
+ await eventually(()=>!!document.querySelector("#se-error")?.textContent);expect(await getSchedules()).toHaveLength(2);
+ (document.querySelector('input[name="se-trigger"][value="interval"]') as HTMLInputElement).click();
+ const every=document.querySelector('.sch-inline input[type="number"]') as HTMLInputElement;every.value="2";every.dispatchEvent(new dom!.window.Event("input"));
+ const unit=document.querySelector('.sch-inline select') as HTMLSelectElement;unit.value="60000";unit.dispatchEvent(new dom!.window.Event("change"));
+ (document.querySelector("#se-enabled") as HTMLInputElement).click();
+ (document.querySelector("#se-save") as HTMLButtonElement).click();
+ await eventually(async()=>(await getSchedules()).length===3);
+ await eventually(()=>document.querySelectorAll('.sch-row').length===3 && document.querySelector("#sw-editor-host")!.hasAttribute("hidden"));
+ expect((await getSchedules()).find(s=>s.name==="Browser created")).toMatchObject({enabled:false,interval_ms:120000});
+ expect((await new EngineJobs().inspect()).records).toHaveLength(0);expect(errors).toEqual([]);
 });
-it("captured menu targets survive selection changes and stale edits fail while source history survives",async()=>{
+it("an edit remains bound to its original schedule and rejects an out-of-date revision",async()=>{
  const alpha=await create("Alpha"),beta=await create("Beta");const {document,errors}=await browser();
- const row=Array.from(document.querySelectorAll(".sw-row")).find(row=>row.textContent!.includes("Alpha"))!;const overflow=row.querySelector('[aria-label="Actions for Alpha"]') as HTMLButtonElement;overflow.click();
- const menu=document.querySelector('[role="menu"]')!;const edit=Array.from(menu.querySelectorAll("button")).find(b=>b.textContent==="Edit")!;
- (Array.from(document.querySelectorAll(".sw-select")).find(b=>b.textContent!.startsWith("Beta")) as HTMLButtonElement).click();edit.click();
- const form=document.querySelector("#sw-editor") as HTMLFormElement;expect((form.elements.namedItem("name") as HTMLInputElement).value).toBe("Alpha");
- await updateSchedule(alpha.id,{name:"Other client"},{expected_revision:1,operation_id:"other"});(form.elements.namedItem("name") as HTMLInputElement).value="Lost edit";form.dispatchEvent(new dom!.window.Event("submit",{bubbles:true,cancelable:true}));
- await eventually(()=>document.querySelector("#sw-status")!.textContent!.includes("SCHEDULE_REVISION_CONFLICT"));expect(form.hidden).toBe(false);expect((await getSchedules()).find(s=>s.id===beta.id)!.name).toBe("Beta");expect((await getSchedules()).find(s=>s.id===alpha.id)!.name).toBe("Other client");expect(errors).toEqual([]);
+ (document.querySelector('[aria-label="Edit Alpha"]') as HTMLButtonElement).click();
+ expect((document.querySelector("#se-name") as HTMLInputElement).value).toBe("Alpha");
+ await updateSchedule(alpha.id,{name:"Other client"},{expected_revision:1,operation_id:"other"});
+ const name=document.querySelector("#se-name") as HTMLInputElement;name.value="Lost edit";name.dispatchEvent(new dom!.window.Event("input"));
+ (document.querySelector("#se-save") as HTMLButtonElement).click();
+ await eventually(()=>document.querySelector("#se-error")!.textContent!.includes("changed elsewhere"));
+ expect(document.querySelector("#sw-editor-host")!.hasAttribute("hidden")).toBe(false);
+ expect((await getSchedules()).find(s=>s.id===beta.id)!.name).toBe("Beta");
+ expect((await getSchedules()).find(s=>s.id===alpha.id)!.name).toBe("Other client");expect(errors).toEqual([]);
 });
 it("shows an invalid legacy strategy without flooding the row or silently replacing its value",async()=>{
  const schedule=await createSchedule({name:"Stabilize additive scan",action:"dream_cycle",parameters:{strategy:"all"},trigger_type:"interval",interval_ms:60000});
  const file=JSON.parse(await readFile(join(directory,"schedules.json"),"utf8"));file.schedules[0].parameters.strategy="associative";
  await commitGraphWrites({actor:"legacy-fixture",scope:["schedules.json"],writes:[{file:"schedules.json",content:JSON.stringify(file)}]});
- const {document,errors}=await browser();const row=document.querySelector(".sw-row")!;
- expect(row.querySelector(".sw-row-status")!.textContent).toBe("Invalid definition");
- expect(row.querySelector(".sw-row-status")!.textContent).not.toContain("invalid_enum_value");
- expect(row.querySelector(".sw-select")!.textContent).toContain("Stabilize additive scan");
- (row.querySelector(".sw-select") as HTMLButtonElement).click();
- expect(document.querySelector(".sw-invalid")!.textContent).toContain("associative");
- expect(document.querySelector(".sw-invalid")!.textContent).toContain("dispatch blocked");
- expect((Array.from(document.querySelectorAll("#sw-detail button")).find(node=>node.textContent==="Run now") as HTMLButtonElement).disabled).toBe(true);
- (Array.from(document.querySelectorAll("#sw-detail button")).find(node=>node.textContent==="Edit") as HTMLButtonElement).click();
- const form=document.querySelector("#sw-editor") as HTMLFormElement,strategy=form.elements.namedItem("param:strategy") as HTMLSelectElement;
+ const {document,errors}=await browser();const row=document.querySelector(".sch-row")!;
+ expect(row.querySelector(".sch-problem")!.textContent).toContain("saved definition is no longer valid");
+ expect(row.querySelector(".sch-problem")!.textContent).not.toContain("invalid_enum_value");
+ expect(row.querySelector(".sch-name")!.textContent).toContain("Stabilize additive scan");
+ expect((row.querySelector('[aria-label^="Run "]') as HTMLButtonElement).disabled).toBe(true);
+ (row.querySelector('[aria-label^="Edit "]') as HTMLButtonElement).click();
+ const strategy=Array.from(document.querySelectorAll<HTMLSelectElement>('#sw-editor-host select')).find(select=>Array.from(select.options).some(option=>option.value==='associative'))!;
  expect(strategy.value).toBe("associative");expect(strategy.selectedOptions[0].textContent).toContain("Unsupported legacy value");
- (document.querySelector("#sw-preview") as HTMLButtonElement).click();
- await eventually(()=>document.querySelector("#sw-field-errors")!.textContent!.includes("parameters.strategy"));
+ await eventually(()=>document.querySelector("#se-error")!.textContent!.includes("Strategy"));
  expect((await getSchedules()).find(item=>item.id===schedule.id)!.parameters.strategy).toBe("associative");
  strategy.value="all";strategy.dispatchEvent(new dom!.window.Event("change",{bubbles:true}));
- form.dispatchEvent(new dom!.window.Event("submit",{bubbles:true,cancelable:true}));
+ (document.querySelector("#se-save") as HTMLButtonElement).click();
  await eventually(async()=>((await getSchedules()).find(item=>item.id===schedule.id)?.parameters.strategy)==="all");
- await eventually(()=>form.hidden&&document.querySelector("#sw-status")!.textContent!.includes("Authority readback"));
+ await eventually(()=>document.querySelector("#sw-editor-host")!.hasAttribute("hidden") && !document.querySelector('.sch-row .sch-problem'));
  expect(errors).toEqual([]);
 });
 
 it('captured schedule navigation opens the exact draft or run preview without mutating definitions or enqueueing work',async()=>{
  const alpha=await create('Captured Alpha'),beta=await create('Other Beta');const before=await getSchedules();
  const {document,errors}=await browser('?'+new URLSearchParams({schedule:alpha.id,revision:String(alpha.definition_revision),view:'run'}));
- await eventually(()=>!!document.querySelector('.sw-confirm'));
- expect(document.querySelector('#sw-detail')!.textContent).toContain('Captured Alpha');expect(document.querySelector('.sw-confirm')!.textContent).toContain('Enqueue this run');
+ await eventually(()=>!!document.querySelector('.sch-confirm'));
+ expect(document.querySelector('.sch-row[data-id="'+alpha.id+'"]')!.textContent).toContain('Captured Alpha');expect(document.querySelector('.sch-confirm')!.textContent).toContain('Enqueue this run');
  expect(await getSchedules()).toEqual(before);expect((await new EngineJobs().inspect()).records).toHaveLength(0);
- (document.querySelector('#sw-refresh') as HTMLButtonElement).click();await eventually(()=>document.querySelector('#sw-status')!.textContent!.startsWith('Authority readback'));
- expect(document.querySelector('.sw-confirm')!.textContent).toContain('Enqueue this run');expect((await getSchedules()).find(s=>s.id===beta.id)!.name).toBe('Other Beta');expect(errors).toEqual([]);
+ expect((await getSchedules()).find(s=>s.id===beta.id)!.name).toBe('Other Beta');expect(errors).toEqual([]);
 });
 it('stale captured schedule navigation shows inspection and never opens or dispatches a replacement action',async()=>{
  const alpha=await create('Before edit');await updateSchedule(alpha.id,{name:'New definition'},{expected_revision:alpha.definition_revision,operation_id:'navigation-other-owner'});
  const {document,errors}=await browser('?'+new URLSearchParams({schedule:alpha.id,revision:String(alpha.definition_revision),view:'run'}));
  await eventually(()=>document.querySelector('#sw-status')!.textContent!.includes('revision changed'));
- expect(document.querySelector('#sw-detail')!.textContent).toContain('New definition');expect(document.querySelector('.sw-confirm')).toBeNull();expect((document.querySelector('#sw-editor') as HTMLFormElement).hidden).toBe(true);
+ expect(document.querySelector('.sch-row[data-id="'+alpha.id+'"]')!.textContent).toContain('New definition');expect(document.querySelector('.sch-confirm')).toBeNull();expect(document.querySelector('#sw-editor-host')!.hasAttribute('hidden')).toBe(true);
  expect((await new EngineJobs().inspect()).records).toHaveLength(0);expect(errors).toEqual([]);
 });
 it('missing captured schedule navigation retains an honest unavailable selection rather than opening another definition',async()=>{
  await create('Available different definition');const {document,errors}=await browser('?schedule=missing-original&revision=1&view=edit');
  await eventually(()=>document.querySelector('#sw-status')!.textContent!.includes('No replacement selected'));
- expect(document.querySelector('#sw-detail')!.textContent).toContain('Select a definition');expect((document.querySelector('#sw-editor') as HTMLFormElement).hidden).toBe(true);expect((await new EngineJobs().inspect()).records).toHaveLength(0);expect(errors).toEqual([]);
+ expect(document.querySelector('#sw-editor-host')!.hasAttribute('hidden')).toBe(true);expect((await new EngineJobs().inspect()).records).toHaveLength(0);expect(errors).toEqual([]);
 });

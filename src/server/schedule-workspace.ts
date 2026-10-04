@@ -308,6 +308,8 @@ function paramControls() {
     let c;
     if (f.type === 'enum') {
       c = h('select', {}, ...(f.options || []).filter(o => !(RETIRED[name] || []).includes(o)).map(o => h('option', { value: o }, STRATEGY[o] || o.replace(/_/g, ' ').replace(/^./, x => x.toUpperCase()))));
+      if (v !== undefined && !Array.from(c.options).some(option => option.value === String(v)))
+        c.prepend(h('option', { value: String(v) }, 'Unsupported legacy value: ' + v));
       if (v !== undefined) c.value = v; bindInput(c, x => { editor.parameters[name] = x; });
     } else if (f.type === 'number') {
       c = h('input', { type: 'number', min: f.minimum, max: f.maximum, step: 1, value: v !== undefined ? v : '' });
@@ -443,8 +445,20 @@ setInterval(() => { if (!document.hidden && !editor && !busy) load(); }, 30000);
 const nav = new URLSearchParams(location.search);
 load().then(() => {
   const id = nav.get('schedule'), view = nav.get('view'), s = id && snap && snap.schedules.find(x => x.id === id);
-  if (!s) { if (nav.get('new') === '1') openEditor(null); return; }
-  if (view === 'edit') openEditor(s); else if (view === 'run') runNow(s); else if (view === 'enable') enable(s);
-  const row = root.querySelector('[data-id="' + CSS.escape(s.id) + '"]'); if (row) { row.scrollIntoView({ block: 'center' }); row.style.outline = '2px solid #4f86ba'; }
+  if (!s) { if (nav.get('new') === '1') openEditor(null); else if (id) say('Original schedule unavailable. No replacement selected.', 'error'); return; }
+  const revision = nav.get('revision');
+  if (revision !== null && String(s.definition_revision) !== revision) {
+    say('This schedule revision changed. Review the current definition before taking action.', 'error');
+  } else if (view === 'edit') openEditor(s);
+  else if (view === 'run' || view === 'enable') {
+    const label = view === 'run' ? 'Enqueue this run' : 'Turn on this schedule';
+    confirmFor = { id: s.id, node: h('div', { class: 'sch-confirm', role: 'group' },
+      h('span', { class: 'grow' }, label + ' for "' + s.name + '"? Review the current definition first.'),
+      h('button', { type: 'button', class: 'sch-primary', onclick: () => { confirmFor = null; view === 'run' ? runNow(s) : enable(s); } }, label),
+      h('button', { type: 'button', onclick: () => { confirmFor = null; renderList(); } }, 'Cancel')) };
+    renderList();
+  }
+  const row = Array.from(root.querySelectorAll('[data-id]')).find(node => node.getAttribute('data-id') === s.id);
+  if (row) { row.scrollIntoView({ block: 'center' }); row.style.outline = '2px solid #4f86ba'; }
 });
 })();`;

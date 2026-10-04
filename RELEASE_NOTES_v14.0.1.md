@@ -24,7 +24,9 @@ The first field patch for Ashoka. It makes every known legacy graph upgrade with
 ## Architect, configuration and schedules
 
 - **Configuration:** the Config pages were rebuilt in plain language. The daemon re-applies engine.env edits without a restart. *Time limit per task* (`DREAMGRAPH_ARCHITECT_PASS_TIMEOUT_MS`, 1–240 minutes, default 30) can be raised for Computer Use work.
+- **Configuration recovery:** template preview/apply/undo and scoped browser-worker/target editing remain available. An uncertain save retains its original request for exact retry; recovering it preserves later draft edits.
 - **Schedules:** the Schedules workspace was rebuilt, with compact rows, a live next-run preview and a table of recent runs. This has not yet been tested on a live instance.
+- **Captured schedule links:** opening a run/enable link shows a review step rather than dispatching immediately. Missing or changed revisions refuse the captured action; unsupported legacy strategy values remain visible for correction.
 - **Budgets:** variance halts now apply only to paid API billing. Paid halts can be reviewed and resumed under Config → Budgets & limits.
 - **Leases and errors:** execution leases are rolling, and stale ones end. Execution requests accept the whole-pass time limit. Admission and Architect errors are shown in plain language instead of raw JSON.
 - **Chat and model:** a visible Clear chat button clears the transcript only; the graph is untouched. The Codex default model is `gpt-6.1-sol`.

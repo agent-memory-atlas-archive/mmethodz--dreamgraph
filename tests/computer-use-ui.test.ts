@@ -10,8 +10,9 @@ const initialResponse=(path:string)=>path.includes('/sessions?')?emptySessions:s
 beforeEach(()=>{calls=[];respond=initialResponse;dom=new JSDOM('<select id="architect-adapter-select"><option value="native_api_tool_loop">API</option><option value="codex-cli">CLI</option></select>'+COMPUTER_USE_MARKUP,{url:"http://127.0.0.1:8010/architect",runScripts:"outside-only"});
  Object.assign(dom.window,{fetch:async(path:string,options?:{body?:string})=>{const body=options?.body?JSON.parse(options.body):null;calls.push({path,body});const result=respond(path,body);return {ok:true,json:async()=>result};},AbortSignal});dom.window.eval(COMPUTER_USE_SCRIPT);});
 afterEach(()=>{dom.window.dispatchEvent(new dom.window.Event("pagehide"));dom.window.close();vi.restoreAllMocks();});
-it("opening/inspecting scope does not mint permission or create a pass and does not add a startup request",async()=>{
- expect(calls).toEqual([]);click("computer-use-open");await vi.waitFor(()=>expect(calls).toHaveLength(2));
+it("reads policy at startup while inspecting scope never mints permission or creates a pass",async()=>{
+ await vi.waitFor(()=>expect(calls.some(call=>call.path==="/api/computer-use/v1/policy")).toBe(true));
+ expect(calls.every(call=>!call.body)).toBe(true);click("computer-use-open");await vi.waitFor(()=>expect(calls.filter(call=>call.path.includes('/api/architect/v1/computer/'))).toHaveLength(2));
  expect(calls.some(call=>call.path.includes("setup?adapter=native_api_tool_loop"))).toBe(true);expect(dom.window.document.getElementById("computer-use-drawer")!.hasAttribute("hidden")).toBe(false);
  expect(dom.window.document.getElementById("computer-use-confirm")!.hasAttribute("hidden")).toBe(true);
 });
@@ -29,8 +30,9 @@ it("exact human confirmation is separate from preparation and loss retries prese
 it("an unavailable native CLI keeps the requested mechanism visible and cannot prepare a harness",async()=>{
  respond=path=>path.includes('/sessions?')?emptySessions:({ok:true,available:false,route:"native_cli",reasons:["COMPUTER_NATIVE_CLI_CONFORMANCE_UNAVAILABLE"]});
  (dom.window.document.getElementById("architect-adapter-select") as HTMLSelectElement).value="codex-cli";click("computer-use-open");
- await vi.waitFor(()=>expect(dom.window.document.getElementById("computer-use-setup")!.textContent).toContain("NATIVE_CLI_CONFORMANCE_UNAVAILABLE"));
- expect((dom.window.document.getElementById("computer-use-prepare") as HTMLButtonElement).disabled).toBe(true);expect(calls).toHaveLength(2);
+ await vi.waitFor(()=>expect(dom.window.document.getElementById("computer-use-setup")!.textContent).toContain("native cli conformance unavailable"));
+ expect((dom.window.document.getElementById("computer-use-prepare") as HTMLButtonElement).disabled).toBe(true);
+ expect(calls.filter(call=>call.path.includes('/api/architect/v1/computer/'))).toHaveLength(2);
 });
 function journal(id="computer-one",state="recovery_required",stop_state="unknown") {return {session:{id,state,host_id:"original-host",terminal_reason:null},
  targets:[{origin:"https://fixture.example"}],capability:{effective:["observe","type"]},limits:{expires_at:new Date(Date.now()+30000).toISOString()},
@@ -78,9 +80,9 @@ function changeRole(value:string){const select=dom.window.document.getElementByI
 it("a late setup for the old model cannot enable a rejected new model",async()=>{
  let reply!:(value:unknown)=>void;const late=new Promise(resolve=>reply=resolve);
  respond=path=>path.includes('/sessions?')?emptySessions:path.includes('model_role=architect')?late:{...setup,available:false,reason:"NEW_ROLE_UNAVAILABLE"};
- click("computer-use-open");await vi.waitFor(()=>expect(calls).toHaveLength(2));changeRole("computer_use");
- await vi.waitFor(()=>expect(dom.window.document.getElementById("computer-use-setup")!.textContent).toContain("NEW_ROLE_UNAVAILABLE"));reply(setup);await late;await new Promise(resolve=>setTimeout(resolve,0));
- expect((dom.window.document.getElementById("computer-use-prepare") as HTMLButtonElement).disabled).toBe(true);expect(dom.window.document.getElementById("computer-use-setup")!.textContent).toContain("NEW_ROLE_UNAVAILABLE");
+ click("computer-use-open");await vi.waitFor(()=>expect(calls.filter(call=>call.path.includes('/api/architect/v1/computer/'))).toHaveLength(2));changeRole("computer_use");
+ await vi.waitFor(()=>expect(dom.window.document.getElementById("computer-use-setup")!.textContent).toContain("Browser harness not available"));reply(setup);await late;await new Promise(resolve=>setTimeout(resolve,0));
+ expect((dom.window.document.getElementById("computer-use-prepare") as HTMLButtonElement).disabled).toBe(true);expect(dom.window.document.getElementById("computer-use-setup")!.textContent).toContain("Browser harness not available");
 });
 it.each(["prepare","confirm"])("a late %s reply cannot attach the old scope to a new model selection",async phase=>{
  let reply!:(value:unknown)=>void;const late=new Promise(resolve=>reply=resolve),prepared={id:"old-preparation",execution_id:"old-execution",interact:true,...setup};

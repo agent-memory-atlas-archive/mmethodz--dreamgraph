@@ -37,7 +37,9 @@ export const COMPUTER_USE_SCRIPT=String.raw`
         lines.push(d?('Codex CLI '+d.version+' has its own Computer Use.'):'This CLI engine uses its own Computer Use when available.');
         if(d&&d.features){const f=Object.entries(d.features).map(([name,v])=>name.replace(/_/g,' ')+': '+(v.enabled?'available':'off')+(v.stage&&v.stage!=='stable'?' ('+v.stage+')':''));if(f.length)lines.push(f.join(' · '));}
         lines.push('DreamGraph switches it on per task according to the Computer Use setting ('+(COMPUTER_POLICY_LABEL[computerPolicy]||'').replace('Computer Use: ','')+').');
-        lines.push('The harness below is only used with the API engine.');return lines.join('\n');}
+        lines.push('The harness below is only used with the API engine.');
+        if(value.available===false&&value.reasons?.length)lines.push('Native CLI unavailable: '+value.reasons.map(computerWords).join(', ')+'.');
+        return lines.join('\n');}
       if(value.available){const c=value.capability||{},p=value.profile||{};return 'Browser harness ready'+(p.main_origin?' for '+p.main_origin:'')+'.\n'+(c.effective&&c.effective.length?'Allowed: '+c.effective.join(', ')+'.':'')+'\nPrepare the next pass to review its scope and limits.';}
       return 'Browser harness not available: '+(value.reasons||[]).map(computerWords).join(', ')+'.'+(value.remedy?'\n'+value.remedy:'');}
     function computerShowSetup(value){computerSetupEl.textContent=computerSetupText(value);computerImageEl.hidden=true;computerImageEl.removeAttribute('src');}
