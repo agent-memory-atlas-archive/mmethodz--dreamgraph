@@ -49,7 +49,7 @@
       "documented": [
         {
           "file": "README.md",
-          "line": 124
+          "line": 126
         },
         {
           "file": "templates/default/config/engine.env",
@@ -173,14 +173,14 @@
       "consumers": [
         {
           "file": "src/cognitive/engine.ts",
-          "line": 173,
+          "line": 174,
           "expression": "Number(process.env.DG_BOOTSTRAP_MAX_CYCLES)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/engine.ts",
-        "line": 173,
+        "line": 174,
         "expression": "Number(process.env.DG_BOOTSTRAP_MAX_CYCLES)"
       }
     },
@@ -213,14 +213,14 @@
       "consumers": [
         {
           "file": "src/cognitive/engine.ts",
-          "line": 175,
+          "line": 176,
           "expression": "Number(process.env.DG_BOOTSTRAP_MAX_HOURS)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/engine.ts",
-        "line": 175,
+        "line": 176,
         "expression": "Number(process.env.DG_BOOTSTRAP_MAX_HOURS)"
       }
     },
@@ -261,14 +261,14 @@
       "consumers": [
         {
           "file": "src/cognitive/engine.ts",
-          "line": 169,
+          "line": 170,
           "expression": "Number(process.env.DG_BOOTSTRAP_MIN_ENTITIES)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/engine.ts",
-        "line": 169,
+        "line": 170,
         "expression": "Number(process.env.DG_BOOTSTRAP_MIN_ENTITIES)"
       }
     },
@@ -309,14 +309,14 @@
       "consumers": [
         {
           "file": "src/cognitive/engine.ts",
-          "line": 171,
+          "line": 172,
           "expression": "Number(process.env.DG_BOOTSTRAP_MIN_VALIDATED_EDGES)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/engine.ts",
-        "line": 171,
+        "line": 172,
         "expression": "Number(process.env.DG_BOOTSTRAP_MIN_VALIDATED_EDGES)"
       }
     },
@@ -349,14 +349,14 @@
       "consumers": [
         {
           "file": "src/cognitive/engine.ts",
-          "line": 180,
+          "line": 181,
           "expression": "Number(process.env.DG_BOOTSTRAP_RELAXED_CONFIDENCE)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/engine.ts",
-        "line": 180,
+        "line": 181,
         "expression": "Number(process.env.DG_BOOTSTRAP_RELAXED_CONFIDENCE)"
       }
     },
@@ -962,14 +962,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2378,
+          "line": 2385,
           "expression": "cooldown_ms: engineEnvNumber(\"DG_EVENT_COOLDOWN\", 60_000)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2378,
+        "line": 2385,
         "expression": "cooldown_ms: engineEnvNumber(\"DG_EVENT_COOLDOWN\", 60_000)"
       }
     },
@@ -1002,14 +1002,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2377,
+          "line": 2384,
           "expression": "runtime_error_threshold: engineEnvNumber(\"DG_EVENT_ERROR_THRESHOLD\", 0.05)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2377,
+        "line": 2384,
         "expression": "runtime_error_threshold: engineEnvNumber(\"DG_EVENT_ERROR_THRESHOLD\", 0.05)"
       }
     },
@@ -1050,14 +1050,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2379,
+          "line": 2386,
           "expression": "max_auto_cycles_per_hour: engineEnvNumber(\"DG_EVENT_MAX_CYCLES_HR\", 10)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2379,
+        "line": 2386,
         "expression": "max_auto_cycles_per_hour: engineEnvNumber(\"DG_EVENT_MAX_CYCLES_HR\", 10)"
       }
     },
@@ -1090,14 +1090,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2376,
+          "line": 2383,
           "expression": "tension_threshold: engineEnvNumber(\"DG_EVENT_TENSION_THRESHOLD\", 0.8)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2376,
+        "line": 2383,
         "expression": "tension_threshold: engineEnvNumber(\"DG_EVENT_TENSION_THRESHOLD\", 0.8)"
       }
     },
@@ -1422,19 +1422,19 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2455,
+          "line": 2462,
           "expression": "process.env.DG_NARRATIVE_AUTO !== undefined"
         },
         {
           "file": "src/cognitive/types.ts",
-          "line": 2456,
+          "line": 2463,
           "expression": "process.env.DG_NARRATIVE_AUTO !== \"false\""
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2455,
+        "line": 2462,
         "expression": "process.env.DG_NARRATIVE_AUTO !== undefined"
       }
     },
@@ -1480,14 +1480,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2453,
+          "line": 2460,
           "expression": "digest_interval: engineEnvNumber(\"DG_NARRATIVE_DIGEST_INTERVAL\", 50)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2453,
+        "line": 2460,
         "expression": "digest_interval: engineEnvNumber(\"DG_NARRATIVE_DIGEST_INTERVAL\", 50)"
       }
     },
@@ -1533,14 +1533,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2452,
+          "line": 2459,
           "expression": "narrative_interval: engineEnvNumber(\"DG_NARRATIVE_INTERVAL\", 10)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2452,
+        "line": 2459,
         "expression": "narrative_interval: engineEnvNumber(\"DG_NARRATIVE_INTERVAL\", 10)"
       }
     },
@@ -1586,14 +1586,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2454,
+          "line": 2461,
           "expression": "max_chapters: engineEnvNumber(\"DG_NARRATIVE_MAX_CHAPTERS\", 100)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2454,
+        "line": 2461,
         "expression": "max_chapters: engineEnvNumber(\"DG_NARRATIVE_MAX_CHAPTERS\", 100)"
       }
     },
@@ -2201,14 +2201,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2589,
+          "line": 2596,
           "expression": "global_cooldown_ms: engineEnvNumber(\"DG_SCHEDULER_COOLDOWN\", 10_000)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2589,
+        "line": 2596,
         "expression": "global_cooldown_ms: engineEnvNumber(\"DG_SCHEDULER_COOLDOWN\", 10_000)"
       }
     },
@@ -2226,19 +2226,19 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2584,
+          "line": 2591,
           "expression": "process.env.DG_SCHEDULER_ENABLED !== undefined"
         },
         {
           "file": "src/cognitive/types.ts",
-          "line": 2585,
+          "line": 2592,
           "expression": "process.env.DG_SCHEDULER_ENABLED !== \"false\""
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2584,
+        "line": 2591,
         "expression": "process.env.DG_SCHEDULER_ENABLED !== undefined"
       }
     },
@@ -2284,14 +2284,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2593,
+          "line": 2600,
           "expression": "execution_timeout_ms: engineEnvNumber(\"DG_SCHEDULER_EXEC_TIMEOUT\", 600_000)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2593,
+        "line": 2600,
         "expression": "execution_timeout_ms: engineEnvNumber(\"DG_SCHEDULER_EXEC_TIMEOUT\", 600_000)"
       }
     },
@@ -2337,14 +2337,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2592,
+          "line": 2599,
           "expression": "max_error_streak: engineEnvNumber(\"DG_SCHEDULER_MAX_ERROR_STREAK\", 3)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2592,
+        "line": 2599,
         "expression": "max_error_streak: engineEnvNumber(\"DG_SCHEDULER_MAX_ERROR_STREAK\", 3)"
       }
     },
@@ -2390,14 +2390,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2591,
+          "line": 2598,
           "expression": "max_history: engineEnvNumber(\"DG_SCHEDULER_MAX_HISTORY\", 500)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2591,
+        "line": 2598,
         "expression": "max_history: engineEnvNumber(\"DG_SCHEDULER_MAX_HISTORY\", 500)"
       }
     },
@@ -2438,14 +2438,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2588,
+          "line": 2595,
           "expression": "max_runs_per_hour: engineEnvNumber(\"DG_SCHEDULER_MAX_RUNS_HR\", 30)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2588,
+        "line": 2595,
         "expression": "max_runs_per_hour: engineEnvNumber(\"DG_SCHEDULER_MAX_RUNS_HR\", 30)"
       }
     },
@@ -2486,14 +2486,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2590,
+          "line": 2597,
           "expression": "nightmare_cooldown_ms: engineEnvNumber(\"DG_SCHEDULER_NIGHTMARE_COOLDOWN\", 300_000)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2590,
+        "line": 2597,
         "expression": "nightmare_cooldown_ms: engineEnvNumber(\"DG_SCHEDULER_NIGHTMARE_COOLDOWN\", 300_000)"
       }
     },
@@ -2539,14 +2539,14 @@
       "consumers": [
         {
           "file": "src/cognitive/types.ts",
-          "line": 2587,
+          "line": 2594,
           "expression": "tick_interval_ms: engineEnvNumber(\"DG_SCHEDULER_TICK\", 30_000)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/types.ts",
-        "line": 2587,
+        "line": 2594,
         "expression": "tick_interval_ms: engineEnvNumber(\"DG_SCHEDULER_TICK\", 30_000)"
       }
     },
@@ -2841,6 +2841,92 @@
           {
             "kind": "max",
             "value": 16384
+          }
+        ]
+      },
+      "consumers": [],
+      "documented": [],
+      "default_source": null
+    },
+    {
+      "key": "DREAMGRAPH_ARCHITECT_PASS_IDLE_MS",
+      "owner": "architect",
+      "unit": "milliseconds",
+      "apply": "next_execution",
+      "secret": false,
+      "protected": false,
+      "description": "A pass with no activity (worker tool calls or CLI output) for this long is treated as stale and stopped. Default 15 minutes.",
+      "constraints": {
+        "type": "integer",
+        "checks": [
+          {
+            "kind": "finite"
+          },
+          {
+            "kind": "int"
+          },
+          {
+            "kind": "min",
+            "value": 0,
+            "inclusive": true
+          },
+          {
+            "kind": "max",
+            "value": 9007199254740991,
+            "inclusive": true
+          },
+          {
+            "kind": "max",
+            "value": 86400000,
+            "inclusive": true
+          },
+          {
+            "kind": "min",
+            "value": 60000,
+            "inclusive": true
+          }
+        ]
+      },
+      "consumers": [],
+      "documented": [],
+      "default_source": null
+    },
+    {
+      "key": "DREAMGRAPH_ARCHITECT_PASS_TIMEOUT_MS",
+      "owner": "architect",
+      "unit": "milliseconds",
+      "apply": "next_execution",
+      "secret": false,
+      "protected": false,
+      "description": "Finite maximum for one whole Architect pass (all tool calls), separate from the per-request model timeout. Never extended by activity. Default 30 minutes.",
+      "constraints": {
+        "type": "integer",
+        "checks": [
+          {
+            "kind": "finite"
+          },
+          {
+            "kind": "int"
+          },
+          {
+            "kind": "min",
+            "value": 0,
+            "inclusive": true
+          },
+          {
+            "kind": "max",
+            "value": 9007199254740991,
+            "inclusive": true
+          },
+          {
+            "kind": "max",
+            "value": 86400000,
+            "inclusive": true
+          },
+          {
+            "kind": "min",
+            "value": 60000,
+            "inclusive": true
           }
         ]
       },
@@ -3187,19 +3273,19 @@
       "consumers": [
         {
           "file": "src/cognitive/engine.ts",
-          "line": 1169,
+          "line": 1170,
           "expression": "process.env.DREAMGRAPH_AUTO_APPLY_RESOLUTION_PLANS === \"1\""
         },
         {
           "file": "src/cognitive/engine.ts",
-          "line": 1170,
+          "line": 1171,
           "expression": "process.env.DREAMGRAPH_AUTO_APPLY_RESOLUTION_PLANS === \"true\""
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/engine.ts",
-        "line": 1169,
+        "line": 1170,
         "expression": "process.env.DREAMGRAPH_AUTO_APPLY_RESOLUTION_PLANS === \"1\""
       }
     },
@@ -3304,6 +3390,35 @@
         "file": "extensions/vscode/src/architect-core/adapters/copilot-cli/host/bridge-entry.ts",
         "line": 78,
         "expression": "process.env[\"DREAMGRAPH_BRIDGE_AUDIT_DIR\"] ?? \"\""
+      }
+    },
+    {
+      "key": "DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE",
+      "owner": "Architect bridge",
+      "unit": "value",
+      "apply": "read_only",
+      "secret": false,
+      "protected": true,
+      "description": "Pass-local authority signal: 1 means instance policy permits requesting Computer Use approval for this execution. It is set by the daemon, not an operator grant or editable engine setting.",
+      "constraints": {
+        "type": "string",
+        "enum": [
+          "0",
+          "1"
+        ]
+      },
+      "consumers": [
+        {
+          "file": "src/architect/cli-mcp-bridge.ts",
+          "line": 42,
+          "expression": "process.env.DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE === \"1\""
+        }
+      ],
+      "documented": [],
+      "default_source": {
+        "file": "src/architect/cli-mcp-bridge.ts",
+        "line": 42,
+        "expression": "process.env.DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE === \"1\""
       }
     },
     {
@@ -3425,22 +3540,22 @@
         },
         {
           "file": "src/architect/cli-mcp-bridge.ts",
-          "line": 51,
+          "line": 53,
           "expression": "process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER ?? \"\""
         },
         {
           "file": "src/architect/cli-mcp-bridge.ts",
-          "line": 102,
+          "line": 104,
           "expression": "process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER ? { \"X-DreamGraph-Session\": process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER } : {}"
         },
         {
           "file": "src/architect/cli-mcp-bridge.ts",
-          "line": 102,
+          "line": 104,
           "expression": "\"X-DreamGraph-Session\": process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER"
         },
         {
           "file": "src/architect/cli-mcp-bridge.ts",
-          "line": 331,
+          "line": 358,
           "expression": "process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER ?? \"\""
         }
       ],
@@ -3471,6 +3586,35 @@
       "consumers": [],
       "documented": [],
       "default_source": null
+    },
+    {
+      "key": "DREAMGRAPH_CODEX_CUA_TRANSPORT",
+      "owner": "Codex CLI Computer Use runtime",
+      "unit": "value",
+      "apply": "read_only",
+      "secret": false,
+      "protected": true,
+      "description": "Internal process transport switch. Default is verified stdio; daemon-http is an explicit experimental opt-in and never grants Computer Use or changes instance policy.",
+      "constraints": {
+        "type": "string",
+        "enum": [
+          "stdio",
+          "daemon-http"
+        ]
+      },
+      "consumers": [
+        {
+          "file": "src/architect/cli-bridge.ts",
+          "line": 643,
+          "expression": "process.env.DREAMGRAPH_CODEX_CUA_TRANSPORT === \"daemon-http\""
+        }
+      ],
+      "documented": [],
+      "default_source": {
+        "file": "src/architect/cli-bridge.ts",
+        "line": 643,
+        "expression": "process.env.DREAMGRAPH_CODEX_CUA_TRANSPORT === \"daemon-http\""
+      }
     },
     {
       "key": "DREAMGRAPH_COMPUTER_USE",
@@ -3681,6 +3825,26 @@
       "default_source": null
     },
     {
+      "key": "DREAMGRAPH_COMPUTER_USE_POLICY",
+      "owner": "computer use",
+      "unit": "value",
+      "apply": "next_execution",
+      "secret": false,
+      "protected": false,
+      "description": "Whether the local Architect may operate this computer (browser/apps): allow, ask every time, or deny. The daemon is loopback-only, so this is the local operator's decision.",
+      "constraints": {
+        "type": "string",
+        "enum": [
+          "allow",
+          "ask",
+          "deny"
+        ]
+      },
+      "consumers": [],
+      "documented": [],
+      "default_source": null
+    },
+    {
       "key": "DREAMGRAPH_CTX_FETCH_TIMEOUT_MS",
       "owner": "client/build utilities",
       "unit": "value",
@@ -3791,14 +3955,14 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 244,
+          "line": 246,
           "expression": "process.env.DREAMGRAPH_ENABLE_DOOM?.trim"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 244,
+        "line": 246,
         "expression": "process.env.DREAMGRAPH_ENABLE_DOOM?.trim"
       }
     },
@@ -4153,7 +4317,7 @@
       "documented": [
         {
           "file": "README.md",
-          "line": 515
+          "line": 517
         },
         {
           "file": "docs/architecture.md",
@@ -4416,17 +4580,17 @@
         },
         {
           "file": "src/architect/routes.ts",
-          "line": 437,
+          "line": 439,
           "expression": "!process.env.DREAMGRAPH_INSTANCE_UUID"
         },
         {
           "file": "src/architect/routes.ts",
-          "line": 693,
+          "line": 695,
           "expression": "process.env.DREAMGRAPH_INSTANCE_UUID ?? null"
         },
         {
           "file": "src/architect/routes.ts",
-          "line": 13635,
+          "line": 13697,
           "expression": "getActiveScope()?.uuid ?? process.env.DREAMGRAPH_INSTANCE_UUID"
         },
         {
@@ -4446,12 +4610,12 @@
         },
         {
           "file": "src/cli/commands/status.ts",
-          "line": 56,
+          "line": 57,
           "expression": "_positional[0] ??\n    (typeof flags.instance === \"string\" ? flags.instance : undefined) ??\n    process.env.DREAMGRAPH_INSTANCE_UUID"
         },
         {
           "file": "src/cognitive/engine.ts",
-          "line": 890,
+          "line": 891,
           "expression": "process.env.DREAMGRAPH_INSTANCE_UUID || \"legacy\""
         },
         {
@@ -4471,7 +4635,7 @@
         },
         {
           "file": "src/cognitive/model-execution.ts",
-          "line": 48,
+          "line": 49,
           "expression": "process.env.DREAMGRAPH_INSTANCE_UUID || directoryInstanceId(this.directory)"
         },
         {
@@ -4498,6 +4662,16 @@
           "file": "src/observability/analytics-snapshot.ts",
           "line": 91,
           "expression": "getActiveScope()?.uuid??process.env.DREAMGRAPH_INSTANCE_UUID"
+        },
+        {
+          "file": "src/server/dashboard.ts",
+          "line": 812,
+          "expression": "process.env.DREAMGRAPH_INSTANCE_UUID || directoryInstanceId(directory)"
+        },
+        {
+          "file": "src/server/dashboard.ts",
+          "line": 818,
+          "expression": "process.env.DREAMGRAPH_INSTANCE_UUID || directoryInstanceId(directory)"
         },
         {
           "file": "src/server/host-model-admission.ts",
@@ -4580,7 +4754,7 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 266,
+          "line": 268,
           "expression": "process.env.DREAMGRAPH_LLM_API_KEY?.trim"
         },
         {
@@ -4610,7 +4784,7 @@
         },
         {
           "file": "src/server/dashboard.ts",
-          "line": 821,
+          "line": 897,
           "expression": "process.env.DREAMGRAPH_LLM_API_KEY ?? \"\""
         }
       ],
@@ -4634,7 +4808,7 @@
       ],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 266,
+        "line": 268,
         "expression": "process.env.DREAMGRAPH_LLM_API_KEY?.trim"
       }
     },
@@ -4732,19 +4906,19 @@
       "consumers": [
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1322,
+          "line": 1331,
           "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_API_KEY || (provider === base.provider ? base.apiKey : defaults.apiKey)"
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1352,
+          "line": 1362,
           "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_API_KEY ?? (provider === base.provider ? base.apiKey : defaults.apiKey)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/llm.ts",
-        "line": 1322,
+        "line": 1331,
         "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_API_KEY || (provider === base.provider ? base.apiKey : defaults.apiKey)"
       }
     },
@@ -5367,7 +5541,7 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 3720,
+          "line": 3750,
           "expression": "model: process.env.DREAMGRAPH_LLM_ARCHITECT_MODEL"
         }
       ],
@@ -5387,7 +5561,7 @@
       ],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 3720,
+        "line": 3750,
         "expression": "model: process.env.DREAMGRAPH_LLM_ARCHITECT_MODEL"
       }
     },
@@ -5440,7 +5614,7 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 3720,
+          "line": 3750,
           "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER as ArchitectLlmConfig[\"provider\"]"
         }
       ],
@@ -5452,7 +5626,7 @@
       ],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 3720,
+        "line": 3750,
         "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER as ArchitectLlmConfig[\"provider\"]"
       }
     },
@@ -7198,7 +7372,7 @@
       "consumers": [
         {
           "file": "src/server/dashboard.ts",
-          "line": 822,
+          "line": 898,
           "expression": "Number(process.env.DREAMGRAPH_LLM_DREAMER_MAX_TOKENS)"
         }
       ],
@@ -7218,7 +7392,7 @@
       ],
       "default_source": {
         "file": "src/server/dashboard.ts",
-        "line": 822,
+        "line": 898,
         "expression": "Number(process.env.DREAMGRAPH_LLM_DREAMER_MAX_TOKENS)"
       }
     },
@@ -7243,7 +7417,7 @@
       "consumers": [
         {
           "file": "src/server/dashboard.ts",
-          "line": 822,
+          "line": 898,
           "expression": "model: process.env.DREAMGRAPH_LLM_DREAMER_MODEL"
         }
       ],
@@ -7255,7 +7429,7 @@
       ],
       "default_source": {
         "file": "src/server/dashboard.ts",
-        "line": 822,
+        "line": 898,
         "expression": "model: process.env.DREAMGRAPH_LLM_DREAMER_MODEL"
       }
     },
@@ -7423,7 +7597,7 @@
       "consumers": [
         {
           "file": "src/server/dashboard.ts",
-          "line": 822,
+          "line": 898,
           "expression": "Number(process.env.DREAMGRAPH_LLM_DREAMER_TEMPERATURE)"
         }
       ],
@@ -7443,7 +7617,7 @@
       ],
       "default_source": {
         "file": "src/server/dashboard.ts",
-        "line": 822,
+        "line": 898,
         "expression": "Number(process.env.DREAMGRAPH_LLM_DREAMER_TEMPERATURE)"
       }
     },
@@ -10149,7 +10323,7 @@
       "consumers": [
         {
           "file": "src/server/dashboard.ts",
-          "line": 823,
+          "line": 899,
           "expression": "Number(process.env.DREAMGRAPH_LLM_NORMALIZER_MAX_TOKENS)"
         }
       ],
@@ -10169,7 +10343,7 @@
       ],
       "default_source": {
         "file": "src/server/dashboard.ts",
-        "line": 823,
+        "line": 899,
         "expression": "Number(process.env.DREAMGRAPH_LLM_NORMALIZER_MAX_TOKENS)"
       }
     },
@@ -10194,7 +10368,7 @@
       "consumers": [
         {
           "file": "src/server/dashboard.ts",
-          "line": 823,
+          "line": 899,
           "expression": "model: process.env.DREAMGRAPH_LLM_NORMALIZER_MODEL"
         }
       ],
@@ -10206,7 +10380,7 @@
       ],
       "default_source": {
         "file": "src/server/dashboard.ts",
-        "line": 823,
+        "line": 899,
         "expression": "model: process.env.DREAMGRAPH_LLM_NORMALIZER_MODEL"
       }
     },
@@ -10384,7 +10558,7 @@
       "consumers": [
         {
           "file": "src/server/dashboard.ts",
-          "line": 823,
+          "line": 899,
           "expression": "Number(process.env.DREAMGRAPH_LLM_NORMALIZER_TEMPERATURE)"
         }
       ],
@@ -10404,7 +10578,7 @@
       ],
       "default_source": {
         "file": "src/server/dashboard.ts",
-        "line": 823,
+        "line": 899,
         "expression": "Number(process.env.DREAMGRAPH_LLM_NORMALIZER_TEMPERATURE)"
       }
     },
@@ -10570,7 +10744,7 @@
         },
         {
           "file": "src/cognitive/model-execution.ts",
-          "line": 47,
+          "line": 48,
           "expression": "currentJob()?.pricing ?? process.env.DREAMGRAPH_LLM_PRICING"
         }
       ],
@@ -10626,7 +10800,7 @@
         },
         {
           "file": "src/server/dashboard.ts",
-          "line": 821,
+          "line": 897,
           "expression": "process.env.DREAMGRAPH_LLM_PROVIDER as LlmConfig[\"provider\"]"
         }
       ],
@@ -10939,7 +11113,7 @@
         },
         {
           "file": "src/server/dashboard.ts",
-          "line": 821,
+          "line": 897,
           "expression": "process.env.DREAMGRAPH_LLM_URL ?? getLlmConfig().baseUrl"
         }
       ],
@@ -11101,7 +11275,7 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 703,
+          "line": 705,
           "expression": "scope?.masterDir ?? process.env.DREAMGRAPH_MASTER_DIR"
         },
         {
@@ -11123,7 +11297,7 @@
       "documented": [],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 703,
+        "line": 705,
         "expression": "scope?.masterDir ?? process.env.DREAMGRAPH_MASTER_DIR"
       }
     },
