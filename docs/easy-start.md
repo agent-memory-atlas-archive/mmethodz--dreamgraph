@@ -1,8 +1,8 @@
 # DreamGraph Easy Start
 
-> **Start here.** You do not need to understand the internals before using DreamGraph. Pick the path that matches your project, run the short command list, and open Architect. Its Config, Schedules, and Status tabs keep daily work in one place.
+> **Start here.** You do not need to understand the internals before using DreamGraph. Pick the path that matches your project, run the short command list, and open Architect. Its Config, Schedules and Status tabs keep routine work in one place; Explorer opens separately when needed.
 
-DreamGraph v14 is browser-first. **Architect** is the main working surface. Open Explorer separately when you want a visual map of the graph.
+DreamGraph v14 is browser-first. **Architect** is the main working surface. Its Config, Schedules and Status tabs handle setup and health. Explorer gives you a visual map when you need orientation.
 
 ## Before you start
 
@@ -22,7 +22,7 @@ Open a new terminal and verify the install:
 dg --version
 ```
 
-You should see DreamGraph CLI v14.0.1.
+You should see DreamGraph CLI v14.0.2.
 
 ## Pick your setup path
 
@@ -65,19 +65,7 @@ dg start platform --http
 dg scan platform --depth deep
 ```
 
-For additional repositories, open the Config tab in Architect and add a `DREAMGRAPH_REPOS` JSON map to the instance `engine.env` file:
-
-```dotenv
-DREAMGRAPH_REPOS={"api":"C:/work/platform-api","web":"C:/work/platform-web","infra":"C:/work/platform-infra"}
-```
-
-Restart after changing configuration:
-
-```bash
-dg restart platform
-```
-
-Keep the list focused. Add the repositories that belong to the system you want Architect to reason about.
+For additional repositories, open **Architect → Config → Repositories**, add the names and paths, and save. The configuration page reports whether a setting applies to new work immediately or needs a restart. Keep the list focused. Add the repositories that belong to the system you want Architect to reason about.
 
 ### D. Bring an existing Codex or Claude workflow
 
@@ -88,17 +76,7 @@ For Codex CLI, install and sign in to Codex as usual. Open Architect and choose:
 - Adapter: `Codex CLI`
 - Model: your preferred Codex model or `auto`
 
-For Claude, use the Anthropic API route. In Architect > Config, set:
-
-```dotenv
-DREAMGRAPH_LLM_PROVIDER=anthropic
-DREAMGRAPH_LLM_API_KEY=your-api-key
-DREAMGRAPH_LLM_ARCHITECT_PROVIDER=anthropic
-DREAMGRAPH_LLM_ARCHITECT_ADAPTER=native_api_tool_loop
-DREAMGRAPH_LLM_ARCHITECT_MODEL=your-claude-model
-```
-
-Then restart the instance. DreamGraph does not currently import Claude Code conversations or expose a Claude Code inline CLI adapter. The supported Claude path is Anthropic API configuration.
+For Claude, use the Anthropic API route. In **Architect → Config → Models**, choose Anthropic and save the API key. In **Config → Architect**, choose the API engine, Anthropic provider and your Claude model. The page reports the effective route. DreamGraph does not import Claude Code conversations or provide a Claude Code inline CLI adapter.
 
 ## Open Architect and Explorer
 
@@ -110,16 +88,23 @@ dg status my-app
 
 Use the host and port shown by `dg status`. If the port is `8100`, open:
 
-| Surface | URL | Use it for |
+| Tab | URL | Use it for |
 |-----|-----|------------|
-| Architect | `http://127.0.0.1:8100/architect` | Your main working tab: ask questions, make plans, implement changes, verify work, and use Config, Schedules, and Status. |
-| Explorer | `http://127.0.0.1:8100/explorer` | Visual orientation, search, relationships, and tensions. Open it from Architect in another browser tab when needed. Both `/explorer` and `/explorer/` work. |
+| Status / Config / Schedules | Inside Architect | Persistent operational tabs for configuration, scheduling and health. |
+| Explorer | `http://127.0.0.1:8100/explorer` | Visual orientation, search, relationships, and tensions. Both `/explorer` and `/explorer/` work. |
+| Architect | `http://127.0.0.1:8100/architect` | Your main working tab: ask questions, make plans, implement changes, and verify work. |
 
 Use them together simply:
 
 1. Start in **Architect** and describe what you want in normal language.
 2. Use **Explorer** when you want to understand how parts of the system connect.
-3. Use Architect's **Config**, **Schedules**, and **Status** tabs when setup or operations need attention.
+3. Use Architect’s **Config**, **Schedules** and **Status** tabs when setup or health needs attention.
+
+## Connect Computer Use
+
+The v14.0.2 installer registers the browser host. Open `chrome://extensions` (or `edge://extensions`), enable Developer mode, choose **Load unpacked**, and select the extension folder printed by `dg browser setup` (normally `~/.dreamgraph/bin/browser-extension`). Keep the browser open and check that the extension popup says **Connected to DreamGraph**; `dg browser status` confirms the host connection.
+
+In **Config → Computer Use**, save Allow, Ask every time or Deny. Codex CLI and native API routes use the DreamGraph backend when connected. After updating, restart your instance and reload the extension. See the [complete setup and troubleshooting guide](https://dreamgraph.nofs.ai/guide/computer-use), including Windows Save/Open dialog support and fallback limits.
 
 ## What to ask Architect first
 
@@ -171,11 +156,11 @@ Your repository stays unchanged. Configure the Anthropic API provider for Archit
 
 ### Can I use a local model?
 
-Yes. Architect > Config can point DreamGraph to Ollama or LM Studio. Use the existing [LLM setup guide](../guide/04-llm-setup.md) when you want local model details.
+Yes. Architect → Config → Models can point DreamGraph to Ollama or LM Studio. Use the existing [LLM setup guide](https://dreamgraph.nofs.ai/guide/llm-setup) when you want local model details.
 
 ### Which tab should I leave open?
 
-Leave Architect open. Open Explorer in another browser tab for orientation when you need it. Use Architect's Status and Config tabs for operations.
+Leave Architect open. Keep Explorer beside it for orientation. Use Architect's Status and Config tabs for operations.
 
 ### Architect opens the wrong project
 
@@ -204,9 +189,8 @@ Both `/explorer` and `/explorer/` are supported. Confirm the daemon is running a
 
 ### I added more repositories but Architect cannot see them
 
-Check `DREAMGRAPH_REPOS` in Architect > Config, restart the instance, and run a deep scan again.
+Check the names and paths in Architect → Config → Repositories. Follow any restart notice shown after saving, then scan the attached repositories.
 
 ### Where do I go next?
 
-Continue with the detailed [user guide](../guide/README.md) only when you need more detail.
-<!-- CONTINUATION TEST SLICE 5 -->
+Continue with [Installation](https://dreamgraph.nofs.ai/guide/installation), [Your first instance](https://dreamgraph.nofs.ai/guide/first-instance), [LLM setup](https://dreamgraph.nofs.ai/guide/llm-setup), or [Architect](https://dreamgraph.nofs.ai/guide/architect) only when you need more detail.

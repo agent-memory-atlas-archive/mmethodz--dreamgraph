@@ -235,4 +235,14 @@ describe("canonical bounded graph context", () => {
     expect(rag.context_pack?.records[0].id).toBe(graphIdentityKey({ instance_id: "legacy", kind: "capability", id: "dashboard" }));
     expect(fetch).not.toHaveBeenCalled();
   });
+  it("makes only the most relevant decisions mandatory, so a long request sharing a product name stays satisfiable", async () => {
+    const decisions = Array.from({ length: 12 }, (_, i) => ({ id: `ADR-${i}`, title: `web64 decision ${i}`, decision: `web64 ide rule ${i} `.repeat(20) }));
+    decisions.push({ id: "ADR-sprite", title: "sprite editor bank dialog", decision: "Sprite editor banks are created through the ide dialog." });
+    await put("adr_log.json", { decisions });
+    const pack = buildContextPack(await loadCanonicalGraph("i"), { query: "use computer use to test the web64 ide sprite editor by creating a new sprite bank and draw a balloon", token_budget: 10000 }, now);
+    const mandatory = pack.records.filter(record => record.mandatory && record.selection_reason === "relevant_decision");
+    expect(mandatory.length).toBeLessThanOrEqual(5);
+    expect(mandatory.map(record => record.id).some(id => id.endsWith("ADR-sprite"))).toBe(true);
+    expect(pack.mandatory_satisfied).toBe(true);
+  });
 });

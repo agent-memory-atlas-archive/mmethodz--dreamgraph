@@ -10,6 +10,7 @@ import { issueExecutionPolicy, prepareExecutionApproval, executionPolicyProjecti
 import { architectPassIdleMs } from "../config/request-bounds.js";
 import { withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
 import { approvalHash } from "../discipline/approval.js";
+import { coreToolPolicy } from "./tool-policy.js";
 import { HostModelAdmission, readRecoveredHostModel, originalHostStopLedger } from "./host-model-admission.js";
 import { ManagedModelAdmissionRequestSchema, ManagedModelSettlementSchema } from "../graph/contracts.js";
 import { captureArchitectPlanRuntimeSource } from "../architect/plan-registry.js";
@@ -38,6 +39,19 @@ function close(context:SessionContext,id:string) {
   const binding=key(context,id), live=leases.get(binding); if(!live)return;
   leases.delete(binding); clearTimeout(live.timer); live.model?.close(); live.lease.close();
 }
+/**
+ * Autonomous mode (operator choice, 2026-10-05): graph writes and project source edits are approved by the operator's
+ * standing policy instead of a click. The approval goes through approveHostExecution exactly like a click, so it is
+ * recorded in the managed context under graph reconciliation before the tool runs; the tool itself keeps its normal
+ * graph-bound path. Commands, unqualified/extension tools, external and runtime writes, discipline session changes and
+ * destructive operations still ask. DREAMGRAPH_AUTONOMOUS_AUTO_APPROVE=0 turns it off.
+ */
+const ALWAYS_REVIEW = new Set(["delete_file", "rename_file", "clear_dreams", "delete_schedule", "init_graph", "bootstrap_instance"]);
+export function autonomousAutoApproves(autonomy: string, tool: string): boolean {
+  if (autonomy !== "autonomous" || process.env.DREAMGRAPH_AUTONOMOUS_AUTO_APPROVE === "0" || ALWAYS_REVIEW.has(tool)) return false;
+  const effect = coreToolPolicy(tool).effect;
+  return effect === "graph_write" || effect === "source_write";
+}
 /** Ephemeral proposal: exact arguments are visible only to the original host, never persisted as evidence. */
 async function requestHostReview(context:SessionContext,id:string,tool:string,args:unknown,signal:AbortSignal):Promise<void> {
   const argumentsCopy=JSON.parse(JSON.stringify(args));
@@ -57,13 +71,16 @@ async function requestHostReview(context:SessionContext,id:string,tool:string,ar
       context_receipt_id:checkpoint.pack.receipt.id,approved_actions:[{tool,arguments:argumentsCopy,scope_id:live.lease.policy.scope[0]??`execution:${id}`,calls:1}]});
     if(Buffer.byteLength(JSON.stringify(request),"utf8")>65536)throw new Error("EXECUTION_APPROVAL_BUDGET");
     live.reviewCount++;
-    return new Promise<void>((resolve,reject)=>{
+    const reviewed=new Promise<void>((resolve,reject)=>{
       let settled=false;
       const abort=()=>settle(signal.reason??new Error("EXECUTION_REVIEW_CANCELLED"));
       const settle=(error?:unknown)=>{if(settled)return;settled=true;signal.removeEventListener("abort",abort);live.pendingReviews.delete(request.approval_id);error===undefined?resolve():reject(error);};
       live.pendingReviews.set(request.approval_id,{request,settle});signal.addEventListener("abort",abort,{once:true});
       if(signal.aborted)abort();
     });
+    // Same approval path as the operator's click; if it cannot be applied, the request stays pending for the operator.
+    if(autonomousAutoApproves(live.lease.policy.autonomy,tool))void withSessionContext(context,()=>approveHostExecution(request)).catch(()=>undefined);
+    return reviewed;
   });
 }
 export async function readHostExecutionReviews(id:string) {

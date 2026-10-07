@@ -275,12 +275,12 @@ it("edits Computer Use policy without reading scoped profiles or granting a sess
   const requests: string[] = [];
   const { document, errors } = await browser('/config', async (path, _input, send) => { requests.push(path); return send(); });
   document.querySelector<HTMLButtonElement>('#cw-tab-computer')!.click();
-  expect(requests.some(path => path.includes('/computer/'))).toBe(false);
+  expect(requests.filter(path => path.includes('/computer/')).every(path => path === '/api/architect/v1/computer/browser-bridge')).toBe(true);
   const policy = document.querySelector<HTMLInputElement>('input[name="cu-policy"][value="deny"]')!;
   policy.click(); (document.querySelector('#cw-save') as HTMLButtonElement).click();
   await eventually(async () => parseEngineEnvDocument(await readFile(envPath, 'utf8')).DREAMGRAPH_COMPUTER_USE_POLICY === 'deny');
   expect((await new EngineJobs().inspect()).records).toHaveLength(0);
-  expect(requests.some(path => path.includes('/computer/'))).toBe(false);
+  expect(requests.filter(path => path.includes('/computer/')).every(path => path === '/api/architect/v1/computer/browser-bridge')).toBe(true);
   expect(errors).toEqual([]);
 });
 it("edits a scoped Computer Use target and replays its captured profile save after lost acknowledgement", async () => {

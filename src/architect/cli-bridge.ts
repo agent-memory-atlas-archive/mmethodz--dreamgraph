@@ -22,6 +22,9 @@ import { beginHostExecution, endHostExecution, withHostExecution } from "../serv
 import type { PlanExecutionIntent } from "../graph/contracts.js";
 import { deliverManagedContext, readManagedContext, type ManagedExecutionContext } from "../graph/execution-context.js";
 import { startCodexCuaHost, type CodexCuaHost } from "./codex-cua-host.js";
+import { openExecutionBrowser, releaseExecutionBrowser } from "../computer/execution-browser.js";
+import { computerUseBackendPreference } from "../computer/computer-use-backend.js";
+import { dreamgraphUiOrigins } from "../computer/dreamgraph-browser.js";
 import { codexBrowserTabIdsFromTranscript, codexBrowserReleaseConfirmed, releaseCodexBrowserSession } from "./codex-cua-release.js";
 import { codexComputerUseServersToml, codexTurnEndHooksToml, codexNativeToolTrace, createCodexItemClock, createCodexTranscriptWriter, createCodexSessionGrantWatcher, readCodexNotify, discoverCodexComputerUseServers, resolveCodexSourceHome, widenCodexComputerUseSurfaces, type CodexComputerUseServer } from "./codex-computer-use.js";
 
@@ -207,14 +210,31 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
   // Logical execution IDs are opaque; a browser session ID may contain Windows-invalid colons.
   const auditPath = join(auditDir, `${createHash("sha256").update(runId).digest("hex")}.ndjson`);
   const bridgeSpawn = resolveBridgeSpawn();
-  let prompt = serializeCliPrompt(input.messages, input.userMessage, input.adapter, toolRequirements.requirements, { autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced", computerUse: input.adapter !== "codex-cli" ? "off" : input.computerUse === true ? "granted" : input.computerUseRequestable === true ? "requestable" : "off" });
+  // Granted Computer Use for Codex: DreamGraph's own browser (the browser_* tools over DreamGraph's MCP bridge, like
+  // every other DreamGraph tool) when its extension is connected; Codex's own Computer Use only as the fallback.
+  // DREAMGRAPH_COMPUTER_USE_BACKEND: auto (default) | dreamgraph-browser (required) | cua-runtime (Codex's own).
+  let browserGuidance: string | null = null;
+  if (input.adapter === "codex-cli" && input.computerUse === true && computerUseBackendPreference() !== "cua-runtime") {
+    try { browserGuidance = (await openExecutionBrowser(runId, input.signal)).guidance; }
+    catch (error) {
+      if (computerUseBackendPreference() === "dreamgraph-browser") {
+        await rm(scratchDir, { recursive: true, force: true });
+        throw new Error(`COMPUTER_USE_UNAVAILABLE: DreamGraph's browser is required (DREAMGRAPH_COMPUTER_USE_BACKEND=dreamgraph-browser) but not available: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+  }
+  const codexNativeComputerUse = input.adapter === "codex-cli" && input.computerUse === true && browserGuidance === null;
+  let prompt = serializeCliPrompt(input.messages, input.userMessage, input.adapter, toolRequirements.requirements, { autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced",
+    computerUse: input.adapter !== "codex-cli" ? "off" : browserGuidance !== null ? "dreamgraph-browser" : input.computerUse === true ? "granted" : input.computerUseRequestable === true ? "requestable" : "off",
+    ...(browserGuidance !== null ? { browserGuidance } : {}),
+    ...(codexNativeComputerUse ? { protectedOrigins: await dreamgraphUiOrigins().catch(() => [] as string[]) } : {}) });
   const model = input.model && input.model !== "auto" ? input.model : undefined;
   const timeoutMs = Number.isFinite(input.timeoutMs) && input.timeoutMs > 0
     ? Math.max(30_000, Math.min(input.timeoutMs, ARCHITECT_PASS_MAX_MS))
     : CLI_DEFAULT_TIMEOUT_MS;
   const startedAt = Date.now();
   const context = getSessionContext();
-  if (!context) { await rm(scratchDir, { recursive: true, force: true }); throw new Error("CLI_EXECUTION_SESSION_REQUIRED"); }
+  if (!context) { await releaseExecutionBrowser(runId, "no execution session").catch(() => null); await rm(scratchDir, { recursive: true, force: true }); throw new Error("CLI_EXECUTION_SESSION_REQUIRED"); }
   let lease: Awaited<ReturnType<typeof beginHostExecution>> | undefined;
   let executionSignal: AbortSignal;
   let renewExecution: () => boolean = () => false;
@@ -232,7 +252,10 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
   }
   catch (error) {
     try { if (lease) await endHostExecution({ execution_id: runId, outcome: "failed", work_termination: "confirmed" }); }
-    finally { await rm(scratchDir, { recursive: true, force: true }); }
+    finally {
+      await releaseExecutionBrowser(runId, "run failed before dispatch").catch(() => null);
+      await rm(scratchDir, { recursive: true, force: true });
+    }
     throw error;
   }
 
@@ -255,7 +278,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       computerUseRequestable: input.adapter === "codex-cli" && input.computerUse !== true && input.computerUseRequestable === true,
     });
     const invocation = input.adapter === "codex-cli"
-      ? await prepareCodexInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames, verbosityMode: input.verbosityMode, reasoningEffort: input.reasoningEffort, computerUse: input.computerUse === true, registerCuaHost: (host) => { cuaHosts.push(host); } })
+      ? await prepareCodexInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames, verbosityMode: input.verbosityMode, reasoningEffort: input.reasoningEffort, computerUse: codexNativeComputerUse, registerCuaHost: (host) => { cuaHosts.push(host); } })
       : await prepareCopilotInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames });
 
     await deliverManagedContext(runId, prompt);
@@ -332,6 +355,9 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       ? releaseComputerUse ? await releaseComputerUse() : { confirmed: false, logPath: null, reason: "release_proof_unavailable" }
       : null;
     if (computerUseRelease?.logPath) computerUseCleanupLog = computerUseRelease.logPath;
+    // DreamGraph's browser: detach the run's tabs and record pending saves before the execution ends.
+    const browserLog = browserGuidance !== null ? await releaseExecutionBrowser(runId, executionSignal.aborted ? "cancelled" : "run finished").catch(() => null) : null;
+    if (browserLog) computerUseCleanupLog = browserLog;
     const computerUseRequestRecord = audit.find((record) => record.tool === "request_computer_use");
     let computerUseRequest: { reason: string } | undefined;
     if (computerUseRequestRecord) { let reason = ""; try { reason = String((JSON.parse(computerUseRequestRecord.inputJson ?? "{}") as { reason?: unknown }).reason ?? ""); } catch { /* bounded audit body */ }
@@ -417,6 +443,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     finally {
       // Ceiling, cancel or crash skip the normal path: release the Computer Use session here too (no-op if done).
       if (releaseComputerUse) await releaseComputerUse();
+      await releaseExecutionBrowser(runId, finished ? "run finished" : "run failed").catch(() => null);
       await endCuaHosts(finished ? "run finished" : "run failed");
       await rm(scratchDir, { recursive: true, force: true }).catch(() => undefined);
     }
@@ -834,7 +861,7 @@ export function serializeCliPrompt(
   userMessage: string,
   adapter: ArchitectCliAdapter,
   toolRequirements?: ArchitectCliToolRequirements | null,
-  controls?: { autonomy: "manual" | "supervised" | "autonomous"; verbosity: ArchitectVerbosityMode; computerUse?: ComputerUseMode },
+  controls?: { autonomy: "manual" | "supervised" | "autonomous"; verbosity: ArchitectVerbosityMode; computerUse?: ComputerUseMode; browserGuidance?: string; protectedOrigins?: readonly string[] },
 ): string {
   const contextMessages = messages.filter((message) => message.role !== "user");
   return [
@@ -848,7 +875,7 @@ export function serializeCliPrompt(
     "Do not use provider-native shell/read/write routes; use dreamgraph:run_command, read_source_code, patch_file, query_resource, query_architecture_decisions, and related DreamGraph MCP tools.",
     "The user request appears only in CURRENT USER REQUEST. Do not reconstruct it from prior sections.",
     createArchitectCliToolRequirementsSection(toolRequirements),
-    createCliControlInstructions(controls?.autonomy ?? "manual", controls?.verbosity ?? "balanced", controls?.computerUse ?? "off"),
+    createCliControlInstructions(controls?.autonomy ?? "manual", controls?.verbosity ?? "balanced", controls?.computerUse ?? "off", controls),
     "",
     ...contextMessages.map((message) => `## ${message.role.toUpperCase()}\n${message.content}`),
     "",
@@ -856,8 +883,9 @@ export function serializeCliPrompt(
     userMessage,
   ].join("\n\n");
 }
-export type ComputerUseMode = "granted" | "requestable" | "off";
-export function createCliControlInstructions(autonomy: "manual" | "supervised" | "autonomous", verbosity: ArchitectVerbosityMode, computerUse: ComputerUseMode = "off"): string {
+export type ComputerUseMode = "granted" | "dreamgraph-browser" | "requestable" | "off";
+export function createCliControlInstructions(autonomy: "manual" | "supervised" | "autonomous", verbosity: ArchitectVerbosityMode, computerUse: ComputerUseMode = "off",
+  options: { browserGuidance?: string; protectedOrigins?: readonly string[] } = {}): string {
   const action = autonomy === "manual" ? "Inspect/propose. Execute at most one specifically approved bounded effect, then return control. Do not continue to another slice."
     : autonomy === "supervised" ? "Execute only the approved checkpoint scope. Stop at its review checkpoint, unresolved question, scope change or governance gate."
     : "Continue eligible work within the approved task scope until task completion, a governance gate, resource limit, contradiction or user stop. Completing an intermediate slice does not complete the task.";
@@ -865,7 +893,9 @@ export function createCliControlInstructions(autonomy: "manual" | "supervised" |
     : verbosity === "detailed" ? "Explain the outcome, relevant rationale, alternatives and uncertainty, with evidence links and diagnostic summary."
     : "Give the outcome with focused evidence and useful reasoning summary.";
   return `Effective controls: autonomy=${autonomy}; verbosity=${verbosity}. ${action} ${density} All modes preserve graph/ADR anchors, provenance, failures, scoped currency/completeness warnings and reconciliation obligations. Output density is guidance, never permission or guaranteed word count. The daemon enforces approved effect arguments and finite limits; ${computerUse === "granted"
-    ? "the local operator has GRANTED full native Computer Use for this pass: use your own tools (in Codex: the cua_repl MCP server, browser and desktop surfaces) to operate any web page or application on this machine to fulfil the request. Site and app access is pre-approved for this run; do not stop to ask for permission. If the request concerns a page or app that is already open, take over that existing tab or window (for a browser tab: cua.getTab({ url }) or browser.user.openTabs() then claimTab) instead of opening a new one. Native page dialogs (alert/confirm/prompt) block the page until answered: answer them with the browser dialog API (accept(), accept(text) or dismiss()) or the desktop surface, then continue. Browser errors that say to retry (for example \"Unable to load browser request-header policy. Retry the browser command.\") are transient start-up checks: wait about two seconds and retry the same browser call up to three times before switching to another route. Every DreamGraph pass is a fresh Codex session that is never resumed, so the browser must be fully released when this turn ends: never call tab.markDeliverable() or tab.markHandoff() (a marked tab stays claimed by a session that no longer exists, leaving the Computer Use cursor and debugging banner on it); if a result page must stay open for the operator, show it in a claimed user tab (navigate that tab) instead of an agent-created tab, because unmarked agent tabs close and unmarked claimed tabs are released and left open at turn end. Computer Use is for operating web pages and applications only: never use it (or cua_repl JavaScript, editors, terminals or file dialogs) to read, write, run or change this project's repository; every project read, mutation and command still goes exclusively through the DreamGraph MCP tools. Report what you did and observed."
+    ? `the local operator has GRANTED full native Computer Use for this pass: use your own tools (in Codex: the cua_repl MCP server, browser and desktop surfaces) to operate any web page or application on this machine to fulfil the request. Site and app access is pre-approved for this run; do not stop to ask for permission. If the request concerns a page or app that is already open, take over that existing tab or window (for a browser tab: cua.getTab({ url }) or browser.user.openTabs() then claimTab) instead of opening a new one. Native page dialogs (alert/confirm/prompt) block the page until answered: answer them with the browser dialog API (accept(), accept(text) or dismiss()) or the desktop surface, then continue. Browser errors that say to retry (for example \"Unable to load browser request-header policy. Retry the browser command.\") are transient start-up checks: wait about two seconds and retry the same browser call up to three times before switching to another route. Every DreamGraph pass is a fresh Codex session that is never resumed, so the browser must be fully released when this turn ends: never call tab.markDeliverable() or tab.markHandoff() (a marked tab stays claimed by a session that no longer exists, leaving the Computer Use cursor and debugging banner on it); if a result page must stay open for the operator, show it in a claimed user tab (navigate that tab) instead of an agent-created tab, because unmarked agent tabs close and unmarked claimed tabs are released and left open at turn end. Computer Use is for operating web pages and applications only: never use it (or cua_repl JavaScript, editors, terminals or file dialogs) to read, write, run or change this project's repository; every project read, mutation and command still goes exclusively through the DreamGraph MCP tools.${options.protectedOrigins?.length ? ` Never operate DreamGraph's own pages (${options.protectedOrigins.join(", ")}): they are the operator's control surface; use the DreamGraph MCP tools for DreamGraph state.` : ""} Report what you did and observed.`
+    : computerUse === "dreamgraph-browser"
+      ? `Computer Use for this pass goes through DreamGraph's browser tools on the dreamgraph MCP server (browser_tabs, browser_snapshot, browser_click, browser_type, browser_press_key, browser_dialog, browser_file_dialog, browser_screenshot, …); there is no other Computer Use route in this run. ${options.browserGuidance ?? ""}`
     : computerUse === "requestable"
       ? "Computer Use is NOT granted for this pass. If the request genuinely requires operating this computer (browser, apps, screen), call the DreamGraph tool request_computer_use with a one-sentence reason, then end your turn; the operator will be asked and the request re-run with Computer Use if allowed. Otherwise do not ask."
       : "no native Computer Use permission is implied."}`;

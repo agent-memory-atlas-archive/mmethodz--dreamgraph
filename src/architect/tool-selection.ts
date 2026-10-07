@@ -653,11 +653,35 @@ function hasNoMutationDirective(text: string): boolean {
   return /\b(read[- ]?only|inspect only(?!\s+as\s+needed)|report only|do not patch|no patch|no source mutation|without mutating|do not mutate|no files? (?:should be )?mutated|no repository files? (?:should be )?changed)\b/i.test(text);
 }
 
-export function isRequiredArchitectToolSatisfied(requiredTool: string, calledTools: readonly string[]): boolean {
+/** Computer Use tools that only observe the application (everything else a Computer Use tool does counts as acting). */
+const COMPUTER_OBSERVATION_TOOLS = new Set(["browser_snapshot", "browser_screenshot", "browser_wait", "browser_tabs"]);
+
+/**
+ * What the pass did through Computer Use. When the work happened in an application (Computer Use acted on it and
+ * observed the result), that evidence satisfies the source-change, reading, verification and graph-health
+ * obligations a prompt implies; graph grounding and graph recording stay required. Without it the required-tool
+ * correction pushes the model into busywork after the task is done (no-op patch_file, blocked run_command, ...).
+ */
+export function computerUseEvidence(calledTools: readonly string[], isComputerTool: (name: string) => boolean): { acted: boolean; observed: boolean } {
+  let acted = false, observed = false;
+  for (const tool of calledTools) {
+    if (!isComputerTool(tool)) continue;
+    if (COMPUTER_OBSERVATION_TOOLS.has(tool)) observed = true;
+    else if (tool.startsWith("browser_")) acted = true;
+    else { acted = true; observed = true; }
+  }
+  return { acted, observed };
+}
+
+export function isRequiredArchitectToolSatisfied(requiredTool: string, calledTools: readonly string[],
+  computer: { acted: boolean; observed: boolean } = { acted: false, observed: false }): boolean {
   const normalized = normalizeArchitectToolName(requiredTool);
   if (!normalized) return true;
   const called = new Set(calledTools.map((tool) => normalizeArchitectToolName(tool)).filter((tool): tool is string => Boolean(tool)));
   if (called.has(normalized)) return true;
+  if (SOURCE_MUTATION_EQUIVALENT_TOOLS.has(normalized) && computer.acted) return true;
+  if (normalized === "read_source_code" && computer.observed) return true;
+  if ((normalized === "run_command" || normalized === "graph_health_report") && computer.acted && computer.observed) return true;
   if (normalized === "read_source_code") return [...called].some((tool) => READ_EQUIVALENT_TOOLS.has(tool));
   if (normalized === "patch_file") return [...called].some((tool) => SOURCE_MUTATION_EQUIVALENT_TOOLS.has(tool));
   if (normalized === "enrich_seed_data") return [...called].some((tool) => GRAPH_RECORDING_EQUIVALENT_TOOLS.has(tool));

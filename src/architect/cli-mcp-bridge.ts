@@ -38,6 +38,8 @@ const AUDIT_BODY_LIMIT = 16 * 1024;
 const AUDIT_QUEUE_LIMIT = 256;
 const AUDIT_SHUTDOWN_BUDGET_MS = 2_000;
 const MANAGED_CONTEXT = process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER?.startsWith("dgexec.") === true;
+/** DreamGraph's Computer Use browser tools (served by the daemon for an execution with Computer Use granted). */
+const COMPUTER_USE_TOOL = /^browser_[a-z_]+$/;
 /** Set only when the instance policy is "ask" and this pass has no grant: the executor may request it. */
 const COMPUTER_USE_REQUESTABLE = process.env.DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE === "1";
 type ContextDelivery = { receipt_id: string; block: string; delivery: "unattested" };
@@ -190,7 +192,8 @@ async function main(): Promise<void> {
         : req.params.name === REQUEST_COMPUTER_USE_TOOL.name
           ? requestComputerUse(req.params.arguments ?? {})
           : await upstream.callTool(req.params, undefined, { signal: extra.signal });
-      if (MANAGED_CONTEXT) {
+      // A Computer Use browser action changes no graph context: no context block after every click and screenshot.
+      if (MANAGED_CONTEXT && !COMPUTER_USE_TOOL.test(req.params.name)) {
         try {
           const delivery = await contextTransport("refresh", {}, extra.signal) as ContextDelivery;
           if (!Array.isArray(result.content)) throw new Error("CLI_OWNER_RESULT_CONTENT_INVALID");

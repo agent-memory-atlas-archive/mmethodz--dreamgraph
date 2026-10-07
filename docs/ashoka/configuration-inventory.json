@@ -49,7 +49,7 @@
       "documented": [
         {
           "file": "README.md",
-          "line": 126
+          "line": 128
         },
         {
           "file": "templates/default/config/engine.env",
@@ -3290,6 +3290,35 @@
       }
     },
     {
+      "key": "DREAMGRAPH_AUTONOMOUS_AUTO_APPROVE",
+      "owner": "architect",
+      "unit": "value",
+      "apply": "next_execution",
+      "secret": false,
+      "protected": true,
+      "description": "Default 1: autonomous executions may approve classified graph/source writes under standing policy. 0 requires interactive approval. External, destructive, runtime and discipline operations still require review; this is not a Computer Use grant.",
+      "constraints": {
+        "type": "string",
+        "enum": [
+          "0",
+          "1"
+        ]
+      },
+      "consumers": [
+        {
+          "file": "src/server/managed-execution.ts",
+          "line": 51,
+          "expression": "process.env.DREAMGRAPH_AUTONOMOUS_AUTO_APPROVE === \"0\""
+        }
+      ],
+      "documented": [],
+      "default_source": {
+        "file": "src/server/managed-execution.ts",
+        "line": 51,
+        "expression": "process.env.DREAMGRAPH_AUTONOMOUS_AUTO_APPROVE === \"0\""
+      }
+    },
+    {
       "key": "DREAMGRAPH_BENCH_ITERATIONS",
       "owner": "client/build utilities",
       "unit": "value",
@@ -3410,14 +3439,14 @@
       "consumers": [
         {
           "file": "src/architect/cli-mcp-bridge.ts",
-          "line": 42,
+          "line": 44,
           "expression": "process.env.DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE === \"1\""
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/architect/cli-mcp-bridge.ts",
-        "line": 42,
+        "line": 44,
         "expression": "process.env.DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE === \"1\""
       }
     },
@@ -3540,22 +3569,22 @@
         },
         {
           "file": "src/architect/cli-mcp-bridge.ts",
-          "line": 53,
+          "line": 55,
           "expression": "process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER ?? \"\""
         },
         {
           "file": "src/architect/cli-mcp-bridge.ts",
-          "line": 104,
+          "line": 106,
           "expression": "process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER ? { \"X-DreamGraph-Session\": process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER } : {}"
         },
         {
           "file": "src/architect/cli-mcp-bridge.ts",
-          "line": 104,
+          "line": 106,
           "expression": "\"X-DreamGraph-Session\": process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER"
         },
         {
           "file": "src/architect/cli-mcp-bridge.ts",
-          "line": 358,
+          "line": 361,
           "expression": "process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER ?? \"\""
         }
       ],
@@ -3605,14 +3634,14 @@
       "consumers": [
         {
           "file": "src/architect/cli-bridge.ts",
-          "line": 643,
+          "line": 670,
           "expression": "process.env.DREAMGRAPH_CODEX_CUA_TRANSPORT === \"daemon-http\""
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/architect/cli-bridge.ts",
-        "line": 643,
+        "line": 670,
         "expression": "process.env.DREAMGRAPH_CODEX_CUA_TRANSPORT === \"daemon-http\""
       }
     },
@@ -3825,6 +3854,26 @@
       "default_source": null
     },
     {
+      "key": "DREAMGRAPH_COMPUTER_USE_BACKEND",
+      "owner": "computer use",
+      "unit": "value",
+      "apply": "next_execution",
+      "secret": false,
+      "protected": false,
+      "description": "Auto prefers the connected DreamGraph browser extension and otherwise uses available Codex CUA. An explicit backend disables automatic selection; permission remains required.",
+      "constraints": {
+        "type": "string",
+        "enum": [
+          "auto",
+          "dreamgraph-browser",
+          "cua-runtime"
+        ]
+      },
+      "consumers": [],
+      "documented": [],
+      "default_source": null
+    },
+    {
       "key": "DREAMGRAPH_COMPUTER_USE_POLICY",
       "owner": "computer use",
       "unit": "value",
@@ -3955,14 +4004,14 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 246,
+          "line": 247,
           "expression": "process.env.DREAMGRAPH_ENABLE_DOOM?.trim"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 246,
+        "line": 247,
         "expression": "process.env.DREAMGRAPH_ENABLE_DOOM?.trim"
       }
     },
@@ -4038,7 +4087,7 @@
         },
         {
           "file": "src/tools/scan-project.ts",
-          "line": 1402,
+          "line": 1395,
           "expression": "Number(process.env.DREAMGRAPH_ENRICHMENT_BATCH_SIZE)"
         }
       ],
@@ -4317,7 +4366,7 @@
       "documented": [
         {
           "file": "README.md",
-          "line": 517
+          "line": 519
         },
         {
           "file": "docs/architecture.md",
@@ -4580,17 +4629,17 @@
         },
         {
           "file": "src/architect/routes.ts",
-          "line": 439,
+          "line": 444,
           "expression": "!process.env.DREAMGRAPH_INSTANCE_UUID"
         },
         {
           "file": "src/architect/routes.ts",
-          "line": 695,
+          "line": 700,
           "expression": "process.env.DREAMGRAPH_INSTANCE_UUID ?? null"
         },
         {
           "file": "src/architect/routes.ts",
-          "line": 13697,
+          "line": 13785,
           "expression": "getActiveScope()?.uuid ?? process.env.DREAMGRAPH_INSTANCE_UUID"
         },
         {
@@ -4635,7 +4684,7 @@
         },
         {
           "file": "src/cognitive/model-execution.ts",
-          "line": 49,
+          "line": 51,
           "expression": "process.env.DREAMGRAPH_INSTANCE_UUID || directoryInstanceId(this.directory)"
         },
         {
@@ -4754,7 +4803,7 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 268,
+          "line": 269,
           "expression": "process.env.DREAMGRAPH_LLM_API_KEY?.trim"
         },
         {
@@ -4808,7 +4857,7 @@
       ],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 268,
+        "line": 269,
         "expression": "process.env.DREAMGRAPH_LLM_API_KEY?.trim"
       }
     },
@@ -5541,7 +5590,7 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 3750,
+          "line": 3765,
           "expression": "model: process.env.DREAMGRAPH_LLM_ARCHITECT_MODEL"
         }
       ],
@@ -5561,7 +5610,7 @@
       ],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 3750,
+        "line": 3765,
         "expression": "model: process.env.DREAMGRAPH_LLM_ARCHITECT_MODEL"
       }
     },
@@ -5614,7 +5663,7 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 3750,
+          "line": 3765,
           "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER as ArchitectLlmConfig[\"provider\"]"
         }
       ],
@@ -5626,7 +5675,7 @@
       ],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 3750,
+        "line": 3765,
         "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER as ArchitectLlmConfig[\"provider\"]"
       }
     },
@@ -10719,6 +10768,25 @@
                 }
               ]
             },
+            "cached_input_per_million": {
+              "type": "number",
+              "checks": [
+                {
+                  "kind": "min",
+                  "value": 0,
+                  "inclusive": true
+                },
+                {
+                  "kind": "finite"
+                },
+                {
+                  "kind": "max",
+                  "value": 1000000,
+                  "inclusive": true
+                }
+              ],
+              "optional": true
+            },
             "output_includes_reasoning": {
               "const": true
             },
@@ -10739,12 +10807,12 @@
         },
         {
           "file": "src/cognitive/jobs.ts",
-          "line": 122,
+          "line": 124,
           "expression": "process.env.DREAMGRAPH_LLM_PRICING ?? \"[]\""
         },
         {
           "file": "src/cognitive/model-execution.ts",
-          "line": 48,
+          "line": 50,
           "expression": "currentJob()?.pricing ?? process.env.DREAMGRAPH_LLM_PRICING"
         }
       ],
@@ -11196,7 +11264,7 @@
         },
         {
           "file": "src/tools/scan-project.ts",
-          "line": 1445,
+          "line": 1438,
           "expression": "Number(process.env.DREAMGRAPH_MAJOR_GRAPH_CHANGE_NODES)"
         }
       ],
@@ -11275,7 +11343,7 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 705,
+          "line": 710,
           "expression": "scope?.masterDir ?? process.env.DREAMGRAPH_MASTER_DIR"
         },
         {
@@ -11297,7 +11365,7 @@
       "documented": [],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 705,
+        "line": 710,
         "expression": "scope?.masterDir ?? process.env.DREAMGRAPH_MASTER_DIR"
       }
     },

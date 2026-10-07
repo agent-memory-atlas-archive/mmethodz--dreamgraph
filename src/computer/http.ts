@@ -1,4 +1,6 @@
 /** Original operator controls. The worker bearer cannot reach these ports or supply a backend. */
+import {browserBridgeStatus} from "./browser-bridge/setup.js";
+import {plannedComputerUseRoute} from "./computer-use-backend.js";
 import type {IncomingMessage,ServerResponse} from "node:http";
 import {z} from "zod";
 import {getSessionContext} from "../server/session-context.js";
@@ -40,12 +42,17 @@ export async function handleComputerHttp(req:IncomingMessage,res:ServerResponse,
     limits:journal.limits,usage:journal.usage,last_receipt:journal.actions?.at(-1)?.receipt??null});
   try{
     const url=new URL(req.url!,"http://local");
+    if(req.method==="GET"&&pathname===browserPrefix+"browser-bridge"){json(res,200,{ok:true,...await browserBridgeStatus()});return true;}
     if(req.method==="GET"&&pathname.endsWith("/profiles")){json(res,200,{ok:true,schemas:computerConfigurationSchemas(),profiles:await listComputerConfiguration()});return true;}
     if(req.method==="GET"&&pathname.endsWith("/profiles/read")){json(res,200,{ok:true,result:await inspectComputerConfiguration(Object.fromEntries(url.searchParams))});return true;}
     if(req.method==="GET"&&pathname.endsWith("/sessions")){
       const query=Object.fromEntries(url.searchParams),result=await listManagedComputerSessions({...query,...(query.limit?{limit:Number(query.limit)}:{})});
       json(res,200,{ok:true,...result,sessions:result.sessions.map(row=>native?projection(row.journal):({...row,worker_available:!!activeComputerBroker(row.execution_id,row.journal.session.id)}))});return true;}
-    if(req.method==="GET"&&pathname.endsWith("/setup")){json(res,200,{ok:true,...await inspectComputerSetup(nativePreparation?'native_api_tool_loop':url.searchParams.get("adapter")??"native_api_tool_loop",authorityOrigins(req),nativePreparation?'computer_use':url.searchParams.get("model_role")??"architect")});return true;}
+    if(req.method==="GET"&&pathname.endsWith("/setup")){
+      // The route a granted pass on this adapter takes now (DreamGraph's browser, Codex's own, the runtime), for the page.
+      const bridge=await browserBridgeStatus().catch(()=>null),adapter=nativePreparation?'native_api_tool_loop':url.searchParams.get("adapter")??"native_api_tool_loop";
+      const computer_use_route=plannedComputerUseRoute(adapter,{connected:!!bridge?.connected,version:bridge?.hosts[0]?.extension_version??null});
+      json(res,200,{ok:true,computer_use_route,...await inspectComputerSetup(nativePreparation?'native_api_tool_loop':url.searchParams.get("adapter")??"native_api_tool_loop",authorityOrigins(req),nativePreparation?'computer_use':url.searchParams.get("model_role")??"architect")});return true;}
     if(req.method==="GET"&&["/status","/observation"].some(route=>pathname.endsWith(route))){
       const request=pair.parse(Object.fromEntries(url.searchParams)),journal=await readComputerJournal(request.execution_id,request.id);
       if(pathname.endsWith("/status")){const broker=activeComputerBroker(request.execution_id,request.id);json(res,200,native?{ok:true,...projection(journal)}:{ok:true,journal,worker_available:!!broker,pause_supported:broker?.pauseSupported??false});return true;}

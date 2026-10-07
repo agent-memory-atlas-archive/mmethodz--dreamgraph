@@ -1,0 +1,27 @@
+<!doctype html><html><head><title>Fixture IDE</title>
+<style>body{font-family:sans-serif;margin:0} #files li{cursor:pointer} canvas{border:1px solid #333} .cover{position:fixed;left:0;top:0;width:60px;height:30px;background:#eee}</style></head>
+<body>
+<nav><button id="new" aria-label="New file" onclick="newFile()">New</button><button onclick="if(confirm('Delete '+current+'?')){remove()}">Delete</button>
+<label><input type="checkbox" id="guard" onchange="window.onbeforeunload=this.checked?(e=>{e.preventDefault();e.returnValue='unsaved'}):null"> Unsaved changes</label></nav>
+<ul id="files"><li onclick="openFile('main.asm')">main.asm</li></ul>
+<div id="editor" contenteditable="true" role="textbox" aria-label="Source code" style="min-height:60px;border:1px solid #999;white-space:pre"></div>
+<button id="save" onclick="saveProject()">Save project</button>
+<input id="name" placeholder="Project name" value="demo">
+<input type="file" id="upload" aria-label="Import file">
+<p id="status">Idle</p>
+<canvas id="sprite" width="96" height="84" aria-label="Sprite canvas"></canvas>
+<div style="height:1600px"></div><button id="far">Far away</button>
+<script>
+let current = 'main.asm';
+function newFile(){ const name = prompt('Virtual file path', 'includes/new-file.asm'); if (name === null) { status('cancelled'); return; }
+  const li = document.createElement('li'); li.textContent = name; li.onclick = () => openFile(name); document.getElementById('files').append(li); openFile(name); status('created ' + name); }
+function openFile(name){ current = name; status('opened ' + name); }
+function remove(){ status('deleted ' + current); }
+function saveProject(){ showSaveFilePicker({ suggestedName: 'main.web64proj', types: [{ description: 'Web64 project', accept: { 'application/json': ['.web64proj'] } }] })
+  .then(handle => handle.createWritable()).then(writable => writable.write('{"main":"hello"}').then(() => writable.close())).then(() => status('saved'), error => status('save ' + error.name)); }
+function status(text){ document.getElementById('status').textContent = text; }
+const c = document.getElementById('sprite'), g = c.getContext('2d'); let down = false; let painted = 0;
+c.onmousedown = e => { down = true; paint(e); }; c.onmousemove = e => { if (down) paint(e); }; addEventListener('mouseup', () => { down = false; });
+function paint(e){ const r = c.getBoundingClientRect(); g.fillRect(Math.floor(e.clientX - r.left), Math.floor(e.clientY - r.top), 2, 2); painted++; c.dataset.painted = painted; }
+document.getElementById('upload').onchange = e => status('upload ' + Array.from(e.target.files).map(f => f.name).join(','));
+</script></body></html>

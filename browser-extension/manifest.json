@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "DreamGraph Computer Use",
+  "version": "14.0.2",
+  "description": "Lets DreamGraph's Architect operate this browser when you grant Computer Use. Connects only to the DreamGraph host on this computer.",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "debugger",
+    "tabs",
+    "nativeMessaging",
+    "alarms"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "DreamGraph Computer Use",
+    "default_popup": "popup.html"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsjjKmUDRQTJcsdX+dBL9TKdtS+wBfadFxj6xYel0bvHn4eRJqnCKbHXBoT8IKrK0q3vscbP2b1vc8THEpusuTd5BDxT495DEp6NQXpo5FBXwb3nthZtB+ComaGCBIygU11hqMxnyDZW5JHsoCnCBGaJx3sIgv7gfDljv2Sd0Rtvjy5bJjCiAAjhErFosGf5o2TyOD9M1InXkgwSMvADEQM9MQH7crc9vwSBxwFN9H0GpPsZ1xXG5sxInfUOsGSWNVcrDJ68nlNiXm8BxT/2h37RDIs+DhgpPT7TiIHFx9bl5EFWJ52IqFhdHGTEQlRen5WcJLJ/loVBXE133XaKV9wIDAQAB"
+}

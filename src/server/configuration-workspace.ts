@@ -481,13 +481,21 @@ function renderAutomation(p) {
 /* ---------------- budgets ---------------- */
 const BUDGET_ROLES = [['initial_scan', 'Initial scan'], ['enrichment', 'Enrichment'], ['dreamer', 'Dreamer'], ['normalizer', 'Normalizer'], ['architect', 'Architect']];
 const PRICE_VERSION = 'dashboard';
+/** The Architect can be switched to the API engine per chat even when its default engine is a CLI. */
+function architectApiModel() {
+  const adapter = eff('DREAMGRAPH_LLM_ARCHITECT_ADAPTER') || 'native_api_tool_loop';
+  if (adapter !== 'codex-cli' && adapter !== 'copilot-cli') return null;
+  const own = eff('DREAMGRAPH_LLM_ARCHITECT_PROVIDER'), provider = own && own !== 'none' ? own : eff('DREAMGRAPH_LLM_PROVIDER'), model = eff('DREAMGRAPH_LLM_ARCHITECT_MODEL');
+  return (provider === 'openai' || provider === 'anthropic') && model ? { provider, model } : null;
+}
 function pricing() { try { const v = JSON.parse(cur('DREAMGRAPH_LLM_PRICING') || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
 function setPrice(provider, model, field, value) {
   const list = pricing(); let row = list.find(r => r.provider === provider && r.model === model && r.version === PRICE_VERSION);
   if (!row) { row = { version: PRICE_VERSION, provider, model, currency: 'USD', source: 'DreamGraph dashboard (operator entered)', input_per_million: 0, output_per_million: 0, output_includes_reasoning: true, input_includes_images: true }; list.push(row); }
-  row[field] = value;
+  if (value === null) delete row[field]; else row[field] = value;
   setDraft('DREAMGRAPH_LLM_PRICING', JSON.stringify(list));
-  for (const [r] of BUDGET_ROLES) { const pr = roles.find(x => x.role === r); if (pr && pr.effective.provider === provider && pr.effective.model === model) { setDraft('DREAMGRAPH_LLM_' + r.toUpperCase() + '_PRICING_VERSION', PRICE_VERSION); if (!cur('DREAMGRAPH_LLM_' + r.toUpperCase() + '_BUDGET_CURRENCY')) setDraft('DREAMGRAPH_LLM_' + r.toUpperCase() + '_BUDGET_CURRENCY', 'USD'); } }
+  const am = architectApiModel();
+  for (const [r] of BUDGET_ROLES) { const pr = roles.find(x => x.role === r); if (pr && pr.effective.provider === provider && pr.effective.model === model || r === 'architect' && am && am.provider === provider && am.model === model) { setDraft('DREAMGRAPH_LLM_' + r.toUpperCase() + '_PRICING_VERSION', PRICE_VERSION); if (!cur('DREAMGRAPH_LLM_' + r.toUpperCase() + '_BUDGET_CURRENCY')) setDraft('DREAMGRAPH_LLM_' + r.toUpperCase() + '_BUDGET_CURRENCY', 'USD'); } }
 }
 const BUDGET_FIELD = { MAX_CALLS: 'requests', MAX_INPUT_TOKENS: 'input_tokens', MAX_OUTPUT_TOKENS: 'output_tokens', CONCURRENCY: 'concurrency', RUN_BUDGET: 'run_amount', DAY_BUDGET: 'day_amount' };
 /** Built-in budget the daemon resolved for this role (placeholder for empty cells). */
@@ -513,21 +521,23 @@ function renderBudgets(p) {
   const apiRoles = roles.filter(r => r.billing && r.billing.channel === 'api' && BUDGET_ROLES.some(b => b[0] === r.role));
   const tbl = h('table', { class: 'cfg-table' }, h('tr', {}, h('th', {}, 'Job'), h('th', {}, 'Requests per run'), h('th', {}, 'Input tokens per run'), h('th', {}, 'Output tokens per run'), h('th', {}, 'Parallel requests'), h('th', {}, 'Spend per run (USD)'), h('th', {}, 'Spend per day (USD)')));
   for (const [r, title] of BUDGET_ROLES) {
-    const R = 'DREAMGRAPH_LLM_' + r.toUpperCase() + '_', pr = roles.find(x => x.role === r), paid = pr && pr.billing && pr.billing.channel === 'api';
-    tbl.append(h('tr', {}, h('td', {}, title, h('div', { class: 'help' }, pr ? pr.effective.model + (paid ? '' : ' · ' + (pr.billing ? pr.billing.channel : 'local')) : '')),
+    const R = 'DREAMGRAPH_LLM_' + r.toUpperCase() + '_', pr = roles.find(x => x.role === r), am = r === 'architect' ? architectApiModel() : null;
+    const paid = pr && pr.billing && pr.billing.channel === 'api' || !!am;
+    tbl.append(h('tr', {}, h('td', {}, title, h('div', { class: 'help' }, am ? am.model + ' · spend limits apply when this chat uses the API engine' : pr ? pr.effective.model + (paid ? '' : ' · ' + (pr.billing ? pr.billing.channel : 'local')) : '')),
       cell(R + 'MAX_CALLS', { step: 1 }), cell(R + 'MAX_INPUT_TOKENS', { step: 1000 }), cell(R + 'MAX_OUTPUT_TOKENS', { step: 1000 }), cell(R + 'CONCURRENCY', { step: 1 }),
       paid ? cell(R + 'RUN_BUDGET', { step: 0.01, integer: false }) : h('td', { class: 'help' }, 'not billed'), paid ? cell(R + 'DAY_BUDGET', { step: 0.01, integer: false }) : h('td', { class: 'help' }, 'not billed')));
   }
   p.append(card('Limits per job', 'Paid API jobs only run when both spend limits are above zero and the model has a price below.', h('div', { style: 'overflow-x:auto' }, tbl)));
   const models = []; for (const r of apiRoles) if (!models.some(m => m.provider === r.effective.provider && m.model === r.effective.model)) models.push({ provider: r.effective.provider, model: r.effective.model });
+  const am = architectApiModel(); if (am && !models.some(m => m.provider === am.provider && m.model === am.model)) models.push(am);
   if (models.length) {
-    const pt = h('table', { class: 'cfg-table' }, h('tr', {}, h('th', {}, 'Model'), h('th', {}, 'Input price per 1M tokens (USD)'), h('th', {}, 'Output price per 1M tokens (USD)')));
+    const pt = h('table', { class: 'cfg-table' }, h('tr', {}, h('th', {}, 'Model'), h('th', {}, 'Input price per 1M tokens (USD)'), h('th', {}, 'Cached input price per 1M tokens (USD)'), h('th', {}, 'Output price per 1M tokens (USD)')));
     for (const m of models) {
       const row = pricing().find(x => x.provider === m.provider && x.model === m.model) || {};
-      const mk = f => { const i = h('input', { type: 'number', min: 0, step: 0.01, value: row[f] !== undefined ? String(row[f]) : '', placeholder: 'e.g. 2.50', 'aria-label': m.model + ' ' + f }); i.addEventListener('input', () => { const n = Number(i.value); if (i.value !== '' && Number.isFinite(n) && n >= 0) setPrice(m.provider, m.model, f, n); }); return h('td', {}, i); };
-      pt.append(h('tr', {}, h('td', {}, m.model, h('div', { class: 'help' }, m.provider)), mk('input_per_million'), mk('output_per_million')));
+      const mk = (f, optional) => { const i = h('input', { type: 'number', min: 0, step: 0.01, value: row[f] !== undefined ? String(row[f]) : '', placeholder: optional ? 'same as input' : 'e.g. 2.50', 'aria-label': m.model + ' ' + f }); i.addEventListener('input', () => { const n = Number(i.value); if (i.value === '' && optional) setPrice(m.provider, m.model, f, null); else if (i.value !== '' && Number.isFinite(n) && n >= 0) setPrice(m.provider, m.model, f, n); }); return h('td', {}, i); };
+      pt.append(h('tr', {}, h('td', {}, m.model, h('div', { class: 'help' }, m.provider)), mk('input_per_million'), mk('cached_input_per_million', true), mk('output_per_million')));
     }
-    p.append(card('Prices of paid models', 'Copy these from your provider\'s pricing page. DreamGraph uses them to stop work before a spend limit would be exceeded.', h('div', { style: 'overflow-x:auto' }, pt)));
+    p.append(card('Prices of paid models', 'Copy these from your provider\'s pricing page. DreamGraph uses them to stop work before a spend limit would be exceeded. The cached input price applies to input the provider reports as cached; leave it empty to count cached input at the full input price.', h('div', { style: 'overflow-x:auto' }, pt)));
   }
   p.append(card('Graph retrieval', 'How much of the graph is gathered around each question.', grid(
     num('DREAMGRAPH_LLM_ARCHITECT_MAX_HOPS', 'Relationship depth (Architect)', 'How many steps away from the focus to follow.', { min: 0, max: 6, step: 1 }),
@@ -544,9 +554,34 @@ function renderComputer(p) {
     opt('allow', 'Allow', 'Use it whenever a task needs it.'),
     opt('ask', 'Ask every time', 'When the Architect needs the computer it asks you first, then continues if you allow it. You can also pre-approve the next message.'),
     opt('deny', 'Deny', 'Never operate this computer.'))),
-    h('div', { class: 'cfg-status' }, 'Codex CLI uses its own built-in Computer Use. The API engine uses DreamGraph\'s browser harness, which is prepared per task from the Architect\'s Harness button.')));
+    h('div', { class: 'cfg-status' }, 'The same choice applies to every engine. Codex CLI and the API engines operate your Chrome through DreamGraph\'s browser extension; without it, Codex CLI falls back to its own built-in Computer Use. No per-task setup is needed.')));
+  p.append(browserBridgeCard());
   p.append(more('Time limit for tasks', grid(num('DREAMGRAPH_ARCHITECT_PASS_TIMEOUT_MS', 'Time limit per task', 'Tasks that use the computer usually need longer. Shared with the Architect page.', { unit: 'minutes', scale: 60000, min: 1, max: 240 }))));
   p.append(profilePanel());
+}
+
+/* DreamGraph's browser bridge (extension + host) used by Codex CLI and the API engines. Read-only status; setup is dg browser setup. */
+function browserBridgeCard() {
+  const body = h('div', { class: 'cfg-status' }, 'Checking the DreamGraph browser extension…');
+  const box = card('Browser for Computer Use', 'Codex CLI and the API engines operate your Chrome through DreamGraph\'s own extension. It stays idle until you grant Computer Use.', body);
+  const draw = s => {
+    const folder = h('code', {}, s.extension_dir);
+    const copy = h('button', { type: 'button', onclick: () => { navigator.clipboard && navigator.clipboard.writeText(s.extension_dir).then(() => say('Folder path copied.', 'ok')).catch(() => undefined); } }, 'Copy folder path');
+    body.replaceChildren(
+      h('p', {}, h('strong', {}, s.connected ? 'Connected' : 'Not connected'), s.connected && s.hosts[0] && s.hosts[0].extension_version ? ' · extension ' + s.hosts[0].extension_version : ''),
+      s.connected ? h('p', {}, 'Ready. Chrome shows a “started debugging this browser” bar while a run controls a tab; Cancel there takes control back.')
+        : h('ol', {}, ...(s.host_registered ? [] : [h('li', {}, 'Run ', h('code', {}, 'dg browser setup'), ' (the installer does this).')]),
+          h('li', {}, 'In Chrome open ', h('code', {}, 'chrome://extensions'), ' and turn on Developer mode.'),
+          h('li', {}, 'Choose Load unpacked and select ', folder, ' ', copy),
+          h('li', {}, 'Keep Chrome open. The extension connects by itself; this card then says Connected.')),
+      h('button', { type: 'button', onclick: load }, 'Check again'));
+  };
+  async function load() {
+    try { draw(await api('/api/architect/v1/computer/browser-bridge')); }
+    catch (e) { body.replaceChildren(h('p', {}, 'Could not read the extension status: ' + e.message)); }
+  }
+  void load();
+  return box;
 }
 
 /* Scoped profile authoring is setup only. The Architect still admits each pass and grant. */

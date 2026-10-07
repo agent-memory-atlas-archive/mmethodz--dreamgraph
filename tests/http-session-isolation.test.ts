@@ -64,10 +64,12 @@ describe("actual local HTTP session boundaries", () => {
     const stateB = await (await fetch(base + "/api/architect/v1", { headers: { "X-DreamGraph-Session": b.token } })).json();
     expect(stateA.architect_runtime.model).toBe("gpt-6.1-sol"); expect(stateB.architect_runtime.model).not.toBe("gpt-6.1-sol");
     expect(await readFile(join(root, "config", "engine.env"), "utf8")).toBe(before);
-    expect((await post("/api/architect/v1/chat-history", a.token, { messages: [{ role: "user", content: "private-a" }] })).status).toBe(200);
+    expect((await post("/api/architect/v1/chat-history", a.token, { scope: "plan", plan_id: "one", messages: [{ role: "user", content: "private-a" }] })).status).toBe(200);
     const aHistory = await (await fetch(base + "/api/architect/v1/chat-history", { headers: { "X-DreamGraph-Session": a.token } })).json();
     const bHistory = await (await fetch(base + "/api/architect/v1/chat-history", { headers: { "X-DreamGraph-Session": b.token } })).json();
     expect(JSON.stringify(aHistory)).toContain("private-a"); expect(JSON.stringify(bHistory)).not.toContain("private-a");
+    const projectHistory = await (await fetch(base + "/api/architect/v1/chat-history?scope=project", { headers: { "X-DreamGraph-Session": a.token } })).json();
+    expect(JSON.stringify(projectHistory)).not.toContain("private-a");
     expect((await post("/api/architect/v1/chat-history", b.token, { session_id: a.state.session_id, clear: true })).status).toBe(403);
     expect((await fetch(base + "/api/architect/v1/chat-history", { headers: { "X-DreamGraph-Session": "forged.token" } })).status).toBe(401);
   });

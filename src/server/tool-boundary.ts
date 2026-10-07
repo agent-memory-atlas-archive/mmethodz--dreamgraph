@@ -44,6 +44,13 @@ export async function invokeToolBoundary(input: { name: string; shape: ZodRawSha
   const requested = (extra?._meta?.dreamgraph as { contract_version?: unknown } | undefined)?.contract_version;
   if (requested !== undefined && requested !== TOOL_CONTRACT_VERSION) return toolBoundaryError(name, "CONTRACT_VERSION_UNSUPPORTED", "This daemon accepts tool contract version 1; refresh capabilities.");
   if (!z.object(input.shape).strict().safeParse(input.args ?? {}).success) return toolBoundaryError(name, "INVALID_INPUT", "Arguments do not match the registered owner schema.");
+  // Computer Use actions are authorized by the execution's Computer Use grant (the owner refuses without one), not by
+  // per-call execution review; they hold no graph writer and record no managed effect. A browser save into project
+  // source records its own change obligation (computer/dreamgraph-browser.ts).
+  if (coreToolPolicy(name).effect === "computer_use") {
+    try { return normalizeToolResult(name, await input.handler()); }
+    catch (error) { return toolBoundaryError(name, extra?.signal?.aborted ? "REQUEST_CANCELLED_EFFECT_UNKNOWN" : "OWNER_FAILURE", error instanceof Error ? error.message : String(error)); }
+  }
   const session = getActiveSession();
   if (session?.status === "active" && !name.startsWith("discipline_")) {
     const args = (input.args ?? {}) as Record<string, unknown>;

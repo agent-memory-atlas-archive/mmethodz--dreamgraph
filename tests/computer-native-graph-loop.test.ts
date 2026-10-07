@@ -132,8 +132,10 @@ it.each(['native_core','native_sdk','native_sdk_stop','native_sdk_plan','native_
      calls=[{id:"gui-action",name:"computer_action",input:action}];}
     if(!followup&&index===5)calls=[{id:"reconcile",name:"scan_project",input:scan}];
     for(const call of calls)expect(request.tools.map((tool:any)=>tool.function.name),"Declared fixture must use only advertised tools").toContain(call.name);
-    res.setHeader("Content-Type","application/json");res.end(JSON.stringify({model:"gpt-4.1",usage:{prompt_tokens:100,completion_tokens:10},choices:[{finish_reason:calls.length?"tool_calls":"stop",message:{
-     content:calls.length?null:'Controlled source evidence inspected.\n```architect_continuation\n{"schema":"dreamgraph.architect.continuation.v1","status":"completed"}\n```',
+    // This refusal case deliberately has no provider usage: retain the conservative wire-byte allocation.
+    // Measured replies on the successful routes exercise the calibrated prompt-caching path.
+    res.setHeader("Content-Type","application/json");res.end(JSON.stringify({model:"gpt-4.1",usage:contextExhausted?undefined:{prompt_tokens:100,completion_tokens:10},choices:[{finish_reason:calls.length?"tool_calls":"stop",message:{
+     content:contextExhausted&&index===4?'Declared context expansion after the GUI action. '.repeat(900):calls.length?null:'Controlled source evidence inspected.\n```architect_continuation\n{"schema":"dreamgraph.architect.continuation.v1","status":"completed"}\n```',
      tool_calls:calls.map(call=>({id:call.id,type:"function",function:{name:call.name,arguments:JSON.stringify(call.input)}}))}}]}));return;}
     const owner=await authority.authorize(req,res);if(!owner)return;
     await withSessionContext(owner,async()=>{if(await authority.handle(req,res,owner)||await handleManagedExecutionApi(req,res,new URL(req.url!,"http://local").pathname))return;
@@ -156,7 +158,10 @@ it.each(['native_core','native_sdk','native_sdk_stop','native_sdk_plan','native_
   nativeOperator=new ManagedExecutionClient({baseUrl:endpoint,sessionBearer:operator.bearer});
   for(const role of ["COMPUTER_USE","ARCHITECT"])for(const [suffix,value]of Object.entries({PROVIDER:"openai",MODEL:"gpt-4.1",API:"chat_completions",URL:endpoint+"/v1",API_KEY:"synthetic-offline-credential",MAX_TOKENS:"1000",TIMEOUT_MS:"60000",RETENTION:"store_false",STRICT_SCHEMA:"false"}))vi.stubEnv(`DREAMGRAPH_LLM_${role}_${suffix}`,value);
   // Explicit fixture admission: the selected plan's native prompt is larger than the project-only prompt.
-  // Keep the smaller actual refusal as its own recovery case; never raise product/default limits or retry a paid request.
+  // The refusal fixture adds an explicit 43KB assistant/tool-call turn after the GUI action rather than depending
+  // on incidental prompt overhead. Its declared output allowance accommodates that synthetic expansion.
+  // Never raise product/default limits or retry a paid request.
+  if(contextExhausted)vi.stubEnv('DREAMGRAPH_LLM_COMPUTER_USE_MAX_TOKENS','20000');
   if(planBound)vi.stubEnv('DREAMGRAPH_LLM_COMPUTER_USE_CONTEXT_TOKENS',contextExhausted?'32768':'65536');
   if(nativeApi)vi.stubEnv('DREAMGRAPH_LLM_ARCHITECT_STRICT_SCHEMA','true'); // Its ordinary role cannot bind; the explicit computer_use role must still work.
   if(nativeApi){
@@ -188,7 +193,7 @@ it.each(['native_core','native_sdk','native_sdk_stop','native_sdk_plan','native_
    if(nativeApi){
     const reply=await nativeOperator!.runComputerPass({computer_preparation_id:prepared.id,message:'Update Controlled GUI and reconcile the graph with incremental scan_project.',autonomy_mode:'supervised',verbosity_mode:'concise',...(planIntent?{plan_id:planIntent.scope.id,plan_execution:planIntent}: {})},executionId,controller.signal);
     const closed=await own(()=>readManagedContext(executionId));
-    expect(reply,JSON.stringify({status:reply.execution.status,content:reply.content.slice(0,1000),plan_termination:closed.plan_closure?.effective_termination,effects:closed.effects.map(effect=>({tool:effect.tool,outcome:effect.outcome})),provider_requests:requests.length,source_transfers:transfers})).toMatchObject({execution_id:executionId,provider:'openai',model:'gpt-4.1',execution:{execution_id:executionId,...(stopRequested?{}:{status:contextExhausted?'recovery_required':'graph_committed'}),authority_active:false}});
+    expect(reply,JSON.stringify({status:reply.execution.status,content:reply.content.slice(0,1000),plan_termination:closed.plan_closure?.effective_termination,effects:closed.effects.map(effect=>({tool:effect.tool,outcome:effect.outcome})),provider_requests:requests.length,source_transfers:transfers})).toMatchObject({execution_id:executionId,provider:'openai',model:'gpt-4.1',execution:{execution_id:executionId,...(stopRequested?{}:{status:contextExhausted?'reconciliation_pending':'graph_committed'}),authority_active:false}});
     if(contextExhausted)expect(reply.content).toContain('ADMISSION_CONTEXT_LIMIT');
     return {graph_execution:await own(()=>readManagedContext(executionId))};
    }
@@ -222,9 +227,9 @@ it.each(['native_core','native_sdk','native_sdk_stop','native_sdk_plan','native_
   if(contextExhausted){const result=await pass,original=result.graph_execution!;expect(transfers).toBe(1);expect(requests).toHaveLength(4);expect(await readFile(source,'utf8')).toBe(changed);
    expect(roleQualification('computer_use',originalModel.fingerprint)).toBeNull();
    expect(original.computer_sessions[0].stop_state).toBe('acknowledged');expect(original.computer_sessions[0].actions[0].receipt.state).toBe('verified');
-   expect(original.plan_closure).toMatchObject({effective_termination:'unconfirmed'});expect(original.effects.some(effect=>effect.outcome==='unknown')).toBe(true);
+   expect(original.plan_closure).toMatchObject({effective_termination:'confirmed'});expect(original.effects.some(effect=>effect.outcome==='unknown')).toBe(false);
    expect((await readChangeObligations()).entries.some(item=>item.execution_id===executionId&&item.state==='reconciliation_pending')).toBe(true);
-   const pending=(await readPlanAuthority(planIntent!.scope))!;expect(pending.progress.verified).toBe(0);expect(pending.state.leases[0].state).toBe('recovery_required');expect(pending.state.slices[0].implementation_receipt_ids).toEqual([]);
+   const pending=(await readPlanAuthority(planIntent!.scope))!;expect(pending.progress.verified).toBe(0);expect(pending.state.leases).toEqual([]);expect(pending.state.slices[0].implementation_receipt_ids).toEqual([]);
    expect(pending.state.slices[0].verification).toBeNull();return;
   }
   const result=await pass;expect(transfers).toBe(1);expect(requests).toHaveLength(6);const contextAt=(i:number)=>requests[i].messages.find((m:any)=>typeof m.content==="string"&&m.content.startsWith("DreamGraph required execution context.")).content;

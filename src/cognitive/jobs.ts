@@ -107,7 +107,9 @@ export class EngineJobs {
       const policy = input.role_policies[role]; if (policy) policies[role] = snapshotRolePolicy(policy);
     } else {
       const { getRoleModelPolicy } = await import("./llm.js");
-      for (const role of MODEL_ROLES) policies[role] = snapshotRolePolicy(await getRoleModelPolicy(role));
+      await this.scope(() => withGraphRead(async () => {
+        for (const role of MODEL_ROLES) policies[role] = snapshotRolePolicy(await getRoleModelPolicy(role));
+      }));
     }
     const budgets = Object.entries(policies).filter(([role]) => !input.roles || input.roles.includes(role as ModelRole)).map(([,value]) => value!.policy.budget);
     const base = input.budget ?? budgets[0];

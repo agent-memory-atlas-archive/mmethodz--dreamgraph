@@ -53,11 +53,22 @@ dg --help             # Show all commands
 3. **Deploys to `~/.dreamgraph/bin/`** -- Copies compiled `dist/`, retains runtime and optional dependencies, runs `npm install --omit=dev`, and verifies installed workspace bytes and daemon imports
 4. **Copies templates** -- Default instance templates to `~/.dreamgraph/templates/`
 5. **Installs VS Code extension** -- Packages a VSIX, installs via `code --install-extension`, then installs runtime dependencies
-6. **Creates command shims** -- `dg` and `dreamgraph` wrappers on PATH
-7. **Configures PATH** -- Windows: adds to user PATH. Linux/macOS: creates shims in `~/.local/bin` or `/usr/local/bin`
-8. **Verifies** -- Runs `dg --version` to confirm everything works
+6. **Registers DreamGraph's browser host** -- copies the Chrome extension to `~/.dreamgraph/bin/browser-extension` and runs `dg browser setup` (see *Computer Use browser extension* below)
+7. **Creates command shims** -- `dg` and `dreamgraph` wrappers on PATH
+8. **Configures PATH** -- Windows: adds to user PATH. Linux/macOS: creates shims in `~/.local/bin` or `/usr/local/bin`
+9. **Verifies** -- Runs `dg --version` to confirm everything works
 
 The optional isolated browser runtime is pinned to `playwright-core@1.62.1`. Installation does not download a browser or enable Computer Use. An explicitly selected browser must pass the installed [worker qualification](docs/ashoka/computer-use.md) before activation.
+
+### Computer Use browser extension
+
+Computer Use (Codex CLI and the API engines) operates your Chrome through DreamGraph's own extension. It stays idle until you grant Computer Use for a pass.
+
+1. Load it once: `chrome://extensions` → **Developer mode** → **Load unpacked** → the folder `dg browser setup` prints (`~/.dreamgraph/bin/browser-extension`). Edge, Chromium and Brave work the same way.
+2. `dg browser status` (or Config → Computer Use → *Browser for Computer Use*) shows whether it is connected.
+3. `dg browser selftest` checks it end to end without a model: a prompt, a confirm, and a save through the operating system's Save dialog (Windows; `--no-file-dialog` skips the save).
+
+After an upgrade, reload the extension (↻ on `chrome://extensions`) when the release notes say it changed. While DreamGraph controls a tab, Chrome shows a "started debugging this browser" bar; **Cancel** there takes control back.
 
 WSL uses Linux Node/npm and its own `$HOME/.dreamgraph` installation. Keep the source checkout on the Linux filesystem and check any `DREAMGRAPH_MASTER_DIR` override. Installing there does not update the Windows daemon. WSL browser proof does not establish native desktop support on a separate Linux machine.
 
@@ -143,6 +154,10 @@ DREAMGRAPH_MASTER_DIR=/opt/dreamgraph bash scripts/install.sh
 
 ---
 
+## Browser extension and Computer Use
+
+The installer registers the native messaging host and deploys `browser-extension/`. Load that folder using **Developer mode → Load unpacked** at `chrome://extensions` or `edge://extensions`. `dg browser setup` prints the exact folder; `dg browser status` and the extension popup verify the connection. Then set the permission in **Architect → Config → Computer Use**. After updates, reload the extension and restart the relevant instances. See the [complete installation and connection guide](guide/17-computer-use.md), including Windows dialog support and fallback limits.
+
 ## Post-Install: First Run
 
 ```bash
@@ -174,12 +189,12 @@ export PATH="$HOME/.local/bin:$PATH"
 
 1. Check the extension is installed: Extensions sidebar > search "DreamGraph"
 2. If missing, the installer may have skipped it (VS Code `code` CLI not in PATH)
-3. Manual install after packaging: `code --install-extension extensions/vscode/dreamgraph-vscode-14.0.1.vsix`
+3. Manual install after packaging: `code --install-extension extensions/vscode/dreamgraph-vscode-14.0.2.vsix`
 4. Reload VS Code: `Ctrl+Shift+P` > "Reload Window"
 
 ### Extension activation error (missing modules)
 
-The v14.0.1 VSIX bundles its runtime and vendors its webview libraries. Reinstall the v14.0.1 VSIX and reload VS Code rather than installing npm dependencies inside the installed extension. If activation still fails, retain the exact missing-module message and report it with the extension and VS Code versions. Physical VS Code activation is not implied by the compiled-suite/package checks.
+The v14.0.2 VSIX bundles its runtime and vendors its webview libraries. Reinstall the v14.0.2 VSIX and reload VS Code rather than installing npm dependencies inside the installed extension. If activation still fails, retain the exact missing-module message and report it with the extension and VS Code versions. Physical VS Code activation is not implied by the compiled-suite/package checks.
 
 ### PowerShell execution policy error
 

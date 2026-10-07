@@ -25,6 +25,10 @@ for (const file of ['package-lock.json', 'explorer/package-lock.json', 'extensio
   }
   await writeFile(file, JSON.stringify(lock, null, 2) + '\n');
 }
+{ // DreamGraph's Chrome extension (Computer Use) carries the product version.
+  const manifest = JSON.parse(await readFile('browser-extension/manifest.json', 'utf8')); manifest.version = version;
+  await writeFile('browser-extension/manifest.json', JSON.stringify(manifest, null, 2) + '\n');
+}
 for (const file of ['src/cli/version.ts', 'extensions/vscode/src/version.ts']) {
   await writeFile(file, (await readFile(file, 'utf8')).replace(old, version));
 }

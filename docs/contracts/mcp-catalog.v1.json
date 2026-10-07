@@ -1,7 +1,7 @@
 {
   "schema": "dreamgraph.mcp_catalog.v1",
   "contract_version": 1,
-  "server_version": "14.0.1",
+  "server_version": "14.0.2",
   "compatibility": {
     "accepted_contract_versions": [
       1

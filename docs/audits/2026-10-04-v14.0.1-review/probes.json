@@ -1,0 +1,49 @@
+{
+  "reviewed_version": "14.0.1",
+  "generated_at": "2026-10-04T10:34:21.945Z",
+  "observations": [
+    {
+      "probe": "unavailable_browser_is_not_proof_of_release",
+      "tabs": [
+        {
+          "tab_id": "123",
+          "outcome": "gone",
+          "detail": "Browser connection unavailable"
+        }
+      ],
+      "turn_ended": "skipped",
+      "reported_confirmed": true
+    },
+    {
+      "probe": "failed_config_reload",
+      "displayed": "Reloaded from engine.env.",
+      "class": "cfg-message is-ok"
+    },
+    {
+      "probe": "unconfirmed_config_activation",
+      "server_activation": "restart_required",
+      "displayed": "Saved 1 setting. Changes apply to new work right away.",
+      "class": "cfg-message is-ok"
+    },
+    {
+      "probe": "repository_only_draft_reload",
+      "before": "1 unsaved change",
+      "confirmations": 0,
+      "after": "No unsaved changes",
+      "repository_name": "original"
+    },
+    {
+      "probe": "cli_inspection_vs_execution_capabilities",
+      "inspected": "capability_required",
+      "diagnostics": [
+        {
+          "field": "effort",
+          "code": "CAPABILITY_REQUIRED",
+          "message": "Requested reasoning effort must be supported by this named adapter/model; it is never silently dropped."
+        }
+      ],
+      "with_execution_capabilities": "configured",
+      "execution_diagnostics": []
+    }
+  ]
+}

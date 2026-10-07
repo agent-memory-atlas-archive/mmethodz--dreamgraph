@@ -68,7 +68,7 @@ import {
   generateStructuralWorkflows,
   generateStructuralDataModel,
 } from "./structural-generators.js";
-import { shouldSkipScanDirectory } from "./scanner-artifact-policy.js";
+import { SCANNED_CODE_EXTENSIONS, shouldSkipScanDirectory } from "./scanner-artifact-policy.js";
 import { classifyAuxiliaryFile } from "./auxiliary-classifier.js";
 import { generateAuxiliaryEntities } from "./auxiliary-generators.js";
 import { mergeAuxiliaryEntities, loadAuxiliaryEntities } from "./auxiliary-store.js";
@@ -112,15 +112,8 @@ const LLM_BATCH_SIZE = 40;
 /** Max bytes to read from a file for content analysis */
 const MAX_FILE_BYTES = 3072;
 
-/** File extensions we scan */
-const CODE_EXTENSIONS = new Set([
-  ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs",
-  ".py", ".rb", ".go", ".rs", ".java", ".kt", ".kts", ".cs",
-  ".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".hxx",
-  ".swift",
-  ".vue", ".svelte", ".xaml", ".razor",
-  ".gradle",
-]);
+/** File extensions we scan (shared with isScannerTrackedFile) */
+const CODE_EXTENSIONS = SCANNED_CODE_EXTENSIONS;
 
 /** Config / manifest files that reveal project structure */
 const MANIFEST_FILES = new Set([

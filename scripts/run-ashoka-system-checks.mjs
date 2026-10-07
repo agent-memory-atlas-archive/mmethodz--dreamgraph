@@ -57,7 +57,7 @@ async function sourceSnapshot(){
    files.push({path,bytes:bytes.length,sha256:sha(bytes)});
   }else throw new Error('ASHOKA_SOURCE_LINK_REFUSED');
  }}
- for(const directory of ['src','packages','explorer/src','extensions/vscode/src','python/analytics','tests','scripts','templates','.github/workflows'])await walk(directory);
+ for(const directory of ['src','packages','browser-extension','explorer/src','extensions/vscode/src','python/analytics','tests','scripts','templates','.github/workflows'])await walk(directory);
  for(const path of ['package.json','package-lock.json','tsconfig.json','tsconfig.base.json','vitest.config.ts','explorer/package.json','explorer/package-lock.json','explorer/tsconfig.json','extensions/vscode/package.json','extensions/vscode/package-lock.json','extensions/vscode/tsconfig.json','extensions/vscode/tsconfig.test.json']){
   const bytes=await readFile(join(root,path));files.push({path,bytes:bytes.length,sha256:sha(bytes)});
  }

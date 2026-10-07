@@ -1,0 +1,66 @@
+{
+  "reviewed_source": "d7b212f",
+  "release_tag": "v14.0.1",
+  "checked_at": "2026-10-04T10:34:52.345Z",
+  "scope": "Live read-only MCP connector. Connector tool descriptions still advertise 13.4.0; daemon process commit not revalidated. Current v14.0.1 resolver source exhibits the metadata behavior discussed in report.",
+  "requests": [
+    {
+      "probe": "health",
+      "tool": "graph_health_report",
+      "arguments": {}
+    },
+    {
+      "probe": "v1-single",
+      "tool": "query_resource",
+      "arguments": {
+        "uri": "system://features",
+        "filter": {
+          "id": "standalone_architect"
+        },
+        "contract_version": "v1",
+        "max_bytes": 65536
+      }
+    },
+    {
+      "probe": "legacy-single",
+      "tool": "query_resource",
+      "arguments": {
+        "uri": "system://features",
+        "filter": {
+          "id": "standalone_architect"
+        },
+        "contract_version": "legacy",
+        "max_bytes": 65536
+      }
+    }
+  ],
+  "results": [
+    {
+      "probe": "health",
+      "success": false,
+      "error": {
+        "code": "OUTPUT_LIMIT_EXCEEDED",
+        "message": "Complete result exceeds the machine-result limit; use bounded owner queries. No data was clipped."
+      },
+      "count": null
+    },
+    {
+      "probe": "v1-single",
+      "success": false,
+      "error": {
+        "code": "ENVELOPE_BUDGET_TOO_SMALL",
+        "message": "Metadata cannot fit this byte limit; increase max_bytes or narrow the scope."
+      },
+      "count": null
+    },
+    {
+      "probe": "legacy-single",
+      "success": true,
+      "error": null,
+      "count": 1,
+      "ids": [
+        "standalone_architect_daemon_routes"
+      ]
+    }
+  ]
+}

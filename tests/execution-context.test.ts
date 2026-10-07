@@ -69,9 +69,15 @@ it("revalidates actual named source content and affected graph constraints, whil
  await expect(assertManagedContext("execution-one")).rejects.toThrow("REFRESH_REQUIRED");
 }));
 it("refuses effects when a mandatory anchor does not fit, rather than dropping it",()=>within(async()=>{
- const entry=await beginManagedContext({id:"insufficient",adapter:"fixture",query:"Execution context",plan_id:"missing-plan",token_budget:1});
+ await commitGraphWrites({actor:"fixture",scope:["adr_log.json"],writes:[{file:"adr_log.json",content:JSON.stringify({decisions:[{id:"ADR-execution",title:"Execution context",decision:"Execution context stays bounded."}]})}]});
+ const entry=await beginManagedContext({id:"insufficient",adapter:"fixture",query:"Execution context",token_budget:1});
  expect(entry.pack.mandatory_satisfied).toBe(false);await deliverManagedContext(entry.id,managedContextPrompt(entry));
  await expect(assertManagedContext(entry.id)).rejects.toThrow("INSUFFICIENT");
+}));
+it("does not require a selected plan that the graph does not project (a reported plans/ document)",()=>within(async()=>{
+ const entry=await beginManagedContext({id:"unprojected-plan",adapter:"fixture",query:"Execution context",plan_id:"missing-plan",token_budget:4000});
+ expect(entry.request.plan_id).toBeUndefined();expect(entry.pack.mandatory_satisfied).toBe(true);
+ expect(entry.pack.state.reasons.some(reason=>reason.code==="MANDATORY_CONTEXT_MISSING")).toBe(false);
 }));
 it("binds actual source effects to the host execution and retains a durable reconciliation obligation at closure",()=>within(async()=>{
  await deliver();const args={filePath:"source.ts",text:"export const changed = true;\n"},lease=issueExecutionPolicy(owner(),{id:"execution-one",context_id:"execution-one",autonomy:"manual",verbosity:"concise",timeout_ms:10000,signal:new AbortController().signal,approvals:[{tool:"edit_file",arguments:args,scope_id:"fixture",calls:1}]});
@@ -105,6 +111,13 @@ it("observes actual native additions/deletions as exact pending scopes while exc
   expect(result.source_obligation?.before_hashes["source:fixture/added.ts"]).toBe("absent");expect(result.source_obligation?.after_hashes["source:fixture/source.ts"]).toBe("absent");
   expect((await finishManagedContext("execution-one")).status).toBe("reconciliation_pending");
  }finally{lease.close();}
+}));
+it("refresh keeps an unchanged context block byte-identical so the provider prompt cache stays valid",()=>within(async()=>{
+ const delivered=await deliver();const before=managedContextPrompt(delivered);
+ await new Promise(resolve=>setTimeout(resolve,5));
+ const refreshed=await refreshManagedContext("execution-one");
+ expect(managedContextPrompt(refreshed)).toBe(before);expect(refreshed.pack.receipt.issued_at).toBe(delivered.pack.receipt.issued_at);
+ await deliverManagedContext(refreshed.id,"system prefix\n"+managedContextPrompt(refreshed));await assertManagedContext(refreshed.id);
 }));
 it("refresh never launders a concrete untracked named-source mismatch into current graph context",()=>within(async()=>{
  await deliver();const content="export const original = false;\n";await writeFile(file,content);

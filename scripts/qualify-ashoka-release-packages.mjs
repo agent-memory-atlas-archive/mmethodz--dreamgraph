@@ -14,7 +14,7 @@ import {addressWorkspaceTarball} from './workspace-artifacts.mjs';
 const run=promisify(execFile), root=resolve('.'), assets=resolve(process.env.ASHOKA_RELEASE_ASSETS||'.codex/ashoka-release/artifacts');
 const targetVersion=JSON.parse(await readFile(join(root,'package.json'),'utf8')).version;
 const baselineVersion=process.env.ASHOKA_RELEASE_BASELINE||'13.4.0';
-assert(['13.4.0','14.0.0'].includes(baselineVersion),`Unsupported release baseline: ${baselineVersion}`);
+assert(['13.4.0','14.0.0','14.0.1'].includes(baselineVersion),`Unsupported release baseline: ${baselineVersion}`);
 const npm=process.env.npm_execpath||join(dirname(process.execPath),'node_modules/npm/bin/npm-cli.js');
 const output=resolve(process.env.ASHOKA_RELEASE_PACKAGE_EVIDENCE||`docs/ashoka/release-packages-${targetVersion}.json`);
 const fixture=await mkdtemp(join(tmpdir(),'dg-release-packages-')), master=join(fixture,'master'), bin=join(master,'bin');
@@ -31,6 +31,7 @@ async function deploy(version){
  await command('tar',['-xzf',tarball,'--strip-components','1','-C',payload]);
  await mkdir(bin,{recursive:true});await rm(join(bin,'dist'),{recursive:true,force:true});await cp(join(payload,'dist'),join(bin,'dist'),{recursive:true});
  await cp(join(payload,'templates'),join(master,'templates'),{recursive:true});
+ if(version===targetVersion)await cp(join(payload,'browser-extension'),join(bin,'browser-extension'),{recursive:true});
  const manifest=JSON.parse(await readFile(join(payload,'package.json'),'utf8'));
  const vendor=join(bin,'vendor');await mkdir(vendor,{recursive:true});
  const dependencies={...manifest.dependencies};
@@ -47,6 +48,11 @@ async function deploy(version){
  if(version===targetVersion){
   const verification=await command(process.execPath,[join(root,'scripts/workspace-artifacts.mjs'),'verify',payload,bin]);record('Installed workspace bytes and daemon import',JSON.parse(verification.stdout));
   for(const file of ['dist/computer/browser-worker-entry.js','dist/explorer-spa/index.html','dist/architect/operational-workspaces-ui.js'])assert((await readFile(join(bin,file))).length>0,file);
+  const extension=JSON.parse(await readFile(join(bin,'browser-extension/manifest.json'),'utf8'));
+  assert.equal(extension.version,targetVersion);
+  for(const file of ['background.js','popup.js','popup.html','README.md'])assert((await readFile(join(bin,'browser-extension',file))).length>0,file);
+  for(const file of ['dist/computer/browser-bridge/host-main.js','dist/cli/commands/browser.js'])assert((await readFile(join(bin,file))).length>0,file);
+  record('Browser extension and native host packaged at release version',{version:extension.version});
  }
  return payload;
 }
@@ -70,7 +76,7 @@ try{
  const reservation=createServer();await new Promise(done=>reservation.listen(0,'127.0.0.1',done));port=reservation.address().port;await new Promise(done=>reservation.close(done));
  const legacyClient=await import(pathToFileURL(join(bin,'dist/cli/utils/mcp-call.js')).href);
  await boot(baselineVersion);const legacyTools=await legacyClient.mcpListTools(port);assert(legacyTools.some(tool=>tool.name==='query_resource'));
- const first=await legacyClient.mcpCallTool(port,'query_resource',{uri:'system://features',filter:{id:'release-fixture'},...(baselineVersion==='14.0.0'?{contract_version:'legacy'}:{})},10000);assert(!first.isError);record(`Actual ${baselineVersion} CLI MCP client`,{tool_count:legacyTools.length,read:true,contract_version:baselineVersion==='14.0.0'?'legacy':'default'});await stop();
+ const first=await legacyClient.mcpCallTool(port,'query_resource',{uri:'system://features',filter:{id:'release-fixture'},...(baselineVersion.startsWith('14.')?{contract_version:'legacy'}:{})},10000);assert(!first.isError);record(`Actual ${baselineVersion} CLI MCP client`,{tool_count:legacyTools.length,read:true,contract_version:baselineVersion.startsWith('14.')?'legacy':'default'});await stop();
  const configBefore=hash(await readFile(config)),historyBefore=hash(await readFile(join(data,'extension_history.json')));
  await deploy(targetVersion);assert.equal(hash(await readFile(config)),configBefore);assert.equal(await readFile(join(data,'features.json'),'utf8'),original);assert.equal(hash(await readFile(join(data,'extension_history.json'))),historyBefore);
  record('Install leaves graph, instance configuration and extension history untouched',true);

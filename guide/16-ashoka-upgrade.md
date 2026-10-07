@@ -1,8 +1,8 @@
-# DreamGraph v14.0.0 — Ashoka release and upgrade guide
+# DreamGraph v14.0.2 — Ashoka release and upgrade guide
 
-This is the v14.0.0 baseline guide. For the current v14.0.1 field fixes, upgrade order and limitations, see the [patch release notes](../RELEASE_NOTES_v14.0.1.md).
+The current patch adds DreamGraph’s browser backend, native Windows dialog handling and context-cost fixes. See the [v14.0.2 release notes](../RELEASE_NOTES_v14.0.2.md) and [browser setup guide](17-computer-use.md).
 
-Ashoka is the first practical-testing release of the unified graph, execution and recovery overhaul. CLI, engine/daemon and MCP authority, browser Architect, VS Code Architect, Explorer, dashboard, analytics and SDK/host/token-economy packages share product version **14.0.0**. Schema and protocol majors are independently versioned; installing a product major does not migrate stored data.
+Ashoka is the first practical-testing release of the unified graph, execution and recovery overhaul. CLI, engine/daemon and MCP authority, browser Architect, VS Code Architect, Explorer, dashboard, analytics and SDK/host/token-economy packages share product version **14.0.2**. Schema and protocol majors are independently versioned; installing a product major does not migrate stored data.
 
 ## Install and restart
 
@@ -26,13 +26,13 @@ dg status <instance>
 
 The installer replaces the shared `~/.dreamgraph/bin/` runtime and reminds the operator to restart existing instances. It does not restart them or convert their graph. Already running instances are expected to continue until the operator restarts them; the release does not implement immutable per-process binary directories. The maintainer explicitly retained this established workflow instead of installer staging. Confirm actual HTTP health after restart; a failed health check is a failed start, even if a PID was allocated. Existing 13.4 clients must reconnect after restart; runtime transport sessions are not a promise of indefinitely resumable sockets. Durable graph, plan, history and authority records remain on disk.
 
-Back up instance data and configuration and retain the previous source/package before upgrading. Review the legacy notice in Architect. Run `dg graph-upgrade <instance> preview --out <new-review.json>` for a read-only structural preview. Follow [the reviewed migration procedure](../docs/ashoka/legacy-upgrade.md) for exact approval, verified backup, offline writer exclusion, apply and lost-reply recovery. Installation with `-Force` is not migration consent. Missing historical scan/enrichment baselines remain unknown. **An old full scan does not imply a stale graph:** inspect tracked mutations, source reconciliation, dirty partitions and concrete gaps.
+Back up instance data and configuration and retain the previous source/package before upgrading. Review the legacy notice in Architect. `dg graph-upgrade <instance> --dry-run --out <new-review.json>` saves a read-only preview. The default `dg graph-upgrade <instance>` applies after its checks, with a verified backup and full review. Stop the instance before migration; a patch install does not require migrating a graph already using the current format. Follow [the reviewed migration procedure](../docs/ashoka/legacy-upgrade.md) for exact approval, verified backup, offline writer exclusion, apply and lost-reply recovery. Installation with `-Force` is not migration consent. Missing historical scan/enrichment baselines remain unknown. **An old full scan does not imply a stale graph:** inspect tracked mutations, source reconciliation, dirty partitions and concrete gaps.
 
 ## Compatibility and recovery
 
 | Boundary | v14 behavior |
 |---|---|
-| Product packages and runtime identity | Synchronized 14.0.0; generated SDK/MCP/provider/configuration artifacts derive from authoritative source. |
+| Product packages and runtime identity | Synchronized 14.0.2; generated SDK/MCP/provider/configuration artifacts derive from authoritative source. |
 | Persisted families and negotiated contracts | Current plus documented previous major where supported. Unknown/future schemas refuse activation; clients must consume advertised schema capabilities. See [canonical contracts](../docs/ashoka/foundation.md) and [migration policy](../docs/ashoka/legacy-upgrade.md). |
 | Plan lifecycle | Canonical current/running/next/completed state is separate from compatibility progress reported by legacy logs. Reported verification is visibly labelled; external Codex work does not fabricate an Architect execution lease. See [plan authority](../docs/ashoka/plan-authority.md). |
 | Pre-cutover recovery | Preserve the verified backup and exact review/operation IDs. Restore only unchanged migrated families through a separately reviewed operation. |
@@ -53,12 +53,12 @@ Explorer keeps a manual review snapshot. Cache invalidation is filterable live t
 
 ## Computer Use and qualification
 
-Prefer the adapter's best available native capability and normalize its contract above it; native API routes use the DreamGraph harness. Computer Use is explicitly granted, session isolated, evidence producing, cancellable and budget bounded. Default-disabled backends must not be advertised as usable merely because a model is selectable.
+Codex CLI and native API routes use DreamGraph’s own browser backend when the extension is connected. Install and connect it using [Computer Use setup](17-computer-use.md). Codex CUA remains a fallback where available. The [current contract](../docs/ashoka/computer-use-contract.md) supersedes the original per-task worker/profile setup; native Windows dialogs are supported, while Linux/macOS dialogs require the operator.
 
 The accepted release evidence is Windows maintainer practical qualification plus WSL2 Ubuntu 24.04 / Node 20 installer and isolated-browser-worker qualification. Native Linux desktop, macOS and additional runtimes/distros are deferred field-feedback work. [The route/platform matrix](../docs/ashoka/v14-release-scope.md) and [Computer Use contract](../docs/ashoka/computer-use.md) identify available routes and remedies. C17 requires input release/action cancellation/control relinquishment within one second and confirmed owned process-tree termination within five seconds of the same Stop request. Show stopping/input-released while waiting; unconfirmed termination remains recovery-required, never Stop complete.
 
 ## Evidence and honest limits
 
-[Slice 27](../docs/ashoka/slice-27-closure.json) seals the functional/system evidence: 2,040 root tests, 546 compiled editor tests and eleven actual Windows browser checks, zero failures and two explicitly retired particle skips. These are controlled environment results, not universal latency or support guarantees. The original instance was not migrated by those tests. Exact release packaging and remote CI are separately recorded by Slice 28.
+[Slice 27](../docs/ashoka/slice-27-closure.json) seals the functional/system evidence: 2,040 root tests, 546 compiled editor tests and eleven actual Windows browser checks, zero failures and two explicitly retired particle skips. These are controlled environment results, not universal latency or support guarantees. Those tests did not migrate the original instance; the later [maintainer confirmation](../docs/ashoka/project-state.md) records successful migration on seven instances. Exact release packaging and remote CI are separately recorded by Slice 28.
 
 [The public GPT-4.1 pilot](../docs/ashoka/benchmarks/2026-10-03-gpt-4.1/README.md) preserves 14 pairs / 28 calls and quality failures, including lifecycle omissions, trust confusion, invented readbacks and age-only staleness. **No measured agent-understanding improvement, superiority or cost-saving claim is made.** Public requests and answers enable community reproduction; private contexts, replies, credentials, approval and spend ledger remain private. Ordinary CI makes no paid calls. Practical testing and community model/configuration comparisons inform patches.

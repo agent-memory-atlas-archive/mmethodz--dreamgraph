@@ -11,6 +11,7 @@ import { withGraphReconciliation, withGraphRead } from "../utils/graph-reconcili
 import { commitGraphWrites, recoverGraphPublication, loadPublicationState, findOperationReceipt } from "./publication.js";
 import { ChangeObligationSchema, DirtyPartitionSchema } from "./contracts.js";
 import { assertJobCurrent, currentJob } from "../cognitive/job-context.js";
+import { isScannerTrackedFile } from "../tools/scanner-artifact-policy.js";
 import { getSessionContext } from "../server/session-context.js";
 
 const ObligationFileSchema = z.object({ schema: z.literal("dreamgraph.change_obligations.v1"), entries: z.array(ChangeObligationSchema) }).strict();
@@ -139,6 +140,18 @@ export interface SourceEffectInput {
   apply: () => Promise<void>;
   /** Disposable effect/crash tests only. */
   fault_inject?: (stage: "intent_committed" | "effect_applied" | "effect_recorded") => void | Promise<void>;
+}
+/** A source file's repository, scope and current hash, for effects made outside DreamGraph's tools (such as a file the
+ * browser saves), observed with the calls below. Null when the file is outside the configured repository roots or
+ * is not a file the project scanner tracks (e.g. an application's own project file): such files get no obligation. */
+export async function observeSourceFile(file: string): Promise<{ repository: string; scope: string; hash: string } | null> {
+  let scope: string;
+  try { scope = await sourceScope(file); }
+  catch (failure) { if (String(failure).includes("SOURCE_SCOPE_DENIED")) return null; throw failure; }
+  const repository = decodeURIComponent(scope.slice(7).split("/")[0]);
+  const root = config.repos[repository];
+  if (!root || !isScannerTrackedFile(await physical(path.resolve(root)), await physical(path.resolve(file)))) return null;
+  return { repository, scope, hash: await sourceHash(file) };
 }
 /** Unknown-footprint process intent. The caller supplies independently observed
  * hashes afterward; a lost process acknowledgement is never retried here. */

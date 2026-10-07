@@ -12,6 +12,7 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { McpSessionConnection } from "../src/cli/utils/mcp-session.js";
 import { ManagedExecutionClient } from "../packages/sdk/src/seams/graph-execution.js";
+import { BROWSER_TOOL_NAMES } from "../src/computer/browser-bridge/tools.js";
 const textResult = (result: any) => JSON.parse(result.content.find((item: any) => item.type === "text").text);
 it("isolates real native MCP transports, rejects foreign browser binding and removes closed sessions", async () => {
   const root = await mkdtemp(join(tmpdir(), "dg-real-transport-"));
@@ -44,7 +45,11 @@ it("isolates real native MCP transports, rejects foreign browser binding and rem
     const [a, b] = await Promise.all([open(), open()]);
     const catalog = await (await fetch(base + "/api/contracts/v1/mcp")).json();
     const advertised = await a.client.listTools();
-    expect(advertised.tools.map(t => t.name).sort()).toEqual(catalog.tools.map((t: any) => t.name).sort());
+    // The core catalogue plus DreamGraph's Computer Use browser tools (outside the discipline catalogue; governed by an
+    // execution's Computer Use grant, effect computer_use).
+    const computerUse = advertised.tools.filter(t => (t._meta?.dreamgraph as any)?.policy?.effect === "computer_use").map(t => t.name).sort();
+    expect(computerUse).toEqual([...BROWSER_TOOL_NAMES].sort());
+    expect(advertised.tools.map(t => t.name).filter(name => !computerUse.includes(name)).sort()).toEqual(catalog.tools.map((t: any) => t.name).sort());
     expect(advertised.tools.every(t => t._meta?.dreamgraph)).toBe(true);
     const invalid = await a.client.callTool({ name: "graph_health_report", arguments: { __undeclared: true } });
     expect(invalid.structuredContent?.error).toMatchObject({ code: "INVALID_INPUT" });

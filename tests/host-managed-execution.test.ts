@@ -268,7 +268,12 @@ it('SDK native lifecycle captures request/port identities, refreshes each contin
   const result={isError:true,content:[{type:'text',text:'🌿漢'.repeat(12000)}],structuredContent:{owner_receipt:'literal original'}};
   expect(await pass.run(async worker=>{expect(prompts.join('')).not.toContain(worker.workerBearer);return {result,workTermination:'confirmed'};})).toBe(result);
   await expect(pass.run(async()=>({result:'no continuation',workTermination:'confirmed'}))).rejects.toThrow('NOT_DELIVERED');
-  await pass.prepare(handoff);expect((await pass.inspect()).pack.receipt.id).not.toBe(initial.pack.receipt.id);expect(prompts).toHaveLength(2);
+  await pass.prepare(handoff);expect((await pass.inspect()).pack.receipt.id).toBe(initial.pack.receipt.id);expect(prompts).toHaveLength(2);
+  await pass.run(async()=>({result:'unchanged continuation',workTermination:'confirmed'}));
+  // Rechecking unchanged evidence preserves its cache identity; a real graph mutation replaces it.
+  await commitGraphWrites({actor:'fixture',scope:['features.json'],writes:[{file:'features.json',content:JSON.stringify({features:[{id:'host',name:'Host context',description:'Updated authoritative architecture',source_repo:'fixture',source_files:['source.ts']}]})}]});
+  await pass.prepare(handoff);expect((await pass.inspect()).pack.receipt.id).not.toBe(initial.pack.receipt.id);
+  expect(prompts.at(-1)).toContain('Updated authoritative architecture');
   await pass.run(async()=>({result:'read-only continuation',workTermination:'confirmed'}));
   const closed=await pass.finish('completed');expect(closed).toMatchObject({status:'no_change',authority_active:false});
   const returned=pass.lastSnapshot!;returned.execution_id='caller mutation';expect(pass.lastSnapshot?.execution_id).toBe('sdk-native-loop');
@@ -391,7 +396,7 @@ it("editor CLI admission injects the whole current pack after serialization and 
  expect(prepared).not.toContain(pass.workerBearer);expect(initial.pack.receipt.delivery).toBe("delivered");
  const refreshed=await pass.preparePrompt("[user]\nContinue from the current graph");
  const current=await host.readExecution(pass.executionId);
- expect(current.pack.receipt.id).not.toBe(initial.pack.receipt.id);expect(refreshed).toContain(current.block);
+ expect(current.pack.receipt.id).toBe(initial.pack.receipt.id);expect(refreshed).toContain(current.block);
  expect(current.pack.receipt.delivery).toBe("delivered");
  pass.observeRun({ok:true,spawn:{exitCode:0,signal:null,timedOut:false,aborted:false}});
  const closed=await pass.finish();expect(closed).toMatchObject({status:"no_change",authority_active:false});
@@ -683,7 +688,7 @@ it("native editor admission delivers whole replacement evidence, uses the actual
   const request=review.view.request!;expect(request.approved_actions[0]).toMatchObject({tool:'create_file',arguments:args,calls:1});
   await review.decide(request.execution_id,request.approval_id,'approve');expect((await observed).isError).not.toBe(true);
   const next=await pass.prepare([{role:'user',content:'Continue'}],[],[],pass.signal);
-  const refreshed=await host.readExecution(pass.executionId);expect(refreshed.pack.receipt.id).not.toBe(delivered.pack.receipt.id);expect(JSON.stringify(next)).toContain(refreshed.pack.receipt.id);
+  const refreshed=await host.readExecution(pass.executionId);expect(refreshed.pack.receipt.id).toBe(delivered.pack.receipt.id);expect(JSON.stringify(next)).toContain(refreshed.pack.receipt.id);
   expect(await pass.finish('completed')).toMatchObject({status:'no_change',authority_active:false});
   await expect(pass.callTool('create_file',args,pass.signal,5000)).rejects.toThrow('PASS_CLOSED');
  }finally{review.stop();await pass.finish('cancelled').catch(()=>undefined);}
@@ -1221,7 +1226,7 @@ it('native-host deadline stops permit waiting without attesting native work stop
  }finally{await host.finishExecution(request.execution_id,'failed','unconfirmed').catch(()=>undefined);}
 },10000);
 
-it('CLI host accounting stays subscription-unmeasured and cannot borrow an API monetary allowance',async()=>{
+it('CLI host accounting stays subscription-unmeasured and never borrows the role\'s API monetary allowance',async()=>{
  const {host,request}=await hostModelFixture('host-model-cli');
  const cli={...request,binding:{...request.binding,adapter:'codex-cli' as const,api:'native_cli' as const,model:'gpt-6.1-sol',effort:'high'},payload:(await host.readExecution(request.execution_id)).block+'\nNative CLI prompt'};
  try{
@@ -1231,7 +1236,13 @@ it('CLI host accounting stays subscription-unmeasured and cannot borrow an API m
   expect(await host.finishExecution(request.execution_id,'completed','confirmed')).toMatchObject({status:'no_change'});
  }finally{await host.finishExecution(request.execution_id,'failed','unconfirmed').catch(()=>undefined);}
  const second=await hostModelFixture('host-model-cli-currency');
- try{vi.stubEnv('DREAMGRAPH_LLM_ARCHITECT_BUDGET_CURRENCY','subscription_units');await expect(second.host.admitModel({...cli,execution_id:second.request.execution_id,request_id:'currency',payload:second.lease.execution.block})).rejects.toThrow('SUBSCRIPTION_CURRENCY_UNQUALIFIED');}
+ // The Architect's spend limits and prices (set for its API engine) are ignored on the subscription channel instead of
+ // being borrowed, so configuring the API engine never blocks Codex/Copilot CLI passes.
+ try{vi.stubEnv('DREAMGRAPH_LLM_ARCHITECT_BUDGET_CURRENCY','USD');
+  const permit=await second.host.admitModel({...cli,execution_id:second.request.execution_id,request_id:'currency',payload:second.lease.execution.block});expect(permit.billing_channel).toBe('subscription');
+  const ledger=JSON.parse(await readFile(join(root,'data/spend_ledger.json'),'utf8'));
+  expect(ledger.runs[ledger.attempts[permit.attempt_id].run_id].budget).toMatchObject({run_amount:0,day_amount:0,currency:'subscription_units',pricing_version:null});
+  await second.host.settleModel({...modelReport(permit),usage:null});}
  finally{await second.host.finishExecution(second.request.execution_id,'failed','confirmed').catch(()=>undefined);}
 });
 

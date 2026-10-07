@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { EngineJobs, withEngineJob } from "../src/cognitive/jobs.js";
 import { ModelAdmission } from "../src/cognitive/model-admission.js";
 import { currentJob, assertJobCurrent } from "../src/cognitive/job-context.js";
-import { resolveRolePolicy } from "../src/config/role-policy.js";
+import { resolveRolePolicy, saveRoleProfiles } from "../src/config/role-policy.js";
 import { commitGraphWrites } from "../src/graph/publication.js";
 import { getRoleModelPolicy } from "../src/cognitive/llm.js";
 import { setDataDirOverride, getDataDir } from "../src/utils/paths.js";
@@ -20,6 +20,24 @@ const input = (operation_id: string, overrides: Record<string, unknown> = {}) =>
 beforeEach(async () => { previous = getDataDir(); directory = await mkdtemp(join(tmpdir(), "dg-jobs-")); setDataDirOverride(directory); jobs = new EngineJobs(directory); });
 afterEach(async () => { vi.unstubAllEnvs(); await releaseGraphWriter(directory); setDataDirOverride(previous); await rm(directory, { recursive: true, force: true }); });
 const until = async (work: () => Promise<boolean>) => { for (let i=0;i<100;i++) { if (await work()) return; await new Promise(resolve => setTimeout(resolve, 5)); } throw new Error("fixture did not settle"); };
+it.each([false, true])("pins admitted role profiles to the job instance when a different instance is selected (foreign recovery=%s)", async recovery => {
+  await saveRoleProfiles({ expected_revision: 0, operation_id: "owner-policy", roles: { dreamer: { provider: "ollama", model: "owner-model" } } });
+  const foreign = await mkdtemp(join(tmpdir(), "dg-job-foreign-"));
+  try {
+    setDataDirOverride(foreign);
+    await saveRoleProfiles({ expected_revision: 0, operation_id: "foreign-policy", roles: { dreamer: { provider: "ollama", model: "foreign-model" } } });
+    if (recovery) await writeFile(join(foreign, "reconciliation_journal.json"), "{}");
+    const record = await jobs.accept({ ...input("owner-admission"), role_policies: undefined });
+    expect(record.snapshot.role_policies.dreamer?.effective.model).toBe("owner-model");
+    expect((await jobs.inspect()).records.map(value => value.job.id)).toEqual([record.job.id]);
+    await expect(readFile(join(foreign, "jobs.json"))).rejects.toMatchObject({ code: "ENOENT" });
+    if (recovery) expect(await readFile(join(foreign, "reconciliation_journal.json"), "utf8")).toBe("{}");
+  } finally {
+    setDataDirOverride(directory);
+    await releaseGraphWriter(foreign);
+    await rm(foreign, { recursive: true, force: true });
+  }
+});
 it("durably accepts exact replay, preserves original result and rejects changed intent", async () => {
   const first = await jobs.accept(input("same", { parameters: { n: 1 } }));
   expect((await new EngineJobs(directory).accept(input("same", { parameters: { n: 1 } }))).job.id).toBe(first.job.id);

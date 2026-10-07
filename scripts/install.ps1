@@ -306,6 +306,15 @@ if (Test-Path $DistTarget) {
 Copy-Item -Recurse -Force $SourceDist $DistTarget
 Write-Ok "dist/ copied"
 
+# Chrome extension for Computer Use on the API engines (loaded once by the user from this folder).
+$BrowserExtensionSource = Join-Path $SourceDir "browser-extension"
+$BrowserExtensionTarget = Join-Path $BinDir "browser-extension"
+if (Test-Path (Join-Path $BrowserExtensionSource "manifest.json")) {
+    New-Item -ItemType Directory -Path $BrowserExtensionTarget -Force | Out-Null
+    Copy-Item -Recurse -Force (Join-Path $BrowserExtensionSource "*") $BrowserExtensionTarget
+    Write-Ok "browser-extension/ copied"
+}
+
 # Workspace packages cannot be resolved from the registry; pack them into
 # the bin vendor dir and rewrite the deps to file: references so
 # `npm install --omit=dev` can complete offline.
@@ -540,6 +549,16 @@ $env:Path = if ([string]::IsNullOrWhiteSpace($env:Path)) { $BinDir } else { "$Bi
 Write-Step "Verifying installation..."
 $verifyResult = Invoke-LoggedCommand -FilePath "node" -Arguments @((Join-Path $DistTarget "cli/dg.js"), "--version") -WorkingDirectory $BinDir -Quiet
 Write-Ok "$($verifyResult.Output -join [Environment]::NewLine)"
+
+# -- Browser bridge (Computer Use on the API engines) ---------------------
+Write-Step "Registering the DreamGraph browser host..."
+$browserResult = Invoke-LoggedCommand -FilePath "node" -Arguments @((Join-Path $DistTarget "cli/dg.js"), "browser", "setup") -WorkingDirectory $BinDir -AllowFailure
+if ($browserResult.ExitCode -eq 0) {
+    Write-Ok "Browser host registered"
+    Write-Host "  Load the extension once: chrome://extensions > Developer mode > Load unpacked > $BrowserExtensionTarget" -ForegroundColor DarkGray
+} else {
+    Write-Warn "Browser host registration failed -- run 'dg browser setup' later"
+}
 
 # -- Summary --------------------------------------------------------
 Write-Host ""

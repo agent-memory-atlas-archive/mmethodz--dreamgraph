@@ -8,7 +8,7 @@ If you are looking for the auto-generated reference (every tool, every parameter
 
 For the shortest route from install to a working browser setup, start with **[DreamGraph Easy Start](00-easy-start.md)**.
 
-Current release: **v14.0.1 - Ashoka**. See the [patch notes](../RELEASE_NOTES_v14.0.1.md); the [v14.0.0 upgrade guide](16-ashoka-upgrade.md) remains the baseline migration guide.
+Current release: **v14.0.2 - Ashoka**. See the [patch notes](../RELEASE_NOTES_v14.0.2.md); the [v14.0.0 upgrade guide](16-ashoka-upgrade.md) remains the baseline migration guide.
 
 ---
 
@@ -38,7 +38,8 @@ You do **not** need to read the guide top-to-bottom. Jump to whichever page matc
 | 8 | [Dreams and cycles](08-dreams-and-cycles.md) | What dreaming means, when to do it, what to expect. |
 | 9 | [Curating the graph](09-curating-the-graph.md) | Reviewing tensions, promoting/rejecting candidates, recording ADRs. |
 | 10 | [A typical daily workflow](10-daily-workflow.md) | A sustainable loop. What to do in the morning, what to leave running. |
-| 11 | [Multi-repo and monorepo setups](11-multi-repo.md) | Attaching more than one repository, including large monorepos. |
+| 11 | [Computer Use: install and connect](17-computer-use.md) | Install the browser extension, verify its native-host connection and grant a task. |
+| [Multi-repo and monorepo setups](11-multi-repo.md) | Attaching more than one repository, including large monorepos. |
 | 12 | [Troubleshooting & FAQ](12-troubleshooting-faq.md) | Diagnosing daemon, graph, model, extension, and workflow issues. |
 | 13 | [Glossary](13-glossary.md) | Plain-language definitions for DreamGraph terms. |
 | 14 | [Adaptive Future Engine](14-adaptive-future-engine.md) | What AFE is, where it runs, how it is deployed, and how to read its audit trails. |

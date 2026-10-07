@@ -74,7 +74,9 @@ describe("independent model role policies", () => {
     const policy = resolveRolePolicy({ role: "architect", env });
     expect(policy).toMatchObject({ effective: { model: "gpt-6.1-sol", api: "native_cli" }, requested: { model: "codex-cli/gpt-6.1-sol" }, billing: { channel: "subscription", currency: "subscription_units" } });
     expect(resolveRolePolicy({ role: "architect", env: { ...env, DREAMGRAPH_LLM_ARCHITECT_API: "responses" } }).diagnostics.map(d => d.code)).toContain("API_CLI_CONTRACT_MISMATCH");
-    expect(resolveRolePolicy({ role: "architect", env: { ...env, DREAMGRAPH_LLM_ARCHITECT_BUDGET_CURRENCY: "USD" } }).diagnostics.map(d => d.code)).toContain("BILLING_CHANNEL_MISMATCH");
+    const subscription = resolveRolePolicy({ role: "architect", env: { ...env, DREAMGRAPH_LLM_ARCHITECT_BUDGET_CURRENCY: "USD" } });
+    expect(subscription.diagnostics.map(d => d.code)).not.toContain("BILLING_CHANNEL_MISMATCH");
+    expect(subscription.policy.budget).toMatchObject({ currency: "subscription_units", run_amount: 0, day_amount: 0, pricing_version: null });
   });
   it("blocks incompatible providers and local-only disclosure to remote endpoints", () => {
     expect(resolveRolePolicy({ role: "dreamer", env: { DREAMGRAPH_LLM_PROVIDER: "anthropic", DREAMGRAPH_LLM_DREAMER_API: "responses" } }).diagnostics.map(d => d.code)).toContain("PROVIDER_API_UNSUPPORTED");

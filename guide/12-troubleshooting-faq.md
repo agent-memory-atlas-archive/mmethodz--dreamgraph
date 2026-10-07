@@ -42,7 +42,7 @@ The installer only installs the extension if `code` is on PATH. Install manually
 ```bash
 cd extensions/vscode
 npm run build
-code --install-extension dreamgraph-vscode-14.0.1.vsix
+code --install-extension dreamgraph-vscode-14.0.2.vsix
 ```
 
 ---
@@ -109,7 +109,7 @@ Runtime dependencies didn't install. Fix:
 
 ```powershell
 # Windows
-cd "$env:USERPROFILE\.vscode\extensions\siteledger.dreamgraph-vscode-14.0.1"
+cd "$env:USERPROFILE\.vscode\extensions\siteledger.dreamgraph-vscode-14.0.2"
 npm install --omit=dev
 ```
 

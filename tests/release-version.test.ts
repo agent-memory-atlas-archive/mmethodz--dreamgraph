@@ -49,6 +49,7 @@ describe("synchronized release version", () => {
     expect(CLI_VERSION).toBe(release);
     expect(EXTENSION_VERSION).toBe(release);
     expect(config.server.version).toBe(release);
+    expect(readJson("browser-extension/manifest.json").version, "browser-extension/manifest.json").toBe(release);
   });
 
   it("exposes the same version through MCP initialization, instructions and capabilities", async () => {

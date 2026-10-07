@@ -28,11 +28,18 @@ it("exact human confirmation is separate from preparation and loss retries prese
  expect(()=>dom.window.eval("takeComputerPreparation(null)")).toThrow("ADAPTER_ROUTE_MISMATCH");
 });
 it("an unavailable native CLI keeps the requested mechanism visible and cannot prepare a harness",async()=>{
- respond=path=>path.includes('/sessions?')?emptySessions:({ok:true,available:false,route:"native_cli",reasons:["COMPUTER_NATIVE_CLI_CONFORMANCE_UNAVAILABLE"]});
+ respond=path=>path.includes('/sessions?')?emptySessions:({ok:true,available:false,route:"native_cli",computer_use_route:{backend:'codex-native',summary:'Codex CLI uses its own Computer Use.'},reasons:["COMPUTER_NATIVE_CLI_CONFORMANCE_UNAVAILABLE"]});
  (dom.window.document.getElementById("architect-adapter-select") as HTMLSelectElement).value="codex-cli";click("computer-use-open");
  await vi.waitFor(()=>expect(dom.window.document.getElementById("computer-use-setup")!.textContent).toContain("native cli conformance unavailable"));
  expect((dom.window.document.getElementById("computer-use-prepare") as HTMLButtonElement).disabled).toBe(true);
  expect(calls.filter(call=>call.path.includes('/api/architect/v1/computer/'))).toHaveLength(2);
+});
+it("DreamGraph browser routing does not show the old native CLI conformance diagnostic",async()=>{
+ respond=path=>path.includes('/sessions?')?emptySessions:({ok:true,available:false,route:'native_cli',computer_use_route:{backend:'dreamgraph-browser',summary:'Computer Use runs through DreamGraph browser (connected).'},reasons:['COMPUTER_NATIVE_CLI_CONFORMANCE_UNAVAILABLE']});
+ (dom.window.document.getElementById('architect-adapter-select') as HTMLSelectElement).value='codex-cli';click('computer-use-open');
+ await vi.waitFor(()=>expect(dom.window.document.getElementById('computer-use-setup')!.textContent).toContain('DreamGraph browser (connected)'));
+ expect(dom.window.document.getElementById('computer-use-setup')!.textContent).not.toContain('conformance unavailable');
+ expect((dom.window.document.getElementById('computer-use-prepare') as HTMLButtonElement).disabled).toBe(true);
 });
 function journal(id="computer-one",state="recovery_required",stop_state="unknown") {return {session:{id,state,host_id:"original-host",terminal_reason:null},
  targets:[{origin:"https://fixture.example"}],capability:{effective:["observe","type"]},limits:{expires_at:new Date(Date.now()+30000).toISOString()},

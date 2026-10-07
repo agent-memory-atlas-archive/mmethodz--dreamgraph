@@ -27,6 +27,7 @@ import {
 } from "../cognitive/register.js";
 import { registerDisciplineResource } from "../discipline/register.js";
 import { registerPluginContributions } from "../plugins/contributions.js";
+import { registerExecutionBrowserTools } from "../computer/execution-browser.js";
 import { startScheduler, stopScheduler } from "../cognitive/scheduler.js";
 import { startLlmReadinessWatcher, stopLlmReadinessWatcher } from "../cognitive/llm-readiness.js";
 import { wireBootstrapOnReady } from "../cognitive/bootstrap-driver.js";
@@ -193,6 +194,8 @@ export function createServer(identity?: SessionContext): McpServer {
   // M4 — Wire any plugin-contributed MCP tools/resources from the
   // manager's contribution registry onto this session's server.
   registerPluginContributions(server);
+  // DreamGraph Computer Use browser tools for CLI executors (bound to an execution with Computer Use granted).
+  registerExecutionBrowserTools(server as any);
 
   // Daemon background work has no connecting client authority or sampling transport.
   if (!daemonRuntimeStarted) {

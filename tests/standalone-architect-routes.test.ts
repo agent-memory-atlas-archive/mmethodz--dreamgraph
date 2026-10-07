@@ -1469,7 +1469,60 @@ describe("standalone Architect route hardening", () => {
       await rm(tempRoot, { recursive: true, force: true });
     }
   });
-
+
+  it("keeps the native API request prefix byte-stable across tool-loop iterations so provider prompt caching applies", async () => {
+    const tempRoot = await mkdtemp(join(tmpdir(), "dreamgraph-architect-cache-prefix-"));
+    const scopeSpy = vi.spyOn(lifecycle, "getActiveScope").mockReturnValue({ uuid: "standalone-architect-cache-prefix-test", projectRoot: tempRoot } as never);
+    const saved = ["DREAMGRAPH_LLM_PROVIDER", "DREAMGRAPH_LLM_ARCHITECT_PROVIDER", "DREAMGRAPH_LLM_ARCHITECT_MODEL", "DREAMGRAPH_LLM_ARCHITECT_URL", "DREAMGRAPH_LLM_API_KEY"]
+      .map(key => [key, process.env[key]] as const);
+    const bodies: Array<Record<string, unknown>> = [];
+    const envelope = JSON.stringify({ schema: ARCHITECT_CONTINUATION_SCHEMA, pass_id: "cache-prefix", status: "completed", summary: "Checked.",
+      work_completed: ["Checked the runtime."], files_touched: [], graph_entities_touched: [], tool_trace_summary: ["run_command checked node"],
+      graph_plan_updates: [], evidence: ["node --version"], blockers: [], uncertainty: 0.1, recommended_actions: [] });
+    const replies = [1, 2].map(index => ({ model: "gpt-5.5", status: "completed", output: [{ type: "function_call", call_id: `call_cache_prefix_${index}`,
+      name: "run_command", arguments: JSON.stringify({ command: "node --version", timeoutMs: 10_000 }) }] }));
+    const providerServer: Server = createServer(async (req, res) => {
+      res.setHeader("content-type", "application/json; charset=utf-8");
+      if (new URL(req.url ?? "/", "http://127.0.0.1").pathname !== "/responses") { res.statusCode = 404; res.end("{}"); return; }
+      const parts: Buffer[] = []; for await (const chunk of req) parts.push(Buffer.from(chunk));
+      bodies.push(JSON.parse(Buffer.concat(parts).toString("utf8")));
+      res.end(JSON.stringify(replies.shift() ?? { model: "gpt-5.5", status: "completed",
+        output_text: ["Checked.", "```architect_continuation", envelope, "```"].join("\n") }));
+    });
+    await new Promise<void>((resolve) => providerServer.listen(0, "127.0.0.1", resolve));
+    try {
+      process.env.DREAMGRAPH_LLM_PROVIDER = "openai";
+      process.env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER = "openai";
+      process.env.DREAMGRAPH_LLM_ARCHITECT_MODEL = "gpt-5.5";
+      process.env.DREAMGRAPH_LLM_ARCHITECT_URL = `http://127.0.0.1:${(providerServer.address() as AddressInfo).port}`;
+      process.env.DREAMGRAPH_LLM_API_KEY = "test-key";
+      initLlmProvider();
+      await withArchitectServer(async (baseUrl) => {
+        await expectJsonOk(await fetch(`${baseUrl}/api/architect/v1/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: "run node --version twice and report", adapter: "native_api_tool_loop", provider: "openai",
+            model: "gpt-5.5", mode: "autonomous", max_passes: 1 }),
+        }));
+      });
+      expect(bodies.length).toBeGreaterThanOrEqual(3);
+      const loop = bodies.slice(0, 3);
+      for (let index = 1; index < loop.length; index += 1) {
+        // Everything before the new tool results must be byte-identical: instructions, tools and earlier input items.
+        expect(loop[index].instructions).toBe(loop[0].instructions);
+        expect(JSON.stringify(loop[index].tools)).toBe(JSON.stringify(loop[0].tools));
+        const before = loop[index - 1].input as unknown[], after = loop[index].input as unknown[];
+        expect(after.length).toBeGreaterThan(before.length);
+        expect(JSON.stringify(after.slice(0, before.length))).toBe(JSON.stringify(before));
+      }
+    } finally {
+      await new Promise<void>((resolve, reject) => providerServer.close((error) => error ? reject(error) : resolve()));
+      for (const [key, value] of saved) if (value == null) delete process.env[key]; else process.env[key] = value;
+      initLlmProvider();
+      scopeSpy.mockRestore();
+      await rm(tempRoot, { recursive: true, force: true });
+    }
+  });
   it("does not advance the selected plan cursor for malformed pass reports", async () => {
     const tempRoot = await mkdtemp(join(tmpdir(), "dreamgraph-architect-pass-cursor-malformed-"));
     const plansDir = join(tempRoot, "plans");

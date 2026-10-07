@@ -86,6 +86,16 @@ async function save(entry: ManagedExecutionContext, stage: string) {
   await commitGraphWrites({ actor: "execution_context", operation_id: `${entry.id}:context:${stage}:${entry.record_revision}`,
     scope: [FILE], writes: [{ file: FILE, content }], result: { execution_id: entry.id, status: entry.status, context_receipt_id: entry.pack.receipt.id } });
 }
+const EVIDENCE_HEADER_PUBLICATION = /^(DreamGraph evidence \(untrusted; assertions retain their class\) \{"revision":"[^"]*","publication":)\d+/m;
+/** Equal except for publication counters, the receipt identity derived from them, issue time and delivery state. */
+function sameManagedContent(before: ManagedExecutionContext["pack"], after: ManagedExecutionContext["pack"]) {
+  const key = (pack: ManagedExecutionContext["pack"]) => stable({ ...pack, id: "", token_count: 0,
+    revision: { graph_revision: pack.revision.graph_revision, graph: pack.revision.domains?.graph ?? null },
+    context_text: pack.context_text.replace(EVIDENCE_HEADER_PUBLICATION, (_match, head: string) => `${head}0`),
+    receipt: { ...pack.receipt, id: "", issued_at: "", delivery: "",
+      revision: { graph_revision: pack.receipt.revision.graph_revision, graph: pack.receipt.revision.domains?.graph ?? null } } });
+  return key(before) === key(after);
+}
 function fingerprint(snapshot: CanonicalGraphRead, pack: ManagedExecutionContext["pack"]) {
   return hash(stable({ required: pack.receipt.mandatory_evidence_ids, mandatory_satisfied: pack.mandatory_satisfied,
     reasons: pack.state.reasons, records: pack.records.map(record => ({ record,
@@ -160,6 +170,8 @@ export function managedContextPrompt(entry: ManagedExecutionContext): string {
     state: entry.pack.state, omissions: entry.pack.omissions, source_fallback: entry.pack.source_fallback,
   }) + "\n" + entry.pack.context_text;
 }
+/** UTF-8 byte upper bound for the managed context block: the context query contract's maximum (ContextQuerySchema). */
+export const MANAGED_CONTEXT_DEFAULT_BUDGET = 10_000;
 export async function beginManagedContext(input: { id: string; adapter: string; query: string; plan_id?: string; slice_id?: string; token_budget?: number;
   plan_execution?: PlanExecutionIntent; plan_source?: PlanRuntimeSource }) {
   return withGraphReconciliation(async () => {
@@ -174,10 +186,16 @@ export async function beginManagedContext(input: { id: string; adapter: string; 
       await archiveManagedContexts(closed.slice(0,128).map(entry => entry.id));
     }
     const instance_id = getActiveScope()?.uuid ?? config.instance?.uuid ?? "legacy";
+    const snapshot = await loadCanonicalGraph(instance_id);
+    // A selected plan is required evidence only when the graph projects it (typed plan authority). A plan that
+    // exists only as a reported plans/ document cannot be supplied, and requiring it made every pass's context
+    // insufficient, which denied every governed effect (EXECUTION_CONTEXT_INSUFFICIENT).
+    const planInGraph = !!input.plan_id && (!!input.plan_execution
+      || snapshot.by_identity.has(graphIdentityKey({ instance_id: snapshot.instance_id, kind: "plan", id: input.plan_id })));
     const request = ContextQuerySchema.parse({ query: input.query, execution_id: input.id, adapter: input.adapter,
-      ...(input.plan_id ? { plan_id: input.plan_id } : {}), ...(input.slice_id ? { slice_id: input.slice_id } : {}),
-      token_budget: input.token_budget ?? 6000, depth: 1, max_neighbors: 12, max_records: 32 });
-    const snapshot = await loadCanonicalGraph(instance_id), pack = buildContextPack(snapshot, request), now = new Date().toISOString();
+      ...(planInGraph ? { plan_id: input.plan_id } : {}), ...(planInGraph && input.slice_id ? { slice_id: input.slice_id } : {}),
+      token_budget: input.token_budget ?? MANAGED_CONTEXT_DEFAULT_BUDGET, depth: 1, max_neighbors: 12, max_records: 32 });
+    const pack = buildContextPack(snapshot, request), now = new Date().toISOString();
     const source_hashes = await sourceHashes(pack,snapshot), source_gaps = namedEvidenceGaps(pack,snapshot,source_hashes);
     withNamedSourceGaps(pack,source_gaps);
     const entry: ManagedExecutionContext = { id: input.id, principal: owner.principal, session_id: owner.session_id, instance_id,
@@ -366,6 +384,7 @@ export async function refreshManagedContext(id: string) {
   return withGraphReconciliation(async () => {
     const entry = await readManagedContext(id);
     if (entry.status !== "running") throw new Error("EXECUTION_CONTEXT_CLOSED");
+    const previous = entry.pack;
     const snapshot = await loadCanonicalGraph(entry.instance_id), pack = buildContextPack(snapshot, entry.request);
     const currentSources = await sourceHashes(pack, snapshot, Object.keys(entry.source_hashes)), obligations = (await readChangeObligations()).entries;
     const changed = new Set([...entry.source_gaps, ...namedEvidenceGaps(pack,snapshot,currentSources),
@@ -381,7 +400,12 @@ export async function refreshManagedContext(id: string) {
       return !reconciled && !pending && !evidenced;
     });
     withNamedSourceGaps(pack,entry.source_gaps);
-    entry.pack = pack; entry.source_hashes = currentSources; entry.input_fingerprint = fingerprint(snapshot, pack);
+    // This execution's own bookkeeping (delivery and refresh records) advances the publication counters without
+    // changing what the model is given. Then the delivered block is kept byte-identical (still re-attested), so the
+    // provider's prompt cache stays valid across tool-loop calls. Any change to content, state, evidence or the
+    // graph revision gives the new pack.
+    entry.pack = sameManagedContent(previous, pack) ? { ...previous, receipt: { ...previous.receipt, delivery: "unattested" } } : pack;
+    entry.source_hashes = currentSources; entry.input_fingerprint = fingerprint(snapshot, entry.pack);
     entry.prompt_hash = hash(managedContextPrompt(entry)); entry.updated_at = new Date().toISOString();
     if (Buffer.byteLength(managedContextPrompt(entry)) > 65536) throw new Error("MANDATORY_EXECUTION_CONTEXT_TRANSPORT_BOUND");
     await save(entry, "refreshed"); return entry;

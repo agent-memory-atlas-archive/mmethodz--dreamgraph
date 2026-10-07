@@ -73,6 +73,7 @@ Commands:
   migrate                     Migrate legacy flat data/ to a UUID instance
   graph-upgrade <query>       Upgrade an offline graph (--dry-run to preview)
   computer-use qualify        Qualify this installed isolated browser runtime
+  browser setup|status        Set up / check the Chrome extension for API-engine Computer Use
   plugin <subcmd> <query>     Manage host runtime plugins (list/inspect/enable/disable/trust/untrust/reload/unload)
   webhook <subcmd> <query>    Manage outbound webhook subscriptions (M5: list/add/remove/enable/disable/test/dead-letter/replay)
 
@@ -263,6 +264,12 @@ async function main(): Promise<void> {
       case "graph-upgrade": {
         const { cmdGraphUpgrade } = await import("./commands/graph-upgrade.js");
         await cmdGraphUpgrade(positional.slice(1), flags);
+        break;
+      }
+
+      case "browser": {
+        const { cmdBrowser } = await import("./commands/browser.js");
+        await cmdBrowser(positional.slice(1), flags);
         break;
       }
 

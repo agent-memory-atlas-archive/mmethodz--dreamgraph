@@ -1,6 +1,6 @@
 {
   "name": "dreamgraph",
-  "version": "14.0.1",
+  "version": "14.0.2",
   "description": "Graph-first cognitive daemon with MCP tools, CLI, dashboard, Explorer, and VS Code integration",
   "engines": {
     "node": ">=20.0.0"
@@ -57,9 +57,9 @@
     "@dreamgraph/token-economy"
   ],
   "dependencies": {
-    "@dreamgraph/host": "14.0.1",
-    "@dreamgraph/sdk": "14.0.1",
-    "@dreamgraph/token-economy": "14.0.1",
+    "@dreamgraph/host": "14.0.2",
+    "@dreamgraph/sdk": "14.0.2",
+    "@dreamgraph/token-economy": "14.0.2",
     "@modelcontextprotocol/sdk": "^1.17.4",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
@@ -109,6 +109,7 @@
     "packages/*/dist/**",
     "packages/*/package.json",
     "packages/*/README.md",
+    "browser-extension/**",
     "scripts/install.ps1",
     "scripts/install.sh",
     "scripts/workspace-artifacts.mjs",
@@ -128,6 +129,7 @@
     "INSTALL.md",
     "LICENSE",
     "RELEASE_NOTES_v14.0.0.md",
-    "RELEASE_NOTES_v14.0.1.md"
+    "RELEASE_NOTES_v14.0.1.md",
+    "RELEASE_NOTES_v14.0.2.md"
   ]
 }

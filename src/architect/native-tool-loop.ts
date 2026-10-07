@@ -1,4 +1,5 @@
 import { summarizeProviderUsage } from "../cognitive/provider-usage.js";
+import { openComputerUseBackend, type ComputerUseBackendSession } from "../computer/computer-use-backend.js";
 import { ProviderOutcomeError } from "../cognitive/provider-outcome.js";
 import type { TokenUsage } from "../cognitive/llm.js";
 import type { IncomingMessage } from "node:http";
@@ -26,6 +27,7 @@ import { getSessionContext } from "../server/session-context.js";
 import { executionPolicyProjection, type ExecutionApproval } from "../server/execution-policy.js";
 import { beginHostExecution, endHostExecution, withHostExecution } from "../server/managed-execution.js";
 import { executeScopedCommand } from "../server/scoped-command.js";
+import { coreToolPolicy } from "../server/tool-policy.js";
 import {withComputerSession,type ComputerExecutionBroker} from "../computer/broker.js";
 import {createPreparedWorker,preparedComputerSummary,preparedComputerModelBinding,type PreparedComputer} from "../computer/browser-registry.js";
 import {COMPUTER_NATIVE_TOOL_NAMES,callComputerNativeTool,computerNativeTools,nativePromptTextBytes} from "../computer/native-tools.js";
@@ -38,6 +40,7 @@ import {
   type ArchitectContinuationToolManifest,
 } from "./continuation.js";
 import {
+  computerUseEvidence,
   isRequiredArchitectToolSatisfied,
   selectArchitectToolNames,
 } from "./tool-selection.js";
@@ -74,6 +77,13 @@ export interface ArchitectToolLoopRoute {
   stop_reason: string;
   fallback_reason: string | null;
   effective_controls?: ReturnType<typeof executionPolicyProjection>;
+  /** Common Computer Use evidence (docs/ashoka/computer-use-contract.md). */
+  computer_use_backend?: "cua-runtime" | "dreamgraph-browser" | "dreamgraph-harness";
+  computer_use_session?: string;
+  computer_use_cleanup_log?: string;
+  computer_use_unavailable?: string;
+  /** Earlier tool results compacted to keep the transcript inside the role's context allocation. */
+  context_compactions?: number;
 }
 
 export interface ArchitectToolLoopProvenance {
@@ -99,6 +109,8 @@ export interface ArchitectToolLoopResult {
   usage_by_call: Array<TokenUsage | null>;
   usage_provenance: "unavailable" | "partial" | "provider_reported";
   graph_execution?: ManagedExecutionContext;
+  /** Policy "ask": the executor asked the operator for Computer Use (common contract; ends the pass). */
+  computer_use_request?: { reason: string };
 }
 
 type ArchitectToolDefinition = LlmToolDefinition;
@@ -109,6 +121,8 @@ type ToolLoopResponse = LlmToolLoopResponse;
 
 const MAX_ARCHITECT_TOOLS = 64;
 const MAX_ARCHITECT_TOOL_ITERATIONS = 8;
+/** Computer Use is sequential (one UI step per call); the pass ceiling and budgets remain the real bounds. */
+const MAX_ARCHITECT_COMPUTER_ITERATIONS = 80;
 const ARCHITECT_TOOL_TIMEOUT_MS = 300_000;
 const PROVIDER_TOOL_NAME_RE = /^[A-Za-z0-9_-]{1,64}$/;
 const NATIVE_RUN_COMMAND_TOOL: ArchitectToolDefinition = Object.freeze({
@@ -126,6 +140,60 @@ const NATIVE_RUN_COMMAND_TOOL: ArchitectToolDefinition = Object.freeze({
     required: ["command"],
   },
 });
+
+/** Common contract, policy "ask": a capability request, not a grant. The pass ends and the operator is asked. */
+export const NATIVE_REQUEST_COMPUTER_USE_TOOL: ArchitectToolDefinition = Object.freeze({
+  name: "request_computer_use",
+  description:
+    "[DreamGraph] Ask the local operator for permission to use Computer Use (operate this computer's browser). Call this ONLY when the task " +
+    "truly requires operating the computer, then end your turn with one short sentence saying what you need it for. If the operator allows " +
+    "it, the same request is run again with Computer Use enabled. Do not try to do the task another way.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      reason: { type: "string", description: "One sentence: what you need to do on the computer and why." },
+    },
+    required: ["reason"],
+  },
+});
+/** Share of the context allocation the transcript may fill; the rest covers provider framing and estimate error. */
+const TRANSCRIPT_TARGET_SHARE = 0.8;
+/** Compaction then goes down to this share, so it happens rarely: each compaction changes the prompt and costs one cache miss. */
+const TRANSCRIPT_COMPACTED_SHARE = 0.6;
+const COMPACTED_RESULT_PREFIX = "[Earlier tool result compacted";
+const COMPACTION_KEEP_CHARS = 600;
+/**
+ * Keeps a long tool loop (Computer Use runs up to 80 steps) inside the role's model admission instead of failing:
+ * once the estimated request (UTF-8 JSON, images included) passes 80 % of the allocation, the oldest tool results
+ * after the required prompt are replaced by a short stub, oldest first, until it is under 60 %. The latest exchange is never
+ * compacted. If the request still does not fit, admission reports ADMISSION_CONTEXT_LIMIT with the setting.
+ * Returns the number of results compacted.
+ */
+export function compactArchitectToolTranscript(messages: NeutralMessage[], requiredCount: number, tools: ArchitectToolDefinition[], contextAllocation: number): number {
+  const toolBytes = Buffer.byteLength(JSON.stringify(tools));
+  let size = Buffer.byteLength(JSON.stringify(messages));
+  if (size <= Math.floor(contextAllocation * TRANSCRIPT_TARGET_SHARE) - toolBytes) return 0;
+  const target = Math.floor(contextAllocation * TRANSCRIPT_COMPACTED_SHARE) - toolBytes;
+  // The latest assistant turn and its results stay intact so the model can act on what it just saw.
+  let protectFrom = messages.length;
+  for (let index = messages.length - 1; index >= requiredCount; index -= 1) if (messages[index].role === "assistant") { protectFrom = index; break; }
+  let compacted = 0;
+  for (let index = requiredCount; index < protectFrom && size > target; index += 1) {
+    const content = messages[index].content;
+    if (!Array.isArray(content)) continue;
+    for (let position = 0; position < content.length && size > target; position += 1) {
+      const block = content[position];
+      if (block.type !== "tool_result" || block.content.startsWith(COMPACTED_RESULT_PREFIX) || block.content.length <= COMPACTION_KEEP_CHARS * 2) continue;
+      const stub = `${COMPACTED_RESULT_PREFIX} to keep this pass within its context allocation (${block.content.length} chars). `
+        + `Beginning: ${block.content.slice(0, COMPACTION_KEEP_CHARS)} … Call the tool again if you need the full result.]`;
+      size -= Buffer.byteLength(JSON.stringify(block.content)) - Buffer.byteLength(JSON.stringify(stub));
+      content[position] = { ...block, content: stub };
+      compacted += 1;
+    }
+  }
+  return compacted;
+}
+const textArg = (value: unknown, max: number) => typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, max) : "";
 
 export interface RunArchitectNativeToolLoopInput {
   req: IncomingMessage;
@@ -148,6 +216,8 @@ export interface RunArchitectNativeToolLoopInput {
   verbosityMode?: "concise" | "balanced" | "detailed";
   /** Captured only by the operator-owned preparation port, never a model-supplied worker/profile. */
   computer?:PreparedComputer;
+  /** Common Computer Use contract: granted for this pass, requestable (policy "ask"), or off. */
+  computerUse?: "granted" | "requestable" | "off";
 }
 /** Generic unconnected reader fixtures remain un-attested; managed sessions use the same daemon fence as native CLI. */
 export async function runArchitectNativeToolLoop(input: RunArchitectNativeToolLoopInput): Promise<ArchitectToolLoopResult> {
@@ -164,7 +234,7 @@ export async function runArchitectNativeToolLoop(input: RunArchitectNativeToolLo
     plan_execution: input.planExecution,
     autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced", approved_actions: input.approvedActions,
     timeout_ms: architectPassTimeoutMs() }, input.signal, input.operatorReviewEnabled === true);
-  let dispatched = false, finished = false;
+  let dispatched = false, finished = false, executionSignal: AbortSignal | undefined;
   try {
     const block = lease.execution.block;
     const messages = [...input.messages, { role: "system" as const, content: block }];
@@ -175,8 +245,9 @@ export async function runArchitectNativeToolLoop(input: RunArchitectNativeToolLo
     const result = await withHostExecution(id, async () => {
       const policy = getSessionContext()!.execution_policy!;
       const signal = input.signal ? AbortSignal.any([input.signal, policy.signal]) : policy.signal;
+      executionSignal = signal;
       signal.throwIfAborted(); dispatched = true;
-      const dispatch=(computer?:ComputerExecutionBroker)=>runArchitectNativeToolLoopDispatch({ ...input, messages, signal:computer?AbortSignal.any([signal,computer.executionSignal]):signal }, lease.worker_bearer,computer);
+      const dispatch=(computer?:ComputerExecutionBroker)=>runArchitectNativeToolLoopDispatch({ ...input, executionId: id, messages, signal:computer?AbortSignal.any([signal,computer.executionSignal]):signal }, lease.worker_bearer,computer);
       let result:ArchitectToolLoopResult;
       if(input.computer){
         const summary=preparedComputerSummary(input.computer),budget=input.config.admissionPolicy?.policy.budget;
@@ -194,8 +265,11 @@ export async function runArchitectNativeToolLoop(input: RunArchitectNativeToolLo
     return { ...result, graph_execution: await readManagedContext(id) };
   } catch (error) {
     if (!finished) try {
+      // The loop runs in this process and every model/tool call is awaited, so once dispatch has thrown the
+      // work has ended. A refused request (e.g. admission) is a failed pass, not an unknown stop. Only an abort
+      // (cancel, ceiling) can leave a governed call that the daemon was still serving.
       await endHostExecution({ execution_id: id, outcome: input.signal?.aborted ? "cancelled" : "failed",
-        work_termination: dispatched ? "unconfirmed" : "confirmed" });
+        work_termination: dispatched && (input.signal?.aborted || executionSignal?.aborted) ? "unconfirmed" : "confirmed" });
     } catch (closure) { throw new Error(`HOST_EXECUTION_CLOSURE_UNCONFIRMED: ${String(closure)}; original failure: ${String(error)}`, { cause: error }); }
     throw error;
   }
@@ -219,6 +293,8 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
   let availableTools: ArchitectToolDefinition[] = [];
   let fallbackReason: string | null = null;
   let connection: McpSessionConnection | undefined;
+  // Common Computer Use contract, API engines: DreamGraph browser bridge or the installed runtime (docs/ashoka/computer-use-contract.md).
+  let cua: ComputerUseBackendSession | null = null;
 
   try {
 
@@ -233,11 +309,22 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
     }
   }
   if(computer&&fallbackReason)throw new Error("COMPUTER_AUTHORITY_TRANSPORT_UNAVAILABLE");
-  availableTools = ensureArchitectNativeSupportTools(availableTools);
+  // DreamGraph's browser tools on the MCP server serve CLI executors; this loop gets them from its own backend session.
+  availableTools = ensureArchitectNativeSupportTools(availableTools.filter((tool) => coreToolPolicy(tool.name).effect !== "computer_use"));
 
   const toolSelection = selectArchitectTools(availableTools, { message: input.userMessage, manifest: input.toolManifest });
-  const computerTools=computer?await computerNativeTools(computer):[];
+  let computerUseUnavailable: string | undefined;
+  if (!computer && input.computerUse === "granted") {
+    try { cua = await openComputerUseBackend({ signal: input.signal, executionId: input.executionId }); }
+    catch (error) { computerUseUnavailable = error instanceof Error ? error.message : String(error); }
+  }
+  const computerTools = computer ? await computerNativeTools(computer) : cua ? cua.tools
+    : input.computerUse === "requestable" ? [NATIVE_REQUEST_COMPUTER_USE_TOOL] : [];
   const advertisedTools = [...toolSelection.tools.slice(0,MAX_ARCHITECT_TOOLS-computerTools.length),...computerTools];
+  // Computer Use work (actions plus observations) satisfies the source/verification obligations a prompt implies.
+  const isComputerTool = (name: string) => COMPUTER_NATIVE_TOOL_NAMES.has(name) || !!cua?.has(name);
+  const maxIterations = computer || cua ? MAX_ARCHITECT_COMPUTER_ITERATIONS : MAX_ARCHITECT_TOOL_ITERATIONS;
+  let computerUseRequest: ArchitectToolLoopResult["computer_use_request"];
   const supportsTools = supportsNativeToolLoop(input.config.provider);
   if (!supportsTools && fallbackReason == null) {
     fallbackReason = `architect_tool_loop_provider_unsupported: ${input.config.provider}`;
@@ -289,6 +376,20 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
   const managedIndex = managedId ? rawMessages.findIndex(message => message.role === "system" && typeof message.content === "string"
     && message.content.startsWith("DreamGraph required execution context.")) : -1;
   const computerIndex=computer?rawMessages.push({role:"system",content:"Computer Use current state pending."})-1:-1;
+  // Common Computer Use contract: the same executor guidance as the Codex CLI engine.
+  if (cua) rawMessages.push({ role: "system", content: cua.guidance });
+  else if (!computer && input.computerUse === "granted") rawMessages.push({ role: "system", content:
+    `The operator granted Computer Use for this pass, but it is unavailable on this machine (${computerUseUnavailable ?? "unknown reason"}). `
+    + "Say so plainly in your answer; do not try to operate the computer another way." });
+  else if (!computer && input.computerUse === "requestable") rawMessages.push({ role: "system", content:
+    "Computer Use is NOT granted for this pass. If the request genuinely requires operating this computer (browser, apps, screen), call "
+    + "request_computer_use with a one-sentence reason, then end your turn; the operator will be asked and the request re-run with Computer Use "
+    + "if allowed. Otherwise do not ask." });
+  // Everything above is the required prompt (operator messages, managed context, guidance). It keeps the 128 KiB
+  // text bound. The tool-loop transcript after it is bounded by the role's model admission and compacted to fit.
+  const requiredCount = rawMessages.length;
+  const contextAllocation = input.config.admissionPolicy?.effective.context_tokens;
+  let contextCompactions = 0;
   const refreshForCompletion = async () => {
     if(computer){await computer.awaitReady();const state=await computer.status();rawMessages[computerIndex]={role:"system",content:"DreamGraph current Computer Use. Use a fresh observation before input; old references/fences cannot be renewed. "+JSON.stringify({
       execution_id:state.session.execution_id,id:state.session.id,state:state.session.state,fence:state.session.fence,targets:state.targets,limits:state.limits,usage:state.usage,stop:state.stop_state,pause:state.pause_state})};
@@ -298,20 +399,24 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
     input.signal?.throwIfAborted();
     const entry = await refreshManagedContext(managedId);
     rawMessages[managedIndex] = { role: "system", content: managedContextPrompt(entry) };
-    if (nativePromptTextBytes(rawMessages) > 128 * 1024) throw new Error("NATIVE_REQUIRED_PROMPT_BYTE_BOUND");
+    if (nativePromptTextBytes(rawMessages.slice(0, requiredCount)) > 128 * 1024) throw new Error("NATIVE_REQUIRED_PROMPT_BYTE_BOUND");
     await deliverManagedContext(managedId, rawMessages[managedIndex].content as string);
+  };
+  const prepareCompletion = async (tools: ArchitectToolDefinition[]) => {
+    await refreshForCompletion();
+    if (contextAllocation) contextCompactions += compactArchitectToolTranscript(rawMessages, requiredCount, tools, contextAllocation);
   };
   let finalText = "";
   let completionModel = input.config.model;
   let stopReason = "max_tool_iterations";
   let iterations = 0;
 
-  for (let iteration = 1; iteration <= MAX_ARCHITECT_TOOL_ITERATIONS; iteration += 1) {
+  for (let iteration = 1; iteration <= maxIterations; iteration += 1) {
     iterations = iteration;
     input.signal?.throwIfAborted();
     // Each loop iteration is liveness evidence for the rolling execution lease.
     getSessionContext()?.execution_policy?.renew();
-    await refreshForCompletion();
+    await prepareCompletion(advertisedTools);
     const response = await measuredCall(() => completeWithNativeTools(input.config, rawMessages, advertisedTools, input.signal));
     completionModel = response.model || completionModel;
     if (response.text) {
@@ -319,8 +424,8 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
     }
 
     if (response.toolCalls.length === 0) {
-      const missingRequiredTools = missingRequiredArchitectToolCalls(toolSelection, trace);
-      if (missingRequiredTools.length > 0 && iteration < MAX_ARCHITECT_TOOL_ITERATIONS) {
+      const missingRequiredTools = missingRequiredArchitectToolCalls(toolSelection, trace, isComputerTool);
+      if (missingRequiredTools.length > 0 && iteration < maxIterations) {
         if (response.text?.trim()) {
           rawMessages.push({ role: "assistant", content: response.text.trim(), providerRawAssistant: response.providerRawAssistant });
         }
@@ -348,7 +453,9 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
       input.signal?.throwIfAborted();
       const startedAt = Date.now();
       const isComputer=COMPUTER_NATIVE_TOOL_NAMES.has(call.name);
-      const argsSummary = isComputer?"Scoped Computer Use; literal arguments are private to the original action review.":summarizeArgs(call.input);
+      const isRuntimeComputer = !!cua && cua.has(call.name);
+      const argsSummary = isComputer?"Scoped Computer Use; literal arguments are private to the original action review."
+        : isRuntimeComputer && cua ? cua.title(call.name, call.input) : summarizeArgs(call.input);
       const traceId = `dreamgraph:${call.name}:${startedAt}`;
       input.onToolTrace?.({
         iteration,
@@ -365,6 +472,16 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
       try {
         if(isComputer){if(!computer)throw new Error("COMPUTER_OPERATOR_BINDING_REQUIRED");
           const result=await callComputerNativeTool(computer,call.name,call.input??{});resultText=result.text;computerPreview=result.preview;computerImage=result.image;
+        }else if (isRuntimeComputer && cua) {
+          const result = await cua.call(call.name, call.input ?? {}, input.signal);
+          resultText = result.text;
+          if (result.isError) status = "failed";
+          if (result.images.length) computerImage = result.images[result.images.length - 1];
+        }else if (!computer && !cua && call.name === NATIVE_REQUEST_COMPUTER_USE_TOOL.name) {
+          const args = (call.input ?? {}) as Record<string, unknown>;
+          computerUseRequest = { reason: textArg(args.reason, 500) || "No reason given." };
+          resultText = "Computer Use requested from the local operator. Do not attempt Computer Use now or do the task another way. "
+            + "End your turn with one short sentence describing what you need to do on the computer.";
         }else if (call.name === NATIVE_RUN_COMMAND_TOOL.name) {
           const result = await runArchitectNativeCommand(call.input ?? {});
           resultText = stringifyMcpResult(result);
@@ -389,7 +506,9 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
         }else resultText=error instanceof Error ? error.message : String(error);
       }
 
-      const compressed = input.budgetCoordinator
+      // Computer Use output (runtime documentation, page reads) is already bounded by the backend and must stay verbatim.
+      const compressed = isRuntimeComputer ? { content: resultText, originalChars: resultText.length, finalChars: resultText.length, mode: "verbatim" }
+        : input.budgetCoordinator
         ? boundedMachineResult(resultText, 16_000) ?? compressToolResult(resultText, input.budgetCoordinator, call.name)
         : { content: resultText, originalChars: resultText.length, finalChars: resultText.length, mode: "verbatim" };
       const finalTokens = estimateTokensFromString(compressed.content);
@@ -430,9 +549,11 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
       }
     }
     rawMessages.push({ role: "user", content: toolResultBlocks });
+    // A Computer Use request ends the pass: no required-tool corrections that push the model into busywork.
+    if (computerUseRequest) { stopReason = "computer_use_requested"; break; }
   }
 
-  const finalMissingRequiredTools = missingRequiredArchitectToolCalls(toolSelection, trace);
+  const finalMissingRequiredTools = computerUseRequest ? [] : missingRequiredArchitectToolCalls(toolSelection, trace, isComputerTool);
   if (finalMissingRequiredTools.length > 0) {
     fallbackReason = fallbackReason ?? `required_tools_not_called:${finalMissingRequiredTools.join(",")}`;
     stopReason = `required_tools_not_called:${finalMissingRequiredTools.join(",")}`;
@@ -451,7 +572,7 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
     }
     rawMessages.push({ role: "user", content: buildArchitectFinalizationPrompt(trace) });
     input.signal?.throwIfAborted();
-    await refreshForCompletion();
+    await prepareCompletion([]);
     const finalization = await measuredCall(() => completeWithNativeTools(input.config, rawMessages, [], input.signal));
     completionModel = finalization.model || completionModel;
     if (finalization.text) finalText = joinAssistantText(finalText, finalization.text);
@@ -480,10 +601,11 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
     });
   }
 
-  if (iterations >= MAX_ARCHITECT_TOOL_ITERATIONS && trace.length > 0 && finalText.trim().length === 0) {
+  if (iterations >= maxIterations && trace.length > 0 && finalText.trim().length === 0) {
     fallbackReason = fallbackReason ?? "max_tool_iterations_without_final_envelope";
     stopReason = "max_tool_iterations_without_final_envelope";
   }
+  const computerUseCleanupLog = cua ? await cua.release("pass finished") : null;
 
   return {
     ...summarizeProviderUsage(usageCalls),
@@ -503,6 +625,10 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
       iterations,
       stop_reason: stopReason,
       fallback_reason: fallbackReason,
+      ...(cua ? { computer_use_backend: cua.backend, computer_use_session: cua.sessionId } : computer ? { computer_use_backend: "dreamgraph-harness" as const } : {}),
+      ...(computerUseCleanupLog ? { computer_use_cleanup_log: computerUseCleanupLog } : {}),
+      ...(computerUseUnavailable ? { computer_use_unavailable: computerUseUnavailable } : {}),
+      ...(contextCompactions ? { context_compactions: contextCompactions } : {}),
     },
     provenance: {
       authority: "dreamgraph_mcp",
@@ -517,10 +643,16 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
       })),
     },
     tool_trace: trace,
+    ...(computerUseRequest ? { computer_use_request: computerUseRequest } : {}),
   };
-  } finally { await connection?.close(); }
+  } finally {
+    // Run-once: also covers ceiling, cancellation and crashes, so no browser claim outlives the pass.
+    if (cua) await cua.release("pass ended").catch(() => null);
+    await connection?.close();
+  }
 }
 
+/** Readable trace label for a Computer Use runtime call: the executor's own title, else the start of its code. */
 function architectMcpPort(req: IncomingMessage): number | null {
   const host = req.headers.host;
   if (!host) return null;
@@ -573,14 +705,17 @@ function buildArchitectFinalizationPrompt(trace: ArchitectToolTraceEntry[]): str
 export function missingRequiredArchitectToolCalls(
   selection: { required_tools: string[]; unavailable_required_tools: string[] },
   trace: ArchitectToolTraceEntry[],
+  isComputerTool: (name: string) => boolean = () => false,
 ): string[] {
   const unavailable = new Set(selection.unavailable_required_tools);
   const calledTools = trace
     .filter((entry) => entry.status === "completed" || entry.status === "failed")
     .map((entry) => entry.tool);
+  // Computer Use counts only when it completed: a failed browser action is not evidence of work done.
+  const computer = computerUseEvidence(trace.filter((entry) => entry.status === "completed").map((entry) => entry.tool), isComputerTool);
   return selection.required_tools
     .filter((tool) => !unavailable.has(tool))
-    .filter((tool) => !isRequiredArchitectToolSatisfied(tool, calledTools));
+    .filter((tool) => !isRequiredArchitectToolSatisfied(tool, calledTools, computer));
 }
 
 function buildRequiredToolCorrectionPrompt(

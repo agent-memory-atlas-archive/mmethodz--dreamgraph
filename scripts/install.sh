@@ -348,6 +348,13 @@ mkdir -p "$BIN_DIR"
 cp -r "$SOURCE_DIST" "$DIST_TARGET"
 ok "dist/ copied"
 
+# Chrome extension for Computer Use on the API engines (loaded once by the user from this folder).
+if [[ -f "$SOURCE_DIR/browser-extension/manifest.json" ]]; then
+    mkdir -p "$BIN_DIR/browser-extension"
+    cp -R "$SOURCE_DIR/browser-extension/." "$BIN_DIR/browser-extension/"
+    ok "browser-extension/ copied"
+fi
+
 # Workspace packages cannot be resolved from the registry; pack them into
 # the bin vendor dir and rewrite the deps to file: references so
 # `npm install --omit=dev` can complete offline.
@@ -641,6 +648,15 @@ if [[ $RUN_LOGGED_EXIT_CODE -ne 0 ]]; then
     fail "Verification failed: 'node $DIST_TARGET/cli/dg.js --version' exited with $RUN_LOGGED_EXIT_CODE"
 fi
 ok "$RUN_LOGGED_OUTPUT"
+
+step "Registering the DreamGraph browser host..."
+run_logged --allow-failure --quiet -- node "$DIST_TARGET/cli/dg.js" browser setup
+if [[ $RUN_LOGGED_EXIT_CODE -eq 0 ]]; then
+    ok "Browser host registered"
+    echo "  Load the extension once: chrome://extensions > Developer mode > Load unpacked > $BIN_DIR/browser-extension"
+else
+    warn "Browser host registration failed -- run 'dg browser setup' later"
+fi
 
 echo ""
 echo -e "${GREEN}${BOLD}==================================================${NC}"

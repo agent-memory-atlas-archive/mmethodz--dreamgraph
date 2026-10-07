@@ -1,14 +1,14 @@
 ![DreamGraph](assets/dreamgraph.jpeg)
 
-# DreamGraph v14.0.1 - Ashoka
+# DreamGraph v14.0.2 - Ashoka
 
 **Current project state:** [Established behavior and maintainer field confirmations](docs/ashoka/project-state.md), including permanent Architect operational tabs, the configuration redesign, working Codex CLI Computer Use and successful graph upgrade on all seven tested instances.
 
-**Current patch:** [v14.0.1 release notes](RELEASE_NOTES_v14.0.1.md) cover legacy graph upgrade recovery, Codex CLI Computer Use cleanup, and consistent validation counts across Status and Explorer. Install and graph migration are separate operations; stop a legacy instance before running `dg graph-upgrade <instance>`. Native API Computer Use remains unqualified in the field, and legacy unresolved references require separate review.
+**Current patch:** [v14.0.2 release notes](RELEASE_NOTES_v14.0.2.md) introduce DreamGraph’s own browser backend for Codex CLI and native API routes, Windows Save/Open dialog handling, clearer task reporting and context-cost fixes. Follow the [browser extension installation and connection guide](guide/17-computer-use.md). Install and graph migration remain separate operations.
 
-Ashoka's [legacy migration procedure](docs/ashoka/legacy-upgrade.md) provides a reviewed preview, backup, cutover and recovery path. Installing v14 does not migrate a graph automatically. The [sealed system gate](docs/ashoka/slice-27-closure.json) records 2,040 passing root tests, 546 compiled editor tests and eleven Windows browser checks. The maintainer's original instance remains a separate migration decision.
+Ashoka's [legacy migration procedure](docs/ashoka/legacy-upgrade.md) provides a reviewed preview, backup, cutover and recovery path. Installing v14 does not migrate a graph automatically. The [sealed system gate](docs/ashoka/slice-27-closure.json) records 2,040 passing root tests, 546 compiled editor tests and eleven Windows browser checks. Subsequent [maintainer field confirmation](docs/ashoka/project-state.md) records successful upgrades on all seven tested instances.
 
-The [Computer Use implementation](docs/ashoka/computer-use.md) extends original execution/job/graph owners with scoped grants, durable action receipts, an isolated browser worker and compact Architect/companion controls. SDK/editor controls retain the original owner and captured endpoint; selection issues no grant. Slice 31 is verified for the maintainer's [Windows and accepted WSL installer/browser scope](docs/ashoka/v14-release-scope.md). Additional platforms/native desktop backends are deferred; unqualified native CLI/provider control remains unavailable without silent substitution.
+The [current Computer Use contract](docs/ashoka/computer-use-contract.md) uses the connected DreamGraph browser backend for Codex CLI and native API execution, with Codex CUA as an available fallback. Browser access requires an explicit permission policy. Native Windows Save/Open dialogs are supported; Linux/macOS dialogs require operator action. Historical [Windows and accepted WSL installer/browser evidence](docs/ashoka/v14-release-scope.md) remains scoped to the runtimes it tested.
 
 Ashoka [native-host spend admission](docs/ashoka/model-admission.md) joins editor/SDK API and CLI transport to the durable ledger without transferring provider credentials. Generated core contracts separate possible-dispatch permits, trusted host reports and read-only recovery.
 
@@ -20,7 +20,7 @@ Ashoka strategy alignment uses one [executable catalogue](docs/ashoka/strategies
 
 [Typed plan authority](docs/ashoka/plan-authority.md) keeps current ownership, running leases, dependency eligibility and reviewed verification in one core reducer and publication journal.
 
-![Version](https://img.shields.io/badge/version-14.0.1-blue)
+![Version](https://img.shields.io/badge/version-14.0.2-blue)
 ![VS%20Code](https://img.shields.io/badge/VS%20Code-extension-0098FF?logo=visualstudiocode&logoColor=white)
 ![MCP](https://img.shields.io/badge/MCP-enabled-7C3AED)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=nodedotjs&logoColor=white)
@@ -34,7 +34,7 @@ Ashoka strategy alignment uses one [executable catalogue](docs/ashoka/strategies
 
 **Engine alignment audit (2026-09-30):** See the [coverage and correctness report](docs/audits/2026-09-30-coverage/report.md), [subsystem alignment map](docs/audits/2026-09-30-coverage/subsystem-alignment.md), and [unified v14.0.0 - Ashoka plan](plans/graph-trust-and-agent-effectiveness.md). [Revision 7](docs/audits/2026-09-30-coverage/plan-refinement.md) retains the resolved policies, schedule management, CLI controls and [coherent lifecycle/status design](docs/audits/2026-09-30-coverage/plan-lifecycle-status.md), and makes [graph-centered execution and bounded digestion](docs/audits/2026-09-30-coverage/graph-centered-execution.md) a release invariant. It also specifies [Architect context menus and selected-plan navigation](docs/audits/2026-09-30-coverage/architect-context-actions.md). The [Computer Use design](docs/audits/2026-09-30-coverage/computer-use.md) adds adapter-native execution, cross-platform workers and bounded delivery. The [full execution simulation](docs/audits/2026-09-30-coverage/execution-simulation.md) closes contract/dependency/recovery handoffs and makes reconciliation-based freshness explicit: old scan does not mean stale graph. See the [sealed system checkpoint](docs/ashoka/slice-27-closure.json), [release evidence](https://github.com/mmethodz/dreamgraph/blob/main/docs/ashoka/slice-28-release-evidence.json) and [implementation log](plans/graph-trust-and-agent-effectiveness.implementation-log.md) for qualification results and explicit limitations.
 
-**v14.0.1 - Ashoka** is the first field patch for the v14 practical-testing release. See the [current release notes](RELEASE_NOTES_v14.0.1.md), [v14.0.0 baseline notes](RELEASE_NOTES_v14.0.0.md), and [upgrade guide](docs/ashoka/release-14.0.0.md); the published model pilot does not establish understanding gains or cost savings.
+**v14.0.2 - Ashoka** extends the v14 practical-testing release with a shared browser backend and field-driven fixes. See the [current release notes](RELEASE_NOTES_v14.0.2.md), [v14.0.1 field patch](RELEASE_NOTES_v14.0.1.md) and [upgrade guide](guide/16-ashoka-upgrade.md). The earlier model pilot does not establish understanding gains; the new cost observation is a single maintainer run, not a general benchmark.
 
 DreamGraph is a governed architecture cognition layer for MCP-enabled software projects. It combines an instance-scoped daemon, CLI, architect beta, VS Code extension, dashboard, and a persistent knowledge graph so project understanding is grounded in source, ADRs, workflows, tests, runtime observations, and human review rather than any single file read or isolated chat turn.
 
@@ -445,7 +445,7 @@ explorer/
 
 ## Version Semantics
 
-The CLI, standalone Architect, VS Code Architect, daemon, Explorer, Dashboard, analytics suite, and daemon-exposed MCP authority share release **14.0.1**. MCP initialization and `system://capabilities` report the daemon package version. Analytics reports it with `python -m analytics --version` from the `python/` directory.
+The CLI, standalone Architect, VS Code Architect, daemon, Explorer, Dashboard, analytics suite, and daemon-exposed MCP authority share release **14.0.2**. MCP initialization and `system://capabilities` report the daemon package version. Analytics reports it with `python -m analytics --version` from the `python/` directory.
 
 DreamGraph instance status can show two different version concepts:
 

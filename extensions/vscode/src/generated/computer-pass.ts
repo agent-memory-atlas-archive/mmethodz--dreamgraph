@@ -9,8 +9,9 @@ export const NativeComputerScopeSchema=z.object({instance_id:id,worker:z.literal
  model:z.object({role:z.literal('computer_use'),provider:id,model:id,api:id,retention:RolePolicySchema.shape.retention,budget:BudgetSchema,policy_hash:id}).strict(),retention:z.literal('none'),
  limits:z.object({max_actions:count,max_images:count,max_image_bytes:count,expires_at:z.string().datetime({offset:true})}).strict(),
  postconditions:z.array(z.object({id,kind:id}).strict()).max(256),capability:ComputerCapabilitySchema}).strict();
-export const NativeComputerSetupSchema=z.union([NativeComputerScopeSchema.extend({ok:z.literal(true),available:z.boolean()}),
- z.object({ok:z.literal(true),available:z.literal(false),route:z.literal('unavailable'),reasons:z.array(id).max(32),remedy:z.string().max(4096)}).strict()]);
+const computerUseRoute=z.object({backend:z.enum(['dreamgraph-browser','codex-native','cua-runtime','unavailable']),summary:z.string().max(4096)}).strict().optional();
+export const NativeComputerSetupSchema=z.union([NativeComputerScopeSchema.extend({ok:z.literal(true),available:z.boolean(),computer_use_route:computerUseRoute}),
+ z.object({ok:z.literal(true),available:z.literal(false),route:z.literal('unavailable'),reasons:z.array(id).max(32),remedy:z.string().max(4096),computer_use_route:computerUseRoute}).strict()]);
 export const NativeComputerPrepareRequestSchema=z.object({interact:z.boolean(),duration_ms:z.number().int().min(1000).max(300000)}).strict();
 export const NativeComputerPreparationSchema=NativeComputerScopeSchema.extend({id:z.string().uuid(),execution_id:id,target_id:id,interact:z.boolean()});
 export const NativeComputerConfirmationSchema=z.object({id:z.string().uuid(),execution_id:id,grant_id:id,expires_at:z.string().datetime({offset:true})}).strict();

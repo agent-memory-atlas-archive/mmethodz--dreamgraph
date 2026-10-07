@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>DreamGraph Computer Use</title>
+<style>
+  body { font: 13px/1.45 system-ui, sans-serif; margin: 0; padding: 14px 16px; width: 300px; color: #1d2421; background: #fbfcfb; }
+  h1 { font-size: 14px; margin: 0 0 8px; }
+  .state { display: flex; align-items: center; gap: 8px; margin: 6px 0 10px; font-weight: 600; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #b9443a; }
+  .ok .dot { background: #2f8f6e; }
+  p { margin: 6px 0; color: #4a5551; }
+  code { font-size: 12px; }
+  button { margin-top: 6px; font: inherit; padding: 4px 10px; }
+  @media (prefers-color-scheme: dark) { body { background: #161b19; color: #e3e9e6; } p { color: #a9b5b0; } }
+</style></head>
+<body>
+  <h1>DreamGraph Computer Use</h1>
+  <div id="state" class="state"><span class="dot"></span><span id="label">Checking…</span></div>
+  <p id="detail"></p>
+  <button id="retry" hidden>Try again</button>
+  <script src="popup.js"></script>
+</body></html>

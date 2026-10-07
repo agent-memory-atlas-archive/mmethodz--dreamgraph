@@ -58,7 +58,7 @@ bash scripts/install.sh --force
 7. **Configures PATH** — adds `~/.dreamgraph/bin` to your user PATH on Windows; uses `~/.local/bin` or `/usr/local/bin` on Unix.
 8. **Verifies** — runs `dg --version` to confirm.
 
-Both installers retain optional `playwright-core@1.62.1` for the isolated Computer Use browser worker. They do not download a browser, activate Computer Use or grant control. A missing optional runtime leaves that worker unavailable. Install an explicit browser and run [the installed runtime qualification](../docs/ashoka/computer-use.md) before configuring a worker.
+Both installers copy the DreamGraph browser extension and register its native messaging host. Load the extension in your browser and check its connection using the [Computer Use setup guide](17-computer-use.md). Installation does not grant computer control. Optional `playwright-core@1.62.1` remains included for the isolated-browser worker; its earlier qualification is separate from extension connection.
 
 In WSL, use Linux Node/npm and a source checkout on the Linux filesystem. The default Linux installation is `$HOME/.dreamgraph`, separate from the Windows installation. `DREAMGRAPH_MASTER_DIR` can override either location, so check it before installing. A WSL browser qualification covers that Linux runtime; native desktop permissions and a separate Mint installation require their own qualification.
 
@@ -70,7 +70,7 @@ The installer modifies PATH. Your **current** terminal won't see the change. Ope
 
 ```bash
 dg --version
-# DreamGraph CLI v14.0.1 (Ashoka)
+# DreamGraph CLI v14.0.2 (Ashoka)
 
 dg --help
 # (lists every subcommand)
@@ -93,7 +93,7 @@ If `code` was missing, install the extension manually:
 ```bash
 cd extensions/vscode
 npm run build
-code --install-extension dreamgraph-vscode-14.0.1.vsix
+code --install-extension dreamgraph-vscode-14.0.2.vsix
 ```
 
 ---
@@ -110,7 +110,7 @@ git pull
 bash scripts/install.sh --force
 ```
 
-After upgrading: **restart any running daemons and reload VS Code windows**. The old runtime stays in memory until you do.
+After upgrading: **restart any running daemons, reload the DreamGraph browser extension and reload VS Code windows**. The old runtime stays in memory until you do.
 
 ```bash
 dg restart <instance-name>

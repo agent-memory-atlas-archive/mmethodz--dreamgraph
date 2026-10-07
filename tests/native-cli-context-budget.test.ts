@@ -4,7 +4,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { resolveRolePolicy, type RoleAdapterCapabilities } from "../src/config/role-policy.js";
 import { NATIVE_CLI_DEFAULT_CONTEXT_ALLOCATION, MODEL_REQUEST_FRAMING_RESERVE_BYTES,
-  NATIVE_CLI_PROMPT_MAX_BYTES } from "../src/config/request-bounds.js";
+  NATIVE_CLI_PROMPT_MAX_BYTES, HOSTED_API_DEFAULT_CONTEXT_ALLOCATION, LOCAL_DEFAULT_CONTEXT_ALLOCATION,
+  ARCHITECT_API_DEFAULT_BUDGET } from "../src/config/request-bounds.js";
 import { ModelExecution } from "../src/cognitive/model-execution.js";
 import { ModelAdmissionError } from "../src/cognitive/model-admission.js";
 import { withDataDirectory } from "../src/utils/paths.js";
@@ -91,11 +92,31 @@ describe("native CLI request allocation", () => {
     expect(dispatched).toBe(0);
   });
 
-  it("keeps the API adapter's context allocation default at 32,768", () => {
+  it("gives an unconfigured hosted API the model's normal limit, and keeps the small allocation for local servers", () => {
     const policy = resolveRolePolicy({ role: "architect", env: baseEnv,
       session: { provider: "openai", model: config.model, adapter: "openai-api", api: "responses", output_tokens: 256 } });
     expect(policy.status).toBe("configured");
-    expect(policy.effective.context_tokens).toBe(32_768);
+    expect(policy.effective.context_tokens).toBe(HOSTED_API_DEFAULT_CONTEXT_ALLOCATION);
     expect(policy.origins.context_tokens).toBe("default");
+    // One native tool-loop pass resends the conversation up to 8 times; the generic role budget ended it after 2-3 requests.
+    expect(policy.policy.budget).toMatchObject(ARCHITECT_API_DEFAULT_BUDGET);
+    const dreamer = resolveRolePolicy({ role: "dreamer", env: baseEnv,
+      session: { provider: "openai", model: config.model, adapter: "openai-api", api: "responses", output_tokens: 256 } });
+    expect(dreamer.effective.context_tokens).toBe(HOSTED_API_DEFAULT_CONTEXT_ALLOCATION);
+    expect(dreamer.policy.budget.input_tokens).toBe(250_000);
+    const local = resolveRolePolicy({ role: "architect", env: { DREAMGRAPH_LLM_PROVIDER: "ollama" },
+      session: { provider: "ollama", model: "qwen3:8b", output_tokens: 256 } });
+    expect(local.effective.context_tokens).toBe(LOCAL_DEFAULT_CONTEXT_ALLOCATION);
+    expect(local.policy.budget.input_tokens).toBe(250_000);
+  });
+  it("applies the Architect's API spend limits and prices only on the API channel", () => {
+    const env = { ...baseEnv, DREAMGRAPH_LLM_ARCHITECT_RUN_BUDGET: "2.5", DREAMGRAPH_LLM_ARCHITECT_DAY_BUDGET: "20",
+      DREAMGRAPH_LLM_ARCHITECT_PRICING_VERSION: "dashboard", DREAMGRAPH_LLM_ARCHITECT_BUDGET_CURRENCY: "USD" };
+    const api = resolveRolePolicy({ role: "architect", env,
+      session: { provider: "openai", model: config.model, adapter: "openai-api", api: "responses", output_tokens: 256 } });
+    expect(api.policy.budget).toMatchObject({ run_amount: 2.5, day_amount: 20, pricing_version: "dashboard", currency: "USD" });
+    const cli = cliPolicy({ env });
+    expect(cli.billing.channel).toBe("subscription");
+    expect(cli.policy.budget).toMatchObject({ run_amount: 0, day_amount: 0, pricing_version: null, currency: "subscription_units" });
   });
 });

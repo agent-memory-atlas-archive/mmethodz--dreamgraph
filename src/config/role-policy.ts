@@ -12,7 +12,7 @@ import { MODEL_ROLES, ROLE_SETTING_FIELDS, ROLE_BUDGET_FIELDS, roleEnvKey } from
 import { modelTemperatureCapability, assertReasoningEffort, type TemperatureCapability } from "./model-temperature.js";
 import { cognitiveRoleInstruction } from "../cognitive/role-instructions.js";
 import { providerCapability, ProviderCapabilitySchema, type ProviderCapability } from "./provider-capabilities.js";
-import { NATIVE_CLI_DEFAULT_CONTEXT_ALLOCATION } from "./request-bounds.js";
+import { NATIVE_CLI_DEFAULT_CONTEXT_ALLOCATION, HOSTED_API_DEFAULT_CONTEXT_ALLOCATION, LOCAL_DEFAULT_CONTEXT_ALLOCATION, ARCHITECT_API_DEFAULT_BUDGET } from "./request-bounds.js";
 
 export { MODEL_ROLES } from "./role-env-fields.js";
 export type ModelRole = typeof MODEL_ROLES[number];
@@ -98,7 +98,9 @@ export function resolveRolePolicy(input: {
   const timeout_ms = choose("timeout_ms", env.DREAMGRAPH_LLM_TIMEOUT_MS ? Number(env.DREAMGRAPH_LLM_TIMEOUT_MS) : input.legacy?.timeoutMs, 120_000)!;
   const output_tokens = choose("output_tokens", env.DREAMGRAPH_LLM_MAX_TOKENS ? Number(env.DREAMGRAPH_LLM_MAX_TOKENS) : input.legacy?.maxTokens, 2048)!;
   const context_tokens = choose("context_tokens", env.DREAMGRAPH_LLM_CONTEXT_TOKENS ? Number(env.DREAMGRAPH_LLM_CONTEXT_TOKENS) : undefined,
-    api === "native_cli" ? NATIVE_CLI_DEFAULT_CONTEXT_ALLOCATION : 32768)!;
+    api === "native_cli" ? NATIVE_CLI_DEFAULT_CONTEXT_ALLOCATION
+      // "Leave empty to use the model's normal limit": hosted APIs reject oversize requests themselves.
+      : provider === "openai" || provider === "anthropic" ? HOSTED_API_DEFAULT_CONTEXT_ALLOCATION : LOCAL_DEFAULT_CONTEXT_ALLOCATION)!;
   const temperature = choose("temperature", env.DREAMGRAPH_LLM_TEMPERATURE ? Number(env.DREAMGRAPH_LLM_TEMPERATURE) : role === "normalizer" ? 0.1 : input.legacy?.temperature, role === "dreamer" ? 0.7 : 0.2)!;
   const strict_schema = choose("strict_schema", undefined, false)!;
   const base_url = choose("base_url", sameProvider ? env.DREAMGRAPH_LLM_URL ?? input.legacy?.baseUrl : undefined, defaults(provider).url)!;
@@ -113,9 +115,14 @@ export function resolveRolePolicy(input: {
   if (env[key(role, "PRICING_VERSION")]) budgetEnv.pricing_version = env[key(role, "PRICING_VERSION")];
   if (env[key(role, "BILLING_PRINCIPAL")]) budgetEnv.billing_principal = env[key(role, "BILLING_PRINCIPAL")];
   if (env[key(role, "BUDGET_CURRENCY")]) budgetEnv.currency = env[key(role, "BUDGET_CURRENCY")];
+  // One role (e.g. the Architect) can run on a paid API or on a subscription CLI; its spend limits, prices and
+  // billing principal describe API money and do not apply to subscription, local or client channels.
+  const apiMoney = (value: Record<string, unknown> | undefined): Record<string, unknown> => channel === "api" || !value ? value ?? {}
+    : Object.fromEntries(Object.entries(value).filter(([field]) => !["run_amount", "day_amount", "pricing_version", "currency", "billing_principal"].includes(field)));
   const budget = BudgetSchema.safeParse({ requests: 64, input_tokens: 250_000, output_tokens: 100_000, retries: 2, elapsed_ms: 3_600_000,
     concurrency: 1, max_hops: 2, max_neighbors: 40, run_amount: 0, day_amount: 0, currency: channel === "subscription" ? "subscription_units" : "USD",
-    pricing_version: null, billing_principal: `${channel}:${provider}`, ...saved.budget, ...budgetEnv, ...session.budget });
+    pricing_version: null, billing_principal: `${channel}:${provider}`,
+    ...(role === "architect" && channel === "api" ? ARCHITECT_API_DEFAULT_BUDGET : {}), ...apiMoney(saved.budget), ...apiMoney(budgetEnv), ...apiMoney(session.budget) });
   if (!budget.success) for (const issue of budget.error.issues) diagnostics.push({ field: `budget.${issue.path.join(".")}`, code: "INVALID_ROLE_BUDGET", message: issue.message });
   const safeBudget = budget.success ? budget.data : BudgetSchema.parse({ requests: 0, input_tokens: 0, output_tokens: 0, retries: 0, elapsed_ms: 0, concurrency: 0, max_hops: 0, max_neighbors: 0, run_amount: 0, day_amount: 0, currency: "USD", pricing_version: null, billing_principal: "blocked" });
   const settingsCheck = RoleSettingsSchema.safeParse({ provider, model, adapter, api, effort, retention, timeout_ms, output_tokens, context_tokens, temperature, base_url, strict_schema });

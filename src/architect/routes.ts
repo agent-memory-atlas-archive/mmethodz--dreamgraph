@@ -41,6 +41,7 @@ import { PlanExecutionIntentSchema } from "../graph/contracts.js";
 import { executeScopedCommand } from "../server/scoped-command.js";
 import { executionContextTransport } from "../graph/execution-context.js";
 import { readHostExecution } from "../server/managed-execution.js";
+import { coreToolPolicy } from "../server/tool-policy.js";
 import { runArchitectNativeToolLoop, type ArchitectToolTraceEntry } from "./native-tool-loop.js";
 import { buildAdaptiveFutureAuditTrail } from "../cognitive/adaptive-future-scaffold.js";
 import { compileTaskPreamble } from "../cognitive/graph-rag.js";
@@ -346,6 +347,10 @@ interface ActiveArchitectExecutionControl {
   started_at: string;
   last_action_at: string;
   steering_prompts: Array<{ prompt: string; received_at: string }>;
+  /** Shown by a page loaded while the pass runs (chat-history pending), so a reload never loses the running request. */
+  message?: string;
+  chat_scope?: ArchitectChatScope;
+  plan_id?: string | null;
 }
 
 interface ArchitectTerminalSession {
@@ -2701,7 +2706,17 @@ function describeArchitectFailure(error: unknown): string {
     ADMISSION_ROLE_POLICY_BLOCKED: "the Architect model is not configured; check Config → Architect",
   };
   const code = /^(ADMISSION_[A-Z_]+)/.exec(message.trim())?.[1];
+  if (code === "ADMISSION_CONTEXT_LIMIT") {
+    // Keep the numbers and the setting: without them the operator cannot act on this refusal.
+    const required = /required_allocation=(\d+)/.exec(message)?.[1], allowed = /context_allocation=(\d+)/.exec(message)?.[1];
+    const setting = /setting=([A-Z0-9_]+)/.exec(message)?.[1], origin = /origin=([a-z_]+)/.exec(message)?.[1];
+    const kib = (value: string) => `${Math.ceil(Number(value) / 1024).toLocaleString("en-US")} KiB`;
+    if (required && allowed) return `${code}: the request (${kib(required)}) is larger than the model's context allowance (${kib(allowed)}${origin ? `, ${origin.replace(/_/g, " ")} setting` : ""})`
+      + (setting ? `; raise ${setting} or Config → Models → Context window` : "");
+  }
   if (code && admission[code]) return `${code}: ${admission[code]}`;
+  if (message.includes("NATIVE_REQUIRED_PROMPT_BYTE_BOUND")) return "NATIVE_REQUIRED_PROMPT_BYTE_BOUND: the required prompt "
+    + "(chat history, managed project context and guidance) is over 128 KiB; clear the chat or start a new message";
   const trimmed = message.trim();
   if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
     try {
@@ -4287,6 +4302,29 @@ function compactTranscriptActionList(value: unknown): Record<string, unknown>[] 
     .slice(0, 8);
 }
 
+/**
+ * The Pass Report's Tool Trace and Graph / Plan Updates come from what the host observed, not only from the model's
+ * envelope (a model may leave them empty although it made the calls). Host lines first, the model's own lines after.
+ */
+export function withHostObservedPassEvidence(
+  report: { tool_trace_summary: string[]; graph_plan_updates: string[] },
+  trace: ReadonlyArray<{ tool: string; status: string; args_summary?: string; result_preview?: string }>,
+): void {
+  const line = (value: string, max: number) => value.replace(/\s+/g, " ").trim().slice(0, max);
+  // CLI traces name DreamGraph tools with their MCP server prefix (dreamgraph:enrich_seed_data).
+  const bare = (tool: string) => tool.replace(/^(?:dreamgraph:|mcp__dreamgraph__)/, "");
+  const traced = new Set(trace.map(entry => entry.tool));
+  // Lines generated from the same trace ("<tool>: <status> …") are replaced by the host lines; model-written lines stay.
+  const generated = (item: string) => { const name = /^([^\s:]+(?::[^\s:]+)?):\s/.exec(item)?.[1]; return !!name && traced.has(name); };
+  const merge = (host: string[], model: string[]) => [...new Set([...host, ...model.filter(item => !host.includes(item) && !generated(item))])];
+  const hostTrace = trace.map(entry => line(`${entry.tool}: ${entry.status}${entry.args_summary ? ` — ${entry.args_summary}` : ""}`, 240));
+  const graphWrites = trace
+    .filter(entry => entry.status === "completed" && coreToolPolicy(bare(entry.tool)).effect === "graph_write")
+    .map(entry => line(`${bare(entry.tool)}: ${entry.result_preview || entry.args_summary || "completed"}`, 300));
+  if (hostTrace.length) report.tool_trace_summary = merge(hostTrace, report.tool_trace_summary ?? []);
+  if (graphWrites.length) report.graph_plan_updates = merge(graphWrites, report.graph_plan_updates ?? []);
+}
+
 function normalizeArchitectChatTranscriptPassReport(value: unknown): Record<string, unknown> | null {
   const report = asRecord(value);
   if (!report) return null;
@@ -4541,6 +4579,16 @@ async function handleArchitectChatHistoryRequest(req: IncomingMessage, res: Serv
       return;
     }
   }
+  if (req.method === "GET") {
+    // A page load restores the conversation it last showed: explicit query, else the persisted selected plan
+    // (plan scope), else project scope. Before this, a reload always read project scope and lost plan chats.
+    const url = new URL(req.url ?? "/", "http://local");
+    for (const key of ["scope", "plan_id", "session_id"]) { const value = url.searchParams.get(key); if (value) body[key] = value; }
+    if (!textField(body, "scope") && !textField(body, "plan_id")) {
+      const selected = getArchitectSelectedPlanConfig().planId;
+      if (selected) { body.plan_id = selected; body.scope = "plan"; }
+    }
+  }
   const requestedSession = textField(body, "session_id") ?? textField(body, "sessionId");
   if (getSessionContext() && requestedSession && requestedSession !== architectSession.session_id) { jsonError(res, 403, "session_owner_rejected", "History belongs to this authenticated session."); return; }
   const sessionId = requestedSession ?? architectSession.session_id;
@@ -4564,11 +4612,16 @@ async function handleArchitectChatHistoryRequest(req: IncomingMessage, res: Serv
     return;
   }
   const transcript = await readArchitectChatTranscript({ sessionId, chatScope, planId });
+  const active = architectSession.activeArchitectExecutionControl;
+  const pending = active && active.state !== "cancelled" && active.message && active.chat_scope === chatScope
+    && (chatScope !== "plan" || (active.plan_id ?? null) === (planId ?? null))
+    ? { message: active.message, started_at: active.started_at, adapter: active.adapter, chat_scope: active.chat_scope, plan_id: active.plan_id ?? null } : null;
   json(res, 200, {
     ok: true,
     transcript: transcript.transcript,
     warnings: transcript.warnings,
     recovered_path: transcript.recovered_path,
+    pending,
   }, { "Cache-Control": "no-store" });
 }
 
@@ -4773,6 +4826,9 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
     started_at: new Date().toISOString(),
     last_action_at: new Date().toISOString(),
     steering_prompts: [],
+    message,
+    chat_scope: chatScope,
+    plan_id: planId ?? null,
   };
   const abortExecution = () => {
     if (!executionController.signal.aborted) executionController.abort();
@@ -4915,6 +4971,9 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
       if (architectBinding) messages[0].content += "\n\n" + architectBinding.policy.cognitive_instruction;
       const completion = await runArchitectNativeToolLoop({
         computer,
+        // Common Computer Use contract (docs/ashoka/computer-use-contract.md): same policy and per-pass grant as Codex CLI.
+        computerUse: computer ? "off" : !continuationToken && (computerUsePolicy() === "allow" || computerUsePolicy() === "ask" && body.computer_use === true)
+          ? "granted" : computerUsePolicy() === "ask" ? "requestable" : "off",
         executionId: architectSession.activeArchitectExecutionControl.id,
         planId: plan?.id,
         sliceId: planExecution ? planExecution.slice_id ?? undefined : (plan?.operational_state.source === "typed_plan_authority" ? plan.operational_state.current_slice_id ?? undefined : undefined),
@@ -4972,6 +5031,7 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
       completionModel = completion.model || architectConfig.model;
       toolTrace = mergeArchitectToolTraceEntries(toolTrace, completion.tool_trace);
       provenance = { ...completion.provenance, graph_execution: completion.graph_execution ? await readHostExecution(completion.graph_execution.id) : null };
+      computerUseRequest = completion.computer_use_request ?? null;
       toolLoopRoute = completion.route;
       if (architectBinding) recordRoleQualification(architectBinding.policy.policy.role, architectBinding.policy.fingerprint);
       fallbackReason = completion.route.fallback_reason;
@@ -5093,6 +5153,7 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
     context: continuationContext,
     autonomyAllowsContinue: autonomyAllowsArchitectContinuation(mode),
   });
+  withHostObservedPassEvidence(continuationDecision.report, toolTrace);
   budgetStatus = finalizeChatBudgetStatus(runtime, budgetCoordinator, promptBundle, passMessage, finalAssistantContent);
   if (budgetStatus) {
     const tokenEconomyRecord = asRecord(tokenEconomy) ?? {};
@@ -10440,13 +10501,16 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
     }
 
     function renderRuntime(payload) {
-      const project = payload.project_scope || (payload.result && payload.result.project_scope) || {};
+      const project = payload.project_scope || (payload.result && payload.result.project_scope) || null;
       const runtime = updateActiveArchitectRuntime(payload);
-      const instanceId = project.instance_id || 'unbound';
-      architectInstanceId = instanceId;
-      const projectRoot = project.project_root || 'unbound';
-      projectScopeEl.textContent = 'Project: ' + projectRoot;
-      projectScopeEl.title = 'Instance: ' + instanceId + ' | plans: ' + (project.plans_root || 'unknown') + ' | binding: ' + (project.binding_status || (project.daemon_bound ? 'bound' : 'unbound'));
+      // Payloads without a project scope (e.g. a pass start) keep the binding shown; only a real scope changes it.
+      if (project) {
+        const instanceId = project.instance_id || 'unbound';
+        architectInstanceId = instanceId;
+        const projectRoot = project.project_root || 'unbound';
+        projectScopeEl.textContent = 'Project: ' + projectRoot;
+        projectScopeEl.title = 'Instance: ' + instanceId + ' | plans: ' + (project.plans_root || 'unknown') + ' | binding: ' + (project.binding_status || (project.daemon_bound ? 'bound' : 'unbound'));
+      }
       const passState = runtime.pass_state || {};
       if (typeof passState.completed === 'number') {
         autonomyPassCount = Math.max(autonomyPassCount, passState.completed);
@@ -10872,6 +10936,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       const messages = replay.messages;
       if (!messages.length) {
         appendHistoryReplayStatus(0, rawMessages.length, replay.skipped, warnings);
+        showPendingPass(payload.pending);
         return;
       }
       resetNode(chatLogEl);
@@ -10887,6 +10952,29 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         }
       }
       appendHistoryReplayStatus(messages.length, rawMessages.length, replay.skipped, warnings);
+      showPendingPass(payload.pending);
+    }
+
+    // A pass started before this page loaded (reload, or another tab) keeps running on the daemon. Show it and
+    // replace the placeholder with the persisted conversation when it ends.
+    let pendingPassTimer = null;
+    function showPendingPass(pending) {
+      if (!pending || !pending.message || chatProcessing || pendingPassTimer) return;
+      appendChatMessage('user', pending.message);
+      const started = pending.started_at ? new Date(pending.started_at).toLocaleTimeString() : 'earlier';
+      appendChatMessage('assistant', 'Still working on this (started ' + started + '). The answer appears here when the pass ends.');
+      chatStatusEl.textContent = 'A pass started before this page was loaded is still running.';
+      pendingPassTimer = window.setInterval(async function() {
+        try {
+          const response = await fetch('/api/architect/v1/chat-history', { cache: 'no-store' });
+          const payload = await response.json().catch(function() { return {}; });
+          if (!response.ok || payload.pending) return;
+          window.clearInterval(pendingPassTimer); pendingPassTimer = null;
+          if (chatProcessing) return;
+          resetNode(chatLogEl);
+          await loadPersistedChatHistory();
+        } catch (error) { /* keep waiting */ }
+      }, 5000);
     }
 
     document.getElementById('chat-clear-history').addEventListener('click', async function() {

@@ -33,15 +33,19 @@ export const COMPUTER_USE_SCRIPT=String.raw`
     const computerWords=code=>String(code||'').replace(/^COMPUTER_/,'').toLowerCase().replace(/_/g,' ');
     function computerSetupText(value){
       if(!value)return 'No setup information.';
+      const route=value.computer_use_route,routeLine=route&&route.summary?route.summary+'\n':'';
+      const policyLine='DreamGraph switches it on per task according to the Computer Use setting ('+(COMPUTER_POLICY_LABEL[computerPolicy]||'').replace('Computer Use: ','')+').';
       if(value.route==='native_cli'){const d=value.native_detection,lines=[];
-        lines.push(d?('Codex CLI '+d.version+' has its own Computer Use.'):'This CLI engine uses its own Computer Use when available.');
-        if(d&&d.features){const f=Object.entries(d.features).map(([name,v])=>name.replace(/_/g,' ')+': '+(v.enabled?'available':'off')+(v.stage&&v.stage!=='stable'?' ('+v.stage+')':''));if(f.length)lines.push(f.join(' · '));}
-        lines.push('DreamGraph switches it on per task according to the Computer Use setting ('+(COMPUTER_POLICY_LABEL[computerPolicy]||'').replace('Computer Use: ','')+').');
-        lines.push('The harness below is only used with the API engine.');
-        if(value.available===false&&value.reasons?.length)lines.push('Native CLI unavailable: '+value.reasons.map(computerWords).join(', ')+'.');
+        if(route&&route.summary)lines.push(route.summary);
+        else lines.push(d?('Codex CLI '+d.version+' has its own Computer Use.'):'This CLI engine uses its own Computer Use when available.');
+        /* Codex's own features matter only when Codex's own Computer Use serves the run. */
+        if((!route||route.backend==='codex-native')&&d&&d.features){const f=Object.entries(d.features).map(([name,v])=>name.replace(/_/g,' ')+': '+(v.enabled?'available':'off')+(v.stage&&v.stage!=='stable'?' ('+v.stage+')':''));if(f.length)lines.push('Codex CLI '+d.version+': '+f.join(' · '));}
+        if(!value.available&&route?.backend==='codex-native'&&(value.reasons||[]).length)lines.push('Unavailable: '+value.reasons.map(computerWords).join(', ')+'.');
+        lines.push(policyLine);
+        lines.push('Nothing to prepare for this engine. The Prepare controls below belong to the older prepared harness of the API engine.');
         return lines.join('\n');}
-      if(value.available){const c=value.capability||{},p=value.profile||{};return 'Browser harness ready'+(p.main_origin?' for '+p.main_origin:'')+'.\n'+(c.effective&&c.effective.length?'Allowed: '+c.effective.join(', ')+'.':'')+'\nPrepare the next pass to review its scope and limits.';}
-      return 'Browser harness not available: '+(value.reasons||[]).map(computerWords).join(', ')+'.'+(value.remedy?'\n'+value.remedy:'');}
+      if(value.available){const c=value.capability||{},p=value.profile||{};return (routeLine?routeLine+'Prepared harness (optional): browser harness ready':'Browser harness ready')+(p.main_origin?' for '+p.main_origin:'')+'.\n'+(c.effective&&c.effective.length?'Allowed: '+c.effective.join(', ')+'.':'')+'\nPrepare the next pass to review its scope and limits.';}
+      return (routeLine?routeLine+'Prepared harness (optional): browser harness not available: ':'Browser harness not available: ')+(value.reasons||[]).map(computerWords).join(', ')+'.'+(value.remedy?'\n'+value.remedy:'');}
     function computerShowSetup(value){computerSetupEl.textContent=computerSetupText(value);computerImageEl.hidden=true;computerImageEl.removeAttribute('src');}
     function computerSelect(value){computerGeneration++;clearTimeout(computerTimer);computerActive=value;computerPolling=null;
       computerImageEl.hidden=true;computerImageEl.removeAttribute('src');computerStopEl.hidden=true;computerRecoverEl.hidden=true;computerPauseEl.hidden=true;computerControlFence=null;computerInspectEl.hidden=!value;
@@ -71,7 +75,7 @@ export const COMPUTER_USE_SCRIPT=String.raw`
     computerSessionsEl.addEventListener('change',()=>{const row=computerSessions.find(item=>item.cursor===computerSessionsEl.value);
       if(row)computerSelect({execution_id:row.execution_id,id:row.journal.session.id});});
     computerPrepareEl.addEventListener('click',async()=>{if(!computerAvailable)return;const generation=++computerPreparationGeneration;computerPrepareEl.disabled=true;computerPendingRequest=null;computerPreparation=null;computerConfirmEl.hidden=true;
-      try{const result=await computerRequest('prepare',{adapter:computerAdapter(),interact:document.getElementById('computer-use-interact').checked,duration_ms:30000,model_role:computerModelRoleEl.value});if(generation!==computerPreparationGeneration)return;computerPreparation=result.result;computerShowSetup(computerPreparation);
+      try{const result=await computerRequest('prepare',{adapter:computerAdapter(),interact:document.getElementById('computer-use-interact').checked,duration_ms:300000,model_role:computerModelRoleEl.value});if(generation!==computerPreparationGeneration)return;computerPreparation=result.result;computerShowSetup(computerPreparation);
         computerStateEl.textContent='Prepared · review scope and limits';computerConfirmEl.textContent=computerPreparation.interact?'Allow this interaction scope':'Allow this observation scope';computerConfirmEl.hidden=false;}
       catch(error){if(generation===computerPreparationGeneration)computerStateEl.textContent=error.message;}finally{if(generation===computerPreparationGeneration)computerPrepareEl.disabled=!computerAvailable;}});
     computerConfirmEl.addEventListener('click',async()=>{if(!computerPreparation)return;const preparation=computerPreparation,generation=computerPreparationGeneration;computerConfirmEl.disabled=true;computerPrepareEl.disabled=true;
@@ -121,16 +125,17 @@ export const COMPUTER_USE_SCRIPT=String.raw`
     let computerPolicy='ask',computerPolicyReadAt=0,computerArmed=false;
     const COMPUTER_POLICY_LABEL={allow:'Computer Use: allowed',ask:'Computer Use: ask every time',deny:'Computer Use: denied'};
     function renderComputerPolicy(){if(typeof document==='undefined'||!document)return;/* page torn down while the policy fetch was in flight */computerPolicyEl.textContent=COMPUTER_POLICY_LABEL[computerPolicy]||COMPUTER_POLICY_LABEL.ask;computerPolicyEl.dataset.policy=computerPolicy;
-      const codex=computerAdapter()==='codex-cli';computerArmEl.hidden=!(codex&&computerPolicy==='ask');computerArmEl.setAttribute('aria-pressed',String(computerArmed));
+      const capable=['codex-cli','native_api_tool_loop'].includes(computerAdapter());computerArmEl.hidden=!(capable&&computerPolicy==='ask');computerArmEl.setAttribute('aria-pressed',String(computerArmed));
       computerArmEl.textContent=computerArmed?'Allowed for next message ✓':'Allow for next message';
-      if(!codex&&computerPolicy!=='deny')computerPolicyEl.title='Codex CLI uses its own Computer Use. Native API adapters use the Harness button.';else computerPolicyEl.title='Change in Config → Computer Use';}
+      computerPolicyEl.title=capable?'Change in Config → Computer Use':'Computer Use is unavailable with this engine';}
     async function loadComputerPolicy(force){if(!force&&Date.now()-computerPolicyReadAt<10000)return computerPolicy;
       try{const result=await fetch('/api/computer-use/v1/policy',{cache:'no-store'}).then(r=>r.json());if(['allow','ask','deny'].includes(result.policy))computerPolicy=result.policy;computerPolicyReadAt=Date.now();}catch(error){/* keep last known */}
       renderComputerPolicy();return computerPolicy;}
     computerArmEl.addEventListener('click',()=>{computerArmed=!computerArmed;renderComputerPolicy();});
     document.getElementById('architect-adapter-select').addEventListener('change',renderComputerPolicy);
     /** Grant for one outgoing message. The daemon re-checks the instance policy; this only carries the operator's answer. */
-    async function decideComputerUse(message,continuation){if(continuation||computerAdapter()!=='codex-cli')return false;const policy=await loadComputerPolicy(false);
+    /** Common contract: the same grant decision for the Codex CLI and API engines. */
+    async function decideComputerUse(message,continuation){if(continuation||!['codex-cli','native_api_tool_loop'].includes(computerAdapter()))return false;const policy=await loadComputerPolicy(false);
       if(policy==='allow')return true;if(policy==='deny')return false;
       if(computerArmed){computerArmed=false;renderComputerPolicy();return true;}
       return false;}

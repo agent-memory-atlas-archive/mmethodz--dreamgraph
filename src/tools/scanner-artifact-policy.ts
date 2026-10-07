@@ -1,4 +1,5 @@
 import path from "node:path";
+import { classifyAuxiliaryFile } from "./auxiliary-classifier.js";
 
 const GENERATED_DIRECTORY_NAMES = new Set([
   "node_modules",
@@ -145,4 +146,32 @@ export function shouldSkipScanDirectory({ repoRoot, absDir, entryName }: ScanDir
   }
 
   return false;
+}
+
+/** File extensions the project scanner reads as source code. */
+export const SCANNED_CODE_EXTENSIONS: ReadonlySet<string> = new Set([
+  ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs",
+  ".py", ".rb", ".go", ".rs", ".java", ".kt", ".kts", ".cs",
+  ".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".hxx",
+  ".swift",
+  ".vue", ".svelte", ".xaml", ".razor",
+  ".gradle",
+]);
+
+/**
+ * Whether the project scanner tracks this file (code or auxiliary file outside skipped/generated directories).
+ * Used for source effects made outside DreamGraph's file tools (e.g. a file the browser saves): only files the scanner
+ * tracks get a source obligation. Gitignore rules are not applied here.
+ */
+export function isScannerTrackedFile(repoRoot: string, absFile: string): boolean {
+  const rel = path.relative(repoRoot, absFile).replace(/\\/g, "/");
+  if (!rel || rel.startsWith("../") || rel === ".." || path.isAbsolute(rel)) return false;
+  const parts = rel.split("/");
+  const name = parts[parts.length - 1];
+  let dir = repoRoot;
+  for (const segment of parts.slice(0, -1)) {
+    dir = path.join(dir, segment);
+    if (shouldSkipScanDirectory({ repoRoot, absDir: dir, entryName: segment })) return false;
+  }
+  return SCANNED_CODE_EXTENSIONS.has(path.extname(name).toLowerCase()) || classifyAuxiliaryFile(rel, name) !== null;
 }

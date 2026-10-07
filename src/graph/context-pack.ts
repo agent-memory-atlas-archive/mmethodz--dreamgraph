@@ -36,6 +36,9 @@ function relationshipUnit(relation: GraphRelationship, score: number): Unit {
       to: relation.target ? graphIdentityKey(relation.target) : null, relation: relation.relation,
       assertion: relation.assertion_class, confidence: relation.confidence, evidence: relation.evidence }) };
 }
+/** Decision anchors: at most this many ADRs become mandatory, each sharing at least this fraction of the query terms. */
+export const ADR_ANCHOR_MAX = 5;
+export const ADR_ANCHOR_MIN_SCORE = 0.1;
 const metadataBytes = (pack: ContextPack): number => Buffer.byteLength(JSON.stringify({ ...pack, context_text: "" }), "utf8");
 
 /** Refresh callers recompute from a new snapshot; receipt revision binds the exact context that was assembled. */
@@ -86,8 +89,12 @@ export function buildContextPack(snapshot: CanonicalGraphRead, request: ContextQ
   const ranked = eligible.map(entity => ({ entity, score: relevance(entity, input.query, queryTerms) }))
     .sort((a, b) => b.score - a.score || key(a.entity).localeCompare(key(b.entity)));
   // Explicit task dependencies reserve decision anchors before optional expansion, without importing unrelated ADRs.
+  // Only the most relevant decisions become mandatory: in a long natural-language request almost every ADR shares
+  // some term (e.g. the product name), and requiring all of them made the context unsatisfiable. Others stay
+  // optional seeds ranked by relevance.
+  let decisionAnchors = 0;
   for (const { entity, score } of ranked) {
-    if (entity.identity.kind === "adr" && score > 0) required.set(key(entity), "relevant_decision");
+    if (entity.identity.kind === "adr" && score >= ADR_ANCHOR_MIN_SCORE && decisionAnchors < ADR_ANCHOR_MAX) { required.set(key(entity), "relevant_decision"); decisionAnchors++; }
     if (entity.evidence.some(ref => ref.source_path && sourceKeys.has(`${ref.source_repo ?? "unknown"}/${ref.source_path}`))) required.set(key(entity), "changed_source_dependency");
   }
   for (const file of input.changed_files) if (!snapshot.source_dependents.has(`${file.repository_id}/${file.path}`)) {

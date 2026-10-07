@@ -27,6 +27,8 @@ export class ModelExecution {
   private deadline?: AbortSignal;
   private signals = new WeakMap<AbortSignal, AbortSignal>();
   private binding?: Promise<{ policy: Readonly<ResolvedRolePolicy>; admission: ModelAdmission; prices: ModelPricing[] }>;
+  /** Previous admitted request of this run and the input tokens the provider reported for it (see calibratedInputAllocation). */
+  private calibration?: { payload: string; input_tokens: number };
   constructor(private readonly config: LlmConfig, private readonly role: ModelRole,
     private readonly supplied?: Readonly<ResolvedRolePolicy>, run_id = `inference:${randomUUID()}`) { this.run_id = run_id; }
   private bind() {
@@ -67,10 +69,11 @@ export class ModelExecution {
     const { policy, prices, admission } = await this.bind();
     input.signal?.throwIfAborted();
     if (input.provider !== policy.policy.provider || input.model !== policy.effective.model) throw new ModelAdmissionError("ADMISSION_REQUEST_POLICY_MISMATCH", this.run_id);
-    const bytes = Buffer.byteLength(input.payload);
-    // Full UTF-8 wire bytes plus framing is a conservative allocation, not measured tokens.
+    // Full UTF-8 wire bytes plus framing is a conservative allocation, not measured tokens. Within a run, the part of
+    // the request already measured by the provider (the unchanged prefix and suffix of the previous request) is
+    // counted by the provider-reported input tokens instead; only the new bytes keep the byte bound.
     // Images are included in the wire allocation. Variance halts further account admission.
-    const input_tokens = bytes + MODEL_REQUEST_FRAMING_RESERVE_BYTES;
+    const input_tokens = calibratedInputAllocation(this.calibration, input.payload) + MODEL_REQUEST_FRAMING_RESERVE_BYTES;
     if (input_tokens > policy.effective.context_tokens) throw new ModelAdmissionError("ADMISSION_CONTEXT_LIMIT", this.run_id, null,
       `setting=DREAMGRAPH_LLM_${this.role.toUpperCase()}_CONTEXT_TOKENS; `
       + `required_allocation=${input_tokens}; context_allocation=${policy.effective.context_tokens}; `
@@ -109,9 +112,27 @@ export class ModelExecution {
       await admission.settle(attempt_id, { acknowledged: false }); throw error;
     }
     await admission.settle(attempt_id, { usage: answer.usage, acknowledged: answer.acknowledged });
+    if (answer.acknowledged && answer.usage?.inputTokens !== undefined) this.calibration = { payload: input.payload, input_tokens: answer.usage.inputTokens };
     if (frame && position !== undefined) frame.usage[position] = answer.usage;
     signal.throwIfAborted(); return answer.result;
   }
+}
+
+/**
+ * Input allocation for a request. Without a measured previous request of the same run this is the UTF-8 byte count.
+ * With one, the new request is split into the prefix and suffix it shares with the previous request plus the bytes
+ * in between: shared content is bounded by the provider-reported input tokens of the previous request (removed
+ * content is not subtracted, which keeps the bound conservative) and the bytes in between are counted as tokens.
+ * Never larger than the byte count.
+ */
+export function calibratedInputAllocation(previous: { payload: string; input_tokens: number } | undefined, payload: string): number {
+  const bytes = Buffer.byteLength(payload);
+  if (!previous || !Number.isSafeInteger(previous.input_tokens) || previous.input_tokens < 0) return bytes;
+  const before = previous.payload, limit = Math.min(before.length, payload.length);
+  let prefix = 0; while (prefix < limit && before.charCodeAt(prefix) === payload.charCodeAt(prefix)) prefix += 1;
+  let suffix = 0; while (suffix < limit - prefix && before.charCodeAt(before.length - 1 - suffix) === payload.charCodeAt(payload.length - 1 - suffix)) suffix += 1;
+  const changed = Buffer.byteLength(payload.slice(prefix, payload.length - suffix));
+  return Math.min(bytes, previous.input_tokens + changed);
 }
 
 /** Readiness GETs deliberately remain outside this boundary; only inference dispatch calls use it. */
