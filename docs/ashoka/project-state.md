@@ -21,3 +21,12 @@ The [2026-10-04 implementation review](../audits/2026-10-04-v14.0.1-review/repor
 - Browser setup is now documented end to end: [install, connect and grant a task](../../guide/17-computer-use.md). Config, Schedules and Status remain permanent Architect tabs.
 - The already-applied cost fixes preserve stable managed context, compact accumulated transcript context and calibrate estimates against reported provider usage. The release does not reverse `cost-fixes.patch`. The release notes’ Web64 cost comparison is a maintainer observation, not a matched multi-model benchmark.
 - [v14.0.2 release notes](../../RELEASE_NOTES_v14.0.2.md) are the release summary. The seven-instance migration confirmation above remains the established field baseline.
+
+## v14.0.2 publication verification
+
+Published tag [v14.0.2](https://github.com/mmethodz/dreamgraph/releases/tag/v14.0.2) and synchronized the [public website](https://dreamgraph.nofs.ai/). The [sealed release evidence](release-14.0.2-evidence.json) records 2198 root test passes, 546 editor test passes, 11 isolated-browser checks and 15 packaged upgrade/recovery checks. Remote CI availability is reported separately in that evidence.
+
+- **Browser upload field check:** DreamGraph's own backend opened Hostinger's standard file input, uploaded the website source ZIP through `browser_file_chooser`, and the deployment completed. Public build and documentation bytes matched the committed website archive. This proves the file-input path on this site; it does not establish the Windows OS Open-dialog path or a new model-driven Codex CLI run.
+- **Admission isolation:** Job admission now snapshots saved role profiles under the job's pinned instance and one coherent graph read. Regression cases proved and then eliminated both foreign-instance model selection and interference from a foreign pending publication journal.
+- **Release reconciliation:** Unchanged graph context retains its receipt for caching; a real graph change replaces it. Selected-plan history is intentional. Strict SDK/editor setup schemas now accept bounded backend-route metadata; the retired native-conformance diagnostic is shown only for `codex-native`.
+- **Budget provenance:** The `apiMoney` filter in `src/config/role-policy.ts` was a pre-existing working-tree change, with no author attribution. It was not introduced by `cost-fixes.patch`. Paired tests retain paid-API monetary budgets and exclude those halts from CLI subscription runs. The already-applied patch was preserved.
