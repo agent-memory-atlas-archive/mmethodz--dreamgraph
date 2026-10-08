@@ -8,7 +8,9 @@ import { beginManagedContext, readManagedContext, finishManagedContext, recordMa
 import { getSessionContext, withSessionContext, type SessionContext } from "./session-context.js";
 import { issueExecutionPolicy, prepareExecutionApproval, executionPolicyProjection, assertExecutionLive } from "./execution-policy.js";
 import { architectPassIdleMs } from "../config/request-bounds.js";
-import { withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
+import { withGraphReconciliation, withGraphRead } from "../utils/graph-reconciliation-barrier.js";
+import { readChangeObligations } from "../graph/change-obligations.js";
+import { loadPublicationState } from "../graph/publication.js";
 import { approvalHash } from "../discipline/approval.js";
 import { coreToolPolicy } from "./tool-policy.js";
 import { HostModelAdmission, readRecoveredHostModel, originalHostStopLedger } from "./host-model-admission.js";
@@ -156,6 +158,28 @@ export async function beginHostExecution(input:unknown,signal?:AbortSignal,opera
   } catch(error){close(context,request.id);lease.close();throw error;}
 }
 export async function readHostExecution(id:string) { const context=owner();return snapshot(await readManagedContext(id),context); }
+/** Read current obligation evidence, not the execution's possibly historical finish status. */
+export async function readHostReconciliation(id:string) {
+  owner();
+  return withGraphRead(async()=>{
+    const entry=await readManagedContext(id); // Same original session/principal checks as execution inspection.
+    const changes=(await readChangeObligations()).entries.filter(item=>item.execution_id===id);
+    if (entry.obligation_ids.some(id=>!changes.some(item=>item.id===id))) throw new Error("CHANGE_LEDGER_INCOMPLETE");
+    const publication=await loadPublicationState();
+    const receipts=new Set(Object.values(publication.receipts).filter(receipt=>receipt.outcome==="committed").map(receipt=>receipt.operation_id));
+    const counts={pending:0,reconciled:0,recovery_required:0,no_change:0};
+    for(const item of changes) {
+      if(item.state==="graph_committed" && item.graph_receipt_id && receipts.has(item.graph_receipt_id)) counts.reconciled++;
+      else if(item.state==="failed") counts.no_change++;
+      else if(item.state==="source_applied" || item.state==="reconciliation_pending") counts.pending++;
+      else counts.recovery_required++;
+    }
+    return {execution_id:entry.id,checked_at:new Date().toISOString(),counts,
+      status:counts.recovery_required?"recovery_required":counts.pending?"pending":counts.reconciled?"reconciled":"no_changes",
+      changes:changes.slice(0,20).map(item=>({id:item.id,state:item.state,updated_at:item.updated_at,receipt_id:item.graph_receipt_id})),
+      total:changes.length};
+  });
+}
 /** The native host remains the transport owner; workers/models cannot reserve or report usage. */
 export async function admitHostModel(input:unknown) {
   const context=owner(),request=ManagedModelAdmissionRequestSchema.parse(input),live=leases.get(key(context,request.execution_id));
@@ -345,6 +369,9 @@ export async function handleManagedExecutionApi(req:IncomingMessage,res:ServerRe
     }
     else if(req.method==="POST"&&pathname==="/api/executions/v1/reviews/open"){
       const input=z.object({execution_id:z.string().min(1).max(1024)}).strict().parse(await body(req));result=await enableHostExecutionReviews(input.execution_id);
+    }
+    else if(req.method==="POST"&&pathname==="/api/executions/v1/reconciliation/read"){
+      const input=z.object({execution_id:z.string().min(1).max(1024)}).strict().parse(await body(req));result=await readHostReconciliation(input.execution_id);
     }
     else if(req.method==="POST"&&pathname==="/api/executions/v1/read"){
       const input=z.object({execution_id:z.string().min(1).max(1024)}).strict().parse(await body(req));result=await readHostExecution(input.execution_id);

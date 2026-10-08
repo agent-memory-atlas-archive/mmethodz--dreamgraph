@@ -76,6 +76,8 @@ export interface ArchitectPassReport {
   continuation_options: ArchitectRecommendedAction[];
   diagnostics: string[];
   fallback_evidence?: ArchitectFallbackEvidenceSection[];
+  /** Host-supplied identity for read-only, current reconciliation status. */
+  reconciliation_execution_id?: string;
 }
 
 export interface ArchitectContinuationState {

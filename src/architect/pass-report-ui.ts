@@ -21,6 +21,54 @@ export const PASS_REPORT_CSS = String.raw`
 .continuation-report .report-content > :last-child { margin-bottom:0; }
 `;
 export const PASS_REPORT_SCRIPT = String.raw`
+    function appendReconciliationStatus(panel, executionId) {
+      const section = document.createElement('details'); section.className = 'continuation-report-section';
+      const heading = document.createElement('summary');
+      const label = document.createElement('span'); label.className = 'report-section-label'; label.textContent = 'Graph reconciliation';
+      const badge = document.createElement('span'); badge.className = 'report-count'; badge.textContent = 'Checking';
+      heading.append(label, badge); section.appendChild(heading);
+      const content = document.createElement('div'); content.className = 'report-content';
+      const status = document.createElement('div'); status.setAttribute('role', 'status');
+      const checked = document.createElement('div'); checked.style.color = 'var(--muted)';
+      const evidence = document.createElement('div');
+      const refresh = document.createElement('button'); refresh.type = 'button'; refresh.textContent = 'Check status';
+      content.append(status, checked, refresh, evidence); section.appendChild(content); panel.appendChild(section);
+      let busy = false;
+      async function check() {
+        if (busy) return; busy = true; refresh.disabled = true;
+        try {
+          const response = await fetch('/api/executions/v1/reconciliation/read', {
+            method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({execution_id:executionId}), signal:AbortSignal.timeout(15000)
+          });
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          const result = await response.json();
+          if (result.execution_id !== executionId || !['pending','reconciled','recovery_required','no_changes'].includes(result.status)) throw new Error('Unexpected reconciliation response');
+          badge.textContent = {pending:'Pending',reconciled:'Confirmed',recovery_required:'Recovery required',no_changes:'No source changes'}[result.status];
+          badge.style.color = result.status === 'reconciled' ? '#80c8a0' : result.status === 'recovery_required' ? '#ed9999' : result.status === 'pending' ? '#e4b55e' : 'var(--muted)';
+          const c = result.counts;
+          status.textContent = c.reconciled + ' reconciled · ' + c.pending + ' pending · ' + c.recovery_required + ' need recovery. ' +
+            (result.status === 'pending' ? 'Source changes are saved; graph reconciliation is not yet confirmed. Pending does not mean a background job is scheduled. Scoped source reconciliation must complete before these entries can be confirmed.' :
+             result.status === 'recovery_required' ? 'The daemon cannot confirm the source outcome. Inspect the original execution before retrying effects.' :
+             result.status === 'reconciled' ? 'Confirmed by the daemon’s recorded reconciliation receipts. Optional enrichment and dreaming are separate.' :
+             'No outstanding source changes are recorded for this execution.');
+          checked.textContent = 'Last successful check: ' + new Date(result.checked_at).toLocaleString() + ' · Check status again after reconciliation.';
+          evidence.replaceChildren();
+          const list = document.createElement('ul');
+          result.changes.forEach(function(change) {
+            const item = document.createElement('li'); item.textContent = change.id + ' · ' + change.state + (change.receipt_id ? ' · receipt ' + change.receipt_id : '');
+            list.appendChild(item);
+          });
+          evidence.appendChild(list);
+          if (result.total > result.changes.length) { const more = document.createElement('div'); more.textContent = 'Showing ' + result.changes.length + ' of ' + result.total + ' records; counts include all records.'; evidence.appendChild(more); }
+        } catch (_) {
+          badge.textContent = 'Unavailable'; badge.style.color = '#e4b55e'; evidence.replaceChildren();
+          status.textContent = 'Current reconciliation status could not be read. No completion is confirmed; use Check status to retry.';
+        } finally { busy = false; refresh.disabled = false; }
+      }
+      refresh.addEventListener('click', check);
+      void check();
+    }
+
     function appendReportText(parent, value) {
       const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
       // JSON stays formatted in a frame; strings cannot introduce HTML or executable URLs.

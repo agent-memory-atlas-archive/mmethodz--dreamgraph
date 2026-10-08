@@ -43,3 +43,31 @@ it("renders expandable framed report sections, safe links, code and complete for
  expect((panel.lastElementChild as HTMLDetailsElement).open).toBe(false);
  dom.window.close();
 });
+
+it("reads daemon reconciliation status and refreshes without dispatching any effect",async()=>{
+ const dom=new JSDOM('<section id="report"></section>',{runScripts:"outside-only"});
+ let status="pending";
+ const requests:Array<{url:string;body:unknown}>=[];
+ (dom.window as any).fetch=async(url:string,options:any)=>{
+  requests.push({url,body:JSON.parse(options.body)});
+  if(status==="offline")throw new Error("offline");
+  return {ok:true,json:async()=>({execution_id:"host-run",checked_at:"2026-10-08T12:00:00Z",status,
+    counts:{pending:status==="pending"?1:0,reconciled:status==="reconciled"?1:0,recovery_required:0},
+    changes:[{id:"change-1",state:status,receipt_id:status==="reconciled"?"receipt-1":null}],total:1})};
+ };
+ dom.window.eval(PASS_REPORT_SCRIPT);
+ const panel=dom.window.document.getElementById("report")!;
+ (dom.window as any).appendReconciliationStatus(panel,"host-run");
+ await new Promise(resolve=>setTimeout(resolve,0));
+ expect(panel.querySelector(".report-count")?.textContent).toBe("Pending");
+ expect(panel.textContent).toContain("does not mean a background job is scheduled");
+ status="reconciled";(panel.querySelector("button") as HTMLButtonElement).click();
+ await new Promise(resolve=>setTimeout(resolve,0));
+ expect(panel.querySelector(".report-count")?.textContent).toBe("Confirmed");
+ expect(panel.textContent).toContain("receipt-1");
+ status="offline";(panel.querySelector("button") as HTMLButtonElement).click();
+ await new Promise(resolve=>setTimeout(resolve,0));
+ expect(panel.querySelector(".report-count")?.textContent).toBe("Unavailable");
+ expect(requests).toEqual(Array(3).fill({url:"/api/executions/v1/reconciliation/read",body:{execution_id:"host-run"}}));
+ dom.window.close();
+});

@@ -519,6 +519,10 @@ describe("standalone Architect route hardening", () => {
         expect(dom.window.document.getElementById("architect-model-config")?.textContent).not.toContain("loading");
         expect(dom.window.document.getElementById("live-event-status")?.textContent).not.toContain("connecting");
         const chatStatus = dom.window.document.getElementById("chat-status")?.textContent || "";
+        const work = [...dom.window.document.querySelectorAll<HTMLDetailsElement>(".continuation-report-section")]
+          .find(section => section.querySelector("summary")?.textContent?.startsWith("Work Completed"))!;
+        expect(work.open).toBe(false);
+        work.open = true; work.dispatchEvent(new dom.window.Event("toggle"));
         const chatText = dom.window.document.getElementById("chat-log")?.textContent || "";
         expect(chatStatus).toContain("oversized");
         expect(chatText).toContain("Implemented compact replay.");

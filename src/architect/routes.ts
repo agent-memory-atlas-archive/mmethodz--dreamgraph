@@ -4385,6 +4385,7 @@ function normalizeArchitectChatTranscriptPassReport(value: unknown): Record<stri
     graph_entities_touched: compactTranscriptList(report.graph_entities_touched, 24, 240),
     tool_trace_summary: compactTranscriptList(report.tool_trace_summary, 16, 240),
     graph_plan_updates: compactTranscriptList(report.graph_plan_updates, 12, 300),
+    reconciliation_execution_id: typeof report.reconciliation_execution_id === "string" ? report.reconciliation_execution_id.slice(0, 1024) : undefined,
     evidence: compactTranscriptList(report.evidence, 12, 240),
     blockers: compactTranscriptList(report.blockers, 12, 240),
     uncertainty: typeof report.uncertainty === "number" ? Math.min(1, Math.max(0, report.uncertainty)) : 1,
@@ -5208,6 +5209,8 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
     autonomyAllowsContinue: autonomyAllowsArchitectContinuation(mode),
   });
   withHostObservedPassEvidence(continuationDecision.report, toolTrace);
+  const reconciliationExecutionId = asRecord(runtimeProvenance.graph_execution)?.execution_id;
+  if (typeof reconciliationExecutionId === "string") continuationDecision.report.reconciliation_execution_id = reconciliationExecutionId;
   budgetStatus = finalizeChatBudgetStatus(runtime, budgetCoordinator, promptBundle, passMessage, finalAssistantContent);
   if (budgetStatus) {
     const tokenEconomyRecord = asRecord(tokenEconomy) ?? {};
@@ -11247,6 +11250,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         appendContinuationReportSection(panel, 'Files / Graph Entities Touched', [].concat(report.files_touched || [], report.graph_entities_touched || []));
         appendContinuationReportSection(panel, 'Tool Trace', report.tool_trace_summary);
         appendContinuationReportSection(panel, 'Graph / Plan Updates Recorded', report.graph_plan_updates);
+        if (report.reconciliation_execution_id) appendReconciliationStatus(panel, report.reconciliation_execution_id);
         appendContinuationReportSection(panel, 'Evidence', report.evidence);
         const fallbackEvidence = Array.isArray(report.fallback_evidence) ? report.fallback_evidence : [];
         const fallbackSummary = [];
