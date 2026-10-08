@@ -72,6 +72,42 @@ describe("default save folder", () => {
   });
 });
 
+describe("delayed browser Save outcomes", () => {
+  async function pendingSave() {
+    const events: unknown[][] = [], transport = savingTransport();
+    const controller = controllerWithSavePicker(transport);
+    const state = controller as unknown as { fileDialogs: Map<number, BrowserFileDialog> };
+    transport.fileDialog = async () => ({ status: "needs_confirmation" });
+    let observedHash = "absent", closed = false;
+    transport.close = async () => { closed = true; };
+    const ledger: SourceLedger = {
+      observe: async () => ({ repository: "app", scope: "source:app/proof.js", hash: observedHash }),
+      begin: (async () => { events.push(["begin"]); return { id: "pending-save", state: "intent" }; }) as SourceLedger["begin"],
+      settle: (async (id, after) => { events.push(["settle", id, after]); return { id, state: after ? "reconciliation_pending" : "unknown" }; }) as SourceLedger["settle"],
+    };
+    const session = await openDreamgraphBrowserSession({ transport, controller, executionId: "exec-pending", ledger, settleWaitMs: 1, logDir: tmpdir(), masterDir: tmpdir() });
+    return { session, events, complete: () => { state.fileDialogs.delete(7); observedHash = "sha256:changed"; }, isClosed: () => closed };
+  }
+  it("retains one unresolved observation across retries, then records a late file write", async () => {
+    const fixture = await pendingSave();
+    await fixture.session.call("browser_file_dialog", { path: "C:/work/proof.js" });
+    const retry = await fixture.session.call("browser_file_dialog", { path: "C:/work/proof.js" });
+    expect(retry.text).toContain("remains pending");
+    expect(fixture.events.filter(event => event[0] === "begin")).toHaveLength(1);
+    expect(fixture.events.filter(event => event[0] === "settle")).toEqual([["settle", "pending-save", null]]);
+    fixture.complete();
+    await fixture.session.release("late write completed");
+    expect(fixture.events.at(-1)).toEqual(["settle", "pending-save", { "source:app/proof.js": "sha256:changed" }]);
+  });
+  it("does not report successful release while a tracked save is unresolved, but still closes transport", async () => {
+    const fixture = await pendingSave();
+    await fixture.session.call("browser_file_dialog", { path: "C:/work/proof.js" });
+    await expect(fixture.session.release("stop")).rejects.toThrow("BROWSER_SAVE_SETTLEMENT_UNCONFIRMED");
+    expect(fixture.events.at(-1)).toEqual(["settle", "pending-save", null]);
+    expect(fixture.isClosed()).toBe(true);
+  });
+});
+
 describe("graph-bound browser saves", () => {
   async function run(executionId: string | undefined, inProject: boolean) {
     const project = await mkdtemp(join(tmpdir(), "dg-project-")), outside = await mkdtemp(join(tmpdir(), "dg-outside-"));

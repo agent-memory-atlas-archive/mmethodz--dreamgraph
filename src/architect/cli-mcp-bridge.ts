@@ -1,7 +1,8 @@
 import { spawn as spawnChild } from "node:child_process";
+import { assertCliAdmissionGate } from "./cli-admission-gate.js";
 import { CLI_VERSION } from "../cli/version.js";
 import { createHash, randomUUID } from "node:crypto";
-import { appendFile, mkdirSync } from "node:fs";
+import { appendFile, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -118,6 +119,14 @@ async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): P
   }
 }
 
+/** Claude's MCP wait and this proxy must not truncate a still-valid operator review at the SDK's 60s default. */
+function claudeBridgeDeadline(): { timeout?: number; maxTotalTimeout?: number } {
+  if (!process.env.DREAMGRAPH_BRIDGE_ADMISSION_PATH) return {};
+  const remaining = Number(process.env.DREAMGRAPH_BRIDGE_DEADLINE_MS) - Date.now();
+  if (!Number.isSafeInteger(remaining) || remaining <= 0 || remaining > 14_400_000) throw new Error("CLI_BRIDGE_DEADLINE_EXPIRED");
+  return { timeout: remaining, maxTotalTimeout: remaining };
+}
+
 async function main(): Promise<void> {
   let started = false;
   upstreamTransport.onclose = () => {
@@ -164,13 +173,14 @@ async function main(): Promise<void> {
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (req, extra) => {
+    await assertCliAdmissionGate();
     if (queuedToolCalls >= 128) throw new Error("CLI_TOOL_TRANSPORT_QUEUE_BOUND");
     queuedToolCalls++;
     const preceding = precedingToolTransport;
     let release!: () => void;
     precedingToolTransport = new Promise<void>(done => { release = () => { queuedToolCalls--; done(); }; });
     await preceding;
-    try { extra.signal.throwIfAborted(); if (contextUnavailable) throw new Error("CLI_CONTEXT_RECOVERY_REQUIRED: previous owner result retained; restart only after reviewing its receipts and context failure"); }
+    try { extra.signal.throwIfAborted(); await assertCliAdmissionGate(); if (contextUnavailable) throw new Error("CLI_CONTEXT_RECOVERY_REQUIRED: previous owner result retained; restart only after reviewing its receipts and context failure"); }
     catch (error) { release(); throw error; }
     transportReleases.set(extra.requestId, release);
     const startedAtEpochMs = Date.now();
@@ -191,7 +201,7 @@ async function main(): Promise<void> {
         ? await runLocalCommand(req.params.arguments ?? {}, extra.signal)
         : req.params.name === REQUEST_COMPUTER_USE_TOOL.name
           ? requestComputerUse(req.params.arguments ?? {})
-          : await upstream.callTool(req.params, undefined, { signal: extra.signal });
+          : await upstream.callTool(req.params, undefined, { signal: extra.signal, ...claudeBridgeDeadline() });
       // A Computer Use browser action changes no graph context: no context block after every click and screenshot.
       if (MANAGED_CONTEXT && !COMPUTER_USE_TOOL.test(req.params.name)) {
         try {
@@ -298,6 +308,10 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
   });
 }
 
+// Private launch-owned marker lets the host confirm the proxy ended as well as the CLI parent.
+if (process.env.DREAMGRAPH_BRIDGE_ADMISSION_PATH) {
+  writeFileSync(process.env.DREAMGRAPH_BRIDGE_ADMISSION_PATH + ".proxy", String(process.pid), { flag: "wx", mode: 0o600 });
+}
 main().catch((error) => {
   bail(1, `bridge fatal error: ${(error as Error).message}`);
 });
@@ -329,7 +343,7 @@ const RUN_COMMAND_TOOL: Tool = Object.freeze({
 /**
  * Capability request, not a grant. The call is recorded in the audit trace; DreamGraph ends the pass
  * as "computer use requested", asks the local operator and, if allowed, re-runs the request with
- * Codex's native Computer Use enabled. Nothing is operated by this tool.
+ * the selected adapter's governed Computer Use enabled. Nothing is operated by this tool.
  */
 const REQUEST_COMPUTER_USE_TOOL: Tool = Object.freeze({
   name: "request_computer_use",
@@ -344,6 +358,7 @@ const REQUEST_COMPUTER_USE_TOOL: Tool = Object.freeze({
   },
 });
 function requestComputerUse(args: unknown): LocalToolResult {
+  if (!COMPUTER_USE_REQUESTABLE) throw new Error("COMPUTER_USE_REQUEST_NOT_ALLOWED");
   const reason = typeof (args as { reason?: unknown })?.reason === "string" ? String((args as { reason: string }).reason).slice(0, 500) : "";
   return { content: [{ type: "text", text: `Computer Use requested from the local operator: ${(reason || "no reason given").replace(/[.\s]+$/, "")}. `
     + "Do not attempt Computer Use now. End your turn with one short sentence describing what you need to do on the computer." }] };

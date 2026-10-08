@@ -28,7 +28,10 @@ import { dreamgraphUiOrigins } from "../computer/dreamgraph-browser.js";
 import { codexBrowserTabIdsFromTranscript, codexBrowserReleaseConfirmed, releaseCodexBrowserSession } from "./codex-cua-release.js";
 import { codexComputerUseServersToml, codexTurnEndHooksToml, codexNativeToolTrace, createCodexItemClock, createCodexTranscriptWriter, createCodexSessionGrantWatcher, readCodexNotify, discoverCodexComputerUseServers, resolveCodexSourceHome, widenCodexComputerUseSurfaces, type CodexComputerUseServer } from "./codex-computer-use.js";
 
-export type ArchitectCliAdapter = "codex-cli" | "copilot-cli";
+import { prepareClaudeInvocation, CLAUDE_LIVE_TESTED_VERSION } from "./claude-cli-invocation.js";
+import { runClaudeProcess, type ClaudeProcessResult } from "./claude-cli-process.js";
+
+export type ArchitectCliAdapter = "codex-cli" | "copilot-cli" | "claude-cli";
 
 /** Concrete controller-derived tool needs for one CLI execution. */
 export interface ArchitectCliToolRequirements {
@@ -56,6 +59,9 @@ export interface ArchitectCliBridgeRoute {
   signal: NodeJS.Signals | null;
   timed_out: boolean;
   adapter_version?: string;
+  adapter_profile_verification?: "profile_verified_at_launch" | "failed_or_incomplete";
+  adapter_live_tested_version?: string;
+  process_recovery?: { cli_pid?: number; proxy_pid?: number };
   /** Codex native Computer Use MCP servers wired into this granted pass (names only). */
   computer_use_servers?: string[];
   /** Codex thread whose browser session was pre-approved under the Computer Use grant. */
@@ -123,6 +129,7 @@ export interface RunArchitectCliBridgeInput {
 }
 
 interface ProcessResult {
+  claude?: ClaudeProcessResult["claude"];
   stdout: string;
   stderr: string;
   exitCode: number | null;
@@ -175,10 +182,12 @@ const REQUIRED_DREAMGRAPH_TOOLS = Object.freeze(["query_resource", "query_archit
 const CLI_BINARY_ENV_KEY_BY_ADAPTER: Record<ArchitectCliAdapter, string> = Object.freeze({
   "codex-cli": "DREAMGRAPH_ARCHITECT_CODEX_CLI_BINARY",
   "copilot-cli": "DREAMGRAPH_ARCHITECT_COPILOT_CLI_BINARY",
+  "claude-cli": "DREAMGRAPH_ARCHITECT_CLAUDE_CLI_BINARY",
 });
 const CLI_DEFAULT_BINARY_BY_ADAPTER: Record<ArchitectCliAdapter, string> = Object.freeze({
   "codex-cli": "codex",
   "copilot-cli": "copilot",
+  "claude-cli": "claude",
 });
 const IS_WINDOWS = process.platform === "win32";
 const WINDOWS_PATH_EXTS: readonly string[] = IS_WINDOWS
@@ -214,10 +223,14 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
   // every other DreamGraph tool) when its extension is connected; Codex's own Computer Use only as the fallback.
   // DREAMGRAPH_COMPUTER_USE_BACKEND: auto (default) | dreamgraph-browser (required) | cua-runtime (Codex's own).
   let browserGuidance: string | null = null;
-  if (input.adapter === "codex-cli" && input.computerUse === true && computerUseBackendPreference() !== "cua-runtime") {
+  if (input.adapter === "claude-cli" && input.computerUse === true && computerUseBackendPreference() === "cua-runtime") {
+    await rm(scratchDir, { recursive: true, force: true });
+    throw new Error("CLAUDE_COMPUTER_USE_BACKEND_UNSUPPORTED: connect the DreamGraph browser extension");
+  }
+  if ((input.adapter === "codex-cli" || input.adapter === "claude-cli") && input.computerUse === true && computerUseBackendPreference() !== "cua-runtime") {
     try { browserGuidance = (await openExecutionBrowser(runId, input.signal)).guidance; }
     catch (error) {
-      if (computerUseBackendPreference() === "dreamgraph-browser") {
+      if (input.adapter === "claude-cli" || computerUseBackendPreference() === "dreamgraph-browser") {
         await rm(scratchDir, { recursive: true, force: true });
         throw new Error(`COMPUTER_USE_UNAVAILABLE: DreamGraph's browser is required (DREAMGRAPH_COMPUTER_USE_BACKEND=dreamgraph-browser) but not available: ${error instanceof Error ? error.message : String(error)}`);
       }
@@ -225,7 +238,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
   }
   const codexNativeComputerUse = input.adapter === "codex-cli" && input.computerUse === true && browserGuidance === null;
   let prompt = serializeCliPrompt(input.messages, input.userMessage, input.adapter, toolRequirements.requirements, { autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced",
-    computerUse: input.adapter !== "codex-cli" ? "off" : browserGuidance !== null ? "dreamgraph-browser" : input.computerUse === true ? "granted" : input.computerUseRequestable === true ? "requestable" : "off",
+    computerUse: input.adapter !== "codex-cli" && input.adapter !== "claude-cli" ? "off" : browserGuidance !== null ? "dreamgraph-browser" : input.computerUse === true ? "granted" : input.computerUseRequestable === true ? "requestable" : "off",
     ...(browserGuidance !== null ? { browserGuidance } : {}),
     ...(codexNativeComputerUse ? { protectedOrigins: await dreamgraphUiOrigins().catch(() => [] as string[]) } : {}) });
   const model = input.model && input.model !== "auto" ? input.model : undefined;
@@ -265,7 +278,8 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
   // transcript; runs at most once, from the normal path or from the final cleanup (ceiling, cancel, crash).
   let releaseComputerUse: (() => Promise<ComputerUseReleaseProof>) | null = null;
   try {
-    const capability = await probeCliControlCapability(input.adapter, executionSignal);
+    const capability = input.adapter === "claude-cli" ? null
+      : await probeCliControlCapability(input.adapter, executionSignal);
     await mkdir(auditDir, { recursive: true, mode: 0o700 });
     const envBase = buildBridgeEnv({
       mcpPort,
@@ -275,9 +289,11 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       workspaceRoot: getArchitectProjectRoot(),
       verbosityMode: input.verbosityMode,
       sessionBearer: lease.worker_bearer,
-      computerUseRequestable: input.adapter === "codex-cli" && input.computerUse !== true && input.computerUseRequestable === true,
+      computerUseRequestable: (input.adapter === "codex-cli" || input.adapter === "claude-cli") && input.computerUse !== true && input.computerUseRequestable === true,
     });
-    const invocation = input.adapter === "codex-cli"
+    const invocation: Awaited<ReturnType<typeof prepareCodexInvocation>> & { claude?: Awaited<ReturnType<typeof prepareClaudeInvocation>>["claude"] } = input.adapter === "claude-cli"
+      ? await prepareClaudeInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, availableToolNames, timeoutMs, signal: executionSignal, reasoningEffort: input.reasoningEffort })
+      : input.adapter === "codex-cli"
       ? await prepareCodexInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames, verbosityMode: input.verbosityMode, reasoningEffort: input.reasoningEffort, computerUse: codexNativeComputerUse, registerCuaHost: (host) => { cuaHosts.push(host); } })
       : await prepareCopilotInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames });
 
@@ -319,13 +335,15 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       processResult = await admitted.request({ provider: baseConfig.provider, model: input.model, payload: prompt,
         output_tokens: baseConfig.maxTokens, signal: executionSignal }, async signal => {
         signal.throwIfAborted(); dispatched = true;
-        const result = await runProcess({ command: invocation.command, args: invocation.args, cwd: invocation.cwd,
+        const result = invocation.claude
+          ? await runClaudeProcess({ ...invocation, ...invocation.claude, timeoutMs, signal, onActivity: () => { renewExecution(); } })
+          : await runProcess({ command: invocation.command, args: invocation.args, cwd: invocation.cwd,
           env: invocation.env, stdin: invocation.stdin, timeoutMs, signal, onActivity: () => { renewExecution(); },
           ...(sessionGrant || transcript ? { onStdout: (chunk: string) => { sessionGrant?.onStdout(chunk); transcript?.write(chunk); itemClock?.onStdout(chunk); } } : {}) });
-        return { result, usage: input.adapter === "codex-cli" ? extractArchitectCodexUsage(result.stdout) : undefined,
+        return { result, usage: "claude" in result ? result.claude?.usage : input.adapter === "codex-cli" ? extractArchitectCodexUsage(result.stdout) : undefined,
           // runProcess resolves only on the child's close event: the native CLI is no longer running,
           // even when it was stopped (timeout/cancel/stale). It must not keep holding admission concurrency.
-          acknowledged: true };
+          acknowledged: input.adapter === "claude-cli" ? result.terminationConfirmed : true };
       });
     } finally {
       await auditTail.stop();
@@ -351,13 +369,20 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     // Codex exec does not release the browser session at turn end (no Stop-hook cleanup), which leaves the
     // tab claimed and the Computer Use cursor on it. Release it the verified way: bind each tab the session
     // held as that session in a new turn, then end that turn.
-    const computerUseRelease = invocation.computerUseServers
+    let computerUseRelease = invocation.computerUseServers
       ? releaseComputerUse ? await releaseComputerUse() : { confirmed: false, logPath: null, reason: "release_proof_unavailable" }
       : null;
     if (computerUseRelease?.logPath) computerUseCleanupLog = computerUseRelease.logPath;
     // DreamGraph's browser: detach the run's tabs and record pending saves before the execution ends.
-    const browserLog = browserGuidance !== null ? await releaseExecutionBrowser(runId, executionSignal.aborted ? "cancelled" : "run finished").catch(() => null) : null;
-    if (browserLog) computerUseCleanupLog = browserLog;
+    if (browserGuidance !== null) {
+      try {
+        const browserLog = await releaseExecutionBrowser(runId, executionSignal.aborted ? "cancelled" : "run finished");
+        computerUseRelease = { confirmed: browserLog !== null, logPath: browserLog, reason: browserLog ? "browser_release_confirmed" : "browser_release_proof_missing" };
+        if (browserLog) computerUseCleanupLog = browserLog;
+      } catch {
+        computerUseRelease = { confirmed: false, logPath: null, reason: "browser_release_unconfirmed" };
+      }
+    }
     const computerUseRequestRecord = audit.find((record) => record.tool === "request_computer_use");
     let computerUseRequest: { reason: string } | undefined;
     if (computerUseRequestRecord) { let reason = ""; try { reason = String((JSON.parse(computerUseRequestRecord.inputJson ?? "{}") as { reason?: unknown }).reason ?? ""); } catch { /* bounded audit body */ }
@@ -365,19 +390,20 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     auditTail.emitEntries(toolTrace);
 
     const content = await extractAssistantContent(input.adapter, processResult, invocation.outputPath);
-    const usage = input.adapter === "codex-cli" ? extractArchitectCodexUsage(processResult.stdout) : undefined;
+    const usage = processResult.claude?.usage ?? (input.adapter === "codex-cli" ? extractArchitectCodexUsage(processResult.stdout) : undefined);
     const completedTools = toolTrace.filter((entry) => entry.status === "completed").length;
     const abortReason = executionSignal.aborted ? String((executionSignal.reason as Error | undefined)?.message ?? "") : "";
     const processFailureReason = /^EXECUTION_(STALE|CEILING_REACHED)/.test(abortReason) ? abortReason
       : executionSignal.aborted ? "ARCHITECT_CLI_CANCELLED" : processResult.timedOut
       ? `${input.adapter.toUpperCase()}_BRIDGE_TIMEOUT: timeout after ${timeoutMs}ms; completed tools ${completedTools}/${toolTrace.length}`
+      : processResult.claude?.error ? processResult.claude.error
       : processResult.exitCode !== 0
         ? `${input.adapter.toUpperCase()}_BRIDGE_NONZERO_EXIT: exit=${processResult.exitCode}; stderr=${compact(processResult.stderr)}`
         : !content.trim()
           ? `${input.adapter.toUpperCase()}_BRIDGE_EMPTY_RESPONSE: CLI completed without assistant text`
           : null;
     const failureReason = computerUseRelease && !computerUseRelease.confirmed
-      ? `CODEX_COMPUTER_USE_RELEASE_UNCONFIRMED: ${computerUseRelease.reason}${processFailureReason ? `; ${processFailureReason}` : ""}`
+      ? `CLI_COMPUTER_USE_RELEASE_UNCONFIRMED: ${computerUseRelease.reason}${processFailureReason ? `; ${processFailureReason}` : ""}`
       : processFailureReason;
 
     const expired = /^EXECUTION_(STALE|CEILING_REACHED)/.test(abortReason);
@@ -411,7 +437,10 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         exit_code: processResult.exitCode,
         signal: processResult.signal,
         timed_out: processResult.timedOut,
-        adapter_version: capability.version,
+        adapter_version: invocation.claude?.expected.version ?? capability!.version,
+        ...(invocation.claude ? { adapter_profile_verification: processResult.claude?.error ? "failed_or_incomplete" : "profile_verified_at_launch",
+          adapter_live_tested_version: CLAUDE_LIVE_TESTED_VERSION } : {}),
+        ...(processResult.claude?.recovery ? { process_recovery: processResult.claude.recovery } : {}),
         ...(invocation.computerUseServers ? { computer_use_servers: invocation.computerUseServers } : {}),
         ...(sessionGrant?.threadId ? { computer_use_session: sessionGrant.threadId } : {}),
         ...(computerUseTranscript ? { computer_use_transcript: computerUseTranscript } : {}),
@@ -1160,7 +1189,8 @@ export async function inspectCodexNativeComputer() {
 }
 export function qualifyCliControlHelp(adapter: ArchitectCliAdapter, versionOutput: string, help: string) {
   const version = /\b(\d+\.\d+\.\d+)\b/.exec(versionOutput)?.[1];
-  const flags = adapter === "codex-cli" ? ["--sandbox", "--json", "--output-last-message", "--ephemeral", "--ignore-rules"]
+  const flags = adapter === "claude-cli" ? ["--tools", "--strict-mcp-config", "--setting-sources", "--permission-mode", "--no-session-persistence"]
+    : adapter === "codex-cli" ? ["--sandbox", "--json", "--output-last-message", "--ephemeral", "--ignore-rules"]
     : ["--allow-all-tools", "--deny-tool", "--disable-builtin-mcps", "--output-format", "--prompt"];
   if (!version || flags.some(flag => !help.includes(flag))) throw new Error("CLI_CONTROL_CAPABILITY_UNQUALIFIED");
   return { version, verified_flags: flags, source: "installed_read_only_version_and_help", output_density: "optional_provider_config_and_prompt_guidance" };
@@ -1183,6 +1213,7 @@ export function extractArchitectCodexUsage(stdout: string): TokenUsage | undefin
 }
 
 async function extractAssistantContent(adapter: ArchitectCliAdapter, result: ProcessResult, outputPath: string | null): Promise<string> {
+  if (adapter === "claude-cli") return result.claude?.content ?? "";
   if (outputPath) {
     const fromFile = await readFile(outputPath, "utf8").catch(() => "");
     if (fromFile.trim()) return fromFile;

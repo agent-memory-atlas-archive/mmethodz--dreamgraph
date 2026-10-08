@@ -125,7 +125,7 @@ export const COMPUTER_USE_SCRIPT=String.raw`
     let computerPolicy='ask',computerPolicyReadAt=0,computerArmed=false;
     const COMPUTER_POLICY_LABEL={allow:'Computer Use: allowed',ask:'Computer Use: ask every time',deny:'Computer Use: denied'};
     function renderComputerPolicy(){if(typeof document==='undefined'||!document)return;/* page torn down while the policy fetch was in flight */computerPolicyEl.textContent=COMPUTER_POLICY_LABEL[computerPolicy]||COMPUTER_POLICY_LABEL.ask;computerPolicyEl.dataset.policy=computerPolicy;
-      const capable=['codex-cli','native_api_tool_loop'].includes(computerAdapter());computerArmEl.hidden=!(capable&&computerPolicy==='ask');computerArmEl.setAttribute('aria-pressed',String(computerArmed));
+      const capable=['codex-cli','claude-cli','native_api_tool_loop'].includes(computerAdapter());computerArmEl.hidden=!(capable&&computerPolicy==='ask');computerArmEl.setAttribute('aria-pressed',String(computerArmed));
       computerArmEl.textContent=computerArmed?'Allowed for next message ✓':'Allow for next message';
       computerPolicyEl.title=capable?'Change in Config → Computer Use':'Computer Use is unavailable with this engine';}
     async function loadComputerPolicy(force){if(!force&&Date.now()-computerPolicyReadAt<10000)return computerPolicy;
@@ -135,7 +135,7 @@ export const COMPUTER_USE_SCRIPT=String.raw`
     document.getElementById('architect-adapter-select').addEventListener('change',renderComputerPolicy);
     /** Grant for one outgoing message. The daemon re-checks the instance policy; this only carries the operator's answer. */
     /** Common contract: the same grant decision for the Codex CLI and API engines. */
-    async function decideComputerUse(message,continuation){if(continuation||!['codex-cli','native_api_tool_loop'].includes(computerAdapter()))return false;const policy=await loadComputerPolicy(false);
+    async function decideComputerUse(message,continuation){if(continuation||!['codex-cli','claude-cli','native_api_tool_loop'].includes(computerAdapter()))return false;const policy=await loadComputerPolicy(false);
       if(policy==='allow')return true;if(policy==='deny')return false;
       if(computerArmed){computerArmed=false;renderComputerPolicy();return true;}
       return false;}

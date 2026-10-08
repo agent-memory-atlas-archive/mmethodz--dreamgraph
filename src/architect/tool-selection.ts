@@ -664,8 +664,9 @@ const COMPUTER_OBSERVATION_TOOLS = new Set(["browser_snapshot", "browser_screens
  */
 export function computerUseEvidence(calledTools: readonly string[], isComputerTool: (name: string) => boolean): { acted: boolean; observed: boolean } {
   let acted = false, observed = false;
-  for (const tool of calledTools) {
-    if (!isComputerTool(tool)) continue;
+  for (const original of calledTools) {
+    const tool = normalizeArchitectToolName(original);
+    if (!tool || !isComputerTool(tool)) continue;
     if (COMPUTER_OBSERVATION_TOOLS.has(tool)) observed = true;
     else if (tool.startsWith("browser_")) acted = true;
     else { acted = true; observed = true; }
@@ -692,7 +693,8 @@ export function normalizeArchitectToolName(name: string): string | null {
   const trimmed = String(name || "").trim();
   if (!trimmed) return null;
   const aliased = TOOL_ALIASES.get(trimmed) ?? TOOL_ALIASES.get(trimmed.toLowerCase()) ?? trimmed;
-  const normalized = aliased.replace(/^dreamgraph:/, "").replace(/^mcp__dreamgraph\./, "");
+  const normalized = aliased.replace(/^dreamgraph:/, "").replace(/^mcp__dreamgraph(?:__|\.)/, "");
+  if (normalized.startsWith("mcp__")) return null; // Foreign server identity cannot counterfeit an owner tool.
   return TOOL_NAME_RE.test(normalized) ? normalized : null;
 }
 

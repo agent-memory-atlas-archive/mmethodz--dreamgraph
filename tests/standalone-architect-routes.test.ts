@@ -869,10 +869,11 @@ describe("standalone Architect route hardening", () => {
       expect(routes.commands).toBe("POST /api/architect/v1/commands");
       expect(((payload.architect_llm as Record<string, unknown>).capabilities as Record<string, unknown>).textAttachments).toBeTypeOf("boolean");
       expect(((payload.architect_llm as Record<string, unknown>).capabilities as Record<string, unknown>).imageAttachments).toBeTypeOf("boolean");
-      expect(adapterCapabilities.selectable).not.toContain("claude-cli");
-      expect(adapterCapabilities.future_gated).toEqual(expect.arrayContaining([
-        expect.objectContaining({ adapter: "claude-cli", selectable: false }),
-      ]));
+      expect(adapterCapabilities.selectable).toContain("claude-cli");
+      expect(adapterCapabilities.future_gated).toEqual([]);
+      expect(adapterCapabilities.claude_cli).toMatchObject({ platform: "win32", live_tested_version: "2.1.293", version_policy: "baseline_or_newer_with_launch_validation",
+        live_tested_model: "claude-sonnet-5", model_selection: "user_selected_explicit_id", native_tools: false, startup_validation: "every_pass", computer_use: "dreamgraph-browser" });
+      expect(buildArchitectProviderReadiness({ adapter: "claude-cli", model: "claude-sonnet-5" })).toMatchObject({ ready: false, kind: "cli_subscription" });
       expect(future.advisory).toBe(true);
       expect(future.fallback_visible).toBe(true);
       expect(interop.companion_surface).toBe(true);
@@ -2706,7 +2707,8 @@ describe("standalone Architect route hardening", () => {
       expect(html).toContain("id=\"architect-adapter-select\"");
       expect(html).toContain("value=\"codex-cli\"");
       expect(html).toContain("value=\"copilot-cli\"");
-      expect(html).not.toContain("value=\"claude-cli\"");
+      expect(html).toContain("value=\"claude-cli\">Claude CLI</option>");
+      expect(html).not.toContain("value=\"claude-cli\" disabled");
       expect(html).toContain("id=\"architect-provider-select\"");
       expect(html).toContain(".control-field option");
       expect(html).toContain("id=\"architect-model-input\"");

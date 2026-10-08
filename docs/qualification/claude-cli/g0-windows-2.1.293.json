@@ -1,0 +1,81 @@
+{
+  "schema": "dreamgraph.claude_cli_qualification.v1",
+  "date": "2026-10-07",
+  "gate": "G0",
+  "status": "G0_verified_reported",
+  "platform": "win32",
+  "version": "2.1.293",
+  "model": "claude-sonnet-5",
+  "effort": null,
+  "auth": {
+    "method": "claude.ai",
+    "provider": "firstParty",
+    "subscription": "max",
+    "credentials_inspected": false
+  },
+  "launch": {
+    "profile": "dreamgraph-mcp-only-v1",
+    "native_tools": [],
+    "plugins": [],
+    "skills": [],
+    "agents": [],
+    "permission_mode": "dontAsk",
+    "mcp_servers": [
+      {
+        "name": "dreamgraph",
+        "status": "connected",
+        "tool_count": 108
+      }
+    ],
+    "empty_arguments_accepted": true
+  },
+  "calls": [
+    {
+      "tool": "query_resource",
+      "scope": "dream://adrs / ADR-217",
+      "upstream_dispatched": true
+    },
+    {
+      "tool": "patch_file",
+      "scope": "qualification-denied.txt",
+      "upstream_dispatched": false,
+      "result": "QUALIFICATION_READ_ONLY"
+    }
+  ],
+  "result": {
+    "exit_code": 0,
+    "subtype": "success",
+    "num_turns": 3,
+    "stdout_bytes": 34642,
+    "stderr_bytes": 0,
+    "duration_ms": 14501,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 57580,
+      "cache_read_input_tokens": 112109,
+      "output_tokens": 774
+    },
+    "list_price_estimate_usd": 0.2604938,
+    "charged_spend": null
+  },
+  "runs_used": 3,
+  "startup_probe": { "duration_ms": 13253, "num_turns": 3, "stdout_bytes": 31376, "stderr_bytes": 0, "hooks_executed": false, "foreign_mcp_advertised": false, "memory_sentinel_returned": false, "exit_code": 0 },
+  "adr": "ADR-242",
+  "first_run": {
+    "result": "init_rejected",
+    "upstream_calls": 0,
+    "termination_confirmed": true,
+    "reason": "Windows probe loader used filesystem path instead of file URL; initial profile exposed builtin plugin/agent entries"
+  },
+  "remaining": [
+    "Later authority and cancellation qualification beyond G0",
+    "Production invocation, managed authority and lifecycle wiring",
+    "Conversation mutation and Computer Use canaries"
+  ],
+  "limitations": [
+    "Read-only qualification proxy forwards only the named ADR query; other calls refused before upstream.",
+    "Successful normal exit observed; browser/session cancellation is not established by this run.",
+    "List-price estimate is not subscription charge or balance.",
+    "No release or general model/platform support claim."
+  ]
+}

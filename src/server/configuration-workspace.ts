@@ -356,19 +356,36 @@ function renderModels(p) {
 
 /* ---------------- architect ---------------- */
 function renderArchitect(p) {
-  const adapter = eff('DREAMGRAPH_LLM_ARCHITECT_ADAPTER') || 'native_api_tool_loop', cli = adapter === 'codex-cli' || adapter === 'copilot-cli';
+  const adapter = eff('DREAMGRAPH_LLM_ARCHITECT_ADAPTER') || 'native_api_tool_loop', cli = adapter === 'codex-cli' || adapter === 'copilot-cli' || adapter === 'claude-cli';
   p.append(h('p', { class: 'cfg-intro' }, 'Defaults for the Architect chat. The engine and model can also be switched per conversation in the Architect composer.'));
-  const engine = pick('DREAMGRAPH_LLM_ARCHITECT_ADAPTER', 'Engine', 'Codex and Copilot CLI use your existing subscription login and their own tools. "API" uses the provider and key below.',
-    [['codex-cli', 'Codex CLI'], ['copilot-cli', 'GitHub Copilot CLI'], ['native_api_tool_loop', 'API (provider + key)'], ['deterministic_fallback', 'Offline (no model)']], { onchange: () => render() });
+  const engine = pick('DREAMGRAPH_LLM_ARCHITECT_ADAPTER', 'Engine', 'CLI engines use their official login. DreamGraph owns graph context, mutation tools and approvals. "API" uses the provider and key below.',
+    [['codex-cli', 'Codex CLI'], ['copilot-cli', 'GitHub Copilot CLI'], ['claude-cli', 'Claude CLI'], ['native_api_tool_loop', 'API (provider + key)'], ['deterministic_fallback', 'Offline (no model)']], { onchange: () => render() });
   const modelKey = 'DREAMGRAPH_LLM_ARCHITECT_MODEL';
-  const model = cli ? text(modelKey, 'Model', 'Leave empty to use the CLI\'s own default model.', { placeholder: adapter === 'codex-cli' ? 'e.g. gpt-6.1-sol' : 'CLI default' }) : modelPicker('architect', 'Model');
-  p.append(card('Engine & model', null, grid(engine, model, adapter === 'codex-cli' || !cli ? effortPicker('architect') : null,
+  const model = cli ? text(modelKey, 'Model', adapter === 'claude-cli' ? 'Full Claude model ID supported by your CLI/account (Sonnet, Opus, Fable or another Claude model). Live adapter tests used claude-sonnet-5; model selection is not restricted to it. No silent fallback.' : 'Leave empty to use the CLI\'s own default model.', { placeholder: adapter === 'claude-cli' ? 'claude-sonnet-5' : adapter === 'codex-cli' ? 'e.g. gpt-6.1-sol' : 'CLI default' }) : modelPicker('architect', 'Model');
+  p.append(card('Engine & model', null, grid(engine, model, adapter === 'claude-cli' ? pick(ROLE_KEY('architect', 'REASONING_EFFORT'), 'Reasoning effort', 'Only Default is qualified for this Claude profile. Clear any previous explicit effort here; it is never silently discarded.', []) : adapter === 'codex-cli' || !cli ? effortPicker('architect') : null,
     num('DREAMGRAPH_ARCHITECT_PASS_TIMEOUT_MS', 'Time limit per task', 'How long one Architect task (all its tool calls together) may run before it is stopped.', { unit: 'minutes', scale: 60000, min: 1, max: 240 })),
     !cli ? more('Use a different provider or key for the Architect', grid(...providerFields('architect'))) : null,
     cli ? more('CLI program location', grid(
       text('DREAMGRAPH_ARCHITECT_CODEX_CLI_BINARY', 'Codex CLI', 'Full path, only if "codex" is not on PATH.', { placeholder: 'codex' }),
-      text('DREAMGRAPH_ARCHITECT_COPILOT_CLI_BINARY', 'Copilot CLI', 'Full path, only if "copilot" is not on PATH.', { placeholder: 'copilot' }))) : null,
+      text('DREAMGRAPH_ARCHITECT_COPILOT_CLI_BINARY', 'Copilot CLI', 'Full path, only if "copilot" is not on PATH.', { placeholder: 'copilot' }),
+      text('DREAMGRAPH_ARCHITECT_CLAUDE_CLI_BINARY', 'Claude CLI', 'Optional absolute path. Also discovered in your user .local/bin directory.', { placeholder: 'claude.exe' }))) : null,
     roleStatus(['architect'])));
+  if (adapter === 'claude-cli') {
+    const status = h('p', { class: 'cfg-status' }, 'Installation, official login and run qualification are checked separately.');
+    const check = h('button', { type: 'button', onclick: async () => {
+      check.disabled = true; status.textContent = 'Checking official Claude CLI profile…';
+      try { const r = await api('/api/architect/v1/provider-readiness', { adapter: 'claude-cli', model: eff(modelKey) });
+        status.textContent = r.readiness.detail; } catch (e) { status.textContent = 'Check failed: ' + e.message; }
+      finally { check.disabled = false; }
+    } }, 'Check Claude setup');
+    p.append(card('Claude CLI setup', 'Windows · live-tested on Claude Code 2.1.293; newer versions checked at every launch · official Pro/Max login. Adapter qualified with live Sonnet evidence; choose any full Claude model ID supported by this CLI/account. All models use the same DreamGraph authority.',
+      h('p', {}, 'Install using PowerShell: ', h('code', {}, 'irm https://claude.ai/install.ps1 | iex')),
+      h('p', {}, 'Default executable: %USERPROFILE%/.local/bin/claude.exe. Git for Windows is recommended.'),
+      h('p', {}, 'Sign in to the dedicated profile in a separate PowerShell window:'),
+      h('code', {}, '$env:CLAUDE_CONFIG_DIR = Join-Path $HOME ".dreamgraph/claude-cli/config"; & "$HOME/.local/bin/claude.exe" auth login'),
+      h('p', {}, 'Keep API tokens out of this profile. Claude uses only DreamGraph MCP tools; it cannot choose a different authority or resume an unrelated CLI conversation.'),
+      check, status));
+  }
   p.append(card('Behaviour', null, grid(
     pick('DREAMGRAPH_ARCHITECT_AUTONOMY_MODE', 'Autonomy', 'How far the Architect continues on its own before handing back.', [['manual', 'Manual — one step, then ask'], ['supervised', 'Supervised — stop at checkpoints'], ['autonomous', 'Autonomous — continue until done']]),
     pick('DREAMGRAPH_ARCHITECT_VERBOSITY_MODE', 'Answer length', null, [['concise', 'Concise'], ['balanced', 'Balanced'], ['detailed', 'Detailed']]),
@@ -484,7 +501,7 @@ const PRICE_VERSION = 'dashboard';
 /** The Architect can be switched to the API engine per chat even when its default engine is a CLI. */
 function architectApiModel() {
   const adapter = eff('DREAMGRAPH_LLM_ARCHITECT_ADAPTER') || 'native_api_tool_loop';
-  if (adapter !== 'codex-cli' && adapter !== 'copilot-cli') return null;
+  if (adapter !== 'codex-cli' && adapter !== 'copilot-cli' && adapter !== 'claude-cli') return null;
   const own = eff('DREAMGRAPH_LLM_ARCHITECT_PROVIDER'), provider = own && own !== 'none' ? own : eff('DREAMGRAPH_LLM_PROVIDER'), model = eff('DREAMGRAPH_LLM_ARCHITECT_MODEL');
   return (provider === 'openai' || provider === 'anthropic') && model ? { provider, model } : null;
 }
@@ -531,13 +548,13 @@ function renderBudgets(p) {
   const models = []; for (const r of apiRoles) if (!models.some(m => m.provider === r.effective.provider && m.model === r.effective.model)) models.push({ provider: r.effective.provider, model: r.effective.model });
   const am = architectApiModel(); if (am && !models.some(m => m.provider === am.provider && m.model === am.model)) models.push(am);
   if (models.length) {
-    const pt = h('table', { class: 'cfg-table' }, h('tr', {}, h('th', {}, 'Model'), h('th', {}, 'Input price per 1M tokens (USD)'), h('th', {}, 'Cached input price per 1M tokens (USD)'), h('th', {}, 'Output price per 1M tokens (USD)')));
+    const pt = h('table', { class: 'cfg-table' }, h('tr', {}, h('th', {}, 'Model'), h('th', {}, 'Input price per 1M tokens (USD)'), h('th', {}, 'Cached input price per 1M tokens (USD)'), h('th', {}, 'Cache write price per 1M tokens (USD)'), h('th', {}, 'Output price per 1M tokens (USD)')));
     for (const m of models) {
       const row = pricing().find(x => x.provider === m.provider && x.model === m.model) || {};
       const mk = (f, optional) => { const i = h('input', { type: 'number', min: 0, step: 0.01, value: row[f] !== undefined ? String(row[f]) : '', placeholder: optional ? 'same as input' : 'e.g. 2.50', 'aria-label': m.model + ' ' + f }); i.addEventListener('input', () => { const n = Number(i.value); if (i.value === '' && optional) setPrice(m.provider, m.model, f, null); else if (i.value !== '' && Number.isFinite(n) && n >= 0) setPrice(m.provider, m.model, f, n); }); return h('td', {}, i); };
-      pt.append(h('tr', {}, h('td', {}, m.model, h('div', { class: 'help' }, m.provider)), mk('input_per_million'), mk('cached_input_per_million', true), mk('output_per_million')));
+      pt.append(h('tr', {}, h('td', {}, m.model, h('div', { class: 'help' }, m.provider)), mk('input_per_million'), mk('cached_input_per_million', true), mk('cache_write_input_per_million', true), mk('output_per_million')));
     }
-    p.append(card('Prices of paid models', 'Copy these from your provider\'s pricing page. DreamGraph uses them to stop work before a spend limit would be exceeded. The cached input price applies to input the provider reports as cached; leave it empty to count cached input at the full input price.', h('div', { style: 'overflow-x:auto' }, pt)));
+    p.append(card('Prices of paid models', 'Copy these from your provider\'s pricing page. DreamGraph uses them to stop work before a spend limit would be exceeded. The cached input price applies to input the provider reports as read from its cache, the cache write price to input it reports as written to its cache (Anthropic charges writes above the input price); leave either empty to use the input price.', h('div', { style: 'overflow-x:auto' }, pt)));
   }
   p.append(card('Graph retrieval', 'How much of the graph is gathered around each question.', grid(
     num('DREAMGRAPH_LLM_ARCHITECT_MAX_HOPS', 'Relationship depth (Architect)', 'How many steps away from the focus to follow.', { min: 0, max: 6, step: 1 }),
@@ -554,7 +571,7 @@ function renderComputer(p) {
     opt('allow', 'Allow', 'Use it whenever a task needs it.'),
     opt('ask', 'Ask every time', 'When the Architect needs the computer it asks you first, then continues if you allow it. You can also pre-approve the next message.'),
     opt('deny', 'Deny', 'Never operate this computer.'))),
-    h('div', { class: 'cfg-status' }, 'The same choice applies to every engine. Codex CLI and the API engines operate your Chrome through DreamGraph\'s browser extension; without it, Codex CLI falls back to its own built-in Computer Use. No per-task setup is needed.')));
+    h('div', { class: 'cfg-status' }, 'The same choice applies to every engine. Codex CLI, Claude CLI and the API engines operate your Chrome through DreamGraph\'s browser extension; without it, Codex CLI falls back to its own built-in Computer Use. Claude CLI requires the connected extension and has no native fallback.')));
   p.append(browserBridgeCard());
   p.append(more('Time limit for tasks', grid(num('DREAMGRAPH_ARCHITECT_PASS_TIMEOUT_MS', 'Time limit per task', 'Tasks that use the computer usually need longer. Shared with the Architect page.', { unit: 'minutes', scale: 60000, min: 1, max: 240 }))));
   p.append(profilePanel());
@@ -563,7 +580,7 @@ function renderComputer(p) {
 /* DreamGraph's browser bridge (extension + host) used by Codex CLI and the API engines. Read-only status; setup is dg browser setup. */
 function browserBridgeCard() {
   const body = h('div', { class: 'cfg-status' }, 'Checking the DreamGraph browser extension…');
-  const box = card('Browser for Computer Use', 'Codex CLI and the API engines operate your Chrome through DreamGraph\'s own extension. It stays idle until you grant Computer Use.', body);
+  const box = card('Browser for Computer Use', 'Codex CLI, Claude CLI and the API engines operate your Chrome through DreamGraph\'s own extension. It stays idle until you grant Computer Use.', body);
   const draw = s => {
     const folder = h('code', {}, s.extension_dir);
     const copy = h('button', { type: 'button', onclick: () => { navigator.clipboard && navigator.clipboard.writeText(s.extension_dir).then(() => say('Folder path copied.', 'ok')).catch(() => undefined); } }, 'Copy folder path');
@@ -577,8 +594,8 @@ function browserBridgeCard() {
       h('button', { type: 'button', onclick: load }, 'Check again'));
   };
   async function load() {
-    try { draw(await api('/api/architect/v1/computer/browser-bridge')); }
-    catch (e) { body.replaceChildren(h('p', {}, 'Could not read the extension status: ' + e.message)); }
+    try { const result = await api('/api/architect/v1/computer/browser-bridge'); if (typeof document === 'undefined' || !document || !body.isConnected) return; draw(result); }
+    catch (e) { if (typeof document === 'undefined' || !document || !body.isConnected) return; body.replaceChildren(h('p', {}, 'Could not read the extension status: ' + e.message)); }
   }
   void load();
   return box;

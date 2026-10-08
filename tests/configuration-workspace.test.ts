@@ -76,6 +76,30 @@ function advancedInput(document: Document, key: string) {
   return expert.querySelector<HTMLInputElement>(`input[aria-label="${key}"]`)!;
 }
 
+it("persists the Claude route and checks setup without sending credentials or an API request", async () => {
+  let readinessBody: unknown;
+  const { document, errors } = await browser("/config?tab=architect", async (path, input, send) => {
+    if (path === "/api/architect/v1/provider-readiness") {
+      readinessBody = JSON.parse(String(input?.body));
+      return new Response(JSON.stringify({ ok: true, readiness: { ready: false, detail: "CLAUDE_LOGIN_REQUIRED" } }), { headers: { "Content-Type": "application/json" } });
+    }
+    return send();
+  });
+  edit(document, "DREAMGRAPH_LLM_ARCHITECT_ADAPTER", "claude-cli");
+  edit(document, "DREAMGRAPH_LLM_ARCHITECT_MODEL", "claude-opus-5-5");
+  (document.querySelector("#cw-save") as HTMLButtonElement).click();
+  await eventually(async () => (await readFile(envPath, "utf8")).includes("DREAMGRAPH_LLM_ARCHITECT_MODEL=claude-opus-5-5"));
+  await eventually(() => document.querySelector<HTMLElement>("#configuration-workspace")?.dataset.busy === "false");
+  document.querySelector<HTMLButtonElement>("#cw-tab-architect")!.click();
+  expect(document.body.textContent).toContain("irm https://claude.ai/install.ps1 | iex");
+  expect(document.body.textContent).toContain("dedicated profile");
+  [...document.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent === "Check Claude setup")!.click();
+  await eventually(() => !!readinessBody);
+  expect(readinessBody).toEqual({ adapter: "claude-cli", model: "claude-opus-5-5" });
+  expect(document.body.textContent).not.toContain("private-secret");
+  expect(await readFile(envPath, "utf8")).toContain("DREAMGRAPH_LLM_ARCHITECT_ADAPTER=claude-cli");
+  expect(errors).toEqual([]);
+});
 it("keeps the embedded configuration workspace functional under the same save authority", async () => {
   const { document, errors } = await browser("/config?embed=architect");
   expect(document.body.dataset.architectWorkspace).toBe("config");

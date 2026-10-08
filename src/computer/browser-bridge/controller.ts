@@ -484,10 +484,23 @@ export class BrowserController {
       request = { ...request, path: await freePath(folder, defaultFileName(picker!)) };
       defaulted = true;
     }
-    const answered = await this.transport.fileDialog(request);
+    let answered = await this.transport.fileDialog(request);
+    const stillPending = () => picker && this.fileDialogs.get(id)?.id === picker.id;
+    if (request.action === "choose" && request.path && picker?.kind === "save" &&
+        ["done", "not_found"].includes(answered.status) && this.transport.confirmSave) {
+      // Chrome may add a browser-owned file-type warning after the OS picker.
+      // It is not Page.handleJavaScriptDialog and must not be answered with an unscoped Enter.
+      const quickDeadline = Date.now() + 500;
+      while (Date.now() < quickDeadline && stillPending()) await sleep(50);
+      if (stillPending()) {
+        const tab = (await this.transport.listTabs()).find(tab => tab.tab_id === id);
+        if (tab) answered = await this.transport.confirmSave({ tab_id: id, path: request.path, origin: new URL(tab.url).origin });
+      }
+    }
     if (answered.status === "done" || answered.status === "cancelled") {
       const deadline = Date.now() + 10_000;
-      while (Date.now() < deadline && picker && this.fileDialogs.get(id)?.id === picker.id) await sleep(100);
+      while (Date.now() < deadline && stillPending()) await sleep(100);
+      if (stillPending()) answered = { status: "needs_confirmation", message: "The picker or browser confirmation is still pending; no completed Save is claimed." };
     }
     const outcome = this.fileDialogOutcomes.get(id);
     const page = outcome && picker && outcome.id === picker.id
@@ -564,13 +577,15 @@ export class BrowserController {
 
   /** Ends control of every tab. Open dialogs stay in the browser for the user. */
   async release(): Promise<void> {
+    const unconfirmed: number[] = [];
     for (const tabId of [...this.attached]) {
       // Pickers in pages that stay open no longer wait for DreamGraph.
       if (!this.dialogs.has(tabId)) await this.transport.send(tabId, "Runtime.evaluate", { expression: "window.__dreamgraphPickerOff = true" }, 2000).catch(() => undefined);
-      await this.transport.detach(tabId).catch(() => undefined);
+      await this.transport.detach(tabId).catch(() => { unconfirmed.push(tabId); });
     }
     this.attached.clear(); this.current = null;
     for (const stop of this.unsubscribe.splice(0)) stop();
+    if (unconfirmed.length) throw new BrowserActionError("BROWSER_RELEASE_UNCONFIRMED", `Detach unconfirmed for ${unconfirmed.length} tab(s)`);
   }
 }
 

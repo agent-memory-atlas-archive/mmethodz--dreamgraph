@@ -9,6 +9,7 @@ import { randomBytes } from "node:crypto";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { answerOsFileDialog } from "./file-dialog.js";
+import { answerSaveConfirmation } from "./save-confirmation.js";
 import type { FileDialogRequest } from "./transport.js";
 import {
   BROWSER_BRIDGE_PROTOCOL, LineReader, NativeMessageReader, bridgeRunDirectory, browserHostEndpoint, encodeLine, encodeNativeMessage,
@@ -38,6 +39,7 @@ export class BrowserHost {
   readonly token = randomBytes(32).toString("hex");
   /** Desktop file dialog driver (replaceable in tests). */
   fileDialog: (request: FileDialogRequest) => ReturnType<typeof answerOsFileDialog> = request => answerOsFileDialog(request, { home: this.home });
+  confirmSave = (request: { path: string; origin: string }) => answerSaveConfirmation(request, { home: this.home });
   readonly endpoint: string;
   readonly infoFile: string;
   private closed = false;
@@ -153,6 +155,19 @@ export class BrowserHost {
       return;
     }
     const tabId = Number(params.tab_id);
+    if (request.method === "os.save_confirmation") {
+      if (this.owners.get(tabId) !== connection) { this.reply(connection, request.id, undefined, { code: "BROWSER_TAB_NOT_CONTROLLED", message: "control the requested tab first" }); return; }
+      void (async () => {
+        const tabs = await this.ask("tabs.list") as Array<{ tab_id: number; url: string }>;
+        const tab = tabs.find(item => item.tab_id === tabId);
+        if (!tab || typeof params.origin !== "string" || typeof params.path !== "string" ||
+            new URL(tab.url).origin !== params.origin || this.owners.get(tabId) !== connection)
+          throw new Error("BROWSER_SAVE_CONFIRMATION_SCOPE_MISMATCH");
+        return this.confirmSave({ path: params.path, origin: params.origin });
+      })().then(result => this.reply(connection, request.id, result),
+        error => this.reply(connection, request.id, undefined, { code: "BROWSER_SAVE_CONFIRMATION_FAILED", message: String(error) }));
+      return;
+    }
     if (request.method === "os.file_dialog") {
       // Desktop work for the run that controls a tab; never relayed to the extension.
       if (!connection.tabs.size) { this.reply(connection, request.id, undefined, { code: "BROWSER_TAB_NOT_CONTROLLED", message: "control a tab first" }); return; }

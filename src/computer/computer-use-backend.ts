@@ -61,6 +61,12 @@ export function plannedComputerUseRoute(adapter: string, extension: { connected:
       ? { backend: "unavailable", summary: `Computer Use is unavailable: DreamGraph's browser extension is required${pinned("dreamgraph-browser")} but not connected.` }
       : { backend: "codex-native", summary: "DreamGraph's browser extension is not connected, so Codex CLI uses its own Computer Use." };
   }
+  if (adapter === "claude-cli") {
+    if (preference === "cua-runtime") return { backend: "unavailable", summary: "Claude CLI requires DreamGraph's browser backend; cua-runtime is not supported." };
+    return extension.connected
+      ? { backend: "dreamgraph-browser", summary: `Computer Use runs through ${browser} (connected), under DreamGraph's execution grant. No native CLI fallback.` }
+      : { backend: "unavailable", summary: "Connect DreamGraph's browser extension to use Computer Use with Claude CLI." };
+  }
   if (adapter === "native_api_tool_loop") {
     if (preference === "cua-runtime") return { backend: "cua-runtime", summary: `The API engine uses the Computer Use runtime installed with the Codex app${pinned("cua-runtime")}.` };
     if (extension.connected) return { backend: "dreamgraph-browser", summary: `Computer Use runs through ${browser} (connected).` };

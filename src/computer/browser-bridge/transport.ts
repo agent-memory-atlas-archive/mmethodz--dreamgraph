@@ -48,6 +48,8 @@ export interface BrowserTransport {
    * Automation in the browser host). Optional: transports without desktop access do not offer it.
    */
   fileDialog?(request: FileDialogRequest): Promise<FileDialogResult>;
+  /** Browser-owned file-type warning after an authorized Save picker; not a JavaScript dialog. */
+  confirmSave?(request: { tab_id: number; path: string; origin: string }): Promise<FileDialogResult>;
   onEvent(listener: BrowserEventListener): () => void;
   onDetach(listener: BrowserDetachListener): () => void;
   close(): Promise<void>;

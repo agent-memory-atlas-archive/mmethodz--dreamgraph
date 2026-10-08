@@ -104,7 +104,7 @@ export async function openDreamgraphBrowserSession(input: { signal?: AbortSignal
   // Other files (outside the repositories, or not source, e.g. an application's own project file such as .web64proj)
   // record nothing here; their meaning belongs in the graph as a feature or evidence entry.
   const ledger = input.ledger ?? LEDGER, settleWaitMs = input.settleWaitMs ?? 250;
-  const pending: Array<{ id: string; file: string; scope: string; before: string }> = [];
+  const pending: Array<{ id: string; file: string; scope: string; before: string; tab: number; picker: number }> = [];
   let operations = 0;
   /** The page writes after the dialog closes (Chrome creates the file, then the page writes and closes it): wait
    * until the file differs from its state before the save and holds still, up to about 24 waits. */
@@ -116,21 +116,25 @@ export async function openDreamgraphBrowserSession(input: { signal?: AbortSignal
       if (next === last && next !== before && next !== "absent") return next;
       last = next;
     }
-    return last;
+    return null; // Unchanged or still moving is not proof that a page cannot write later.
   };
-  const settlePending = async (): Promise<string[]> => {
+  const settlePending = async (final = false): Promise<string[]> => {
     const notes: string[] = [];
-    while (pending.length) {
-      const item = pending.shift()!;
+    for (const item of [...pending]) {
       try {
-        const hash = await writtenHash(item.file, item.before);
+        const picker = controller.fileDialogState(item.tab);
+        const cancelled = picker.last?.id === item.picker && ["cancelled", "error"].includes(picker.last.outcome);
+        const hash = picker.open?.id === item.picker ? null
+          : cancelled ? item.before : await writtenHash(item.file, item.before);
         const settled = await ledger.settle(item.id, hash ? { [item.scope]: hash } : null);
-        notes.push(`graph: ${item.file} → ${settled.state === "reconciliation_pending" ? "recorded for graph reconciliation" : settled.state === "failed" ? "unchanged, nothing to reconcile" : settled.state} (obligation ${item.id})`);
+        if (hash) pending.splice(pending.indexOf(item), 1);
+        notes.push(`graph: ${item.file} → ${hash ? settled.state === "reconciliation_pending" ? "recorded for graph reconciliation" : "picker cancelled; no source write" : "save outcome unresolved; retained for recovery"} (obligation ${item.id})`);
       } catch (error) {
         notes.push(`graph: recording ${item.file} failed: ${error instanceof Error ? error.message : String(error)} (obligation ${item.id} stays open for recovery)`);
       }
     }
     for (const note of notes) await log(note);
+    if (final && pending.length) throw new Error("BROWSER_SAVE_SETTLEMENT_UNCONFIRMED: " + pending.map(item => item.id).join(", "));
     return notes;
   };
   /** Before a save dialog is answered with a path inside a repository: the observed intent. */
@@ -138,13 +142,19 @@ export async function openDreamgraphBrowserSession(input: { signal?: AbortSignal
     if (name !== "browser_file_dialog" || args.cancel === true || typeof args.path !== "string") return null;
     const tab = controller.currentTab;
     if (tab === null || controller.fileDialogState(tab).open?.kind !== "save") return null;
+    const picker = controller.fileDialogState(tab).open!;
+    const existing = pending.find(item => item.tab === tab && item.picker === picker.id);
+    if (existing) {
+      if (existing.file !== args.path) throw new Error("BROWSER_SAVE_PATH_CHANGED: settle or cancel the pending save first");
+      return `graph: save observation remains pending (obligation ${existing.id})`;
+    }
     const observed = await ledger.observe(args.path);
     if (!observed) return null;
     if (!input.executionId) throw new Error("BROWSER_SAVE_NOT_GRAPH_BOUND: this pass has no managed execution, so a save inside the project cannot be recorded; save outside the project or ask the user");
     operations += 1;
     const intent = await ledger.begin({ operation_id: `browser-save:${sessionId}:${operations}`, execution_id: input.executionId, actor: "dreamgraph_browser",
       repositories: [observed.repository], before_hashes: { [observed.scope]: observed.hash } });
-    pending.push({ id: intent.id, file: args.path, scope: observed.scope, before: observed.hash });
+    pending.push({ id: intent.id, file: args.path, scope: observed.scope, before: observed.hash, tab, picker: picker.id });
     return `graph: the saved file is recorded for graph reconciliation once the page has written it (obligation ${intent.id})`;
   };
 
@@ -168,9 +178,11 @@ export async function openDreamgraphBrowserSession(input: { signal?: AbortSignal
     release(reason) {
       released ??= (async () => {
         await log(`release (${reason}); tabs ${controller.controlledTabs.join(",") || "none"}`);
-        await settlePending();
-        await controller.release().catch(error => log(`release error: ${String(error)}`));
+        let releaseError: unknown;
+        try { await settlePending(true); } catch (error) { releaseError = error; await log(`save reconciliation unconfirmed: ${String(error)}`); }
+        try { await controller.release(); } catch (error) { releaseError = error; await log(`release unconfirmed: ${String(error)}`); }
         await transport.close().catch(() => undefined);
+        if (releaseError) throw releaseError;
         await log("released");
         return logFile;
       })();

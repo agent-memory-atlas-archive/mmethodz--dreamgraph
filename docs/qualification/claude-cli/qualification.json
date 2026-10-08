@@ -1,0 +1,251 @@
+{
+  "schema": "dreamgraph.claude_cli_qualification.v1",
+  "date": "2026-10-08",
+  "baseline": "14.0.2",
+  "release": null,
+  "qualified": true,
+  "profile": {
+    "platform": "win32",
+    "effort": null,
+    "authentication": "official claude.ai Max subscription in dedicated profile",
+    "computer_use_backend": "dreamgraph-browser",
+    "extension_version": "14.0.2",
+    "live_tested_model": "claude-sonnet-5",
+    "model_selection": "user-selected full Claude model ID; installed CLI/account availability; exact init identity; no silent fallback",
+    "live_tested_cli_version": "2.1.293",
+    "version_policy": "baseline_or_newer_with_launch_validation",
+    "minimum_cli_version": "2.1.293"
+  },
+  "authority": {
+    "plan": "claude-cli-adapter",
+    "adr": "ADR-242",
+    "user_authorization": "2026-10-08: ok proceed in that order; additional bounded qualification runs",
+    "normal_dispatch": "enabled; exact startup profile revalidated every pass",
+    "canonical_plan_verification": "not asserted by this external implementation"
+  },
+  "limits": {
+    "initial_live_runs": 3,
+    "additional_live_runs": 3,
+    "additional_consumed": 3,
+    "max_turns_per_run": 12,
+    "conversation_timeout_ms": 240000,
+    "computer_timeout_ms": 600000,
+    "automatic_retries": 0,
+    "api_fallback": false,
+    "model_escalation": false,
+    "review_save_runs_authorized": 1,
+    "review_save_runs_consumed": 1,
+    "total_live_runs_consumed": 7
+  },
+  "cases": [
+    {
+      "id": "A01",
+      "evidence": "g0-windows-2.1.293.json",
+      "result": "real Claude retrieved scoped ADR with provenance"
+    },
+    {
+      "id": "A02",
+      "run_id": "claude-live-b541b527-1e38-48fc-a361-2e850de09bce",
+      "duration_ms": 28949,
+      "source_artifact_sha256": "9b246771abb16df131b68fc1a7f8f9988938de0796142a3dde05f6d40b3643fe",
+      "result": "one exact approved edit committed to disposable source; model declined second unapproved effect; durable source obligation and owner state receipts retained",
+      "obligation_id": "cd7dd3ed-3e43-49a9-a129-8ebf42d1b5ea",
+      "state_receipts": [
+        "cd9183e8-9135-49f9-916f-a5bff917d101:intent",
+        "cd9183e8-9135-49f9-916f-a5bff917d101:applied"
+      ],
+      "graph_status": "reconciliation_pending",
+      "harness_note": "Original test failed after successful execution because it expected unprefixed trace names. Reviewed original evidence, corrected assertions with production normalization; did not replay the mutation.",
+      "refusal_evidence": "follow-up harness injected unapproved edit at real MCP owner; EXECUTION_POLICY_DENIED / EXECUTION_ACTION_APPROVAL_REQUIRED; physical file unchanged. Model refusal alone is not enforcement evidence."
+    },
+    {
+      "id": "A07",
+      "run_id": "claude-live-5e20dea6-565a-4ca4-b430-2148790d2079",
+      "duration_ms": 10922,
+      "source_artifact_sha256": "bac5d418fd061b57eaf0c8e87f15470027624efc98b4286f146867cb26185c0a",
+      "result": "fresh CLI recalled cobalt-ad1f808b from selected owner transcript, excluded foreign plan marker, reread source using DreamGraph, distinguished committed and unapproved edits; no new mutation",
+      "fixture_note": "After correcting harness assertion, preserved actual first-run answer was imported into declared disposable selected-conversation history. No native resume or cross-owner live transcript access. Separate deterministic tests cover owner/plan/project isolation.",
+      "graph_status": "no_change"
+    },
+    {
+      "id": "A12",
+      "run_id": "claude-live-ca2477f8-49bf-49cb-bb26-80d300e9f958",
+      "duration_ms": 39113,
+      "source_artifact_sha256": "2c98f57ee41ead84c205a5199374b26aff7059aa5691f8dffa52cb038b63e6a8",
+      "tools": [
+        "browser_tabs",
+        "browser_screenshot",
+        "browser_snapshot",
+        "browser_click",
+        "browser_file_chooser"
+      ],
+      "result": "two actual screenshots, clicked fixture control, file chooser uploaded exact CLAUDE_BROWSER_UPLOAD_PROOF to disposable local receiver, verified changed page; no repository browser mutation",
+      "release": {
+        "state": "confirmed",
+        "reason": "browser_release_confirmed",
+        "controlled_tabs": 1,
+        "execution_browser_registry_empty": true,
+        "cli_and_registered_proxy_termination": "confirmed"
+      },
+      "scope_note": "Claude exercised file chooser, not a new native Windows Open/Save proof. Existing shared Windows native-dialog qualification is reused; grant denial, wrong execution, cancellation, extension-loss and detach failure are deterministic shared fixtures.",
+      "graph_status": "no_change"
+    }
+  ],
+  "offline": {
+    "focused": {
+      "files_passed": 15,
+      "tests_passed": 149,
+      "live_test_skipped": 1,
+      "exit_code": 0,
+      "unhandled_errors": 0,
+      "model_choice_regression": "explicit Sonnet/Opus/Fable/future IDs, exact init mismatch refusal, persistent Opus configuration",
+      "version_regression": "baseline/newer semver accepted; older/unparseable/prerelease refused; newer init must match observed executable and exact tool catalog"
+    },
+    "shared_managed_execution": {
+      "prior_tests_passed": 133,
+      "files": 2,
+      "not_additional_live_runs": true
+    },
+    "named_computer_use_evidence": [
+      {
+        "file": "tests/mcp-bridge-transport.test.ts",
+        "test": "Computer Use ask request is a capability request only; requestable=%s",
+        "cases": [
+          false,
+          true
+        ],
+        "proves": "Only requestable profiles advertise/accept request_computer_use. Requests do not operate the computer or forward to upstream; disabled profiles refuse invented approval."
+      },
+      {
+        "file": "tests/execution-browser.test.ts",
+        "test": "refuses calls outside an execution with Computer Use granted",
+        "proves": "Ungrantable/missing-grant calls fail COMPUTER_USE_NOT_GRANTED."
+      },
+      {
+        "file": "tests/execution-browser.test.ts",
+        "test": "serves the holding execution only, returns images, and releases once",
+        "proves": "No borrowing another execution's grant; release removes access."
+      },
+      {
+        "file": "tests/browser-controller.test.ts",
+        "test": "never operates DreamGraph's own pages",
+        "proves": "Opening/navigating protected DreamGraph targets is refused before Page.navigate."
+      }
+    ],
+    "computer_use_scope_note": "These are deterministic real-proxy/fake-browser boundary tests, not new live Claude ask/deny/UI runs. Existing live browser success proves granted operation.",
+    "browser_save_followup": {
+      "files": 5,
+      "tests": 32,
+      "exit_code": 0,
+      "build_server": "passed"
+    }
+  },
+  "matrix_evidence": {
+    "A03-A06,A08-A11,A13-A17": [
+      "tests/host-managed-execution.test.ts",
+      "tests/mcp-bridge-transport.test.ts",
+      "tests/cli-admission-gate.test.ts",
+      "tests/claude-cli-profile.test.ts",
+      "tests/claude-cli-process.test.ts",
+      "tests/claude-cli-lifecycle.test.ts",
+      "tests/claude-adapter-policy.test.ts"
+    ],
+    "A12,A18": [
+      "tests/execution-browser.test.ts",
+      "tests/browser-controller.test.ts",
+      "tests/computer-use-governance.test.ts",
+      "tests/computer-use-required-tools.test.ts",
+      "tests/claude-tool-evidence.test.ts"
+    ],
+    "configuration": [
+      "tests/configuration-workspace.test.ts",
+      "tests/standalone-architect-routes.test.ts"
+    ]
+  },
+  "limitations": [
+    "Controlled CLI configuration is not an OS sandbox; init does not attest zero prior inference.",
+    "Newer CLI versions use launch validation rather than separate live qualification; explicit effort and additional platforms remain unqualified.",
+    "Source mutation receipts correctly retain reconciliation debt; no semantic completeness claim.",
+    "No release version, tag, install or restart performed.",
+    "Published evidence omits credentials, raw subscription sessions, screenshots and unrelated browser-tab inventory.",
+    "Public benchmark usefulness, billing cost and universal model accuracy are not claimed.",
+    "Original Claude Save run failed at Chrome's post-picker warning. Corrected shared backend passed live without another model run; full Claude Save replay was not performed."
+  ],
+  "reproduce": "tests/claude-cli-live.test.ts is skipped by ordinary CI. Explicit DG_CLAUDE_LIVE_CASE selects preflight (no inference), conversation (two runs) or computer (one run); followup reuses reviewed prior evidence. New inference requires an explicit allowance.",
+  "model_scope_decision": "2026-10-08 user: if it works on sonnet, it will work on opus and fable. Adapter qualification is shared; no per-model live-run requirement.",
+  "checks": [
+    "build:server",
+    "contracts:check",
+    "providers:check",
+    "mcp:check",
+    "config:check",
+    "ashoka:baseline:check",
+    "git diff --check"
+  ],
+  "version_policy_review": {
+    "date": "2026-10-08",
+    "exact_pin": false,
+    "actual_version_recorded": true,
+    "init_matches_probe": true,
+    "newer_versions": "profile_verified_at_launch; not independently live-tested",
+    "requalification_trigger": "failed boundary or required output-format check"
+  },
+  "additional_native_save": {
+    "date": "2026-10-08",
+    "user_authorization": "Run one bounded Save check; scanner-tracked .js target in disposable project",
+    "runs": 1,
+    "max_turns": 12,
+    "timeout_ms": 600000,
+    "automatic_run_retries": 0,
+    "run_id": "claude-live-0f567af5-96ca-4b3e-93ca-e3c0592d094d",
+    "duration_ms": 89113,
+    "source_artifact_sha256": "1aaab36e6b45080bcb2954c023d98b2ebca080fc5f1e895a4aa884e81e1d5d44",
+    "result": "failed",
+    "target": "disposable project/claude-save-proof.js",
+    "target_exists": false,
+    "native_dialog": "first call reported done but page never confirmed; second model-issued dialog call reported not_found; model stopped without reopening picker",
+    "path_verified": "Both tool arguments exactly matched the authorized target; no doubled-backslash mismatch.",
+    "ledger": "Two browser-save obligations recorded intent, then failed/no-change after bounded unchanged observation; neither is successful Save or reconciliation proof.",
+    "obligation_ids": [
+      "5e3cbabf-53fd-46f0-8af8-11cd8a64f05e",
+      "397b4ab3-742b-4000-a155-565c2e36a2ad"
+    ],
+    "release": "browser_release_confirmed; CLI/proxy completed; no save success claim",
+    "remaining": "Root cause corrected and shared backend independently verified; original Claude run is still recorded as failed. No further inference performed.",
+    "late_observation": "The exact requested file and contents were subsequently found after the run; the maintainer identified Chrome's separate .js Save warning. The original no-change disposition was premature."
+  },
+  "handoff": "source_ready_with_documented_shared_backend_save_evidence",
+  "qualification_scope": "Conversation/authority and screenshot/click/upload through real Claude; corrected tracked-source Save through the real shared backend, with offline host routing and recovery evidence. No combined Claude Save replay or install.",
+  "browser_save_followup": {
+    "date": "2026-10-08",
+    "result": "passed",
+    "mode": "shared_backend_without_model",
+    "test": "tests/browser-native-save-live.test.ts",
+    "platform": "Windows",
+    "browser": "Chrome, Finnish UI",
+    "extension_version": "14.0.2",
+    "source_artifact_sha256": "4b75774f6580f45b4c0b5e3cd9d70b8a0b309863e6136629b3d24de222ff4963",
+    "target": "disposable project/native-save-proof.js",
+    "wrong_origin": {
+      "message": "No unique matching browser Save confirmation; observed 0. No button pressed.",
+      "status": "needs_confirmation"
+    },
+    "browser_confirmation": {
+      "message": "Matching browser file-type Save confirmation accepted; page completion must still be observed.",
+      "status": "done"
+    },
+    "file_hash": "sha256:fec8bd06345dc56b68f9427828ef36f255d82719a809126c3b63d535e46cf5e0",
+    "obligation_id": "22ee1190-1a1a-45dd-8aab-68b97e793ff8",
+    "obligation_state": "reconciliation_pending",
+    "intent_receipt": "browser-save:9c94f74e-97c0-4c10-ae90-0fcbc5fb2cc0:1:intent",
+    "observed_receipt": "browser-save:9c94f74e-97c0-4c10-ae90-0fcbc5fb2cc0:1:observed",
+    "page_success_observed": true,
+    "release": "confirmed",
+    "inference_runs": 0,
+    "scope": "Real extension/CDP, checkout OS picker and Chrome confirmation helpers, real source-obligation ledger and commit receipts. Checkout desktop callbacks replace installed-host helpers for this isolated test; new host/client scope routing is covered offline. This is not a rerun of Claude or proof of a managed execution lease or completed semantic reconciliation.",
+    "limitations": [
+      "Windows English/Finnish Save/Don't save pairs supported; Finnish verified live. Unknown locales or ambiguous prompts remain needs_confirmation.",
+      "Original Claude Save failure retained. No further model runs, install or restart."
+    ]
+  }
+}

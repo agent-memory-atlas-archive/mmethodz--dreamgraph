@@ -99,6 +99,20 @@ describe("DreamGraph browser host", () => {
     await run.close();
   });
 
+  it("checks tab ownership and current origin before answering a browser Save confirmation", async () => {
+    const requests: unknown[] = [];
+    host.confirmSave = async request => { requests.push(request); return { status: "done" }; };
+    const run = await BridgeTransport.connect({ home }), other = await BridgeTransport.connect({ home });
+    const request = { tab_id: 1, path: "C:/work/proof.js", origin: "http://localhost:5173" };
+    await run.attach(1);
+    await expect(other.confirmSave(request)).rejects.toThrow("BROWSER_TAB_NOT_CONTROLLED");
+    await expect(run.confirmSave({ ...request, origin: "https://unrelated.example" })).rejects.toThrow("SCOPE_MISMATCH");
+    expect(requests).toEqual([]);
+    expect(await run.confirmSave(request)).toEqual({ status: "done" });
+    expect(requests).toEqual([{ path: request.path, origin: request.origin }]);
+    await run.close(); await other.close();
+  });
+
   it("reports a plain reason when no browser host is running", async () => {
     const empty = await mkdtemp(join(tmpdir(), "dg-browser-none-"));
     await expect(BridgeTransport.connect({ home: empty })).rejects.toThrow("DREAMGRAPH_BROWSER_UNAVAILABLE");

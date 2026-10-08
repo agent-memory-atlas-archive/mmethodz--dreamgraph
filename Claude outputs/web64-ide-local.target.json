@@ -1,0 +1,29 @@
+{
+  "schema": "dreamgraph.browser_target_definition.v1",
+  "id": "web64-ide-local",
+  "initial_url": "http://localhost:5173/ide",
+  "main_origin": "http://localhost:5173",
+  "main_path_prefix": "/",
+  "navigation": false,
+  "network": [
+    { "origin": "http://localhost:5173", "path_prefix": "/", "methods": ["GET", "HEAD"], "allow_query": true }
+  ],
+  "blocked_origins": [],
+  "elements": [
+    { "id": "source-editor", "selector": ".web64-code-editor[aria-label=\"Source code\"] .cm-content", "read_text": true, "read_value": false, "operations": ["click", "focus", "type", "key", "scroll"] },
+    { "id": "start-prg", "selector": "button[aria-label=\"Start PRG\"]", "read_text": false, "read_value": false, "operations": ["click"] },
+    { "id": "pause-emulator", "selector": "button[aria-label=\"Pause emulator\"]", "read_text": false, "read_value": false, "operations": ["click"] },
+    { "id": "emulator-status", "selector": ".web64-ide-emulator-state", "read_text": true, "read_value": false, "operations": [] },
+    { "id": "emulator-display", "selector": "canvas[aria-label=\"Web64 emulator display\"]", "read_text": false, "read_value": false, "operations": [] },
+    { "id": "debugger-panel", "selector": "section[aria-label=\"Debugger\"]", "read_text": true, "read_value": false, "operations": [] }
+  ],
+  "postconditions": [
+    { "id": "emulator-paused", "selector": "button[aria-label=\"Resume emulator\"]", "kind": "visible" },
+    { "id": "debugger-open", "selector": "section[aria-label=\"Debugger\"][data-active=\"1\"]", "kind": "visible" }
+  ],
+  "observation_bytes": 65536,
+  "action_timeout_ms": 30000,
+  "max_actions": 40,
+  "images": { "enabled": true, "region": "body", "mask_selectors": [], "max_bytes": 2000000, "max_count": 10, "total_bytes": 20000000 },
+  "redactions": []
+}

@@ -1,7 +1,8 @@
 /** Real stdio bridge process, paged upstream and cancellation; no provider/CLI inference. */
+
 import { it, expect } from "vitest";
 import { createServer } from "node:http";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, writeFile, unlink, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -11,6 +12,45 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+
+it("Claude admission rejects pre-init and queued calls after revocation without forwarding them", async () => {
+  const root = await mkdtemp(join(tmpdir(), "dg-bridge-admission-"));
+  const gate = join(root, "gate"), token = "a".repeat(64);
+  const upstream = new Server({ name: "fixture", version: "1" }, { capabilities: { tools: {} } });
+  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: randomUUID });
+  let calls = 0, release!: () => void;
+  const held = new Promise<void>(done => { release = done; });
+  upstream.setRequestHandler(ListToolsRequestSchema, () => ({ tools: [{ name: "commit", inputSchema: { type: "object" } }] }));
+  upstream.setRequestHandler(CallToolRequestSchema, async () => { calls++; await held; return { content: [{ type: "text", text: "owner receipt" }] }; });
+  await upstream.connect(transport);
+  const http = createServer(async (req, res) => { try { await transport.handleRequest(req, res); } catch { if (!res.headersSent) res.writeHead(500); res.end(); } });
+  await new Promise<void>(done => http.listen(0, "127.0.0.1", done));
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith("DREAMGRAPH_"))) as Record<string, string>;
+  Object.assign(env, { DREAMGRAPH_HOST_MCP_URL: "http://127.0.0.1:" + (http.address() as { port: number }).port + "/mcp",
+    DREAMGRAPH_BRIDGE_ADMISSION_PATH: gate, DREAMGRAPH_BRIDGE_ADMISSION_TOKEN: token, DREAMGRAPH_BRIDGE_DEADLINE_MS: String(Date.now() + 20000) });
+  const client = new Client({ name: "gate-fixture", version: "1" });
+  const bridge = new StdioClientTransport({ command: process.execPath,
+    args: ["--import", pathToFileURL(resolve("node_modules/tsx/dist/loader.mjs")).href, resolve("src/architect/cli-mcp-bridge.ts")],
+    cwd: root, env, stderr: "pipe" });
+  try {
+    await client.connect(bridge);
+    expect((await client.listTools()).tools.some(t => t.name === "commit")).toBe(true);
+    await expect(client.callTool({ name: "commit", arguments: {} })).rejects.toThrow("CLI_ADMISSION_NOT_READY");
+    expect(calls).toBe(0);
+    await writeFile(gate, token);
+    const first = client.callTool({ name: "commit", arguments: {} });
+    for (let i = 0; !calls && i < 100; i++) await new Promise(done => setTimeout(done, 10));
+    expect(calls).toBe(1);
+    const second = client.callTool({ name: "commit", arguments: {} });
+    const rejected = expect(second).rejects.toThrow("CLI_ADMISSION_NOT_READY");
+    await unlink(gate); release();
+    expect((await first).content).toEqual([{ type: "text", text: "owner receipt" }]);
+    await rejected; expect(calls).toBe(1);
+  } finally {
+    release(); await client.close(); await upstream.close(); http.closeAllConnections();
+    await new Promise<void>(done => http.close(() => done())); await rm(root, { recursive: true, force: true });
+  }
+}, 20000);
 
 it("a failed managed refresh preserves the original committed result and prevents later native CLI dispatch",async()=>{
  const root=await mkdtemp(join(tmpdir(),"dg-bridge-context-failure-")),upstream=new Server({name:"fixture",version:"1"},{capabilities:{tools:{}}});
@@ -73,6 +113,42 @@ it("retains page cursors, structured/meta/media, one session, scoped bearer and 
     abort.abort(); await expect(wait).rejects.toThrow();
     for (let i = 0; !cancelled && i < 100; i++) await new Promise(done => setTimeout(done, 10));
     expect(cancelled).toBe(true); expect(initializations).toBe(1);
+  } finally {
+    await client.close(); await upstream.close(); http.closeAllConnections();
+    await new Promise<void>(done => http.close(() => done())); await rm(root, { recursive: true, force: true });
+  }
+}, 20000);
+
+it.each([false, true])("Computer Use ask request is a capability request only; requestable=%s", async requestable => {
+  const root = await mkdtemp(join(tmpdir(), "dg-bridge-cu-policy-"));
+  const upstream = new Server({ name: "fixture", version: "1" }, { capabilities: { tools: {} } });
+  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: randomUUID });
+  let calls = 0;
+  upstream.setRequestHandler(ListToolsRequestSchema, () => ({ tools: [] }));
+  upstream.setRequestHandler(CallToolRequestSchema, () => { calls++; return { content: [] }; });
+  await upstream.connect(transport);
+  const http = createServer(async (req, res) => {
+    try { await transport.handleRequest(req, res); } catch { if (!res.headersSent) res.writeHead(500); res.end(); }
+  });
+  await new Promise<void>(done => http.listen(0, "127.0.0.1", done));
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith("DREAMGRAPH_"))) as Record<string, string>;
+  Object.assign(env, { DREAMGRAPH_HOST_MCP_URL: "http://127.0.0.1:" + (http.address() as { port: number }).port + "/mcp",
+    DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE: requestable ? "1" : "0" });
+  const client = new Client({ name: "grant-fixture", version: "1" });
+  const bridge = new StdioClientTransport({ command: process.execPath,
+    args: ["--import", pathToFileURL(resolve("node_modules/tsx/dist/loader.mjs")).href, resolve("src/architect/cli-mcp-bridge.ts")],
+    cwd: root, env, stderr: "pipe" });
+  try {
+    await client.connect(bridge);
+    expect((await client.listTools()).tools.some(t => t.name === "request_computer_use")).toBe(requestable);
+    if (requestable) {
+      const result = await client.callTool({ name: "request_computer_use", arguments: { reason: "Save the fixture" } });
+      expect(JSON.stringify(result)).toContain("Do not attempt Computer Use now");
+    } else {
+      await expect(client.callTool({ name: "request_computer_use", arguments: { reason: "Invented approval" } }))
+        .rejects.toThrow("COMPUTER_USE_REQUEST_NOT_ALLOWED");
+    }
+    expect(calls).toBe(0);
   } finally {
     await client.close(); await upstream.close(); http.closeAllConnections();
     await new Promise<void>(done => http.close(() => done())); await rm(root, { recursive: true, force: true });

@@ -21,6 +21,12 @@ describe("Computer Use evidence for required tools", () => {
     expect(missing([...GROUNDING, ...BROWSER_WORK, "read_source_code", "enrich_seed_data"])).toEqual([]);
   });
 
+  it("normalizes authenticated Claude tools but rejects foreign lookalikes and observation-only passes", () => {
+    const prefix = (names: string[]) => names.map(name => "mcp__dreamgraph__" + name);
+    expect(missing(prefix([...GROUNDING, ...BROWSER_WORK, "enrich_seed_data"]))).toEqual([]);
+    expect(missing(prefix([...GROUNDING, "browser_snapshot", "enrich_seed_data"]))).toContain("patch_file");
+    expect(missing([...GROUNDING, ...BROWSER_WORK.map(name => "mcp__foreign__" + name), "enrich_seed_data"])).toContain("patch_file");
+  });
   it("still requires the graph record", () => {
     expect(missing([...GROUNDING, ...BROWSER_WORK])).toEqual(["enrich_seed_data"]);
   });

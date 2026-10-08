@@ -1,0 +1,80 @@
+{
+  "schema": "dreamgraph.claude_cli_implementation_status.v1",
+  "date": "2026-10-08",
+  "baseline": "14.0.2",
+  "release": null,
+  "qualified": true,
+  "normal_architect_dispatch": "enabled_windows_launch_verified_profile",
+  "profile": {
+    "platform": "win32",
+    "effort": null,
+    "auth": "official claude.ai Pro/Max; maintainer observed Max",
+    "live_tested_model": "claude-sonnet-5",
+    "model_selection": "user-selected full Claude model ID; installed CLI/account availability; exact init identity; no silent fallback",
+    "live_tested_version": "2.1.293",
+    "version_policy": "baseline_or_newer_with_launch_validation"
+  },
+  "plan": "plans/claude-cli-adapter.md",
+  "adr": "ADR-242",
+  "slices": {
+    "claude-cli-0": "verified_reported",
+    "claude-cli-1": "verified_reported",
+    "claude-cli-2": "verified_reported",
+    "claude-cli-3": "verified_reported",
+    "claude-cli-4": "verified_reported",
+    "claude-cli-5": "verified_reported",
+    "claude-cli-6": "verified_reported"
+  },
+  "evidence": {
+    "g0": "docs/qualification/claude-cli/g0-windows-2.1.293.json",
+    "focused": {
+      "files": 15,
+      "tests": 149,
+      "exit_code": 0,
+      "unhandled_errors": 0
+    },
+    "shared_managed_execution": {
+      "files": 2,
+      "tests": 133,
+      "exit_code": 0
+    },
+    "checks": [
+      "build:server",
+      "contracts:check",
+      "providers:check",
+      "mcp:check",
+      "config:check",
+      "ashoka:baseline:check",
+      "git diff --check"
+    ],
+    "live": "docs/qualification/claude-cli/qualification.json",
+    "browser_save_followup": {
+      "files": 5,
+      "tests": 32,
+      "exit_code": 0,
+      "build_server": "passed"
+    }
+  },
+  "limits": {
+    "live_runs_consumed": 7,
+    "additional_live_runs_authorization": "2026-10-08 user: ok proceed in that order; three additional runs consumed; 2026-10-08 one additional 12-turn/10-minute Save run authorized and consumed",
+    "max_turns_per_run": 12,
+    "conversation_timeout_ms": 240000,
+    "computer_use_timeout_ms": 600000,
+    "api_fallback": false,
+    "model_escalation": false
+  },
+  "remaining_live_cases": [
+    "Corrected Save has shared-backend live evidence; the full Claude-to-Save flow was not repeated after the correction. Further inference requires a new bounded allowance."
+  ],
+  "limitations": [
+    "Controlled official CLI configuration, not an OS sandbox",
+    "Init validation is not proof of zero prior inference",
+    "Newer versions require launch validation; explicit effort and additional platforms remain unqualified",
+    "Source tool receipts report pending graph reconciliation",
+    "Reported slice closure is evidence-backed source progress, not canonical verification or a running Architect lease."
+  ],
+  "model_scope_decision": "2026-10-08 user: if it works on sonnet, it will work on opus and fable. Adapter qualification is shared; no per-model live-run requirement.",
+  "handoff": "source_ready_with_documented_shared_backend_save_evidence",
+  "qualification_scope": "Conversation/authority and screenshot/click/upload through real Claude; corrected tracked-source Save through the real shared backend, with offline host routing and recovery evidence. No combined Claude Save replay or install."
+}

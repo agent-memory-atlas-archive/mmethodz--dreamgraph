@@ -1,0 +1,402 @@
+diff --git a/src/architect/native-tool-loop.ts b/src/architect/native-tool-loop.ts
+index f52592d..f81b993 100644
+--- a/src/architect/native-tool-loop.ts
++++ b/src/architect/native-tool-loop.ts
+@@ -156,19 +156,22 @@ export const NATIVE_REQUEST_COMPUTER_USE_TOOL: ArchitectToolDefinition = Object.
+ });
+ /** Share of the context allocation the transcript may fill; the rest covers provider framing and estimate error. */
+ const TRANSCRIPT_TARGET_SHARE = 0.8;
++/** Compaction then goes down to this share, so it happens rarely: each compaction changes the prompt and costs one cache miss. */
++const TRANSCRIPT_COMPACTED_SHARE = 0.6;
+ const COMPACTED_RESULT_PREFIX = "[Earlier tool result compacted";
+ const COMPACTION_KEEP_CHARS = 600;
+ /**
+  * Keeps a long tool loop (Computer Use runs up to 80 steps) inside the role's model admission instead of failing:
+- * the oldest tool results after the required prompt are replaced by a short stub, oldest first, until the
+- * estimated request (UTF-8 JSON, images included, as admission counts it) fits. The latest exchange is never
++ * once the estimated request (UTF-8 JSON, images included) passes 80 % of the allocation, the oldest tool results
++ * after the required prompt are replaced by a short stub, oldest first, until it is under 60 %. The latest exchange is never
+  * compacted. If the request still does not fit, admission reports ADMISSION_CONTEXT_LIMIT with the setting.
+  * Returns the number of results compacted.
+  */
+ export function compactArchitectToolTranscript(messages: NeutralMessage[], requiredCount: number, tools: ArchitectToolDefinition[], contextAllocation: number): number {
+-  const target = Math.floor(contextAllocation * TRANSCRIPT_TARGET_SHARE) - Buffer.byteLength(JSON.stringify(tools));
++  const toolBytes = Buffer.byteLength(JSON.stringify(tools));
+   let size = Buffer.byteLength(JSON.stringify(messages));
+-  if (size <= target) return 0;
++  if (size <= Math.floor(contextAllocation * TRANSCRIPT_TARGET_SHARE) - toolBytes) return 0;
++  const target = Math.floor(contextAllocation * TRANSCRIPT_COMPACTED_SHARE) - toolBytes;
+   // The latest assistant turn and its results stay intact so the model can act on what it just saw.
+   let protectFrom = messages.length;
+   for (let index = messages.length - 1; index >= requiredCount; index -= 1) if (messages[index].role === "assistant") { protectFrom = index; break; }
+diff --git a/src/cognitive/model-admission.ts b/src/cognitive/model-admission.ts
+index 35dab95..26e0df7 100644
+--- a/src/cognitive/model-admission.ts
++++ b/src/cognitive/model-admission.ts
+@@ -7,7 +7,7 @@ import { commitGraphWrites, loadPublicationState, publicationContentHash, recove
+ import { withGraphRead, withGraphReconciliation } from "../utils/graph-reconciliation-barrier.js";
+ import { dataPath, getDataDir, withDataDirectory } from "../utils/paths.js";
+ import { stripBom } from "../utils/read-json.js";
+-import { allocationFloor, estimateCharge, ModelPricingSchema, type ModelPricing } from "../config/model-pricing.js";
++import { allocationFloor, estimateCharge, estimateUsageCharge, ModelPricingSchema, type ModelPricing } from "../config/model-pricing.js";
+ import type { TokenUsage } from "./llm.js";
+ import { assertJobCurrent, withoutJobContext } from "./job-context.js";
+ 
+@@ -247,7 +247,7 @@ export class ModelAdmission {
+       attempt.state = complete && attempt.acknowledged ? "settled" : "uncertain";
+       attempt.settled_at = this.clock().toISOString();
+       if (attempt.pricing && observed?.inputTokens !== undefined && observed.outputTokens !== undefined) {
+-        const charge = estimateCharge(attempt.pricing, observed.inputTokens, observed.outputTokens);
++        const charge = estimateUsageCharge(attempt.pricing, { inputTokens: observed.inputTokens, outputTokens: observed.outputTokens, cachedInputTokens: observed.cachedInputTokens });
+         // Missing reasoning is already inside output billing; monetary estimation can
+         // be known while its independent reasoning limit remains conservatively held.
+         attempt.accounted_nanounits = String(charge); attempt.charge_source = "provider_usage_estimate";
+diff --git a/src/cognitive/model-execution.ts b/src/cognitive/model-execution.ts
+index 13a64c0..4d8c43a 100644
+--- a/src/cognitive/model-execution.ts
++++ b/src/cognitive/model-execution.ts
+@@ -27,6 +27,8 @@ export class ModelExecution {
+   private deadline?: AbortSignal;
+   private signals = new WeakMap<AbortSignal, AbortSignal>();
+   private binding?: Promise<{ policy: Readonly<ResolvedRolePolicy>; admission: ModelAdmission; prices: ModelPricing[] }>;
++  /** Previous admitted request of this run and the input tokens the provider reported for it (see calibratedInputAllocation). */
++  private calibration?: { payload: string; input_tokens: number };
+   constructor(private readonly config: LlmConfig, private readonly role: ModelRole,
+     private readonly supplied?: Readonly<ResolvedRolePolicy>, run_id = `inference:${randomUUID()}`) { this.run_id = run_id; }
+   private bind() {
+@@ -67,10 +69,11 @@ export class ModelExecution {
+     const { policy, prices, admission } = await this.bind();
+     input.signal?.throwIfAborted();
+     if (input.provider !== policy.policy.provider || input.model !== policy.effective.model) throw new ModelAdmissionError("ADMISSION_REQUEST_POLICY_MISMATCH", this.run_id);
+-    const bytes = Buffer.byteLength(input.payload);
+-    // Full UTF-8 wire bytes plus framing is a conservative allocation, not measured tokens.
++    // Full UTF-8 wire bytes plus framing is a conservative allocation, not measured tokens. Within a run, the part of
++    // the request already measured by the provider (the unchanged prefix and suffix of the previous request) is
++    // counted by the provider-reported input tokens instead; only the new bytes keep the byte bound.
+     // Images are included in the wire allocation. Variance halts further account admission.
+-    const input_tokens = bytes + MODEL_REQUEST_FRAMING_RESERVE_BYTES;
++    const input_tokens = calibratedInputAllocation(this.calibration, input.payload) + MODEL_REQUEST_FRAMING_RESERVE_BYTES;
+     if (input_tokens > policy.effective.context_tokens) throw new ModelAdmissionError("ADMISSION_CONTEXT_LIMIT", this.run_id, null,
+       `setting=DREAMGRAPH_LLM_${this.role.toUpperCase()}_CONTEXT_TOKENS; `
+       + `required_allocation=${input_tokens}; context_allocation=${policy.effective.context_tokens}; `
+@@ -109,11 +112,29 @@ export class ModelExecution {
+       await admission.settle(attempt_id, { acknowledged: false }); throw error;
+     }
+     await admission.settle(attempt_id, { usage: answer.usage, acknowledged: answer.acknowledged });
++    if (answer.acknowledged && answer.usage?.inputTokens !== undefined) this.calibration = { payload: input.payload, input_tokens: answer.usage.inputTokens };
+     if (frame && position !== undefined) frame.usage[position] = answer.usage;
+     signal.throwIfAborted(); return answer.result;
+   }
+ }
+ 
++/**
++ * Input allocation for a request. Without a measured previous request of the same run this is the UTF-8 byte count.
++ * With one, the new request is split into the prefix and suffix it shares with the previous request plus the bytes
++ * in between: shared content is bounded by the provider-reported input tokens of the previous request (removed
++ * content is not subtracted, which keeps the bound conservative) and the bytes in between are counted as tokens.
++ * Never larger than the byte count.
++ */
++export function calibratedInputAllocation(previous: { payload: string; input_tokens: number } | undefined, payload: string): number {
++  const bytes = Buffer.byteLength(payload);
++  if (!previous || !Number.isSafeInteger(previous.input_tokens) || previous.input_tokens < 0) return bytes;
++  const before = previous.payload, limit = Math.min(before.length, payload.length);
++  let prefix = 0; while (prefix < limit && before.charCodeAt(prefix) === payload.charCodeAt(prefix)) prefix += 1;
++  let suffix = 0; while (suffix < limit - prefix && before.charCodeAt(before.length - 1 - suffix) === payload.charCodeAt(payload.length - 1 - suffix)) suffix += 1;
++  const changed = Buffer.byteLength(payload.slice(prefix, payload.length - suffix));
++  return Math.min(bytes, previous.input_tokens + changed);
++}
++
+ /** Readiness GETs deliberately remain outside this boundary; only inference dispatch calls use it. */
+ export async function admittedModelFetch(provider: string, url: string, init: RequestInit, retry = false): Promise<Response> {
+   const bound = execution.getStore();
+diff --git a/src/config/model-pricing.ts b/src/config/model-pricing.ts
+index 44a23fb..6e65056 100644
+--- a/src/config/model-pricing.ts
++++ b/src/config/model-pricing.ts
+@@ -4,6 +4,8 @@ export const ModelPricingSchema = z.object({
+   version: z.string().min(1), provider: z.string().min(1), model: z.string().min(1), currency: z.string().min(1),
+   source: z.string().min(1), input_per_million: z.number().nonnegative().finite().max(1_000_000),
+   output_per_million: z.number().nonnegative().finite().max(1_000_000),
++  /** Optional tariff for provider-reported cached input (cache reads). Absent: cached input is charged at the input tariff. */
++  cached_input_per_million: z.number().nonnegative().finite().max(1_000_000).optional(),
+   /** Output tariff includes billed reasoning; input tariff includes un-discounted image/input tokens. */
+   output_includes_reasoning: z.literal(true), input_includes_images: z.literal(true),
+ }).strict();
+@@ -30,3 +32,16 @@ export function estimateCharge(pricing: ModelPricing, input: number, output: num
+   const numerator = BigInt(input) * amountCeiling(pricing.input_per_million) + BigInt(output) * amountCeiling(pricing.output_per_million);
+   return (numerator + 999_999n) / 1_000_000n;
+ }
++/**
++ * Settlement charge from provider-reported usage. Cached input (cache reads) uses the cached tariff when the operator
++ * entered one; everything else, including cache writes, uses the input tariff. Reservations keep using estimateCharge
++ * (no discount), so a cache miss can never exceed what was admitted.
++ */
++export function estimateUsageCharge(pricing: ModelPricing, usage: { inputTokens: number; outputTokens: number; cachedInputTokens?: number }): bigint {
++  const cached = Math.min(usage.cachedInputTokens ?? 0, usage.inputTokens);
++  if (pricing.cached_input_per_million === undefined || cached === 0) return estimateCharge(pricing, usage.inputTokens, usage.outputTokens);
++  if (![usage.inputTokens, usage.outputTokens, cached].every(value => Number.isSafeInteger(value) && value >= 0)) throw new Error("INVALID_CHARGE_COUNTS");
++  const numerator = BigInt(usage.inputTokens - cached) * amountCeiling(pricing.input_per_million)
++    + BigInt(cached) * amountCeiling(pricing.cached_input_per_million) + BigInt(usage.outputTokens) * amountCeiling(pricing.output_per_million);
++  return (numerator + 999_999n) / 1_000_000n;
++}
+diff --git a/src/graph/execution-context.ts b/src/graph/execution-context.ts
+index 91ac7ff..214be48 100644
+--- a/src/graph/execution-context.ts
++++ b/src/graph/execution-context.ts
+@@ -86,6 +86,16 @@ async function save(entry: ManagedExecutionContext, stage: string) {
+   await commitGraphWrites({ actor: "execution_context", operation_id: `${entry.id}:context:${stage}:${entry.record_revision}`,
+     scope: [FILE], writes: [{ file: FILE, content }], result: { execution_id: entry.id, status: entry.status, context_receipt_id: entry.pack.receipt.id } });
+ }
++const EVIDENCE_HEADER_PUBLICATION = /^(DreamGraph evidence \(untrusted; assertions retain their class\) \{"revision":"[^"]*","publication":)\d+/m;
++/** Equal except for publication counters, the receipt identity derived from them, issue time and delivery state. */
++function sameManagedContent(before: ManagedExecutionContext["pack"], after: ManagedExecutionContext["pack"]) {
++  const key = (pack: ManagedExecutionContext["pack"]) => stable({ ...pack, id: "", token_count: 0,
++    revision: { graph_revision: pack.revision.graph_revision, graph: pack.revision.domains?.graph ?? null },
++    context_text: pack.context_text.replace(EVIDENCE_HEADER_PUBLICATION, (_match, head: string) => `${head}0`),
++    receipt: { ...pack.receipt, id: "", issued_at: "", delivery: "",
++      revision: { graph_revision: pack.receipt.revision.graph_revision, graph: pack.receipt.revision.domains?.graph ?? null } } });
++  return key(before) === key(after);
++}
+ function fingerprint(snapshot: CanonicalGraphRead, pack: ManagedExecutionContext["pack"]) {
+   return hash(stable({ required: pack.receipt.mandatory_evidence_ids, mandatory_satisfied: pack.mandatory_satisfied,
+     reasons: pack.state.reasons, records: pack.records.map(record => ({ record,
+@@ -374,6 +384,7 @@ export async function refreshManagedContext(id: string) {
+   return withGraphReconciliation(async () => {
+     const entry = await readManagedContext(id);
+     if (entry.status !== "running") throw new Error("EXECUTION_CONTEXT_CLOSED");
++    const previous = entry.pack;
+     const snapshot = await loadCanonicalGraph(entry.instance_id), pack = buildContextPack(snapshot, entry.request);
+     const currentSources = await sourceHashes(pack, snapshot, Object.keys(entry.source_hashes)), obligations = (await readChangeObligations()).entries;
+     const changed = new Set([...entry.source_gaps, ...namedEvidenceGaps(pack,snapshot,currentSources),
+@@ -389,7 +400,12 @@ export async function refreshManagedContext(id: string) {
+       return !reconciled && !pending && !evidenced;
+     });
+     withNamedSourceGaps(pack,entry.source_gaps);
+-    entry.pack = pack; entry.source_hashes = currentSources; entry.input_fingerprint = fingerprint(snapshot, pack);
++    // This execution's own bookkeeping (delivery and refresh records) advances the publication counters without
++    // changing what the model is given. Then the delivered block is kept byte-identical (still re-attested), so the
++    // provider's prompt cache stays valid across tool-loop calls. Any change to content, state, evidence or the
++    // graph revision gives the new pack.
++    entry.pack = sameManagedContent(previous, pack) ? { ...previous, receipt: { ...previous.receipt, delivery: "unattested" } } : pack;
++    entry.source_hashes = currentSources; entry.input_fingerprint = fingerprint(snapshot, entry.pack);
+     entry.prompt_hash = hash(managedContextPrompt(entry)); entry.updated_at = new Date().toISOString();
+     if (Buffer.byteLength(managedContextPrompt(entry)) > 65536) throw new Error("MANDATORY_EXECUTION_CONTEXT_TRANSPORT_BOUND");
+     await save(entry, "refreshed"); return entry;
+diff --git a/src/server/configuration-workspace.ts b/src/server/configuration-workspace.ts
+index 336610e..71c57a9 100644
+--- a/src/server/configuration-workspace.ts
++++ b/src/server/configuration-workspace.ts
+@@ -492,7 +492,7 @@ function pricing() { try { const v = JSON.parse(cur('DREAMGRAPH_LLM_PRICING') ||
+ function setPrice(provider, model, field, value) {
+   const list = pricing(); let row = list.find(r => r.provider === provider && r.model === model && r.version === PRICE_VERSION);
+   if (!row) { row = { version: PRICE_VERSION, provider, model, currency: 'USD', source: 'DreamGraph dashboard (operator entered)', input_per_million: 0, output_per_million: 0, output_includes_reasoning: true, input_includes_images: true }; list.push(row); }
+-  row[field] = value;
++  if (value === null) delete row[field]; else row[field] = value;
+   setDraft('DREAMGRAPH_LLM_PRICING', JSON.stringify(list));
+   const am = architectApiModel();
+   for (const [r] of BUDGET_ROLES) { const pr = roles.find(x => x.role === r); if (pr && pr.effective.provider === provider && pr.effective.model === model || r === 'architect' && am && am.provider === provider && am.model === model) { setDraft('DREAMGRAPH_LLM_' + r.toUpperCase() + '_PRICING_VERSION', PRICE_VERSION); if (!cur('DREAMGRAPH_LLM_' + r.toUpperCase() + '_BUDGET_CURRENCY')) setDraft('DREAMGRAPH_LLM_' + r.toUpperCase() + '_BUDGET_CURRENCY', 'USD'); } }
+@@ -531,13 +531,13 @@ function renderBudgets(p) {
+   const models = []; for (const r of apiRoles) if (!models.some(m => m.provider === r.effective.provider && m.model === r.effective.model)) models.push({ provider: r.effective.provider, model: r.effective.model });
+   const am = architectApiModel(); if (am && !models.some(m => m.provider === am.provider && m.model === am.model)) models.push(am);
+   if (models.length) {
+-    const pt = h('table', { class: 'cfg-table' }, h('tr', {}, h('th', {}, 'Model'), h('th', {}, 'Input price per 1M tokens (USD)'), h('th', {}, 'Output price per 1M tokens (USD)')));
++    const pt = h('table', { class: 'cfg-table' }, h('tr', {}, h('th', {}, 'Model'), h('th', {}, 'Input price per 1M tokens (USD)'), h('th', {}, 'Cached input price per 1M tokens (USD)'), h('th', {}, 'Output price per 1M tokens (USD)')));
+     for (const m of models) {
+       const row = pricing().find(x => x.provider === m.provider && x.model === m.model) || {};
+-      const mk = f => { const i = h('input', { type: 'number', min: 0, step: 0.01, value: row[f] !== undefined ? String(row[f]) : '', placeholder: 'e.g. 2.50', 'aria-label': m.model + ' ' + f }); i.addEventListener('input', () => { const n = Number(i.value); if (i.value !== '' && Number.isFinite(n) && n >= 0) setPrice(m.provider, m.model, f, n); }); return h('td', {}, i); };
+-      pt.append(h('tr', {}, h('td', {}, m.model, h('div', { class: 'help' }, m.provider)), mk('input_per_million'), mk('output_per_million')));
++      const mk = (f, optional) => { const i = h('input', { type: 'number', min: 0, step: 0.01, value: row[f] !== undefined ? String(row[f]) : '', placeholder: optional ? 'same as input' : 'e.g. 2.50', 'aria-label': m.model + ' ' + f }); i.addEventListener('input', () => { const n = Number(i.value); if (i.value === '' && optional) setPrice(m.provider, m.model, f, null); else if (i.value !== '' && Number.isFinite(n) && n >= 0) setPrice(m.provider, m.model, f, n); }); return h('td', {}, i); };
++      pt.append(h('tr', {}, h('td', {}, m.model, h('div', { class: 'help' }, m.provider)), mk('input_per_million'), mk('cached_input_per_million', true), mk('output_per_million')));
+     }
+-    p.append(card('Prices of paid models', 'Copy these from your provider\'s pricing page. DreamGraph uses them to stop work before a spend limit would be exceeded.', h('div', { style: 'overflow-x:auto' }, pt)));
++    p.append(card('Prices of paid models', 'Copy these from your provider\'s pricing page. DreamGraph uses them to stop work before a spend limit would be exceeded. The cached input price applies to input the provider reports as cached; leave it empty to count cached input at the full input price.', h('div', { style: 'overflow-x:auto' }, pt)));
+   }
+   p.append(card('Graph retrieval', 'How much of the graph is gathered around each question.', grid(
+     num('DREAMGRAPH_LLM_ARCHITECT_MAX_HOPS', 'Relationship depth (Architect)', 'How many steps away from the focus to follow.', { min: 0, max: 6, step: 1 }),
+diff --git a/tests/architect-tool-transcript.test.ts b/tests/architect-tool-transcript.test.ts
+index 8ea1754..aca25af 100644
+--- a/tests/architect-tool-transcript.test.ts
++++ b/tests/architect-tool-transcript.test.ts
+@@ -21,12 +21,13 @@ describe("native tool loop transcript working set", () => {
+     const messages = [...required(), ...step("a", 60_000), ...step("b", 60_000), ...step("c", 60_000)];
+     const before = JSON.stringify(messages.slice(0, 2));
+     const compacted = compactArchitectToolTranscript(messages, 2, [], 200_000);
+-    expect(compacted).toBe(1);
++    // Over 80 % of the allocation: compacts down below 60 % in one go, so the prompt changes rarely.
++    expect(compacted).toBe(2);
+     expect(resultOf(messages, 3)).toMatch(/^\[Earlier tool result compacted .*\(60002 chars\)\. Beginning: a:x+ … Call the tool again/);
+-    expect(resultOf(messages, 5)).toHaveLength(60_002);
++    expect(resultOf(messages, 5)).toMatch(/^\[Earlier tool result compacted .*Beginning: b:x+/);
+     expect(resultOf(messages, 7)).toHaveLength(60_002);
+     expect(JSON.stringify(messages.slice(0, 2))).toBe(before);
+-    expect(Buffer.byteLength(JSON.stringify(messages))).toBeLessThanOrEqual(200_000 * 0.8);
++    expect(Buffer.byteLength(JSON.stringify(messages))).toBeLessThanOrEqual(200_000 * 0.6);
+   });
+ 
+   it("counts advertised tool definitions against the allocation and does not compact twice", () => {
+diff --git a/tests/execution-context.test.ts b/tests/execution-context.test.ts
+index 36a60f5..14a9e5e 100644
+--- a/tests/execution-context.test.ts
++++ b/tests/execution-context.test.ts
+@@ -112,6 +112,13 @@ it("observes actual native additions/deletions as exact pending scopes while exc
+   expect((await finishManagedContext("execution-one")).status).toBe("reconciliation_pending");
+  }finally{lease.close();}
+ }));
++it("refresh keeps an unchanged context block byte-identical so the provider prompt cache stays valid",()=>within(async()=>{
++ const delivered=await deliver();const before=managedContextPrompt(delivered);
++ await new Promise(resolve=>setTimeout(resolve,5));
++ const refreshed=await refreshManagedContext("execution-one");
++ expect(managedContextPrompt(refreshed)).toBe(before);expect(refreshed.pack.receipt.issued_at).toBe(delivered.pack.receipt.issued_at);
++ await deliverManagedContext(refreshed.id,"system prefix\n"+managedContextPrompt(refreshed));await assertManagedContext(refreshed.id);
++}));
+ it("refresh never launders a concrete untracked named-source mismatch into current graph context",()=>within(async()=>{
+  await deliver();const content="export const original = false;\n";await writeFile(file,content);
+  const refreshed=await refreshManagedContext("execution-one");expect(refreshed.pack.receipt.delivery).toBe("unattested");
+diff --git a/tests/model-cost-calibration.test.ts b/tests/model-cost-calibration.test.ts
+new file mode 100644
+index 0000000..9d7124c
+--- /dev/null
++++ b/tests/model-cost-calibration.test.ts
+@@ -0,0 +1,76 @@
++import { afterEach, beforeEach, describe, expect, it } from "vitest";
++import { mkdtemp, rm } from "node:fs/promises";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import { ModelAdmission } from "../src/cognitive/model-admission.js";
++import { calibratedInputAllocation } from "../src/cognitive/model-execution.js";
++import { BudgetSchema } from "../src/graph/contracts.js";
++import { estimateCharge, estimateUsageCharge, ModelPricingSchema, type ModelPricing } from "../src/config/model-pricing.js";
++import { releaseGraphWriter } from "../src/graph/writer-lease.js";
++
++const pricing: ModelPricing = { provider: "openai", model: "fixture", currency: "USD", version: "fixture-price.v1", source: "frozen fixture tariff",
++  input_per_million: 10, output_per_million: 10, output_includes_reasoning: true, input_includes_images: true };
++const cachedPricing: ModelPricing = { ...pricing, cached_input_per_million: 1 };
++
++describe("cached input tariff", () => {
++  it("is optional and charges cached input at the full input tariff when absent", () => {
++    expect(ModelPricingSchema.parse(pricing)).toEqual(pricing);
++    expect(ModelPricingSchema.parse(cachedPricing).cached_input_per_million).toBe(1);
++    expect(() => ModelPricingSchema.parse({ ...pricing, cached_input_per_million: -1 })).toThrow();
++    expect(estimateUsageCharge(pricing, { inputTokens: 1000, outputTokens: 100, cachedInputTokens: 900 })).toBe(estimateCharge(pricing, 1000, 100));
++  });
++
++  it("charges provider-reported cache reads at the cached tariff and never more than the cached count reported", () => {
++    // 100 uncached × $10/M + 900 cached × $1/M + 100 output × $10/M = $0.0029
++    expect(estimateUsageCharge(cachedPricing, { inputTokens: 1000, outputTokens: 100, cachedInputTokens: 900 })).toBe(2_900_000n);
++    expect(estimateUsageCharge(cachedPricing, { inputTokens: 1000, outputTokens: 100 })).toBe(estimateCharge(cachedPricing, 1000, 100));
++    expect(estimateUsageCharge(cachedPricing, { inputTokens: 100, outputTokens: 0, cachedInputTokens: 500 })).toBe(100_000n);
++  });
++
++  describe("settlement", () => {
++    let root: string;
++    beforeEach(async () => { root = await mkdtemp(join(tmpdir(), "dg-cached-tariff-")); });
++    afterEach(async () => { await releaseGraphWriter(root); await rm(root, { recursive: true, force: true }); });
++    it("accounts cache reads at the cached tariff while the reservation stays undiscounted", async () => {
++      const service = new ModelAdmission("i", root);
++      const budget = BudgetSchema.parse({ requests: 5, input_tokens: 10_000, output_tokens: 1000, reasoning_tokens: 0, retries: 1, concurrency: 2,
++        elapsed_ms: 86_400_000, max_hops: 2, max_neighbors: 40, run_amount: 1, day_amount: 1, currency: "USD",
++        billing_principal: "fixture-account", pricing_version: pricing.version });
++      const reserved = await service.reserve({ id: "a", run_id: "run", policy_fingerprint: "policy:1", provider: "openai", model: "fixture", channel: "api",
++        credential_reference: "DREAMGRAPH_LLM_API_KEY", payload_hash: "payload:a", source_scope: ["repo/file.ts"], budget,
++        resources: { input_tokens: 1000, output_tokens: 100, reasoning_tokens: 0, retry: false }, pricing: cachedPricing });
++      expect(reserved.reserved_nanounits).toBe(String(estimateCharge(cachedPricing, 1000, 100)));
++      await service.dispatch("a");
++      const settled = await service.settle("a", { acknowledged: true, usage: { inputTokens: 1000, outputTokens: 100, cachedInputTokens: 900 } });
++      expect(settled.accounted_nanounits).toBe("2900000");
++      expect(settled.variance).toEqual([]);
++    });
++  });
++});
++
++describe("calibrated input allocation", () => {
++  const request = (items: string[], instructions = "system ".repeat(200)) => JSON.stringify({ model: "m", input: items, tools: [], instructions });
++
++  it("counts UTF-8 bytes when the run has no measured request yet", () => {
++    const payload = request(["hello"]);
++    expect(calibratedInputAllocation(undefined, payload)).toBe(Buffer.byteLength(payload));
++  });
++
++  it("counts the shared prefix and suffix by the reported tokens and only the new bytes by size", () => {
++    const first = request(["a".repeat(4000)]), second = request(["a".repeat(4000), "new tool result"]);
++    const allocation = calibratedInputAllocation({ payload: first, input_tokens: 1200 }, second);
++    expect(allocation).toBe(1200 + Buffer.byteLength(',"new tool result"'));
++    expect(allocation).toBeLessThan(Buffer.byteLength(second));
++  });
++
++  it("does not subtract removed content and never exceeds the byte count", () => {
++    const first = request(["image".repeat(2000), "b"]), second = request(["b"]);
++    expect(calibratedInputAllocation({ payload: first, input_tokens: 3000 }, second)).toBe(Buffer.byteLength(second));
++    expect(calibratedInputAllocation({ payload: first, input_tokens: 10 }, second)).toBe(10);
++  });
++
++  it("ignores an invalid measurement", () => {
++    const payload = request(["x"]);
++    expect(calibratedInputAllocation({ payload, input_tokens: -1 }, payload)).toBe(Buffer.byteLength(payload));
++  });
++});
+diff --git a/tests/standalone-architect-routes.test.ts b/tests/standalone-architect-routes.test.ts
+index 62bb33b..93f5b34 100644
+--- a/tests/standalone-architect-routes.test.ts
++++ b/tests/standalone-architect-routes.test.ts
+@@ -1469,7 +1469,60 @@ describe("standalone Architect route hardening", () => {
+       await rm(tempRoot, { recursive: true, force: true });
+     }
+   });
+-
++
++  it("keeps the native API request prefix byte-stable across tool-loop iterations so provider prompt caching applies", async () => {
++    const tempRoot = await mkdtemp(join(tmpdir(), "dreamgraph-architect-cache-prefix-"));
++    const scopeSpy = vi.spyOn(lifecycle, "getActiveScope").mockReturnValue({ uuid: "standalone-architect-cache-prefix-test", projectRoot: tempRoot } as never);
++    const saved = ["DREAMGRAPH_LLM_PROVIDER", "DREAMGRAPH_LLM_ARCHITECT_PROVIDER", "DREAMGRAPH_LLM_ARCHITECT_MODEL", "DREAMGRAPH_LLM_ARCHITECT_URL", "DREAMGRAPH_LLM_API_KEY"]
++      .map(key => [key, process.env[key]] as const);
++    const bodies: Array<Record<string, unknown>> = [];
++    const envelope = JSON.stringify({ schema: ARCHITECT_CONTINUATION_SCHEMA, pass_id: "cache-prefix", status: "completed", summary: "Checked.",
++      work_completed: ["Checked the runtime."], files_touched: [], graph_entities_touched: [], tool_trace_summary: ["run_command checked node"],
++      graph_plan_updates: [], evidence: ["node --version"], blockers: [], uncertainty: 0.1, recommended_actions: [] });
++    const replies = [1, 2].map(index => ({ model: "gpt-5.5", status: "completed", output: [{ type: "function_call", call_id: `call_cache_prefix_${index}`,
++      name: "run_command", arguments: JSON.stringify({ command: "node --version", timeoutMs: 10_000 }) }] }));
++    const providerServer: Server = createServer(async (req, res) => {
++      res.setHeader("content-type", "application/json; charset=utf-8");
++      if (new URL(req.url ?? "/", "http://127.0.0.1").pathname !== "/responses") { res.statusCode = 404; res.end("{}"); return; }
++      const parts: Buffer[] = []; for await (const chunk of req) parts.push(Buffer.from(chunk));
++      bodies.push(JSON.parse(Buffer.concat(parts).toString("utf8")));
++      res.end(JSON.stringify(replies.shift() ?? { model: "gpt-5.5", status: "completed",
++        output_text: ["Checked.", "```architect_continuation", envelope, "```"].join("\n") }));
++    });
++    await new Promise<void>((resolve) => providerServer.listen(0, "127.0.0.1", resolve));
++    try {
++      process.env.DREAMGRAPH_LLM_PROVIDER = "openai";
++      process.env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER = "openai";
++      process.env.DREAMGRAPH_LLM_ARCHITECT_MODEL = "gpt-5.5";
++      process.env.DREAMGRAPH_LLM_ARCHITECT_URL = `http://127.0.0.1:${(providerServer.address() as AddressInfo).port}`;
++      process.env.DREAMGRAPH_LLM_API_KEY = "test-key";
++      initLlmProvider();
++      await withArchitectServer(async (baseUrl) => {
++        await expectJsonOk(await fetch(`${baseUrl}/api/architect/v1/chat`, {
++          method: "POST",
++          headers: { "Content-Type": "application/json" },
++          body: JSON.stringify({ message: "run node --version twice and report", adapter: "native_api_tool_loop", provider: "openai",
++            model: "gpt-5.5", mode: "autonomous", max_passes: 1 }),
++        }));
++      });
++      expect(bodies.length).toBeGreaterThanOrEqual(3);
++      const loop = bodies.slice(0, 3);
++      for (let index = 1; index < loop.length; index += 1) {
++        // Everything before the new tool results must be byte-identical: instructions, tools and earlier input items.
++        expect(loop[index].instructions).toBe(loop[0].instructions);
++        expect(JSON.stringify(loop[index].tools)).toBe(JSON.stringify(loop[0].tools));
++        const before = loop[index - 1].input as unknown[], after = loop[index].input as unknown[];
++        expect(after.length).toBeGreaterThan(before.length);
++        expect(JSON.stringify(after.slice(0, before.length))).toBe(JSON.stringify(before));
++      }
++    } finally {
++      await new Promise<void>((resolve, reject) => providerServer.close((error) => error ? reject(error) : resolve()));
++      for (const [key, value] of saved) if (value == null) delete process.env[key]; else process.env[key] = value;
++      initLlmProvider();
++      scopeSpy.mockRestore();
++      await rm(tempRoot, { recursive: true, force: true });
++    }
++  });
+   it("does not advance the selected plan cursor for malformed pass reports", async () => {
+     const tempRoot = await mkdtemp(join(tmpdir(), "dreamgraph-architect-pass-cursor-malformed-"));
+     const plansDir = join(tempRoot, "plans");

@@ -12,6 +12,7 @@ class ScriptedTransport implements BrowserTransport {
   readonly attached = new Set<number>();
   dialogOpen: BrowserDialog | null = null;
   fileDialog?: (request: FileDialogRequest) => Promise<FileDialogResult>;
+  confirmSave?: BrowserTransport["confirmSave"];
   private readonly listeners = new Set<BrowserEventListener>();
   private readonly detachListeners = new Set<BrowserDetachListener>();
   private blocked: Array<() => void> = [];
@@ -166,11 +167,47 @@ describe("dreamgraph-browser controller dialogs", () => {
     expect(controller.fileDialogState(1).open).toBeNull();
   });
 
+  it("answers the separate Chrome file-type warning only for the pending Save and observes completion", async () => {
+    const transport = promptPage(), controller = new BrowserController(transport, { settleMs: 1 });
+    await controller.selectTab(1);
+    transport.emit("Runtime.bindingCalled", { name: "__dreamgraphPicker", payload: JSON.stringify({ phase: "open", id: 4, kind: "save", suggested_name: "proof.js", types: [], multiple: false }) });
+    transport.fileDialog = async () => ({ status: "done" });
+    const confirmations: unknown[] = [];
+    transport.confirmSave = async request => {
+      confirmations.push(request);
+      transport.emit("Runtime.bindingCalled", { name: "__dreamgraphPicker", payload: JSON.stringify({ phase: "closed", id: 4, outcome: "chosen", names: ["proof.js"] }) });
+      return { status: "done" };
+    };
+    const result = await controller.answerFileDialog({ action: "choose", path: "C:/work/proof.js" });
+    expect(confirmations).toEqual([{ tab_id: 1, path: "C:/work/proof.js", origin: "http://localhost:5173" }]);
+    expect(result.note).toContain("the page received proof.js");
+    expect(transport.sent.some(command => command.method === "Page.handleJavaScriptDialog")).toBe(false);
+  });
+
+  it("keeps an unmatched browser confirmation pending without reporting Save complete", async () => {
+    const transport = promptPage(), controller = new BrowserController(transport, { settleMs: 1 });
+    await controller.selectTab(1);
+    transport.emit("Runtime.bindingCalled", { name: "__dreamgraphPicker", payload: JSON.stringify({ phase: "open", id: 5, kind: "save", suggested_name: "proof.js", types: [], multiple: false }) });
+    transport.fileDialog = async () => ({ status: "not_found" });
+    transport.confirmSave = async () => ({ status: "needs_confirmation", message: "No unique matching confirmation" });
+    const result = await controller.answerFileDialog({ action: "choose", path: "C:/work/proof.js" });
+    expect(result.note).toContain("needs_confirmation");
+    expect(result.note).toContain("not reported the result");
+    expect(controller.fileDialogState(1).open?.id).toBe(5);
+  });
+
   it("says plainly when the connection cannot operate OS file dialogs", async () => {
     const transport = promptPage(), controller = new BrowserController(transport, { commandTimeoutMs: 200, settleMs: 1 });
     await controller.selectTab(1);
     const result = await callBrowserTool(controller, "browser_file_dialog", { cancel: true });
     expect(result.text).toMatch(/^BROWSER_FILE_DIALOG_UNSUPPORTED/);
+  });
+
+  it("does not turn a failed detach into successful release", async () => {
+    const transport = promptPage(), controller = new BrowserController(transport);
+    await controller.selectTab(1);
+    transport.detach = async () => { throw new Error("extension disconnected"); };
+    await expect(controller.release()).rejects.toThrow("Detach unconfirmed");
   });
 
   it("releases every controlled tab", async () => {

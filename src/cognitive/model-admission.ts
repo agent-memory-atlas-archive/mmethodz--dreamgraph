@@ -247,7 +247,7 @@ export class ModelAdmission {
       attempt.state = complete && attempt.acknowledged ? "settled" : "uncertain";
       attempt.settled_at = this.clock().toISOString();
       if (attempt.pricing && observed?.inputTokens !== undefined && observed.outputTokens !== undefined) {
-        const charge = estimateUsageCharge(attempt.pricing, { inputTokens: observed.inputTokens, outputTokens: observed.outputTokens, cachedInputTokens: observed.cachedInputTokens });
+        const charge = estimateUsageCharge(attempt.pricing, { inputTokens: observed.inputTokens, outputTokens: observed.outputTokens, cachedInputTokens: observed.cachedInputTokens, cacheCreationInputTokens: observed.cacheCreationInputTokens });
         // Missing reasoning is already inside output billing; monetary estimation can
         // be known while its independent reasoning limit remains conservatively held.
         attempt.accounted_nanounits = String(charge); attempt.charge_source = "provider_usage_estimate";

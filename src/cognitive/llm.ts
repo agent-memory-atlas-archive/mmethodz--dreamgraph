@@ -742,6 +742,35 @@ async function callOpenAiResponsesWithTools(
   };
 }
 
+/**
+ * Anthropic caches a prompt only up to explicit cache_control breakpoints (order: tools, system, messages). Three are
+ * set: the last tool, the system prompt, and the last content block of the latest message. The last one rolls: each
+ * tool-loop call reads the prefix the previous call cached and writes only the new suffix. DreamGraph keeps the
+ * managed context byte-identical between calls, so that prefix stays valid. Thinking blocks cannot carry a
+ * breakpoint. DREAMGRAPH_ANTHROPIC_PROMPT_CACHE=0 turns it off.
+ */
+export function withAnthropicPromptCache(body: Record<string, unknown>): Record<string, unknown> {
+  const mark = { type: "ephemeral" };
+  const tools = Array.isArray(body.tools) ? body.tools as Array<Record<string, unknown>> : [];
+  if (tools.length) tools[tools.length - 1] = { ...tools[tools.length - 1], cache_control: mark };
+  if (typeof body.system === "string" && body.system) body.system = [{ type: "text", text: body.system, cache_control: mark }];
+  const messages = Array.isArray(body.messages) ? body.messages as Array<Record<string, unknown>> : [];
+  const last = messages[messages.length - 1];
+  if (last) {
+    const blocks: Array<Record<string, unknown>> = typeof last.content === "string"
+      ? (last.content ? [{ type: "text", text: last.content }] : [])
+      : Array.isArray(last.content) ? [...last.content as Array<Record<string, unknown>>] : [];
+    for (let index = blocks.length - 1; index >= 0; index--) {
+      const type = String(blocks[index].type);
+      if (type === "thinking" || type === "redacted_thinking" || type === "text" && !blocks[index].text) continue;
+      blocks[index] = { ...blocks[index], cache_control: mark };
+      messages[messages.length - 1] = { ...last, content: blocks };
+      break;
+    }
+  }
+  return body;
+}
+
 async function callAnthropicWithTools(
   config: ArchitectLlmConfig,
   messages: LlmToolLoopMessage[],
@@ -768,6 +797,7 @@ async function callAnthropicWithTools(
   if (systemText) {
     body.system = systemText;
   }
+  if (process.env.DREAMGRAPH_ANTHROPIC_PROMPT_CACHE !== "0") withAnthropicPromptCache(body);
 
   const res = await admittedModelFetch(config.provider, `${config.baseUrl}/messages`, {
     method: "POST",

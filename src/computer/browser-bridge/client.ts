@@ -112,6 +112,7 @@ export class BridgeTransport implements BrowserTransport {
     return (await this.request<{ dialog: BrowserDialog | null }>("dialog.get", { tab_id: tabId })).dialog;
   }
   fileDialog(request: FileDialogRequest): Promise<FileDialogResult> { return this.request<FileDialogResult>("os.file_dialog", { ...request }, 45_000); }
+  confirmSave(request: { tab_id: number; path: string; origin: string }): Promise<FileDialogResult> { return this.request<FileDialogResult>("os.save_confirmation", { ...request }, 15_000); }
   onEvent(listener: BrowserEventListener) { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
   onDetach(listener: BrowserDetachListener) { this.detachListeners.add(listener); return () => { this.detachListeners.delete(listener); }; }
   async close(): Promise<void> {

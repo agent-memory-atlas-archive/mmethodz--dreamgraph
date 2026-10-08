@@ -23,7 +23,7 @@ export interface BridgeEvent { event: "cdp" | "detach" | "tab_removed"; tab_id: 
 
 /** Host methods the daemon may call (the host relays most of them to the extension). */
 export type BridgeMethod = "hello" | "tabs.list" | "tabs.open" | "tabs.close" | "tabs.activate" | "debugger.attach" | "debugger.detach"
-  | "debugger.send" | "dialog.get" | "os.file_dialog" | "status";
+  | "debugger.send" | "dialog.get" | "os.file_dialog" | "os.save_confirmation" | "status";
 
 export function bridgeRunDirectory(home = homedir()): string { return join(home, ".dreamgraph", "run"); }
 /** Info file the host writes when it starts: { protocol, pid, endpoint, token, extension_version, started_at }. */
