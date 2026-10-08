@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import { assertRouteEffort } from "../config/architect-model-controls.js";
 import { promisify } from "node:util";
 import { randomBytes, createHash } from "node:crypto";
 import { writeFile } from "node:fs/promises";
@@ -42,7 +43,7 @@ export async function prepareClaudeInvocation(input: {
   envBase: Record<string, string>; availableToolNames: string[];
 }) {
   assertClaudeModelId(input.model);
-  if (input.reasoningEffort) throw new Error("CLAUDE_EFFORT_UNQUALIFIED");
+  assertRouteEffort("claude-cli", "none", input.model, input.reasoningEffort);
   const profile = await probeClaudeProfile({ cwd: input.scratchDir, timeoutMs: input.timeoutMs, signal: input.signal });
   const settings = join(input.scratchDir, "claude-settings.json"), mcpConfig = join(input.scratchDir, "claude-mcp.json");
   const gatePath = join(input.scratchDir, "claude-admitted"), gateToken = randomBytes(32).toString("hex");
@@ -53,7 +54,7 @@ export async function prepareClaudeInvocation(input: {
   await writeFile(mcpConfig, JSON.stringify({ mcpServers: { dreamgraph: {
     type: "stdio", command: input.bridgeSpawn.command, args: input.bridgeSpawn.args, env: bridgeEnv,
   } } }), { mode: 0o600, flag: "wx" });
-  return { command: profile.command, args: claudeProfileArgs({ settings, mcpConfig, model: input.model, maxTurns: 12 }),
+  return { command: profile.command, args: claudeProfileArgs({ settings, mcpConfig, model: input.model, maxTurns: 12, effort: input.reasoningEffort }),
     cwd: input.scratchDir, env: profile.env, stdin: input.prompt, outputPath: null,
     claude: { expected: { version: profile.version, model: input.model,
       tools: [...input.availableToolNames, ...(input.envBase.DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE === "1" ? ["request_computer_use"] : [])] },

@@ -198,7 +198,7 @@ const WINDOWS_PATH_EXTS: readonly string[] = IS_WINDOWS
 
 export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): Promise<ArchitectCliBridgeResult> {
   input.signal?.throwIfAborted();
-  if (input.reasoningEffort && input.adapter !== "codex-cli") throw new Error("CLI_EFFORT_UNQUALIFIED");
+  if (input.reasoningEffort && !["codex-cli", "claude-cli"].includes(input.adapter)) throw new Error("CLI_EFFORT_UNQUALIFIED");
   const mcpPort = architectMcpPort(input.req);
   if (mcpPort == null) {
     throw new Error("ARCHITECT_CLI_BRIDGE_MCP_PORT_UNAVAILABLE: request host did not expose a local MCP port");

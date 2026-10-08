@@ -4,6 +4,7 @@ import { promisify } from "node:util";
 import { constants } from "node:fs";
 import { delimiter, isAbsolute, join, resolve } from "node:path";
 import { homedir } from "node:os";
+import { assertRouteEffort } from "../config/architect-model-controls.js";
 
 /** Controlled MCP-only launch boundary, checked on every pass. */
 export const CLAUDE_CLI_PROFILE = "dreamgraph-mcp-only-v1";
@@ -114,8 +115,7 @@ export function claudeProfileArgs(input: {
   assertClaudeModelId(input.model);
   if (!Number.isSafeInteger(input.maxTurns) || input.maxTurns < 1 || input.maxTurns > 12)
     throw new Error("CLAUDE_PROFILE_RUN_BOUND");
-  if (input.effort && !["low", "medium", "high", "xhigh", "max"].includes(input.effort))
-    throw new Error("CLAUDE_EFFORT_UNSUPPORTED");
+  assertRouteEffort("claude-cli", "none", input.model, input.effort);
   return ["--print", "--output-format", "stream-json", "--verbose",
     "--tools", "", "--strict-mcp-config", "--mcp-config", input.mcpConfig,
     "--setting-sources", "", "--settings", input.settings,

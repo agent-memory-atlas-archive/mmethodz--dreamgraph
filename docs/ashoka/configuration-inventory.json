@@ -2850,14 +2850,14 @@
       "consumers": [
         {
           "file": "src/cognitive/llm.ts",
-          "line": 800,
+          "line": 801,
           "expression": "process.env.DREAMGRAPH_ANTHROPIC_PROMPT_CACHE !== \"0\""
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/llm.ts",
-        "line": 800,
+        "line": 801,
         "expression": "process.env.DREAMGRAPH_ANTHROPIC_PROMPT_CACHE !== \"0\""
       }
     },
@@ -2902,14 +2902,14 @@
       "consumers": [
         {
           "file": "src/architect/claude-cli-invocation.ts",
-          "line": 22,
+          "line": 24,
           "expression": "override: process.env.DREAMGRAPH_ARCHITECT_CLAUDE_CLI_BINARY"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/architect/claude-cli-invocation.ts",
-        "line": 22,
+        "line": 24,
         "expression": "override: process.env.DREAMGRAPH_ARCHITECT_CLAUDE_CLI_BINARY"
       }
     },
@@ -3799,7 +3799,7 @@
         },
         {
           "file": "src/architect/cli-mcp-bridge.ts",
-          "line": 375,
+          "line": 376,
           "expression": "process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER ?? \"\""
         }
       ],
@@ -3849,14 +3849,14 @@
       "consumers": [
         {
           "file": "src/architect/cli-bridge.ts",
-          "line": 695,
+          "line": 699,
           "expression": "process.env.DREAMGRAPH_CODEX_CUA_TRANSPORT === \"daemon-http\""
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/architect/cli-bridge.ts",
-        "line": 695,
+        "line": 699,
         "expression": "process.env.DREAMGRAPH_CODEX_CUA_TRANSPORT === \"daemon-http\""
       }
     },
@@ -4219,14 +4219,14 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 249,
+          "line": 251,
           "expression": "process.env.DREAMGRAPH_ENABLE_DOOM?.trim"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 249,
+        "line": 251,
         "expression": "process.env.DREAMGRAPH_ENABLE_DOOM?.trim"
       }
     },
@@ -4844,17 +4844,17 @@
         },
         {
           "file": "src/architect/routes.ts",
-          "line": 448,
+          "line": 451,
           "expression": "!process.env.DREAMGRAPH_INSTANCE_UUID"
         },
         {
           "file": "src/architect/routes.ts",
-          "line": 704,
+          "line": 708,
           "expression": "process.env.DREAMGRAPH_INSTANCE_UUID ?? null"
         },
         {
           "file": "src/architect/routes.ts",
-          "line": 13811,
+          "line": 13846,
           "expression": "getActiveScope()?.uuid ?? process.env.DREAMGRAPH_INSTANCE_UUID"
         },
         {
@@ -4899,7 +4899,7 @@
         },
         {
           "file": "src/cognitive/model-execution.ts",
-          "line": 51,
+          "line": 52,
           "expression": "process.env.DREAMGRAPH_INSTANCE_UUID || directoryInstanceId(this.directory)"
         },
         {
@@ -4939,17 +4939,17 @@
         },
         {
           "file": "src/server/host-model-admission.ts",
-          "line": 34,
+          "line": 35,
           "expression": "process.env.DREAMGRAPH_INSTANCE_UUID || directoryInstanceId(this.directory)"
         },
         {
           "file": "src/server/host-model-admission.ts",
-          "line": 147,
+          "line": 148,
           "expression": "process.env.DREAMGRAPH_INSTANCE_UUID||directoryInstanceId(directory)"
         },
         {
           "file": "src/server/host-model-admission.ts",
-          "line": 160,
+          "line": 161,
           "expression": "process.env.DREAMGRAPH_INSTANCE_UUID||directoryInstanceId(directory)"
         },
         {
@@ -4987,14 +4987,14 @@
       "consumers": [
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1227,
+          "line": 1228,
           "expression": "api = process.env.DREAMGRAPH_LLM_API"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/llm.ts",
-        "line": 1227,
+        "line": 1228,
         "expression": "api = process.env.DREAMGRAPH_LLM_API"
       }
     },
@@ -5018,32 +5018,32 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 273,
+          "line": 275,
           "expression": "process.env.DREAMGRAPH_LLM_API_KEY?.trim"
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1202,
+          "line": 1203,
           "expression": "process.env.DREAMGRAPH_LLM_API_KEY ?? \"lm-studio\""
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1207,
+          "line": 1208,
           "expression": "process.env.DREAMGRAPH_LLM_API_KEY ?? \"\""
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1212,
+          "line": 1213,
           "expression": "process.env.DREAMGRAPH_LLM_API_KEY ?? \"\""
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1293,
+          "line": 1294,
           "expression": "process.env.DREAMGRAPH_LLM_API_KEY ?? \"\""
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1295,
+          "line": 1296,
           "expression": "process.env.DREAMGRAPH_LLM_API_KEY ?? \"\""
         },
         {
@@ -5072,7 +5072,7 @@
       ],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 273,
+        "line": 275,
         "expression": "process.env.DREAMGRAPH_LLM_API_KEY?.trim"
       }
     },
@@ -5170,19 +5170,19 @@
       "consumers": [
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1361,
+          "line": 1362,
           "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_API_KEY || (provider === base.provider ? base.apiKey : defaults.apiKey)"
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1392,
+          "line": 1393,
           "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_API_KEY ?? (provider === base.provider ? base.apiKey : defaults.apiKey)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/llm.ts",
-        "line": 1361,
+        "line": 1362,
         "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_API_KEY || (provider === base.provider ? base.apiKey : defaults.apiKey)"
       }
     },
@@ -5805,7 +5805,7 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 3780,
+          "line": 3789,
           "expression": "model: process.env.DREAMGRAPH_LLM_ARCHITECT_MODEL"
         }
       ],
@@ -5825,7 +5825,7 @@
       ],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 3780,
+        "line": 3789,
         "expression": "model: process.env.DREAMGRAPH_LLM_ARCHITECT_MODEL"
       }
     },
@@ -5878,7 +5878,7 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 3780,
+          "line": 3789,
           "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER as ArchitectLlmConfig[\"provider\"]"
         }
       ],
@@ -5890,7 +5890,7 @@
       ],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 3780,
+        "line": 3789,
         "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER as ArchitectLlmConfig[\"provider\"]"
       }
     },
@@ -5913,9 +5913,24 @@
         "nullable": true,
         "optional": true
       },
-      "consumers": [],
+      "consumers": [
+        {
+          "file": "src/architect/routes.ts",
+          "line": 3789,
+          "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT || undefined"
+        },
+        {
+          "file": "src/cognitive/llm.ts",
+          "line": 1397,
+          "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT !== undefined"
+        }
+      ],
       "documented": [],
-      "default_source": null
+      "default_source": {
+        "file": "src/architect/routes.ts",
+        "line": 3789,
+        "expression": "process.env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT || undefined"
+      }
     },
     {
       "key": "DREAMGRAPH_LLM_ARCHITECT_RETENTION",
@@ -9846,12 +9861,12 @@
       "consumers": [
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1231,
+          "line": 1232,
           "expression": "process.env.DREAMGRAPH_LLM_MAX_TOKENS === undefined"
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1231,
+          "line": 1232,
           "expression": "Number(process.env.DREAMGRAPH_LLM_MAX_TOKENS)"
         }
       ],
@@ -9871,7 +9886,7 @@
       ],
       "default_source": {
         "file": "src/cognitive/llm.ts",
-        "line": 1231,
+        "line": 1232,
         "expression": "process.env.DREAMGRAPH_LLM_MAX_TOKENS === undefined"
       }
     },
@@ -9895,12 +9910,12 @@
       "consumers": [
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1197,
+          "line": 1198,
           "expression": "process.env.DREAMGRAPH_LLM_MODEL ?? \"\""
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1229,
+          "line": 1230,
           "expression": "process.env.DREAMGRAPH_LLM_MODEL ?? model"
         }
       ],
@@ -9932,7 +9947,7 @@
       ],
       "default_source": {
         "file": "src/cognitive/llm.ts",
-        "line": 1197,
+        "line": 1198,
         "expression": "process.env.DREAMGRAPH_LLM_MODEL ?? \"\""
       }
     },
@@ -11046,7 +11061,7 @@
         },
         {
           "file": "src/cognitive/model-execution.ts",
-          "line": 50,
+          "line": 51,
           "expression": "currentJob()?.pricing ?? process.env.DREAMGRAPH_LLM_PRICING"
         }
       ],
@@ -11097,7 +11112,7 @@
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1177,
+          "line": 1178,
           "expression": "process.env.DREAMGRAPH_LLM_PROVIDER ?? \"ollama\""
         },
         {
@@ -11220,14 +11235,14 @@
       "consumers": [
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1226,
+          "line": 1227,
           "expression": "process.env.DREAMGRAPH_LLM_REASONING_EFFORT?.trim"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/llm.ts",
-        "line": 1226,
+        "line": 1227,
         "expression": "process.env.DREAMGRAPH_LLM_REASONING_EFFORT?.trim"
       }
     },
@@ -11253,14 +11268,14 @@
       "consumers": [
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1228,
+          "line": 1229,
           "expression": "retention = process.env.DREAMGRAPH_LLM_RETENTION"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/llm.ts",
-        "line": 1228,
+        "line": 1229,
         "expression": "retention = process.env.DREAMGRAPH_LLM_RETENTION"
       }
     },
@@ -11293,12 +11308,12 @@
       "consumers": [
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1230,
+          "line": 1231,
           "expression": "process.env.DREAMGRAPH_LLM_TEMPERATURE === undefined"
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1230,
+          "line": 1231,
           "expression": "Number(process.env.DREAMGRAPH_LLM_TEMPERATURE)"
         }
       ],
@@ -11318,7 +11333,7 @@
       ],
       "default_source": {
         "file": "src/cognitive/llm.ts",
-        "line": 1230,
+        "line": 1231,
         "expression": "process.env.DREAMGRAPH_LLM_TEMPERATURE === undefined"
       }
     },
@@ -11364,14 +11379,14 @@
       "consumers": [
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1183,
+          "line": 1184,
           "expression": "Number(process.env.DREAMGRAPH_LLM_TIMEOUT_MS)"
         }
       ],
       "documented": [],
       "default_source": {
         "file": "src/cognitive/llm.ts",
-        "line": 1183,
+        "line": 1184,
         "expression": "Number(process.env.DREAMGRAPH_LLM_TIMEOUT_MS)"
       }
     },
@@ -11395,22 +11410,22 @@
       "consumers": [
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1193,
+          "line": 1194,
           "expression": "process.env.DREAMGRAPH_LLM_URL ?? \"http://localhost:11434\""
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1198,
+          "line": 1199,
           "expression": "process.env.DREAMGRAPH_LLM_URL ?? \"http://localhost:1234/v1\""
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1206,
+          "line": 1207,
           "expression": "process.env.DREAMGRAPH_LLM_URL ?? \"https://api.openai.com/v1\""
         },
         {
           "file": "src/cognitive/llm.ts",
-          "line": 1211,
+          "line": 1212,
           "expression": "process.env.DREAMGRAPH_LLM_URL ?? \"https://api.anthropic.com/v1\""
         },
         {
@@ -11447,7 +11462,7 @@
       ],
       "default_source": {
         "file": "src/cognitive/llm.ts",
-        "line": 1193,
+        "line": 1194,
         "expression": "process.env.DREAMGRAPH_LLM_URL ?? \"http://localhost:11434\""
       }
     },
@@ -11577,7 +11592,7 @@
       "consumers": [
         {
           "file": "src/architect/routes.ts",
-          "line": 714,
+          "line": 718,
           "expression": "scope?.masterDir ?? process.env.DREAMGRAPH_MASTER_DIR"
         },
         {
@@ -11599,7 +11614,7 @@
       "documented": [],
       "default_source": {
         "file": "src/architect/routes.ts",
-        "line": 714,
+        "line": 718,
         "expression": "scope?.masterDir ?? process.env.DREAMGRAPH_MASTER_DIR"
       }
     },

@@ -1,3 +1,4 @@
+import { cliModelEfforts } from "../config/architect-model-controls.js";
 /** Original-host inference permits. Native transport/secrets stay in the editor/SDK. */
 import { createHash } from "node:crypto";
 import { ManagedModelAdmissionRequestSchema, ManagedModelPermitSchema, ManagedModelSettlementSchema,
@@ -56,7 +57,7 @@ export class HostModelAdmission {
         api_key_env: "HOST_NATIVE_CREDENTIAL" };
       const policy=snapshotRolePolicy(resolveRolePolicy({ role:"architect",env:sessionEnvironment(),saved:profiles.roles.architect,
         revision:profiles.revision,session,...(native?{capabilities:{adapter:binding.adapter,version:"dreamgraph.native_cli_invocation.v1",model:binding.model,
-          apis:["native_cli"],efforts:binding.adapter==="codex-cli"?["none","minimal","low","medium","high","xhigh","max"]:[],retention:[],strict_schema:false}}:{}) }));
+          apis:["native_cli"],efforts:cliModelEfforts(binding.adapter,binding.model),retention:[],strict_schema:false}}:{}) }));
       if(policy.status!=="configured")throw new ModelAdmissionError("ADMISSION_ROLE_POLICY_BLOCKED",this.runId);
       const config={provider:binding.provider,model:binding.model,baseUrl:binding.base_url,apiKey:"",temperature:policy.effective.temperature??.2,
         maxTokens:binding.output_tokens,timeoutMs:policy.effective.timeout_ms};

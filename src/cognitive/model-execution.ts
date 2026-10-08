@@ -1,3 +1,4 @@
+import { cliModelEfforts } from "../config/architect-model-controls.js";
 /** Physical inference boundary. A request cannot reach a provider without durable admission. */
 import { AsyncLocalStorage } from "node:async_hooks";
 import { createHash, randomUUID } from "node:crypto";
@@ -180,9 +181,9 @@ export async function nativeCliModelExecution(config: LlmConfig, adapter: string
   const profiles = await readRoleProfiles();
   const policy = snapshotRolePolicy(resolveRolePolicy({ role, legacy: config, saved: profiles.roles[role], revision: profiles.revision,
     session: { provider: config.provider, model, adapter, api: "native_cli", output_tokens: config.maxTokens,
-      timeout_ms: config.timeoutMs, ...(effort ? { effort } : {}) },
+      timeout_ms: config.timeoutMs, effort: effort ?? null },
     capabilities: { adapter, version: "dreamgraph.native_cli_invocation.v1", model,
-      apis: ["native_cli"], efforts: adapter === "codex-cli" ? ["none", "minimal", "low", "medium", "high", "xhigh", "max"] : [],
+      apis: ["native_cli"], efforts: cliModelEfforts(adapter, model),
       retention: [], strict_schema: false } }));
   return new ModelExecution({ ...config, model }, role, policy, run_id);
 }

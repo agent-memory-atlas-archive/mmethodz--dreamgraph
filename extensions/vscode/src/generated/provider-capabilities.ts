@@ -57,6 +57,26 @@ export const PROVIDER_CAPABILITIES = [
   },
   {
     "provider": "anthropic",
+    "model": "claude-haiku-5-5",
+    "version": "2026-09-30.r3",
+    "source": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
+    "apis": [
+      "anthropic-messages"
+    ],
+    "default_api": "anthropic-messages",
+    "efforts": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+    ],
+    "strict_schema": true,
+    "tools": true,
+    "images": true
+  },
+  {
+    "provider": "anthropic",
     "model": "claude-mythos-5",
     "version": "2026-09-30.r3",
     "source": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",

@@ -76,6 +76,10 @@ function advancedInput(document: Document, key: string) {
   return expert.querySelector<HTMLInputElement>(`input[aria-label="${key}"]`)!;
 }
 
+function editArchitect(document: Document, key: string, value: string) {
+  const input = document.querySelector<HTMLSelectElement>("#f-" + key)!;
+  input.value = value; input.dispatchEvent(new dom!.window.Event("change", { bubbles: true }));
+}
 it("persists the Claude route and checks setup without sending credentials or an API request", async () => {
   let readinessBody: unknown;
   const { document, errors } = await browser("/config?tab=architect", async (path, input, send) => {
@@ -85,8 +89,11 @@ it("persists the Claude route and checks setup without sending credentials or an
     }
     return send();
   });
-  edit(document, "DREAMGRAPH_LLM_ARCHITECT_ADAPTER", "claude-cli");
-  edit(document, "DREAMGRAPH_LLM_ARCHITECT_MODEL", "claude-opus-5-5");
+  editArchitect(document, "DREAMGRAPH_LLM_ARCHITECT_ADAPTER", "claude-cli");
+  editArchitect(document, "DREAMGRAPH_LLM_ARCHITECT_MODEL", "claude-opus-5-5");
+  const effort = document.querySelector<HTMLSelectElement>('#f-DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT')!;
+  expect([...effort.options].map(option => option.value)).toEqual(["", "low", "medium", "high", "xhigh", "max"]);
+  editArchitect(document, "DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT", "max");
   (document.querySelector("#cw-save") as HTMLButtonElement).click();
   await eventually(async () => (await readFile(envPath, "utf8")).includes("DREAMGRAPH_LLM_ARCHITECT_MODEL=claude-opus-5-5"));
   await eventually(() => document.querySelector<HTMLElement>("#configuration-workspace")?.dataset.busy === "false");
@@ -95,9 +102,37 @@ it("persists the Claude route and checks setup without sending credentials or an
   expect(document.body.textContent).toContain("dedicated profile");
   [...document.querySelectorAll<HTMLButtonElement>("button")].find(button => button.textContent === "Check Claude setup")!.click();
   await eventually(() => !!readinessBody);
-  expect(readinessBody).toEqual({ adapter: "claude-cli", model: "claude-opus-5-5" });
+  expect(readinessBody).toEqual({ adapter: "claude-cli", model: "claude-opus-5-5", reasoning_effort: "max" });
+  expect(await readFile(envPath, "utf8")).toContain("DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT=max");
   expect(document.body.textContent).not.toContain("private-secret");
   expect(await readFile(envPath, "utf8")).toContain("DREAMGRAPH_LLM_ARCHITECT_ADAPTER=claude-cli");
+  expect(errors).toEqual([]);
+});
+it("offers model-specific effort choices and an explicit clearing path", async () => {
+  const { document, errors } = await browser("/config?tab=architect");
+  const effort = () => document.querySelector<HTMLSelectElement>("#f-DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT")!;
+  editArchitect(document, "DREAMGRAPH_LLM_ARCHITECT_ADAPTER", "codex-cli");
+  expect(effort().querySelector('option[value="max"]')).not.toBeNull();
+  editArchitect(document, "DREAMGRAPH_LLM_ARCHITECT_ADAPTER", "claude-cli");
+  editArchitect(document, "DREAMGRAPH_LLM_ARCHITECT_MODEL", "claude-opus-5-5");
+  editArchitect(document, "DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT", "xhigh");
+  editArchitect(document, "DREAMGRAPH_LLM_ARCHITECT_MODEL", "claude-opus-4-6");
+  expect(effort().value).toBe("xhigh");
+  expect(effort().selectedOptions[0].disabled).toBe(true);
+  expect(effort().disabled).toBe(false);
+  editArchitect(document, "DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT", "");
+  editArchitect(document, "DREAMGRAPH_LLM_ARCHITECT_MODEL", "claude-haiku-4-5");
+  expect(effort().disabled).toBe(true);
+  expect(document.querySelector("#f-DREAMGRAPH_LLM_ARCHITECT_MODEL")?.tagName).toBe("SELECT");
+  editArchitect(document, "DREAMGRAPH_LLM_ARCHITECT_MODEL", "__custom");
+  const custom = document.querySelector<HTMLInputElement>('[data-key="DREAMGRAPH_LLM_ARCHITECT_MODEL"] input')!;
+  expect(custom.hidden).toBe(false);
+  custom.value="claude-custom"; custom.dispatchEvent(new dom!.window.Event("input",{bubbles:true}));
+  custom.dispatchEvent(new dom!.window.Event("change",{bubbles:true}));
+  expect(effort().disabled).toBe(true);
+  document.querySelector<HTMLButtonElement>("#cw-save")!.click();
+  await eventually(async()=> (await readFile(envPath,"utf8")).includes("DREAMGRAPH_LLM_ARCHITECT_MODEL=claude-custom"));
+  expect(await readFile(envPath,"utf8")).toMatch(/DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT=(?=\r?\n|$)/);
   expect(errors).toEqual([]);
 });
 it("keeps the embedded configuration workspace functional under the same save authority", async () => {

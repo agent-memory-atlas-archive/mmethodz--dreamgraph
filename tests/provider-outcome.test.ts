@@ -10,6 +10,34 @@ const usage = { input_tokens: 110, output_tokens: 20, total_tokens: 130, input_t
 installOfflineAdmissionFixtures();
 
 describe("provider outcome boundary", () => {
+  it.each(["claude-opus-5-5", "claude-opus-4-7", "claude-sonnet-4-6"])("uses adaptive thinking and output effort in %s completions and tool turns", async model => {
+    const bodies: any[] = [];
+    vi.stubGlobal("fetch", vi.fn(async (_url, init) => {
+      bodies.push(JSON.parse(init.body));
+      return Response.json({ content: [{type:"text",text:"done"}], stop_reason:"end_turn", usage:{input_tokens:1,output_tokens:1} });
+    }));
+    const cfg = { ...config("anthropic", model), reasoningEffort:"max" };
+    await createLlmProviderForConfig(cfg).complete([]);
+    await completeWithNativeTools(cfg, [], [{name:"inspect"}]);
+    expect(bodies).toHaveLength(2);
+    for (const body of bodies) {
+      expect(body.output_config.effort).toBe("max");
+      expect(body.thinking.type).toBe("adaptive");
+      expect(body.thinking).not.toHaveProperty("budget_tokens");
+      expect(body).not.toHaveProperty("temperature");
+    }
+  });
+  it("leaves Opus 5.5 thinking adaptive even at Default effort", async () => {
+    let body: any;
+    vi.stubGlobal("fetch", vi.fn(async (_url, init) => {
+      body = JSON.parse(init.body);
+      return Response.json({ content:[{type:"text",text:"done"}],stop_reason:"end_turn" });
+    }));
+    await completeWithNativeTools(config("anthropic","claude-opus-5-5"),[],[{name:"inspect"}]);
+    expect(body.thinking.type).toBe("adaptive");
+    expect(body.output_config?.effort).toBeUndefined();
+    expect(body.thinking).not.toHaveProperty("budget_tokens");
+  });
   it.each(['computer_call','custom_tool_call','local_shell_call','future_native_call'])('refuses an unmapped Responses %s instead of ignoring it as a final answer',async type=>{
     const fetch=vi.fn(async()=>Response.json({status:'completed',output:[{type,call_id:'unmapped',actions:[{type:'click',x:1,y:1}],input:'DO_NOT_LOG_SECRET'}],usage}));vi.stubGlobal('fetch',fetch);
     await expect(completeWithNativeTools(config('openai','gpt-6.1-sol'),[],[{name:'inspect'}])).rejects.toMatchObject({code:'PROVIDER_OUTPUT_INVALID',stopReason:'unmapped_tool_output',usage:{totalTokens:130}});

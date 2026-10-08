@@ -1,3 +1,4 @@
+import { architectModelChoices, architectEffortChoices, assertRouteEffort } from "../config/architect-model-controls.js";
 import { z } from "zod";
 import { CONTEXT_MENU_CSS, CONTEXT_MENU_SCRIPT } from "../server/context-menu.js";
 import { ARCHITECT_CONTEXT_ACTION_SCRIPT } from "./context-actions.js";
@@ -321,6 +322,7 @@ interface ActiveArchitectSessionRuntime {
   provider_source: string;
   model: string;
   model_source: string;
+  reasoning_effort: string | null;
   autonomy_mode: ArchitectAutonomyMode;
   autonomy_source: string;
   verbosity_mode: ArchitectVerbosityMode;
@@ -631,7 +633,7 @@ function buildArchitectExecutionControlPayload(runtime: ActiveArchitectSessionRu
   };
 }
 
-function buildActiveArchitectSessionRuntime(overrides: Partial<Pick<ActiveArchitectSessionRuntime, "adapter" | "provider" | "model" | "autonomy_mode" | "verbosity_mode" | "pass_state">> = {}): ActiveArchitectSessionRuntime {
+function buildActiveArchitectSessionRuntime(overrides: Partial<Pick<ActiveArchitectSessionRuntime, "adapter" | "provider" | "model" | "autonomy_mode" | "verbosity_mode" | "pass_state" | "reasoning_effort">> = {}): ActiveArchitectSessionRuntime {
   const architect = getArchitectLlmConfig();
   const adapter = getArchitectAdapterConfig();
   const autonomy = getArchitectAutonomyMode();
@@ -649,6 +651,7 @@ function buildActiveArchitectSessionRuntime(overrides: Partial<Pick<ActiveArchit
     provider_source: overrides.provider ? "request" : architect.providerSource,
     model: runtimeModel,
     model_source: overrides.model ? "request" : architect.modelSource,
+    reasoning_effort: Object.hasOwn(overrides, "reasoning_effort") ? overrides.reasoning_effort ?? null : architect.reasoningEffort ?? null,
     autonomy_mode: runtimeAutonomyMode,
     autonomy_source: overrides.autonomy_mode ? "request" : autonomy.source,
     verbosity_mode: runtimeVerbosityMode,
@@ -2756,6 +2759,7 @@ function buildArchitectLlmRequestConfig(body: Record<string, unknown>): Architec
     providerSource: provider === base.provider ? base.providerSource : "architect",
     model,
     modelSource: model === base.model ? base.modelSource : "architect",
+    reasoningEffort: Object.hasOwn(body, "reasoning_effort") ? typeof body.reasoning_effort === "string" ? body.reasoning_effort.trim() || undefined : undefined : base.reasoningEffort,
     baseUrl,
   };
 }
@@ -3701,7 +3705,7 @@ async function handleArchitectProviderReadinessRequest(req: IncomingMessage, res
     if (body.adapter === "claude-cli") {
       try {
         assertClaudeModelId(body.model);
-        if (getArchitectLlmConfig().reasoningEffort) throw new Error("CLAUDE_EFFORT_UNQUALIFIED: clear the explicit Architect reasoning effort");
+        assertRouteEffort("claude-cli", "none", String(body.model), buildArchitectLlmRequestConfig(body).reasoningEffort);
         const profile = await probeClaudeProfile({ cwd: tmpdir(), timeoutMs: architectPassTimeoutMs() });
         // No inference or graph effects: the actual invocation still validates init and the bridge catalogue.
         readiness = { ...readiness, ready: CLAUDE_ADAPTER_QUALIFIED, installed: true, authenticated: true, qualification_pending: !CLAUDE_ADAPTER_QUALIFIED,
@@ -3754,6 +3758,9 @@ async function handleArchitectConfigRequest(req: IncomingMessage, res: ServerRes
     architectAutonomyModeField(body, "autonomy_mode") ?? architectAutonomyModeField(body, "mode") ?? getArchitectAutonomyMode().mode;
   const verbosityMode =
     architectVerbosityModeField(body, "verbosity_mode") ?? architectVerbosityModeField(body, "verbosityMode") ?? architectVerbosityModeField(body, "mode") ?? getArchitectVerbosityMode().mode;
+  const effort = buildArchitectLlmRequestConfig(body).reasoningEffort;
+  try { assertRouteEffort(adapter, provider, model, effort); }
+  catch (error) { jsonError(res, 400, "reasoning_effort_unsupported", String(error)); return; }
   const requestedTokenEconomy = architectBooleanField(body, "token_economy");
   const tokenEconomy = requestedTokenEconomy ?? getArchitectTokenEconomyConfig().token_economy;
 
@@ -3766,6 +3773,7 @@ async function handleArchitectConfigRequest(req: IncomingMessage, res: ServerRes
     DREAMGRAPH_LLM_ARCHITECT_ADAPTER: adapter,
     DREAMGRAPH_LLM_ARCHITECT_PROVIDER: provider,
     DREAMGRAPH_LLM_ARCHITECT_MODEL: model,
+    DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT: effort ?? "",
     DREAMGRAPH_ARCHITECT_AUTONOMY_MODE: autonomyMode,
     [ARCHITECT_VERBOSITY_MODE_ENV_KEY]: verbosityMode,
     [ARCHITECT_TOKEN_ECONOMY_ENV_KEY]: tokenEconomy ? "true" : "false",
@@ -3778,7 +3786,7 @@ async function handleArchitectConfigRequest(req: IncomingMessage, res: ServerRes
   for (const [key, value] of Object.entries(updates)) {
     if (!getSessionContext()) process.env[key] = ENGINE_DEPLOYMENT_OVERRIDES[key] ?? value;
   }
-  const architect = getSessionContext() ? getArchitectLlmConfig() : updateArchitectLlmConfig({ provider: process.env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER as ArchitectLlmConfig["provider"], model: process.env.DREAMGRAPH_LLM_ARCHITECT_MODEL });
+  const architect = getSessionContext() ? getArchitectLlmConfig() : updateArchitectLlmConfig({ provider: process.env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER as ArchitectLlmConfig["provider"], model: process.env.DREAMGRAPH_LLM_ARCHITECT_MODEL, reasoningEffort: process.env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT || undefined });
   const runtime = buildActiveArchitectSessionRuntime({ verbosity_mode: verbosityMode });
   const result = {
     changed: true,
@@ -4767,6 +4775,8 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
 
   const architectConfig = buildArchitectLlmRequestConfig(body);
   architectConfig.model = normalizeArchitectModelForAdapter(adapter, architectConfig.model);
+  try { assertRouteEffort(adapter, architectConfig.provider, architectConfig.model, architectConfig.reasoningEffort); }
+  catch (error) { jsonError(res, 400, "reasoning_effort_unsupported", String(error)); return; }
   architectConfig.textVerbosity = resolveArchitectNarrativeDensity(verbosityMode).provider_text_verbosity;
   let provider = createLlmProviderForConfig(architectConfig);
   let architectBinding: Awaited<ReturnType<typeof getRoleLlmProvider>> | null = null;
@@ -4776,7 +4786,7 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
       const requestedProvider = architectProviderField(body, "provider") ?? architectProviderField(body, "architect_provider");
       const requestedModel = textField(body, "model") ?? textField(body, "architect_model");
       const requestedUrl = textField(body, "base_url") ?? textField(body, "baseUrl");
-      architectBinding = await getRoleLlmProvider("architect", { ...(requestedProvider ? { provider: requestedProvider } : {}), ...(requestedModel ? { model: requestedModel } : {}), ...(requestedUrl ? { base_url: requestedUrl } : {}) });
+      architectBinding = await getRoleLlmProvider("architect", { ...(requestedProvider ? { provider: requestedProvider } : {}), ...(requestedModel ? { model: requestedModel } : {}), ...(requestedUrl ? { base_url: requestedUrl } : {}), ...(Object.hasOwn(body, "reasoning_effort") ? { effort: architectConfig.reasoningEffort ?? null } : {}) });
       if (architectBinding.policy.effective.strict_schema) throw new Error("ROLE_STRICT_NATIVE_TOOL_OUTPUT_UNSUPPORTED: strict Architect pass projection requires the client contract integration");
       Object.assign(architectConfig, architectBinding.config);
       architectConfig.providerSource = ["role_env", "saved", "session"].includes(architectBinding.policy.origins.provider) ? "architect" : "general";
@@ -4839,6 +4849,7 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
     adapter,
     provider: architectConfig.provider,
     model: architectConfig.model,
+    reasoning_effort: architectConfig.reasoningEffort ?? null,
     autonomy_mode: mode,
     verbosity_mode: verbosityMode,
     pass_state: updateActiveArchitectPassState({ status: "running", tools: 0 }),
@@ -7738,6 +7749,9 @@ function renderArchitectShell(): string {
         <label class="control-field">Model
           <select id="architect-model-input"></select>
         </label>
+        <label class="control-field">Reasoning effort
+          <select id="architect-effort-select" aria-label="Reasoning effort"></select>
+        </label>
         <label class="control-field">Autonomy
           <select id="architect-autonomy-mode-select">
             <option value="autonomous">Autonomous</option>
@@ -8017,6 +8031,7 @@ function renderArchitectShell(): string {
     const architectAdapterSelectEl = document.getElementById('architect-adapter-select');
     const architectProviderSelectEl = document.getElementById('architect-provider-select');
     const architectModelInputEl = document.getElementById('architect-model-input');
+    const architectEffortSelectEl = document.getElementById('architect-effort-select');
     const architectAutonomyModeSelectEl = document.getElementById('architect-autonomy-mode-select');
     const architectVerbosityModeSelectEl = document.getElementById('architect-verbosity-mode-select');
     const architectPassViewEl = document.getElementById('architect-pass-view');
@@ -8111,17 +8126,8 @@ function renderArchitectShell(): string {
     let architectTabSequence = 0;
     let architectCodeEditorModulePromise = null;
 ${isArchitectDoomEnabled() ? "    let architectDoomRuntimePromise = null;\n" : ""}    const architectTabTypeRegistry = new Map();
-    const architectModelOptionsByProvider = {
-      anthropic: ['claude-opus-5-5', 'claude-sonnet-5-5', 'claude-fable-5-1', 'claude-mythos-5-1', 'claude-opus-5', 'claude-sonnet-5', 'claude-opus-4-8', 'claude-opus-4-7', 'claude-fable-5', 'claude-mythos-5', 'claude-opus-4-6', 'claude-sonnet-4-6', 'claude-haiku-4-5'],
-      openai: ['gpt-6.1-sol', 'gpt-6-astra', 'gpt-6-sol', 'gpt-6-luna', 'gpt-5.6', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5', 'gpt-5.4', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano', 'gpt-4o-mini', 'o3', 'o4-mini'],
-      ollama: ['qwen3:8b', 'llama3.1', 'mistral', 'codellama'],
-      lmstudio: ['local-model'],
-      sampling: ['client'],
-      none: [''],
-      'claude-cli': ['claude-sonnet-5', 'claude-opus-5-5', 'claude-fable-5-1', 'claude-sonnet-5-5', 'claude-opus-5', 'claude-fable-5', 'claude-haiku-4-5'],
-      'copilot-cli': ['claude-opus-4.7', 'claude-opus-4.6', 'gpt-5.5', 'gpt-5.4', 'gpt-4o', 'claude-sonnet-4.6', 'auto'],
-      'codex-cli': ['gpt-6.1-sol', 'gpt-6-astra', 'gpt-6-sol', 'gpt-6-luna', 'gpt-5.6', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5.4', 'gpt-5.3-codex', 'gpt-5.2-codex', 'gpt-5.2', 'gpt-5-mini', 'auto'],
-    };
+    const architectModelOptionsByProvider = ${JSON.stringify(architectModelChoices())};
+    const architectEffortChoices = ${JSON.stringify(architectEffortChoices())};
 
     function registerArchitectTabType(descriptor) {
       if (!descriptor || !descriptor.type || typeof descriptor.create !== 'function') return;
@@ -9521,6 +9527,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
             adapter: controls.adapter,
             provider: controls.provider,
             model: controls.model,
+            reasoning_effort: controls.reasoning_effort,
             mode: controls.mode,
             autonomy_mode: controls.mode,
             token_economy: nextEnabled,
@@ -9924,6 +9931,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
           adapter: architectAdapterSelectEl.value,
           provider: architectProviderSelectEl.value,
           model: architectModelInputEl.value,
+          reasoning_effort: architectEffortSelectEl.value,
           mode: architectAutonomyModeSelectEl.value,
         }));
       } catch (_) { /* storage may be unavailable */ }
@@ -9994,6 +10002,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
             adapter: controls.adapter,
             provider: controls.provider,
             model: controls.model,
+            reasoning_effort: controls.reasoning_effort,
             mode: controls.mode,
             autonomy_mode: controls.mode,
             verbosity_mode: controls.verbosity_mode,
@@ -10044,6 +10053,25 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         : (visibleModels[0] || '');
     }
 
+    function syncArchitectEffort(preferred) {
+      const table = architectEffortChoices[modelProviderKeyForControls()] || {};
+      const levels = table[architectModelInputEl.value] || table['*'] || [];
+      const selected = preferred === undefined ? architectEffortSelectEl.value : preferred || '';
+      resetNode(architectEffortSelectEl);
+      for (const value of [''].concat(levels)) {
+        const option = document.createElement('option');
+        option.value = value; option.textContent = value || 'Default';
+        architectEffortSelectEl.appendChild(option);
+      }
+      if (selected && levels.indexOf(selected) < 0) {
+        const option = document.createElement('option'); option.value = selected;
+        option.textContent = selected + ' — unsupported; choose Default'; option.disabled = true;
+        architectEffortSelectEl.appendChild(option);
+      }
+      architectEffortSelectEl.value = selected;
+      architectEffortSelectEl.disabled = levels.length === 0 && !selected;
+    }
+
     function syncArchitectControlState(preferredModel) {
       const adapter = architectAdapterSelectEl.value || 'native_api_tool_loop';
       const cliAdapter = adapter === 'codex-cli' || adapter === 'copilot-cli' || adapter === 'claude-cli';
@@ -10061,6 +10089,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       architectProviderSelectEl.disabled = cliAdapter || deterministic;
       renderArchitectModelOptions(modelProviderKeyForControls(), normalizedPreferredModel);
       architectModelInputEl.disabled = deterministic;
+      syncArchitectEffort();
       syncAttachmentCapabilities(computeAttachmentCapabilities(adapter, deterministicProviderForAdapter(adapter), architectModelInputEl.value.trim()));
     }
 
@@ -10075,6 +10104,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       architectAutonomyModeSelectEl.value = runtime.autonomy_mode || saved.mode || 'autonomous';
       architectVerbosityModeSelectEl.value = runtime.verbosity_mode || 'balanced';
       syncArchitectControlState(runtime.model || saved.model || '');
+      syncArchitectEffort(runtime.reasoning_effort);
       architectAdapterSelectEl.addEventListener('change', function() {
         syncArchitectControlState('');
         saveArchitectControls();
@@ -10083,7 +10113,9 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         syncArchitectControlState('');
         saveArchitectControls();
       });
+      architectEffortSelectEl.addEventListener('change', saveArchitectControls);
       architectModelInputEl.addEventListener('change', function() {
+        syncArchitectEffort();
         syncAttachmentCapabilities(computeAttachmentCapabilities(architectAdapterSelectEl.value, deterministicProviderForAdapter(architectAdapterSelectEl.value), architectModelInputEl.value.trim()));
         saveArchitectControls();
       });
@@ -10097,6 +10129,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         adapter: adapter,
         provider: deterministicProviderForAdapter(adapter),
         model: architectModelInputEl.value.trim(),
+        reasoning_effort: architectEffortSelectEl.value || null,
         mode: architectAutonomyModeSelectEl.value || 'autonomous',
         verbosity_mode: architectVerbosityModeSelectEl.value || 'balanced',
       };
@@ -12144,6 +12177,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
             adapter: requestRuntime.adapter || controls.adapter,
             provider: requestRuntime.provider || controls.provider,
             model: requestRuntime.model || controls.model,
+            reasoning_effort: controls.reasoning_effort,
             session_id: requestRuntime.session_id,
             responseTransport: 'sse'
           }),
@@ -13551,7 +13585,7 @@ function handleArchitectContract(req: IncomingMessage, res: ServerResponse): voi
       selectable: ARCHITECT_ADAPTER_OPTIONS.filter(adapter => adapter !== "claude-cli" || CLAUDE_ADAPTER_QUALIFIED),
       future_gated: CLAUDE_ADAPTER_QUALIFIED ? [] : [{ adapter: "claude-cli", selectable: false, reason: "Live A02/A07/A12 qualification pending; G0 profile qualified." }],
       claude_cli: { platform: "win32", live_tested_version: CLAUDE_LIVE_TESTED_VERSION, version_policy: CLAUDE_VERSION_POLICY, model_selection: "user_selected_explicit_id", live_tested_model: CLAUDE_LIVE_TESTED_MODEL,
-        auth: "official_dedicated_pro_or_max", qualified: CLAUDE_ADAPTER_QUALIFIED, native_tools: false, effort: "unqualified",
+        auth: "official_dedicated_pro_or_max", qualified: CLAUDE_ADAPTER_QUALIFIED, native_tools: false, effort: "validated_per_model",
         computer_use: "dreamgraph-browser", startup_validation: "every_pass", billing: "subscription" },
     },
     routes: {

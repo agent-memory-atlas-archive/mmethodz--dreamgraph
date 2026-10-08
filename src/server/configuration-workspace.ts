@@ -1,3 +1,4 @@
+import { architectModelChoices, architectEffortChoices } from "../config/architect-model-controls.js";
 /**
  * Human-facing configuration workspace (v14.0.1).
  *
@@ -129,6 +130,8 @@ details.cfg-more>.cfg-grid,details.cfg-more>div{margin-top:10px}
 
 /** Served as /config/workspace.js. No backticks or template placeholders may appear inside. */
 export const CONFIGURATION_WORKSPACE_SCRIPT = String.raw`(() => {
+const ARCHITECT_MODELS = ${JSON.stringify(architectModelChoices())};
+const EFFORT_CHOICES = ${JSON.stringify(architectEffortChoices())};
 'use strict';
 const $ = id => document.getElementById(id), root = $('configuration-workspace');
 if (!root) return;
@@ -287,21 +290,29 @@ function modelChoices(provider) {
 }
 const ROLE_KEY = (role, suffix) => role === 'main' ? 'DREAMGRAPH_LLM_' + suffix : 'DREAMGRAPH_LLM_' + role.toUpperCase() + '_' + suffix;
 function roleProvider(role) { return role === 'main' ? eff('DREAMGRAPH_LLM_PROVIDER') || 'ollama' : (cur(ROLE_KEY(role, 'PROVIDER')) || eff('DREAMGRAPH_LLM_PROVIDER') || 'ollama'); }
-function modelPicker(role, title, help) {
-  const key = ROLE_KEY(role, 'MODEL'), provider = roleProvider(role), choices = modelChoices(provider), c = cur(key);
+function modelPicker(role, title, help, route) {
+  const key = ROLE_KEY(role, 'MODEL'), provider = roleProvider(role), choices = route ? ARCHITECT_MODELS[route] || [] : modelChoices(provider), c = cur(key);
   const sel = h('select', { id: 'f-' + key }), custom = h('input', { type: 'text', placeholder: 'Model name exactly as the provider calls it', value: c || '', spellcheck: 'false' });
-  sel.append(h('option', { value: '' }, role === 'main' ? 'Provider default' : 'Same as main model'));
+  sel.append(h('option', { value: '' }, route ? 'Adapter default' : role === 'main' ? 'Provider default' : 'Same as main model'));
   for (const v of choices) sel.append(h('option', { value: v }, v));
   sel.append(h('option', { value: '__custom' }, 'Other…'));
   const known = c && choices.includes(c);
   sel.value = !c ? '' : known ? c : '__custom';
   custom.hidden = sel.value !== '__custom';
-  sel.addEventListener('change', () => { custom.hidden = sel.value !== '__custom'; if (sel.value === '__custom') { custom.focus(); setDraft(key, custom.value.trim() || null); } else setDraft(key, sel.value || null); markDirty(key); });
+  sel.addEventListener('change', () => { custom.hidden = sel.value !== '__custom'; if (sel.value === '__custom') { custom.focus(); setDraft(key, custom.value.trim() || null); markDirty(key); return; } else setDraft(key, sel.value || null); markDirty(key); render(); });
   custom.addEventListener('input', () => { setDraft(key, custom.value.trim() || null); markDirty(key); });
+  custom.addEventListener('change', () => render());
   return field(key, title, help || (provider === 'lmstudio' ? 'Use the model id shown in LM Studio.' : null), h('div', { class: 'cfg-inline' }, sel, custom));
 }
-function effortPicker(role) {
-  return pick(ROLE_KEY(role, 'REASONING_EFFORT'), 'Reasoning effort', 'For reasoning models only; others ignore it.', [['minimal', 'Minimal'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High'], ['xhigh', 'Extra high']]);
+function effortPicker(role, route) {
+  const key = ROLE_KEY(role, 'REASONING_EFFORT'), model = eff(ROLE_KEY(role, 'MODEL')) || eff('DREAMGRAPH_LLM_MODEL') || '';
+  const table = EFFORT_CHOICES[route || roleProvider(role)] || {}, levels = table[model] || table['*'] || [];
+  const control = pick(key, 'Reasoning effort', levels.length ? 'Default uses the selected route’s default. Unsupported levels are refused before launch.' : 'This model/adapter has no confirmed effort control. Clear an inherited value with Default.', levels.map(v => [v, v === 'xhigh' ? 'Extra high' : v[0].toUpperCase() + v.slice(1)]));
+  const select = control.querySelector('select');
+  select.addEventListener('change', () => { if (select.value === '') { setDraft(key, ''); markDirty(key); } });
+  select.disabled = levels.length === 0 && !cur(key);
+  for (const option of select.options) if (option.value && !levels.includes(option.value)) { option.disabled = true; option.textContent += ' — unsupported'; }
+  return control;
 }
 function roleStatus(roleNames) {
   const rows = roles.filter(r => roleNames.includes(r.role));
@@ -334,7 +345,7 @@ function roleCard(role, title, sub, opts) {
     grid(modelPicker(role, 'Model'),
       slider(tkey, 'Creativity', opts.tempHelp, { min: 0, max: 1.5, step: 0.05, left: 'precise', right: 'creative', fallback: opts.temp }),
       num(ROLE_KEY(role, 'MAX_TOKENS'), 'Longest answer', 'Maximum tokens the model may write per request.', { unit: 'tokens', min: 256, max: 200000, step: 256 }),
-      provider === 'openai' ? effortPicker(role) : null),
+      ['openai', 'anthropic'].includes(provider) ? effortPicker(role) : null),
   ];
   if (role !== 'main') body.push(more('Use a different provider or key for this role', grid(...providerFields(role))));
   if (opts.extra) body.push(opts.extra);
@@ -361,8 +372,8 @@ function renderArchitect(p) {
   const engine = pick('DREAMGRAPH_LLM_ARCHITECT_ADAPTER', 'Engine', 'CLI engines use their official login. DreamGraph owns graph context, mutation tools and approvals. "API" uses the provider and key below.',
     [['codex-cli', 'Codex CLI'], ['copilot-cli', 'GitHub Copilot CLI'], ['claude-cli', 'Claude CLI'], ['native_api_tool_loop', 'API (provider + key)'], ['deterministic_fallback', 'Offline (no model)']], { onchange: () => render() });
   const modelKey = 'DREAMGRAPH_LLM_ARCHITECT_MODEL';
-  const model = cli ? text(modelKey, 'Model', adapter === 'claude-cli' ? 'Full Claude model ID supported by your CLI/account (Sonnet, Opus, Fable or another Claude model). Live adapter tests used claude-sonnet-5; model selection is not restricted to it. No silent fallback.' : 'Leave empty to use the CLI\'s own default model.', { placeholder: adapter === 'claude-cli' ? 'claude-sonnet-5' : adapter === 'codex-cli' ? 'e.g. gpt-6.1-sol' : 'CLI default' }) : modelPicker('architect', 'Model');
-  p.append(card('Engine & model', null, grid(engine, model, adapter === 'claude-cli' ? pick(ROLE_KEY('architect', 'REASONING_EFFORT'), 'Reasoning effort', 'Only Default is qualified for this Claude profile. Clear any previous explicit effort here; it is never silently discarded.', []) : adapter === 'codex-cli' || !cli ? effortPicker('architect') : null,
+  const model = modelPicker('architect', 'Model', cli ? 'Choose a model supported by your CLI/account, or Other for an exact model ID. No silent fallback.' : undefined, cli ? adapter : undefined);
+  p.append(card('Engine & model', null, grid(engine, model, effortPicker('architect', cli ? adapter : adapter === 'deterministic_fallback' ? 'none' : undefined),
     num('DREAMGRAPH_ARCHITECT_PASS_TIMEOUT_MS', 'Time limit per task', 'How long one Architect task (all its tool calls together) may run before it is stopped.', { unit: 'minutes', scale: 60000, min: 1, max: 240 })),
     !cli ? more('Use a different provider or key for the Architect', grid(...providerFields('architect'))) : null,
     cli ? more('CLI program location', grid(
@@ -374,7 +385,7 @@ function renderArchitect(p) {
     const status = h('p', { class: 'cfg-status' }, 'Installation, official login and run qualification are checked separately.');
     const check = h('button', { type: 'button', onclick: async () => {
       check.disabled = true; status.textContent = 'Checking official Claude CLI profile…';
-      try { const r = await api('/api/architect/v1/provider-readiness', { adapter: 'claude-cli', model: eff(modelKey) });
+      try { const r = await api('/api/architect/v1/provider-readiness', { adapter: 'claude-cli', model: eff(modelKey), reasoning_effort: eff('DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT') || null });
         status.textContent = r.readiness.detail; } catch (e) { status.textContent = 'Check failed: ' + e.message; }
       finally { check.disabled = false; }
     } }, 'Check Claude setup');

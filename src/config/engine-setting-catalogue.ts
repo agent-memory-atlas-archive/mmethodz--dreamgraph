@@ -1,3 +1,4 @@
+import { assertRouteEffort } from "./architect-model-controls.js";
 import { resolveHttpPolicy } from "../server/http-policy.js";
 /** Configuration ownership, types and apply semantics. Unknown imported keys survive. */
 import { z } from "zod";
@@ -109,6 +110,7 @@ export function validateEngineEnvValues(values: Record<string, string>, changedK
   resolveHttpPolicy(8100, values);
   const diagnostics: string[] = [];
   for (const [key, value] of Object.entries(values)) {
+    if (key.endsWith("_REASONING_EFFORT") && value === "ultracode") throw new Error(`CONFIG_INVALID_SETTING: ${key}; ultracode is workflow orchestration, not effort`);
     const entry = entries.get(key);
     if (!entry) { if (changedKeys?.includes(key)) throw new Error(`CONFIG_UNKNOWN_KEY: ${key}`); diagnostics.push(`UNKNOWN_IMPORTED_KEY: ${key}`); continue; }
     if (changedKeys?.includes(key) && entry.apply === "read_only") throw new Error(`CONFIG_READ_ONLY: ${key}`);
@@ -122,6 +124,13 @@ export function validateEngineEnvValues(values: Record<string, string>, changedK
     const model = values[roleEnvKey(role, "MODEL")], provider = values[roleEnvKey(role, "PROVIDER")] ?? values.DREAMGRAPH_LLM_PROVIDER;
     const capability = values[roleEnvKey(role, "CAPABILITY")];
     if (capability) { const record = JSON.parse(capability); if (record.model !== model || record.provider !== provider) throw new Error(`CONFIG_CAPABILITY_SCOPE_MISMATCH: ${role}`); }
+  }
+  const architectKeys = ["DREAMGRAPH_LLM_ARCHITECT_ADAPTER", "DREAMGRAPH_LLM_ARCHITECT_MODEL", "DREAMGRAPH_LLM_ARCHITECT_PROVIDER", "DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT"];
+  if (changedKeys?.some(key => architectKeys.includes(key))) {
+    assertRouteEffort(values.DREAMGRAPH_LLM_ARCHITECT_ADAPTER || "native_api_tool_loop",
+      values.DREAMGRAPH_LLM_ARCHITECT_PROVIDER || values.DREAMGRAPH_LLM_PROVIDER || "none",
+      values.DREAMGRAPH_LLM_ARCHITECT_MODEL || values.DREAMGRAPH_LLM_MODEL || "",
+      values.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT);
   }
   return diagnostics;
 }

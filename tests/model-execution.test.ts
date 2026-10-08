@@ -6,6 +6,7 @@ import {withEngineJob,EngineJobs} from "../src/cognitive/jobs.js";
 import {DaemonHttpAuthority} from "../src/server/http-authority.js";
 import {HostModelAdmission} from "../src/server/host-model-admission.js";
 import { ModelAdmission } from "../src/cognitive/model-admission.js";
+import { nativeCliModelExecution } from "../src/cognitive/model-execution.js";
 import { getDataDir } from "../src/utils/paths.js";
 import { installOfflineAdmissionFixtures } from "./helpers/offline-admission.js";
 
@@ -18,6 +19,16 @@ const ledger = async () => JSON.parse(await readFile(`${getDataDir()}/spend_ledg
 const answer = (extra = {}) => Response.json({ choices: [{ message: { content: "{}" }, finish_reason: "stop" }], ...extra });
 
 describe("physical inference admission", () => {
+  it("admits explicit CLI Default without restoring an incompatible saved effort", async () => {
+    vi.stubEnv("DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT", "xhigh");
+    const execution = await nativeCliModelExecution({...config,provider:"none"}, "claude-cli", "claude-opus-4-6", undefined);
+    const dispatch = vi.fn(async()=>({result:"done",acknowledged:true,usage:{inputTokens:1,outputTokens:1}}));
+    expect(await execution.request({provider:"none",model:"claude-opus-4-6",payload:"fixture",output_tokens:10},dispatch)).toBe("done");
+    expect(dispatch).toHaveBeenCalledOnce();
+    const refused = await nativeCliModelExecution({...config,provider:"none"}, "claude-cli", "claude-opus-4-6", "xhigh");
+    await expect(refused.request({provider:"none",model:"claude-opus-4-6",payload:"fixture",output_tokens:10},dispatch)).rejects.toThrow("ADMISSION_ROLE_POLICY_BLOCKED");
+    expect(dispatch).toHaveBeenCalledOnce();
+  });
   it("native computer-role tools share the actual job and role allocation instead of the Architect route",async()=>{
     vi.stubEnv("DREAMGRAPH_INSTANCE_UUID","");const instance=new EngineJobs().instance_id;
     expect(new DaemonHttpAuthority(1,{}).sessions.instance_id).toBe(instance);expect(new HostModelAdmission("fixture",new Date(Date.now()+30000).toISOString(),new AbortController().signal).instanceId).toBe(instance);

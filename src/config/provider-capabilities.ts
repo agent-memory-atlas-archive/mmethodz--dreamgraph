@@ -43,7 +43,7 @@ add("anthropic", ["claude-opus-4-5", "claude-opus-4-6", "claude-sonnet-4-6"], {
   apis: ["anthropic-messages"], default_api: "anthropic-messages", efforts: ["low", "medium", "high", "max"], strict_schema: true, tools: true, images: true });
 add("anthropic", ["claude-sonnet-4-5", "claude-haiku-4-5"], {
   apis: ["anthropic-messages"], default_api: "anthropic-messages", efforts: [], strict_schema: true, tools: true, images: true });
-add("anthropic", ["claude-opus-4-7", "claude-opus-4-8", "claude-opus-5", "claude-opus-5-5", "claude-sonnet-5", "claude-sonnet-5-5", "claude-fable-5", "claude-fable-5-1", "claude-mythos-5", "claude-mythos-5-1"], {
+add("anthropic", ["claude-opus-4-7", "claude-opus-4-8", "claude-opus-5", "claude-opus-5-5", "claude-sonnet-5", "claude-sonnet-5-5", "claude-haiku-5-5", "claude-fable-5", "claude-fable-5-1", "claude-mythos-5", "claude-mythos-5-1"], {
   apis: ["anthropic-messages"], default_api: "anthropic-messages", efforts: ["low", "medium", "high", "xhigh", "max"], strict_schema: true, tools: true, images: true });
 add("anthropic", ["claude-mythos-preview"], {
   apis: ["anthropic-messages"], default_api: "anthropic-messages", efforts: ["low", "medium", "high", "max"], strict_schema: true, tools: true, images: true });

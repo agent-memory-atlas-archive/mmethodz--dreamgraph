@@ -1,3 +1,4 @@
+import { cliModelEfforts } from "./architect-model-controls.js";
 /** Independent, inspectable role policies. Resolution never probes or buys a model. */
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -60,6 +61,7 @@ export function resolveRolePolicy(input: {
   const envSettings: Record<string, unknown> = {};
   for (const [field, suffix] of Object.entries(ROLE_SETTING_FIELDS)) {
     const raw = env[key(role, suffix)]?.trim();
+    if (field === "effort" && raw === "") { envSettings[field] = null; continue; }
     if (raw === undefined || raw === "") continue;
     if (["temperature", "output_tokens", "context_tokens", "timeout_ms"].includes(field)) envSettings[field] = Number(raw);
     else if (field === "strict_schema") envSettings[field] = raw === "true" ? true : raw === "false" ? false : raw;
@@ -139,7 +141,7 @@ export function resolveRolePolicy(input: {
     adapter, version: documented.version, model: effectiveModel,
     apis: documented.apis.map(value => value === "chat-completions" ? "chat_completions" : value === "anthropic-messages" ? "messages" : value === "ollama-chat" ? "local" : value),
     efforts: documented.efforts, retention: provider === "openai" ? ["store_false", "store_true"] : [], strict_schema: documented.strict_schema,
-  } : undefined);
+  } : adapter.endsWith("-cli") ? { adapter, model: effectiveModel, version: "dreamgraph.native_cli_invocation.v1", apis: ["native_cli"], efforts: cliModelEfforts(adapter, effectiveModel), retention: [], strict_schema: false } : undefined);
   const require = (field: string, code: string, message: string) => diagnostics.push({ field, code, message });
   try { if (api !== "native_cli") assertReasoningEffort(provider, effectiveModel, effort); }
   catch (failure) { require("effort", "EFFORT_UNSUPPORTED", String(failure)); }

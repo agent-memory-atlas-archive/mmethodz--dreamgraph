@@ -208,10 +208,11 @@ function usesBoundAnthropicThinking(model: string): boolean {
   return /^claude-(?:opus-5-5|sonnet-5-5|fable-5-1)(?:$|[-_])/i.test(model.trim());
 }
 
-function anthropicThinkingOptions(model: string): Record<string, unknown> {
+function anthropicThinkingOptions(model: string, effort?: string): Record<string, unknown> {
   return usesBoundAnthropicThinking(model) ? {
     thinking: { type: "adaptive", block_binding: { prefix_mismatch_behavior: "drop_block" } },
-  } : {};
+  } : (/^claude-(?:(?:opus|sonnet|haiku|fable|mythos)-5|opus-4-[78])(?:$|[-_])/.test(model)
+    || effort && ["claude-opus-4-6", "claude-sonnet-4-6", "claude-mythos-preview"].includes(model)) ? { thinking: { type: "adaptive" } } : {};
 }
 
 function anthropicThinkingHeaders(model: string): Record<string, string> {
@@ -787,8 +788,8 @@ async function callAnthropicWithTools(
     model: config.model,
     max_tokens: config.maxTokens,
     ...(config.reasoningEffort ? { output_config: { effort: config.reasoningEffort } } : {}),
-    ...anthropicThinkingOptions(config.model),
-    ...(getModelCapabilities("anthropic", config.model).supportsTemperature ? { temperature: config.temperature } : {}),
+    ...anthropicThinkingOptions(config.model, config.reasoningEffort),
+    ...(!anthropicThinkingOptions(config.model, config.reasoningEffort).thinking && getModelCapabilities("anthropic", config.model).supportsTemperature ? { temperature: config.temperature } : {}),
     messages: messages
       .filter((message) => message.role !== "system")
       .map(toAnthropicToolMessage),
@@ -1027,8 +1028,8 @@ class AnthropicProvider implements LlmProvider {
     if (options.images?.length && !messages.some(m => m.role === "user")) throw new Error("PROVIDER_IMAGE_USER_MESSAGE_REQUIRED");
     const nativeSchema = Boolean(options.jsonSchema && evidence?.strict_schema);
     const body: Record<string, unknown> = { model, max_tokens: options.maxTokens ?? this.defaultMaxTokens,
-      ...anthropicThinkingOptions(model),
-      ...(getModelCapabilities("anthropic", model, options.reasoningEffort).supportsTemperature ? { temperature: options.temperature ?? this.defaultTemperature } : {}),
+      ...anthropicThinkingOptions(model, options.reasoningEffort),
+      ...(!anthropicThinkingOptions(model, options.reasoningEffort).thinking && getModelCapabilities("anthropic", model, options.reasoningEffort).supportsTemperature ? { temperature: options.temperature ?? this.defaultTemperature } : {}),
       messages: messages.filter(m => m.role !== "system").map((m, index, values) => ({ ...m, content: m.role === "user" && index === values.map(value => value.role).lastIndexOf("user") ? providerImageContent(m.content, options!.images ?? [], "anthropic-messages") : m.content })),
       ...(systemText ? { system: systemText } : {}) };
     if (nativeSchema || options.reasoningEffort) body.output_config = {
@@ -1361,7 +1362,7 @@ export function getArchitectLlmConfig(): ArchitectLlmConfig {
       apiKey: process.env.DREAMGRAPH_LLM_ARCHITECT_API_KEY || (provider === base.provider ? base.apiKey : defaults.apiKey),
       temperature: Number(env.DREAMGRAPH_LLM_ARCHITECT_TEMPERATURE ?? base.temperature),
       maxTokens: Number(env.DREAMGRAPH_LLM_ARCHITECT_MAX_TOKENS ?? base.maxTokens), timeoutMs: base.timeoutMs,
-      reasoningEffort: env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT || base.reasoningEffort };
+      reasoningEffort: env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT !== undefined ? env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT || undefined : base.reasoningEffort };
   }
   if (!_architectConfig) {
     const base = getLlmConfig();
@@ -1393,7 +1394,7 @@ export function getArchitectLlmConfig(): ArchitectLlmConfig {
       temperature: envNumber("DREAMGRAPH_LLM_ARCHITECT_TEMPERATURE", base.temperature),
       maxTokens: Math.trunc(envNumber("DREAMGRAPH_LLM_ARCHITECT_MAX_TOKENS", base.maxTokens)),
       timeoutMs: base.timeoutMs,
-      reasoningEffort: envText("DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT") ?? base.reasoningEffort,
+      reasoningEffort: process.env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT !== undefined ? envText("DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT") ?? undefined : base.reasoningEffort,
     };
     logger.info(
       `LLM architect config: provider=${_architectConfig.provider} (${_architectConfig.providerSource}), ` +
@@ -1406,7 +1407,7 @@ export function getArchitectLlmConfig(): ArchitectLlmConfig {
 
 /** Update Architect chat LLM settings at runtime. */
 export function updateArchitectLlmConfig(
-  partial: Partial<Pick<ArchitectLlmConfig, "provider" | "model" | "baseUrl" | "temperature" | "maxTokens">>,
+  partial: Partial<Pick<ArchitectLlmConfig, "provider" | "model" | "baseUrl" | "temperature" | "maxTokens" | "reasoningEffort">>,
 ): ArchitectLlmConfig {
   const current = getArchitectLlmConfig();
   const base = getLlmConfig();
@@ -1424,6 +1425,7 @@ export function updateArchitectLlmConfig(
     baseUrl: partial.baseUrl ?? (providerChanged ? defaults.baseUrl : current.baseUrl),
     apiKey: providerChanged ? defaults.apiKey : current.apiKey,
     temperature: partial.temperature ?? current.temperature,
+    reasoningEffort: Object.hasOwn(partial, "reasoningEffort") ? partial.reasoningEffort : current.reasoningEffort,
     maxTokens: Math.trunc(partial.maxTokens ?? current.maxTokens),
   };
   logger.info(

@@ -1625,6 +1625,44 @@ describe("standalone Architect route hardening", () => {
     }
   });
 
+  it("round-trips runtime effort, refuses downshifts and renders model-specific selectors", async () => {
+    const keys = ["DREAMGRAPH_LLM_ARCHITECT_ADAPTER", "DREAMGRAPH_LLM_ARCHITECT_PROVIDER", "DREAMGRAPH_LLM_ARCHITECT_MODEL", "DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT"];
+    const before = Object.fromEntries(keys.map(key => [key, process.env[key]]));
+    try {
+      await withArchitectServer(async baseUrl => {
+        const save = (model: string, reasoning_effort: string | null) => fetch(baseUrl + "/api/architect/v1/config", {
+          method:"POST", headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({adapter:"claude-cli",provider:"none",model,reasoning_effort})
+        });
+        const configured = await expectJsonOk(await save("claude-opus-5-5","max"));
+        expect(configured.runtime).toMatchObject({reasoning_effort:"max",model:"claude-opus-5-5"});
+        expect(process.env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT).toBe("max");
+        const refused = await save("claude-opus-4-6","xhigh");
+        expect(refused.status).toBe(400);
+        expect(process.env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT).toBe("max");
+        expect((await save("claude-opus-5-5","ultracode")).status).toBe(400);
+        const cleared = await expectJsonOk(await save("claude-opus-5-5",null));
+        expect(cleared.runtime).toMatchObject({reasoning_effort:null});
+        expect(process.env.DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT).toBe("");
+        const html = await (await fetch(baseUrl + "/architect")).text();
+        const {dom,errors} = await executeArchitectShellInJsdom({baseUrl,html,chatHistoryPayload:{ok:true,messages:[]}});
+        try {
+          const effort = dom.window.document.querySelector<HTMLSelectElement>("#architect-effort-select")!;
+          const model = dom.window.document.querySelector<HTMLSelectElement>("#architect-model-input")!;
+          expect([...effort.options].map(o=>o.value)).toEqual(["","low","medium","high","xhigh","max"]);
+          model.value="claude-opus-4-6";model.dispatchEvent(new dom.window.Event("change"));
+          expect([...effort.options].map(o=>o.value)).toEqual(["","low","medium","high","max"]);
+          model.value="claude-haiku-4-5";model.dispatchEvent(new dom.window.Event("change"));
+          expect(effort.disabled).toBe(true);
+          expect(errors).toEqual([]);
+        } finally { dom.window.close(); }
+      }, {historicalPlanFixtures:true});
+    } finally {
+      for (const key of keys) { if(before[key]===undefined)delete process.env[key];else process.env[key]=before[key]; }
+      initLlmProvider();
+    }
+  });
+
   it("replaces a stale local model when codex-cli is selected", async () => {
     const previousAdapter = process.env.DREAMGRAPH_LLM_ARCHITECT_ADAPTER;
     const previousProvider = process.env.DREAMGRAPH_LLM_ARCHITECT_PROVIDER;
