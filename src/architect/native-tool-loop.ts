@@ -4,7 +4,7 @@ import { ProviderOutcomeError } from "../cognitive/provider-outcome.js";
 import type { TokenUsage } from "../cognitive/llm.js";
 import type { IncomingMessage } from "node:http";
 import type { BudgetCoordinator } from "@dreamgraph/token-economy/budget-coordinator";
-import { compressToolResult, estimateTokensFromString } from "@dreamgraph/token-economy";
+import { estimateTokensFromString } from "@dreamgraph/token-economy";
 import type {
   ArchitectLlmConfig,
   LlmMessage,
@@ -17,7 +17,7 @@ import type {
 } from "../cognitive/llm.js";
 import { completeWithNativeTools as completeLlmWithNativeTools } from "../cognitive/llm.js";
 import { McpSessionConnection, architectMcpHeaders, type McpCallResult } from "../cli/utils/mcp-call.js";
-import { serializeMcpResult, boundedMachineResult } from "../utils/mcp-result.js";
+import { serializeMcpResult } from "../utils/mcp-result.js";
 import { logger } from "../utils/logger.js";
 import { getArchitectProjectRoot } from "./plan-registry.js";
 import type { PlanExecutionIntent } from "../graph/contracts.js";
@@ -82,8 +82,6 @@ export interface ArchitectToolLoopRoute {
   computer_use_session?: string;
   computer_use_cleanup_log?: string;
   computer_use_unavailable?: string;
-  /** Earlier tool results compacted to keep the transcript inside the role's context allocation. */
-  context_compactions?: number;
 }
 
 export interface ArchitectToolLoopProvenance {
@@ -126,7 +124,8 @@ const NATIVE_RUN_COMMAND_TOOL: ArchitectToolDefinition = Object.freeze({
   name: "run_command",
   description:
     "[DreamGraph native support tool] Execute a shell command inside the workspace for build/test/verification tasks. " +
-    "Use this instead of provider-inline shell tools; cwd is constrained to the workspace root.",
+    "Use this instead of provider-inline shell tools; cwd is constrained to the workspace root. " +
+    (process.platform === "win32" ? "Shell: Windows cmd.exe; Unix head and PowerShell syntax are not available unless explicitly invoked." : "Shell: /bin/sh."),
   inputSchema: {
     type: "object",
     properties: {
@@ -153,43 +152,6 @@ export const NATIVE_REQUEST_COMPUTER_USE_TOOL: ArchitectToolDefinition = Object.
     required: ["reason"],
   },
 });
-/** Share of the context allocation the transcript may fill; the rest covers provider framing and estimate error. */
-const TRANSCRIPT_TARGET_SHARE = 0.8;
-/** Compaction then goes down to this share, so it happens rarely: each compaction changes the prompt and costs one cache miss. */
-const TRANSCRIPT_COMPACTED_SHARE = 0.6;
-const COMPACTED_RESULT_PREFIX = "[Earlier tool result compacted";
-const COMPACTION_KEEP_CHARS = 600;
-/**
- * Keeps a long tool loop inside the role's model admission instead of failing:
- * once the estimated request (UTF-8 JSON, images included) passes 80 % of the allocation, the oldest tool results
- * after the required prompt are replaced by a short stub, oldest first, until it is under 60 %. The latest exchange is never
- * compacted. If the request still does not fit, admission reports ADMISSION_CONTEXT_LIMIT with the setting.
- * Returns the number of results compacted.
- */
-export function compactArchitectToolTranscript(messages: NeutralMessage[], requiredCount: number, tools: ArchitectToolDefinition[], contextAllocation: number): number {
-  const toolBytes = Buffer.byteLength(JSON.stringify(tools));
-  let size = Buffer.byteLength(JSON.stringify(messages));
-  if (size <= Math.floor(contextAllocation * TRANSCRIPT_TARGET_SHARE) - toolBytes) return 0;
-  const target = Math.floor(contextAllocation * TRANSCRIPT_COMPACTED_SHARE) - toolBytes;
-  // The latest assistant turn and its results stay intact so the model can act on what it just saw.
-  let protectFrom = messages.length;
-  for (let index = messages.length - 1; index >= requiredCount; index -= 1) if (messages[index].role === "assistant") { protectFrom = index; break; }
-  let compacted = 0;
-  for (let index = requiredCount; index < protectFrom && size > target; index += 1) {
-    const content = messages[index].content;
-    if (!Array.isArray(content)) continue;
-    for (let position = 0; position < content.length && size > target; position += 1) {
-      const block = content[position];
-      if (block.type !== "tool_result" || block.content.startsWith(COMPACTED_RESULT_PREFIX) || block.content.length <= COMPACTION_KEEP_CHARS * 2) continue;
-      const stub = `${COMPACTED_RESULT_PREFIX} to keep this pass within its context allocation (${block.content.length} chars). `
-        + `Beginning: ${block.content.slice(0, COMPACTION_KEEP_CHARS)} … Call the tool again if you need the full result.]`;
-      size -= Buffer.byteLength(JSON.stringify(block.content)) - Buffer.byteLength(JSON.stringify(stub));
-      content[position] = { ...block, content: stub };
-      compacted += 1;
-    }
-  }
-  return compacted;
-}
 const textArg = (value: unknown, max: number) => typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, max) : "";
 
 export interface RunArchitectNativeToolLoopInput {
@@ -209,6 +171,7 @@ export interface RunArchitectNativeToolLoopInput {
   planExecution?: PlanExecutionIntent;
   approvedActions?: ExecutionApproval;
   operatorReviewEnabled?: boolean;
+  actionApprovalMode?: import("../server/managed-execution.js").ActionApprovalMode;
   autonomyMode?: "manual" | "supervised" | "autonomous";
   verbosityMode?: "concise" | "balanced" | "detailed";
   /** Captured only by the operator-owned preparation port, never a model-supplied worker/profile. */
@@ -230,7 +193,7 @@ export async function runArchitectNativeToolLoop(input: RunArchitectNativeToolLo
   const lease = await beginHostExecution({ id, query: input.userMessage, adapter: "native_api_tool_loop", plan_id: input.planId, slice_id: input.sliceId,
     plan_execution: input.planExecution,
     autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced", approved_actions: input.approvedActions,
-    timeout_ms: architectPassTimeoutMs() }, input.signal, input.operatorReviewEnabled === true);
+    timeout_ms: architectPassTimeoutMs() }, input.signal, input.operatorReviewEnabled === true, input.actionApprovalMode ?? "standard");
   let dispatched = false, finished = false, executionSignal: AbortSignal | undefined;
   try {
     const block = lease.execution.block;
@@ -382,10 +345,9 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
     + "request_computer_use with a one-sentence reason, then end your turn; the operator will be asked and the request re-run with Computer Use "
     + "if allowed. Otherwise do not ask." });
   // Everything above is the required prompt (operator messages, managed context, guidance). It keeps the 128 KiB
-  // text bound. The tool-loop transcript after it is bounded by the role's model admission and compacted to fit.
+  // text bound. Preserve all retrieved tool evidence in the cumulative conversation; admission reports
+  // a genuine allocation limit explicitly instead of silently replacing earlier results with stubs.
   const requiredCount = rawMessages.length;
-  const contextAllocation = input.config.admissionPolicy?.effective.context_tokens;
-  let contextCompactions = 0;
   const refreshForCompletion = async () => {
     if(computer){await computer.awaitReady();const state=await computer.status();rawMessages[computerIndex]={role:"system",content:"DreamGraph current Computer Use. Use a fresh observation before input; old references/fences cannot be renewed. "+JSON.stringify({
       execution_id:state.session.execution_id,id:state.session.id,state:state.session.state,fence:state.session.fence,targets:state.targets,limits:state.limits,usage:state.usage,stop:state.stop_state,pause:state.pause_state})};
@@ -397,10 +359,6 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
     rawMessages[managedIndex] = { role: "system", content: managedContextPrompt(entry) };
     if (nativePromptTextBytes(rawMessages.slice(0, requiredCount)) > 128 * 1024) throw new Error("NATIVE_REQUIRED_PROMPT_BYTE_BOUND");
     await deliverManagedContext(managedId, rawMessages[managedIndex].content as string);
-  };
-  const prepareCompletion = async (tools: ArchitectToolDefinition[]) => {
-    await refreshForCompletion();
-    if (contextAllocation) contextCompactions += compactArchitectToolTranscript(rawMessages, requiredCount, tools, contextAllocation);
   };
   let finalText = "";
   let completionModel = input.config.model;
@@ -414,7 +372,7 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
     input.signal?.throwIfAborted();
     // Each loop iteration is liveness evidence for the rolling execution lease.
     getSessionContext()?.execution_policy?.renew();
-    await prepareCompletion(advertisedTools);
+    await refreshForCompletion();
     const response = await measuredCall(() => completeWithNativeTools(input.config, rawMessages, advertisedTools, input.signal));
     completionModel = response.model || completionModel;
     if (response.text) {
@@ -506,11 +464,9 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
         }else resultText=error instanceof Error ? error.message : String(error);
       }
 
-      // Computer Use output (runtime documentation, page reads) is already bounded by the backend and must stay verbatim.
-      const compressed = isRuntimeComputer ? { content: resultText, originalChars: resultText.length, finalChars: resultText.length, mode: "verbatim" }
-        : input.budgetCoordinator
-        ? boundedMachineResult(resultText, 16_000) ?? compressToolResult(resultText, input.budgetCoordinator, call.name)
-        : { content: resultText, originalChars: resultText.length, finalChars: resultText.length, mode: "verbatim" };
+      // Tool owners bound/page their results. Preserve that evidence verbatim in every later model request;
+      // the budget coordinator records usage and pressure, never rewrites investigative history.
+      const compressed = { content: resultText, originalChars: resultText.length, finalChars: resultText.length, mode: "verbatim" };
       const finalTokens = estimateTokensFromString(compressed.content);
       input.budgetCoordinator?.recordComponentActual(`tool:${call.name}`, finalTokens);
       const entry: ArchitectToolTraceEntry = {
@@ -572,7 +528,7 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
     }
     rawMessages.push({ role: "user", content: buildArchitectFinalizationPrompt(trace) });
     input.signal?.throwIfAborted();
-    await prepareCompletion([]);
+    await refreshForCompletion();
     const finalization = await measuredCall(() => completeWithNativeTools(input.config, rawMessages, [], input.signal));
     completionModel = finalization.model || completionModel;
     if (finalization.text) finalText = joinAssistantText(finalText, finalization.text);
@@ -623,7 +579,6 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
       ...(cua ? { computer_use_backend: cua.backend, computer_use_session: cua.sessionId } : computer ? { computer_use_backend: "dreamgraph-harness" as const } : {}),
       ...(computerUseCleanupLog ? { computer_use_cleanup_log: computerUseCleanupLog } : {}),
       ...(computerUseUnavailable ? { computer_use_unavailable: computerUseUnavailable } : {}),
-      ...(contextCompactions ? { context_compactions: contextCompactions } : {}),
     },
     provenance: {
       authority: "dreamgraph_mcp",

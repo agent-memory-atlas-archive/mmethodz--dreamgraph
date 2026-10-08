@@ -5897,7 +5897,7 @@ export const MCP_CATALOG_V1 = {
     },
     {
       "name": "search_source_code",
-      "description": "Search across files in a configured repository for a literal string or regex. **This is a discovery fallback** when entity-aware lookups (`query_api_surface`, `read_source_code` with `entity`) cannot resolve the symbol you need. Returns matching file paths with line numbers and a snippet of each hit. Once you have a likely symbol name from the results, switch back to `read_source_code` in entity mode for the actual read.",
+      "description": "Search across files in a configured repository for a literal string or regex. **This is a discovery fallback** when entity-aware lookups (`query_api_surface`, `read_source_code` with `entity`) cannot resolve the symbol you need. Returns matching compact pointers with ready-to-use read_source_code arguments and a short matching-line hint. Use contextLines for optional previews. Once you have a likely symbol name from the results, switch back to `read_source_code` in entity mode for the actual read.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -5912,7 +5912,7 @@ export const MCP_CATALOG_V1 = {
           },
           "pathPrefix": {
             "type": "string",
-            "description": "Optional repo-relative directory to limit the search (e.g. 'src/server'). Defaults to the entire repo."
+            "description": "Optional repo-relative file or directory to limit the search (e.g. 'src/server' or 'src/server/index.ts'). Defaults to the entire repo."
           },
           "includeExtensions": {
             "type": "array",
@@ -5935,7 +5935,7 @@ export const MCP_CATALOG_V1 = {
             "type": "integer",
             "minimum": 0,
             "maximum": 5,
-            "description": "Number of context lines to include before and after each match. Default 1."
+            "description": "Optional preview context lines before and after each match. Default 0: compact matching-line hint with a read_source_code pointer."
           }
         },
         "required": [

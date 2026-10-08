@@ -1901,7 +1901,8 @@ describe("standalone Architect route hardening", () => {
     expect(nativeLoopSource).not.toContain('capabilities.api === "responses"');
     expect(nativeLoopSource).not.toContain('admittedModelFetch(config.provider, `${config.baseUrl}/responses`');
     expect(nativeLoopSource).toContain('context_pressure: ${coordinator.getContextPressureLabel()}');
-    expect(nativeLoopSource).toContain('compressToolResult(resultText, input.budgetCoordinator, call.name)');
+    expect(nativeLoopSource).not.toContain('compressToolResult(resultText, input.budgetCoordinator, call.name)');
+    expect(nativeLoopSource).toContain('content: resultText, originalChars: resultText.length, finalChars: resultText.length, mode: "verbatim"');
     expect(nativeLoopSource).toContain('recordComponentActual(`tool:${call.name}`, finalTokens)');
     expect(routesSource).toContain('buildArchitectChatPromptBundle(passMessage, plan, runtime, chatScope, budgetCoordinator)');
     expect(routesSource).toContain('budgetCoordinator?.recordComponentEstimate("preamble", maxPreambleTokens)');

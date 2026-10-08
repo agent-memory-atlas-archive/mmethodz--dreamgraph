@@ -15,6 +15,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { config } from "../config/config.js";
 import { success, error, safeExecute } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
+import { createRootGitignoreFilter } from "./scanner-ignore-policy.js";
 import { recordFileRead, recordToolCall } from "../utils/metrics.js";
 import type { ToolResponse } from "../types/index.js";
 import { managedSourceEffect, managedSourceWrite } from "../graph/change-obligations.js";
@@ -32,11 +33,11 @@ const SEARCH_MATCH_BYTES = 24 * 1024;
 const SEARCH_PREVIEW_BYTES = 2048;
 
 /** Source discovery previews are byte-bounded, independently of match count. */
-function searchPreview(text: string): string {
+function searchPreview(text: string, maximumBytes = SEARCH_PREVIEW_BYTES): string {
   let bytes = 0, end = 0;
   for (const character of text) {
     bytes += Buffer.byteLength(character, "utf8");
-    if (bytes > SEARCH_PREVIEW_BYTES) break;
+    if (bytes > maximumBytes) break;
     end += character.length;
   }
   return text.slice(0, end);
@@ -65,7 +66,7 @@ function findEntity(source: string, entityName: string): EntityLocation | null {
   // We look for the entity name in common declaration patterns
   // Case-insensitive so "ArchitectLLM" matches "ArchitectLlm" etc.
   const escaped = escapeRegex(entityName);
-  const patterns: Array<{ regex: RegExp; kind: EntityLocation["kind"] }> = [
+  const patterns: Array<{ regex: RegExp; kind: EntityLocation["kind"]; method?: boolean }> = [
     // export [async] function name / function name
     { regex: new RegExp(`^\\s*(?:export\\s+)?(?:default\\s+)?(?:async\\s+)?function\\s+${escaped}\\s*[<(]`, "i"), kind: "function" },
     { regex: new RegExp(`^\\s*(?:export\\s+)?(?:default\\s+)?(?:async\\s+)?function\\s+${escaped}\\s*$`, "i"), kind: "function" },
@@ -89,14 +90,17 @@ function findEntity(source: string, entityName: string): EntityLocation | null {
           `${escaped}\\s*(?:<[^>]*>)?\\s*\\(`,
         "i",
       ),
-      kind: "function",
+      kind: "function", method: true,
     },
   ];
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    for (const { regex, kind } of patterns) {
+  // Prefer explicit declarations to method-shaped callsites anywhere earlier in the file.
+  for (const { regex, kind, method } of patterns) {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
       if (regex.test(line)) {
+        // Indentation alone does not distinguish a method from a function call.
+        if (method && !/^[^;]*\)\s*(?::[^;{=]+)?\s*\{/.test(lines.slice(i, i + 32).join("\n"))) continue;
         // Find optional leading decorators/JSDoc above the match
         let startIdx = i;
         // Walk backwards to include decorators (@...) and JSDoc (/** ... */)
@@ -1581,7 +1585,7 @@ export function registerCodeSensesTools(server: McpServer): void {
     "Search across files in a configured repository for a literal string or regex. " +
       "**This is a discovery fallback** when entity-aware lookups (`query_api_surface`, " +
       "`read_source_code` with `entity`) cannot resolve the symbol you need. Returns matching " +
-      "file paths with line numbers and a snippet of each hit. Once you have a likely symbol " +
+      "compact pointers with ready-to-use read_source_code arguments and a short matching-line hint. Use contextLines for optional previews. Once you have a likely symbol " +
       "name from the results, switch back to `read_source_code` in entity mode for the actual read.",
     {
       query: z
@@ -1599,7 +1603,7 @@ export function registerCodeSensesTools(server: McpServer): void {
         .string()
         .optional()
         .describe(
-          "Optional repo-relative directory to limit the search (e.g. 'src/server'). " +
+          "Optional repo-relative file or directory to limit the search (e.g. 'src/server' or 'src/server/index.ts'). " +
             "Defaults to the entire repo."
         ),
       includeExtensions: z
@@ -1626,11 +1630,11 @@ export function registerCodeSensesTools(server: McpServer): void {
         .min(0)
         .max(5)
         .optional()
-        .describe("Number of context lines to include before and after each match. Default 1."),
+        .describe("Optional preview context lines before and after each match. Default 0: compact matching-line hint with a read_source_code pointer."),
     },
     async ({ query, repo, pathPrefix, includeExtensions, isRegex, maxResults, contextLines }) => {
       const limit = maxResults ?? 100;
-      const ctx = contextLines ?? 1;
+      const ctx = contextLines ?? 0;
       logger.debug(
         `search_source_code called: query="${query}", repo="${repo ?? "(auto)"}", pathPrefix="${pathPrefix ?? ""}", isRegex=${isRegex ?? false}`
       );
@@ -1651,15 +1655,24 @@ export function registerCodeSensesTools(server: McpServer): void {
           repoRoot = path.resolve(all[0]);
         }
 
-        // Build search root
+        repoRoot = await fs.realpath(repoRoot);
+        const repoName = repo ?? Object.keys(config.repos)[0];
+        const contains = (file: string) => { const rel = path.relative(repoRoot, file); return rel !== ".." && !rel.startsWith(`..${path.sep}`) && !path.isAbsolute(rel); };
+        // Accept a filename as well as a directory; missing paths are errors, not empty searches.
         let searchRoot = repoRoot;
         if (pathPrefix) {
           const candidate = path.resolve(repoRoot, pathPrefix);
-          if (!candidate.toLowerCase().startsWith(repoRoot.toLowerCase())) {
+          if (!contains(candidate)) {
             return error("ACCESS_DENIED", `pathPrefix '${pathPrefix}' escapes repo root.`);
           }
           searchRoot = candidate;
         }
+        try { searchRoot = await fs.realpath(searchRoot); }
+        catch { return error("INVALID_PATH", `Search path does not exist: ${pathPrefix ?? "."}`); }
+        if (!contains(searchRoot)) return error("ACCESS_DENIED", "Search path resolves outside the repository.");
+        const isGitignored = await createRootGitignoreFilter(repoRoot);
+        const searchInfo = await fs.stat(searchRoot);
+        if (!searchInfo.isFile() && !searchInfo.isDirectory()) return error("INVALID_PATH", "Search path must be a file or directory.");
 
         // Compile matcher
         let matcher: (line: string) => boolean;
@@ -1698,6 +1711,7 @@ export function registerCodeSensesTools(server: McpServer): void {
           line: number;
           preview: string;
           preview_truncated: boolean;
+          read_source_code: { repo: string; filePath: string; startLine?: number; endLine?: number; entity?: string };
         }
         const matches: Match[] = [];
         let matchBytes = 2; // JSON array brackets; count each whole record and separator.
@@ -1712,11 +1726,15 @@ export function registerCodeSensesTools(server: McpServer): void {
           }
           let entries: import("node:fs").Dirent[];
           try {
-            entries = await fs.readdir(dir, { withFileTypes: true });
+            if (dir === searchRoot && searchInfo.isFile()) {
+              dir = path.dirname(searchRoot);
+              entries = (await fs.readdir(dir, { withFileTypes: true })).filter(entry => entry.name === path.basename(searchRoot));
+            } else entries = await fs.readdir(dir, { withFileTypes: true });
           } catch {
             return;
           }
           for (const entry of entries) {
+            if (isGitignored(path.relative(repoRoot,path.join(dir,entry.name)),entry.isDirectory())) continue;
             if (outputByteLimitReached || matches.length >= limit) {
               truncated = true;
               return;
@@ -1753,8 +1771,17 @@ export function registerCodeSensesTools(server: McpServer): void {
               }
               const rel = path.relative(repoRoot, full).replace(/\\/g, "/");
               const snippet = snippetLines.join("\n");
-              const preview = searchPreview(snippet);
-              const match: Match = { filePath: rel, line: i + 1, preview, preview_truncated: preview.length < snippet.length };
+              const preview = searchPreview(snippet, ctx > 0 ? SEARCH_PREVIEW_BYTES : 240);
+              const read: Match["read_source_code"] = { repo: repoName, filePath: rel, startLine: start + 1, endLine: end };
+              // Only a declaration hit can advertise an entity. References retain exact line pointers.
+              const declaration = lines[i].match(/^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:function|class|interface|type|enum|const|let|var)\s+([A-Za-z_$][\w$]*)/);
+              if (declaration) {
+                const entity = findEntity(text, declaration[1]);
+                if (entity && entity.startLine <= i + 1 && entity.endLine >= i + 1) {
+                  read.entity = declaration[1]; delete read.startLine; delete read.endLine;
+                }
+              }
+              const match: Match = { filePath: rel, line: i + 1, preview, preview_truncated: preview.length < snippet.length, read_source_code: read };
               const bytes = Buffer.byteLength(JSON.stringify(match), "utf8") + (matches.length ? 1 : 0);
               if (matchBytes + bytes > SEARCH_MATCH_BYTES) {
                 truncated = true;
@@ -1779,7 +1806,7 @@ export function registerCodeSensesTools(server: McpServer): void {
           truncated,
           maxResults: limit,
           match_bytes_limit: SEARCH_MATCH_BYTES,
-          preview_bytes_limit: SEARCH_PREVIEW_BYTES,
+          preview_bytes_limit: ctx > 0 ? SEARCH_PREVIEW_BYTES : 240,
           output_byte_limit_reached: outputByteLimitReached,
           ...(truncated || matches.some(match => match.preview_truncated)
             ? { notice: "Partial discovery results or clipped previews. Narrow query/pathPrefix; use read_source_code with filePath and line range for source evidence." } : {}),

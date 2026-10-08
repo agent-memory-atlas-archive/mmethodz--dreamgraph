@@ -312,3 +312,26 @@ it("archival retains complete settled context and idempotent readback, blocks ID
  const current=JSON.parse(await readFile(join(root,"data","execution_contexts.json"),"utf8"));expect(current.entries.map((entry:any)=>entry.id)).toEqual(["unfinished"]);
  await writeFile(join(root,"data",archive.archive),"tampered");await expect(readManagedContext(closed.id)).rejects.toThrow("ARCHIVE_UNAVAILABLE");
 }));
+
+it("commands stream source observation beyond the old per-file and repository byte limits",()=>within(async()=>{
+ // Sparse on disk but all bytes are actually hashed before/after the command.
+ const {open}=await import("node:fs/promises");
+ const large=await open(join(root,"large-fixture.txt"),"w");try{await large.truncate(129*1024*1024);}finally{await large.close();}
+ await deliver();const args={command:'node -e "process.stdout.write(\'large repo works\')"'};
+ const lease=issueExecutionPolicy(owner(),{id:"execution-one",context_id:"execution-one",autonomy:"manual",verbosity:"concise",timeout_ms:30000,signal:new AbortController().signal,approvals:[{tool:"run_command",arguments:args,scope_id:"fixture",calls:1}]});
+ try{const result=await executeScopedCommand(lease.policy,args,root);expect(result.exitCode).toBe(0);expect(result.stdout).toBe("large repo works");expect(result.source_obligation?.state).toBe("failed");}
+ finally{lease.close();}
+}),30000);
+
+it("command observation follows scanner gitignore patterns and negations without losing included source changes",()=>within(async()=>{
+ const {mkdir}=await import("node:fs/promises");await mkdir(join(root,"ignored"));
+ await writeFile(join(root,".gitignore"),"ignored/\n*.tmp\n!keep.tmp\n");
+ await writeFile(join(root,"ignored","generated.ts"),"before");
+ await writeFile(join(root,"discard.tmp"),"before");await writeFile(join(root,"keep.tmp"),"before");
+ const script=join(root,"command.mjs");await writeFile(script,"import {writeFile} from 'node:fs/promises';await writeFile('ignored/generated.ts','after');await writeFile('discard.tmp','after');await writeFile('keep.tmp','after');await writeFile('source.ts','export const changed = true;');");
+ await deliver();const args={command:`node "${script}"`},lease=issueExecutionPolicy(owner(),{id:"execution-one",context_id:"execution-one",autonomy:"manual",verbosity:"concise",timeout_ms:10000,signal:new AbortController().signal,approvals:[{tool:"run_command",arguments:args,scope_id:"fixture",calls:1}]});
+ try{const result=await executeScopedCommand(lease.policy,args,root);expect(result.exitCode).toBe(0);
+  expect(result.source_obligation?.scope).toEqual(["source:fixture/keep.tmp","source:fixture/source.ts"]);
+  expect(JSON.stringify(result.source_obligation)).not.toContain("generated.ts");expect(JSON.stringify(result.source_obligation)).not.toContain("discard.tmp");
+ }finally{lease.close();}
+}));

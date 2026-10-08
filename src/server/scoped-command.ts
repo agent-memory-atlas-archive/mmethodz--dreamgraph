@@ -20,7 +20,7 @@ export async function executeScopedCommand(policy: ExecutionPolicy | undefined, 
   try {
   const timeout = Math.min(input.timeoutMs ?? 60000, Date.parse(policy.expires_at) - Date.now());
   signal.throwIfAborted();
-  const observation = policy.context_id ? await observeCommandSource({ execution_id: policy.id, workspace: root,
+  const observation = policy.context_id ? await observeCommandSource({ execution_id: policy.id, workspace: root, signal,
     before_intent: async () => { signal.throwIfAborted(); await assertManagedContext(policy.context_id!, { source_work: true }); } }) : null;
   let processStarted = false, processTerminated = false, observationAttempted = false;
   try {
@@ -57,7 +57,7 @@ export async function executeScopedCommand(policy: ExecutionPolicy | undefined, 
   observationAttempted = true;
   const source_obligation = await observation?.settle(true);
   if (policy.context_id) await recordManagedEffect(policy.context_id, {tool:"run_command",outcome:"owner_returned",receipt_ids:[]});
-  return {...result,...(source_obligation?{source_obligation,source_observation:"complete_in_declared_scan_visible_scope; secrets/generated paths excluded; external effects unattested"}:{})};
+  return {...result,...(source_obligation?{source_obligation,source_observation:"complete_in_declared_scan_visible_scope; gitignored/secrets/generated paths excluded; external effects unattested"}:{})};
   } catch(error) {
     let recoveryError: unknown;
     try { if (observation && !observationAttempted) await observation.settle(processTerminated || !processStarted); }

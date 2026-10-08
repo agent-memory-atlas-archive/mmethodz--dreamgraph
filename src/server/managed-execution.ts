@@ -18,8 +18,10 @@ import { PlanRuntimeLease, preparePlanRuntimeClosure, applyPlanRuntimeClosure, c
 import { readPlanAuthority } from "../discipline/plan-authority.js";
 
 type Lease = ReturnType<typeof issueExecutionPolicy>;
-type PendingReview = { request: ManagedExecutionApprovalRequest; settle: (error?: unknown) => void };
-type HostLease = {owner:SessionContext;lease:Lease;timer:ReturnType<typeof setTimeout>;activeApprovals:Set<string>;pendingReviews:Map<string,PendingReview>;reviewCount:number;model?:HostModelAdmission};
+export type ActionApprovalMode = "standard" | "ask" | "auto_accept";
+const approvalModeSchema = z.enum(["standard", "ask", "auto_accept"]);
+type PendingReview = { request: ManagedExecutionApprovalRequest; settle: (error?: unknown) => void; error?: string };
+type HostLease = {owner:SessionContext;lease:Lease;timer:ReturnType<typeof setTimeout>;activeApprovals:Set<string>;approvalAcks:Map<string,string>;pendingReviews:Map<string,PendingReview>;reviewCount:number;approvalMode:ActionApprovalMode;model?:HostModelAdmission};
 const leases = new Map<string,HostLease>();
 const key = (owner:SessionContext,id:string) => JSON.stringify([owner.directory,owner.principal,owner.session_id,id]);
 const owner = () => { const context=getSessionContext(); if(!context || context.execution_policy) throw new Error("HOST_EXECUTION_CONTROL_REQUIRED"); return context; };
@@ -52,6 +54,12 @@ export function autonomousAutoApproves(autonomy: string, tool: string): boolean 
   const effect = coreToolPolicy(tool).effect;
   return effect === "graph_write" || effect === "source_write";
 }
+export function autoApprovesAction(mode: ActionApprovalMode, autonomy: string, tool: string): boolean {
+  if (mode === "ask") return false;
+  if (mode === "standard") return autonomousAutoApproves(autonomy, tool);
+  // Operator consent covers registered DreamGraph effects and its scoped command bridge, never unknown extensions.
+  return tool === "run_command" || coreToolPolicy(tool).qualification === "core_registered";
+}
 /** Ephemeral proposal: exact arguments are visible only to the original host, never persisted as evidence. */
 async function requestHostReview(context:SessionContext,id:string,tool:string,args:unknown,signal:AbortSignal):Promise<void> {
   const argumentsCopy=JSON.parse(JSON.stringify(args));
@@ -63,7 +71,7 @@ async function requestHostReview(context:SessionContext,id:string,tool:string,ar
     const checkpoint=await readManagedContext(id);
     if(checkpoint.status!=="running"||checkpoint.pack.receipt.delivery!=="delivered")throw new Error("EXECUTION_APPROVAL_CONTEXT_NOT_DELIVERED");
     const repair=tool==="scan_project"&&argumentsCopy.mode==="incremental"&&argumentsCopy.enrich!==true&&argumentsCopy.dry_run!==true;
-    await assertManagedContext(id,{repair_source:repair});
+    await assertManagedContext(id,{repair_source:repair,source_work:tool==="run_command"||coreToolPolicy(tool).effect==="source_write"});
     signal.throwIfAborted();
     // Recheck after asynchronous reads; concurrent proposals cannot exceed the one-review bound.
     if(leases.get(key(context,id))!==live||live.pendingReviews.size)throw new Error("EXECUTION_REVIEW_CAPACITY");
@@ -79,14 +87,16 @@ async function requestHostReview(context:SessionContext,id:string,tool:string,ar
       if(signal.aborted)abort();
     });
     // Same approval path as the operator's click; if it cannot be applied, the request stays pending for the operator.
-    if(autonomousAutoApproves(live.lease.policy.autonomy,tool))void withSessionContext(context,()=>approveHostExecution(request)).catch(()=>undefined);
+    if(autoApprovesAction(live.approvalMode,live.lease.policy.autonomy,tool))void withSessionContext(context,()=>approveHostExecutionCompact(request)).catch(error=>{
+      const pending=live.pendingReviews.get(request.approval_id);if(pending)pending.error=error instanceof Error?error.message:String(error);
+    });
     return reviewed;
   });
 }
-export async function readHostExecutionReviews(id:string) {
+export async function readHostExecutionReviews(id:string,details=false) {
   const context=owner(),entry=await readManagedContext(id),live=leases.get(key(context,id));
   const active=(await snapshot(entry,context)).authority_active;
-  return {execution_id:id,authority_active:active,review_enabled:!!live?.lease.policy.request_review,requests:active&&live?structuredClone([...live.pendingReviews.values()].map(review=>review.request)):[]};
+  return {execution_id:id,authority_active:active,...(details?{approval_mode:live?.approvalMode??"standard",errors:live?Object.fromEntries([...live.pendingReviews].filter(([,review])=>review.error).map(([id,review])=>[id,review.error])):{}}:{}),review_enabled:!!live?.lease.policy.request_review,requests:active&&live?structuredClone([...live.pendingReviews.values()].map(review=>review.request)):[]};
 }
 export async function enableHostExecutionReviews(id:string) {
   const context=owner();await readManagedContext(id);
@@ -102,8 +112,20 @@ export async function declineHostExecutionReview(input:unknown) {
   pending?.settle(new Error("EXECUTION_REVIEW_OPERATOR_DECLINED"));
   return {execution_id:request.execution_id,approval_id:request.approval_id,status:pending?"declined":"not_pending"};
 }
-export async function beginHostExecution(input:unknown,signal?:AbortSignal,operatorReviewEnabled=false) {
+/** Original operator only. Changing this policy never retries an effect or grants native CLI tools. */
+export async function setHostActionApprovalMode(input:unknown) {
+  const context=owner(),request=z.object({execution_id:z.string().min(1),approval_mode:approvalModeSchema}).strict().parse(input);
+  await readManagedContext(request.execution_id);
+  const live=leases.get(key(context,request.execution_id));if(!live)throw new Error("HOST_EXECUTION_AUTHORITY_UNAVAILABLE");
+  assertExecutionLive(live.lease.policy);live.approvalMode=request.approval_mode;
+  const pending=[...live.pendingReviews.values()][0];
+  if(pending&&autoApprovesAction(live.approvalMode,live.lease.policy.autonomy,pending.request.approved_actions[0].tool))
+    await approveHostExecutionCompact(pending.request);
+  return {execution_id:request.execution_id,approval_mode:live.approvalMode};
+}
+export async function beginHostExecution(input:unknown,signal?:AbortSignal,operatorReviewEnabled=false,approvalMode:ActionApprovalMode="standard") {
   const context=owner(),request=ManagedExecutionRequestSchema.parse(structuredClone(input));
+  approvalModeSchema.parse(approvalMode);
   signal?.throwIfAborted();
   if(leases.size>=512)throw new Error("HOST_EXECUTION_CAPACITY");
   const intent=request.plan_execution;
@@ -128,8 +150,8 @@ export async function beginHostExecution(input:unknown,signal?:AbortSignal,opera
     // Rolling lease: staleness aborts the policy signal (revoking worker authority) while the owner
     // still settles it through endHostExecution. The hard ceiling remains a final cleanup bound.
     const timer=setTimeout(()=>close(context,request.id),Math.max(1,Date.parse(lease.policy.ceiling_at)-Date.now()));timer.unref();
-    leases.set(key(context,request.id),{owner:context,lease,timer,activeApprovals:new Set(),pendingReviews:new Map(),reviewCount:0});
-    if(operatorReviewEnabled)lease.policy.request_review=(tool,args,signal)=>requestHostReview(context,request.id,tool,args,signal);
+    leases.set(key(context,request.id),{owner:context,lease,timer,activeApprovals:new Set(),approvalAcks:new Map(),pendingReviews:new Map(),reviewCount:0,approvalMode});
+    if(operatorReviewEnabled||approvalMode!=="standard")lease.policy.request_review=(tool,args,signal)=>requestHostReview(context,request.id,tool,args,signal);
     return {execution:await snapshot(entry,context),worker_bearer:lease.bearer,controls:lease.projection};
   } catch(error){close(context,request.id);lease.close();throw error;}
 }
@@ -189,8 +211,25 @@ export async function observeHostModelStop(input:unknown) {
     return snapshot(await finishManagedContext(entry.id),context);
   });
 }
+/** Small read-only acknowledgement: no graph assembly and no redispatch after a lost HTTP reply. */
+export async function readHostApprovalAcknowledgement(input:unknown) {
+  const context=owner(),request=ManagedExecutionApprovalRequestSchema.parse(input);
+  const live=leases.get(key(context,request.execution_id));
+  if(!live) { await readManagedContext(request.execution_id); return {execution:{execution_id:request.execution_id},approval_id:request.approval_id,review_activated:false}; }
+  const accepted=live.approvalAcks.get(request.approval_id);
+  if(accepted && accepted!==approvalHash(request))throw new Error("EXECUTION_APPROVAL_IDENTITY_CONFLICT");
+  return {execution:{execution_id:request.execution_id},approval_id:request.approval_id,review_activated:!!accepted};
+}
 /** Original-host control, never a model tool. Exact retry cannot replenish consumed actions. */
 export async function approveHostExecution(input: unknown) {
+  return approveHostExecutionWithView(input,snapshot);
+}
+async function approveHostExecutionCompact(input:unknown) {
+  const ack=await readHostApprovalAcknowledgement(input);
+  if(ack.review_activated)return {...ack,replayed:true};
+  return approveHostExecutionWithView(input,async(entry)=>({execution_id:entry.id}));
+}
+async function approveHostExecutionWithView<T>(input:unknown,view:(entry:ManagedExecutionContext,context:SessionContext)=>Promise<T>) {
   const context = owner(), request = ManagedExecutionApprovalRequestSchema.parse(input);
   if (Buffer.byteLength(JSON.stringify(request), "utf8") > 65536) throw new Error("EXECUTION_APPROVAL_BUDGET");
   const live = leases.get(key(context, request.execution_id));
@@ -208,7 +247,7 @@ export async function approveHostExecution(input: unknown) {
       // Validate the exact original payload even on a historical acknowledgement retry.
       await recordManagedApproval(request, prior.policy_revision);
       if (live.activeApprovals.has(request.approval_id)) { pending?.settle(); return {
-        execution: await snapshot(current, context), approval_id: prior.id, review_policy_revision: prior.policy_revision,
+        execution: await view(current, context), approval_id: prior.id, review_policy_revision: prior.policy_revision,
         controls: executionPolicyProjection(live.lease.policy), replayed: true, review_activated: true,
       }; }
       // Review publication may have succeeded before activation was interrupted.
@@ -220,10 +259,11 @@ export async function approveHostExecution(input: unknown) {
     if (current.pack.receipt.id !== request.context_receipt_id) throw new Error("EXECUTION_APPROVAL_CONTEXT_CHANGED");
     const repair = request.approved_actions.every(action => action.tool === "scan_project" && action.arguments.mode === "incremental"
       && action.arguments.enrich !== true && action.arguments.dry_run !== true);
-    await assertManagedContext(request.execution_id, { repair_source: repair });
+    await assertManagedContext(request.execution_id, { repair_source: repair,
+      source_work: request.approved_actions.every(action=>action.tool==="run_command"||coreToolPolicy(action.tool).effect==="source_write") });
     const recorded = await recordManagedApproval(request, prepared.revision);
-    prepared.activate(); live.activeApprovals.add(request.approval_id); pending?.settle();
-    return { execution: await snapshot(recorded.entry, context), approval_id: recorded.review.id, review_policy_revision: recorded.review.policy_revision,
+    prepared.activate(); live.activeApprovals.add(request.approval_id); live.approvalAcks.set(request.approval_id,approvalHash(request)); pending?.settle();
+    return { execution: await view(recorded.entry, context), approval_id: recorded.review.id, review_policy_revision: recorded.review.policy_revision,
       controls: executionPolicyProjection(live.lease.policy), replayed: recorded.replayed, review_activated: true };
   });
 }
@@ -293,10 +333,15 @@ export async function handleManagedExecutionApi(req:IncomingMessage,res:ServerRe
     else if(req.method==="POST"&&pathname==="/api/executions/v1/model/read")result=await readHostModel(await body(req));
     else if(req.method==="POST"&&pathname==="/api/executions/v1/model/observe-stop")result=await observeHostModelStop(await body(req));
     else if(req.method==="POST"&&pathname==="/api/executions/v1/approve")result=await approveHostExecution(await body(req));
+    else if(req.method==="POST"&&pathname==="/api/executions/v1/approve-compact"){
+      result=await approveHostExecutionCompact(await body(req));
+    }
+    else if(req.method==="POST"&&pathname==="/api/executions/v1/reviews/ack")result=await readHostApprovalAcknowledgement(await body(req));
+    else if(req.method==="POST"&&pathname==="/api/executions/v1/reviews/policy")result=await setHostActionApprovalMode(await body(req));
     else if(req.method==="POST"&&pathname==="/api/executions/v1/finish")result=await endHostExecution(await body(req));
     else if(req.method==="POST"&&pathname==="/api/executions/v1/reviews/decline")result=await declineHostExecutionReview(await body(req));
-    else if(req.method==="POST"&&pathname==="/api/executions/v1/reviews/read"){
-      const input=z.object({execution_id:z.string().min(1).max(1024)}).strict().parse(await body(req));result=await readHostExecutionReviews(input.execution_id);
+    else if(req.method==="POST"&&["/api/executions/v1/reviews/read","/api/executions/v1/reviews/details"].includes(pathname)){
+      const input=z.object({execution_id:z.string().min(1).max(1024)}).strict().parse(await body(req));result=await readHostExecutionReviews(input.execution_id,pathname.endsWith("/details"));
     }
     else if(req.method==="POST"&&pathname==="/api/executions/v1/reviews/open"){
       const input=z.object({execution_id:z.string().min(1).max(1024)}).strict().parse(await body(req));result=await enableHostExecutionReviews(input.execution_id);

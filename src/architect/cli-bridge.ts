@@ -115,6 +115,7 @@ export interface RunArchitectCliBridgeInput {
   autonomyMode?: "manual" | "supervised" | "autonomous";
   approvedActions?: ExecutionApproval;
   operatorReviewEnabled?: boolean;
+  actionApprovalMode?: import("../server/managed-execution.js").ActionApprovalMode;
   reasoningEffort?: string;
   /** Opt-in live qualification only; ordinary CLI passes use the host execution deadline. */
   qualificationMaxTurns?: number;
@@ -260,7 +261,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     lease = await beginHostExecution({ id: runId, query: input.userMessage, adapter: input.adapter,
       plan_id: input.planId, slice_id: input.sliceId, plan_execution: input.planExecution,
       autonomy: input.autonomyMode ?? "manual", verbosity: input.verbosityMode ?? "balanced",
-      approved_actions: input.approvedActions, timeout_ms: Math.trunc(timeoutMs) }, input.signal, input.operatorReviewEnabled === true);
+      approved_actions: input.approvedActions, timeout_ms: Math.trunc(timeoutMs) }, input.signal, input.operatorReviewEnabled === true, input.actionApprovalMode ?? "standard");
     prompt += "\n\n" + lease.execution.block;
     if (Buffer.byteLength(prompt) > NATIVE_CLI_PROMPT_MAX_BYTES) throw new Error("CLI_REQUIRED_PROMPT_BYTE_BOUND: narrow the task without clipping required evidence");
     const executionPolicy = await withHostExecution(runId, async () => getSessionContext()!.execution_policy!);
@@ -909,6 +910,7 @@ export function serializeCliPrompt(
     "Living-graph contract: record governed source effects and targeted reconciliation/digestion obligations. Keep hypotheses separate from facts. Run only approved bounded cognition over affected focus_entities; hop depth is a configured maximum, never a mandatory minimum.",
     "ADR contract: if the pass introduces a new durable architectural policy, reverses a guard rail, or creates a lasting cross-module decision, record it with record_architecture_decision; otherwise report the ADRs consulted and why no new ADR was needed.",
     "Do not use provider-native shell/read/write routes; use dreamgraph:run_command, read_source_code, patch_file, query_resource, query_architecture_decisions, and related DreamGraph MCP tools.",
+    `The DreamGraph run_command shell is ${process.platform === "win32" ? "Windows cmd.exe (no Unix head or PowerShell syntax unless explicitly invoking that program)" : "/bin/sh"}. Use commands appropriate for that shell.`,
     "The user request appears only in CURRENT USER REQUEST. Do not reconstruct it from prior sections.",
     createArchitectCliToolRequirementsSection(toolRequirements),
     createCliControlInstructions(controls?.autonomy ?? "manual", controls?.verbosity ?? "balanced", controls?.computerUse ?? "off", controls),

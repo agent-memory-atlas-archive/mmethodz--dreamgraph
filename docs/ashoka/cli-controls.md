@@ -15,3 +15,20 @@ The verified local help sources on 2026-10-01 are Codex 0.159.2 and Copilot 1.0.
 Native Computer Use grants, independent stop and platform capability qualification remain Slice 31. No paid CLI/model canary has run. Instrumented executable/MCP/stop fixtures pass, including the same fixed task under all three modes for both adapters. Manual permits one effect; Supervised permits two effects in one checkpoint and rejects the next; Autonomous admits the explicitly approved next checkpoint and still rejects outside scope. These are actual disposable native executable/bridge runs, not paid model outputs. Full wave review is pending.
 
 The native17-item handoff is accepted after stable133files/1499root passes,488extension passes and generated/build checks. [Evidence](wave-15-30-tests.json), [review](wave-15-30-verification.json). The explicit later composition/qualification limits remain; this is not the completed v14 release.
+
+## Action approvals — October 2026 update
+
+Architect's Advanced runtime controls now separate action approval from autonomy. The choice is saved in this browser for this instance and captured for each submitted pass:
+
+- **Standard — ask for commands** preserves existing autonomous approval of graph/source edits and reviews commands and other effects.
+- **Ask for every action** disables that standing edit approval.
+- **Auto accept — DreamGraph actions** lets the original operator authorize registered DreamGraph mutations and scoped commands without repeated clicks. The daemon still journals each exact action before dispatch and enforces graph context, scope, cancellation and existing effect/deadline limits. Unknown extensions are not automatically authorized.
+- **Auto accept this task** on a pending review changes only that live execution. It does not change subsequent-task defaults.
+
+This is shared by Claude CLI, Codex CLI, Copilot CLI and native API execution. It never enables a CLI's own repository mutation tools. Computer Use permission remains a separate control.
+
+Browser approvals use a compact acknowledgement rather than echoing the context pack. Lost replies can be checked using the original approval ID and argument hash, including while the approved action is running; acknowledgement recovery does not reissue the effect. Existing SDK/editor review response contracts remain unchanged.
+
+Managed commands observe files using streamed hashes and the scanner's repository-root .gitignore rules, including negations. Ignored/generated/secret material is excluded from this declared observation scope. Pre-dispatch hashing is cancellable. Concurrent file changes are still refused, and source changes still produce reconciliation obligations. A successful command does not claim external-effect verification or graph reconciliation.
+
+Pass Reports present the summary, work and blockers in framed sections, with counts, safe links and code formatting. Tool/evidence/raw sections are collapsible and materialize their contents when opened. This presentation does not compact the model's accumulated investigation context.

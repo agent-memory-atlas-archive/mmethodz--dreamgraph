@@ -10,7 +10,7 @@ export const EXECUTION_REVIEW_CSS = String.raw`
 export const EXECUTION_REVIEW_MARKUP = String.raw`
   <section id="execution-review-panel" class="execution-review" aria-label="Exact action review" hidden>
     <details open><summary id="execution-review-title">Action review</summary><pre id="execution-review-detail" tabindex="0"></pre></details>
-    <div class="review-actions"><button id="execution-review-approve" type="button">Approve once</button><button id="execution-review-decline" type="button">Decline</button><button id="execution-review-inspect" type="button">Check outcome</button></div>
+    <div class="review-actions"><button id="execution-review-approve" type="button">Approve once</button><button id="execution-review-auto" type="button" title="Approve DreamGraph mutations and commands for this task. Scope, graph validation and Computer Use permissions still apply.">Auto accept this task</button><button id="execution-review-decline" type="button">Decline</button><button id="execution-review-inspect" type="button">Check outcome</button></div>
     <p id="execution-review-status" class="review-status" role="status" aria-live="polite"></p>
   </section>
 `;
@@ -20,6 +20,7 @@ export const EXECUTION_REVIEW_SCRIPT = String.raw`
     const executionReviewDetailEl = document.getElementById('execution-review-detail');
     const executionReviewStatusEl = document.getElementById('execution-review-status');
     const executionReviewApproveEl = document.getElementById('execution-review-approve');
+    const executionReviewAutoEl = document.getElementById('execution-review-auto');
     const executionReviewDeclineEl = document.getElementById('execution-review-decline');
     const executionReviewInspectEl = document.getElementById('execution-review-inspect');
     let executionReviewId = null, executionReviewTimer = 0, executionReviewPolling = false;
@@ -27,7 +28,7 @@ export const EXECUTION_REVIEW_SCRIPT = String.raw`
     let reviewAcknowledgementUnconfirmed = false;
     let executionReviewInspection = null;
     async function executionReviewRequest(route, request) {
-      const signal = AbortSignal.timeout(10000);
+      const signal = AbortSignal.timeout(60000);
       const response = await fetch('/api/executions/v1/' + route, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(request), signal });
       if (!response.body) throw new Error('Execution review response unavailable.');
       const reader = response.body.getReader(), parts = []; let bytes = 0;
@@ -42,6 +43,7 @@ export const EXECUTION_REVIEW_SCRIPT = String.raw`
     function showExecutionReview(request) {
       displayedExecutionReview = JSON.parse(JSON.stringify(request));
       executionReviewInspection = null;
+      executionReviewAutoEl.disabled = false;
       executionReviewApproveEl.disabled = false; executionReviewDeclineEl.disabled = false; executionReviewInspectEl.disabled = false;
       const action = request.approved_actions[0];
       executionReviewTitleEl.textContent = 'Review ' + action.tool + ' · ' + action.calls + ' call';
@@ -54,12 +56,13 @@ export const EXECUTION_REVIEW_SCRIPT = String.raw`
       if (!executionReviewId || executionReviewPolling || executionReviewSubmitting || reviewAcknowledgementUnconfirmed) return;
       const id = executionReviewId; executionReviewPolling = true;
       try {
-        const queue = await executionReviewRequest('reviews/read', {execution_id:id});
+        const queue = await executionReviewRequest('reviews/details', {execution_id:id});
         if (id !== executionReviewId || executionReviewSubmitting || reviewAcknowledgementUnconfirmed) return;
         if (queue.execution_id !== id || !Array.isArray(queue.requests) || queue.requests.length > 1) throw new Error('Review queue identity is unconfirmed.');
         const request = queue.authority_active && queue.requests[0];
         if (request && request.execution_id === id && Array.isArray(request.approved_actions) && request.approved_actions.length === 1) {
           if (!displayedExecutionReview || displayedExecutionReview.approval_id !== request.approval_id) showExecutionReview(request);
+          if (queue.errors && queue.errors[request.approval_id]) executionReviewStatusEl.textContent = 'Automatic approval could not complete: ' + queue.errors[request.approval_id];
         } else { displayedExecutionReview = null; executionReviewPanelEl.hidden = true; }
       } catch (error) {
         // The start event may precede assembly. An unavailable read can never authorize an action.
@@ -83,20 +86,42 @@ export const EXECUTION_REVIEW_SCRIPT = String.raw`
       if (!displayedExecutionReview || executionReviewSubmitting) return;
       if (executionReviewInspection && !executionReviewInspection.authority_active) { executionReviewStatusEl.textContent = 'Authority revoked. Inspection cannot renew the historical approval.'; return; }
       const captured = JSON.parse(JSON.stringify(displayedExecutionReview)); executionReviewSubmitting = true;
+      executionReviewAutoEl.disabled = true;
       reviewAcknowledgementUnconfirmed = true; executionReviewApproveEl.disabled = true; executionReviewDeclineEl.disabled = true; executionReviewInspectEl.disabled = true;
       executionReviewStatusEl.textContent = 'Recording review ' + captured.approval_id + '…';
       try {
-        const result = await executionReviewRequest('approve', captured);
+        const result = await executionReviewRequest('approve-compact', captured);
         if (result.approval_id !== captured.approval_id || !result.execution || result.execution.execution_id !== captured.execution_id || result.review_activated !== true) throw new Error('Approval acknowledgement identity is unconfirmed.');
         reviewAcknowledgementUnconfirmed = false; displayedExecutionReview = null; executionReviewPanelEl.hidden = true;
         if (chatStatusEl.textContent.indexOf('Resolve the unconfirmed action review') === 0) chatStatusEl.textContent = 'Review confirmed for ' + captured.execution_id + '. No uncertain action was redispatched by this acknowledgement retry.';
       } catch (error) {
         executionReviewStatusEl.textContent = 'Approval acknowledgement unconfirmed: ' + error.message + '. Retry this same review ID or inspect execution ' + captured.execution_id + '; do not repeat uncertain effects. Automatic continuation is paused.';
         executionReviewApproveEl.textContent = 'Retry same review';
+        try {
+          const ack = await executionReviewRequest('reviews/ack', captured);
+          if (ack.execution && ack.execution.execution_id === captured.execution_id && ack.approval_id === captured.approval_id && ack.review_activated === true) {
+            reviewAcknowledgementUnconfirmed = false; displayedExecutionReview = null; executionReviewPanelEl.hidden = true;
+          }
+        } catch (_) { /* Retain the captured review when acknowledgement is still unknown. */ }
       } finally {
         executionReviewSubmitting = false; executionReviewApproveEl.disabled = false; executionReviewDeclineEl.disabled = reviewAcknowledgementUnconfirmed; executionReviewInspectEl.disabled = !displayedExecutionReview;
+        executionReviewAutoEl.disabled = reviewAcknowledgementUnconfirmed;
         if (!reviewAcknowledgementUnconfirmed) { executionReviewApproveEl.textContent = 'Approve once'; void pollExecutionReviews(); }
       }
+    });
+    executionReviewAutoEl.addEventListener('click', async function() {
+      if (!displayedExecutionReview || executionReviewSubmitting || reviewAcknowledgementUnconfirmed) return;
+      const captured = JSON.parse(JSON.stringify(displayedExecutionReview)); executionReviewSubmitting = true;
+      executionReviewAutoEl.disabled = true;
+      executionReviewStatusEl.textContent = 'Enabling auto accept for DreamGraph actions in this task…';
+      try {
+        const result = await executionReviewRequest('reviews/policy', {execution_id:captured.execution_id,approval_mode:'auto_accept'});
+        if (result.execution_id !== captured.execution_id || result.approval_mode !== 'auto_accept') throw new Error('Approval policy acknowledgement is unconfirmed.');
+        displayedExecutionReview = null; executionReviewPanelEl.hidden = true;
+      } catch (error) {
+        executionReviewStatusEl.textContent = 'Policy acknowledgement unconfirmed: ' + error.message + '. Check the original outcome; do not repeat the action.';
+        reviewAcknowledgementUnconfirmed = true;
+      } finally { executionReviewSubmitting = false; executionReviewAutoEl.disabled = reviewAcknowledgementUnconfirmed; executionReviewDeclineEl.disabled = reviewAcknowledgementUnconfirmed; if (!reviewAcknowledgementUnconfirmed) void pollExecutionReviews(); }
     });
     executionReviewDeclineEl.addEventListener('click', async function() {
       if (!displayedExecutionReview || executionReviewSubmitting || reviewAcknowledgementUnconfirmed) return;
@@ -116,6 +141,11 @@ export const EXECUTION_REVIEW_SCRIPT = String.raw`
       executionReviewApproveEl.disabled = true; executionReviewDeclineEl.disabled = true; executionReviewInspectEl.disabled = true;
       executionReviewStatusEl.textContent = 'Reading original execution ' + captured.execution_id + '; no action will be repeated.';
       try {
+        const ack = await executionReviewRequest('reviews/ack', captured);
+        if (ack.execution && ack.execution.execution_id === captured.execution_id && ack.approval_id === captured.approval_id && ack.review_activated === true) {
+          reviewAcknowledgementUnconfirmed = false; displayedExecutionReview = null; executionReviewPanelEl.hidden = true;
+          chatStatusEl.textContent = 'Original approval confirmed. No action was repeated.'; return;
+        }
         const result = await executionReviewRequest('read', {execution_id:captured.execution_id});
         if (!displayedExecutionReview || displayedExecutionReview.execution_id !== captured.execution_id || displayedExecutionReview.approval_id !== captured.approval_id
           || result.execution_id !== captured.execution_id || typeof result.instance_id !== 'string' || typeof result.authority_active !== 'boolean'
@@ -137,6 +167,7 @@ export const EXECUTION_REVIEW_SCRIPT = String.raw`
       } catch (error) { executionReviewStatusEl.textContent = 'Inspection unconfirmed: ' + error.message + '. No action was repeated; retain the original execution.'; }
       finally {
         executionReviewSubmitting = false;
+        executionReviewAutoEl.disabled = !displayedExecutionReview || reviewAcknowledgementUnconfirmed || !!executionReviewInspection && !executionReviewInspection.authority_active;
         executionReviewApproveEl.disabled = !displayedExecutionReview || !!executionReviewInspection && !executionReviewInspection.authority_active;
         executionReviewDeclineEl.disabled = !displayedExecutionReview || reviewAcknowledgementUnconfirmed || !!executionReviewInspection && !executionReviewInspection.authority_active;
         executionReviewInspectEl.disabled = !displayedExecutionReview;

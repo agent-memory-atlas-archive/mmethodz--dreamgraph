@@ -2,6 +2,7 @@ import { architectModelChoices, architectEffortChoices, assertRouteEffort } from
 import { z } from "zod";
 import { CONTEXT_MENU_CSS, CONTEXT_MENU_SCRIPT } from "../server/context-menu.js";
 import { ARCHITECT_CONTEXT_ACTION_SCRIPT } from "./context-actions.js";
+import { PASS_REPORT_CSS, PASS_REPORT_SCRIPT } from "./pass-report-ui.js";
 import { EXECUTION_REVIEW_CSS, EXECUTION_REVIEW_MARKUP, EXECUTION_REVIEW_SCRIPT } from "./execution-review-ui.js";
 import {COMPUTER_USE_CSS,COMPUTER_USE_MARKUP,COMPUTER_USE_SCRIPT} from "./computer-use-ui.js";
 import { PlanCommandSchema, type PlanActor } from "../discipline/plan-workflow.js";
@@ -4764,6 +4765,10 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
   const verbosityMode =
     architectVerbosityModeField(body, "verbosity_mode") ?? architectVerbosityModeField(body, "verbosityMode") ?? architectVerbosityModeField(body, "mode") ?? getArchitectVerbosityMode().mode;
   const adapter = architectAdapterField(body, "adapter") ?? getArchitectAdapterConfig().adapter;
+  const actionApprovalMode = body.action_approval_mode ?? "standard";
+  if (typeof actionApprovalMode !== "string" || !["standard","ask","auto_accept"].includes(actionApprovalMode) || getSessionContext()?.execution_policy && actionApprovalMode !== "standard") {
+    jsonError(res,400,"action_approval_invalid","Only the operator can select an action approval policy.");return;
+  }
   const approvedActions = ExecutionApprovalSchema.safeParse(body.approved_actions ?? []);
   if (!approvedActions.success || getSessionContext()?.execution_policy && approvedActions.data?.length) { jsonError(res, 400, "execution_approval_invalid", "Only the operator request can supply exact bounded approved actions."); return; }
   const parsedPlanExecution = body.plan_execution === undefined ? null : PlanExecutionIntentSchema.safeParse(body.plan_execution);
@@ -4936,6 +4941,7 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
         autonomyMode: mode,
         approvedActions: approvedActions.data,
         operatorReviewEnabled: body.operator_review === true,
+        actionApprovalMode: actionApprovalMode as "standard" | "ask" | "auto_accept",
         reasoningEffort: architectConfig.reasoningEffort,
         toolRequirements: continuationToolManifest ? {
           required_tools: continuationToolManifest.required_tools,
@@ -5029,6 +5035,7 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
         verbosityMode,
         approvedActions: approvedActions.data,
         operatorReviewEnabled: body.operator_review === true,
+        actionApprovalMode: actionApprovalMode as "standard" | "ask" | "auto_accept",
         req,
         config: architectConfig,
         onUsage: usage => usageCalls.push(usage),
@@ -7773,6 +7780,13 @@ function renderArchitectShell(): string {
             <option value="detailed">Detailed</option>
           </select>
         </label>
+        <label class="control-field" title="Independent of autonomy. All actions still use DreamGraph tools, project scope and graph validation. Computer Use has its own permission.">Action approvals
+          <select id="architect-action-approval-select">
+            <option value="standard">Standard — ask for commands</option>
+            <option value="ask">Ask for every action</option>
+            <option value="auto_accept">Auto accept — DreamGraph actions</option>
+          </select>
+        </label>
         <label class="control-field">Passes
           <span id="architect-pass-view" class="pass-view">0 passes | 0 tools</span>
         </label>
@@ -7968,7 +7982,7 @@ function renderArchitectShell(): string {
   </main>
   <script src="/api/architect/v1/assets/xterm/xterm.js"></script>
   <script src="/api/architect/v1/assets/xterm/addon-fit.js"></script>
-  <style>${CONTEXT_MENU_CSS}${EXECUTION_REVIEW_CSS}${COMPUTER_USE_CSS}</style><script>${CONTEXT_MENU_SCRIPT}</script>
+  <style>${CONTEXT_MENU_CSS}${EXECUTION_REVIEW_CSS}${COMPUTER_USE_CSS}${PASS_REPORT_CSS}</style><script>${CONTEXT_MENU_SCRIPT}</script>
   <script>
     ${ARCHITECT_CONTEXT_ACTION_SCRIPT}
     ${EXECUTION_REVIEW_SCRIPT}
@@ -8040,6 +8054,7 @@ function renderArchitectShell(): string {
     const architectModelInputEl = document.getElementById('architect-model-input');
     const architectEffortSelectEl = document.getElementById('architect-effort-select');
     const architectAutonomyModeSelectEl = document.getElementById('architect-autonomy-mode-select');
+    const architectActionApprovalSelectEl = document.getElementById('architect-action-approval-select');
     const architectVerbosityModeSelectEl = document.getElementById('architect-verbosity-mode-select');
     const architectPassViewEl = document.getElementById('architect-pass-view');
     const recordActionButtonEl = document.getElementById('record-action-button');
@@ -9943,6 +9958,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
           model: architectModelInputEl.value,
           reasoning_effort: architectEffortSelectEl.value,
           mode: architectAutonomyModeSelectEl.value,
+          action_approval_mode: architectActionApprovalSelectEl.value,
         }));
       } catch (_) { /* storage may be unavailable */ }
       window.clearTimeout(architectControlPersistTimer);
@@ -10112,6 +10128,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       if (!architectProviderSelectEl.value) architectProviderSelectEl.value = 'none';
       lastNativeArchitectProvider = architectProviderSelectEl.value !== 'none' ? architectProviderSelectEl.value : '';
       architectAutonomyModeSelectEl.value = runtime.autonomy_mode || saved.mode || 'autonomous';
+      architectActionApprovalSelectEl.value = ['standard','ask','auto_accept'].includes(saved.action_approval_mode) ? saved.action_approval_mode : 'standard';
       architectVerbosityModeSelectEl.value = runtime.verbosity_mode || 'balanced';
       syncArchitectControlState(runtime.model || saved.model || '');
       syncArchitectEffort(runtime.reasoning_effort);
@@ -10132,6 +10149,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         saveArchitectControls();
       });
       architectAutonomyModeSelectEl.addEventListener('change', saveArchitectControls);
+      architectActionApprovalSelectEl.addEventListener('change', saveArchitectControls);
       architectVerbosityModeSelectEl.addEventListener('change', saveArchitectControls);
     }
 
@@ -10143,6 +10161,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         model: architectModelInputEl.value.trim(),
         reasoning_effort: architectEffortSelectEl.value || null,
         mode: architectAutonomyModeSelectEl.value || 'autonomous',
+        action_approval_mode: architectActionApprovalSelectEl.value || 'standard',
         verbosity_mode: architectVerbosityModeSelectEl.value || 'balanced',
       };
     }
@@ -11174,7 +11193,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         detailsSummary.textContent = 'Details';
         details.appendChild(detailsSummary);
         const pre = document.createElement('pre');
-        pre.textContent = parsed.details.length > 1800 ? parsed.details.slice(0, 1800).trim() + '...' : parsed.details;
+        pre.textContent = parsed.details;
         details.appendChild(pre);
         row.appendChild(details);
       }
@@ -11204,22 +11223,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       section.appendChild(list);
     }
 
-    function appendContinuationReportSection(panel, title, value) {
-      const section = document.createElement('div');
-      section.className = 'continuation-report-section';
-      const heading = document.createElement('strong');
-      heading.textContent = title;
-      section.appendChild(heading);
-      if (Array.isArray(value)) {
-        appendContinuationList(section, value);
-      } else {
-        const text = document.createElement('div');
-        const normalized = compactContinuationReportText(value);
-        text.textContent = isRenderableContinuationReportText(normalized) ? normalized : 'None recorded.';
-        section.appendChild(text);
-      }
-      panel.appendChild(section);
-    }
+    ${PASS_REPORT_SCRIPT}
 
     function renderArchitectContinuationReport(message, result, runtime) {
       if (!message || !message.body || !result) return;
@@ -11262,6 +11266,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
           'completed passes: ' + String(continuation.completed_passes || 0) + '/' + String(continuation.max_passes || 0),
         ]);
       }
+      appendContinuationReportSection(panel, 'Raw report data', {report:report,continuation:continuation});
       renderArchitectContinuationPills(panel, result, runtime);
       message.body.appendChild(panel);
       chatLogEl.scrollTop = chatLogEl.scrollHeight;
@@ -12179,6 +12184,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
           body: JSON.stringify({
             message: outboundMessage,
             operator_review: true,
+            action_approval_mode: controls.action_approval_mode,
             ...(dispatchComputerPreparation?{computer_preparation_id:dispatchComputerPreparation}:{}),
             ...(dispatchComputerUse?{computer_use:true}:{}),
             scope: dispatchScope,
@@ -12704,7 +12710,15 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       railStatusEl.textContent = 'Creating plan...';
       try {
         const plan = await createDaemonPlan(title);
-        await loadPlans(plan.id);
+        if (!plan.id) throw new Error('Plan was created but the daemon did not return its id.');
+        // A newly created plan is always selected, revealed in the rail (even when the
+        // active filters would hide it) and becomes the chat scope.
+        const selectOptions = { activatePlanScope: true, revealSelected: true };
+        revealedPlanId = plan.id;
+        await loadPlans(plan.id, selectOptions);
+        // loadPlans drops its selection when another list refresh or plan load overlaps it;
+        // the explicit create intent wins, so select the new plan directly in that case.
+        if (activePlanId !== plan.id) await loadPlan(plan.id, null, selectOptions);
       } finally {
         createPlanButtonEl.disabled = false;
       }

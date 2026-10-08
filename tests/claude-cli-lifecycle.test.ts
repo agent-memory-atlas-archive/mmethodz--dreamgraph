@@ -78,3 +78,21 @@ it("preserves failed terminal reason, turns and usage even without a final newli
     await expect(access(input.gatePath)).rejects.toThrow();
   });
 });
+
+it("drains long stdout and stderr streams without killing a healthy investigative run", async () => {
+  const event = { type: "user", message: { content: [{ type: "tool_result", content: "evidence ".repeat(1024) }] } };
+  const code = "const {once}=require('node:events');(async()=>{console.log(" + JSON.stringify(JSON.stringify(init)) +
+    ");const event=" + JSON.stringify(JSON.stringify(event) + "\n") +
+    ";for(let i=0;i<150;i++){if(!process.stdout.write(event))await once(process.stdout,'drain');}" +
+    "if(!process.stderr.write('diagnostic '.repeat(7000)))await once(process.stderr,'drain');" +
+    "console.log(" + JSON.stringify(JSON.stringify(result)) + ");})()";
+  await fixture(code, async input => {
+    const value = await runClaudeProcess(input);
+    expect(value.exitCode).toBe(0);
+    expect(value.terminationConfirmed).toBe(true);
+    expect(value.claude.error).toBeUndefined();
+    expect(value.claude.content).toBe("actual terminal");
+    expect(value.stdout).toBe(""); expect(value.stderr).toBe("");
+    await expect(access(input.gatePath)).rejects.toThrow();
+  });
+});

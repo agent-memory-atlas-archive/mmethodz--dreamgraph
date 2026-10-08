@@ -1802,3 +1802,49 @@ it('portable SDK callback gets the captured final request despite mutation durin
   await entered;request.payload='changed';request.binding.model='gpt-4.1-mini';release();expect(await outcome).toBe('Captured native fixture');expect(await pass.finish('completed')).toMatchObject({status:'no_change'});
  }finally{release?.();await pass.finish('completed').catch(()=>undefined);host.dispose();}
 });
+
+
+it.each(["claude-cli","codex-cli","native_api_tool_loop"])("operator auto accept admits commands and mutations through the same durable review for %s",async(adapter)=>{
+ const host=client(),lease=await host.beginExecution({id:"auto-"+adapter,adapter,query:"Host context",autonomy:"autonomous"});
+ await host.deliverExecution(lease.workerBearer,lease.execution.pack.receipt.id,lease.execution.block);
+ await host.openExecutionReviews(lease.execution.execution_id);
+ const owner=[...contexts.values()].find(value=>!value.execution_policy)!;
+ const {setHostActionApprovalMode,autoApprovesAction}=await import("../src/server/managed-execution.js");
+ await withSessionContext(owner,()=>setHostActionApprovalMode({execution_id:lease.execution.execution_id,approval_mode:"auto_accept"}));
+ expect(autoApprovesAction("auto_accept","autonomous","unknown_plugin_write")).toBe(false);
+ let ran=0;
+ const effect=await withSessionContext(owner,()=>withHostExecution(lease.execution.execution_id,()=>invokeToolBoundary({
+  name:"delete_file",shape:{filePath:z.string()},args:{filePath:"disposable.ts"},
+  handler:async()=>{ran++;expect((await readManagedContext(lease.execution.execution_id)).approval_reviews.at(-1)?.actions[0].tool).toBe("delete_file");return {content:[]};}
+ })));
+ expect(effect.isError).not.toBe(true);expect(ran).toBe(1);
+ const result=await withSessionContext(owner,()=>withHostExecution(lease.execution.execution_id,()=>executeScopedCommand(getSessionContext()!.execution_policy,{command:'node -e "process.stdout.write(\'approved\')"'},root)));
+ expect(result.stdout).toBe("approved");expect(result.exitCode).toBe(0);
+ const record=await withSessionContext(owner,()=>readManagedContext(lease.execution.execution_id));
+ expect(record.approval_reviews.map(review=>review.actions[0].tool)).toEqual(["delete_file","run_command"]);
+ await expect(withSessionContext(owner,()=>withHostExecution(lease.execution.execution_id,()=>setHostActionApprovalMode({execution_id:lease.execution.execution_id,approval_mode:"auto_accept"})))).rejects.toThrow("HOST_EXECUTION_CONTROL_REQUIRED");
+ await host.finishExecution(lease.execution.execution_id,"completed","confirmed");
+});
+it("Ask overrides autonomous edit approval, and a compact acknowledgement recovers while the already-approved effect is still running",async()=>{
+ const host=client(),lease=await host.beginExecution({id:"compact-review",adapter:"claude-cli",query:"Host context",autonomy:"autonomous"});
+ await host.deliverExecution(lease.workerBearer,lease.execution.pack.receipt.id,lease.execution.block);await host.openExecutionReviews(lease.execution.execution_id);
+ const owner=[...contexts.values()].find(value=>!value.execution_policy)!;
+ const {setHostActionApprovalMode,readHostApprovalAcknowledgement}=await import("../src/server/managed-execution.js");
+ await withSessionContext(owner,()=>setHostActionApprovalMode({execution_id:lease.execution.execution_id,approval_mode:"ask"}));
+ let release!:()=>void,started!:()=>void,ran=0;
+ const hold=new Promise<void>(done=>release=done),running=new Promise<void>(done=>started=done);
+ const effect=withSessionContext(owner,()=>withHostExecution(lease.execution.execution_id,()=>invokeToolBoundary({
+  name:"edit_file",shape:{filePath:z.string()},args:{filePath:"source.ts"},handler:async()=>{ran++;started();await hold;return {content:[]};}
+ })));
+ try {
+  let queue!:Awaited<ReturnType<DaemonClient["readExecutionReviews"]>>;
+  await vi.waitFor(async()=>{queue=await host.readExecutionReviews(lease.execution.execution_id);expect(queue.requests).toHaveLength(1);},{timeout:3000});
+  expect(ran).toBe(0);
+  await host.approveExecution(queue.requests[0]);await running;
+  const ack=await Promise.race([withSessionContext(owner,()=>readHostApprovalAcknowledgement(queue.requests[0])),new Promise<never>((_,reject)=>setTimeout(()=>reject(new Error("ack blocked behind effect")),1000))]);
+  expect(ack).toMatchObject({review_activated:true,approval_id:queue.requests[0].approval_id});
+  expect(Buffer.byteLength(JSON.stringify(ack))).toBeLessThan(1024);
+  await expect(withSessionContext(owner,()=>readHostApprovalAcknowledgement({...queue.requests[0],approved_actions:[{...queue.requests[0].approved_actions[0],arguments:{filePath:"different.ts"}}]}))).rejects.toThrow("IDENTITY_CONFLICT");
+  expect(ran).toBe(1);
+ }finally{release();await effect;await host.finishExecution(lease.execution.execution_id,"completed","confirmed");}
+});

@@ -1,5 +1,4 @@
 import { spawn } from "node:child_process";
-import { StringDecoder } from "node:string_decoder";
 import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
 import { validateClaudeInit, type ClaudeInitExpectation } from "./claude-cli-profile.js";
 import { providerUsage } from "../cognitive/provider-outcome.js";
@@ -23,24 +22,49 @@ function terminalFailureCode(subtype: unknown): string {
   }
 }
 
+/** Per-record memory guard: accommodates the 8 MiB MCP result bound plus JSON escaping/framing.
+ * It is not a cumulative transcript or model-token allowance. Completed nonterminal records are discarded. */
+export const CLAUDE_STREAM_RECORD_MAX_BYTES = 32 * 1024 * 1024;
+
 /** Bounded JSONL parser; partial assistant messages are presentation, never terminal truth. */
 export class ClaudeStream {
-  private decoder = new StringDecoder("utf8");
-  private pending = "";
-  private bytes = 0;
+  private pending = Buffer.alloc(0);
+  private pendingBytes = 0;
   private initialized = false;
   private sessionId = "";
   private terminal: any;
   constructor(private expected: ClaudeInitExpectation, private admit: () => void, private settle: () => void = () => {}) {}
   push(chunk: Buffer): void {
-    this.bytes += chunk.length;
-    if (this.bytes > 512 * 1024) throw new Error("CLAUDE_OUTPUT_BYTE_BOUND");
-    this.pending += this.decoder.write(chunk);
-    let end: number;
-    while ((end = this.pending.indexOf("\n")) >= 0) {
-      const line = this.pending.slice(0, end); this.pending = this.pending.slice(end + 1);
-      if (line.trim()) this.event(line);
+    let offset = 0;
+    while (offset < chunk.length) {
+      const newline = chunk.indexOf(0x0a, offset);
+      const end = newline < 0 ? chunk.length : newline;
+      const length = end - offset;
+      if (this.pendingBytes + length > CLAUDE_STREAM_RECORD_MAX_BYTES)
+        throw new Error("CLAUDE_STREAM_RECORD_BYTE_BOUND");
+      if (length) {
+        // Geometric growth bounds both bytes and allocation count, even for single-byte fragments.
+        // Never retain a slice backed by a whole multi-record input chunk.
+        const required = this.pendingBytes + length;
+        if (required > this.pending.length) {
+          const capacity = Math.min(CLAUDE_STREAM_RECORD_MAX_BYTES, Math.max(required, 65536, this.pending.length * 2));
+          const next = Buffer.allocUnsafe(capacity);
+          this.pending.copy(next, 0, 0, this.pendingBytes);
+          this.pending = next;
+        }
+        chunk.copy(this.pending, this.pendingBytes, offset, end);
+        this.pendingBytes = required;
+      }
+      if (newline < 0) break;
+      this.flushRecord();
+      offset = newline + 1;
     }
+  }
+  private flushRecord(): void {
+    // Decode once the whole record is present, preserving UTF-8 split across pipe chunks.
+    const line = this.pending.toString("utf8", 0, this.pendingBytes);
+    this.pending = Buffer.alloc(0); this.pendingBytes = 0;
+    if (line.trim()) this.event(line);
   }
   private event(line: string): void {
     let event: any;
@@ -78,9 +102,7 @@ export class ClaudeStream {
   }
   usage(): TokenUsage | undefined { return providerUsage("anthropic", this.terminal?.usage); }
   finish(): { content: string; usage?: TokenUsage } {
-    this.pending += this.decoder.end();
-    if (this.pending.trim()) this.event(this.pending);
-    this.pending = "";
+    this.flushRecord();
     const result = this.terminal;
     if (!result) throw new Error("CLAUDE_TERMINAL_RESULT_MISSING");
     if (result.subtype !== "success" || result.is_error !== false) throw new Error(terminalFailureCode(result.subtype));
@@ -108,7 +130,7 @@ export async function runClaudeProcess(input: {
     const child = spawn(input.command, input.args, { cwd: input.cwd, env: input.env, shell: false,
       windowsHide: true, detached: process.platform !== "win32", stdio: ["pipe", "pipe", "pipe"] });
     let failure: string | undefined, timedOut = false, kill: Promise<boolean> | undefined;
-    let stderrBytes = 0, closed = false, completed = false;
+    let closed = false, completed = false;
     let proxyPid: number | undefined;
     let stopDeadline: ReturnType<typeof setTimeout> | undefined;
     const revoke = () => { try { unlinkSync(input.gatePath); } catch { /* Absent is closed. */ } };
@@ -162,10 +184,8 @@ export async function runClaudeProcess(input: {
       if (failure || completed) return;
       try { parser.push(chunk); input.onActivity?.(); } catch (error) { failure = (error as Error).message; stop(); }
     });
-    child.stderr.on("data", (chunk: Buffer) => {
-      stderrBytes += chunk.length; input.onActivity?.();
-      if (stderrBytes > 32768) { failure = "CLAUDE_STDERR_BYTE_BOUND"; stop(); }
-    });
+    // Drain diagnostics without retaining them or imposing a cumulative run-output quota.
+    child.stderr.on("data", () => { if (!completed) input.onActivity?.(); });
     child.once("error", error => {
       failure = "CLAUDE_SPAWN_FAILED";
       if (!child.pid) { closed = true; finish(null, null, true); } else stop();

@@ -34,7 +34,7 @@ async function search(args: Record<string, unknown> = {}) {
 it("preserves ordinary hits and exact source positions without unnecessary clipping", async () => {
   await writeFile(join(root, "a.ts"), "before\nconst needle = 1;\nafter\n");
   const data = await search();
-  expect(data.matches).toEqual([{ filePath: "a.ts", line: 2, preview: "> 2: const needle = 1;", preview_truncated: false }]);
+  expect(data.matches).toEqual([{ filePath: "a.ts", line: 2, preview: "> 2: const needle = 1;", preview_truncated: false, read_source_code: {repo:"fixture",filePath:"a.ts",entity:"needle"} }]);
   expect(data.truncated).toBe(false);
   expect(data.notice).toBeUndefined();
 });
@@ -61,4 +61,39 @@ it("still honors the requested result count", async () => {
   expect(data.matchCount).toBe(1);
   expect(data.truncated).toBe(true);
   expect(data.output_byte_limit_reached).toBe(false);
+});
+
+it("returns usable compact pointers, supports an exact filename, and reads the declaration rather than an earlier callsite", async () => {
+  await writeFile(join(root,"a.ts"), 'function before() {\n  needle("caller");\n}\nexport function needle(value: string) {\n  return value;\n}\n');
+  const data = await search({pathPrefix:"a.ts"});
+  expect(data.filesScanned).toBe(1);
+  expect(data.matches).toHaveLength(2);
+  expect(data.matches[0].read_source_code).toEqual({repo:"fixture",filePath:"a.ts",startLine:2,endLine:2});
+  expect(data.matches[1].read_source_code).toEqual({repo:"fixture",filePath:"a.ts",entity:"needle"});
+  for (const hit of data.matches) {
+    const result = await client.callTool({name:"read_source_code",arguments:hit.read_source_code});
+    const text = JSON.stringify(result.content);
+    expect(text).toContain(hit.line === 2 ? "caller" : "return value");
+  }
+});
+it("missing paths and sibling-prefix escapes cannot masquerade as no matches", async () => {
+  for (const pathPrefix of ["missing.ts",root+"-outside"]) {
+    const response = await client.callTool({name:"search_source_code",arguments:{repo:"fixture",query:"needle",pathPrefix}});
+    expect(JSON.parse((response.content as Array<{text:string}>)[0].text).success).toBe(false);
+  }
+});
+it("keeps default hints compact while explicit context previews remain available", async () => {
+  await writeFile(join(root,"a.ts"), "before\nneedle " + "x".repeat(900) + "\nafter");
+  const compact = await search(), preview = await search({contextLines:1});
+  expect(Buffer.byteLength(compact.matches[0].preview)).toBeLessThanOrEqual(240);
+  expect(compact.matches[0].preview_truncated).toBe(true);
+  expect(preview.matches[0].preview).toContain("before");
+  expect(preview.matches[0].preview).toContain("after");
+  expect(preview.matches[0].read_source_code).toMatchObject({startLine:1,endLine:3});
+});
+
+it("discovery shares scanner gitignore exclusions and negations",async()=>{
+ await writeFile(join(root,".gitignore"),"*.ts\n!keep.ts\n");
+ await writeFile(join(root,"ignored.ts"),"needle");await writeFile(join(root,"keep.ts"),"needle");
+ const data=await search();expect(data.filesScanned).toBe(1);expect(data.matches.map((hit:any)=>hit.filePath)).toEqual(["keep.ts"]);
 });

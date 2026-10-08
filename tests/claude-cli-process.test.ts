@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ClaudeStream } from "../src/architect/claude-cli-process.js";
+import { ClaudeStream, CLAUDE_STREAM_RECORD_MAX_BYTES } from "../src/architect/claude-cli-process.js";
 const expected = { version: "2.1.293", model: "claude-sonnet-5", tools: ["query_resource"] };
 const init = { type: "system", subtype: "init", session_id: "one", permissionMode: "dontAsk",
   claude_code_version: expected.version, model: expected.model, tools: ["mcp__dreamgraph__query_resource"],
@@ -47,7 +47,7 @@ describe("Claude terminal and streaming truth", () => {
       [[line(init)], "RESULT_MISSING"],
       [[line(init), line(init)], "INIT_DUPLICATE"],
       [[line(init), line(result), line(result)], "RESULT_DUPLICATE"],
-      [[line(init), Buffer.alloc(524289)], "BYTE_BOUND"],
+      [[line(init), Buffer.alloc(CLAUDE_STREAM_RECORD_MAX_BYTES + 1)], "STREAM_RECORD_BYTE_BOUND"],
     ] as const) {
       const parser = new ClaudeStream(expected, () => {});
       expect(() => { for (const chunk of chunks) parser.push(chunk); parser.finish(); }).toThrow(error);
@@ -84,4 +84,42 @@ it("accepts a successful result after 100 investigative turns", () => {
   parser.push(line({ ...result, num_turns: 101 }));
   expect(parser.finish().content).toBe(result.result);
   expect(parser.diagnostic()?.num_turns).toBe(101);
+});
+
+it.each(["separate", "coalesced", "fragmented"])("streams a transcript larger than the record bound without a run quota (%s)", mode => {
+  const parser = new ClaudeStream(expected, () => {});
+  const event = line({ type: "user", message: { content: [
+    { type: "tool_result", tool_use_id: "read", content: "entity evidence ".repeat(4096) },
+  ] } });
+  const count = Math.ceil(CLAUDE_STREAM_RECORD_MAX_BYTES / event.length) + 1;
+  parser.push(line(init));
+  if (mode === "coalesced") parser.push(Buffer.concat(Array.from({ length: count }, () => event)));
+  else for (let i = 0; i < count; i++) {
+    if (mode === "separate") parser.push(event);
+    else for (let offset = 0; offset < event.length; offset += 997) parser.push(event.subarray(offset, offset + 997));
+  }
+  parser.push(line(result));
+  expect(parser.finish().content).toBe(result.result);
+});
+it("accepts a large individual result and preserves the final terminal without a newline", () => {
+  const parser = new ClaudeStream(expected, () => {});
+  parser.push(line(init));
+  parser.push(line({ type: "user", message: { content: [{ type: "tool_result", content: "x".repeat(1024 * 1024) }] } }));
+  parser.push(Buffer.from(JSON.stringify(result)));
+  expect(parser.finish().content).toBe(result.result);
+});
+it("bounds a single unfinished UTF-8 record by wire bytes across fragments", () => {
+  const parser = new ClaudeStream(expected, () => {});
+  parser.push(line(init));
+  const block = Buffer.from("測".repeat(65536));
+  const repeats = Math.floor(CLAUDE_STREAM_RECORD_MAX_BYTES / block.length);
+  for (let i = 0; i < repeats; i++) parser.push(block);
+  expect(() => parser.push(block)).toThrow("CLAUDE_STREAM_RECORD_BYTE_BOUND");
+});
+it("still validates capabilities after consuming a large investigation trace", () => {
+  const parser = new ClaudeStream(expected, () => {});
+  parser.push(line(init));
+  parser.push(line({ type: "user", message: { content: "x".repeat(600000) } }));
+  expect(() => parser.push(line({ type: "assistant", message: { content: [{ type: "tool_use", name: "Bash" }] } })))
+    .toThrow("CLAUDE_UNADVERTISED_TOOL");
 });
