@@ -529,7 +529,7 @@ if can_build_vscode_extension; then
             ok "Extension built"
             rm -f "$VSIX_PATH"
             pushd "$EXT_SOURCE" >/dev/null
-            run_logged --allow-failure -- npx --yes @vscode/vsce package --out "$VSIX_PATH"
+            run_logged --allow-failure -- npm run package -- --out "$VSIX_PATH"
             popd >/dev/null
             if [[ $RUN_LOGGED_EXIT_CODE -ne 0 ]] || [[ ! -f "$VSIX_PATH" ]]; then
                 warn "Extension packaging failed -- skipping VS Code extension install"

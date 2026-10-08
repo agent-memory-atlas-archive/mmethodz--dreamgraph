@@ -100,7 +100,7 @@ function Invoke-LoggedCommand {
     }
 
     if (-not $Quiet) {
-        @($output) | Where-Object { $_ -is [string] -and $_.Trim() } | ForEach-Object {
+        @($output) | ForEach-Object { [string]$_ } | Where-Object { $_.Trim() } | ForEach-Object {
             Write-Host "  $_" -ForegroundColor DarkGray
         }
     }
@@ -465,7 +465,7 @@ if (Test-CanBuildVsCodeExtension) {
                 Remove-Item -Force $vsixPath
             }
 
-            $packageResult = Invoke-LoggedCommand -FilePath "npx" -Arguments @("--yes", "@vscode/vsce", "package", "--out", $vsixPath) -WorkingDirectory $ExtSourceDir -AllowFailure
+            $packageResult = Invoke-LoggedCommand -FilePath "npm" -Arguments @("run", "package", "--", "--out", $vsixPath) -WorkingDirectory $ExtSourceDir -AllowFailure
             if ($packageResult.ExitCode -ne 0 -or -not (Test-Path $vsixPath)) {
                 Write-Warn "Extension packaging failed -- skipping VS Code extension install"
             } else {
