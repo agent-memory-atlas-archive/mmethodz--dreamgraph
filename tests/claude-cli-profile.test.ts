@@ -90,3 +90,11 @@ describe("Claude G0 candidate launch boundary", () => {
     ]) expect(() => validateClaudeInit({ ...init, ...patch }, expected)).toThrow("CLAUDE_INIT");
   });
 });
+
+it("confines the twelve-turn limit to explicitly bounded qualification runs", () => {
+  const input = { mcpConfig: join(tmpdir(), "mcp.json"), settings: join(tmpdir(), "settings.json"), model: "claude-sonnet-5" };
+  expect(claudeProfileArgs(input)).not.toContain("--max-turns");
+  const qualification = claudeProfileArgs({ ...input, maxTurns: 12 });
+  expect(qualification[qualification.indexOf("--max-turns") + 1]).toBe("12");
+  for (const maxTurns of [0, 13, Infinity, NaN]) expect(() => claudeProfileArgs({ ...input, maxTurns })).toThrow("RUN_BOUND");
+});

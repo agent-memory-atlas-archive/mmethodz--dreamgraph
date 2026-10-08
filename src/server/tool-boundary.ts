@@ -72,6 +72,7 @@ export async function invokeToolBoundary(input: { name: string; shape: ZodRawSha
     const admit=async()=>{
       try {
         if (effect && policy?.context_id) await assertManagedContext(policy.context_id, {
+          source_work: coreToolPolicy(name).effect === "source_write",
           repair_source: name === "scan_project" && (input.args as Record<string, unknown>)?.mode === "incremental"
             && (input.args as Record<string, unknown>)?.enrich !== true && (input.args as Record<string, unknown>)?.dry_run !== true,
         });

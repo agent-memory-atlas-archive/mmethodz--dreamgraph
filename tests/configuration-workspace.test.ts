@@ -393,3 +393,12 @@ it("retains a profile read when the operator leaves the Computer Use tab mid-req
   expect(document.querySelector<HTMLInputElement>('#cw-computer-id')!.value).toBe('new-target');
   expect(errors).toEqual([]);
 });
+
+it("routes the current Computer Use policy through the main API router", async () => {
+  for (const policy of ["allow","deny","ask"]) {
+    process.env.DREAMGRAPH_COMPUTER_USE_POLICY=policy;
+    const response=await fetch(url+"/api/computer-use/v1/policy");
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ok:true,policy});
+  }
+});

@@ -5,6 +5,24 @@ import { validateClaudeInit, type ClaudeInitExpectation } from "./claude-cli-pro
 import { providerUsage } from "../cognitive/provider-outcome.js";
 import type { TokenUsage } from "../cognitive/llm.js";
 
+/** Safe terminal metadata only: never persist provider error bodies or repeated tool/context payloads. */
+export interface ClaudeTerminalDiagnostic {
+  subtype: string;
+  is_error: boolean | null;
+  num_turns?: number;
+  error_count?: number;
+}
+function terminalFailureCode(subtype: unknown): string {
+  switch (subtype) {
+    case "error_max_turns":
+    case "error_max_turns_reached": return "CLAUDE_MAX_TURNS_REACHED";
+    case "error_max_budget_usd": return "CLAUDE_MAX_BUDGET_REACHED";
+    case "error_during_execution": return "CLAUDE_EXECUTION_FAILED";
+    case "error_max_structured_output_retries": return "CLAUDE_STRUCTURED_OUTPUT_RETRIES_EXHAUSTED";
+    default: return "CLAUDE_TERMINAL_FAILED";
+  }
+}
+
 /** Bounded JSONL parser; partial assistant messages are presentation, never terminal truth. */
 export class ClaudeStream {
   private decoder = new StringDecoder("utf8");
@@ -48,6 +66,16 @@ export class ClaudeStream {
       throw new Error("CLAUDE_EVENT_AFTER_RESULT");
     }
   }
+  diagnostic(): ClaudeTerminalDiagnostic | undefined {
+    const result = this.terminal;
+    if (!result) return undefined;
+    return {
+      subtype: typeof result.subtype === "string" && /^[a-z0-9_]{1,80}$/.test(result.subtype) ? result.subtype : "unrecognized",
+      is_error: typeof result.is_error === "boolean" ? result.is_error : null,
+      ...(Number.isSafeInteger(result.num_turns) && result.num_turns >= 0 ? { num_turns: result.num_turns } : {}),
+      ...(Array.isArray(result.errors) ? { error_count: result.errors.length } : {}),
+    };
+  }
   usage(): TokenUsage | undefined { return providerUsage("anthropic", this.terminal?.usage); }
   finish(): { content: string; usage?: TokenUsage } {
     this.pending += this.decoder.end();
@@ -55,7 +83,7 @@ export class ClaudeStream {
     this.pending = "";
     const result = this.terminal;
     if (!result) throw new Error("CLAUDE_TERMINAL_RESULT_MISSING");
-    if (result.subtype !== "success" || result.is_error !== false) throw new Error("CLAUDE_TERMINAL_FAILED");
+    if (result.subtype !== "success" || result.is_error !== false) throw new Error(terminalFailureCode(result.subtype));
     const content = result.structured_output !== undefined ? JSON.stringify(result.structured_output) : result.result;
     if (typeof content !== "string" || !content.trim()) throw new Error("CLAUDE_TERMINAL_CONTENT_MISSING");
     // Anthropic's input, cache-write and cache-read components are additive, not byte estimates.
@@ -67,7 +95,7 @@ export class ClaudeStream {
 export interface ClaudeProcessResult {
   stdout: string; stderr: string; exitCode: number | null; signal: NodeJS.Signals | null;
   timedOut: boolean; durationMs: number; terminationConfirmed: boolean;
-  claude: { content: string; usage?: TokenUsage; error?: string; recovery?: { cli_pid?: number; proxy_pid?: number } };
+  claude: { content: string; usage?: TokenUsage; error?: string; terminal?: ClaudeTerminalDiagnostic; recovery?: { cli_pid?: number; proxy_pid?: number } };
 }
 export async function runClaudeProcess(input: {
   command: string; args: string[]; cwd: string; env: Record<string, string>; stdin: string;
@@ -121,12 +149,13 @@ export async function runClaudeProcess(input: {
       if (stopDeadline) clearTimeout(stopDeadline);
       input.signal?.removeEventListener("abort", abort);
       let result: { content: string; usage?: TokenUsage } = { content: "" };
-      const usage = parser.usage(); if (usage) result.usage = usage;
       if (!failure) try { result = parser.finish(); } catch (error) { failure = (error as Error).message; }
+      const usage = parser.usage(); if (usage) result.usage = usage;
+      const terminal = parser.diagnostic();
       if (exitCode !== 0 && !failure) failure = "CLAUDE_NONZERO_EXIT";
       if (!terminationConfirmed && !failure) failure = "CLAUDE_TERMINATION_UNCONFIRMED";
       resolve({ stdout: "", stderr: "", exitCode, signal, timedOut, durationMs: Date.now() - started, terminationConfirmed,
-        claude: { ...result, ...(failure ? { content: "", error: failure } : {}),
+        claude: { ...result, ...(terminal ? { terminal } : {}), ...(failure ? { content: "", error: failure } : {}),
           ...(!terminationConfirmed ? { recovery: { cli_pid: child.pid, proxy_pid: proxyPid } } : {}) } });
     };
     child.stdout.on("data", (chunk: Buffer) => {

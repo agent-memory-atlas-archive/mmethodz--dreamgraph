@@ -2835,7 +2835,7 @@ export const MCP_CATALOG_V1 = {
     },
     {
       "name": "graph_health_report",
-      "description": "Read-only architectural quality assessment for the active DreamGraph instance. Reports semantic density, enrichment, parser-only and hollow nodes, naming quality, contracts, workflows, datastore/UI coverage, connectivity, tensions, dream promotion, repository drift, and staleness. Returns evidence-based smallest-first maintenance recommendations; it never executes them.",
+      "description": "Read-only architectural quality assessment for the active DreamGraph instance. Reports semantic density, enrichment, parser-only and hollow nodes, naming quality, contracts, workflows, datastore/UI coverage, connectivity, tensions, dream promotion, repository drift, and staleness. Returns aggregate diagnostic counts and explicitly sampled scopes, not the full graph diagnostic ledger. Returns evidence-based smallest-first maintenance recommendations; it never executes them.",
       "inputSchema": {
         "type": "object",
         "properties": {

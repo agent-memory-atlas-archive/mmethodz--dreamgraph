@@ -129,6 +129,20 @@ it("refresh never launders a concrete untracked named-source mismatch into curre
  const reconciled=await refreshManagedContext(refreshed.id);expect(reconciled.source_gaps).toEqual([]);
  await deliverManagedContext(reconciled.id,managedContextPrompt(reconciled));await assertManagedContext(reconciled.id);
 }));
+it("legacy source patterns stay contextual without inventing missing files or blocking commands",()=>within(async()=>{
+ await commitGraphWrites({actor:"legacy-pattern",scope:["features.json"],writes:[{file:"features.json",content:JSON.stringify({features:[{...feature(),source_files:["src/cognitive/*.ts","source.ts"]}]})}]});
+ const entry=await deliver();
+ expect(Object.keys(entry.source_hashes)).toEqual(["fixture/source.ts"]);
+ expect(entry.source_gaps).toEqual([]);
+ expect(entry.pack.context_text).toContain("src/cognitive/*.ts");
+ await assertManagedContext(entry.id);
+ const refreshed=await refreshManagedContext(entry.id);await deliverManagedContext(entry.id,managedContextPrompt(refreshed));
+ await assertManagedContext(entry.id);
+ // A real file remains authoritative even alongside a historical region pattern.
+ await writeFile(file,"changed outside DreamGraph");
+ await expect(assertManagedContext(entry.id)).rejects.toThrow("REFRESH_REQUIRED");
+}));
+
 it("missing named source is disclosed on the initial prompt and cannot authorize ordinary effects",()=>within(async()=>{
  await rm(file);const entry=await begin();
  expect(entry.source_gaps).toEqual(["fixture/source.ts"]);
@@ -186,6 +200,37 @@ it("a delivered known source obligation admits only an explicitly approved repai
   expect(closed.effects.flatMap(effect=>effect.receipt_ids)).toEqual(["fixture-source-repair"]);
  });}finally{lease.close();}
 }));
+it("permits verification and further source work on delivered own changes without pretending debt is settled",()=>within(async()=>{
+ await deliver();
+ const args={command:'node -e "process.stdout.write(\'verified\')"'};
+ const lease=issueExecutionPolicy(owner(),{id:"execution-one",context_id:"execution-one",autonomy:"autonomous",verbosity:"concise",timeout_ms:30000,signal:new AbortController().signal,
+  approvals:[{tool:"run_command",arguments:args,scope_id:"fixture",calls:1},{tool:"edit_file",arguments:{filePath:"source.ts"},scope_id:"fixture",calls:1}]});
+ try {await withSessionContext({...owner(),execution_policy:lease.policy},async()=>{
+  await managedSourceEffect({changes:[{file,content:"changed",expected_content:"export const original = true;\n"}],apply:()=>writeFile(file,"changed")});
+  const refreshed=await refreshManagedContext("execution-one");await deliverManagedContext(refreshed.id,managedContextPrompt(refreshed));
+  await expect(assertManagedContext(refreshed.id)).rejects.toThrow("REFRESH_REQUIRED");
+  await assertManagedContext(refreshed.id,{source_work:true});
+  const verification=await executeScopedCommand(lease.policy,args,root);
+  expect(verification.stdout).toBe("verified");
+  const edit=await invokeToolBoundary({name:"edit_file",shape:{filePath:z.string()},args:{filePath:"source.ts"},handler:async()=>{
+   await managedSourceEffect({changes:[{file,content:"changed twice",expected_content:"changed"}],apply:()=>writeFile(file,"changed twice")});
+   return {content:[]};
+  }});
+  expect(edit.isError,JSON.stringify(edit)).not.toBe(true);
+  const after=await refreshManagedContext(refreshed.id);await deliverManagedContext(after.id,managedContextPrompt(after));
+  expect((await readChangeObligations()).entries.filter(e=>e.state==="reconciliation_pending")).toHaveLength(2);
+  expect(after.pack.state.freshness).toBe("stale");
+  await writeFile(file,"unknown external edit");
+  await expect(assertManagedContext(after.id,{source_work:true})).rejects.toThrow("REFRESH_REQUIRED");
+ });}finally{lease.close();}
+}));
+
+it("does not grant continued source work for another execution's pending effect",()=>within(async()=>{
+ await managedSourceEffect({changes:[{file,content:"earlier edit",expected_content:"export const original = true;\n"}],apply:()=>writeFile(file,"earlier edit")});
+ const entry=await deliver();
+ await expect(assertManagedContext(entry.id,{source_work:true})).rejects.toThrow("REFRESH_REQUIRED");
+}));
+
 it("a pending closed execution can recover its verified reconciliation without redispatching the source effect",()=>within(async()=>{
  await deliver();const obligation=await managedSourceEffect({execution_id:"execution-one",changes:[{file,content:"changed"}],apply:()=>writeFile(file,"changed")});
  expect((await finishManagedContext("execution-one")).status).toBe("reconciliation_pending");

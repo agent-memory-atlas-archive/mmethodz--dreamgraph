@@ -62,6 +62,7 @@ export interface ArchitectCliBridgeRoute {
   adapter_profile_verification?: "profile_verified_at_launch" | "failed_or_incomplete";
   adapter_live_tested_version?: string;
   process_recovery?: { cli_pid?: number; proxy_pid?: number };
+  cli_terminal?: ClaudeProcessResult["claude"]["terminal"];
   /** Codex native Computer Use MCP servers wired into this granted pass (names only). */
   computer_use_servers?: string[];
   /** Codex thread whose browser session was pre-approved under the Computer Use grant. */
@@ -115,6 +116,8 @@ export interface RunArchitectCliBridgeInput {
   approvedActions?: ExecutionApproval;
   operatorReviewEnabled?: boolean;
   reasoningEffort?: string;
+  /** Opt-in live qualification only; ordinary CLI passes use the host execution deadline. */
+  qualificationMaxTurns?: number;
   toolRequirements?: ArchitectCliToolRequirements | null;
   signal?: AbortSignal;
   onToolTrace?: (entry: ArchitectToolTraceEntry) => void;
@@ -164,7 +167,7 @@ interface AuditRecord {
 const OUTPUT_LIMIT = 512 * 1024;
 const CLI_DEFAULT_TIMEOUT_MS = ARCHITECT_PASS_DEFAULT_MS;
 const CODEX_HOME_AUTH_ARTIFACTS = Object.freeze(["auth.json", "version.json", "installation_id"] as const);
-const BRIDGE_LOCAL_DREAMGRAPH_TOOLS = Object.freeze(["run_command"] as const);
+import { cliBridgeToolNames } from "./cli-bridge-tools.js";
 const BRIDGE_MCP_CONFIG_ENV_KEYS = Object.freeze([
   "DREAMGRAPH_HOST_MCP_URL",
   "DREAMGRAPH_BRIDGE_SESSION_BEARER",
@@ -206,7 +209,8 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
 
   const headers = architectMcpHeaders(input.req);
   const upstreamTools = await mcpListTools(mcpPort, { headers, signal: input.signal });
-  const availableToolNames = resolveArchitectCliBridgeToolNames(upstreamTools.map((tool) => tool.name));
+  const availableToolNames = resolveArchitectCliBridgeToolNames(upstreamTools.map((tool) => tool.name), { managedContext: true,
+    computerUseRequestable: (input.adapter === "codex-cli" || input.adapter === "claude-cli") && input.computerUse !== true && input.computerUseRequestable === true });
   const toolRequirements = resolveCliToolRequirements(input.toolRequirements, availableToolNames);
   const missingTools = REQUIRED_DREAMGRAPH_TOOLS.filter((name) => !availableToolNames.includes(name));
   if (missingTools.length > 0) {
@@ -292,7 +296,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
       computerUseRequestable: (input.adapter === "codex-cli" || input.adapter === "claude-cli") && input.computerUse !== true && input.computerUseRequestable === true,
     });
     const invocation: Awaited<ReturnType<typeof prepareCodexInvocation>> & { claude?: Awaited<ReturnType<typeof prepareClaudeInvocation>>["claude"] } = input.adapter === "claude-cli"
-      ? await prepareClaudeInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, availableToolNames, timeoutMs, signal: executionSignal, reasoningEffort: input.reasoningEffort })
+      ? await prepareClaudeInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, availableToolNames, timeoutMs, signal: executionSignal, reasoningEffort: input.reasoningEffort, qualificationMaxTurns: input.qualificationMaxTurns })
       : input.adapter === "codex-cli"
       ? await prepareCodexInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames, verbosityMode: input.verbosityMode, reasoningEffort: input.reasoningEffort, computerUse: codexNativeComputerUse, registerCuaHost: (host) => { cuaHosts.push(host); } })
       : await prepareCopilotInvocation({ scratchDir, prompt, model, bridgeSpawn, envBase, runId, availableToolNames });
@@ -396,7 +400,9 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
     const processFailureReason = /^EXECUTION_(STALE|CEILING_REACHED)/.test(abortReason) ? abortReason
       : executionSignal.aborted ? "ARCHITECT_CLI_CANCELLED" : processResult.timedOut
       ? `${input.adapter.toUpperCase()}_BRIDGE_TIMEOUT: timeout after ${timeoutMs}ms; completed tools ${completedTools}/${toolTrace.length}`
-      : processResult.claude?.error ? processResult.claude.error
+      : processResult.claude?.error ? [processResult.claude.error,
+        ...(processResult.claude.terminal ? [`subtype=${processResult.claude.terminal.subtype}`,
+          ...(processResult.claude.terminal.num_turns !== undefined ? [`turns=${processResult.claude.terminal.num_turns}`] : [])] : [])].join("; ")
       : processResult.exitCode !== 0
         ? `${input.adapter.toUpperCase()}_BRIDGE_NONZERO_EXIT: exit=${processResult.exitCode}; stderr=${compact(processResult.stderr)}`
         : !content.trim()
@@ -428,7 +434,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         required_tools: toolRequirements.requirements?.required_tools ?? [],
         unavailable_required_tools: toolRequirements.unavailable_required_tools,
         iterations: 1,
-        stop_reason: computerUseRelease?.confirmed === false ? "computer_use_release_unconfirmed" : expired ? (abortReason.startsWith("EXECUTION_STALE") ? "execution_stale" : "execution_ceiling_reached") : cancelled ? "cli_cancelled" : processResult.timedOut ? "cli_timed_out" : processResult.exitCode !== 0 ? "cli_failed" : failureReason ? "cli_empty_response" : "cli_completed",
+        stop_reason: computerUseRelease?.confirmed === false ? "computer_use_release_unconfirmed" : expired ? (abortReason.startsWith("EXECUTION_STALE") ? "execution_stale" : "execution_ceiling_reached") : cancelled ? "cli_cancelled" : processResult.timedOut ? "cli_timed_out" : processResult.exitCode !== 0 || processResult.claude?.error ? "cli_failed" : failureReason ? "cli_empty_response" : "cli_completed",
         fallback_reason: failureReason,
         run_id: runId,
         executable: invocation.command,
@@ -440,6 +446,7 @@ export async function runArchitectCliBridge(input: RunArchitectCliBridgeInput): 
         adapter_version: invocation.claude?.expected.version ?? capability!.version,
         ...(invocation.claude ? { adapter_profile_verification: processResult.claude?.error ? "failed_or_incomplete" : "profile_verified_at_launch",
           adapter_live_tested_version: CLAUDE_LIVE_TESTED_VERSION } : {}),
+        ...(processResult.claude?.terminal ? { cli_terminal: processResult.claude.terminal } : {}),
         ...(processResult.claude?.recovery ? { process_recovery: processResult.claude.recovery } : {}),
         ...(invocation.computerUseServers ? { computer_use_servers: invocation.computerUseServers } : {}),
         ...(sessionGrant?.threadId ? { computer_use_session: sessionGrant.threadId } : {}),
@@ -1225,12 +1232,8 @@ async function extractAssistantContent(adapter: ArchitectCliAdapter, result: Pro
   return compact(result.stdout);
 }
 
-export function resolveArchitectCliBridgeToolNames(upstreamToolNames: readonly string[]): string[] {
-  const names = [...upstreamToolNames];
-  for (const localToolName of BRIDGE_LOCAL_DREAMGRAPH_TOOLS) {
-    if (!names.includes(localToolName)) names.push(localToolName);
-  }
-  return names;
+export function resolveArchitectCliBridgeToolNames(upstreamToolNames: readonly string[], options: Parameters<typeof cliBridgeToolNames>[1] = {}): string[] {
+  return cliBridgeToolNames(upstreamToolNames, options);
 }
 
 function extractCopilotAssistantText(stdout: string): string {

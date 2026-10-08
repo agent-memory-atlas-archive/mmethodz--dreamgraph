@@ -1,7 +1,7 @@
 /** Executed browser script against declared HTTP responses. Real Chrome/process checks are separate. */
 import {afterEach,beforeEach,expect,it,vi} from "vitest";
 import {JSDOM} from "jsdom";
-import {COMPUTER_USE_MARKUP,COMPUTER_USE_SCRIPT} from "../src/architect/computer-use-ui.js";
+import {COMPUTER_USE_CSS,COMPUTER_USE_MARKUP,COMPUTER_USE_SCRIPT} from "../src/architect/computer-use-ui.js";
 let dom:JSDOM,calls:Array<{path:string;body:Record<string,unknown>|null}>,respond:(path:string,body:Record<string,unknown>|null)=>unknown;
 const click=(id:string)=>(dom.window.document.getElementById(id) as HTMLButtonElement).click();
 const setup={ok:true,available:true,origin:"https://fixture.example",limits:{max_actions:3},capability:{route:"dreamgraph_harness"}};
@@ -108,4 +108,23 @@ it("pause and resume use the selected original fence and retain independent Stop
  await vi.waitFor(()=>expect(dom.window.document.getElementById("computer-use-pause")!.textContent).toBe("Resume"));expect(dom.window.document.getElementById("computer-use-stop")!.hasAttribute("hidden")).toBe(false);
  click("computer-use-pause");await vi.waitFor(()=>expect(dom.window.document.getElementById("computer-use-pause")!.textContent).toBe("Pause"));
  expect(calls.find(call=>call.path.endsWith('/pause'))!.body).toEqual({execution_id:"original-execution",id:"computer-one",fence:1});expect(calls.find(call=>call.path.endsWith('/resume'))!.body).toEqual({execution_id:"original-execution",id:"computer-one",fence:2});
+});
+
+it("refreshes the saved policy on configuration readback with green/red/yellow states",async()=>{
+  const badge=dom.window.document.getElementById("computer-use-policy")!;
+  for(const [policy,label,color] of [["allow","always allow","#9fe0b8"],["deny","always denied","#e3a8a8"],["ask","ask every time","#ecd39a"]]){
+    respond=path=>path==="/api/computer-use/v1/policy"?{ok:true,policy}:initialResponse(path);
+    dom.window.dispatchEvent(new dom.window.MessageEvent("message",{origin:dom.window.location.origin,data:{type:"dreamgraph.configuration.readback"}}));
+    await vi.waitFor(()=>expect(badge.dataset.policy).toBe(policy));
+    expect(badge.textContent).toContain(label);
+    expect(COMPUTER_USE_CSS).toContain(".computer-policy[data-policy="+policy+"]");
+    expect(COMPUTER_USE_CSS).toContain("color:"+color);
+    expect((dom.window.document.getElementById("computer-use-arm") as HTMLButtonElement).hidden).toBe(policy!=="ask");
+  }
+});
+it("does not describe an unavailable policy as ask every time",async()=>{
+  respond=()=>({error:"not_found"});
+  await dom.window.eval("loadComputerPolicy(true)");
+  expect(dom.window.document.getElementById("computer-use-policy")!.textContent).toBe("Computer Use: policy unavailable");
+  expect((dom.window.document.getElementById("computer-use-arm") as HTMLButtonElement).hidden).toBe(true);
 });

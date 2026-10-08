@@ -98,7 +98,7 @@ if(${JSON.stringify(adapter)}==='codex-cli') {
 const client=new Client({name:'instrumented-native-cli',version:'1'}),transport=new StdioClientTransport({command,args,env:{...process.env,...env},stderr:'pipe'});
 await client.connect(transport);
 const outcomes=[];
-for(const [name,arguments_] of [['query_resource',{}],['query_architecture_decisions',{}],['edit_file',{filePath:'fixture.txt',text:'first'}],['edit_file',{filePath:'fixture.txt',text:'second'}],['edit_file',{filePath:'fixture.txt',text:'next-checkpoint'}],['edit_file',{filePath:'fixture.txt',text:'outside'}]]) {
+for(const [name,arguments_] of [['query_resource',{}],['query_architecture_decisions',{}],...Array.from({length:98},()=>['query_resource',{}]),['edit_file',{filePath:'fixture.txt',text:'first'}],['edit_file',{filePath:'fixture.txt',text:'second'}],['edit_file',{filePath:'fixture.txt',text:'next-checkpoint'}],['edit_file',{filePath:'fixture.txt',text:'outside'}]]) {
  const r=await client.callTool({name,arguments:arguments_});outcomes.push({name,isError:r.isError===true,required_context:r.content?.some(item=>item.type==='text'&&item.text.startsWith('DreamGraph required execution context.'))===true});
 }
 await client.close();await writeFile(process.env.ASHOKA_FIXTURE_CAPTURE,JSON.stringify({argv,prompt,outcomes,credential:env.DREAMGRAPH_BRIDGE_SESSION_BEARER?.startsWith('dgexec.')?'execution_bound':'incorrect'}));
@@ -150,12 +150,25 @@ it.each(["codex-cli", "copilot-cli"] as const)("%s executes real bridge tool fen
         autonomyMode: mode, verbosityMode: verbosity, approvedActions: [action("first"), action("second"), ...(mode === "autonomous" ? [action("next-checkpoint", "slice-two")] : [])] }));
       expect(result.route.fallback_reason).toBeNull(); expect(writes).toBe(mode === "manual" ? 1 : mode === "supervised" ? 2 : 3);
       const recorded = JSON.parse(await readFile(capture, "utf8")); expect(recorded.credential).toBe("execution_bound");
-      expect(recorded.outcomes.slice(0, 2).every((r: any) => !r.isError)).toBe(true);
-      expect(recorded.outcomes.every((r:any)=>r.required_context)).toBe(true);
-      expect(recorded.outcomes[4].isError).toBe(mode !== "autonomous"); expect(recorded.outcomes[5].isError).toBe(true); expect(recorded.prompt).toContain(`autonomy=${mode}; verbosity=${verbosity}`);
+      expect(recorded.outcomes.slice(0, 100).every((r: any) => !r.isError)).toBe(true);
+      // Unchanged read results reuse the already-delivered prompt context (prompt-cache cost fix).
+      expect(recorded.outcomes.slice(0, 100).every((r:any)=>!r.required_context)).toBe(true);
+      expect(recorded.prompt).toContain("DreamGraph required execution context.");
+      expect(recorded.outcomes[102].isError).toBe(mode !== "autonomous"); expect(recorded.outcomes[103].isError).toBe(true); expect(recorded.prompt).toContain(`autonomy=${mode}; verbosity=${verbosity}`);
       expect(recorded.prompt).toContain("scoped currency/completeness warnings"); expect(recorded.prompt).not.toContain(session.bearer);
       expect(result.route.effective_controls).toMatchObject({ effective: { autonomy: mode, verbosity }, support: "enforced" });
       expect(result.route.output_controls?.exact_density).toBe("not_guaranteed");
     }
   } finally { for (const connection of connections) await connection.server.close(); http.closeAllConnections(); await new Promise<void>(done => http.close(() => done())); }
 }, 90000);
+
+it("100 investigative reads do not consume the shared CLI/API mutation allowance", () => {
+  const lease = issueExecutionPolicy(context(), { id: "long-investigation", autonomy: "manual", verbosity: "balanced",
+    timeout_ms: 10000, signal: new AbortController().signal, approvals: [action("first")] });
+  try {
+    for (let index = 0; index < 100; index++) assertExecutionAction(lease.policy, "query_resource", {});
+    expect(lease.policy.effects_started).toBe(0);
+    assertExecutionAction(lease.policy, "edit_file", action("first").arguments);
+    expect(lease.policy.effects_started).toBe(1);
+  } finally { lease.close(); }
+});

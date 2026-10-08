@@ -852,6 +852,7 @@ async function load(keepDrafts) {
     const inFile = Object.values(snap.settings).filter(s => s.source === 'instance').length, deployedCount = Object.values(snap.settings).filter(s => s.source === 'deployment').length;
     $('cfg-source').textContent = 'engine.env · ' + inFile + ' value' + (inFile === 1 ? '' : 's') + ' set' + (deployedCount ? ' · ' + deployedCount + ' set by the launch environment' : '') + ' · read ' + new Date().toLocaleTimeString();
     $('cw-revision').value = snap.revision; root.dataset.loading = 'false';
+    if (window.parent !== window) window.parent.postMessage({ type: 'dreamgraph.configuration.readback' }, window.location.origin);
     const sync = r.engine_env_sync;
     if (sync && sync.error) say('engine.env was edited but could not be applied: ' + humanError(sync.error), 'error');
     else if (sync && sync.restart_required && sync.restart_required.length) say('engine.env changes are saved, but these only take effect after restarting DreamGraph: ' + sync.restart_required.map(label).join(', ') + ' (' + $('cw-restart-command').value + ').');

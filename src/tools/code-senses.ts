@@ -28,6 +28,19 @@ function sourceEffectStatus(effect: Awaited<ReturnType<typeof managedSourceEffec
 const MAX_READ_SOURCE_CODE_CHARS = 24000;
 const READ_SOURCE_CODE_PREVIEW_HEAD_CHARS = 12000;
 const READ_SOURCE_CODE_PREVIEW_TAIL_CHARS = 8000;
+const SEARCH_MATCH_BYTES = 24 * 1024;
+const SEARCH_PREVIEW_BYTES = 2048;
+
+/** Source discovery previews are byte-bounded, independently of match count. */
+function searchPreview(text: string): string {
+  let bytes = 0, end = 0;
+  for (const character of text) {
+    bytes += Buffer.byteLength(character, "utf8");
+    if (bytes > SEARCH_PREVIEW_BYTES) break;
+    end += character.length;
+  }
+  return text.slice(0, end);
+}
 
 // ---------------------------------------------------------------------------
 // Entity extraction — find named entities (function, class, etc.) by name
@@ -1684,13 +1697,16 @@ export function registerCodeSensesTools(server: McpServer): void {
           filePath: string;
           line: number;
           preview: string;
+          preview_truncated: boolean;
         }
         const matches: Match[] = [];
+        let matchBytes = 2; // JSON array brackets; count each whole record and separator.
+        let outputByteLimitReached = false;
         let filesScanned = 0;
         let truncated = false;
 
         async function walk(dir: string): Promise<void> {
-          if (matches.length >= limit) {
+          if (outputByteLimitReached || matches.length >= limit) {
             truncated = true;
             return;
           }
@@ -1701,7 +1717,7 @@ export function registerCodeSensesTools(server: McpServer): void {
             return;
           }
           for (const entry of entries) {
-            if (matches.length >= limit) {
+            if (outputByteLimitReached || matches.length >= limit) {
               truncated = true;
               return;
             }
@@ -1736,11 +1752,17 @@ export function registerCodeSensesTools(server: McpServer): void {
                 snippetLines.push(`${marker} ${j + 1}: ${lines[j]}`);
               }
               const rel = path.relative(repoRoot, full).replace(/\\/g, "/");
-              matches.push({
-                filePath: rel,
-                line: i + 1,
-                preview: snippetLines.join("\n"),
-              });
+              const snippet = snippetLines.join("\n");
+              const preview = searchPreview(snippet);
+              const match: Match = { filePath: rel, line: i + 1, preview, preview_truncated: preview.length < snippet.length };
+              const bytes = Buffer.byteLength(JSON.stringify(match), "utf8") + (matches.length ? 1 : 0);
+              if (matchBytes + bytes > SEARCH_MATCH_BYTES) {
+                truncated = true;
+                outputByteLimitReached = true;
+                return;
+              }
+              matchBytes += bytes;
+              matches.push(match);
             }
           }
         }
@@ -1756,12 +1778,17 @@ export function registerCodeSensesTools(server: McpServer): void {
           matchCount: matches.length,
           truncated,
           maxResults: limit,
+          match_bytes_limit: SEARCH_MATCH_BYTES,
+          preview_bytes_limit: SEARCH_PREVIEW_BYTES,
+          output_byte_limit_reached: outputByteLimitReached,
+          ...(truncated || matches.some(match => match.preview_truncated)
+            ? { notice: "Partial discovery results or clipped previews. Narrow query/pathPrefix; use read_source_code with filePath and line range for source evidence." } : {}),
           matches,
         });
       });
 
       return {
-        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+        content: [{ type: "text" as const, text: JSON.stringify(result) }],
       };
     }
   );

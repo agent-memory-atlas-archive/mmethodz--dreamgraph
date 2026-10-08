@@ -108,12 +108,13 @@ export function assertClaudeModelId(model: unknown): asserts model is string {
 }
 
 export function claudeProfileArgs(input: {
-  mcpConfig: string; settings: string; model: string; maxTurns: number;
+  mcpConfig: string; settings: string; model: string; maxTurns?: number;
   effort?: string; jsonSchema?: string;
 }): string[] {
   if (!isAbsolute(input.mcpConfig) || !isAbsolute(input.settings)) throw new Error("CLAUDE_PROFILE_PATH_REQUIRED");
   assertClaudeModelId(input.model);
-  if (!Number.isSafeInteger(input.maxTurns) || input.maxTurns < 1 || input.maxTurns > 12)
+  // Optional qualification bound; ordinary passes use the daemon's finite execution deadline.
+  if (input.maxTurns !== undefined && (!Number.isSafeInteger(input.maxTurns) || input.maxTurns < 1 || input.maxTurns > 12))
     throw new Error("CLAUDE_PROFILE_RUN_BOUND");
   assertRouteEffort("claude-cli", "none", input.model, input.effort);
   return ["--print", "--output-format", "stream-json", "--verbose",
@@ -121,7 +122,8 @@ export function claudeProfileArgs(input: {
     "--setting-sources", "", "--settings", input.settings,
     "--permission-mode", "dontAsk", "--allowedTools", "mcp__dreamgraph__*",
     "--disable-slash-commands", "--no-session-persistence", "--no-chrome",
-    "--model", input.model, "--max-turns", String(input.maxTurns),
+    "--model", input.model,
+    ...(input.maxTurns !== undefined ? ["--max-turns", String(input.maxTurns)] : []),
     ...(input.effort ? ["--effort", input.effort] : []),
     ...(input.jsonSchema ? ["--json-schema", input.jsonSchema] : [])];
 }

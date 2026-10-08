@@ -1,6 +1,8 @@
 /** Real stdio bridge process, paged upstream and cancellation; no provider/CLI inference. */
 
 import { it, expect } from "vitest";
+import { resolveArchitectCliBridgeToolNames } from "../src/architect/cli-bridge.js";
+import { validateClaudeInit } from "../src/architect/claude-cli-profile.js";
 import { createServer } from "node:http";
 import { mkdtemp, writeFile, unlink, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -52,22 +54,50 @@ it("Claude admission rejects pre-init and queued calls after revocation without 
   }
 }, 20000);
 
-it("a failed managed refresh preserves the original committed result and prevents later native CLI dispatch",async()=>{
+it.each(["codex-cli","claude-cli"])("%s reads retain literal results without context refresh; failed effect refresh still closes dispatch",async adapter=>{
  const root=await mkdtemp(join(tmpdir(),"dg-bridge-context-failure-")),upstream=new Server({name:"fixture",version:"1"},{capabilities:{tools:{}}});
- const transport=new StreamableHTTPServerTransport({sessionIdGenerator:randomUUID});let calls=0;
+ const transport=new StreamableHTTPServerTransport({sessionIdGenerator:randomUUID});let calls=0,refreshes=0,recovered=false;
  upstream.setRequestHandler(ListToolsRequestSchema,()=>({tools:[{name:"commit",inputSchema:{type:"object"}}]}));
  upstream.setRequestHandler(CallToolRequestSchema,()=>{calls++;return {content:[{type:"text",text:"literal committed result"}],structuredContent:{receipt:{operation_id:"original-commit",revision:7}},_meta:{owner:"fixture"}};});
  await upstream.connect(transport);
- const http=createServer(async(req,res)=>{if(req.url?.endsWith('/context/refresh')){res.writeHead(503,{'Content-Type':'application/json'});res.end(JSON.stringify({error:'fixture-context-unavailable'}));return;}
+ const http=createServer(async(req,res)=>{
+  if(req.url?.endsWith('/context/deliver')){res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({receipt_id:'refreshed',delivery:'delivered'}));return;}
+  if(req.url?.endsWith('/context/refresh')){refreshes++;res.writeHead(recovered?200:503,{'Content-Type':'application/json'});res.end(JSON.stringify(recovered?{receipt_id:'refreshed',block:'Current graph evidence',delivery:'unattested'}:{error:'fixture-context-unavailable'}));return;}
   try{await transport.handleRequest(req,res);}catch{if(!res.headersSent)res.writeHead(500);res.end();}});
  await new Promise<void>(done=>http.listen(0,'127.0.0.1',done));
  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!key.startsWith('DREAMGRAPH_'))) as Record<string,string>;
  Object.assign(env,{DREAMGRAPH_HOST_MCP_URL:`http://127.0.0.1:${(http.address() as {port:number}).port}/mcp`,DREAMGRAPH_BRIDGE_SESSION_BEARER:'dgexec.fixture'});
+ if(adapter==="claude-cli"){
+  const gate=join(root,"admitted"),token="a".repeat(64);await writeFile(gate,token);
+  Object.assign(env,{DREAMGRAPH_BRIDGE_ADMISSION_PATH:gate,DREAMGRAPH_BRIDGE_ADMISSION_TOKEN:token,DREAMGRAPH_BRIDGE_DEADLINE_MS:String(Date.now()+20000)});
+ }
  const client=new Client({name:'fixture-client',version:'1'}),bridge=new StdioClientTransport({command:process.execPath,args:['--import',pathToFileURL(resolve('node_modules/tsx/dist/loader.mjs')).href,resolve('src/architect/cli-mcp-bridge.ts')],cwd:root,env,stderr:'pipe'});
- try{await client.connect(bridge);const result=await client.callTool({name:'commit',arguments:{}});
+ try{await client.connect(bridge);
+  const advertised=(await client.listTools()).tools.map(tool=>tool.name);
+  const expected=resolveArchitectCliBridgeToolNames(["commit"],{managedContext:true});
+  expect(advertised).toEqual(expected);
+  const init={type:"system",subtype:"init",permissionMode:"dontAsk",claude_code_version:"2.1.293",
+    model:"claude-opus-5-5",session_id:"fixture",mcp_servers:[{name:"dreamgraph",status:"connected"}],
+    tools:advertised.map(name=>"mcp__dreamgraph__"+name),plugins:[],skills:[],agents:[]};
+  expect(validateClaudeInit(init,{version:"2.1.293",model:init.model,tools:expected})).toBe("fixture");
+  expect(()=>validateClaudeInit({...init,tools:[...init.tools,"Bash"]},{version:"2.1.293",model:init.model,tools:expected})).toThrow("CLAUDE_INIT_TOOL_MISMATCH");
+  for(const name of ["search_source_code","read_source_code"]){
+   const read=await client.callTool({name,arguments:{}});
+   expect(read.isError).not.toBe(true);
+   expect(read.content).toEqual([{type:"text",text:"literal committed result"}]);
+   expect(read.structuredContent).toEqual({receipt:{operation_id:"original-commit",revision:7}});
+  }
+  expect(refreshes).toBe(0);expect(calls).toBe(2);
+  const result=await client.callTool({name:'commit',arguments:{}});
   expect(result.isError).toBe(true);expect(result.structuredContent).toEqual({receipt:{operation_id:'original-commit',revision:7}});
   expect(result.content).toContainEqual({type:'text',text:'literal committed result'});expect(JSON.stringify(result.content)).toContain('CLI_CONTEXT_REFRESH_FAILED');
-  await expect(client.callTool({name:'commit',arguments:{}})).rejects.toThrow('CLI_CONTEXT_RECOVERY_REQUIRED');expect(calls).toBe(1);
+  await expect(client.callTool({name:'commit',arguments:{}})).rejects.toThrow('CLI_CONTEXT_RECOVERY_REQUIRED');expect(calls).toBe(3);expect(refreshes).toBe(1);
+  expect((await client.callTool({name:'read_source_code',arguments:{}})).isError).not.toBe(true);expect(calls).toBe(4);
+  recovered=true;
+  const recovery=await client.callTool({name:'refresh_execution_context',arguments:{}});
+  expect(recovery.isError).not.toBe(true);expect(recovery.content).toContainEqual({type:'text',text:'Current graph evidence'});
+  expect((await client.callTool({name:'commit',arguments:{}})).isError).not.toBe(true);
+  expect(calls).toBe(5);expect(refreshes).toBe(3);
  }finally{await client.close();await transport.close();await upstream.close();http.closeAllConnections();await new Promise<void>(done=>http.close(()=>done()));await rm(root,{recursive:true,force:true});}
 });
 

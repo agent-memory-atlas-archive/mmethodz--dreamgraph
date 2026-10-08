@@ -140,9 +140,19 @@ export function buildContextPack(snapshot: CanonicalGraphRead, request: ContextQ
   const candidateKeys = new Set(candidates.keys());
   const scopedKinds = new Set(input.kinds ?? eligible.map(entity => entity.identity.kind));
   const scopedFiles = new Set(CANONICAL_FAMILIES.filter(family => scopedKinds.has(family.kind)).map(family => family.file));
-  const reasons = snapshot.state.reasons.filter(reason => !reason.scope.length || reason.scope.some(scope =>
-    candidateKeys.has(scope) || scopedFiles.has(scope) || input.mandatory_evidence_ids.includes(scope) ||
-    input.changed_files.some(file => scope === `source:${encodeURIComponent(file.repository_id)}/${file.path.replace(/\\/g, "/").split("/").map(encodeURIComponent).join("/")}`)));
+  const relevantScope = (scope: string) => candidateKeys.has(scope) || scopedFiles.has(scope) || input.mandatory_evidence_ids.includes(scope) ||
+    input.changed_files.some(file => scope === `source:${encodeURIComponent(file.repository_id)}/${file.path.replace(/\\/g, "/").split("/").map(encodeURIComponent).join("/")}`);
+  // A task-scoped warning must not import every other entity affected by the same file.
+  // Retain source/repository fences for mutation admission and distinct diagnostic details.
+  // Repeated obligations with the same warning do not create additional evidence.
+  const uniqueReasons = new Map<string, ResultState["reasons"][number]>();
+  for (const reason of snapshot.state.reasons) {
+    if (reason.scope.length && !reason.scope.some(relevantScope)) continue;
+    const projected = { ...reason, scope: [...new Set(reason.scope.filter(scope =>
+      relevantScope(scope) || scope.startsWith("source:") || scope.startsWith("repository:")))].sort() };
+    uniqueReasons.set(JSON.stringify(projected), projected);
+  }
+  const reasons = [...uniqueReasons.values()];
   const scope = [...new Set([...candidateKeys, ...missing])];
   const state: ResultState = { availability: eligible.length || !reasons.length ? "available" : "unavailable",
     completeness: reasons.length ? "partial" : "complete",

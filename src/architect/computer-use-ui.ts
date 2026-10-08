@@ -122,14 +122,15 @@ export const COMPUTER_USE_SCRIPT=String.raw`
 
     /* Local operator policy for Codex native Computer Use: allow | ask | deny. */
     const computerPolicyEl=document.getElementById('computer-use-policy'),computerArmEl=document.getElementById('computer-use-arm');
-    let computerPolicy='ask',computerPolicyReadAt=0,computerArmed=false;
-    const COMPUTER_POLICY_LABEL={allow:'Computer Use: allowed',ask:'Computer Use: ask every time',deny:'Computer Use: denied'};
-    function renderComputerPolicy(){if(typeof document==='undefined'||!document)return;/* page torn down while the policy fetch was in flight */computerPolicyEl.textContent=COMPUTER_POLICY_LABEL[computerPolicy]||COMPUTER_POLICY_LABEL.ask;computerPolicyEl.dataset.policy=computerPolicy;
+    let computerPolicy=null,computerPolicyReadAt=0,computerArmed=false,computerPolicyGeneration=0;
+    const COMPUTER_POLICY_LABEL={allow:'Computer Use: always allow',ask:'Computer Use: ask every time',deny:'Computer Use: always denied'};
+    function renderComputerPolicy(){if(typeof document==='undefined'||!document)return;/* page torn down while the policy fetch was in flight */computerPolicyEl.textContent=COMPUTER_POLICY_LABEL[computerPolicy]||'Computer Use: policy unavailable';computerPolicyEl.dataset.policy=computerPolicy||'unknown';
       const capable=['codex-cli','claude-cli','native_api_tool_loop'].includes(computerAdapter());computerArmEl.hidden=!(capable&&computerPolicy==='ask');computerArmEl.setAttribute('aria-pressed',String(computerArmed));
       computerArmEl.textContent=computerArmed?'Allowed for next message ✓':'Allow for next message';
       computerPolicyEl.title=capable?'Change in Config → Computer Use':'Computer Use is unavailable with this engine';}
     async function loadComputerPolicy(force){if(!force&&Date.now()-computerPolicyReadAt<10000)return computerPolicy;
-      try{const result=await fetch('/api/computer-use/v1/policy',{cache:'no-store'}).then(r=>r.json());if(['allow','ask','deny'].includes(result.policy))computerPolicy=result.policy;computerPolicyReadAt=Date.now();}catch(error){/* keep last known */}
+      const generation=++computerPolicyGeneration;
+      try{const response=await fetch('/api/computer-use/v1/policy',{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!response.ok)throw new Error('POLICY_READ_FAILED');const result=await response.json();if(!['allow','ask','deny'].includes(result.policy))throw new Error('POLICY_INVALID');if(generation!==computerPolicyGeneration)return computerPolicy;computerPolicy=result.policy;computerPolicyReadAt=Date.now();if(computerPolicy!=='ask')computerArmed=false;}catch(error){if(generation!==computerPolicyGeneration)return computerPolicy;computerPolicy=null;computerPolicyReadAt=0;}
       renderComputerPolicy();return computerPolicy;}
     computerArmEl.addEventListener('click',()=>{computerArmed=!computerArmed;renderComputerPolicy();});
     document.getElementById('architect-adapter-select').addEventListener('change',renderComputerPolicy);
@@ -163,5 +164,9 @@ export const COMPUTER_USE_SCRIPT=String.raw`
       const host=messageEl&&messageEl.node?messageEl.node:messageEl;
       if(host&&host.appendChild){const note=document.createElement('p');note.className='computer-request-note';note.textContent='Waiting for your answer in the Computer Use bar below.';host.appendChild(note);}
       box.scrollIntoView({block:'nearest'});allow.focus();}
-    void loadComputerPolicy(true);setInterval(()=>{if(!document.hidden)void loadComputerPolicy(true);},30000);
+    window.addEventListener('message',event=>{if(event.origin===window.location.origin&&event.data&&event.data.type==='dreamgraph.configuration.readback')void loadComputerPolicy(true);});
+    window.addEventListener('focus',()=>void loadComputerPolicy(true));
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)void loadComputerPolicy(true);});
+    void loadComputerPolicy(true);const computerPolicyTimer=setInterval(()=>{if(!document.hidden)void loadComputerPolicy(true);},30000);
+    window.addEventListener('pagehide',()=>{computerPolicyGeneration++;clearInterval(computerPolicyTimer);});
 `;

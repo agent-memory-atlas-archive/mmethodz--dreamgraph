@@ -105,6 +105,9 @@ function fingerprint(snapshot: CanonicalGraphRead, pack: ManagedExecutionContext
 }
 /** Observe only named evidence paths, never scan age or unrelated repository changes. */
 const sourceKey = (repo: string, sourcePath: string) => `${encodeURIComponent(repo)}/${sourcePath.replace(/\\/g,"/").split("/").map(encodeURIComponent).join("/")}`;
+/** Legacy source_files may describe a region with a glob, not attest an individual file. */
+const concreteSourcePath = (sourcePath: string) => !/[*?\[\]{}]/.test(sourcePath);
+const concreteSourceKey = (key: string) => concreteSourcePath(key.split("/").slice(1).map(decodeURIComponent).join("/"));
 async function sourceHashes(pack: ManagedExecutionContext["pack"], snapshot: CanonicalGraphRead, retainedKeys: string[] = []) {
   const result: Record<string, string> = {};
   let bytes = 0;
@@ -112,11 +115,11 @@ async function sourceHashes(pack: ManagedExecutionContext["pack"], snapshot: Can
   for (const record of pack.records) {
     const entity = record.identity ? snapshot.by_identity.get(graphIdentityKey(record.identity)) : undefined;
     for (const evidence of entity?.evidence ?? []) {
-      if (evidence.source_repo && evidence.source_path) named.set(sourceKey(evidence.source_repo,evidence.source_path),{repo:evidence.source_repo,sourcePath:evidence.source_path});
+      if (evidence.source_repo && evidence.source_path && concreteSourcePath(evidence.source_path)) named.set(sourceKey(evidence.source_repo,evidence.source_path),{repo:evidence.source_repo,sourcePath:evidence.source_path});
     }
   }
   // Keep observing named paths after deletion/remapping, so explicit reconciliation can settle them.
-  for (const key of retainedKeys) if (!named.has(key)) {
+  for (const key of retainedKeys) if (concreteSourceKey(key) && !named.has(key)) {
     const [repo,...segments]=key.split("/").map(decodeURIComponent);
     if (!repo || !segments.length) throw new Error("EXECUTION_EVIDENCE_KEY_INVALID");
     named.set(key,{repo,sourcePath:segments.join("/")});
@@ -157,7 +160,7 @@ function withNamedSourceGaps(pack: ManagedExecutionContext["pack"], gaps: string
 function namedEvidenceGaps(pack: ManagedExecutionContext["pack"], snapshot: CanonicalGraphRead, hashes: Record<string,string>): string[] {
   const gaps = new Set(Object.keys(hashes).filter(key=>["absent","unavailable"].includes(hashes[key])));
   for (const record of pack.records) for (const evidence of (record.identity ? snapshot.by_identity.get(graphIdentityKey(record.identity))?.evidence : undefined) ?? []) {
-    if (!evidence.source_repo || !evidence.source_path || !evidence.content_hash) continue;
+    if (!evidence.source_repo || !evidence.source_path || !evidence.content_hash || !concreteSourcePath(evidence.source_path)) continue;
     const key=sourceKey(evidence.source_repo,evidence.source_path);
     if (hashes[key] !== evidence.content_hash) gaps.add(key);
   }
@@ -389,7 +392,7 @@ export async function refreshManagedContext(id: string) {
     const currentSources = await sourceHashes(pack, snapshot, Object.keys(entry.source_hashes)), obligations = (await readChangeObligations()).entries;
     const changed = new Set([...entry.source_gaps, ...namedEvidenceGaps(pack,snapshot,currentSources),
       ...Object.keys(entry.source_hashes).filter(key => currentSources[key] !== entry.source_hashes[key])]);
-    entry.source_gaps = [...changed].filter(key => {
+    entry.source_gaps = [...changed].filter(concreteSourceKey).filter(key => {
       const expected = currentSources[key];
       if (!expected || expected === "unavailable") return true;
       const reconciled = obligations.some(item => item.state === "graph_committed" && item.after_hashes[sourceScope(key)] === expected);
@@ -429,7 +432,7 @@ export async function executionContextTransport(action: "refresh" | "deliver", i
   return { receipt_id: delivered.pack.receipt.id, delivery: delivered.pack.receipt.delivery };
 }
 /** Revalidate immediately at effect admission; unrelated graph activity does not invalidate context. */
-export async function assertManagedContext(id: string, input: { repair_source?: boolean } = {}) {
+export async function assertManagedContext(id: string, input: { repair_source?: boolean; source_work?: boolean } = {}) {
   const entry = await readManagedContext(id);
   if (entry.status !== "running" || entry.pack.receipt.delivery !== "delivered") throw new Error("EXECUTION_CONTEXT_NOT_DELIVERED");
   if (!entry.pack.mandatory_satisfied || entry.pack.state.availability === "unavailable") throw new Error("EXECUTION_CONTEXT_INSUFFICIENT");
@@ -440,7 +443,9 @@ export async function assertManagedContext(id: string, input: { repair_source?: 
     .flatMap(reason => reason.scope.filter(scope => scope.startsWith("source:") || scope.startsWith("repository:"))));
   const pending = (await readChangeObligations()).entries.filter(item => !["graph_committed", "failed"].includes(item.state)
     && item.scope.some(scope => affectedSourceScopes.has(scope)));
-  const repair = input.repair_source && (entry.source_gaps.length > 0 || pending.length > 0)
+  // Known, delivered changes made by this execution may be followed by source work or verification.
+  // They remain pending; this does not authorize semantic graph writes or attest reconciliation.
+  const repair = (input.repair_source || input.source_work && pending.length > 0 && entry.source_gaps.length === 0) && (entry.source_gaps.length > 0 || pending.length > 0)
     && !Object.values(entry.source_hashes).includes("unavailable")
     && pending.every(item => item.execution_id === id && ["source_applied", "reconciliation_pending"].includes(item.state))
     && pack.state.reasons.every(reason => ["SOURCE_RECONCILIATION_PENDING","NAMED_SOURCE_CONTEXT_CHANGED"].includes(reason.code));

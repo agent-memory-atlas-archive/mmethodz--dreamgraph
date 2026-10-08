@@ -30,6 +30,21 @@ afterEach(async () => {
 });
 
 describe("canonical bounded graph context", () => {
+  it("bounds repeated file warnings to task identities while retaining source fences and distinct details", async () => {
+    await put("features.json", [{id:"selected",name:"selected",description:"task"}]);
+    const graph = await loadCanonicalGraph("i"), selected = graphIdentityKey(identity("selected"));
+    const reason = {code:"SOURCE_RECONCILIATION_PENDING",scope:["source:repo/large.ts", selected, ...Array.from({length:1000},(_,i)=>graphIdentityKey(identity("unrelated-"+i)))],detail:"Pending structural reconciliation."};
+    graph.state.reasons = [...Array.from({length:30},()=>reason), {...reason,detail:"A different unresolved obligation."}];
+    const pack = buildContextPack(graph,{query:"selected",depth:0,metadata_budget_bytes:4096},now);
+    expect(pack.state.reasons).toHaveLength(2);
+    for (const item of pack.state.reasons) expect(item.scope).toEqual([selected,"source:repo/large.ts"].sort());
+    expect(pack.state.freshness).toBe("stale");
+    expect(pack.state.completeness).toBe("partial");
+    expect(pack.mandatory_satisfied).toBe(true);
+    expect(pack.context_text).not.toContain("unrelated-");
+    expect(Buffer.byteLength(JSON.stringify({...pack,context_text:""}))).toBeLessThanOrEqual(4096);
+    expect(graph.state.reasons[0].scope).toHaveLength(1002);
+  });
   it.each(CANONICAL_FAMILIES.map(family => [family.kind, family.file, family.arrays[0]] as const))(
     "retrieves the literal %s family instead of silently excluding it", async (kind, file, array) => {
       await put(file, { [array]: [{ id: `f_${kind}`, name: `f_${kind}`, description: `Unique ${kind} knowledge` }] });

@@ -349,6 +349,7 @@ interface ArchitectExecutionControlCapabilities {
 interface ActiveArchitectExecutionControl {
   id: string;
   adapter: ArchitectAdapterType;
+  runtime: ActiveArchitectSessionRuntime;
   controller: AbortController;
   state: Extract<ArchitectPassStatus, "running" | "paused" | "cancelled">;
   started_at: string;
@@ -638,24 +639,25 @@ function buildActiveArchitectSessionRuntime(overrides: Partial<Pick<ActiveArchit
   const adapter = getArchitectAdapterConfig();
   const autonomy = getArchitectAutonomyMode();
   const verbosity = getArchitectVerbosityMode();
-  const runtimeAdapter = overrides.adapter ?? architectSession.activeArchitectExecutionControl?.adapter ?? adapter.adapter;
-  const runtimeProvider = overrides.provider ?? architect.provider;
-  const runtimeModel = overrides.model ?? architect.model;
-  const runtimeAutonomyMode = overrides.autonomy_mode ?? autonomy.mode;
-  const runtimeVerbosityMode = overrides.verbosity_mode ?? verbosity.mode;
+  const admitted = architectSession.activeArchitectExecutionControl?.runtime;
+  const runtimeAdapter = overrides.adapter ?? admitted?.adapter ?? adapter.adapter;
+  const runtimeProvider = overrides.provider ?? admitted?.provider ?? architect.provider;
+  const runtimeModel = overrides.model ?? admitted?.model ?? architect.model;
+  const runtimeAutonomyMode = overrides.autonomy_mode ?? admitted?.autonomy_mode ?? autonomy.mode;
+  const runtimeVerbosityMode = overrides.verbosity_mode ?? admitted?.verbosity_mode ?? verbosity.mode;
 
   return {
     adapter: runtimeAdapter,
-    adapter_source: overrides.adapter ? "request" : adapter.source,
+    adapter_source: overrides.adapter ? "request" : admitted?.adapter_source ?? adapter.source,
     provider: runtimeProvider,
-    provider_source: overrides.provider ? "request" : architect.providerSource,
+    provider_source: overrides.provider ? "request" : admitted?.provider_source ?? architect.providerSource,
     model: runtimeModel,
-    model_source: overrides.model ? "request" : architect.modelSource,
-    reasoning_effort: Object.hasOwn(overrides, "reasoning_effort") ? overrides.reasoning_effort ?? null : architect.reasoningEffort ?? null,
+    model_source: overrides.model ? "request" : admitted?.model_source ?? architect.modelSource,
+    reasoning_effort: Object.hasOwn(overrides, "reasoning_effort") ? overrides.reasoning_effort ?? null : admitted ? admitted.reasoning_effort : architect.reasoningEffort ?? null,
     autonomy_mode: runtimeAutonomyMode,
-    autonomy_source: overrides.autonomy_mode ? "request" : autonomy.source,
+    autonomy_source: overrides.autonomy_mode ? "request" : admitted?.autonomy_source ?? autonomy.source,
     verbosity_mode: runtimeVerbosityMode,
-    verbosity_source: overrides.verbosity_mode ? "request" : verbosity.source,
+    verbosity_source: overrides.verbosity_mode ? "request" : admitted?.verbosity_source ?? verbosity.source,
     verbosity_modes: [...ARCHITECT_VERBOSITY_MODE_OPTIONS],
     narrative_density: resolveArchitectNarrativeDensity(runtimeVerbosityMode),
     pass_state: { ...(overrides.pass_state ?? architectSession.activeArchitectPassState) },
@@ -3779,7 +3781,11 @@ async function handleArchitectConfigRequest(req: IncomingMessage, res: ServerRes
     [ARCHITECT_TOKEN_ECONOMY_ENV_KEY]: tokenEconomy ? "true" : "false",
   };
   const scope = getActiveScope();
-  if (getSessionContext()) { await saveSessionEnvironment(updates); }
+  if (getSessionContext()) {
+    await saveSessionEnvironment(updates);
+    // Heartbeats must not keep the environment captured by the first page request.
+    architectSession.context = getSessionContext();
+  }
   else if (scope?.engineEnvPath) {
     await persistArchitectEngineConfig(scope.engineEnvPath, updates);
   }
@@ -4858,6 +4864,7 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
   architectSession.activeArchitectExecutionControl = {
     id: computer?.preparation.execution_id??`${runtime.session_id}:${Date.now()}`,
     adapter,
+    runtime: { ...runtime },
     controller: executionController,
     state: "running",
     started_at: new Date().toISOString(),
@@ -8079,6 +8086,8 @@ function renderArchitectShell(): string {
     let autonomyPassCount = 0;
     let architectControlPersistTimer = 0;
     let lastNativeArchitectProvider = '';
+    let dispatchRuntime = null;
+    let architectControlsReady = false;
     let activeArchitectRuntime = (initialRuntimePayload && (initialRuntimePayload.runtime || initialRuntimePayload.architect_runtime || initialRuntimePayload.architect_llm)) || {};
     let lastPersistedPlanId = initialRuntimePayload && (initialRuntimePayload.selected_plan_id || (initialRuntimePayload.architect_selection && initialRuntimePayload.architect_selection.selected_plan_id)) || null;
     let activeChatScope = lastPersistedPlanId ? 'plan' : 'project';
@@ -9466,7 +9475,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
 
     function updateActiveArchitectRuntime(payload) {
       const runtime = runtimeFromPayload(payload);
-      activeArchitectRuntime = Object.assign({}, activeArchitectRuntime || {}, runtime || {});
+      activeArchitectRuntime = Object.assign({}, activeArchitectRuntime || {}, runtime || {}, dispatchRuntime || {});
       const tokenEconomy = payload && (payload.token_economy || payload.architect_token_economy || (payload.architect_llm && payload.architect_llm.token_economy) || (payload.result && (payload.result.token_economy || (payload.result.route && payload.result.route.token_economy))) || (activeArchitectRuntime && activeArchitectRuntime.token_economy));
       const budgetStatus = payload && (payload.budget_status || (payload.result && (payload.result.budget_status || (payload.result.token_economy && payload.result.token_economy.budget_status) || (payload.result.route && payload.result.route.token_economy && payload.result.route.token_economy.budget_status))));
       if (tokenEconomy) activeTokenEconomy = tokenEconomy;
@@ -9926,6 +9935,7 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
     }
 
     function saveArchitectControls() {
+      renderRuntime({});
       try {
         window.localStorage.setItem(architectControlStorageKey, JSON.stringify({
           adapter: architectAdapterSelectEl.value,
@@ -9989,10 +9999,10 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       return (controls.provider || 'none') + '/' + model;
     }
 
-    async function persistArchitectControls() {
+    async function persistArchitectControls(capturedControls) {
       window.clearTimeout(architectControlPersistTimer);
       architectControlPersistTimer = 0;
-      const controls = selectedArchitectControls();
+      const controls = capturedControls || selectedArchitectControls();
       const economyEnabled = activeTokenEconomy && activeTokenEconomy.token_economy !== false;
       try {
         const response = await fetch('/api/architect/v1/config', {
@@ -10105,6 +10115,8 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       architectVerbosityModeSelectEl.value = runtime.verbosity_mode || 'balanced';
       syncArchitectControlState(runtime.model || saved.model || '');
       syncArchitectEffort(runtime.reasoning_effort);
+      architectControlsReady = true;
+      renderRuntime({});
       architectAdapterSelectEl.addEventListener('change', function() {
         syncArchitectControlState('');
         saveArchitectControls();
@@ -10575,14 +10587,16 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         projectScopeEl.textContent = 'Project: ' + projectRoot;
         projectScopeEl.title = 'Instance: ' + instanceId + ' | plans: ' + (project.plans_root || 'unknown') + ' | binding: ' + (project.binding_status || (project.daemon_bound ? 'bound' : 'unbound'));
       }
+      const displayRuntime = !chatProcessing && architectControlsReady
+        ? Object.assign({}, runtime, selectedArchitectControls(), { autonomy_mode: selectedArchitectControls().mode }) : runtime;
       const passState = runtime.pass_state || {};
       if (typeof passState.completed === 'number') {
         autonomyPassCount = Math.max(autonomyPassCount, passState.completed);
       }
       const llm = payload.architect_llm || {};
-      syncAttachmentCapabilities(llm.capabilities || computeAttachmentCapabilities(runtime.adapter, runtime.provider, runtime.model));
-      architectModelConfigEl.textContent = 'Model: ' + architectRuntimeLabel(runtime) + ' | ' + (runtime.verbosity_mode || 'balanced');
-      architectModelConfigEl.title = 'session: ' + (runtime.session_id || 'unknown') + ' | route: ' + (runtime.execution_route || runtime.adapter || 'unknown') + ' | autonomy: ' + (runtime.autonomy_mode || 'unknown') + ' | verbosity: ' + (runtime.verbosity_mode || 'balanced') + ' | provenance: ' + (runtime.provenance_authority || 'unknown') + ' | adapter source: ' + (runtime.adapter_source || 'unknown') + ' | model source: ' + (runtime.model_source || 'unknown') + ' | provider source: ' + (runtime.provider_source || 'unknown');
+      syncAttachmentCapabilities(computeAttachmentCapabilities(displayRuntime.adapter, displayRuntime.provider, displayRuntime.model));
+      architectModelConfigEl.textContent = 'Model: ' + architectRuntimeLabel(displayRuntime) + ' | ' + (displayRuntime.verbosity_mode || 'balanced');
+      architectModelConfigEl.title = 'session: ' + (runtime.session_id || 'unknown') + ' | route: ' + architectRuntimeLabel(displayRuntime) + ' | autonomy: ' + (displayRuntime.autonomy_mode || 'unknown') + ' | verbosity: ' + (displayRuntime.verbosity_mode || 'balanced') + ' | source: ' + (!chatProcessing && architectControlsReady ? 'Advanced runtime controls for next request' : 'current execution') + ' | provenance: ' + (runtime.provenance_authority || 'unknown');
     }
 
     function renderArchitectPulse(pulse) {
@@ -12147,7 +12161,10 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         activeContinuationToken = null;
         activeContinuationOptions = [];
       }
-      const persistedPayload = await persistArchitectControls();
+      dispatchRuntime = { adapter: controls.adapter, provider: controls.provider, model: controls.model,
+        reasoning_effort: controls.reasoning_effort, autonomy_mode: controls.mode, verbosity_mode: controls.verbosity_mode };
+      renderRuntime({ runtime: dispatchRuntime });
+      const persistedPayload = await persistArchitectControls(controls);
       const requestRuntime = updateActiveArchitectRuntime(persistedPayload);
       const dispatchComputerPreparation=takeComputerPreparation(continuation);
       const dispatchComputerUse=await decideComputerUse(outboundMessage,continuation);
@@ -12171,12 +12188,12 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
             ...(dispatchNativeTask ? {plan_execution:dispatchNativeTask} : {}),
             continuationToken: continuation ? continuation.continuationToken : null,
             selected_action_id: continuation ? continuation.selectedActionId : null,
-            mode: requestRuntime.autonomy_mode || controls.mode,
-            autonomy_mode: requestRuntime.autonomy_mode || controls.mode,
-            verbosity_mode: requestRuntime.verbosity_mode || controls.verbosity_mode,
-            adapter: requestRuntime.adapter || controls.adapter,
-            provider: requestRuntime.provider || controls.provider,
-            model: requestRuntime.model || controls.model,
+            mode: controls.mode,
+            autonomy_mode: controls.mode,
+            verbosity_mode: controls.verbosity_mode,
+            adapter: controls.adapter,
+            provider: controls.provider,
+            model: controls.model,
             reasoning_effort: controls.reasoning_effort,
             session_id: requestRuntime.session_id,
             responseTransport: 'sse'
@@ -12188,6 +12205,8 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         }
         if(dispatchNativeTask&&JSON.stringify(preparedNativePlanTask)===JSON.stringify(dispatchNativeTask)){preparedNativePlanTask=null;renderPreparedNativeTask();}
         clearPendingChatAttachments();
+        // The completed pass reports its actual admitted route, including explicit prepared-role routing.
+        dispatchRuntime = null;
         renderRuntime(payload);
         const runtime = updateActiveArchitectRuntime(payload);
         const result = payload.result || {};
@@ -12231,7 +12250,9 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
         }
       } finally {
         stopExecutionReviewPolling();
+        dispatchRuntime = null;
         setChatProcessing(false);
+        renderRuntime({});
       }
     }
 
@@ -12726,9 +12747,9 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       });
       stream.addEventListener('architect.noop', function(event) {
         const envelope = parseArchitectEvent(event);
-        if (envelope.payload && (envelope.payload.project_scope || envelope.payload.architect_llm)) {
-          renderRuntime(envelope.payload);
-        }
+        // A heartbeat reports liveness, not a new routing decision.
+        envelope.payload = Object.assign({}, envelope.payload || {}, { runtime: !chatProcessing && architectControlsReady
+          ? Object.assign({}, activeArchitectRuntime, selectedArchitectControls()) : activeArchitectRuntime });
         renderLiveEventStatus(envelope, 'idle');
       });
       stream.addEventListener('architect.tool_result', appendToolTraceEvent);

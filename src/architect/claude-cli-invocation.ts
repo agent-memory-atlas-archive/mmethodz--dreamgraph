@@ -38,7 +38,7 @@ export async function probeClaudeProfile(input: { cwd: string; timeoutMs: number
 
 export async function prepareClaudeInvocation(input: {
   scratchDir: string; prompt: string; model: string | undefined; reasoningEffort?: string;
-  timeoutMs: number; signal?: AbortSignal;
+  timeoutMs: number; signal?: AbortSignal; qualificationMaxTurns?: number;
   bridgeSpawn: { command: string; args: string[] };
   envBase: Record<string, string>; availableToolNames: string[];
 }) {
@@ -54,9 +54,9 @@ export async function prepareClaudeInvocation(input: {
   await writeFile(mcpConfig, JSON.stringify({ mcpServers: { dreamgraph: {
     type: "stdio", command: input.bridgeSpawn.command, args: input.bridgeSpawn.args, env: bridgeEnv,
   } } }), { mode: 0o600, flag: "wx" });
-  return { command: profile.command, args: claudeProfileArgs({ settings, mcpConfig, model: input.model, maxTurns: 12, effort: input.reasoningEffort }),
+  return { command: profile.command, args: claudeProfileArgs({ settings, mcpConfig, model: input.model, maxTurns: input.qualificationMaxTurns, effort: input.reasoningEffort }),
     cwd: input.scratchDir, env: profile.env, stdin: input.prompt, outputPath: null,
     claude: { expected: { version: profile.version, model: input.model,
-      tools: [...input.availableToolNames, ...(input.envBase.DREAMGRAPH_BRIDGE_COMPUTER_USE_REQUESTABLE === "1" ? ["request_computer_use"] : [])] },
+      tools: input.availableToolNames },
       gatePath, gateToken, requireProxyTermination: true }, version: profile.version, fingerprint: profile.fingerprint };
 }

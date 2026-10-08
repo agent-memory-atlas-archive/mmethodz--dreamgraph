@@ -123,6 +123,26 @@ export interface GraphHealthReport {
   recommendations: GraphMaintenanceRecommendation[];
   primary_recommendation: GraphMaintenanceRecommendation | null;
   maintenance_state: GraphMaintenanceState;
+  diagnostics: { total: number; by_code: Record<string, number>; sampled: boolean; scope_sample_limit: number };
+}
+
+/** Aggregate diagnostics, never serialize an entire large graph through the health overview. */
+export function summarizeHealthDiagnostics(state: CanonicalGraphRead["state"]) {
+  const counts: Record<string, number> = {};
+  const samples = new Map<string, CanonicalGraphRead["state"]["reasons"][number]>();
+  for (const reason of state.reasons) {
+    counts[reason.code] = (counts[reason.code] ?? 0) + 1;
+    if (!samples.has(reason.code)) samples.set(reason.code, {
+      code: reason.code, scope: reason.scope.slice(0, 8),
+      detail: reason.detail?.slice(0, 512),
+    });
+  }
+  return {
+    state: { ...state, reasons: [...samples.values()] },
+    diagnostics: { total: state.reasons.length, by_code: counts,
+      sampled: state.reasons.some(reason => reason.scope.length > 8 || (reason.detail?.length ?? 0) > 512) || samples.size < state.reasons.length,
+      scope_sample_limit: 8 },
+  };
 }
 
 function envPositive(name: string, fallback: number): number {
@@ -310,7 +330,15 @@ async function assessGraphHealthUnlocked(): Promise<GraphHealthReport> {
     loadGraphMaintenanceState(),
   ]);
 
-  const family=(kind:CanonicalKind)=>canonical.entities.filter(e=>e.identity.kind===kind).map(e=>({...e.payload,id:graphIdentityKey(e.identity),name:e.label,links:canonical.relationships.filter(r=>r.kind==="fact"&&r.source&&graphIdentityKey(r.source)===graphIdentityKey(e.identity)).map(r=>({target:r.target?graphIdentityKey(r.target):r.target_ref,relationship:r.relation}))}));
+  const facts = new Map<string, Array<{ target: string; relationship: string }>>();
+  for (const relation of canonical.relationships) {
+    if (relation.kind !== "fact" || !relation.source) continue;
+    const key = graphIdentityKey(relation.source), links = facts.get(key) ?? [];
+    links.push({ target: relation.target ? graphIdentityKey(relation.target) : relation.target_ref, relationship: relation.relation });
+    facts.set(key, links);
+  }
+  const family=(kind:CanonicalKind)=>canonical.entities.filter(e=>e.identity.kind===kind).map(e=>({...e.payload,id:graphIdentityKey(e.identity),name:e.label,links:facts.get(graphIdentityKey(e.identity)) ?? []}));
+  const diagnosticSummary = summarizeHealthDiagnostics(canonical.state);
   const groups: Record<CanonicalKind, CanonicalNode[]> = {
     feature: asCanonical(family("feature"), "feature"),
     workflow: asCanonical(family("workflow"), "workflow"),
@@ -375,9 +403,9 @@ async function assessGraphHealthUnlocked(): Promise<GraphHealthReport> {
     observations.push({ signal, severity, observed, reasoning_impact: impact });
   };
   const integrityDefects=canonical.state.reasons.filter(r=>/INVALID|UNAVAILABLE|UNPUBLISHED|DUPLICATE|MISSING|DANGLING/.test(r.code));
-  for(const reason of integrityDefects)observe(reason.code,"critical",reason.detail,`Canonical context is incomplete in ${reason.scope.join(", ")||"an unknown scope"}; aggregate coverage cannot hide this defect.`);
+  for(const reason of diagnosticSummary.state.reasons.filter(r=>/INVALID|UNAVAILABLE|UNPUBLISHED|DUPLICATE|MISSING|DANGLING/.test(r.code)))observe(reason.code,"critical",`${diagnosticSummary.diagnostics.by_code[reason.code]} diagnostic(s): ${reason.detail}`,`Canonical context is incomplete. Sample scope: ${reason.scope.join(", ")||"unknown"}; aggregate coverage cannot hide this defect.`);
   const requiredGaps=canonical.state.reasons.filter(r=>["SOURCE_RECONCILIATION_PENDING","SOURCE_EFFECT_UNKNOWN"].includes(r.code));
-  for(const reason of requiredGaps)observe(reason.code,"critical",reason.detail,`Reconcile the declared scope ${reason.scope.join(", ")}; unrelated recent mutations do not settle this obligation.`);
+  for(const reason of diagnosticSummary.state.reasons.filter(r=>["SOURCE_RECONCILIATION_PENDING","SOURCE_EFFECT_UNKNOWN"].includes(r.code)))observe(reason.code,"critical",`${diagnosticSummary.diagnostics.by_code[reason.code]} diagnostic(s): ${reason.detail}`,`Pending source evidence. Sample scope: ${reason.scope.join(", ")}; unrelated recent mutations do not settle this obligation.`);
   if (total === 0) observe("empty_graph", "critical", "No canonical graph nodes are present.", "Architectural planning and retrieval have no project model to ground decisions.");
   if (parserOnly > 0) observe("parser_only_nodes", parserOnly / Math.max(total, 1) > 0.2 ? "critical" : "warning", `${parserOnly} parser-origin nodes lack successful LLM enrichment.`, "Mechanical nodes bias retrieval toward syntax and filenames instead of intent and responsibility.");
   if (enrichedCount < enrichmentDenominator && enrichmentDenominator > 0) {
@@ -462,7 +490,7 @@ async function assessGraphHealthUnlocked(): Promise<GraphHealthReport> {
 
   return {
     schema: "dreamgraph.graph_health.v1",
-    definition_version:"2.0.0",revision:canonical.revision,currency:canonical.currency,state:canonical.state,
+    definition_version:"2.0.0",revision:canonical.revision,currency:canonical.currency,...diagnosticSummary,
     dimensions:{integrity:integrityDefects.length?"defective":canonical.state.completeness==="unknown"?"unknown":"sound",freshness:canonical.state.freshness,coverage:total===0?"empty":semanticPoor?"partial":"complete",readiness:canonical.state.availability==="unavailable"?"unavailable":status==="healthy"||status==="excellent"?"ready":"attention",workload:{open_tensions:unresolvedTensions,dirty_regions:dirty.length,optional_pending_regions:dirty.filter(p=>!p.pending_stages.includes("reconciliation")).length}},
     task_usefulness:{measured:false,understanding_gain:null,avoided_rereads:null,reason:"Requires matched task evaluation; coverage, confidence and context delivered do not measure understanding."},
     generated_at: new Date().toISOString(),
@@ -500,14 +528,14 @@ async function assessGraphHealthUnlocked(): Promise<GraphHealthReport> {
     observations,
     recommendations,
     primary_recommendation: recommendations[0] ?? null,
-    maintenance_state: state,
+    maintenance_state: { ...state, curation: undefined, digestion: undefined },
   };
 }
 
 export function registerGraphHealthTools(server: McpServer): void {
   server.tool(
     "graph_health_report",
-    "Read-only architectural quality assessment for the active DreamGraph instance. Reports semantic density, enrichment, parser-only and hollow nodes, naming quality, contracts, workflows, datastore/UI coverage, connectivity, tensions, dream promotion, repository drift, and staleness. Returns evidence-based smallest-first maintenance recommendations; it never executes them.",
+    "Read-only architectural quality assessment for the active DreamGraph instance. Reports semantic density, enrichment, parser-only and hollow nodes, naming quality, contracts, workflows, datastore/UI coverage, connectivity, tensions, dream promotion, repository drift, and staleness. Returns aggregate diagnostic counts and explicitly sampled scopes, not the full graph diagnostic ledger. Returns evidence-based smallest-first maintenance recommendations; it never executes them.",
     {
       include_recommendations: z.boolean().default(true).describe("Include ranked user-approval maintenance actions (default true)."),
     },

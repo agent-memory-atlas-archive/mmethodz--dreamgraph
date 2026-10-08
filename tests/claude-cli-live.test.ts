@@ -93,7 +93,7 @@ it.skipIf(!mode)("qualifies the real isolated Claude route in a disposable proje
       packet.runs.push({ executionId, started: new Date().toISOString() }); // record dispatch before waiting; never replay
       const result = await withSessionContext(owner.context, () => runArchitectCliBridge({
         adapter: "claude-cli", req, userMessage, messages: [], model: "claude-sonnet-5",
-        timeoutMs: ["computer", "save"].includes(mode!) ? 600000 : 240000, autonomyMode: "manual", executionId, ...extra,
+        timeoutMs: ["computer", "save"].includes(mode!) ? 600000 : 240000, autonomyMode: "manual", executionId, ...extra, qualificationMaxTurns: 12,
       }));
       packet.runs[packet.runs.length - 1].result = result;
       expect(result.route.fallback_reason).toBeNull(); expect(result.route.stop_reason).toBe("cli_completed");

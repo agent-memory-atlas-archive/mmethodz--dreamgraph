@@ -1,5 +1,7 @@
 import { spawn as spawnChild } from "node:child_process";
 import { assertCliAdmissionGate } from "./cli-admission-gate.js";
+import { cliBridgeLocalToolNames } from "./cli-bridge-tools.js";
+import { coreToolPolicy } from "../server/tool-policy.js";
 import { CLI_VERSION } from "../cli/version.js";
 import { createHash, randomUUID } from "node:crypto";
 import { appendFile, mkdirSync, writeFileSync } from "node:fs";
@@ -54,7 +56,7 @@ let queuedToolCalls = 0;
 async function contextTransport(action: "refresh" | "deliver", body: unknown, signal?: AbortSignal) {
   const response = await fetch(new URL(`/api/architect/v1/execution/context/${action}`, HOST_MCP_URL), {
     method: "POST", headers: { "Content-Type": "application/json", "X-DreamGraph-Session": process.env.DREAMGRAPH_BRIDGE_SESSION_BEARER ?? "" },
-    body: JSON.stringify(body), signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(10000)]) : AbortSignal.timeout(10000),
+    body: JSON.stringify(body), signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(30000)]) : AbortSignal.timeout(30000),
   });
   const bytes = Number(response.headers.get("content-length"));
   if (Number.isFinite(bytes) && bytes > 256 * 1024) throw new Error("CLI_CONTEXT_RESPONSE_BYTE_BOUND");
@@ -154,6 +156,7 @@ async function main(): Promise<void> {
   );
 
   const toolPages = new Map<string, ReturnType<typeof upstream.listTools>>();
+  const upstreamToolNames = new Set<string>();
   server.setRequestHandler(ListToolsRequestSchema, async (req, extra) => {
     const key = req.params?.cursor ?? "";
     if (!toolPages.has(key)) {
@@ -168,8 +171,12 @@ async function main(): Promise<void> {
       throw error;
     }
     // A local extension appears once, on the final page, never on every page.
-    if (result.nextCursor || result.tools.some((tool) => tool.name === RUN_COMMAND_TOOL.name)) return result;
-    return { ...result, tools: [...result.tools, RUN_COMMAND_TOOL, ...(COMPUTER_USE_REQUESTABLE ? [REQUEST_COMPUTER_USE_TOOL] : [])] };
+    for (const tool of result.tools) upstreamToolNames.add(tool.name);
+    if (result.nextCursor) return result;
+    const localNames = cliBridgeLocalToolNames({ managedContext: MANAGED_CONTEXT, computerUseRequestable: COMPUTER_USE_REQUESTABLE });
+    const localTools = [RUN_COMMAND_TOOL, REFRESH_CONTEXT_TOOL, REQUEST_COMPUTER_USE_TOOL]
+      .filter(tool => localNames.includes(tool.name) && !upstreamToolNames.has(tool.name));
+    return { ...result, tools: [...result.tools, ...localTools] };
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (req, extra) => {
@@ -180,7 +187,7 @@ async function main(): Promise<void> {
     let release!: () => void;
     precedingToolTransport = new Promise<void>(done => { release = () => { queuedToolCalls--; done(); }; });
     await preceding;
-    try { extra.signal.throwIfAborted(); await assertCliAdmissionGate(); if (contextUnavailable) throw new Error("CLI_CONTEXT_RECOVERY_REQUIRED: previous owner result retained; restart only after reviewing its receipts and context failure"); }
+    try { extra.signal.throwIfAborted(); await assertCliAdmissionGate(); if (contextUnavailable && !coreToolPolicy(req.params.name).read_only && req.params.name !== REFRESH_CONTEXT_TOOL.name) throw new Error("CLI_CONTEXT_RECOVERY_REQUIRED: effects are paused; inspect prior receipts with read tools, then call refresh_execution_context. Unknown effects must not be retried."); }
     catch (error) { release(); throw error; }
     transportReleases.set(extra.requestId, release);
     const startedAtEpochMs = Date.now();
@@ -197,13 +204,17 @@ async function main(): Promise<void> {
       correlationId,
     });
     try {
-      let result = req.params.name === RUN_COMMAND_TOOL.name
+      const explicitRefresh = req.params.name === REFRESH_CONTEXT_TOOL.name;
+      if (explicitRefresh && (!MANAGED_CONTEXT || Object.keys(req.params.arguments ?? {}).length)) throw new Error("MANAGED_CONTEXT_REFRESH_ARGUMENTS_INVALID");
+      let result = explicitRefresh ? { content: [] as CallToolResult["content"] } : req.params.name === RUN_COMMAND_TOOL.name
         ? await runLocalCommand(req.params.arguments ?? {}, extra.signal)
         : req.params.name === REQUEST_COMPUTER_USE_TOOL.name
           ? requestComputerUse(req.params.arguments ?? {})
           : await upstream.callTool(req.params, undefined, { signal: extra.signal, ...claudeBridgeDeadline() });
-      // A Computer Use browser action changes no graph context: no context block after every click and screenshot.
-      if (MANAGED_CONTEXT && !COMPUTER_USE_TOOL.test(req.params.name)) {
+      // Core reads cannot change the graph. Keep their literal result without rebuilding/reinjecting the
+      // execution context; effects still revalidate it at daemon admission and refresh after dispatch.
+      // Unknown extension tools remain effectful. Browser actions retain their separate CU authority.
+      if (MANAGED_CONTEXT && (explicitRefresh || !coreToolPolicy(req.params.name).read_only && !COMPUTER_USE_TOOL.test(req.params.name))) {
         try {
           const delivery = await contextTransport("refresh", {}, extra.signal) as ContextDelivery;
           if (!Array.isArray(result.content)) throw new Error("CLI_OWNER_RESULT_CONTENT_INVALID");
@@ -217,7 +228,7 @@ async function main(): Promise<void> {
           // Refresh failure cannot hide a committed owner's literal result or receipts.
           result = { ...result, isError: true, content: [...result.content, { type: "text", text: JSON.stringify({
             error: { code: "CLI_CONTEXT_REFRESH_FAILED", message: String(error) },
-            effect_status: "Original owner result retained. Consult its receipts; refresh failure is not rollback. Further dispatch is stopped.",
+            effect_status: "Original owner result retained. Consult its receipts; refresh failure is not rollback. Effects are paused. Read tools remain available; inspect receipts and call refresh_execution_context. Never retry an uncertain mutation blindly.",
           }) }], _meta: { ...result._meta, dreamgraph_context_failure: "recovery_required; no replacement context was delivered" } };
         }
       }
@@ -274,7 +285,7 @@ async function main(): Promise<void> {
       if (delivery) {
         const acknowledgement = contextTransport("deliver", { receipt_id: delivery.receipt_id, block: delivery.block });
         pendingAcknowledgements.add(acknowledgement);
-        try { await acknowledgement; } catch (error) { contextUnavailable = true; throw error; }
+        try { await acknowledgement; contextUnavailable = false; } catch (error) { contextUnavailable = true; throw error; }
         finally { pendingAcknowledgements.delete(acknowledgement); }
       }
     } finally { release?.(); }
@@ -323,6 +334,12 @@ function safeStringify(value: unknown): string {
     return JSON.stringify(String(value));
   }
 }
+
+const REFRESH_CONTEXT_TOOL: Tool = Object.freeze({
+  name: "refresh_execution_context",
+  description: "[DreamGraph] Refresh and deliver this execution's graph context after inspecting a context failure. Read tools remain available during recovery. Does not repeat a prior action, reconcile source, or resolve an unknown effect.",
+  inputSchema: { type: "object" as const, properties: {}, additionalProperties: false },
+});
 
 const RUN_COMMAND_TOOL: Tool = Object.freeze({
   name: "run_command",

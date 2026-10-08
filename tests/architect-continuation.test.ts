@@ -657,3 +657,18 @@ describe("CLI execution result normalization", () => {
     expect(decision.reason).toBe("no_safe_continuation_action");
   });
 });
+
+
+it("separates successful reads from failed CLI completion and retains its terminal reason", () => {
+  const result = synthesizeArchitectRouteFailureContinuation({
+    reason: "CLAUDE_MAX_TURNS_REACHED; subtype=error_max_turns_reached; turns=12",
+    adapter: "claude-cli", provider: "none", model: "claude-opus-5-5",
+    context: { selected_plan_id: null, chat_scope: "project", completed_passes: 1, max_passes: 50, now: new Date() },
+    tool_trace_summary: Array.from({ length: 18 }, () => "query_resource: completed"),
+  });
+  expect(result.envelope.summary).toContain("18 recorded tool calls");
+  expect(result.envelope.summary).not.toContain("envelope");
+  expect(result.envelope.stop_reason).toContain("turns=12");
+  expect(result.report.recommended_next_step.id).toBe("report-only");
+  expect(result.report.continuation_options.find(action => action.id === "retry-route")?.safe).toBe(false);
+});

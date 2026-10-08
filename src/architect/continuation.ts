@@ -429,7 +429,10 @@ export function synthesizeArchitectRouteFailureContinuation(input: ArchitectRout
   const reason = sanitizeText(input.reason || "architect_route_failed", 240);
   const contextLimited = /ADMISSION_CONTEXT_LIMIT|CLI_REQUIRED_PROMPT_BYTE_BOUND/.test(reason);
   const contextLimitRecovery = "Review the configured role context allocation and required prompt size before retrying. Narrow optional context or explicitly change the role budget; required graph evidence must remain intact.";
-  const diagnostics = [reason, "architect_route_failed_before_envelope_parse"];
+  const cli = ["codex-cli", "claude-cli", "copilot-cli"].includes(input.adapter);
+  const tracedCalls = input.tool_trace_summary?.length ?? 0;
+  const needsReview = cli && (tracedCalls > 0 || /CLAUDE_(MAX_|STRUCTURED_OUTPUT_RETRIES)/.test(reason));
+  const diagnostics = [reason, cli ? "architect_cli_run_failed" : "architect_route_failed_before_envelope_parse"];
   const retryPrompt = [
     "Retry the previous DreamGraph Architect pass through the configured standalone route.",
     `Previous route failure: ${reason}`,
@@ -448,7 +451,9 @@ export function synthesizeArchitectRouteFailureContinuation(input: ArchitectRout
     schema: ARCHITECT_CONTINUATION_SCHEMA,
     pass_id: "route-failure",
     status: "failed",
-    summary: `Standalone Architect route failed before a continuation envelope could be parsed: ${reason}`,
+    summary: cli
+      ? `Architect CLI run ended unsuccessfully after ${tracedCalls} recorded tool calls: ${reason}. Successful tool calls do not establish task completion; inspect the trace before continuing.`
+      : `Standalone Architect route failed before a continuation envelope could be parsed: ${reason}`,
     work_completed: [],
     files_touched: [],
     graph_entities_touched: [],
@@ -457,7 +462,7 @@ export function synthesizeArchitectRouteFailureContinuation(input: ArchitectRout
       ...sanitizeTextList(input.tool_trace_summary),
     ],
     graph_plan_updates: [],
-    evidence: [`failure classified before envelope parsing: ${reason}`],
+    evidence: [cli ? `CLI terminal or process failure: ${reason}` : `failure classified before envelope parsing: ${reason}`],
     blockers: [reason],
     uncertainty: 1,
     stop_reason: reason,
@@ -477,14 +482,14 @@ export function synthesizeArchitectRouteFailureContinuation(input: ArchitectRout
       {
         id: "retry-route",
         label: "Retry route",
-        rationale: contextLimited ? contextLimitRecovery : "The adapter/provider failed before producing an envelope, so retrying the same bounded pass is safe.",
+        rationale: contextLimited ? contextLimitRecovery : needsReview ? "Review the terminal diagnostic and existing tool effects before starting another pass; do not replay uncertain mutations." : "The route returned no completed answer. Any retry remains subject to the existing execution controls.",
         kind: "continue",
         prompt: retryPrompt,
-        safe: !contextLimited,
-        recommended: !contextLimited,
+        safe: !contextLimited && !needsReview,
+        recommended: !contextLimited && !needsReview,
         required_tools: [],
         preferred_tools: [],
-        disabled_reason: contextLimited ? "The same prompt exceeds its context allocation; retrying unchanged will fail again." : null,
+        disabled_reason: contextLimited ? "The same prompt exceeds its context allocation; retrying unchanged will fail again." : needsReview ? "Review the recorded calls and terminal reason before continuing." : null,
       },
       {
         id: "report-only",
@@ -493,7 +498,7 @@ export function synthesizeArchitectRouteFailureContinuation(input: ArchitectRout
         kind: "pause",
         prompt: reportPrompt,
         safe: true,
-        recommended: false,
+        recommended: needsReview && !contextLimited,
         required_tools: [],
         preferred_tools: [],
         disabled_reason: null,

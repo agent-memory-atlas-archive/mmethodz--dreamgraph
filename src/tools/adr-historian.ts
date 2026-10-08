@@ -525,6 +525,12 @@ export function registerADRTools(server: McpServer): void {
               .map(({ decision }) => decision);
           }
 
+          // A targeted guard check must not attach the entire ADR log when no search filter was given.
+          if (params.guard_check_entity_id && !params.entity_id && !params.tag && !params.status && !params.search) {
+            const eid = params.guard_check_entity_id.toLowerCase();
+            filtered = filtered.filter(d => d.status === "accepted" && d.context.affected_entities.some(e => e.toLowerCase() === eid));
+          }
+
           // Guard rail check
           const warnings: GuardRailWarning[] = [];
           if (params.guard_check_entity_id) {

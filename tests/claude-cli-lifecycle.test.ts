@@ -33,7 +33,7 @@ it.each([100, 15000])("observes the registered proxy after parent exit (proxy du
 it("requires a real terminal and revokes admission on normal close", async () => {
   await fixture("console.log(" + JSON.stringify(JSON.stringify(init)) + ");console.log(" + JSON.stringify(JSON.stringify(result)) + ")", async input => {
     const value = await runClaudeProcess(input);
-    expect(value.claude).toEqual({ content: "actual terminal" }); expect(value.exitCode).toBe(0);
+    expect(value.claude).toEqual({ content: "actual terminal", terminal: { subtype: "success", is_error: false } }); expect(value.exitCode).toBe(0);
     await expect(access(input.gatePath)).rejects.toThrow();
   });
 });
@@ -61,5 +61,20 @@ it("refuses spawn failure, malformed stdout and missing terminal instead of echo
   await fixture("", async input => {
     const result = await runClaudeProcess({ ...input, command: join(input.cwd, "absent.exe") });
     expect(result.claude.error).toBe("CLAUDE_SPAWN_FAILED"); expect(result.terminationConfirmed).toBe(true);
+  });
+});
+
+it("preserves failed terminal reason, turns and usage even without a final newline and with exit zero", async () => {
+  const terminal = { ...result, subtype: "error_max_turns_reached", is_error: true, num_turns: 12,
+    usage: { input_tokens: 100, output_tokens: 10 }, errors: ["private body"] };
+  await fixture("console.log(" + JSON.stringify(JSON.stringify(init)) + ");process.stdout.write(" + JSON.stringify(JSON.stringify(terminal)) + ")", async input => {
+    const value = await runClaudeProcess(input);
+    expect(value.exitCode).toBe(0);
+    expect(value.claude.error).toBe("CLAUDE_MAX_TURNS_REACHED");
+    expect(value.claude.content).toBe("");
+    expect(value.claude.usage).toBeDefined();
+    expect(value.claude.terminal).toEqual({ subtype: "error_max_turns_reached", is_error: true, num_turns: 12, error_count: 1 });
+    expect(JSON.stringify(value)).not.toContain("private body");
+    await expect(access(input.gatePath)).rejects.toThrow();
   });
 });

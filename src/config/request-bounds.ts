@@ -15,7 +15,7 @@ export const HOSTED_API_DEFAULT_CONTEXT_ALLOCATION = 512 * 1024;
 export const LOCAL_DEFAULT_CONTEXT_ALLOCATION = 32768;
 /**
  * Default per-pass resource ceilings for the Architect on a hosted API. One native tool-loop pass resends the
- * growing conversation on every iteration (up to 8), so the generic role defaults (250k input / 100k output and
+ * growing conversation on every iteration, so the generic role defaults (250k input / 100k output and
  * reasoning) end a pass after two or three requests. Money stays governed by the mandatory run/day amounts.
  */
 export const ARCHITECT_API_DEFAULT_BUDGET = { input_tokens: 8 * HOSTED_API_DEFAULT_CONTEXT_ALLOCATION, output_tokens: 262_144, reasoning_tokens: 262_144 } as const;

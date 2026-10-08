@@ -9,6 +9,7 @@ import { JSDOM, VirtualConsole } from "jsdom";
 import { describe, expect, it, vi } from "vitest";
 
 import { config } from "../src/config/config.js";
+import * as cliBridge from "../src/architect/cli-bridge.js";
 import {
   createArchitectCliBridgeSpawnPlan,
   createArchitectCodexConfigToml,
@@ -107,6 +108,8 @@ async function executeArchitectShellInJsdom(input: {
   baseUrl: string;
   html: string;
   chatHistoryPayload: Record<string, unknown>;
+  respond?: (url: URL, init?: RequestInit) => Promise<Response | undefined>;
+  eventSourceReady?: (emit: (type: string, payload: Record<string, unknown>) => void) => void;
 }): Promise<{ dom: JSDOM; errors: string[] }> {
   const errors: string[] = [];
   const virtualConsole = new VirtualConsole();
@@ -129,6 +132,8 @@ async function executeArchitectShellInJsdom(input: {
       win.fetch = async (resource: RequestInfo | URL, init?: RequestInit) => {
         const raw = typeof resource === "string" || resource instanceof URL ? String(resource) : resource.url;
         const url = new URL(raw, input.baseUrl);
+        const override = await input.respond?.(url, init);
+        if (override) return override;
         if (url.pathname === "/api/architect/v1/chat-history") {
           return new Response(JSON.stringify(input.chatHistoryPayload), {
             status: 200,
@@ -183,6 +188,7 @@ async function executeArchitectShellInJsdom(input: {
         private readonly listeners = new Map<string, (event: MessageEvent) => void>();
         constructor(url: string) {
           this.url = url;
+          input.eventSourceReady?.((type, payload) => this.listeners.get(type)?.(new window.MessageEvent(type, {data:JSON.stringify({seq:99,kind:type,payload})})));
           window.setTimeout(() => {
             const listener = this.listeners.get("architect.noop");
             if (!listener) return;
@@ -2805,7 +2811,7 @@ describe("standalone Architect route hardening", () => {
       expect(html).toContain('<option value="detailed">Detailed</option>');
       expect(html).toContain("const architectVerbosityModeSelectEl");
       expect(html).toContain("verbosity_mode: controls.verbosity_mode");
-      expect(html).toContain("verbosity_mode: requestRuntime.verbosity_mode || controls.verbosity_mode");
+      expect(html).not.toContain("verbosity_mode: requestRuntime.verbosity_mode || controls.verbosity_mode");
       expect(html).toContain("architectVerbosityModeSelectEl.value = runtime.verbosity_mode || 'balanced'");
       expect(html).toContain("function renderChatContent");
       expect(html).toContain("function appendTextWithAdrPreviews");
@@ -2942,6 +2948,80 @@ describe("standalone Architect route hardening", () => {
     } finally {
       if (previous === undefined) delete process.env.DREAMGRAPH_ENABLE_DOOM;
       else process.env.DREAMGRAPH_ENABLE_DOOM = previous;
+    }
+  });
+});
+
+describe("Architect selected and admitted routing", () => {
+  it("dispatches the captured Advanced controls despite stale saved/default and heartbeat routes", async () => {
+    await withArchitectServer(async baseUrl => {
+      const html=await (await fetch(baseUrl+"/architect")).text();
+      let posted: any, release!:()=>void, emit!: (type:string,payload:Record<string,unknown>)=>void;
+      const held=new Promise<void>(done=>{release=done;});
+      const wrong={adapter:"codex-cli",provider:"none",model:"gpt-6.1-sol",autonomy_mode:"manual",verbosity_mode:"concise"};
+      const {dom,errors}=await executeArchitectShellInJsdom({baseUrl,html,chatHistoryPayload:{ok:true,messages:[]},
+        eventSourceReady: callback=>{emit=callback;},
+        respond:async(url,init)=>{
+          if(url.pathname==="/api/architect/v1/config")return Response.json({ok:true,runtime:wrong,result:{persisted:true}});
+          if(url.pathname==="/api/architect/v1/chat"){
+            posted=JSON.parse(String(init?.body));await held;
+            return Response.json({ok:true,runtime:{...posted,autonomy_mode:posted.mode},result:{content:"Fixture failed before inference.",route:{fallback_reason:"fixture"},tool_trace:[]}});
+          }
+        }});
+      try {
+        const doc=dom.window.document;
+        const change=(id:string,value:string)=>{const el=doc.getElementById(id) as HTMLSelectElement;el.value=value;el.dispatchEvent(new dom.window.Event("change"));};
+        change("architect-adapter-select","claude-cli");change("architect-model-input","claude-opus-5-5");
+        change("architect-effort-select","max");
+        expect(doc.getElementById("architect-model-config")?.textContent).toContain("claude-cli/claude-opus-5-5");
+        emit("architect.noop",{status:"idle",architect_llm:wrong,project_scope:{project_root:"test"}});
+        expect(doc.getElementById("architect-model-config")?.textContent).toContain("claude-cli/claude-opus-5-5");
+        const input=doc.getElementById("chat-input") as HTMLTextAreaElement;
+        input.value="Inspect the selected route";input.dispatchEvent(new dom.window.Event("input",{bubbles:true}));
+        doc.getElementById("chat-form")!.dispatchEvent(new dom.window.Event("submit",{bubbles:true,cancelable:true}));
+        await waitForCondition(()=>Boolean(posted),5000);
+        expect(posted).toMatchObject({adapter:"claude-cli",provider:"none",model:"claude-opus-5-5",reasoning_effort:"max"});
+        emit("architect.noop",{status:"running",architect_llm:wrong});
+        emit("architect.status",{runtime:wrong,project_scope:{project_root:"test"}});
+        expect(doc.getElementById("architect-model-config")?.textContent).toContain("claude-cli/claude-opus-5-5");
+        release();await waitForCondition(()=>doc.getElementById("chat-form")?.getAttribute("aria-busy")==="false",5000);
+        expect(doc.getElementById("architect-model-config")?.textContent).toContain("claude-cli/claude-opus-5-5");
+        expect(errors).toEqual([]);
+      } finally {release();dom.window.close();}
+    },{historicalPlanFixtures:true});
+  });
+
+  it("keeps the admitted Claude model and effort in running status and failure provenance over Codex defaults", async () => {
+    let entered=false,release!:()=>void;
+    const held=new Promise<void>(done=>{release=done;});
+    const spy=vi.spyOn(cliBridge,"runArchitectCliBridge").mockImplementation(async input=>{
+      expect(input).toMatchObject({adapter:"claude-cli",model:"claude-opus-5-5",reasoningEffort:"max"});
+      entered=true;await held;throw new Error("CLAUDE_INIT_TOOL_MISMATCH");
+    });
+    const keys=["DREAMGRAPH_LLM_ARCHITECT_ADAPTER","DREAMGRAPH_LLM_ARCHITECT_PROVIDER","DREAMGRAPH_LLM_ARCHITECT_MODEL","DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT"];
+    const before=Object.fromEntries(keys.map(key=>[key,process.env[key]]));
+    try {
+      Object.assign(process.env,{DREAMGRAPH_LLM_ARCHITECT_ADAPTER:"codex-cli",DREAMGRAPH_LLM_ARCHITECT_PROVIDER:"none",DREAMGRAPH_LLM_ARCHITECT_MODEL:"gpt-6.1-sol",DREAMGRAPH_LLM_ARCHITECT_REASONING_EFFORT:"low"});
+      initLlmProvider();
+      await withArchitectServer(async baseUrl=>{
+        const pending=fetch(baseUrl+"/api/architect/v1/chat",{method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({message:"Inspect route only",scope:"project",adapter:"claude-cli",provider:"none",model:"claude-opus-5-5",reasoning_effort:"max",mode:"manual"})});
+        try {
+          await waitForCondition(()=>entered,10000);
+          const status=await expectJsonOk(await fetch(baseUrl+"/api/architect/v1"));
+          expect(status.runtime).toMatchObject({adapter:"claude-cli",provider:"none",model:"claude-opus-5-5",reasoning_effort:"max"});
+        } finally {release();}
+        const reply=await expectJsonOk(await pending);
+        expect(reply.runtime).toMatchObject({adapter:"claude-cli",model:"claude-opus-5-5",reasoning_effort:"max"});
+        const result=reply.result as any;
+        expect(JSON.stringify(result)).toContain("claude-opus-5-5");
+        expect(result.content).not.toContain("claude-sonnet-5");
+        expect(result.content).not.toContain("gpt-6.1-sol");
+      },{historicalPlanFixtures:true});
+    } finally {
+      release();spy.mockRestore();
+      for(const key of keys){if(before[key]===undefined)delete process.env[key];else process.env[key]=before[key];}
+      initLlmProvider();
     }
   });
 });

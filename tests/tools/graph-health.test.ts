@@ -97,3 +97,20 @@ describe("graph health assessment", () => {
     expect(report.recommendations.some((item) => item.tool === "bootstrap_instance")).toBe(false);
   });
 });
+
+it("reports complete counts with bounded diagnostic samples on a large graph", async () => {
+  const { summarizeHealthDiagnostics } = await import("../../src/tools/graph-health.js");
+  const { normalizeToolResult } = await import("../../src/server/tool-boundary.js");
+  const scope = Array.from({ length: 200 }, (_, i) => "source:fixture/affected-" + i + ".ts");
+  const state = { availability: "available" as const, completeness: "partial" as const, freshness: "stale" as const,
+    reasons: Array.from({ length: 10000 }, (_, i) => ({ code: i % 2 ? "SOURCE_RECONCILIATION_PENDING" : "UNRESOLVED_ENDPOINT", scope, detail: "Known diagnostic" })) };
+  const summary = summarizeHealthDiagnostics(state);
+  expect(summary.diagnostics).toMatchObject({ total: 10000, sampled: true,
+    by_code: { SOURCE_RECONCILIATION_PENDING: 5000, UNRESOLVED_ENDPOINT: 5000 } });
+  expect(summary.state.freshness).toBe("stale");
+  expect(summary.state.reasons).toHaveLength(2);
+  expect(summary.state.reasons.every(reason => reason.scope.length === 8)).toBe(true);
+  expect(Buffer.byteLength(JSON.stringify(summary))).toBeLessThan(4096);
+  expect(normalizeToolResult("graph_health_report", { content: [{ type: "text", text: JSON.stringify(summary) }] }).isError).not.toBe(true);
+  expect(state.reasons[0].scope).toHaveLength(200);
+});

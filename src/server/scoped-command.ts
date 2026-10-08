@@ -14,15 +14,14 @@ export async function executeScopedCommand(policy: ExecutionPolicy | undefined, 
   const input = ScopedCommandSchema.parse(args);
   const root = await realpath(workspace), cwd = await realpath(resolve(root, input.cwd ?? ".")), rel = relative(root, cwd);
   if (rel === ".." || rel.startsWith(`..${process.platform === "win32" ? "\\" : "/"}`) || isAbsolute(rel)) throw new Error("COMMAND_WORKSPACE_SCOPE_REJECTED");
-  if (policy.context_id) await assertManagedContext(policy.context_id);
   await reviewExecutionAction(policy, "run_command", args, signal);
-  if (policy.context_id) await assertManagedContext(policy.context_id);
+  if (policy.context_id) await assertManagedContext(policy.context_id, { source_work: true });
   const releaseAction = reserveExecutionAction(policy, "run_command", args);
   try {
   const timeout = Math.min(input.timeoutMs ?? 60000, Date.parse(policy.expires_at) - Date.now());
   signal.throwIfAborted();
   const observation = policy.context_id ? await observeCommandSource({ execution_id: policy.id, workspace: root,
-    before_intent: async () => { signal.throwIfAborted(); await assertManagedContext(policy.context_id!); } }) : null;
+    before_intent: async () => { signal.throwIfAborted(); await assertManagedContext(policy.context_id!, { source_work: true }); } }) : null;
   let processStarted = false, processTerminated = false, observationAttempted = false;
   try {
   signal.throwIfAborted();

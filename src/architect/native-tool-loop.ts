@@ -120,9 +120,6 @@ type NeutralMessage = LlmToolLoopMessage;
 type ToolLoopResponse = LlmToolLoopResponse;
 
 const MAX_ARCHITECT_TOOLS = 64;
-const MAX_ARCHITECT_TOOL_ITERATIONS = 8;
-/** Computer Use is sequential (one UI step per call); the pass ceiling and budgets remain the real bounds. */
-const MAX_ARCHITECT_COMPUTER_ITERATIONS = 80;
 const ARCHITECT_TOOL_TIMEOUT_MS = 300_000;
 const PROVIDER_TOOL_NAME_RE = /^[A-Za-z0-9_-]{1,64}$/;
 const NATIVE_RUN_COMMAND_TOOL: ArchitectToolDefinition = Object.freeze({
@@ -163,7 +160,7 @@ const TRANSCRIPT_COMPACTED_SHARE = 0.6;
 const COMPACTED_RESULT_PREFIX = "[Earlier tool result compacted";
 const COMPACTION_KEEP_CHARS = 600;
 /**
- * Keeps a long tool loop (Computer Use runs up to 80 steps) inside the role's model admission instead of failing:
+ * Keeps a long tool loop inside the role's model admission instead of failing:
  * once the estimated request (UTF-8 JSON, images included) passes 80 % of the allocation, the oldest tool results
  * after the required prompt are replaced by a short stub, oldest first, until it is under 60 %. The latest exchange is never
  * compacted. If the request still does not fit, admission reports ADMISSION_CONTEXT_LIMIT with the setting.
@@ -323,7 +320,6 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
   const advertisedTools = [...toolSelection.tools.slice(0,MAX_ARCHITECT_TOOLS-computerTools.length),...computerTools];
   // Computer Use work (actions plus observations) satisfies the source/verification obligations a prompt implies.
   const isComputerTool = (name: string) => COMPUTER_NATIVE_TOOL_NAMES.has(name) || !!cua?.has(name);
-  const maxIterations = computer || cua ? MAX_ARCHITECT_COMPUTER_ITERATIONS : MAX_ARCHITECT_TOOL_ITERATIONS;
   let computerUseRequest: ArchitectToolLoopResult["computer_use_request"];
   const supportsTools = supportsNativeToolLoop(input.config.provider);
   if (!supportsTools && fallbackReason == null) {
@@ -408,10 +404,12 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
   };
   let finalText = "";
   let completionModel = input.config.model;
-  let stopReason = "max_tool_iterations";
+  let stopReason = "end_turn";
   let iterations = 0;
+  let requiredToolCorrectionSent = false;
 
-  for (let iteration = 1; iteration <= maxIterations; iteration += 1) {
+  // Investigation has no turn/call cap. The host deadline, cancellation and admission remain authoritative.
+  for (let iteration = 1; ; iteration += 1) {
     iterations = iteration;
     input.signal?.throwIfAborted();
     // Each loop iteration is liveness evidence for the rolling execution lease.
@@ -425,7 +423,9 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
 
     if (response.toolCalls.length === 0) {
       const missingRequiredTools = missingRequiredArchitectToolCalls(toolSelection, trace, isComputerTool);
-      if (missingRequiredTools.length > 0 && iteration < maxIterations) {
+      if (missingRequiredTools.length > 0 && !requiredToolCorrectionSent) {
+        // One correction for an attempted final answer, not a limit on investigative calls.
+        requiredToolCorrectionSent = true;
         if (response.text?.trim()) {
           rawMessages.push({ role: "assistant", content: response.text.trim(), providerRawAssistant: response.providerRawAssistant });
         }
@@ -593,7 +593,6 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
 
   if (trace.length > 0 && !hasArchitectContinuationEnvelopeText(finalText)) {
     fallbackReason = fallbackReason ?? "missing_continuation_envelope_after_tool_use";
-    stopReason = stopReason === "max_tool_iterations" ? "missing_continuation_envelope_after_tool_use" : stopReason;
     finalText = synthesizeArchitectNativeToolLoopRecoveryText({
       assistantText: finalText,
       trace,
@@ -601,10 +600,6 @@ async function runArchitectNativeToolLoopDispatch(input: RunArchitectNativeToolL
     });
   }
 
-  if (iterations >= maxIterations && trace.length > 0 && finalText.trim().length === 0) {
-    fallbackReason = fallbackReason ?? "max_tool_iterations_without_final_envelope";
-    stopReason = "max_tool_iterations_without_final_envelope";
-  }
   const computerUseCleanupLog = cua ? await cua.release("pass finished") : null;
 
   return {

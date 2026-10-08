@@ -23,7 +23,7 @@ describe("Claude terminal and streaming truth", () => {
     parser.push(line(init));
     parser.push(line({ ...result, subtype: "error_max_turns", is_error: true }));
     expect(closed).toBe(true);
-    expect(() => parser.finish()).toThrow("CLAUDE_TERMINAL_FAILED");
+    expect(() => parser.finish()).toThrow("CLAUDE_MAX_TURNS_REACHED");
     expect(parser.usage()).toBeDefined();
   });
   it("refuses a native or foreign capability without opening the gate", () => {
@@ -33,7 +33,7 @@ describe("Claude terminal and streaming truth", () => {
     expect(admitted).toBe(false);
   });
   it.each([
-    [{ type: "result", subtype: "error_max_turns", is_error: true, session_id: "one" }, "TERMINAL_FAILED"],
+    [{ type: "result", subtype: "error_max_turns", is_error: true, session_id: "one" }, "MAX_TURNS_REACHED"],
     [{ ...result, result: "" }, "CONTENT_MISSING"],
     [{ ...result, session_id: "foreign" }, "SESSION_MISMATCH"],
   ])("cannot promote a failed or foreign terminal to success", (terminal, error) => {
@@ -60,4 +60,28 @@ describe("Claude terminal and streaming truth", () => {
       expect(() => parser.push(line(event))).toThrow(/CATALOG_CHANGED|UNADVERTISED_TOOL/);
     }
   });
+});
+
+it.each([
+  ["error_max_turns_reached", "CLAUDE_MAX_TURNS_REACHED"],
+  ["error_max_budget_usd", "CLAUDE_MAX_BUDGET_REACHED"],
+  ["error_during_execution", "CLAUDE_EXECUTION_FAILED"],
+  ["error_max_structured_output_retries", "CLAUDE_STRUCTURED_OUTPUT_RETRIES_EXHAUSTED"],
+  ["future_failure", "CLAUDE_TERMINAL_FAILED"],
+])("retains safe terminal metadata for %s without copying provider payloads", (subtype, code) => {
+  const parser = new ClaudeStream(expected, () => {});
+  parser.push(line(init));
+  parser.push(line({ ...result, subtype, is_error: true, num_turns: 12, errors: ["private provider payload"] }));
+  expect(() => parser.finish()).toThrow(code);
+  expect(parser.diagnostic()).toEqual({ subtype, is_error: true, num_turns: 12, error_count: 1 });
+  expect(JSON.stringify(parser.diagnostic())).not.toContain("private");
+});
+it("accepts a successful result after 100 investigative turns", () => {
+  const parser = new ClaudeStream(expected, () => {});
+  parser.push(line(init));
+  for (let turn = 0; turn < 100; turn++) parser.push(line({ type: "assistant",
+    message: { content: [{ type: "tool_use", name: "mcp__dreamgraph__query_resource", id: String(turn) }] } }));
+  parser.push(line({ ...result, num_turns: 101 }));
+  expect(parser.finish().content).toBe(result.result);
+  expect(parser.diagnostic()?.num_turns).toBe(101);
 });

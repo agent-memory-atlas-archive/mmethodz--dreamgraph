@@ -1142,7 +1142,7 @@ export async function handleApiRoute(
 
   if(pathname.startsWith("/api/schedules/v2")||pathname.startsWith("/api/jobs/v1")){recordOnce(`${method} ${pathname}`);return (await import("../server/schedule-api.js")).handleScheduleApi(req,res,pathname);}
   if(pathname.startsWith("/api/executions/v1/")){recordOnce(`${method} ${pathname}`);return (await import("../server/managed-execution.js")).handleManagedExecutionApi(req,res,pathname);}
-  if (pathname === "/api/dashboard/v1" || pathname === "/api/config/v1" || pathname.startsWith("/api/config/v1/")) {
+  if (pathname === "/api/dashboard/v1" || pathname === "/api/computer-use/v1/policy" || pathname === "/api/config/v1" || pathname.startsWith("/api/config/v1/")) {
     recordOnce(`${method} ${pathname}`);
     return (await import("../server/dashboard.js")).handleDashboardRoute(req, res, pathname);
   }
