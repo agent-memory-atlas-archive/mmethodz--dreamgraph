@@ -21,7 +21,7 @@ const DETAIL_FIELDS = ["fields", "members", "parameters", "steps", "flows", "con
 function entityUnit(entity: GraphEntity, mandatory: boolean, reason: string, score: number): Unit {
   // Whole assertions and their evidence travel together. Long assertions are omitted, never clipped into a different claim.
   const evidence = entity.evidence;
-  const fields = ["lifecycle", "status", "current_slice_ids", "running_slice_ids", "next_slice_ids", "depends_on", "plan_id", "source_files", "application", "workflow_id",
+  const fields = ["lifecycle", "status", "semantic_validity", "current_slice_ids", "running_slice_ids", "next_slice_ids", "depends_on", "plan_id", "source_files", "application", "workflow_id",
     ...(["plan", "slice"].includes(entity.identity.kind) ? ["source", "project_id", "slice_id", "revision", "event_sequence", "definition_hash", "plan_projection", "owner", "blockers", "prior_status", "required_stages", "verification", "evidence_ids", "implementation_revision", "implementation_receipt_ids", "effect_obligation_ids", "acceptance_hash", "deferral", "last_attempt"] : [])];
   const structural = Object.fromEntries(fields.filter(name => entity.payload[name] !== undefined).map(name => [name, entity.payload[name]]));
   return { entity, score, record: { id: key(entity), record_type: "entity", identity: entity.identity,

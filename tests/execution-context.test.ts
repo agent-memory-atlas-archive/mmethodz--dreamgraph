@@ -177,30 +177,28 @@ it("a refreshed concrete gap admits only the canonical explicitly approved struc
  expect((await finishManagedContext(repaired.id)).status).toBe("graph_committed");
  }finally{lease.close();}
 }));
-it("a delivered known source obligation admits only an explicitly approved repair and retains the execution-bound graph receipt",()=>within(async()=>{
- await deliver();const editArgs={filePath:"source.ts",text:"export const changed = true;\n"},scanArgs={mode:"incremental"};
+it("a delivered source obligation is reconciled by the daemon before the next graph-dependent action",()=>within(async()=>{
+ await deliver();const editArgs={filePath:"source.ts",text:"export const changed = true;\n"};
  const lease=issueExecutionPolicy(owner(),{id:"execution-one",context_id:"execution-one",autonomy:"supervised",verbosity:"concise",timeout_ms:10000,signal:new AbortController().signal,
-  approvals:[{tool:"edit_file",arguments:editArgs,scope_id:"fixture",calls:1},{tool:"scan_project",arguments:scanArgs,scope_id:"fixture",calls:1}]});
+  approvals:[{tool:"edit_file",arguments:editArgs,scope_id:"fixture",calls:1}]});
  try {await withSessionContext({...owner(),execution_policy:lease.policy},async()=>{
   const edited=await invokeToolBoundary({name:"edit_file",shape:{filePath:z.string(),text:z.string()},args:editArgs,handler:async()=>{
    const obligation=await managedSourceEffect({changes:[{file,content:editArgs.text}],apply:()=>writeFile(file,editArgs.text)});return {content:[{type:"text",text:JSON.stringify({obligation})}]};}});
   expect(edited.isError).not.toBe(true);
   const refreshed=await refreshManagedContext("execution-one");await deliverManagedContext(refreshed.id,managedContextPrompt(refreshed));
-  await expect(assertManagedContext(refreshed.id)).rejects.toThrow("REFRESH_REQUIRED");
-  const repair=await invokeToolBoundary({name:"scan_project",shape:{mode:z.enum(["full","incremental"])},args:scanArgs,handler:async()=>{
-   // Actual atomic graph owner over a disposable source fixture; no paid parser/model qualification is inferred.
-   const obligations=(await readChangeObligations()).entries;
-   const writes=await prepareChangeReconciliation(obligations.map(item=>item.id),"fixture-source-repair");
-   const result=await commitGraphWrites({actor:"fixture-reconciliation",operation_id:"fixture-source-repair",scope:["source:fixture/source.ts"],writes:[...writes,
-    {file:"features.json",content:JSON.stringify({features:[{...feature(),description:"Reconciled changed source"}]})}],source_reconciliation:{revision:"fixture-repaired",scope:["source:fixture/source.ts"],full:false}});
-   return {content:[{type:"text",text:JSON.stringify({receipt:result.receipt})}]};}});
-  expect(repair.isError,JSON.stringify(repair)).not.toBe(true);
+  await assertManagedContext(refreshed.id);
+  const settled=(await readChangeObligations()).entries[0];
+  expect(settled.state).toBe("graph_committed");expect(settled.graph_receipt_id).toMatch(/^managed-source-reconciliation:/);
+  const graph=JSON.parse(await readFile(join(root,"data","features.json"),"utf8"));
+  expect(graph.features.find((row:any)=>row.id==="execution-context").source_hashes["source.ts"])
+   .toBe("sha256:"+createHash("sha256").update(editArgs.text).digest("hex"));
   const current=await refreshManagedContext("execution-one");await deliverManagedContext(current.id,managedContextPrompt(current));await assertManagedContext(current.id);
   const closed=await finishManagedContext(current.id);expect(closed.status).toBe("graph_committed");
-  expect(closed.effects.flatMap(effect=>effect.receipt_ids)).toEqual(["fixture-source-repair"]);
+  expect(closed.effects.map(effect=>effect.tool)).toEqual(["edit_file"]); // no model scan or repair call
+  expect((await readChangeObligations()).entries[0].graph_receipt_id).toBe(settled.graph_receipt_id);
  });}finally{lease.close();}
 }));
-it("permits verification and further source work on delivered own changes without pretending debt is settled",()=>within(async()=>{
+it("reconciles between source edits and verification, while still refusing unrecorded external changes",()=>within(async()=>{
  await deliver();
  const args={command:'node -e "process.stdout.write(\'verified\')"'};
  const lease=issueExecutionPolicy(owner(),{id:"execution-one",context_id:"execution-one",autonomy:"autonomous",verbosity:"concise",timeout_ms:30000,signal:new AbortController().signal,
@@ -208,7 +206,7 @@ it("permits verification and further source work on delivered own changes withou
  try {await withSessionContext({...owner(),execution_policy:lease.policy},async()=>{
   await managedSourceEffect({changes:[{file,content:"changed",expected_content:"export const original = true;\n"}],apply:()=>writeFile(file,"changed")});
   const refreshed=await refreshManagedContext("execution-one");await deliverManagedContext(refreshed.id,managedContextPrompt(refreshed));
-  await expect(assertManagedContext(refreshed.id)).rejects.toThrow("REFRESH_REQUIRED");
+  await assertManagedContext(refreshed.id);
   await assertManagedContext(refreshed.id,{source_work:true});
   const verification=await executeScopedCommand(lease.policy,args,root);
   expect(verification.stdout).toBe("verified");
@@ -218,16 +216,23 @@ it("permits verification and further source work on delivered own changes withou
   }});
   expect(edit.isError,JSON.stringify(edit)).not.toBe(true);
   const after=await refreshManagedContext(refreshed.id);await deliverManagedContext(after.id,managedContextPrompt(after));
-  expect((await readChangeObligations()).entries.filter(e=>e.state==="reconciliation_pending")).toHaveLength(2);
-  expect(after.pack.state.freshness).toBe("stale");
+  expect((await readChangeObligations()).entries.filter(e=>e.state==="graph_committed")).toHaveLength(2);
+  expect(after.reconciliation_error).toBeNull();
   await writeFile(file,"unknown external edit");
   await expect(assertManagedContext(after.id,{source_work:true})).rejects.toThrow("REFRESH_REQUIRED");
  });}finally{lease.close();}
 }));
 
-it("does not grant continued source work for another execution's pending effect",()=>within(async()=>{
+it("settles verified earlier-session source dependencies before initial context delivery",()=>within(async()=>{
  await managedSourceEffect({changes:[{file,content:"earlier edit",expected_content:"export const original = true;\n"}],apply:()=>writeFile(file,"earlier edit")});
+ await managedSourceEffect({changes:[{file,content:"latest edit",expected_content:"earlier edit"}],apply:()=>writeFile(file,"latest edit")});
  const entry=await deliver();
+ await assertManagedContext(entry.id,{source_work:true});
+ await assertManagedContext(entry.id);
+ expect((await readChangeObligations()).entries.every(item=>item.state==="graph_committed")).toBe(true);
+ await writeFile(file,"unrecorded external change");
+ await expect(assertManagedContext(entry.id,{source_work:true})).rejects.toThrow("REFRESH_REQUIRED");
+ const refreshed=await refreshManagedContext(entry.id);await deliverManagedContext(entry.id,managedContextPrompt(refreshed));
  await expect(assertManagedContext(entry.id,{source_work:true})).rejects.toThrow("REFRESH_REQUIRED");
 }));
 
@@ -259,15 +264,14 @@ it("unapproved managed cognition is rejected before a durable engine job or owne
   expect((await loadPublicationState()).stores["jobs.json"]).toEqual(before.stores["jobs.json"]);
  }finally{lease.close();}
 }));
-it("unrelated execution debt does not prevent explicitly approved repair of the affected source",()=>within(async()=>{
+it("reconciles only owned or dependent source changes and leaves unrelated execution debt alone",()=>within(async()=>{
  await deliver();
  await managedSourceEffect({execution_id:"execution-one",changes:[{file,content:"owned change"}],apply:()=>writeFile(file,"owned change")});
  const other=join(root,"other.ts");await writeFile(other,"unrelated before");
  await managedSourceEffect({execution_id:"other-execution",changes:[{file:other,content:"unrelated after"}],apply:()=>writeFile(other,"unrelated after")});
  const refreshed=await refreshManagedContext("execution-one");await deliverManagedContext(refreshed.id,managedContextPrompt(refreshed));
- await expect(assertManagedContext(refreshed.id)).rejects.toThrow("REFRESH_REQUIRED");
- await assertManagedContext(refreshed.id,{repair_source:true});
- expect((await readChangeObligations()).entries.filter(item=>item.state==="reconciliation_pending")).toHaveLength(2);
+ await assertManagedContext(refreshed.id);
+ expect((await readChangeObligations()).entries.filter(item=>item.state==="reconciliation_pending")).toMatchObject([{execution_id:"other-execution"}]);
 }));
 it("separates an execution-bound operational commit from graph publication and rejects invented closure receipts",()=>within(async()=>{
  await deliver();const lease=issueExecutionPolicy(owner(),{id:"execution-one",context_id:"execution-one",autonomy:"manual",verbosity:"concise",timeout_ms:10000,signal:new AbortController().signal});

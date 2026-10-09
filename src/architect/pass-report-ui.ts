@@ -47,10 +47,11 @@ export const PASS_REPORT_SCRIPT = String.raw`
           badge.style.color = result.status === 'reconciled' ? '#80c8a0' : result.status === 'recovery_required' ? '#ed9999' : result.status === 'pending' ? '#e4b55e' : 'var(--muted)';
           const c = result.counts;
           status.textContent = c.reconciled + ' reconciled · ' + c.pending + ' pending · ' + c.recovery_required + ' need recovery. ' +
-            (result.status === 'pending' ? 'Source changes are saved; graph reconciliation is not yet confirmed. Pending does not mean a background job is scheduled. Scoped source reconciliation must complete before these entries can be confirmed.' :
+            (result.status === 'pending' ? 'Graph reconciliation is not yet confirmed. The daemon reconciles affected source before completion and when needed mid-run. Pending records remain visible if it cannot finish; Check status reads the latest outcome.' :
              result.status === 'recovery_required' ? 'The daemon cannot confirm the source outcome. Inspect the original execution before retrying effects.' :
              result.status === 'reconciled' ? 'Confirmed by the daemon’s recorded reconciliation receipts. Optional enrichment and dreaming are separate.' :
              'No outstanding source changes are recorded for this execution.');
+          if (result.reconciliation_error) status.textContent += ' Daemon reconciliation failed: ' + result.reconciliation_error;
           checked.textContent = 'Last successful check: ' + new Date(result.checked_at).toLocaleString() + ' · Check status again after reconciliation.';
           evidence.replaceChildren();
           const list = document.createElement('ul');

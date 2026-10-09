@@ -60,7 +60,7 @@ it("reads daemon reconciliation status and refreshes without dispatching any eff
  (dom.window as any).appendReconciliationStatus(panel,"host-run");
  await new Promise(resolve=>setTimeout(resolve,0));
  expect(panel.querySelector(".report-count")?.textContent).toBe("Pending");
- expect(panel.textContent).toContain("does not mean a background job is scheduled");
+ expect(panel.textContent).toContain("daemon");
  status="reconciled";(panel.querySelector("button") as HTMLButtonElement).click();
  await new Promise(resolve=>setTimeout(resolve,0));
  expect(panel.querySelector(".report-count")?.textContent).toBe("Confirmed");

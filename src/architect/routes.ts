@@ -4077,9 +4077,9 @@ function buildArchitectChatSystemPrompt(plan: ArchitectPlanProjection | null, ru
   return [
     "You are DreamGraph Architect inside the daemon-served standalone browser surface.",
     "Graph-bound execution contract: every repository-specific pass must ground itself with DreamGraph MCP graph context before acting. Use query_resource for system/project resources and query_architecture_decisions for ADR guard rails; use graph_rag_retrieve, query_api_surface, search_data_model, workflows, or data-model resources when they fit the task.",
-    "Cognitive-health contract: before substantial architectural work, inspect graph_health_report and explain concrete affected evidence or reconciliation gaps. Last full scan age is informational and never proves staleness; managed mutations and reconciliation keep established graphs current. Recommend the smallest evidence-backed repair only for an actual gap. Execute maintenance only within the user's authorized scope, using the canonical owner tools.",
-    "Mutation contract: source, docs, UI, data-model, or plan changes must be recorded back into DreamGraph evidence using the appropriate governed graph tool, such as enrich_seed_data, modify_api_surface, register_ui_element, solidify_cognitive_insight, or another exposed graph-write tool. Final reports must name the graph entities/resources updated or explain a concrete unavailable-tool blocker.",
-    "Living-graph contract: material changes require a durable affected-scope reconciliation receipt or explicit pending obligation. Optional digestion is separate from source currency and requires its configured authority and spend admission. Use measured affected scope with independent hop/cardinality/token caps; no minimum hop count or automatic paid dreaming merely to satisfy a prompt.",
+    "Cognitive-health contract: routine local UI/source fixes do not require repository-wide scans or graph maintenance. Pending reconciliation is not a request to run scan_project. Before substantial architectural work, inspect graph_health_report and explain concrete affected evidence or reconciliation gaps. Last full scan age is informational and never proves staleness; managed mutations and reconciliation keep established graphs current. Recommend the smallest evidence-backed repair only for an actual gap. Execute maintenance only within the user's authorized scope, using the canonical owner tools.",
+    "Mutation contract: all mutations use DreamGraph tools. Governed source tools already record exact changes for daemon-owned reconciliation; do not add duplicate graph facts or enrichment just to log a small edit. Use graph owner tools for new architectural knowledge, UI registrations or plan decisions when the task changes those contracts. Final reconciliation status is supplied by the daemon.",
+    "Living-graph contract: the daemon reconciles recorded source changes before run completion and before dependent actions mid-run. It reports committed receipts or explicit unresolved failures; the model must not launch scan_project to settle managed changes. External modifications retain their existing detection/reconciliation owners. Optional enrichment/digestion is separate and requires configured authority and spend admission.",
     "ADR contract: check accepted ADRs before choosing an implementation path. If the pass introduces a new durable architectural policy, reverses a guard rail, or creates a lasting cross-module decision, record it with record_architecture_decision; otherwise report the ADRs consulted and why no new ADR was needed.",
     "Keep answers concise, project-bound, and grounded in daemon authority. Do not claim direct browser filesystem authority.",
     "Honor the Current execution runtime narrative density: compact means brief status/final answers, standard means readable summaries, diagnostic means include evidence/provenance summaries without dumping raw JSON unless explicitly requested.",
@@ -5219,7 +5219,8 @@ async function handleArchitectChatRequest(req: IncomingMessage, res: ServerRespo
 
   let passCursorUpdate: Record<string, unknown> | null = null;
   let refreshedPlan = plan;
-  if (chatScope === "plan" && plan && continuationParseResult.envelope?.status === "completed" && !executionController.signal.aborted) {
+  if (chatScope === "plan" && plan && continuationParseResult.envelope?.status === "completed" && !executionController.signal.aborted
+    && !["recovery_required", "reconciliation_pending", "work_pending"].includes(String(asRecord(runtimeProvenance.graph_execution)?.status ?? ""))) {
     passCursorUpdate = await recordArchitectPassCompletionCursor({
       plan,
       report: continuationDecision.report,
@@ -12109,25 +12110,37 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
 
     async function readArchitectChatPayload(response) {
       const contentType = response.headers.get('content-type') || '';
-      if (!contentType.includes('text/event-stream')) {
-        return await response.json().catch(function() { return {}; });
-      }
-      const text = await response.text();
+      if (!contentType.includes('text/event-stream')) return await response.json().catch(function() { return {}; });
+      if (!response.body) throw new Error('Architect response stream unavailable.');
+      const reader = response.body.getReader(), decoder = new TextDecoder();
       const newline = String.fromCharCode(10);
-      let resultPayload = {};
-      for (const block of text.split(newline + newline)) {
-        const lines = block.split(newline);
+      let buffer = '', resultPayload = null;
+      function consume(block) {
+        const lines = block.split(newline).map(function(line) { return line.endsWith(String.fromCharCode(13)) ? line.slice(0,-1) : line; });
         const eventLine = lines.find(function(line) { return line.indexOf('event: ') === 0; });
         const dataLines = lines.filter(function(line) { return line.indexOf('data: ') === 0; });
-        if (!eventLine || dataLines.length === 0) continue;
-        const eventName = eventLine.slice('event: '.length);
-        const rawData = dataLines.map(function(line) { return line.slice('data: '.length); }).join(newline);
-        const data = JSON.parse(rawData);
-        appendEventLine('[chat-stream] ' + eventName);
-        if (eventName === 'architect.chat.result') {
-          resultPayload = data;
+        if (!eventLine || !dataLines.length) return;
+        const eventName = eventLine.slice(7), data = JSON.parse(dataLines.map(function(line) { return line.slice(6); }).join(newline));
+        if (eventName === 'architect.chat.status' && data.phase === 'tool') {
+          liveToolTraceSeen = true;
+          appendToolTraceMessage([data], null, data.runtime);
+          updateAutonomyPassView('running', activeToolTraceRows.size);
         }
+        if (eventName === 'architect.chat.result') resultPayload = data;
       }
+      try {
+        while (true) {
+          const next = await reader.read();
+          buffer += next.done ? decoder.decode() : decoder.decode(next.value, {stream:true});
+          // Preserve chunk boundaries, including a split CRLF and a split UTF-8 character.
+          let match;
+          while ((match = /\\r?\\n\\r?\\n/.exec(buffer))) {
+            consume(buffer.slice(0,match.index)); buffer = buffer.slice(match.index + match[0].length);
+          }
+          if (next.done) { if (buffer.trim()) consume(buffer); break; }
+        }
+      } finally { reader.releaseLock(); }
+      if (!resultPayload) throw new Error('Architect stream ended before a final result. Check the original execution before retrying.');
       return resultPayload;
     }
 
@@ -13342,8 +13355,9 @@ ${isArchitectDoomEnabled() ? "      registerArchitectTabType({ type: 'doom', tit
       .provider-setup .meta { margin: 0; font-size: 10px; line-height: 1.4; }
       .runtime-advanced { padding: 6px 10px; border: 0; border-radius: 0; background: #181818; }
       .runtime-advanced > summary { min-height: 22px; line-height: 22px; font-size: 11px; }
-      .runtime-controls { margin-top: 6px; padding: 6px 0; border: 0; border-radius: 0; background: transparent; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .control-field { font-size: 10px; gap: 4px; }
+      .runtime-controls { margin-top: 4px; padding: 2px 0; border: 0; border-radius: 0; background: transparent; grid-template-columns: repeat(4, minmax(0, 190px)); justify-content: start; gap: 4px 10px; }
+.control-field { font-size: 10px; gap: 2px; }
+      .runtime-controls .control-field select, .runtime-controls .pass-view { height: 24px; min-height: 24px; padding: 2px 6px; font-size: 11px; }
       .architect-center-tab-strip { gap: 0; padding: 0 8px 0 0; background: #141414; }
       .architect-center-tabs { gap: 0; }
 ${ARCHITECT_OPERATIONAL_WORKSPACES_CSS}
@@ -13428,7 +13442,7 @@ ${ARCHITECT_OPERATIONAL_WORKSPACES_CSS}
         .architect-sidebar-handle { display: none; }
       }
       @media (max-width: 560px) {
-        .runtime-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .runtime-controls { grid-template-columns: repeat(2, minmax(0, 190px)); }
         .architect-tab-panels { padding: 6px; }
         .architect-welcome { padding: 8px; }
         #architect-welcome-title { font-size: 16px; }

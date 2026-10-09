@@ -505,7 +505,7 @@ Discovery rules:
 // `ensureStringArray`, `sanitizeEntry`) live in `./sanitize-entity.js`.
 // ---------------------------------------------------------------------------
 
-async function buildIndex(overrides: Partial<Record<"features.json" | "workflows.json" | "data_model.json", Record<string, unknown>[]>> = {}): Promise<ResourceIndex> {
+export async function buildIndex(overrides: Partial<Record<"features.json" | "workflows.json" | "data_model.json", Record<string, unknown>[]>> = {}): Promise<ResourceIndex> {
   const features = (overrides["features.json"] ?? await loadJsonArray<Feature>("features.json")) as Feature[];
   const workflows = (overrides["workflows.json"] ?? await loadJsonArray<Workflow>("workflows.json")) as Workflow[];
   const dataModel = (overrides["data_model.json"] ?? await loadJsonArray<DataModelEntity>("data_model.json")) as DataModelEntity[];

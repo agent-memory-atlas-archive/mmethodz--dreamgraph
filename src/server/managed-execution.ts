@@ -4,7 +4,7 @@ import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { ManagedExecutionRequestSchema, ManagedExecutionSnapshotSchema, ManagedExecutionApprovalRequestSchema, type ManagedExecutionApprovalRequest } from "../graph/contracts.js";
 import { beginManagedContext, readManagedContext, finishManagedContext, recordManagedEffect, recordManagedApproval, assertManagedContext, managedContextPrompt,
-  reassembleManagedPlanContext, recordManagedPlanClosure, recordManagedNativeStop, recordManagedNativeStopRecovery, recordManagedPlanStopRecovery, assertManagedPlanBinding, type ManagedExecutionContext } from "../graph/execution-context.js";
+  reconcileManagedContextSources, reassembleManagedPlanContext, recordManagedPlanClosure, recordManagedNativeStop, recordManagedNativeStopRecovery, recordManagedPlanStopRecovery, assertManagedPlanBinding, type ManagedExecutionContext } from "../graph/execution-context.js";
 import { getSessionContext, withSessionContext, type SessionContext } from "./session-context.js";
 import { issueExecutionPolicy, prepareExecutionApproval, executionPolicyProjection, assertExecutionLive } from "./execution-policy.js";
 import { architectPassIdleMs } from "../config/request-bounds.js";
@@ -32,9 +32,12 @@ async function snapshot(entry:ManagedExecutionContext,context:SessionContext) {
   const plan = entry.plan_execution ? await readPlanAuthority(entry.plan_execution.scope) : null;
   if(entry.plan_execution && !plan)throw new Error("PLAN_NOT_IMPORTED");
   const planLease=plan?.state.leases.find(item=>item.execution_id===entry.id);
+  const reconciliationReceipts=entry.obligation_ids.length ? (await readChangeObligations()).entries
+    .filter(item=>item.execution_id===entry.id && item.state==="graph_committed" && item.graph_receipt_id)
+    .map(item=>item.graph_receipt_id!) : [];
   return ManagedExecutionSnapshotSchema.parse({schema:"dreamgraph.managed_execution.v1",execution_id:entry.id,instance_id:entry.instance_id,
     status:entry.status,record_revision:entry.record_revision,pack:entry.pack,block:managedContextPrompt(entry),
-    graph_receipt_ids:[...new Set(entry.effects.flatMap(effect=>effect.receipt_ids))],state_receipt_ids:[...new Set(entry.effects.flatMap(effect=>effect.state_receipt_ids))],
+    graph_receipt_ids:[...new Set([...entry.effects.flatMap(effect=>effect.receipt_ids),...reconciliationReceipts])],state_receipt_ids:[...new Set(entry.effects.flatMap(effect=>effect.state_receipt_ids))],
     obligation_ids:entry.obligation_ids,authority_active:!!live&&!live.lease.policy.signal.aborted&&Date.parse(live.lease.policy.expires_at)>Date.now()
       &&(!entry.plan_execution || !entry.plan_closure && planLease?.state==="running" && Date.parse(planLease.expires_at)>Date.now()),
     delivery_attests:"host_transport_only",...(entry.plan_execution?{plan_execution:{intent:entry.plan_execution,state:plan!.state}}:{})});
@@ -174,8 +177,8 @@ export async function readHostReconciliation(id:string) {
       else if(item.state==="source_applied" || item.state==="reconciliation_pending") counts.pending++;
       else counts.recovery_required++;
     }
-    return {execution_id:entry.id,checked_at:new Date().toISOString(),counts,
-      status:counts.recovery_required?"recovery_required":counts.pending?"pending":counts.reconciled?"reconciled":"no_changes",
+    return {execution_id:entry.id,checked_at:new Date().toISOString(),counts,reconciliation_error:entry.reconciliation_error ?? null,
+      status:counts.recovery_required?"recovery_required":counts.pending || entry.reconciliation_error?"pending":counts.reconciled?"reconciled":"no_changes",
       changes:changes.slice(0,20).map(item=>({id:item.id,state:item.state,updated_at:item.updated_at,receipt_id:item.graph_receipt_id})),
       total:changes.length};
   });
@@ -231,6 +234,7 @@ export async function observeHostModelStop(input:unknown) {
       }
       if(entry.plan_stop_recovery)await applyPlanRuntimeClosure(entry.plan_stop_recovery);
       await recordManagedNativeStopRecovery(entry.id,runId,attempts.map(attempt=>attempt.id));
+      await reconcileManagedContextSources(entry.id);
     }
     return snapshot(await finishManagedContext(entry.id),context);
   });
@@ -327,6 +331,7 @@ export async function endHostExecution(input:unknown) {
     if(entry.plan_closure?.command)await applyPlanRuntimeClosure(entry.plan_closure.command);
     if(closing.effectiveTermination==="unconfirmed" && ["assembled","running"].includes(entry.status))
       await recordManagedEffect(entry.id,{tool:"host_adapter_termination",outcome:"unknown",receipt_ids:[]});
+    if(closing.effectiveTermination==="confirmed") await reconcileManagedContextSources(entry.id);
     const finished=await finishManagedContext(entry.id);
     return {execution:await snapshot(finished,context),adapter_outcome:request.outcome,work_termination:closing.effectiveTermination};
   });

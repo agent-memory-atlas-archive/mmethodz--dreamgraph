@@ -34,6 +34,7 @@ const PlanClosureSchema = z.object({ requested_outcome: z.enum(["completed", "ca
 const EntrySchema = z.object({ id: text, principal: text, session_id: text, instance_id: text,
   request: ContextQuerySchema, pack: ContextPackSchema, input_fingerprint: text,
   source_hashes: z.record(z.string()), prompt_hash: text,
+  reconciliation_error: z.string().max(2048).nullable().optional(),
   source_gaps: z.array(text).max(64).default([]), record_revision: z.number().int().nonnegative().default(0),
   status: ManagedExecutionStatusSchema,
   effects: z.array(EffectSchema).max(128), obligation_ids: z.array(text).max(1024),
@@ -118,6 +119,16 @@ async function sourceHashes(pack: ManagedExecutionContext["pack"], snapshot: Can
       if (evidence.source_repo && evidence.source_path && concreteSourcePath(evidence.source_path)) named.set(sourceKey(evidence.source_repo,evidence.source_path),{repo:evidence.source_repo,sourcePath:evidence.source_path});
     }
   }
+  // Pending-source warnings may name paths even when legacy graph records lack source evidence.
+  // Observe those exact paths too; a dirty graph alone is not permission to guess source currency.
+  for (const reason of pack.state.reasons) if (reason.code === "SOURCE_RECONCILIATION_PENDING") {
+    for (const scope of reason.scope) if (scope.startsWith("source:")) {
+      const key = scope.slice(7);
+      if (!concreteSourceKey(key)) continue;
+      const [repo,...segments] = key.split("/").map(decodeURIComponent);
+      if (repo && segments.length) named.set(key,{repo,sourcePath:segments.join("/")});
+    }
+  }
   // Keep observing named paths after deletion/remapping, so explicit reconciliation can settle them.
   for (const key of retainedKeys) if (concreteSourceKey(key) && !named.has(key)) {
     const [repo,...segments]=key.split("/").map(decodeURIComponent);
@@ -157,6 +168,13 @@ function withNamedSourceGaps(pack: ManagedExecutionContext["pack"], gaps: string
   if (Buffer.byteLength(JSON.stringify({...pack,context_text:""})) > pack.metadata_budget_bytes) throw new Error("EXECUTION_CONTEXT_METADATA_BOUND");
   return pack;
 }
+/** Only the latest recorded source outcome can justify continued source work. This does not settle it. */
+function knownPendingSource(key: string, current: string | undefined, obligations: Awaited<ReturnType<typeof readChangeObligations>>["entries"]) {
+  if (!current || current === "absent" || current === "unavailable") return false;
+  const scope = "source:" + key;
+  const latest = obligations.filter(item => item.scope.includes(scope) && item.state !== "failed").at(-1);
+  return !!latest && ["source_applied", "reconciliation_pending"].includes(latest.state) && latest.after_hashes[scope] === current;
+}
 function namedEvidenceGaps(pack: ManagedExecutionContext["pack"], snapshot: CanonicalGraphRead, hashes: Record<string,string>): string[] {
   const gaps = new Set(Object.keys(hashes).filter(key=>["absent","unavailable"].includes(hashes[key])));
   for (const record of pack.records) for (const evidence of (record.identity ? snapshot.by_identity.get(graphIdentityKey(record.identity))?.evidence : undefined) ?? []) {
@@ -171,6 +189,7 @@ export function managedContextPrompt(entry: ManagedExecutionContext): string {
     // The injected bytes precede acknowledgement. Keep them stable across an exact acknowledgement retry.
     context_receipt: { ...entry.pack.receipt, delivery: "unattested" }, mandatory_satisfied: entry.pack.mandatory_satisfied,
     state: entry.pack.state, omissions: entry.pack.omissions, source_fallback: entry.pack.source_fallback,
+    ...(entry.reconciliation_error ? {source_reconciliation_error:entry.reconciliation_error,source_reconciliation_owner:"daemon; do not launch repository-wide scans to clear this condition"} : {}),
   }) + "\n" + entry.pack.context_text;
 }
 /** UTF-8 byte upper bound for the managed context block: the context query contract's maximum (ContextQuerySchema). */
@@ -198,12 +217,22 @@ export async function beginManagedContext(input: { id: string; adapter: string; 
     const request = ContextQuerySchema.parse({ query: input.query, execution_id: input.id, adapter: input.adapter,
       ...(planInGraph ? { plan_id: input.plan_id } : {}), ...(planInGraph && input.slice_id ? { slice_id: input.slice_id } : {}),
       token_budget: input.token_budget ?? MANAGED_CONTEXT_DEFAULT_BUDGET, depth: 1, max_neighbors: 12, max_records: 32 });
-    const pack = buildContextPack(snapshot, request), now = new Date().toISOString();
-    const source_hashes = await sourceHashes(pack,snapshot), source_gaps = namedEvidenceGaps(pack,snapshot,source_hashes);
+    let pack = buildContextPack(snapshot, request);
+    let reconciliation_error: string | null = null;
+    const dependencies = pack.state.reasons.filter(reason=>reason.code==="SOURCE_RECONCILIATION_PENDING").flatMap(reason=>reason.scope);
+    if (dependencies.length) {
+      try {
+        await (await import("../tools/managed-source-reconciliation.js")).reconcileManagedSourceChanges(input.id,dependencies);
+        Object.assign(snapshot,await loadCanonicalGraph(instance_id)); pack=buildContextPack(snapshot,request);
+      } catch(error) { reconciliation_error=String(error).slice(0,2048); }
+    }
+    const now = new Date().toISOString();
+    const source_hashes = await sourceHashes(pack,snapshot), obligations = (await readChangeObligations()).entries;
+    const source_gaps = namedEvidenceGaps(pack,snapshot,source_hashes).filter(key => !knownPendingSource(key,source_hashes[key],obligations));
     withNamedSourceGaps(pack,source_gaps);
     const entry: ManagedExecutionContext = { id: input.id, principal: owner.principal, session_id: owner.session_id, instance_id,
       request, pack, input_fingerprint: fingerprint(snapshot, pack), source_hashes, prompt_hash: "pending",
-      status: "assembled", effects: [], approval_reviews: [], native_stop_observations: [], model_reports: [], computer_sessions: [], obligation_ids: [], source_gaps, record_revision: 0, created_at: now, updated_at: now,
+      reconciliation_error, status: "assembled", effects: [], approval_reviews: [], native_stop_observations: [], model_reports: [], computer_sessions: [], obligation_ids: [], source_gaps, record_revision: 0, created_at: now, updated_at: now,
       ...(input.plan_execution ? { plan_execution: PlanExecutionIntentSchema.parse(input.plan_execution), plan_source: PlanRuntimeSourceSchema.parse(input.plan_source) } : {}) };
     entry.prompt_hash = hash(managedContextPrompt(entry));
     if (Buffer.byteLength(managedContextPrompt(entry)) > 65536) throw new Error("MANDATORY_EXECUTION_CONTEXT_TRANSPORT_BOUND");
@@ -382,11 +411,28 @@ export async function deliverManagedContext(id: string, actualPrompt: string) {
   });
 }
 const sourceScope = (source: string) => `source:${source}`;
+/** Daemon settlement, separate from model approval and optional enrichment. Failed work stays explicit. */
+export async function reconcileManagedContextSources(id: string) {
+  return withGraphReconciliation(async()=>{
+    const entry=await readManagedContext(id);
+    if(terminal.has(entry.status)) return entry;
+    const previousError=entry.reconciliation_error ?? null;
+    let reconciled=0;
+    const dependencies=entry.pack.state.reasons.filter(reason=>reason.code==="SOURCE_RECONCILIATION_PENDING").flatMap(reason=>reason.scope);
+    try {
+      reconciled=(await (await import("../tools/managed-source-reconciliation.js")).reconcileManagedSourceChanges(id,dependencies)).reconciled;
+      entry.reconciliation_error=null;
+    } catch(error) { entry.reconciliation_error=String(error).slice(0,2048); }
+    if(reconciled || previousError!==(entry.reconciliation_error ?? null)) await save(entry,"source-reconciliation");
+    return entry;
+  });
+}
 /** The host must inject and acknowledge the replacement whole block before another effect. */
 export async function refreshManagedContext(id: string) {
   return withGraphReconciliation(async () => {
-    const entry = await readManagedContext(id);
+    let entry = await readManagedContext(id);
     if (entry.status !== "running") throw new Error("EXECUTION_CONTEXT_CLOSED");
+    entry = await reconcileManagedContextSources(id);
     const previous = entry.pack;
     const snapshot = await loadCanonicalGraph(entry.instance_id), pack = buildContextPack(snapshot, entry.request);
     const currentSources = await sourceHashes(pack, snapshot, Object.keys(entry.source_hashes)), obligations = (await readChangeObligations()).entries;
@@ -396,8 +442,7 @@ export async function refreshManagedContext(id: string) {
       const expected = currentSources[key];
       if (!expected || expected === "unavailable") return true;
       const reconciled = obligations.some(item => item.state === "graph_committed" && item.after_hashes[sourceScope(key)] === expected);
-      const pending = obligations.some(item => item.execution_id === id && ["source_applied", "reconciliation_pending"].includes(item.state)
-        && item.after_hashes[sourceScope(key)] === expected);
+      const pending = knownPendingSource(key, expected, obligations);
       const evidenced = pack.records.some(record => record.identity && snapshot.by_identity.get(graphIdentityKey(record.identity))?.evidence
         .some(evidence => evidence.source_repo && evidence.source_path && sourceKey(evidence.source_repo,evidence.source_path) === key && evidence.content_hash === expected));
       return !reconciled && !pending && !evidenced;
@@ -443,11 +488,15 @@ export async function assertManagedContext(id: string, input: { repair_source?: 
     .flatMap(reason => reason.scope.filter(scope => scope.startsWith("source:") || scope.startsWith("repository:"))));
   const pending = (await readChangeObligations()).entries.filter(item => !["graph_committed", "failed"].includes(item.state)
     && item.scope.some(scope => affectedSourceScopes.has(scope)));
-  // Known, delivered changes made by this execution may be followed by source work or verification.
+  // Known delivered source changes may be followed across sessions, but never treated as reconciled graph evidence.
+  // Check every pending scope against the latest ledger outcome and revalidate the actual bytes below.
+  const knownSourceWork = input.source_work && entry.source_gaps.length === 0 && pending.every(item =>
+    ["source_applied","reconciliation_pending"].includes(item.state) && item.scope.every(scope =>
+      scope.startsWith("source:") && knownPendingSource(scope.slice(7),entry.source_hashes[scope.slice(7)],pending)));
   // They remain pending; this does not authorize semantic graph writes or attest reconciliation.
   const repair = (input.repair_source || input.source_work && pending.length > 0 && entry.source_gaps.length === 0) && (entry.source_gaps.length > 0 || pending.length > 0)
     && !Object.values(entry.source_hashes).includes("unavailable")
-    && pending.every(item => item.execution_id === id && ["source_applied", "reconciliation_pending"].includes(item.state))
+    && (knownSourceWork || pending.every(item => item.execution_id === id && ["source_applied", "reconciliation_pending"].includes(item.state)))
     && pack.state.reasons.every(reason => ["SOURCE_RECONCILIATION_PENDING","NAMED_SOURCE_CONTEXT_CHANGED"].includes(reason.code));
   if (entry.source_gaps.length && !repair || !pack.mandatory_satisfied || pack.state.freshness === "stale" && !repair || pack.state.reasons.some(reason => /STORE|LEDGER_UNAVAILABLE|SOURCE_EFFECT_UNKNOWN/.test(reason.code))
     || fingerprint(snapshot, pack) !== entry.input_fingerprint || stable(await sourceHashes(pack, snapshot, Object.keys(entry.source_hashes))) !== stable(entry.source_hashes))
@@ -530,7 +579,7 @@ export async function finishManagedContext(id: string) {
     entry.status = invalidReceipt || entry.source_gaps.length || obligations.some(item => ["intent", "unknown"].includes(item.state))
       || computerUnknown || effects.some(effect => effect.outcome === "unknown") || jobs.some(record => record.job.state === "recovery_required") ? "recovery_required"
       : computerPending || jobs.some(record => !record.work_settled) ? "work_pending"
-      : obligations.some(item => !["graph_committed", "failed"].includes(item.state)) ? "reconciliation_pending"
+      : entry.reconciliation_error || obligations.some(item => !["graph_committed", "failed"].includes(item.state)) ? "reconciliation_pending"
       : effects.some(effect => effect.receipt_ids.length) || obligations.some(item => item.state === "graph_committed") ? "graph_committed"
       : obligations.length && obligations.every(item=>item.state==="failed") && effects.every(effect=>observedSourceTools.has(effect.tool)&&effect.outcome==="owner_returned") ? "no_change"
       : entry.computer_sessions.length || effects.some(effect => effect.state_receipt_ids.length) ? "state_committed"

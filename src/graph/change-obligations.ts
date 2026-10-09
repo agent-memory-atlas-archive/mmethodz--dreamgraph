@@ -68,7 +68,7 @@ async function sourceScope(file: string): Promise<string> {
   }
   throw new Error("SOURCE_SCOPE_DENIED: effect is outside configured physical repository roots");
 }
-async function sourceForScope(scope: string): Promise<string> {
+export async function sourceForScope(scope: string): Promise<string> {
   if (!scope.startsWith("source:")) throw new Error("SOURCE_SCOPE_UNSUPPORTED");
   const [repo, ...parts] = scope.slice(7).split("/").map(decodeURIComponent);
   if (!repo || !config.repos[repo] || !parts.length) throw new Error("SOURCE_SCOPE_UNAVAILABLE");

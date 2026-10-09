@@ -11,6 +11,7 @@ import {withSessionContext,getSessionContext,type SessionContext} from "../src/s
 import {executionContextTransport,assertManagedContext,readManagedContext,recordManagedApproval} from "../src/graph/execution-context.js";
 import {readHostExecution,readHostReconciliation,withHostExecution,approveHostExecution} from "../src/server/managed-execution.js";
 import {invokeToolBoundary} from "../src/server/tool-boundary.js";
+import * as sourceReconciliation from "../src/tools/managed-source-reconciliation.js";
 import {managedSourceEffect,prepareChangeReconciliation} from "../src/graph/change-obligations.js";
 import {commitGraphWrites,loadPublicationState} from "../src/graph/publication.js";
 import {getDataDir,setDataDirOverride} from "../src/utils/paths.js";
@@ -111,7 +112,7 @@ beforeEach(async()=>{
  await new Promise<void>(done=>server.listen(0,"127.0.0.1",done));port=(server.address() as {port:number}).port;
 });
 afterEach(async()=>{for(const value of clients.splice(0))value.dispose();for(const connection of mcpConnections.splice(0))await connection.server.close();server.closeAllConnections();await new Promise<void>(done=>server.close(()=>done()));
- modelHandlers.splice(0);modelDispatchEvidence.splice(0);
+ vi.restoreAllMocks();modelHandlers.splice(0);modelDispatchEvidence.splice(0);
  if(pluginCleanup)await pluginCleanup();
  await releaseGraphWriter(join(root,"data"));setDataDirOverride(previous);config.repos=repos;contexts.clear();modelRequests.splice(0);modelReplies.splice(0);vi.unstubAllEnvs();await rm(root,{recursive:true,force:true});});
 
@@ -151,7 +152,7 @@ it("a worker credential cannot issue a new grant, close another host pass or cha
  expect(response.status).toBe(409);
  await host.finishExecution("worker","cancelled","confirmed");
 });
-it("host-mediated effects use the original exact policy and retain source debt; unknown adapter termination is recoverable",async()=>{
+it("host-mediated effects retain exact policy and settle source debt; unknown adapter termination stays recoverable",async()=>{
  const host=client(),args={filePath:"source.ts",content:"source after"};
  const lease=await host.beginExecution({id:"sdk-write",adapter:"sdk/native",query:"Host context",approved_actions:[{tool:"edit_file",arguments:args,scope_id:"fixture",calls:1}]});
  await host.deliverExecution(lease.workerBearer,lease.execution.pack.receipt.id,lease.execution.block);
@@ -160,18 +161,19 @@ it("host-mediated effects use the original exact policy and retain source debt; 
   const obligation=await managedSourceEffect({changes:[{file:join(root,"source.ts"),content:args.content}],apply:()=>writeFile(join(root,"source.ts"),args.content)});
   return {content:[{type:"text",text:JSON.stringify({obligation})}]};}})));
  expect(result.isError).not.toBe(true);
- expect(await host.finishExecution("sdk-write","completed","confirmed")).toMatchObject({status:"reconciliation_pending",authority_active:false,obligation_ids:[expect.any(String)]});
+ expect(await host.finishExecution("sdk-write","completed","confirmed")).toMatchObject({status:"graph_committed",authority_active:false,obligation_ids:[expect.any(String)]});
  const pending=await withSessionContext(owner,()=>readHostReconciliation("sdk-write"));
- expect(pending).toMatchObject({status:"pending",counts:{pending:1,reconciled:0}});
+ expect(pending).toMatchObject({status:"reconciled",counts:{pending:0,reconciled:1}});
+ expect(pending.changes[0].receipt_id).toMatch(/^managed-source-reconciliation:/);
  await expect(withSessionContext({...owner,principal:"another-owner"},()=>readHostReconciliation("sdk-write"))).rejects.toThrow();
  const ledgerBefore=await readFile(join(root,"data/change_obligations.json"),"utf8");
  await withSessionContext(owner,()=>readHostReconciliation("sdk-write"));
  expect(await readFile(join(root,"data/change_obligations.json"),"utf8")).toBe(ledgerBefore);
- const writes=await prepareChangeReconciliation(pending.changes.map(change=>change.id),"report-reconciliation-proof");
- await commitGraphWrites({actor:"fixture-source-repair",operation_id:"report-reconciliation-proof",scope:["source:fixture/source.ts"],writes});
+ // Repeated closure and inspection do not redispatch or produce another source receipt.
+ await host.finishExecution("sdk-write","completed","confirmed");
+ expect(await readFile(join(root,"data/change_obligations.json"),"utf8")).toBe(ledgerBefore);
  expect(await withSessionContext(owner,()=>readHostReconciliation("sdk-write"))).toMatchObject({status:"reconciled",counts:{pending:0,reconciled:1}});
- // Reconciliation inspection uses current receipts even when the historical execution still says pending.
- expect(await withSessionContext(owner,()=>readHostExecution("sdk-write"))).toMatchObject({status:"reconciliation_pending"});
+ expect(await withSessionContext(owner,()=>readHostExecution("sdk-write"))).toMatchObject({status:"graph_committed",graph_receipt_ids:[pending.changes[0].receipt_id]});
  const unknown=await host.beginExecution({id:"lost-provider",adapter:"sdk/native",query:"Host context"});
  expect(unknown.execution.status).toBe("assembled");
  expect(await host.finishExecution("lost-provider","cancelled","unconfirmed")).toMatchObject({status:"recovery_required",authority_active:false});
@@ -299,7 +301,7 @@ it('SDK handoff rejects a clipped exact checkpoint before worker dispatch and ne
   expect(await pass.finish('failed')).toMatchObject({status:'no_change',authority_active:false});
  }finally{await pass.finish('failed').catch(()=>undefined);host.dispose();}
 });
-it('SDK native worker performs one actual governed source effect and retains durable source debt rather than graph completion',async()=>{
+it('SDK native worker performs one governed source effect and waits for daemon reconciliation',async()=>{
  realSourceOwners=true;const args={filePath:'source.ts',old_text:'source before',new_text:'SDK physical source 🌿\n'},host=sdkHost(),pass=new ManagedGraphPass(host,{id:'sdk-source-owner',adapter:'sdk/native',query:'Host context',approved_actions:[{tool:'edit_file',arguments:args,scope_id:'fixture',calls:1}]});
  let workerClient:WireClient|undefined;
  try{await pass.begin();await pass.prepare(wholeHandoff);
@@ -310,7 +312,7 @@ it('SDK native worker performs one actual governed source effect and retains dur
    return {result,workTermination:'confirmed'};
   });
   expect(result.content).toBeTruthy();expect(await readFile(join(root,'source.ts'),'utf8')).toBe(args.new_text);
-  expect(await pass.finish('completed')).toMatchObject({status:'reconciliation_pending',authority_active:false,graph_receipt_ids:[],obligation_ids:[expect.any(String)]});
+  expect(await pass.finish('completed')).toMatchObject({status:'graph_committed',authority_active:false,graph_receipt_ids:[expect.stringMatching(/^managed-source-reconciliation:/)],obligation_ids:[expect.any(String)]});
  }finally{await workerClient?.close();await pass.finish('completed').catch(()=>undefined);host.dispose();}
 });
 it('SDK wait cancellation keeps a noncooperative callback and late successful reply termination-unconfirmed',async()=>{
@@ -705,14 +707,14 @@ it("native editor admission delivers whole replacement evidence, uses the actual
  }finally{review.stop();await pass.finish('cancelled').catch(()=>undefined);}
 });
 
-it("native editor source changes retain reconciliation debt rather than reporting a graph commit",async()=>{
+it("native editor source changes close with a confirmed daemon graph receipt",async()=>{
  const host=client(),args={filePath:'source.ts',content:'source after'};
  const pass=await ManagedNativePass.begin(host,{id:'editor-native-source-debt',adapter:'vscode/anthropic',query:'Host context',approved_actions:[{tool:'create_file',arguments:args,scope_id:'fixture',calls:1}]});
  try{
   await pass.prepare([{role:'user',content:'Edit source'}],[],[],pass.signal);
   const returned=await pass.callTool('create_file',args,pass.signal,5000);expect((returned as any).isError).not.toBe(true);
   expect(await readFile(join(root,'source.ts'),'utf8')).toBe('source after');
-  expect(await pass.finish('completed')).toMatchObject({status:'reconciliation_pending',authority_active:false,graph_receipt_ids:[],obligation_ids:[expect.any(String)]});
+  expect(await pass.finish('completed')).toMatchObject({status:'graph_committed',authority_active:false,graph_receipt_ids:[expect.stringMatching(/^managed-source-reconciliation:/)],obligation_ids:[expect.any(String)]});
  }finally{await pass.finish('failed').catch(()=>undefined);}
 });
 
@@ -812,7 +814,8 @@ it("the compiled ordinary editor loop preserves whole context through actual pro
  }finally{panel.abortController.abort();await running;panel.dispose();}
 },20000);
 
-it("the compiled ordinary editor loop reports confirmed source debt distinctly and refuses successful continuation",async()=>{
+it("the compiled ordinary editor loop reports failed daemon reconciliation and refuses successful continuation",async()=>{
+ vi.spyOn(sourceReconciliation,"reconcileManagedSourceChanges").mockRejectedValue(new Error("SOURCE_RECONCILIATION_SOURCE_CHANGED: fixture fault"));
  hostModelAllocation();
  const host=client(),{panel,tools}=nativePanelFixture(host);
  modelReplies.push(nativeReply('create_file',{filePath:'source.ts',content:'source after'}),nativeReply(undefined,{},'The source changed.'));
@@ -850,15 +853,15 @@ async function undoWithPanel(service:any,panel:any,review:any){
  });
 }
 
-it('compiled editor Undo restores exact Unicode/BOM/mixed newline bytes through actual HTTP/MCP source owners and retains graph debt',async()=>{
+it('compiled editor Undo restores exact Unicode/BOM/mixed newline bytes and reconciles through the daemon',async()=>{
  const {host,panel,changeReviewService:service,authority,events}=await operatorPanelFixture(),file=join(root,'source.ts');
  const baseline=Buffer.from('\uFEFFconst 🌿 = "漢字";\r\n// 🌊\n','utf8'),review=await recordedReview(service,authority,file,baseline,Buffer.from('changed source\n'));
  try{
   const result=await undoWithPanel(service,panel,review);expect(result).toMatchObject({ok:true,status:'undone'});
   expect(await readFile(file)).toEqual(baseline);expect(service.getPendingReview(file)).toBeUndefined();expect(modelRequests).toHaveLength(0);
   const event=events.find(event=>event.type==='tool-progress'&&event.tool==='DreamGraph operator execution');
-  expect(event.message).toContain('reconciliation_pending');const executionId=event.message.split(': reconciliation_pending')[0];
-  expect(await host.readExecution(executionId)).toMatchObject({status:'reconciliation_pending',authority_active:false,graph_receipt_ids:[]});
+  expect(event.message).toContain('graph_committed');const executionId=event.message.split(': graph_committed')[0];
+  expect(await host.readExecution(executionId)).toMatchObject({status:'graph_committed',authority_active:false,graph_receipt_ids:[expect.stringMatching(/^managed-source-reconciliation:/)]});
   const owner=[...contexts.values()].find(value=>!value.execution_policy)!;
   const journal=await withSessionContext(owner,()=>readManagedContext(executionId));expect(journal.effects).toHaveLength(1);
   expect(journal.effects[0].tool).toBe('create_file');expect(journal.obligation_ids).toHaveLength(1);
@@ -908,7 +911,7 @@ it('a lost operator closure acknowledgement retains recovery and duplicate Undo/
   expect(service.getPendingReview(file)).toMatchObject({id:review.id,undoUnconfirmed:true});expect(panel._requiresOperatorRecovery()).toBe(true);
   expect(await undoWithPanel(service,panel,review)).toMatchObject({ok:false});expect(await service.keep(file,review.id)).toMatchObject({ok:false});expect(closed).toBe(1);
   await expect(panel._executeOperatorTool('read_source_code',{filePath:file},authority)).rejects.toThrow('RECOVERY_REQUIRED');
-  expect(await host.readExecution(panel._operatorRecovery.executionId)).toMatchObject({status:'reconciliation_pending',authority_active:false});
+  expect(await host.readExecution(panel._operatorRecovery.executionId)).toMatchObject({status:'graph_committed',authority_active:false});
   const executionId=panel._operatorRecovery.executionId;
   const restored=await service.recoverUndo(file,review.id,async(id:string,binding:any)=>{
     const execution=await panel._recoverOperatorExecution(id,binding);
@@ -985,13 +988,14 @@ it('an explicit operator message action records changed-file review under its or
  service.listReviewableWorkspacePaths=async()=>[file];
  try{
   const returned=await panel._executeMessageActionTool('create_file',{filePath:file,content:'operator changed 🌿\r\n'});
-  expect(returned.execution).toMatchObject({status:'reconciliation_pending',authority_active:false});expect(returned.reviewError).toBeUndefined();
+  expect(returned.execution).toMatchObject({status:'graph_committed',authority_active:false});expect(returned.reviewError).toBeUndefined();
   expect(service.getPendingReview(file)).toMatchObject({authority,baselineKind:'existing',currentKind:'existing'});
   expect(panel._lastToolTrace.at(-1)).toMatchObject({tool:'create_file',status:'completed'});expect(modelRequests).toHaveLength(0);
  }finally{panel.dispose();}
 },15000);
 
 it('a returned message action persists its original instance outcome and never labels pending source debt as completed after selection changes',async()=>{
+ vi.spyOn(sourceReconciliation,'reconcileManagedSourceChanges').mockRejectedValue(new Error('SOURCE_RECONCILIATION_SOURCE_CHANGED: fixture fault'));
  const {panel,authority,events}=await operatorPanelFixture(),source={id:'operator-source-message',instanceId:authority.instanceId,role:'assistant',content:'Declared operator action',timestamp:new Date().toISOString()};
  const saved:Array<{instance:string;messages:any[]}>=[],execute=panel._executeMessageActionTool.bind(panel);
  panel.messages=[source];panel.memory={save:async(instance:string,messages:any[])=>{saved.push({instance,messages:JSON.parse(JSON.stringify(messages))});}};
@@ -1091,7 +1095,7 @@ it('a compiled palette command uses the original daemon owner, records actual so
   const returned=await run({command,timeoutMs:5000});
   expect(returned.result.isError).not.toBe(true);const result=JSON.parse(returned.result.content[0].text);
   expect(result).toMatchObject({exitCode:0,execution_id:returned.execution.execution_id});
-  expect(returned.execution).toMatchObject({status:'reconciliation_pending',authority_active:false,obligation_ids:[expect.any(String)]});
+  expect(returned.execution).toMatchObject({status:'graph_committed',authority_active:false,obligation_ids:[expect.any(String)]});
   expect(await readFile(file,'utf8')).toBe('palette source after');
   expect(service.getPendingReview(file)).toMatchObject({authority:binding,baselineContent:expect.anything()});
   expect((await host.readExecution(returned.execution.execution_id)).pack.receipt.delivery).toBe('delivered');expect(modelRequests).toHaveLength(0);
@@ -1387,7 +1391,8 @@ it('compiled v1 API seam records literal MCP errors without transforming them in
  }finally{await pass.finish('failed').catch(()=>undefined);}
 });
 
-it('compiled v1 API seam separates a complete model loop from source reconciliation and cannot advance autonomy',async()=>{
+it('compiled v1 API seam cannot advance autonomy when daemon reconciliation fails',async()=>{
+ vi.spyOn(sourceReconciliation,'reconcileManagedSourceChanges').mockRejectedValue(new Error('SOURCE_RECONCILIATION_SOURCE_CHANGED: fixture fault'));
  const {host,pass:probe,llm}=await admittedNativeFixture('core-effect-probe');await probe.finish('completed');
  const args={filePath:'source.ts',content:'source after'},pass=await ManagedNativePass.begin(host,{id:'core-source-pending',adapter:'vscode/openai',query:'Host context',approved_actions:[{tool:'create_file',arguments:args,scope_id:'fixture',calls:1}]});
  const fixture=compiledEditor(),state=coreSeamHost(llm,pass.instanceId);modelReplies.push(nativeReply('create_file',args),nativeReply(undefined,{},'Source changed; graph reconciliation is pending.'));
